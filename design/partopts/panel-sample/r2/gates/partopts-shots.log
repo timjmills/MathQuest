@@ -1,0 +1,71 @@
+Y1.B2.S9
+  chart: 2 | 1 to 2 worked examples
+  vocab: 3 | 2 to 3 words
+  remember: - | 
+  wedo: 3 | 2 to 3 problems
+  rows: - | Not on this lesson sheet (no room)
+  practice: 16 | 16 to 80 problems, in rows of 4, or 0 to leave it off · 1 page of 16
+  mixed: 12 | 12 to 24 problems, or 0 to leave it off · 1 page of 12
+  M caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":1,"practice":1,"mixedT":" 12 12 to 24 problems, or 0 to leave it off · 1 page of 12","practiceT":" 16 16 to 80 problems, in rows of 4, or 0 to leave it off · 1 page of 16","rowsT":"Not on this lesson sheet (no room)"}
+  L caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":1,"practice":1,"mixedT":" 10 10 to 20 problems, or 0 to leave it off · 1 page of 10","practiceT":" 15 12 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15","rowsT":"Not on this lesson sheet (no room)"}
+  390: Parts 298 px wide
+  after switch: {"reset":false,"vocab":"3"}
+Y4.B1.S14
+  chart: 4 | 1 to 4 worked examples
+  vocab: 3 | 2 to 3 words, or 0 to leave it off
+  remember: - | 
+  wedo: 3 | 2 to 3 problems, or 0 to leave it off
+  rows: - | Fixed: 1 (fewer would leave the lesson sheet short)
+  practice: 15 | 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15
+  mixed: 21 | 21 to 42 problems, or 0 to leave it off · 1 page of 21
+  M caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":1,"practice":1,"mixedT":" 21 21 to 42 problems, or 0 to leave it off · 1 page of 21","practiceT":" 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15","rowsT":"Fixed: 1 (fewer would leave the lesson sheet short)"}
+  L caption: {"cap":"Vocabulary, Remember, We Do and practice rows: two pages","sheet":2,"mixed":1,"practice":1,"mixedT":" 15 15 to 30 problems, or 0 to leave it off · 1 page of 15","practiceT":" 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15","rowsT":"Fixed: 2 (fewer would leave the lesson sheet short)"}
+  390: Parts 298 px wide
+Y4.B2.S5
+  chart: - | Fixed: 1 (the chart's design)
+  vocab: 3 | 2 to 3 words, or 0 to leave it off
+  remember: - | 
+  wedo: 2 | 2 problems, or 0 to leave it off
+  rows: - | Fixed: 1 (fewer would leave the lesson sheet short)
+  practice: 6 | 6 to 30 problems, in rows of 2, or 0 to leave it off · 1 page of 6
+  mixed: 12 | 12 to 24 problems, or 0 to leave it off · 1 page of 12
+  M caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":1,"practice":1,"mixedT":" 12 12 to 24 problems, or 0 to leave it off · 1 page of 12","practiceT":" 6 6 to 30 problems, in rows of 2, or 0 to leave it off · 1 page of 6","rowsT":"Fixed: 1 (fewer would leave the lesson sheet short)"}
+  L caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":1,"practice":1,"mixedT":" 8 8 to 16 problems, or 0 to leave it off · 1 page of 8","practiceT":" 6 6 to 30 problems, in rows of 2, or 0 to leave it off · 1 page of 6","rowsT":"Not on this lesson sheet (no room)"}
+  390: Parts 298 px wide
+skill:addition:add_wp_10
+  chart: - | Fixed: 1 (the chart's design)
+  vocab: 3 | 2 to 3 words, or 0 to leave it off
+  remember: - | 
+  wedo: 1 | 1 problem, or 0 to leave it off
+  rows: - | Not on this lesson sheet (no room)
+  practice: 4 | 4 to 20 problems, in rows of 2, or 0 to leave it off · 1 page of 4
+  mixed: - | 
+  M caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":0,"practice":1,"mixedT":"","practiceT":" 4 4 to 20 problems, in rows of 2, or 0 to leave it off · 1 page of 4","rowsT":"Not on this lesson sheet (no room)"}
+  L caption: {"cap":"Vocabulary, Remember, We Do and practice rows: one page","sheet":1,"mixed":0,"practice":1,"mixedT":"","practiceT":" 4 4 to 20 problems, in rows of 2, or 0 to leave it off · 1 page of 4","rowsT":"Not on this lesson sheet (no room)"}
+  390: Parts 298 px wide
+packet Y1.B2.S9 M min: {"cur":{"chart":{"n":1},"vocab":{"n":2},"remember":{"on":false},"wedo":{"n":2}},"teach":{"guided":2,"independent":0,"fill":[0.898]},"pages":4}
+packet Y1.B2.S9 M max: {"cur":{"practice":{"n":80},"mixed":{"n":24}},"teach":{"guided":3,"independent":0,"fill":[0.998]},"pages":9}
+packet Y1.B2.S9 M combo: {"cur":{"vocab":{"n":2},"remember":{"on":false},"wedo":{"n":2}},"teach":{"guided":2,"independent":0,"fill":[0.898]},"pages":4}
+packet Y1.B2.S9 L min: {"cur":{"chart":{"n":1},"vocab":{"n":2},"remember":{"on":false},"wedo":{"n":2},"practice":{"n":12}},"teach":{"guided":2,"independent":0,"fill":[0.912]},"pages":4}
+packet Y1.B2.S9 L max: {"cur":{"practice":{"n":75},"mixed":{"n":20}},"teach":{"guided":3,"independent":0,"fill":[1]},"pages":9}
+packet Y1.B2.S9 L combo: {"cur":{"vocab":{"n":2},"remember":{"on":false},"wedo":{"n":2}},"teach":{"guided":2,"independent":0,"fill":[0.912]},"pages":4}
+packet Y4.B1.S14 M min: {"cur":{"chart":{"n":1}},"teach":{"guided":3,"independent":3,"fill":[0.982]},"pages":4}
+packet Y4.B1.S14 M max: {"cur":{"practice":{"n":75},"mixed":{"n":42}},"teach":{"guided":3,"independent":3,"fill":[0.982]},"pages":9}
+packet Y4.B1.S14 M combo: {"cur":{"vocab":{"on":false},"remember":{"on":false},"wedo":{"n":2}},"teach":{"guided":2,"independent":9,"fill":[0.884]},"pages":4}
+packet Y4.B1.S14 L min: {"cur":{"chart":{"n":1}},"teach":{"guided":3,"independent":6,"fill":[0.64,0.638]},"pages":5}
+packet Y4.B1.S14 L max: {"cur":{"practice":{"n":75},"mixed":{"n":30}},"teach":{"guided":3,"independent":6,"fill":[0.64,0.638]},"pages":10}
+packet Y4.B1.S14 L combo: {"cur":{"vocab":{"on":false},"remember":{"on":false},"wedo":{"n":2}},"teach":{"guided":2,"independent":6,"fill":[0.987]},"pages":4}
+packet Y4.B2.S5 M min: {"cur":{},"teach":{"guided":2,"independent":3,"fill":[1]},"pages":4}
+packet Y4.B2.S5 M max: {"cur":{"practice":{"n":30},"mixed":{"n":24}},"teach":{"guided":2,"independent":3,"fill":[1]},"pages":9}
+packet Y4.B2.S5 M combo: {"cur":{"vocab":{"on":false},"remember":{"on":false},"wedo":{"on":false}},"teach":{"guided":0,"independent":9,"fill":[0.891]},"pages":4}
+packet Y4.B2.S5 L min: {"cur":{},"teach":{"guided":2,"independent":0,"fill":[1]},"pages":4}
+packet Y4.B2.S5 L max: {"cur":{"practice":{"n":30},"mixed":{"n":16}},"teach":{"guided":2,"independent":0,"fill":[1]},"pages":9}
+packet Y4.B2.S5 L combo: {"cur":{"vocab":{"on":false},"remember":{"on":false},"wedo":{"on":false}},"teach":{"guided":0,"independent":6,"fill":[0.815]},"pages":4}
+packet skill:addition:add_wp_10 M min: {"cur":{},"teach":{"guided":1,"independent":0,"fill":[0.983]},"pages":4}
+packet skill:addition:add_wp_10 M max: {"cur":{"practice":{"n":20},"mixed":{"n":20}},"teach":{"guided":1,"independent":0,"fill":[0.983]},"pages":9}
+packet skill:addition:add_wp_10 M combo: {"cur":{"vocab":{"on":false},"remember":{"on":false},"wedo":{"on":false}},"teach":{"guided":0,"independent":4,"fill":[0.888]},"pages":4}
+packet skill:addition:add_wp_10 L min: {"cur":{},"teach":{"guided":1,"independent":0,"fill":[1]},"pages":5}
+packet skill:addition:add_wp_10 L max: {"cur":{"practice":{"n":20}},"teach":{"guided":1,"independent":0,"fill":[1]},"pages":9}
+packet skill:addition:add_wp_10 L combo: {"cur":{"vocab":{"on":false},"remember":{"on":false},"wedo":{"on":false}},"teach":{"guided":0,"independent":3,"fill":[0.985]},"pages":5}
+screenshots in ../../../../../../tmp/claude-0/-home-user-MathQuest/376c56fc-fc5b-5c86-8142-5de2c49bd4ab/scratchpad/partopts-shots
+ws-partopts-shots: OK

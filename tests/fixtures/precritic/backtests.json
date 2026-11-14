@@ -8855,10 +8855,10 @@
     "state": "Guided M / L, default and every band: '\"twenty-six\": 2 tens, 6 ones.' under twenty-six, 26 more hints"
    },
    "pass": {
-    "commit": "ae83dfbc",
-    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.'"
+    "commit": "b372b573",
+    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.' (re-pointed in round-cap r3: the check was tightened to ANY answer digit outside a gap and to the H T O deals in live1 r1 - critic live1 N1, row pv-words-hint-any-digit - so ae83dfbc, which still printed '\"two hundred\": 2 in the hundreds.', fails it; the row already failed at the r2 head)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -8875,10 +8875,10 @@
     "state": "Guided M default: 'eleven' under 'Read the tens word. Read the ones word.'; band 20 pages mixing one-word, teen and decade names"
    },
    "pass": {
-    "commit": "ae83dfbc",
-    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind"
+    "commit": "b372b573",
+    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9018,7 +9018,7 @@
     "commit": "feadad0b",
     "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9038,7 +9038,7 @@
     "commit": "feadad0b",
     "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9055,10 +9055,130 @@
     "state": "to_words default / band 20 / band 1000 M / L: the hundreds Steps with a literal 'three hundred' over two-digit numbers"
    },
    "pass": {
-    "commit": "feadad0b",
-    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20)"
+    "commit": "b372b573",
+    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20) (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-one-kind-roles",
+   "check": "number_word_form: every item a Model and Steps are set over is the Model's kind, on the lesson, guided, opener and scripted-model pages, every wordform x band x answer slot; 11 and 12 are their own kind (no ones word), 0-10 one kind (round-cap r3, critic live1 r2 N3 / N6; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (every role, Model kind)",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'twelve' / 'eleven' under the teen Model and Steps 'Find the ones in the word.' (guided / opener band 20); the lesson's Model 39 over Guided 11, Model 'six' over 'sixteen', Model 'fifty' over two-word names; the opener's to_words Model 95 over 50"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "compose.js stepsKindOf / oneKindFirst shared by the opener, the guided page, the lesson's We Do and its example; 11 / 12 their own kind"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-lesson-rule-fits",
+   "check": "number_word_form lesson: no Rule / Remember / Steps line names a box, a place, a teen word or a dash that no number-name item on its sheet has (round-cap r3, critic live1 r2 N6)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages LESSON-RULE-FITS",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'Rule: Every box gets a digit.' over words written on a line (to_words, band 20, band 100); 'Remember: A number name says the hundreds, then the rest.' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "lesson routine pv-number-words ruleFromItems: the Rule and Remember line from the worked example's kind and slot (roles/lesson.js fitLessonData)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only LESSON-RULE-FITS --pages lesson --seeds 1 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-to-words-overflow",
+   "check": "number_word_form Opener L, numeral to words: the Model's answer line stays inside its half-width cell (critic live1 r2 N7, OVERFLOW; ws-grade-render --gate on the to_words deal)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate --roles opener (to_words)",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'page 1 cell 1: content overflows its cell' - the 100 mm L line across the Model cell's edge into the Steps column"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "words.js: the to_words line max-width 100 % of its cell, a long name wraps on it at its own size"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills composing:number_word_form --roles opener --size L --opts '{\"wordform\":[\"to_words\"]}' --gate --no-screen --out /tmp/mq-bt-pv-opener-tw",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-thousand-kind",
+   "check": "number_word_form at band 1,000 (both ways, both answer slots), the FIXED seed 913052 on every role: 'one thousand' is never dealt under a non-thousand Model or under Steps that do not cover it (critic live2 N9; the one-kind class)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (fixed seed 913052, band 1,000)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided M / L 'one thousand' under the Model 233 and the hundreds Steps, both ways; opener M / L the same"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000 is its own kind (pv.js WORDS_TO_NUMBER_1000 / NUMBER_TO_WORDS_1000), so compose.js stepsKindOf / oneKindFirst keep it off a hundreds page"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 0 --seed-list 913052 --deals 'band 1000,band 1000 hto,to_words band 1000' --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-kind-steps-all",
+   "check": "number_word_form, seed-free: over every name 0-1,000, both ways and both answer slots, the provider's Steps are equal exactly when the kinds are (so no seed can deal two kinds under one Model), every quoted step phrase is part of the name, and no step puts two place words in a row (critic live2 N9)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-KIND-STEPS / WORDS-STEPS-TRUE-ALL / WORDS-STEPS-GARBLE",
+   "browser": false,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: one Steps set covers hundreds + thousand (3 ways); '\"one thousand hundred\": 10 in the hundreds.'"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000 has its own Steps and worked steps ('\"one thousand\": 1 thousand.')"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-KIND-STEPS,WORDS-STEPS-TRUE-ALL,WORDS-STEPS-GARBLE --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble-places",
+   "check": "number_word_form Guided: a grey hint with two place words in a row ('\"one thousand hundred\": ___ in the hundreds.') fails GUIDED-HINT-GARBLE (critic live2 N9: the check read it and passed it)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE (place words)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided L band 1000 seed 913052, the hint '\"one thousand hundred\": in the hundreds.'"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000's own worked steps; no such hint"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-GARBLE --seeds 0 --seed-list 913052 --pages guided --deals 'band 1000' --skills composing:number_word_form",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9075,10 +9195,10 @@
     "state": "band 20 M: Model 'five' with Guided 'fifteen', 'seventeen', 'ten'; to_words band 20 '15' beside '20'"
    },
    "pass": {
-    "commit": "feadad0b",
-    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band"
+    "commit": "b372b573",
+    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9139,6 +9259,608 @@
     "state": "list / missing-part / 3-addend answers take the plain stem; true equation stems unchanged"
    },
    "command": "node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_missing_digit,addition:add_three --seeds 7,23",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-sample",
+   "check": "the Options panel's live sample, opened the teacher's way at 1280 and 390 px, lies inside its frame and holds ink (lf-algebra F8/G11: fit()'s is-cropped under _tidySample's translate(-50%,-50%) scale(k) put the stage off the frame); precritic's scoped options-shots row, and deploy session 4 for all 725 skills",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots (stage inside, or over 90 % of, .tv-sko-frame; > 0.5 % pixels darker than luma 230 in a 3 px inset)",
+   "browser": true,
+   "fail": {
+    "commit": "389a69c6",
+    "state": "lf-partopts branch base: FAIL 4 - add_word_problems and geo_translate at 1280 and 390, stage off the frame, 0.00 % ink. The same defect as lf-algebra d20c8a003 on patterns:pattern_features / growing_shape_patterns (precritic --only options-shots there: FAIL 4; on d20c8a003 + d7847568's fix: PASS); those skills are not on this branch, so the reachable pair is the branch's own base and fix"
+   },
+   "pass": {
+    "commit": "d7847568",
+    "state": "the fix: 0 findings, both samples inside the frame at a legible scale"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --widths 1280,390 --skip-no-panel --workers 1 --no-spot --checks inside,ink",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-legibility",
+   "check": "critic-panel-r1 F1: the option panel's sample is legible: its smallest visible HTML word or digit is drawn at >= 9 px (computed font-size x effective scale), every part of a sample shown in parts read in turn",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [text]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "round-1 tree: geo_translate drawn at k 0.2267 / 0.2056 (text 3.3-3.6 px), multi_step_word at 0.2571 (3.3 px)"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "the fix: the item one whole part at a time (1 of N), every part >= 9 px"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate,algebra:multi_step_word --widths 1280,390 --skip-no-panel --workers 1 --no-spot --checks text",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-controls",
+   "check": "critic-panel-r1 F2: after both tidies the option panel's footer and Done button are inside the window",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [controls]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "add_5_pictures: footer bottom 1024 in a 1000 px window (Done cut by 24 px); classify_count 1007"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "the panel re-clamped after the tidies and on its own size change"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_5_pictures,comparing:classify_count --widths 1280 --skip-no-panel --workers 1 --no-spot --checks controls",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-resize",
+   "check": "critic-panel-r1 F2 (resize): with the panel open, the window shrinks from 1280x1000 to 1280x720; the footer stays inside it",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [controls] @1280x1000>720",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "geo_translate: footer bottom 987 in a 720 px window (nothing re-places the panel on resize)"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "a window resize re-places the panel and re-fits the sample"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --checks controls",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-frame-scale",
+   "check": "critic-panel-r1 F3: a grown frame draws its sample at scale >= 0.30 and is never shorter than its CSS height (border-box growth)",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [scale]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "coord_distance_q1 at k 0.2979, mult_chart_easy at 0.2984 (want computed from clientHeight, written as a border-box height)"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "growth computed in border-box terms"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:coord_distance_q1,multiplication:mult_chart_easy --widths 1280 --skip-no-panel --workers 1 --no-spot --checks scale",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-option-change",
+   "check": "critic-panel-r1 F4: the first option of the panel is changed and the sample is re-read at +50 ms and +1.5 s (inside, inked, legible)",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots --change --changed-only [text]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "classify_count at 390: legible when opened (9.0 px) but 7.6 px after its first option changes; fraction_of_set 8.6 px"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "the redrawn sample is tidied to the same floor"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill comparing:classify_count,fractions:fraction_of_set --widths 390 --skip-no-panel --workers 1 --no-spot --change --changed-only --checks text",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-clip",
+   "check": "critic-panel-r1 F4: the stage must lie inside the frame (the 'covers >= 90 %' escape is gone)",
+   "kind": "fixture",
+   "rule": "ws-options-shots [inside]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/oversize.fail.js",
+    "state": "an oversize regression: the stage drawn at scale 1, overflowing a frame it fully covers (the old gate: OK, covers 100 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks inside --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-pageerror",
+   "check": "critic-panel-r1 F4: a page error thrown while the panel opens or redraws fails the check it was thrown in",
+   "kind": "fixture",
+   "rule": "ws-options-shots [pageerror]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/pageerror.fail.js",
+    "state": "the panel throws each time it draws (the old gate printed it and passed)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks pageerror --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-inner-clip",
+   "check": "critic-panel-r2 F1: no box inside the panel sample's stage clips its own content (overflow not visible and scrollWidth/scrollHeight over its client size by more than 1 px), on every part",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [clip]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: the 12 x 12 chart's 765 px table in a 400 px overflow:auto box (div 765>400 wide) on both parts"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the clipping box is opened (_sampleUnclip) and the table paged in tiles"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-cover",
+   "check": "critic-panel-r2 F1/F2, the new class: across all parts every block of the unpaged item (each word outside a drawing, each drawing) is wholly visible on some part",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [cover]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: 73 of 162 blocks on no part (columns 7-12 of the chart)"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the chart in 4 tiles (rows 1-6 / 7-12 x columns 1-6 / 7-12, heading row and row labels on each): every cell on a part"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks cover",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-choices",
+   "check": "critic-panel-r2 F2: the answer choices are one part of their own (never with the question, never spread), each with its letter or label, and split the same way at every width",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [choices]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: 4 unlettered figures packed A | BC | D, A with the question"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the four figures lettered A-D, two to a row, one part of their own"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks choices",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-svgtext",
+   "check": "critic-panel-r2 F3: SVG text in the panel sample is drawn at >= 9 px (font-size x its screen scale), every part",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [svgtext]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: geo_translate's 'original' tag 5.8 px; fraction_of_set's group numbers 8.6 px"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "SVG text counted in _sampleNeed: parts zoomed (<= 2) or sliced, an undividable drawing may grow the frame to 45 %"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate,fractions:fraction_of_set --checks svgtext",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-summary",
+   "check": "critic-panel-r2 F5: a two-line-clamped option summary has an expand control (a button with aria-expanded) reachable by touch and keyboard",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [summary]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: algebra_all's summary clamped after an option change, full text only in the title attribute"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "a 'Show all' button (aria-expanded, aria-controls) opens the summary"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra_mixed:algebra_all --change --changed-only --checks summary",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-repeat",
+   "check": "critic-panel-r2 F6: the panel sample shows no sentence (20+ characters) of its question line again outside it",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [repeat]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: the story in the question line and again in the story block ('how many cards does lena have now')"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the preview hides a question line the visual already says (as live play's mq-dup does)"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra:multi_step_word --checks repeat",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-inner-clip-fixture",
+   "check": "critic-panel-r2 F1 (fixture asked by the brief): a table clipped inside the stage fails [clip] though the stage box is inside the frame",
+   "kind": "fixture",
+   "rule": "ws-options-shots [clip]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/inner-clip.fail.js",
+    "state": "the box around the chart set to overflow:hidden at 200 px every 50 ms"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-parts-cap",
+   "check": "critic-panel-r2 soft spot: every part is walked (the old walk stopped at 12); more than 40 parts FAILs [parts]",
+   "kind": "fixture",
+   "rule": "ws-options-shots [parts]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/parts-endless.fail.js",
+    "state": "the Next arrow is never disabled"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks parts --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-part-ink",
+   "check": "critic-panel-r2 soft spot: a part needs 0.5 % ink in its OWN drawn box (the old floor was 0.03 % of the frame)",
+   "kind": "fixture",
+   "rule": "ws-options-shots [ink]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/part-sparse.fail.js",
+    "state": "part 2 replaced by one 14 px digit in a 380 x 260 box"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks ink --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-hit",
+   "check": "critic-panel-r3 P1: every visible option control in the panel body takes a pointer at its centre (document.elementFromPoint is the control, inside it, or its own label), and the option-change pass clicks with page.mouse.click",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [hit]",
+   "browser": true,
+   "fail": {
+    "commit": "fdfddfdd",
+    "state": "master: the \"?\" button's 44 px ::after hangs off the whole row (position: static !important); 6 of 6 controls on geo_translate and 15 of 15 on mult_chart_easy hit .sko-tip, and a mouse click on the first tick box / select opens the tip"
+   },
+   "pass": {
+    "commit": "6553e352",
+    "state": "the P1 hotfix: .tv-sko .sko-has-tip > .sko-tip { position: relative !important }"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --change --widths 1280 --skill coordinates:geo_translate,multiplication:mult_chart_easy --checks hit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-slice",
+   "check": "critic-panel-r3 N1: no SVG label or shape of the panel sample is cut - by a viewBox slice window, by its own drawing's clipped edge, or by the frame edge: every drawn leaf (SVG text and shapes, HTML words) lies wholly inside the frame or its scroll area",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [slice], [inside]",
+   "browser": true,
+   "fail": {
+    "commit": "6de83995",
+    "state": "round-3 tree: nl_mult and add_int paged in overlapping viewBox slices - the axis cut on every slice, \"50\" / \"60\" and \"-11\" ... \"-14\" cut at the frame edge, \"-7\" at the slice edge"
+   },
+   "pass": {
+    "commit": "9126cb62",
+    "state": "the slicer removed: each number line shown whole, scaled to the frame (a drawing too wide to read at 9 px is drawn at that floor in a frame that scrolls)"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:nl_mult,integers:add_int --checks slice,inside",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-scroll-cue",
+   "check": "critic-panel-r4 N1-cue: a panel sample frame that scrolls by more than 8 px shows a visible cue beside it (tablet and ChromeOS scrollbars are overlays that show nothing until touched), and no cue shows under a frame that does not scroll",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [scroll-cue]",
+   "browser": true,
+   "fail": {
+    "commit": "30a4674f",
+    "state": "round-4 tree: histogram_read and hotspot_quads drawn whole at 9 px scroll 122 / 213 px at 1024 and 820 with nothing on screen to say so; the hidden part is the last bar and 1-2 of the shapes the question asks about"
+   },
+   "pass": {
+    "commit": "05c287e1",
+    "state": "a line under the frame names the way to scroll (\"Scroll sideways to see the whole drawing\"), and the scrollbar is drawn always"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1024,820 --skill data_analysis:histogram_read,shapes_classify:hotspot_quads --checks scroll-cue",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "nos-browser-settle-reclick",
+   "check": "lead 2026-11-13 (lf-builds chart_to_120, -lf-builds 427e28563): ws-no-size-s --browser FAILed once ('the worksheet M click built at L') and PASSed on the same tree: a size click landed while the last build was still redrawing the controls. A worksheet sheet whose FIRST size click is lost (planted in a copy of the served tree) reproduces it",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s --browser WORKS: wait for the built size to hold, re-scan, click; on a miss re-click once; only a repeat miss fails (a control that never works still fails: --self-test --browser, 30 mutations)",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "master's tool: the one lost click FAILs WORKS worksheet sheet"
+   },
+   "pass": {
+    "commit": "db3d4c97d",
+    "state": "the de-flaked tool re-clicks once after the build settles: OK"
+   },
+   "command": "bash tests/fixtures/precritic/nos-drop-first-click.sh {root} tests/scripts/ws-no-size-s.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "key-json",
+   "check": "no answer key (or page) prints the generator's raw JSON as an answer, on any role: plotted points read 'A (5, 3)', a match reads its tile names numbered by the pictures (lf-engine -roles critic r2 F5: coordinate_q1 and shape_name_match_3d lesson keys printed [{\"label\":\"A\",\"x\":5,...}] / {\"t0\":\"b0\",...})",
+   "kind": "commit-pair",
+   "rule": "ws-key-json L-KEY",
+   "browser": true,
+   "fail": {
+    "commit": "d23423151",
+    "state": "coordinate_q1 / shape_name_match_3d lesson M keys: raw JSON in the Answer: line"
+   },
+   "pass": {
+    "commit": "4b3d2dcf9",
+    "state": "'A (5, 3), B (6, 8)' / '1. cube  2. sphere ...'"
+   },
+   "command": "node tests/scripts/ws-key-json.cjs --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-role-cover-plan",
+   "check": "lf-ops critic cbt r2 root cause (E3 / E5 / E6): precritic --skill linted only the Independent (and lesson) page at defaults, so Scripted Model L (L-OVERLAP SECTION), Opener (CL40-INK) and Error analysis (L-TOPSTART CL-4b) never gated though plain print-lint was red on them. The --skill dry run must plan print-lint / empty-band / raster-fit on every offered role (no card: every buildSheet role) at M and L, and print the plan's size",
+   "kind": "commit-pair",
+   "rule": "ws-precritic --skill plans ws-role-cover (every offered role x M/L x drawing option values; --dry-run prints 'role cover size: N print-lint + N empty-band + N raster-fit unit(s) ... est N min'); read by ws-role-cover --plan-check",
+   "browser": false,
+   "fail": {
+    "commit": "22752843c",
+    "state": "master: print-lint rows only on independent (L, M) and lesson (L, M); no row lints opener, error-analysis or scripted-model"
+   },
+   "pass": {
+    "commit": "d17e76aa7",
+    "state": "the role-cover rows: every buildSheet role of count_by_tables (no signed card on this tree) at M and L, 8 drawing variants"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-cbt-e3-e5-e6",
+   "check": "lf-ops critic cbt r2 E3 / E5 / E6 on the frozen tree 8f76b6401: run with the NEW coverage (ws-role-cover's lint on the card's roles where they live: opener, error-analysis, scripted-model at M and L), print-lint FAILs naming all three - E3 scripted-model@L L-OVERLAP SECTION (the Say band covered), E5 opener CL40-INK (the step tab in the label keep-out), E6 error-analysis L-TOPSTART CL-4b (the gap above 'Sam wrote:'). With the OLD coverage (Independent only, at M and L) the same tree is OK - which is how the three reached the critic",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint units (every offered role x M/L; precritic role-cover-1..n)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "args": "--roles opener,error-analysis,scripted-model --expect-e3e5e6",
+    "state": "the new plan's lint rows on the roles of E3 / E5 / E6: FAIL with all three visible"
+   },
+   "pass": {
+    "commit": "8f76b6401",
+    "args": "--roles independent --with-covered",
+    "state": "the SAME tree under the old plan's lint coverage (Independent at M and L): OK - the coverage, not the tree, is what changed"
+   },
+   "command": "bash tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-buildsheet-variants",
+   "check": "critic roles r1 D1: ws-drawing-variants signed a value from the generator's cell only, so options buildSheet draws round the problem (supports: frame, touch, tile, line, boxsign) read 'same as defaults' (add_facts 1 of 30) and add_facts guided + support=frame (L-SUPPORT SCC-T10 at M and L) was never role-covered. The --skill dry run must plan add_facts' support=frame variant on the guided role",
+   "kind": "commit-pair",
+   "rule": "ws-drawing-variants signs each value on the cell AND the buildSheet pupil page vocabulary (role independent, M, seed 7000); read by ws-role-cover --plan-check --variant",
+   "browser": false,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "cell-only signature: add_facts 1 drawing variant of 30 (notation=across); no support variant planned"
+   },
+   "pass": {
+    "commit": "b153ae21e",
+    "state": "page-vocabulary signature: add_facts 8 of 30 (notation=across + 7 support values, support=frame among them) on all 17 card roles, guided included"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill addition:add_facts --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill addition:add_facts --roles guided --variant support=frame",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-e3e5e6-pass-can-fail",
+   "check": "critic roles r1 D2: expect-e3-e5-e6.sh turned any FAIL without all of E3 / E5 / E6 into OK on BOTH sides, so the pass side of role-cover-cbt-e3-e5-e6 could never fail. A planted unrelated FAIL given to the wrapper without --expect-e3e5e6 must stay FAIL",
+   "kind": "commit-pair",
+   "rule": "expect-e3-e5-e6.sh re-states a FAIL only with --expect-e3e5e6 (the fail side); without it OK needs the run OK and none of E3 / E5 / E6",
+   "browser": false,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "the wrapper prints 'OK (a FAIL without all of E3, E5 and E6 ...)' for a planted unrelated FAIL"
+   },
+   "pass": {
+    "commit": "b153ae21e",
+    "state": "the planted FAIL passes through as FAIL"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --check-wrapper {root}/tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-copy-light-role-cover-size",
+   "check": "critic roles r1 D3: a --copy-light --dry-run planned the role-cover rows but returned before the 'role cover size: ... est N min' line, so a copy-light lane did not see the role cover's cost",
+   "kind": "commit-pair",
+   "rule": "ws-precritic --dry-run prints the role cover and its size before the copy-light branch; read by ws-role-cover --plan-check",
+   "browser": false,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "copy-light dry run: no 'role cover:' or 'role cover size:' line"
+   },
+   "pass": {
+    "commit": "b153ae21e",
+    "state": "copy-light dry run prints count_by_tables' role cover (17 roles, 8 variants) and its size and minutes"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --copy-light --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-add-facts-guided-frame",
+   "check": "critic roles r1 D1 proven escape: add_facts guided + support=frame fails L-SUPPORT SCC-T10 (the answer zone moves between cells, supports drawn) at M and L, yet no precritic --skill row ran it. The role cover on that variant must name L-SUPPORT SCC-T10: on ac526b6b2 the variant is not planned (and print-lint got --opts only, so L-SUPPORT never ran)",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint units of support variants run print-lint with --supports (precritic role-cover-1..n)",
+   "browser": true,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "the role cover of add_facts guided@L holds no support=frame unit: clean, the escape"
+   },
+   "pass": {
+    "commit": "225d8f049",
+    "state": "the support=frame unit lints with --supports frame and names L-SUPPORT SCC-T10"
+   },
+   "command": "node {root}/tests/scripts/ws-role-cover.mjs --root {root} --skill addition:add_facts --tools lint --roles guided --sizes L --variants support=frame 2>&1 | grep -q 'guided@L~support=frame: L-SUPPORT SCC-T10' && echo 'role-cover --guided-frame: OK (L-SUPPORT SCC-T10 named on guided@L support=frame)' || echo 'role-cover --guided-frame: FAIL (guided + support=frame not linted for L-SUPPORT)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "chart-name-line",
+   "check": "lf-engine chart-name (owner request 2026-11-14): every lesson's ANCHOR CHART, pupil and key, prints frame.js pageHeader's Name / Date line (the same type and rule as an ordinary page), no Score unless the chart is scored, the key's line at the pupil page's places, no overflow, one page inside A4 (master printed the chart's header with no Name / Date)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples CHART-HEAD",
+   "browser": true,
+   "fail": {
+    "commit": "22752843c",
+    "state": "CHART-HEAD FAIL: add / round / div M, L pupil + key - no Name / Date field, the header is not pageHeader's markup"
+   },
+   "pass": {
+    "commit": "cb5e5bd94",
+    "state": "CHART-HEAD PASS: chartPage takes the frame header (Name / Date, Score off); detailed lessons keep their bare header"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only add,round,div --rules CHART-HEAD --sizes M,L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "chart-name-line-detailed",
+   "check": "lead ruling 2026-11-14 (owner: Name / Date on EVERY anchor chart): the detailed lessons' anchor charts (P2, chunk P2b), pupil and key, print frame.js pageHeader's Name / Date line too (40d0df133 exempted them, chartBare)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples CHART-HEAD --detailed",
+   "browser": true,
+   "fail": {
+    "commit": "40d0df133",
+    "state": "CHART-HEAD FAIL: g2-nbt3-read-write-1000 P2 / P2b and g3-oa5-mult-properties P2, pupil + key - no Name / Date field (FAIL 92 over all 7 packs)"
+   },
+   "pass": {
+    "commit": "4e99c262c",
+    "state": "CHART-HEAD OK: chartBare removed, every chart takes the frame header"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules CHART-HEAD --detailed g2-nbt3-read-write-1000,g3-oa5-mult-properties",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

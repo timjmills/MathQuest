@@ -346,7 +346,7 @@
     },
     "pv-words-pages": {
      "newRow": {
-      "name": "ws-pv-words-pages (opt-in lf-placevalue live1, lf-roles critic r8b D3 / D4: number_word_form's Guided hint never gives the answer, GUIDED-HINT-LEAK; one kind of problem per Guided page, GUIDED-ONE-KIND; M / L, default and every band)",
+      "name": "ws-pv-words-pages (opt-in lf-placevalue live1, lf-roles critic r8b D3 / D4: number_word_form's Guided hint never gives the answer, GUIDED-HINT-LEAK; one kind of problem per page, GUIDED-ONE-KIND - round-cap r3, critic live1 r2 N3 / N6: on the lesson, guided, opener and scripted-model pages every item is the Model's kind, 11 / 12 their own kind; LESSON-RULE-FITS: a Rule / Remember / Steps line names no box, place or word kind that no item on its sheet has; M / L, every wordform x band x answer slot)",
       "script": "ws-pv-words-pages",
       "kind": "browser",
       "args": []
@@ -358,6 +358,14 @@
       "script": "ws-pv-screen-numeral",
       "kind": "browser",
       "args": ["--skills", "placevalue:expand"]
+     }
+    },
+    "pv-words-opener-gate": {
+     "newRow": {
+      "name": "ws-grade-render --gate --roles opener --size L on the to_words deal (opt-in lf-placevalue critic live1 r2 N7: the numeral-to-words Model's answer line left its cell, OVERFLOW; the lane's precritic dealt the opener only the default way)",
+      "script": "ws-grade-render",
+      "kind": "browser",
+      "args": ["--roles", "opener", "--size", "L", "--opts", "{\"wordform\":[\"to_words\"]}", "--gate", "--no-screen", "--out", "/tmp/mq-pv-words-opener-gate"]
      }
     }
    }
