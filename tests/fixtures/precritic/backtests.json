@@ -8259,6 +8259,892 @@
    "fail": "FAIL",
    "pass": "OK"
   }
- }
+ },
+  {
+   "id": "frame-title-place-long",
+   "check": "The teacher's page title (owner request 2026-11-13): titlePos above draws the title before the Name / Date / Score row, a custom title never shrinks, never passes two lines (cut at a word with an ellipsis and reported in res.titleFit for the dialog), and nothing overlaps the field row, the rule or the first row - every role and key, M and L",
+   "kind": "commit-pair",
+   "rule": "ws-frame-title TITLE-PLACE / TITLE-LONG",
+   "browser": true,
+   "fail": {
+    "commit": "f4294f68b",
+    "state": "origin/master + the checks: no title option (the title stays below and the custom words are ignored)"
+   },
+   "pass": {
+    "commit": "cbfb4e9ca",
+    "state": "the title option built (frame.js pageHeader, print-sheet.js fitTitle / withTitleOption)"
+   },
+   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only geom,long",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "frame-title-ident-planted",
+   "check": "TITLE-IDENT detects a no-option page that is no longer byte-identical to origin/master (planted: one pinned hash of addition:add_facts independent L changed); the live pin of master a6883082c passes",
+   "kind": "fixture",
+   "rule": "ws-frame-title TITLE-IDENT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/frame-title/bt-planted-changed-page.json",
+    "state": "planted: the pinned pupil page differs from the render"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/frame-title/master-hashes.json",
+    "state": "the hashes of origin/master a6883082c (no option)"
+   },
+   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only ident --hashes-against {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "title-code-roundtrip",
+   "check": "The page title travels with the simple print's QP1 share code and link and reaches the request; old codes (pinned from origin/master) decode and re-encode unchanged with the defaults",
+   "kind": "commit-pair",
+   "rule": "ws-title-code TITLE-CODE-RT / -OLD / -REQ",
+   "browser": true,
+   "fail": {
+    "commit": "f4294f68b",
+    "state": "origin/master + the checks: the code drops the title"
+   },
+   "pass": {
+    "commit": "cbfb4e9ca",
+    "state": "cleanPrint appends pageTitle / titlePos only when set; titleHeaderOf"
+   },
+   "command": "node tests/scripts/ws-title-code.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "title-ui-caret",
+   "check": "Critic title r1 T1 (and T4 / T5): in both print dialogs the Page title box keeps the cursor across the redraw that follows a keystroke (cursor at 5, X, a rebuild, Y: 'XY' at 5 - the simple print gave 'FractXions and more wordsY'); with Header Title unticked the title controls are disabled and say why; the simple print box is at least 400 px with a one-line label",
+   "kind": "commit-pair",
+   "rule": "ws-frame-title-ui UI-CARET / UI-TITLE-OFF / UI-WIDTH",
+   "browser": true,
+   "fail": {
+    "commit": "aaafcfb67",
+    "state": "critic r1 state: the simple print's render() put the cursor at the end; Title off left the controls live; the box 270 px"
+   },
+   "pass": {
+    "commit": "a2460c266",
+    "state": "render() keeps selectionStart / selectionEnd; syncTitleControls; .sp-ptitle full width"
+   },
+   "command": "node tests/scripts/ws-frame-title-ui.cjs --only caret,off,width",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-ss-mult-facts-card",
+   "check": "ws-screen-slots CELL-READ: a host render that reads 0 [data-ws-cell] cells is the finding host:read, never a pass",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots CELL-READ (lf-checks queue 20, lead 2026-11-13; lf-ops divarray critic)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "the mult_facts practice card (#questionPaper) carries no [data-ws-cell]: card:read"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "question-render.js: the card paper carries data-ws-cell=\"fact\""
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:mult_facts --hosts card",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-sa-mult-facts-card",
+   "check": "ws-screen-answer CELL-READ: each host root must hold a [data-ws-cell] cell before the answer is entered",
+   "kind": "commit-pair",
+   "rule": "ws-screen-answer CELL-READ (lf-checks queue 20)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "the mult_facts card has 0 [data-ws-cell] cells at #questionPaper"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "the card paper carries data-ws-cell"
+   },
+   "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:mult_facts --hosts card --no-live",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-pc-mult-facts-card",
+   "check": "ws-phone-card CELL-READ: the card at 390 carries a [data-ws-cell] cell",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card CELL-READ (lf-checks queue 20)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "the mult_facts card at 390 has 0 [data-ws-cell] cells"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "the card paper carries data-ws-cell"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_facts --items 1 --sizes 390x844 --hosts card --only CELL-READ --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-target-sub-wp-390",
+   "check": "ws-phone-card TOUCH-TARGET: every typed answer place on card, worksheet and quiz at 390 has a >= 48 x 48 px touch box (working boxes >= 44)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-TARGET (lf-checks queue 10; lf-builds word-stories critic F3, lead 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "sub_word_problems .mq-wwans answer inputs 40 x 44 px (card, quiz) and 44 x 44 (worksheet) at 390"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "screen-cell.css: the input is >= 48 x 48 as transparent padding around the drawn 44 px box"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 390x844 --only TOUCH-TARGET --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-mult-facts-worksheet",
+   "check": "RE-POINTED (lf-hosts critic r1 F1, lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master): the premise 'worksheet grid digits >= 40 / 48 / 56 px' was overturned, and 1fbdb8eca now passes ws-screen-slots --screen-digit (worksheet 40 px >= 29). The row now proves ws-worksheet-reflow WS-REFLOW / WS-DIGIT on mult_facts: the worksheet holds master's columns, card heights, answer places and numerals at 820 / 1024 / 1280 / 1366",
+   "kind": "commit-pair",
+   "rule": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT (re-pointed from ws-screen-slots SCREEN-DIGIT, lf-checks queue 11 / 18 / 21)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "hand-off 1's raise of the worksheet to 40 / 48 / 56 px: mult_facts cards 345 -> 373 px, answer place 86 x 48 -> 104 x 58 px at every width (before the ruling this row failed 1fbdb8eca on SCREEN-DIGIT)"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "the raise removed: mult_facts holds master's worksheet layout and 40 px numerals"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --sample-only multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-dealt",
+   "check": "queue 14 (lf-vocab, 11-13): a worksheet item is matched with the print cell of the SAME item it dealt (the kit's renderCell at the print size), never read as SIZE-REF because the Independent seed-7 page never deals that word (4 vocab words read as false SIZE-REF); the dealt cell then judges its size",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK / SIZE-REF (dealt print cells)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/vocab-dealt-small.fail.html",
+    "state": "the dealt print cell draws the word's 3 marks at 5 mm; the screen draws them at 2.5 mm (50 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/vocab-dealt.pass.html",
+    "state": "the Independent page holds only a 12-dot array; the dealt cell (w1) holds the word at 5 mm, the screen 6 mm (the old tool read SIZE-REF here)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-term",
+   "check": "queue 15 (lead, 11-13): a growing-pattern TERM drawing is judged by its unit (ring / dot / square mm, screen vs print), never by its bounding width: a one-dot-wide column is taller than wide by the maths (the old SIZE-WIDTH failed it at 2 %); a term with 1-2 marks is still judged",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK on pattern terms (SIZE-WIDTH skips them)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/term-small.fail.html",
+    "state": "Terms 1-3 as columns of 2 / 3 / 4 rings, screen rings 1.0 mm against print 2.2 mm (45 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/term-column.pass.html",
+    "state": "the same columns, screen rings 2.6 mm (the old tool: SIZE-WIDTH FAIL 2 %)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-WIDTH,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-growing",
+   "check": "queue 15 on the real tree: patterns:growing_shape_patterns worksheet 1280 (9 term drawings the old SIZE-WIDTH failed) passes SIZE-WIDTH / SIZE-INK / SIZE-REF; a real too-small pattern fails",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size SIZE-INK on pattern terms",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/term-small.fail.html",
+    "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-WIDTH,SIZE-REF",
+    "state": "A FIXTURE (the growing worksheet draws its terms at print size, so no commit is too small): screen rings 45 % of print"
+   },
+   "pass": {
+    "commit": "791c84183",
+    "state": "lf-algebra head: the growing worksheet at 1280, its term columns judged by the ring (2.19 mm print)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:growing_shape_patterns --hosts worksheet --only SIZE-INK,SIZE-WIDTH,SIZE-REF --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-text-label",
+   "check": "queue 16 G9 (lf-algebra critic r2): TEXT-SIZE - a label's rendered size (font-size x every transform above it) on a screen host is >= its print size (5 % tolerance) and never under 8 pt; the growing quiz 'Term 1-4' labels at 8.3 pt against 11 pt on paper FAIL",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE (labels)",
+   "browser": true,
+   "fail": {
+    "commit": "791c84183",
+    "state": "lf-algebra head: growing quiz 1280, 'Term 1' 11.0 px (8.3 pt) against 11 pt on paper"
+   },
+   "pass": {
+    "commit": "5297534b5",
+    "state": "MOVED FROM A FIXTURE TO A COMMIT (lf-hosts, 2026-11-13; was the fixture text-label-ok.pass.html, which screen-ink-size-text-fixture still proves): 5297534b5 is 791c84183 plus the one screen-cell.js hunk master already carries (917807f41, lf-vocab r5: the k2 twin fit skips an element with no box). Root cause of G9: the quiz hides the growing pattern's given counts (display:none); their 0 x 0 rects at 0,0 read as 145 px of overflow each side at 1280 and the fit shrank --mq-k2 5.4 -> 2.4 px. After: quiz 'Term n' 24.3 px (18.2 pt) at 1280, 20.6 px at 820, 16.8 px at 390, against 11 pt on paper. Branch claude/sweet-newton-c8wrv1-lf-hosts-g9-probe."
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:growing_shape_patterns --hosts quiz --only TEXT-SIZE --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-cell-read",
+   "check": "CELL-READ (lf-hosts, 2026-11-13): ws-screen-ink-size FAILS a host render that read 0 [data-ws-cell] cells (not rendered, root missing, a card / quiz paper with no [data-ws-cell], a worksheet of 0 cards or a card with none) instead of passing it with nothing judged; judged on every full run (an --only run judges it when it names CELL-READ). The same rule as ws-screen-slots / ws-screen-answer / ws-phone-card (lf-checks 1fbdb8eca); --self-test holds 8 CELL-READ cases",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size CELL-READ",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "lf-checks before hand-off 1's fix: the mult_facts practice card draws no [data-ws-cell]; the old ws-screen-ink-size read 0 cells there and passed"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "lf-checks hand-off 1: the card paper carries data-ws-cell (the fix the cell-read-ss / -sa / -pc rows prove)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill multiplication:mult_facts --hosts card --widths 390 --only CELL-READ --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-text-fixture",
+   "check": "queue 16: TEXT-SIZE on a saved cell - labels under their print size FAIL, at print size pass",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size TEXT-SIZE (labels)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/text-label-small.fail.html",
+    "state": "Term labels 11 px (8.3 pt) against 11 pt on paper"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/text-label-ok.pass.html",
+    "state": "the same labels at 15 px"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only TEXT-SIZE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-text-countrow",
+   "check": "queue 17 G1 (lf-algebra critic r2 via lf-ops): TEXT-SIZE - non-slot digit text (every numeral but the cell's largest, which ws-screen-slots SCREEN-DIGIT judges) is >= the host's digit floor (40 / 48 / 56 px, read from ws-screen-slots; a count row on a phone TY-10b 29 px); number_patterns_rule card 390 count-row digits at 19.7 px FAIL",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE (digits)",
+   "browser": true,
+   "fail": {
+    "commit": "662c6bbea",
+    "state": "lf-ops-props before r4b (parent of 8d7343c0f): count-row digits 19.7 px on the 390 card"
+   },
+   "pass": {
+    "commit": "85c694896",
+    "state": "lf-ops-props r4b: box-train numerals at the host digit size"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:number_patterns_rule --hosts card --widths 390 --only TEXT-SIZE --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-raise-3c7b",
+   "check": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT: at 820 / 1024 / 1280 / 1366 the online worksheet's column count never falls, its tallest card and largest answer place grow <= 6 px, and its worst card's numeral never falls below master's (baseline pinned from 77f0acad)",
+   "kind": "commit-pair",
+   "rule": "ws-worksheet-reflow WS-REFLOW (lf-hosts critic r1 F1; lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "hand-off 1's #worksheetView 40 / 48 / 56 px digit raise: placevalue:expand 2 -> 1 column at 1024, cards +84-101 px, answer places to 251 x 111; sub_100_no_regroup / mult_facts / add_facts cards +28-32 px"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "the raise removed: every sample skill holds master's columns, cards, answer places and numerals"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "focus-ring-sub-wp-tablet",
+   "check": "ws-phone-card FOCUS-RING: in each [data-ws-cell] cell every focused answer place draws one ring and every focused working box one ring (after the page's focus handlers settle), each >= 3:1 against its fill (AX-6); card and quiz at 820 / 1024",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS-RING (lf-hosts critic r1 F3)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "sub_word_problems: the focused .mq-wwans answer box outlined in yellow #f2c200, 1.68:1 on white, beside master's ring on the other boxes"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "screen-cell.css: the focused / next .mq-wwans box draws master's O-1 next-box ring (--mq-next-*, blue 4 px) on the drawn edge"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 820x1180,1024x768 --only FOCUS-RING --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-unique-sub-wp-tablet",
+   "check": "ws-phone-card TOUCH-UNIQUE: elementFromPoint 1 px inside each edge of every typed answer place returns that input, never another typed box; card, worksheet and quiz at 820 / 1024",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-UNIQUE (lf-hosts critic r1 F4)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "sub_word_problems .mq-wwans: 44 px drawn boxes on a 47 px pitch with 48 px touch boxes overlap 1 px; a tap on a box's right edge focuses its neighbour (card, worksheet, quiz)"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "screen-cell.css: a column-work grid holding answer boxes opens its column gap to >= 4 px on screen (pitch >= 48); the drawn boxes keep their size"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 820x1180,1024x768 --only TOUCH-UNIQUE --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-word-work-tablet",
+   "check": "ws-phone-card TOUCH-HIT: a REAL tap (page.mouse.click) 1 px inside each of the 4 edge midpoints and 4 corners of every typed box's touch area leaves document.activeElement on that box; card, worksheet and quiz at 820 / 1024 / 1280 / 1366",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-HIT (lf-hosts critic r2 F1)",
+   "browser": true,
+   "fail": {
+    "commit": "d53fa104e",
+    "state": "div_word_problems / add_wp_20 .mq-wwans: the column work's overflow-x:auto wrapper clipped the 48 px touch ring, so a tap 1 px inside the top edge of answer box 1 hit div.mq-wwstep and the cell focused box 0 (card, worksheet, quiz; 820 and 1280)"
+   },
+   "pass": {
+    "commit": "b024860c9",
+    "state": "screen-cell.css: the wrapper gets padding cancelled by a negative margin and the input is lifted (position:relative; z-index:2); the drawn boxes do not move"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills division:div_word_problems,subtraction:sub_word_problems,addition:add_wp_20 --items 1 --sizes 820x1180,1024x768,1280x900,1366x768 --only TOUCH-HIT --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "timeoutS": 2400
+  },
+  {
+   "id": "cell-read-empty-card",
+   "check": "ws-phone-card CELL-READ: a card cell that carries a kind but holds no drawn mark and no answer slot is a finding (the host stamps 'legacy' on any paper, so r1's CELL-READ passed by construction)",
+   "kind": "fixture",
+   "rule": "ws-phone-card CELL-READ (lf-hosts critic r2 F3)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-empty.fail.html",
+    "state": "#questionPaper data-ws-cell=\"legacy\" with nothing in it"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-ok.pass.html",
+    "state": "a fact cell holding its numerals and answer slot, labelled 'fact'"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only CELL-READ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-kind-card",
+   "check": "ws-phone-card CELL-READ: the card cell's [data-ws-cell] kinds include the kind the quiz stamps on the same item (msc, else the kit template's kind cellKindFor)",
+   "kind": "fixture",
+   "rule": "ws-phone-card CELL-READ (lf-hosts critic r2 F3)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-kind.fail.html",
+    "state": "a 3 x 4 fact item (answerType text) labelled 'legacy' on the card while the quiz's rule labels it 'fact'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-ok.pass.html",
+    "state": "the same item labelled 'fact' on the card (question-render.js labels with the quiz's rule)"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only CELL-READ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-shrink-r2",
+   "check": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT: a sheet that SHRINKS (tallest card, any card, the answer place), a card width that changes either way, and a numeral drop on ANY card are findings, not only growth and the worst card's numeral",
+   "kind": "commit-pair",
+   "rule": "ws-worksheet-reflow WS-REFLOW (lf-hosts critic r2 F5)",
+   "browser": true,
+   "fail": {
+    "commit": "b024860c9",
+    "args": "--baseline tests/fixtures/precritic/worksheet-reflow/r2-f5-shrink.fail.json",
+    "state": "same commit, judged against master's baseline with mult_facts@1280 20 px taller / wider and card 1's numeral +4 px: the measured sheet reads as shrunk, re-widthed and one card's numeral dropped (r1's growth-only ratchet passed it)"
+   },
+   "pass": {
+    "commit": "b024860c9",
+    "args": "--baseline design/audit/baselines/worksheet-reflow.json",
+    "state": "the real baseline pinned from master 77f0acad2"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --sample-only multiplication:mult_facts {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-widths-plan-owner-set",
+   "check": "ws-screen-widths-plan: every screen gate on precritic's --skill plan (ws-phone-card, ws-screen-slots --screen-digit, ws-screen-ink-size per host, ws-worksheet-reflow) renders at exactly the owner set read from tests/lib/ws-screen-widths.cjs (820 / 1024 / 1280 / 1366), and no gate label names another width",
+   "kind": "commit-pair",
+   "rule": "ws-screen-widths-plan SW-MISSING / SW-SET / SW-UNREAD / SW-LABEL (lf-hosts critic r2 F2)",
+   "browser": false,
+   "fail": {
+    "commit": "d53fa104e",
+    "state": "precritic planned ws-phone-card at its 390 x 844 / 390 x 664 default with the label 'practice card at 390 px' (so TOUCH-UNIQUE, FOCUS-RING and the card CELL-READ never ran at a tablet width); the other screen gates could not state their widths"
+   },
+   "pass": {
+    "commit": "341c0dd84",
+    "state": "every screen gate at 820 / 1024 / 1280 / 1366 from the one table (ws-screen-ink-size's worksheet and quiz too), labels name the set"
+   },
+   "command": "node tests/scripts/ws-screen-widths-plan.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-settle-retap",
+   "check": "ws-phone-card TOUCH-HIT de-flake: the tap point is read after two animation frames and once the scroll and the box's rect hold still, a miss is re-tapped the same way, and only a REPEATED miss is a finding (lf-hosts hand-over r3 m1: 2-3 random 'focuses nothing (body)' misses a run on untouched cells, all at 1280 x 900 bottom edges / corners: sub_100_no_regroup, placevalue:expand, add_facts; they never repeated)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-HIT (lf-checks de-flake, lf-hosts r3 m1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-settle.html",
+    "args": "--no-retap",
+    "state": "the d23e42fa6 tap (--no-retap): the point read in the same task as the blur, one tap; the page's focusout moves the card 80 px on the next task, so the tap lands on a stale point and reports a miss that is not there (the 1280 x 900 flake class)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-settle.html",
+    "args": "",
+    "state": "the same page, today's tap: settled point, re-tap on a miss; nothing covers the box, so OK (3 of 3 runs)"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-HIT {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-overlay-true-miss",
+   "check": "ws-phone-card TOUCH-HIT still FAILS a box that truly cannot be hit after the de-flake: a div painted over the bottom 12 px of the answer box swallows the bottom edge and corner taps, the settled re-tap misses again, and the finding is reported (every run)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-HIT (lf-checks de-flake, lf-hosts r3 m1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-overlay.fail.html",
+    "state": "an overlay covers the answer box's bottom 12 px: 3 repeated misses (bottom, bottom-left, bottom-right), FAIL 3 of 3 runs"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-overlay.pass.html",
+    "state": "the same overlay 4 px below the box: every tap focuses it"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-HIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-slot-x",
+   "check": "ws-worksheet-reflow WS-REFLOW per-slot x: no typed answer place moves sideways inside its card by more than 1.5 px against the baseline's slotXs (the r1 F4 4 px gap moves a box by up to 1 px): 1 px holds, 2 px fails",
+   "kind": "fixture",
+   "rule": "ws-worksheet-reflow WS-REFLOW slot x (lf-hosts critic r3)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/slot-x-2px.fail.json",
+    "state": "card 1's second answer place 2 px right of master's (before: no per-slot x measure at all, so any sideways move under 6 px of card width passed)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/slot-x-1px.pass.json",
+    "state": "the same place 1 px right (the r1 F4 gap's move): holds"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-mode-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
+   "kind": "commit-pair",
+   "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+   },
+   "pass": {
+    "commit": "70d347578",
+    "state": "the mode verdict line reads OK"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-pipe-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+   },
+   "pass": {
+    "commit": "82b8fbf44",
+    "state": "the verdict line is the last line"
+   },
+   "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-hint-leak",
+   "check": "number_word_form Guided: no grey hint gives the answer away - its place phrases built together ('2 tens, 6 ones' -> 26), or every digit of the answer named; the allowed form is the first step's gapped frame (lf-roles critic r8b D3, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M / L, default and every band: '\"twenty-six\": 2 tens, 6 ones.' under twenty-six, 26 more hints"
+   },
+   "pass": {
+    "commit": "ae83dfbc",
+    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-one-kind",
+   "check": "number_word_form Guided: one kind of problem per page - no item (teen, tens word alone, one word, two words, hundreds) whose kind the page's Steps do not cover (lf-roles critic r8b D4, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M default: 'eleven' under 'Read the tens word. Read the ones word.'; band 20 pages mixing one-word, teen and decade names"
+   },
+   "pass": {
+    "commit": "ae83dfbc",
+    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-eb-band",
+   "check": "number_word_form Guided M / L: no cell 30 % or more empty under its ink (lf-roles critic r8b D2: 35-50 % in all 15 cells)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (--roles guided)",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "EB-BAND 15: M 35-50 %, L 35-59 % (rows stretched to the page)"
+   },
+   "pass": {
+    "commit": "878f5325",
+    "state": "words footprint guidedTight: rows at their measured height, the Model row the larger of its work line and the hint: EB-BAND 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --roles guided --sizes M,L --hosts none --no-baseline --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-numeral",
+   "check": "placevalue:expand on the online worksheet: the number sentence's numerals set and drawn at >= 29 px (the worksheet digit floor), Andika 700, no operator left at a line's end (lf-hosts critic via the lead 2026-11-13: 18 px)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "worksheet 1280 / 820 / 390: '144 =' set at 18 px weight 400 (drawn 22 px at 390), '+' alone at a line's end at 390"
+   },
+   "pass": {
+    "commit": "77b6ce24",
+    "state": "inlineBlanksHTML numeric: the sentence at --mq-digit (29 px), bold, each operator kept with its box"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-floor",
+   "check": "SCREEN-DIGIT holds the online worksheet to the shared table's 29 px floor (tests/lib/ws-screen-widths.cjs), not the card's 56 / 48: a 29 px worksheet numeral passes, 28 px still fails (lead ruling 2026-11-13 21:21 a; the ratchet pin design/audit/baselines/screen-digit-ratchet.json is proved by the --self-test case 'worksheet ratchet')",
+   "kind": "fixture",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (worksheet floor)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-28.html",
+    "state": "expand's worksheet sentence at 28 px, Andika 700: under the 29 px floor"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-29.html",
+    "state": "the same at 29 px: the worksheet floor, passes"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280 --host worksheet",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-no-numeral-skip",
+   "check": "SCREEN-DIGIT SKIPS a screen cell with no numeral (a number-name skill's card or quiz) instead of failing it 'no numeral found' (lead ruling 2026-11-13 21:21 b). Each state runs its OWN ws-screen-slots on the same fixture: the ruling changes the check",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (no numeral: SKIP)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form's card (the name 'twenty-six', no numeral): 'no numeral found in the cell' FAIL"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "SKIP no numeral, OK"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --digit-fixture tests/fixtures/precritic/screen-digit/no-numeral.html --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-chrome",
+   "check": "SCREEN-DIGIT never reads the worksheet card's chrome (the number badge .mq-wsbar, Nunito 16 px; the hint popup) as the item's numeral (lead ruling 2026-11-13 21:21 d: number_word_form's worksheet 'the numeral \"1\" is 16 px, font Nunito' was the badge). Each state runs its OWN ws-screen-slots on the live app",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (chrome excluded)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form worksheet@1280 / 1366 / 820 / 1024: the badge '1' 16 px Nunito; card / quiz 'no numeral found'"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": ".mq-wsbar / .hint-popup excluded, a cell with no numeral SKIPPED: 0 misses"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --skills composing:number_word_form --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-card-numeral",
+   "check": "placevalue:expand's practice card sets its number sentence at the card's digit floor (56 / 48 px at 1280-1366 / 820-1024), bold, every operator with its box (lead ruling 2026-11-13 21:21 c: 24 px regular)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (card)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "expand card@1280 '552 =' 24 px weight 400 (and 22 / 20 px at the narrower widths)"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "question-render.js .mq-ibnum: 56 px Andika 700 at 1280, 48 at 820; worksheet 29, quiz 56: 0 misses"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills placevalue:expand --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-any-digit",
+   "check": "number_word_form Guided: no hint names ANY digit of the answer outside a ruled gap, on every band and answer slot (lf-placevalue critic live1 N1, the class; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK (any digit)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 1000 M / L: '\"two hundred\": 2 in the hundreds.' under 262, '\"nine hundred\": 9 in the hundreds.' under 986"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble",
+   "check": "number_word_form Guided: every hint reads as English - no template filled with 'no' ('the no is'), no doubled word, no hole (critic live1 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words M / L: '26: the no is in the hundreds place.'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-to-words-steps",
+   "check": "number_word_form numeral-to-words Guided: the Steps fit every item's kind and name no place no item has (critic live1 N2: 'Say the hundreds: three hundred.' over 53, 26, 99)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (to_words, places)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words default / band 20 / band 1000 M / L: the hundreds Steps with a literal 'three hundred' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-one-kind",
+   "check": "number_word_form Opener: the Model and its Guided band are one kind its Steps cover (critic live1 N3: 'twenty' beside a teen Model and the teen Steps at band 20)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND --roles opener",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 20 M: Model 'five' with Guided 'fifteen', 'seventeen', 'ten'; to_words band 20 '15' beside '20'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-one-line",
+   "check": "placevalue:expand online worksheet at 820 px and wider: the sentence on one line, every answer box at least 100 x 76 px - the size before the twin (critic live1 N4, a ratchet)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-ONE-LINE / WS-SLOT-SIZE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "3 columns at 1280: '+ [ ]' on a second line in every card, boxes 62 x 46"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "nowrap line, 2 columns at 1280 / 1 at 820, boxes 103 x 76"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-touch-target",
+   "check": "placevalue:expand and placevalue:unit_form answer boxes >= 48 px on the worksheet and the builder-made quiz at 820 / 1024 (critic live1 N5, H6; lf-tools r1 A1 - one shared fix)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TOUCH-TARGET (--quiz-builder)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "expand quiz-820 / -1024 and worksheet 46 px inputs; unit_form worksheet-820 / -1024 46 px (30 findings)"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "a boxed slot's box >= 50 px, its input 48 px: 0 findings"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills placevalue:expand,placevalue:unit_form --roles independent --size M --gate --quiz-builder --out /tmp/mq-bt-touch",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tof-stem",
+   "check": "a True or False? frame restates the problem as 'a op b =' only when that equation is true of the answer: one number equal to the operands combined (lf-ops critic-cbt-r2 E1: count_by_tables printed '3 x 12 = 12, 18, 24, 30, 36'; 55 skills on master)",
+   "kind": "commit-pair",
+   "rule": "ws-tof-stem TOF-STEM",
+   "browser": true,
+   "fail": {
+    "commit": "05dbd1149",
+    "state": "count_by_tables True or False? M: 'a x 12 =' stem over a 5-part list on pupil page and key"
+   },
+   "pass": {
+    "commit": "fc02a4642",
+    "state": "list / missing-part / 3-addend answers take the plain stem; true equation stems unchanged"
+   },
+   "command": "node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_missing_digit,addition:add_three --seeds 7,23",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
  ]
 }

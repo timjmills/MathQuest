@@ -44,6 +44,7 @@ export const EXTRA = [
 const TEACHER_PHONE = 'a TEACHER screen test: its 390 px steps check the teacher\'s own phone layout on purpose (touch, slide-over, no sideways scroll); no pupil screen host is rendered at 390. The owner rule 2026-11-13 names pupil screens; dropping a teacher phone check is an owner / lead call (lf-tools no-phone-width status, "Not changed")';
 export const ALLOW = {
     'tests/scripts/ws-no-phone-width.mjs': 'this check: its self-test plants 390 lines on purpose',
+    'tests/scripts/ws-screen-widths-plan.mjs': 'the screen-widths plan check (lf-hosts critic r2 F2): it NAMES phone widths to flag them (its known-widths list and its self-test plant the d53fa104e 390 plan on purpose); it renders nothing',
     'tests/scripts/ws-teacher-wrm.cjs': TEACHER_PHONE,
     'tests/scripts/ws-teacher-shell.cjs': TEACHER_PHONE,
     'tests/scripts/ws-teacher-library.cjs': TEACHER_PHONE,
