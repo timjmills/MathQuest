@@ -794,3 +794,16 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   precritic-copy-light-role-cover-size: all PASS; role-cover-cbt-e3-e5-e6 and precritic-role-cover-plan re-run PASS.
 - N1 (numbers masked whole) not addressed.
 - checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).
+
+## 2026-11-14 — ws-merge-master (lead: "most of today's lost deploy time was merge conflicts")
+
+- `node tests/scripts/ws-merge-master.mjs [--commit] [--ref origin/master]`, run by each lane every few hours: fetch +
+  merge origin/master with no commit; backtests.json merged 3-way BY ROW ID (a row only one side changed takes that side; a
+  row both changed is left for the lane; no base row is ever dropped; the file's own format, so untouched rows stay
+  byte-identical); CHECKS_FROM_CRITICS, LEAD_DECISIONS and design/status/*.md conflict hunks unioned (master's lines,
+  then the branch's, no repeated line); generated reports (QUEUE.md, queue.json, BUILD_QUEUE.md, STANDARDS_COVERAGE.md,
+  BUILD_LIST.md) take master's copy and are regenerated; anything else is listed and the merge is not committed; then
+  ws-conflict-markers. Never touches design/STATUS.md, never pushes. `MQ_COMMIT_TRAILER` adds the lane's footer.
+- Proof: `--self-test` (7 cases) is a deploy session-1 gate; a replay of the real lf-tools-roles merge (d47f0c59e +
+  369173bc2: 3 conflicted files) produced exactly the hand-resolved 577b111da (backtests 486 rows, ledger and status
+  identical).
