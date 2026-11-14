@@ -10150,6 +10150,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-step-align",
+   "check": "ws-two-step --align STEP-ALIGN: in a two-step cell whose two steps are fact sentences, the step blocks and the sentences top-align within 1 mm (opener / guided / independent, pupil + key, M / L)",
+   "kind": "commit-pair",
+   "rule": "STEP-ALIGN (lead 2026-11-14 on the STEP-FORM Opener; STEP-FORM critic F1: Step 2 ~80 px above Step 1)",
+   "fail": {
+    "commit": "c102ebc73",
+    "state": "the step row aligns the blocks' feet: Step 2 (two-line question, unit bank) stands 16-21 mm higher"
+   },
+   "pass": {
+    "commit": "938fdadbe",
+    "state": "fact-pair blocks top-align, the question lines share a 2-line height, the unit stands at its sentence's top"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --align --skill algebra:two_step_add_then_div,algebra:two_step_mult_div_first",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
