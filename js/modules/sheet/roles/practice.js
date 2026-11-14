@@ -1214,7 +1214,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // empty under the line, ws-empty-band EB-BAND)
             const spreadMax = tightRows(its) && its.length && its.every((it) => Number((it.footprint || {}).spreadMax) > 1)
                 ? Math.min(SPREAD_CAP, ...its.map((it) => Number(it.footprint.spreadMax))) : null;
-            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && (!tightRows(its) || spreadMax)) {
+            // (a chart window that is the only window its chart has - band 10, band 120's three rows - is dealt once a sheet
+            // (CROSS-GIVEAWAY, chart_120 r2 F4 / F9): its lone cell keeps its own height, never stretched 1.8 x round 17 mm of ink)
+            const loneWindow = its.length === 1 && its[0].q && its[0].q.cell && its[0].q.cell.template === 'chartwindow'
+                && ((its[0].q.cell.payload || {}).rows || []).length < 8;
+            if (!gap.gap && lone && baseMm && !loneWindow && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && (!tightRows(its) || spreadMax)) {
                 if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin, spreadMax || SPREAD_CAP);
                 else if (chunks.every((c) => !c.blocks)) {
                     // a section over several pages: the FIRST page's stretch, applied to every page

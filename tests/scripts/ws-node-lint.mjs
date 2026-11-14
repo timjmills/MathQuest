@@ -474,6 +474,17 @@ export function helpNamedValues(text, universe) {
  */
 export function wrongFitsSlot(wrong, payload) {
     const p = payload || {};
+    // A number-chart window (chartwindow: {rows, cols, blanks}): each empty square holds what the window's widest number holds
+    // (3 digits from the 1-100 chart up: its 100), and the wrong values are one per square, joined ', ' (lf-builds chart_120 fix:
+    // 'writes-ten-ten' put 1011 in a 3-digit square, printed '1,011' over the next square on True or False? L).
+    if (Array.isArray(p.rows) && Array.isArray(p.cols) && Array.isArray(p.blanks) && p.rows.length && p.cols.length) {
+        const top = Math.max(...p.rows.map(Number)) * 10 + Math.max(...p.cols.map(Number)) + 1;
+        const sq = Math.max(3, String(top).length);
+        const parts = String(wrong == null ? '' : wrong).split(/,\s+/).map((x) => x.replace(/[,\s ]/g, ''));
+        if (!parts.length || !parts.every((x) => /^\d+$/.test(x))) return { judged: false };
+        const digits = Math.max(...parts.map((x) => x.length));
+        return { judged: true, fits: digits <= sq, digits, boxes: sq };
+    }
     const boxes = [p.ansDigits, p.answerDigits, p.boxes].map(Number).find((n) => Number.isFinite(n) && n > 0);
     if (!boxes) return { judged: false };
     const s = String(wrong == null ? '' : wrong).replace(/[,\s ]/g, '');
@@ -630,6 +641,9 @@ function selfTest() {
     eq(wrongFitsSlot('1,234', { ansDigits: 4 }).fits, true, 'S1: a comma takes no box');
     eq(wrongFitsSlot('12', {}).judged, false, 'S1: no declared boxes is not judged');
     eq(wrongFitsSlot('8 R 5', { ansDigits: 2 }).judged, false, 'S1: a non-number is not judged');
+    eq(wrongFitsSlot('1011', { rows: [9, 10, 11], cols: [0, 1, 2, 3, 4], blanks: [111] }).fits, false, 'chart_120: 1011 in a 3-digit chart square');
+    eq(wrongFitsSlot('121, 103', { rows: [9, 10, 11], cols: [0, 1, 2, 3, 4], blanks: [111, 103] }).fits, true, 'chart_120: one 3-digit value per square, joined');
+    eq(wrongFitsSlot('64', { rows: [4, 5, 6], cols: [3, 4, 5, 6, 7], blanks: [54] }).fits, true, 'chart: a 1-100 square holds 3 digits');
     // WRONG-FITS-SLOTS / WRONG-FILL (lf-placevalue critic r1 F3)
     const three = '<span class="ws-box" style="--w:20mm" data-ws-slot="part0" data-ws-shape="box">5 + 0 + 3</span> + <span class="ws-box" style="--w:20mm" data-ws-slot="part1" data-ws-shape="box">5 + 0 + 3</span>'
         + '<span data-ws-slot="choice" data-ws-shape="ring">A</span><span data-ws-slot="x" data-ws-shape="box" data-ws-graded="0">9</span>';

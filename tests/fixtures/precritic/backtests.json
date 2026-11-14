@@ -10448,6 +10448,578 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120-wrong-fits",
+   "check": "a chart window's wrong answer fits its square: one value per square, no more digits than the window's widest number (chart_120 'writes-ten-ten' 1011 printed '1,011' over the next square, True or False? L)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint WRONG-FITS (chartwindow payload)",
+   "fail": {
+    "commit": "e3733905c",
+    "state": "WRONG-FITS too-long #12, #20 (4>3) on composing:chart_to_120"
+   },
+   "pass": {
+    "commit": "ac88be08e",
+    "state": "the chart square no longer deals writes-ten-ten"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules WRONG-FITS --no-baseline --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-tagink",
+   "check": "a lettered chart square on Error analysis keeps its written number clear of the A / B tag (gate seed, L)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TAGINK",
+   "browser": true,
+   "fail": {
+    "commit": "e3733905c",
+    "state": "TAGINK 8 on chart_to_120 error-analysis L"
+   },
+   "pass": {
+    "commit": "ac88be08e",
+    "state": "k2-chartwindow [data-ws-tagged] padding under the tag"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --rules TAGINK --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-lesson-wide",
+   "check": "the fallback lesson draws a row of ten (hundreds_chart_fill band 10) in full-width chart rows, never a 92 mm anchor-chart panel or beside the Steps (OVERFLOW 54, lesson S/M/L)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (card option value on the lesson role)",
+   "browser": true,
+   "fail": {
+    "commit": "e3733905c",
+    "state": "OVERFLOW 18 on hundreds_chart_fill lesson M {band: 10}"
+   },
+   "pass": {
+    "commit": "032e07ec6",
+    "state": "lesson.js chartDataOf: a fallback lesson takes chartWide for an example wider than half the page"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=10 --opt-roles lesson --size M --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-centred-band",
+   "check": "a CENTRED cell (chartwindow) is judged by its white above + under as one band, and its centring is not drawn height (EB-FOOT read a 59 mm window in a 76.5 mm row as 'drawn 67.5 mm', 60 false reds; EB-BAND passed a 42 % band around a window beside the Guided Model)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (centred) / EB-FOOT (centred cells)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/eb-centred/fail.json",
+    "state": "guided M p1 cell 2: 24.5 + 23.9 mm of 115.1 (42 %), passed by the under-only measure"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/eb-centred/pass.json",
+    "state": "independent M p1 cell 1: 8.7 + 8.8 mm of 76.5 (23 %), the row stretch EB-FOOT failed"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-title-band",
+   "check": "a band-120 chart names 'a chart to 120' on every role, not 'a hundreds chart' (L6 / L28; print-sheet reads the band for the I Can)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE (the lesson title follows the option)",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "lesson {band:120} key printed 'on a hundreds chart' and the key 101 left its square (KEYFIT)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "'a chart to 120'; the window states its width so it never squeezes"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=120 --opt-roles lesson --size L --rules KEYFIT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-ri-under",
+   "check": "Reason It holds more than one chart-window item a page: a window past 100 states its true width (inkWMm) and takes the A|B-under layout, not the stacked one-a-page form (H5)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks LONE-PAGE",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "reason-it L one item a page where the role holds 2 (LONE-PAGE)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "chartwindow footprint inkWMm -> reason-it UNDER layout, 2 a page"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles reason-it --size L --rules LONE-PAGE --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-pupiltag",
+   "check": "the 'Sam wrote:' label sits 2 mm over a chart-window error-analysis item, not 6.5 mm (PT-ERR-4): the window drops its own letter keep-out inside the work block",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "error-analysis M label 6.5 mm from its work (PUPILTAG 8)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "css/sheet-kit.css .mq-judge-work .k2-chart margin-top 0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --card-opts --size M --rules PUPILTAG --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-role-hidden",
+   "check": "an option value a signed card hides on a role (chartwindow §7a: grid rows / whole on lesson, guided, test) is never dealt there: the role's page with the value is byte-identical to its page with the default (lead ruling 2026-11-13; the whole chart overflowed lesson 18/24, guided 8-12, and printed one a page on the test)",
+   "kind": "commit-pair",
+   "rule": "ws-role-hidden ROLE-HIDDEN (card role-scoped hidden decisions)",
+   "browser": true,
+   "fail": {
+    "commit": "e1389d1f3",
+    "state": "grid=rows / whole drawn on lesson, guided, test of hundreds_chart_fill and chart_to_120"
+   },
+   "pass": {
+    "commit": "25e62c6d6",
+    "state": "skill-options hiddenOnRoles + print-sheet optsForRole: the roles fall back to the window"
+   },
+   "command": "node tests/scripts/ws-role-hidden.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-text-misc",
+   "check": "a misconception a card re-scopes to TEXT (chartwindow M-C1 'writes-ten-ten', textOnly) reaches the screen practice card and Reason It's statements in words within 16 seeds, and no chart square ever holds more digits than its window's widest number (lead ruling 2026-11-13: re-scoped, not dropped)",
+   "kind": "commit-pair",
+   "rule": "ws-text-misconception REACH-SCREEN / REACH-TEXT / SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "e1389d1f3",
+    "state": "writes-ten-ten taught nowhere (dropped from the square with no text form)"
+   },
+   "pass": {
+    "commit": "25e62c6d6",
+    "state": "provider wrongText + Reason It text pairs + screen distractorTags; squares unchanged"
+   },
+   "command": "node tests/scripts/ws-text-misconception.cjs --skills composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-guided-echo",
+   "check": "no try on a Guided page shows the Model's own picture: the chart_to_120 Model's 96-120 window with 100 traced came back as a try with 100 blank (lf-roles critic r8b D5)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo GUIDED-MODEL-ECHO",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "guided L seeds 3 and 7: a try draws the Model's window (3x5@96, 3x5@91)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "the window is the generator's dupKey: no window twice on a page while another is left"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 8 --only GUIDED-MODEL-ECHO",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-score-slots",
+   "check": "a page's Score equals the answer places of its scored chart windows: Guided printed Score /3 over three windows holding 5 empty squares (lf-roles critic r8b n5); Error analysis stays one judgement a cell",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "every scored chart page counted one point a window (guided /3 vs 5-7 squares, independent /6 vs 11-13)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "chartwindow footprint points = its blanks (slotPoints); error-analysis.js keeps 1 a cell"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 4 --only SCORE-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-card-plan-preset",
+   "check": "a PRESET skill is planned from its host's signed card (every role it offers, the host's other option values): composing:chart_to_120 fell back to the 9 default roles and no option values, so opener / scripted-model / pre-skill-check / mixed-practice / stretch were never rendered before a critic (L25)",
+   "kind": "commit-pair",
+   "rule": "ws-card-plan preset plan",
+   "fail": {
+    "commit": "f80dfd9d6",
+    "state": "cardPlanFor(composing:chart_to_120): no card, 0 card roles (the 9 default roles)"
+   },
+   "pass": {
+    "commit": "a810a6cbc",
+    "state": "preset planned from the chartwindow card: 14 roles"
+   },
+   "command": "node -e \"const o=JSON.parse(require('child_process').execFileSync('node',['{root}/tests/lib/ws-card-plan.mjs','--skill','composing:chart_to_120','--root','{root}'],{stdio:['ignore','pipe','ignore']}).toString())[0];const ok=!!(o.preset&&o.roles.length>9);console.log('ws-card-plan --preset: '+(ok?'OK':'FAIL'));process.exit(ok?0:1)\"",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-screen-digit",
+   "check": "a chart window's screen numerals reach their host's floor: practice card and quiz 48 px at 820 / 1024, 56 px at 1280 / 1366; online worksheet 29 px (LEAD_DECISIONS 2026-11-13). They were 29-34 px on the card and quiz and 24.7 px on the worksheet at 1024",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "34419f4d1",
+    "state": "card@1280 34 px, quiz@820 28.9 px, worksheet@1024 24.7 px"
+   },
+   "pass": {
+    "commit": "4b464e322",
+    "state": "squares sized from the digits on the card / quiz (48 / 56 px) and the worksheet (30 px), scoped to the window"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-wrong-multi",
+   "check": "every chart window, every gap count the skill deals, has a wrong answer that is a number in every slot and differs from the key in exactly one slot (chart_120 critic r1 F1: num('91, 101') was NaN, no multi-gap window had a wrong answer, True or False? dealt all True; L27)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit WRONG-MULTI",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "wrongAnswer null on every 2- and 3-gap window"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartWrong: one gap written wrong per candidate, the others kept"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules WRONG-MULTI",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-steps-all-slots",
+   "check": "a chart window's worked steps name EVERY gap's value in grammatical sentences (critic r1 F3: steps ended 'Write <first gap>.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit STEPS-ALL-SLOTS",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the second and third gaps never named"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartSteps works every gap (relation + Write per gap; row runs for 4+ gaps)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules STEPS-ALL-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-say-agree",
+   "check": "the Say line names every gap and agrees in number ('The missing numbers are 101 and 104.'; critic r1 F3: 'The missing number is 101, 104.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "'The missing number is 101, 104.'"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayValues: chartSay (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-hint-all",
+   "check": "the Guided Model's grey work lines name every traced gap (critic r1 F3b: hints explained only 100 of 100, 107, 117)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit HINT-ALL",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "work lines name the first gap only"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "one relation line per gap"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules HINT-ALL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-tf-false",
+   "check": "True or False? deals True and False statements on every chart page (2+ statements) and 35-65 % False over the seeds (critic r1 F1, PT-TOF-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo TF-FALSE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "4 of 4 True on chart_to_120 pages"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "per-slot wrong answers deal False on multi-gap windows"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only TF-FALSE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-pattern",
+   "check": "Error analysis cannot be answered by counting gaps: windows of 2+ gaps are judged both Correct and Fix it over the seeds (critic r1 F2)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo EA-PATTERN",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "every multi-gap window Correct"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "per-slot wrong answers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only EA-PATTERN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-score-roles",
+   "check": "Score /N counts answer slots on opener, review, mixed-practice, pre-skill-check and lesson as on independent / test (critic r1 F6: opener /2 over 4 squares, mixed /6 over 13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS (every scored role)",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "opener / review / mixed / pre-skill-check / lesson count windows"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "paginate.js slotScore on those roles"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only SCORE-SLOTS --score-roles opener,review,mixed-practice,pre-skill-check,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-cross-giveaway",
+   "check": "no chart window prints, as a chart number, an empty square of another window of the same squares on the sheet - every band x grid value (critic r1 F4: band 120 grid=rows, one window, items copying each other's answers; F9: band 10)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY --variants",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "band 120 rows and band 10 pages give answers away item to item"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "the dealer never deals a window of squares already on the sheet (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-strip-numbers",
+   "check": "a lesson sheet's Steps zone and strip name no number (11+) that is not printed in, or a key of, a cell of its page (critic r1 F5: 'The number before is 109 ... Write 110.' beside windows with no 109 / 110)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo STRIP-NUMBERS",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the strip walks the example, not on the page"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "stripStepsFor: the skill's general steps when the example's steps name its own numbers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 2 --only STRIP-NUMBERS --score-roles lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-chart-square",
+   "check": "a chart window on Reason It / True or False? / Error analysis is never squeezed under the 14 mm writing floor (critic r1 F10: band 100 Reason It L at 10.4 mm squares)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CHART-SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "hundreds_chart_fill reason-it L 10.4 mm"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartwindow footprint states inkWMm for a 1-100 window, so Reason It takes its wide form"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes M,L --only CHART-SQUARE --score-roles reason-it,true-false,error-analysis",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-touch-hit",
+   "check": "a chart window's empty square takes a real tap 1 px inside every edge and corner on the practice card / quiz at 820-1366 (master's TOUCH-HIT on the lane's digit-sized chart window: a neighbour's number span lay 1 px over the input, and the card's .visual-aid scrolled the window 1 px)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-HIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "eb28a8960",
+    "state": "TOUCH-HIT 9 on hundreds_chart_fill (bottom edge 820-1366, top corners 1280)"
+   },
+   "pass": {
+    "commit": "00bafd629",
+    "state": "the empty square's slot z-index 1; .visual-aid overflow visible for a fitting window"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill --sizes 820x1180,1280x900",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-rowx",
+   "check": "Error analysis of chart windows with 1, 2 and 3 gaps on one page: the Correct / Fix it judgement starts at one x a column (the 3-box fix widened its centred cell: 100.7-113.2 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "00bafd629",
+    "state": "EA-ROWX 4 on chart_to_120 error-analysis M/L"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "error-analysis.js: one fix width a one-column page (fixWBy / o.fixW)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles error-analysis --rules EA-ROWX,EA-PAD --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-one-window-hidden",
+   "check": "lead ruling (a) 2026-11-14: a chart with ONE window (band 120 grid=rows, band 10) is not dealt on the multi-item practice pages - one item a sheet left the page 68 % empty (options-verify --render L-DENSITY PAGEFILL on grid=rows)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render PAGEFILL (+ ws-role-hidden on the card decision)",
+   "browser": true,
+   "fail": {
+    "commit": "427e28563",
+    "state": "chart_to_120 grid=rows @M/@L PAGEFILL (one window a sheet)"
+   },
+   "pass": {
+    "commit": "af76fc570",
+    "state": "grid=rows@band=120 and band 10 hidden on independent / more-practice / review / mixed-practice (+ test for band 10)"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-model-state-marks",
+   "check": "every Scripted Model state and lesson-anchor panel whose step says 'Write N' draws N in that state, the newest marks trace grey and the earlier ones solid; judged for the templates in scripted-model.js TRACE_TEMPLATES (chart_120 critic r2 N1: a two-gap window's 'Write 101.' state drew no 101; PT-MOD-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo MODEL-STATE-MARKS",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "chartwindow not in TRACE_TEMPLATES: states 2-3 blank, state 4 traces both gaps"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chartwindow draws traceSlots / traceNew on the Scripted Model and the lesson anchor"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only MODEL-STATE-MARKS --screen-seeds 0 --score-roles scripted-model,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-screen-giveaway",
+   "check": "the online worksheet's cards and the quiz builder's questions never repeat a chart window's squares, so no card prints another's answers (chart_120 critic r2 N2: the screen deal repeated band-120 windows; CROSS-GIVEAWAY on the screen hosts, L13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY (screen)",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "worksheet.js / quiz-builder deal without the window rule"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chart-giveaway.js shared by print-sheet, the worksheet and the quiz builder"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 0 --only CROSS-GIVEAWAY --screen-seeds 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-say-frame",
+   "check": "the UNFILLED Say frame of a chart window agrees with its gaps: one blank a gap, plural for 2+ ('The missing numbers are __ and __.'; chart_120 critic r2 N3: the opener printed 'The missing number is __.' under a two-gap Model)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE (unfilled frame)",
+   "fail": {
+    "commit": "03c811eed",
+    "state": "fixed strings.say 'The missing number is __.' (k2.js:481)"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayFrame(q): chartSayFrame"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

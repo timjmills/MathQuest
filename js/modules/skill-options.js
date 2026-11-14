@@ -1246,6 +1246,15 @@ function _gridOptions() {
             values: [{ v: 'window', l: 'A small piece (3 rows of 5)' }, { v: 'rows', l: 'Three whole rows of ten' },
                 { v: 'whole', l: 'The whole chart (to "Numbers to")' }],
             help: 'A small piece is cut from anywhere in the chart. Whole rows of ten show the down-ten pattern in full. The whole chart is one grid to a page.',
+            // Lead ruling 2026-11-13 (chartwindow card §7a, role-scoped hidden): the whole chart and three rows of ten are
+            // one chart to a page by design, so they stay on Independent, More practice and the simple print; the Lesson,
+            // Guided and Test pages share the page with Steps / a Model / other items and draw the window instead
+            // (optsForRole). ws-role-hidden holds every role's deal to this.
+            // Lead ruling 2026-11-14 (chart_120 r2): at band 120 three rows of ten are the chart's ONE window - one item a
+            // sheet or a giveaway - so the multi-item practice pages draw the window there ('value@option=value': hidden only
+            // when that other option holds that value).
+            hiddenOnRoles: { lesson: ['rows', 'whole'], guided: ['rows', 'whole'], test: ['rows', 'whole'],
+                independent: ['rows@band=120'], 'more-practice': ['rows@band=120'], review: ['rows@band=120'], 'mixed-practice': ['rows@band=120'] },
         },
         {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
@@ -3261,10 +3270,17 @@ _ap1Put('composing:number_bonds', {
 // hundreds_chart_fill (owner, 2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100. Each chart
 // is the first N numbers in rows of ten; the window is cut from inside it (1 to 10 is its one
 // row, drawn whole). 100 stays the default, so every old page and code is unchanged.
-_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100], 100, {
-    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)' },
-    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50 or 100 numbers, ten to a row. '
-        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20).',
+// chart_120 (card chartwindow, signed 2026-11-12): band 120 cuts every window from rows 91-120,
+// so every window crosses 100; the whole chart is 12 rows on one page.
+_ap1Put('composing:hundreds_chart_fill', Object.assign(_opsBand([10, 20, 30, 40, 50, 100, 120], 100, {
+    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)', 120: '120 (91 to 120, across 100)' },
+    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50, 100 or 120 numbers, ten to a row. '
+        + 'A small chart holds fewer empty boxes. '
+        + 'At 120 every window is cut from 91 to 120, so it crosses 100.',
+}), {
+    // Lead ruling 2026-11-14 (chart_120 r2): the chart to 10 is ONE window (its one row) - one item a sheet or a giveaway -
+    // so the multi-item practice pages deal the 1-100 window instead; the card, the quiz and the lesson keep it.
+    hiddenOnRoles: { independent: [10], 'more-practice': [10], review: [10], 'mixed-practice': [10], test: [10] },
 }));
 // number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
 // thousands). "Numbers in" names the stretch of the chart; every number in the window is in it.
@@ -3918,6 +3934,45 @@ export function offeredOptionsFor(categoryId, skillId) {
 }
 
 /** The defaults for a skill: what it generates when the teacher chooses nothing. */
+/**
+ * The option values a page ROLE must not deal (an option def's `hiddenOnRoles: {role: [values]}`): {optionId: [values]}.
+ * A role-scoped hidden decision of a signed card (§7a `roles`) is mirrored here; ws-role-hidden checks the two agree and
+ * that the role's deal never holds a hidden value.
+ */
+export function roleHiddenValues(categoryId, skillId, role) {
+    const out = {};
+    if (!role) return out;
+    for (const def of optionsFor(categoryId, skillId)) {
+        const vs = def && def.hiddenOnRoles && def.hiddenOnRoles[role];
+        if (Array.isArray(vs) && vs.length) out[def.id] = vs.slice();
+    }
+    return out;
+}
+
+/**
+ * A skill's opts as a page ROLE deals them: a value the role hides (`hiddenOnRoles`) falls back to the option's default
+ * (grid whole / rows on a Lesson, Guided or Test page draw the window). Other values pass through untouched.
+ */
+export function optsForRole(categoryId, skillId, opts, role) {
+    const hid = roleHiddenValues(categoryId, skillId, role);
+    const ids = Object.keys(hid);
+    if (!ids.length || !opts || typeof opts !== 'object') return opts;
+    // a preset's own values count too (chart_to_120 is hundreds_chart_fill with band 120): read through normalizeOptions
+    let norm;
+    try { norm = normalizeOptions(categoryId, skillId, opts); } catch (e) { norm = opts; }
+    let out = opts;
+    for (const id of ids) {
+        const v = id in opts ? opts[id] : norm[id];
+        // ('value@option=x': hidden only while that option holds x - grid rows at band 120)
+        const hit = (h) => { const [hv, cond] = String(h).split('@'); if (hv !== String(v)) return false; if (!cond) return true; const [ck, cv] = cond.split('='); return String(ck in opts ? opts[ck] : norm[ck]) === cv; };
+        if (!hid[id].some(hit)) continue;
+        const def = optionsFor(categoryId, skillId).find((d) => d.id === id);
+        if (out === opts) out = { ...opts };
+        out[id] = def ? def.default : undefined;
+    }
+    return out;
+}
+
 export function defaultOptions(categoryId, skillId) {
     const out = {};
     for (const o of optionsFor(categoryId, skillId)) out[o.id] = o.default;

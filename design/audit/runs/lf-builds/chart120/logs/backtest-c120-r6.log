@@ -1,0 +1,2 @@
+ws-backtest row c120-wrong-fits: PASS  fail state FAIL 0.4s, pass state OK 0.3s
+ws-backtest: killed by SIGTERM

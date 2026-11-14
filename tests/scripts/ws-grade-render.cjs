@@ -476,8 +476,12 @@ async function renderQuiz(page, skill, file, width = 1280, height = 900, seedOve
                 const t = tests.slice().sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))[0];
                 for (const q of (t ? t.sections.flatMap((x) => x.questions) : [])) questions.push(Object.assign({}, q, { id: questions.length }));
             }
+            // (the quiz builder's window rule, chart-giveaway.js dealPastWindows - chart_120 critic r2 N2: no question repeats the
+            // squares of an earlier chart window; every other skill takes its first draw, as before)
+            const CG = viaBuilder ? null : await import(new URL('js/modules/chart-giveaway.js', location.href).href);
             for (let i = 0; !viaBuilder && i < 3; i++) {
-                const q = window.generateQuestionFor({ category: skill.categoryId, skill: skill.skillId, seed: seed + i, itemIndex: i });
+                const gen = (k) => window.generateQuestionFor({ category: skill.categoryId, skill: skill.skillId, seed: k ? seed + i + 7919 * k : seed + i, itemIndex: i });
+                const q = CG ? CG.dealPastWindows(gen, questions.map((x) => x.questionData)) : gen(0);
                 if (!q) continue;
                 // what the quiz builder stores (quiz-take.js quizQuestionData), so the quiz renders as a real one
                 const qd = window.quizQuestionData ? window.quizQuestionData(q) : { text: q.text, ans: q.ans, hint: q.hint, options: q.options, answerType: q.answerType, visual: q.visual, skillLabel: q.skillLabel };

@@ -9,6 +9,7 @@ import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
+import { chartSeen, chartGivesAway } from './chart-giveaway.js';
 import { syncWorksheetRefLine } from './refline-screen.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
@@ -862,14 +863,22 @@ function _wsGenerate(i) {
     const prevMember = i > 0 ? memberOf(earlier[i - 1]) : '';
     const fairMember = (m) => !m || (m !== prevMember && win.filter((x) => x === m).length < 2);
     let kitFallback = null;              // a kit cell that broke only the variety rule
-    const tries = kitPool ? 24 : 12;
+    // CROSS-GIVEAWAY on the screen (chart_120 critic r2 N2): a chart window never repeats the squares of an earlier card's
+    // window - with other gaps it prints that card's answers - as the paper deal (chart-giveaway.js). Band 120 has six
+    // windows, so a chart sheet draws more tries before it relaxes.
+    const cwSeen = chartSeen(earlier);
+    const tries = kitPool ? 24 : cwSeen.size ? 48 : 12;
     for (let attempt = 0; attempt < tries; attempt++) {
         const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
         let cand = null;
         try {
+            // (a chart sheet whose tries at this card's place all repeat a window draws the second half of its tries at the
+            // next places of the ladder: band 120's crossing items - one in three - have only the two edge windows, and two
+            // of them with cards between can find both taken; r2 N2)
+            const at = cwSeen.size && attempt >= tries / 2 ? i + 1 + (attempt % 2) : i;
             cand = generateQuestionFor({
                 category: state.category, skill: state.skill, opts: state.skillOptions,
-                seed, itemIndex: i, gameMode: 'worksheet',
+                seed, itemIndex: at, gameMode: 'worksheet',
             });
         } catch (e) {
             console.error('worksheet: generateQuestionFor failed', e);
@@ -884,6 +893,7 @@ function _wsGenerate(i) {
             if (!kitFallback && !seen.has(_wsItemKey(cand))) kitFallback = cand;
             continue;
         }
+        if (cwSeen.size && attempt < tries - 1 && chartGivesAway(cand, cwSeen, { same: true })) { if (!q) q = cand; continue; }
         const key = _wsItemKey(cand);
         if (!seen.has(key)) { q = cand; break; }
         if (!fallback && key !== prevKey) fallback = cand;

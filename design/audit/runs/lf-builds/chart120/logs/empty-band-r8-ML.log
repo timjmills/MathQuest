@@ -1,0 +1,46 @@
+note: slot ink on: an empty PRINT answer slot is ink over its whole box (the writing room)
+note: composing:chart_to_120: slot ink on; card design/cards/chartwindow/chartwindow.md; 14 roles x M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: composing:hundreds_chart_fill: slot ink on; card design/cards/chartwindow/chartwindow.md; 14 roles x M/L + 6 option variant(s) of 18 + hosts card, worksheet, quiz
+EB-BAND  FAIL 16
+   composing:chart_to_120 lesson M p1 cell 1: empty band 37.2 mm under the ink of a 114.5 mm cell (32.5 %; limit 28 % = 32.0 mm; the 3.0 mm top pad excluded) []
+   composing:chart_to_120 lesson M p1 cell 2: empty band 42.5 mm under the ink of a 114.5 mm cell (37.2 %; limit 28 % = 32.0 mm; the 3.0 mm top pad excluded) []
+   composing:chart_to_120 lesson M p1 cell 4: empty band 42.7 mm under the ink of a 114.5 mm cell (37.3 %; limit 28 % = 32.0 mm; the 3.0 mm top pad excluded) []
+   composing:chart_to_120 lesson L p1 cell 1: empty band 37.2 mm under the ink of a 114.5 mm cell (32.5 %; limit 28 % = 32.0 mm; the 3.0 mm top pad excluded) []
+   composing:chart_to_120 lesson L p1 cell 2: empty band 42.5 mm under the ink of a 114.5 mm cell (37.2 %; limit 28 % = 32.0 mm; the 3.0 mm top pad excluded) []
+   composing:chart_to_120 lesson L p1 cell 4: empty band 42.7 mm under the ink of a 114.5 mm cell (37.3 %; limit 28 % = 32.0 mm; the 3.0 mm top pad excluded) []
+   composing:chart_to_120 lesson L p2 cell 2: empty band 24.3 mm around (above + under) the ink of a 84.9 mm cell (28.6 %; limit 28 % = 23.8 mm; the 7.0 mm top pad excluded) [legacy]
+   composing:chart_to_120 lesson L p2 cell 3: empty band 25.6 mm around (above + under) the ink of a 84.4 mm cell (30.4 %; limit 28 % = 23.6 mm; the 3.0 mm top pad excluded) [chartwindow]
+   composing:chart_to_120 guided M p1 cell 2: empty band 53.0 mm around (above + under) the ink of a 115.1 mm cell (46.0 %; limit 28 % = 32.2 mm; the 3.0 mm top pad excluded) [chartwindow]
+   composing:chart_to_120 guided L p1 cell 2: empty band 45.3 mm around (above + under) the ink of a 111.1 mm cell (40.8 %; limit 28 % = 31.1 mm; the 3.0 mm top pad excluded) [chartwindow]
+   composing:hundreds_chart_fill lesson L p2 cell 2: empty band 23.3 mm under the ink of a 81.1 mm cell (28.7 %; limit 28 % = 22.7 mm; the 3.0 mm top pad excluded) [counters]
+   composing:hundreds_chart_fill lesson L p2 cell 3: empty band 25.7 mm around (above + under) the ink of a 84.7 mm cell (30.3 %; limit 28 % = 23.7 mm; the 3.0 mm top pad excluded) [chartwindow]
+   composing:hundreds_chart_fill lesson L p2 cell 4: empty band 25.8 mm around (above + under) the ink of a 84.7 mm cell (30.5 %; limit 28 % = 23.7 mm; the 3.0 mm top pad excluded) [chartwindow]
+   composing:hundreds_chart_fill guided M p1 cell Model: empty band 37.6 mm around (above + under) the ink of a 115.1 mm cell (32.6 %; limit 28 % = 32.2 mm; the 6.0 mm top pad excluded) [chartwindow]
+   composing:hundreds_chart_fill guided M p1 cell 2: empty band 53.4 mm around (above + under) the ink of a 115.1 mm cell (46.4 %; limit 28 % = 32.2 mm; the 3.0 mm top pad excluded) [chartwindow]
+   ... 1 more
+EB-SIDE  PASS
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-ROLE  FAIL 4
+   composing:chart_to_120 stretch M: the card offers it, the app does not compose it: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+   composing:chart_to_120 stretch L: the card offers it, the app does not compose it: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+   composing:hundreds_chart_fill stretch M: the card offers it, the app does not compose it: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+   composing:hundreds_chart_fill stretch L: the card offers it, the app does not compose it: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  FAIL 4
+   composing:chart_to_120 pre-skill-check M p1: 55 % of the page body is empty under its last block (not the last page; limit 30 %)
+   composing:chart_to_120 pre-skill-check L p1: 52 % of the page body is empty under its last block (not the last page; limit 30 %)
+   composing:hundreds_chart_fill pre-skill-check M p1: 50 % of the page body is empty under its last block (not the last page; limit 30 %)
+   composing:hundreds_chart_fill pre-skill-check L p1: 42 % of the page body is empty under its last block (not the last page; limit 30 %)
+EB-GDPCAP FAIL 1
+   composing:chart_to_120 guided L: 7 scored tries on the Guided page(s) at L; the §12.1 ceiling is 6 plus the Model
+EB-PARITY PASS
+EB-ITEMKEY PASS
+EB-ITEMPARITY PASS
+(2 skill(s), 134 renders, 507 cells, 212 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (25)

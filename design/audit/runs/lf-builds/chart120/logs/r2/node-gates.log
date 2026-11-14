@@ -1,0 +1,4 @@
+ws-code-snapshot: OK (735 codes, 35 categories, +163 appended since the pinned baseline of 572, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable, 3216 option round trips)
+ws-providers-unit: OK (105868 checks, 32 time and money + 24 re-graded skills + 9 siblings + 41 place-value / rounding / estimation + 4 count-by)
+ws-roles-unit: OK (87 check(s))
+ws-spec-card: FAIL — needs owner signature: design/cards/chartwindow/chartwindow.md (everything else green)
