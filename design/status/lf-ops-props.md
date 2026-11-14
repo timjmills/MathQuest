@@ -424,3 +424,21 @@ L-DENSITY / L-OVERLAP too); ws-precritic-plan OK.
     - the Steps band is estimated at 39.7 mm and drawn at 37.3 mm.
 - Structural, not blocking (lead): sibling-compare NO-SIBLING. The "unparsed" no-size-s-browser and copy-light rows go to lf-checks.
 - The D1 (S) and D10 (390) ledger rows now carry the owner-rule exemptions.
+
+## PARKED: count_by_tables (lead rule 7, 2026-11-14) — critic cbt r2 FAIL at the cap, lowest 4
+Report: design/audit/runs/lf-ops/critic-cbt-r2.md (graded at 8f76b6401). Every finding has a ledger row in
+CHECKS_FROM_CRITICS (2026-11-14, `exempt: parked ...`, fail commit 8f76b6401), naming its planned check. Re-arm each with a backtest when cbt resumes.
+- **Root cause of the lost round:** precritic `--skill` lints only the Independent page at defaults. Six card roles and the per-option lesson renders were never gated, and E3 / E5 / E6 were already red in plain print-lint. The coverage fix goes to **lf-checks** (lead).
+- E1 True or False? false equations: true-false.js:53-56. Fix **routed to lf-roles** (lead). Check: TOF-STEM.
+- E2 Pre-skill check, one quadrant, ~75 % empty. Check: --page-fill + PRE-QUADRANTS.
+- E3 Scripted Model L, Say band clipped. Check: L-OVERLAP SECTION + RR-CLIP on the path.
+- E4 jumps=15 lesson chart 9 + 6, squeezed. Check: CHART-DIGIT + CHART-SHAPE per option.
+- E5 opener CL40-INK. Check: the opener on the lint roles.
+- E6 error-analysis top-start gap. Check: error-analysis on the lint roles.
+- E7 times / jumps=15 chart merges steps 1 and 2. Check: panels = workedSteps for every option.
+- E8 onePage leaks into the lesson chart and Guided. Check: OPTION-ROLE-SCOPE.
+- E9 the WS-REFLOW template exemption makes number_patterns_rule's worksheet cards about 30 % used. **Lead: when cbt resumes, the exemption becomes PER CARD** (only a card whose train measures wider than its column). Check: FULLROW-USE >= 50 %.
+- m2 mixed circles and hexagons as writing places (number_seq_fill). Check: SLOT-SHAPE.
+- N1 Guided L and the times options' feet: the lead is asking lf-roles to confirm its ledger covers them.
+- The routed EB reds (lf-roles Guided fit; lf-engine opener and vocab) stand as ledgered on 2026-11-13.
+- Part B (mult_properties / arrays_groups) is still held. Nothing from -props ships now.
