@@ -2194,3 +2194,8 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell],
 html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell],
 html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell] { z-index: 1; }
+/* (and its scroll box: the card's .visual-aid scrolls sideways for a wide chart, so a chart window that fits - every 3 x 5
+   window at 820 to 1366 - scrolled 1 px down inside it once a square took focus, and a tap on the top corners of a first-row
+   square landed outside the clip: ws-phone-card TOUCH-HIT at 1280. A window that fits its card does not scroll. Additive.) */
+html body #questionCard .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)),
+html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)) { overflow: visible !important; }
