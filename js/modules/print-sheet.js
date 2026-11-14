@@ -5029,6 +5029,9 @@ async function buildLesson(n, metaOf) {
     const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
     const nz = Object.assign({}, n, { size });
     const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
+    // (lf-engine chart-name, 2026-11-14: a library lesson's anchor chart prints the Name / Date line; a detailed lesson's
+    // chart keeps its bare header, byte-identical - the detailed lessons are paused. lesson-pages/chart.js chartPage)
+    if (n.lessonData) lessonInput.chartBare = true;
     // (lf-partopts: the counts the lesson role reads - chart examples, vocabulary words, Remember, We Do cells, rows)
     const partN = lessonPartN(po);
     if (partN) lessonInput.partN = partN;
