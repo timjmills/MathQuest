@@ -21,6 +21,7 @@ import {
     renderCell, cellAnswerKey, cellGridItem, hasCell,
     resolveCtx, esc,
 } from '../index.js';
+import { LIVE_W_MM } from '../layout.js';
 
 /* ------------------------------------------------------------------ the plan (data only) */
 
@@ -347,14 +348,32 @@ function itemHtml(item, ctx, report) {
 
 /* --------------------------------------------------------------------------- the render */
 
+/**
+ * LDIV-ROOM (owner 2026-11-14: "a lot of white area to work with"): the room (mm) a grid part gives its i-th cell, from the
+ * part's drawn height, rows, row shares and columns, plus how many cells the part holds. Handed ONLY to the long-division
+ * template (`ctx.room`), which grows its writing boxes into it; every other template's ctx is untouched.
+ */
+function partRoom(part, i, n) {
+    const H = parseFloat(part.height);
+    if (!(H > 0) || !/mm$/.test(String(part.height))) return null;
+    const cols = Math.max(1, part.cols || 2), rows = Math.max(1, part.rows || Math.ceil(n / cols));
+    let fr = part.rowsTpl ? String(part.rowsTpl).trim().split(/\s+/).map(parseFloat) : null;
+    if (!fr || fr.length !== rows || fr.some((x) => !(x > 0))) fr = null;
+    const r = Math.min(rows - 1, Math.floor(i / cols));
+    const hMm = fr ? H * fr[r] / fr.reduce((a, b) => a + b, 0) : H / rows;
+    return { wMm: LIVE_W_MM / cols, hMm, cells: rows * cols };
+}
+const isLongDivision = (item) => !!(item && item.q && item.q.cell && item.q.cell.template === 'division');
+
 function gridPart(part, ctx, report) {
     const items = part.items || [];
     const cells = items.map((item, i) => {
         report.index = report.cellNo++;
         const gi = item.q ? cellGridItem(item.q, ctx) : { cls: '', style: '' };
+        const room = isLongDivision(item) ? partRoom(part, i, items.length) : null;
         // critic r3 (N-1, lead ruling on Q1): the key marks a Model cell, so its traced worked answer
         // stays a black given there while a Guided Practice trace takes the key ink (key only).
-        let html = itemHtml(item, ctx, report);
+        let html = itemHtml(item, room ? Object.assign({}, ctx, { room }) : ctx, report);
         const keyModel = report.key && (item.model || report.inModel);
         if (keyModel && /\sdata-ws-cell="/.test(html)) html = html.replace(/(<[a-zA-Z][^>]*?)\sdata-ws-cell="/, '$1 data-ws-key-model data-ws-cell="');
         return {

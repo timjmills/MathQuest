@@ -261,6 +261,24 @@ function compactGutterMm(p, ctx, trackMm, g) {
     return Number(m.factRowGutter) > 0 ? Number(m.factRowGutter) : 0;
 }
 
+/**
+ * LDIV-ROOM (owner 2026-11-14: on the long-division page "it seems there is a lot of white area to work with"; lead
+ * ruling): when the page hands the cell its room (`ctx.room`, answer-key.js partRoom) and holds 4 cells or fewer, the
+ * WRITING boxes - the quotient boxes, the remainder box and the subtraction work grid - grow into it, up to 2x, keeping
+ * ROOM_KEEP_MM of white above and below the (centred) block and beside it. The printed digits keep their size token
+ * (only their tracks widen with the grid, so each still heads its own column); the divisor's tracks and the bracket's
+ * gutter do not grow. 6 and 8 a page, facts, screen twins and fact rows keep 1.
+ */
+const ROOM_KEEP_MM = 6, ROOM_CAP = 2;
+function growOf(p, ctx, g, { trackMm, rows, qH, gutterMm, dv, n }) {
+    const R = ctx.room;
+    if (!R || ctx.mode === 'screen' || p.fact || !rows || !(R.cells <= 4) || !(R.hMm > 0) || !(R.wMm > 0)) return 1;
+    const rowMm = Math.max(g.writeMm, 6) + 1;
+    const byH = (R.hMm - 2 * ROOM_KEEP_MM - g.pt * 25.4 / 72 * 1.25) / (qH + rows * rowMm);
+    const byW = (R.wMm - 2 * ROOM_KEEP_MM - dv * trackMm - gutterMm) / ((n + (p.rbox ? 2.1 : 0)) * trackMm);
+    return Math.max(1, Math.min(ROOM_CAP, byH, byW));
+}
+
 register('division', {
     render(p, ctx) {
         const g = geo(ctx);
@@ -284,6 +302,8 @@ register('division', {
         // divisor's last digit and the dividend's first (bracketArc's compact path).
         const rowGutter = compactGutterMm(p, ctx, trackMm, g);
         const gutterMm = rowGutter || trackMm * 1.1;
+        const grow = growOf(p, ctx, g, { trackMm, rows, qH, gutterMm, dv, n });
+        const T = trackMm * grow;   // a dividend / writing track (LDIV-ROOM); the divisor keeps trackMm
         const k = keyOf(p);
         const ink = inkOf(ctx);
         const vals = slotValues(ctx, k.slots, (w) => {
@@ -293,8 +313,8 @@ register('division', {
             return o;
         });
         const o = dv + 2;
-        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)})`
-            + `${p.rbox ? ` ${g.em(trackMm * 0.9)} ${g.em(trackMm * 1.2)}` : ''};`;
+        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(T)})`
+            + `${p.rbox ? ` ${g.em(T * 0.9)} ${g.em(T * 1.2)}` : ''};`;
         // S5 step state: {slot: {value, ink}} and one ink per work row (stepState below).
         const sv = ctx.stepVals || null;
         const vAt = (id) => (sv ? ((sv[id] && sv[id].value) || '') : vals[id] || '');
@@ -305,7 +325,7 @@ register('division', {
         // Row 1: the quotient strip over every dividend track (VA-61, SL-12).
         for (let i = 0; i < n; i++) {
             html += cell(box(g, `q-${i}`, {
-                wMm: trackMm, hMm: qH, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: openQ ? null : stripPos(i, n),
+                wMm: T, hMm: qH * grow, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: openQ ? null : stripPos(i, n),
                 ...(openQ ? { shape: 'open', extra: 'border:0;background:transparent;' } : {}),
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
@@ -314,7 +334,7 @@ register('division', {
         // P11: the remainder slot, "R [ ]", on the quotient's row after the last dividend track.
         if (p.rbox) {
             html += cell('<span style="font-weight:700">R</span>', dv + 2 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
-            html += cell(box(g, 'r', { wMm: trackMm, hMm: g.stripMm, value: vAt('r'), ink: iAt('r'), mark: 'cell' }), dv + 3 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+            html += cell(box(g, 'r', { wMm: T, hMm: g.stripMm * grow, value: vAt('r'), ink: iAt('r'), mark: 'cell' }), dv + 3 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
         }
         // Row 2: divisor, bracket, dividend. The vinculum is the top border of the dividend row.
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
@@ -339,7 +359,7 @@ register('division', {
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;
         const work = sv ? workRows(p, rows, null) : ink === null ? [] : workRows(p, rows, shownQ);
-        const rowH = g.em(Math.max(g.writeMm, 6) + 1);
+        const rowH = g.em((Math.max(g.writeMm, 6) + 1) * grow);
         for (let r = 0; r < rows; r++) {
             const gridRow = 3 + r;
             const subtract = r % 2 === 0;
@@ -366,7 +386,7 @@ register('division', {
         const geoAttr = rowGutter && Number((ctx.metrics || {}).factRowGeo) > 0 ? ' data-ws-rowgeo="1"' : '';
         return markWriteAbove(root(g, 'division',
             `<div role="group" aria-label="${esc(label)}"${geoAttr} style="display:inline-grid;${cols}grid-template-rows:auto ${g.em(g.pt * 25.4 / 72 * (mixRow ? 1.15 : 1.25))};align-items:stretch;margin:0 auto${rowGutter ? `;position:relative;left:-${(bracketLeadEm(V, trackMm / g.E) / 2).toFixed(3)}em` : ''}">${html}</div>`,
-            'text-align:center;', this.footprint(p, ctx).wMm));
+            'text-align:center;', grow > 1 ? Math.ceil(dv * trackMm + gutterMm + (n + (p.rbox ? 2.1 : 0)) * T + 8) : this.footprint(p, ctx).wMm));
     },
     answerKey(p) {
         const k = keyOf(p);
