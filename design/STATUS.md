@@ -850,3 +850,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Owner note T3: on a two-line title the descenders sit 0.7–0.85 mm above the rule (critic accepted; the alternative costs a row of problems).
 - Precritic reads "tool --mode: OK" verdicts; ws-copy-light no longer truncates its verdict through a pipe (process.exitCode). Rows precritic-mode-verdict, copy-light-pipe-verdict.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, frame-title (196), title-code, frame-title-ui, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest self-test, precritic self-test, precritic-plan + checks-from-critics, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy pv live1 (lf-placevalue; expand + unit_form critic r2 PASS)
+- placevalue:expand: worksheet back to one line (boxes 103x76, 2 columns at 1280), card numerals 56 px, quiz / worksheet touch targets >= 48 px. placevalue:unit_form: worksheet boxes 50 px.
+- Global screen rule: a boxed answer slot (.mq-cellbox holding input.mq-cellslot) is at least 50 px tall (border-box: 48 px of input). 30-skill passed sweep: no non-pv screen changed.
+- number_word_form Guided D2-D4 and hint-gap fixes (equal or better on every changed page; not yet passed: one-kind root cause on live2).
+- Gates: code-snapshot, no-size-s, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, capacity-pin, frame-title (196), screen-widths-plan; lane: redesign-passed 30, precritic-plan, no-phone-width, boot-smoke, lesson baseline 1772 identical.
