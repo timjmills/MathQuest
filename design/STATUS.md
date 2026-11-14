@@ -861,3 +861,21 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Two-step word problems: a lone row is held to its ink (ONE-ROW-CAP); Guided fits 2 stories a page by drawn heights (GUIDED-DRAWN-FIT); a Model too tall to share its page spills Guided and Independent to page 2 under a header naming the part (PT-OPN-10, OPENER-SPILL, SPILL-P1); Reason It two-step pairs print A over B at full width (RI-TWOSTEP, capacity 1 ruled); LONE-PAGE reads `ruled`.
 - Passed skills: only div_facts_long review M and sub_2d_1d review L changed (graded 9/9/8/9); 220 other passed pages identical.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit (101), frame-title (196), simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan + checks-from-critics, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Hotfix TOF-STEM: True or False? never states a false equation (lf-roles)
+- The shared True or False? role used an "a op b =" stem whenever a question had two operands, so 55 skills could print a false statement (count_by_tables: "3 x 12 = 12, 18, 24, 30, 36"; missing-part, 3-addend, story and mixed skills). The stem is now used only when it is true of the answer; otherwise "The answer is ...".
+- ws-tof-stem on precritic (--skill and --role true-false): 727 skills, 7,673 frames OK; backtest tof-stem PASS; passed skills' True or False? pages byte-identical; lesson baseline 1772 identical; content-audit OK.
+
+## 2026-11-14 — Deploy options panel (lf-partopts, critic r5 PASS: every criterion >= 8 at 1280/1366/1024/820) + ledger fix + no-size-s browser de-flake (lf-checks)
+- Teacher Options panel: the live sample is drawn whole and scaled (no sliced drawings), a too-wide drawing scrolls with a visible cue; the "?" tip button no longer takes the row's clicks ([hit] check + options-panel-hit row now on master). FU-1 (page count after M->L->M) is held with paused part B: its code (resnapPartOpts) is only on the lane branch.
+- Ledger: lf-checks' checks-from-critics fix (0 fail on master) + the panel's rows; stale duplicate rows from the merge removed. 4 panel rows remain WARNING, routed to lf-checks before 13:00 UTC.
+- ws-no-size-s --browser waits for the built size and re-clicks once on a miss (row nos-browser-settle-reclick).
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, frame-title, simple-print (one load failure, OK when run alone), screen-answer, pdf-preview, teacher-wrm, options-panel rows, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Final deploy before the owner's budget stop
+- number_word_form live2 (final round PASS; N3 / N6 / N7 / N9 fixed; PVW evidence updated).
+- L-KEY hotfix (lf-roles): answer keys and pupil pages never print raw JSON or generator ids (89 skills hit on master, 1,041 findings); ws-key-json on precritic.
+- Anchor charts carry the Name / Date line on every lesson, detailed lessons included (owner request; critics 9/9/9/9 and 9/9/9/8; re-pinned 512 + 86 chart hashes).
+- Every-role precritic (lf-checks, narrow critic r2 PASS): precritic --skill lints every card role x M/L x drawing-changing option.
+- Ledger: 0 fail before the 13:00 UTC sweep.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.

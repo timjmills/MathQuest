@@ -9,6 +9,13 @@ Builder profile: mq-opus-medium
 Critic rounds: 2, FAIL (r2: identify C2 3, value C3 6, expand C3 5, combine C2 4, unit_form C3 5)
 
 ## Now
+- 2026-11-14 live2 r3 (ROUND CAP, fresh builder Opus medium, branch claude/lf-placevalue-live2): root cause of the one-kind class
+  (critic live1 r2 N3 / N6) - the kind rule lived in the Opener only (opener.js oneKindFirst) and `wordsKind` lumped 11 / 12 with
+  13-19. Fixed once: compose.js `stepsKindOf` / `oneKindFirst` shared by the opener, the guided page, the lesson's We Do and its
+  example (chart.js pickExample: a well-dealt kind); 11 / 12 their own kind, 0-10 one kind; the lesson Rule / Remember from the dealt
+  kind (`ruleFromItems`, roles/lesson.js fitLessonData). N7: the to_words line never leaves its cell. Checks first: GUIDED-ONE-KIND on
+  every role, LESSON-RULE-FITS (new), the to_words opener gate on the lane path; backtests pv-words-one-kind-roles,
+  pv-words-lesson-rule-fits, pv-words-opener-to-words-overflow. Next: one narrow critic round on number_word_form.
 - HAND-OVER 2026-11-07 ~13:30 UTC (budget: week at ~60 %, no new work after 14:10). Branch claude/lf-placevalue @ a2c0e635, PR #35.
 - Critic r1 FAIL (all five lesson #1 skills); r1 fix round done; precritic r3 (design/audit/runs/lf-placevalue/precritic-r3.md) is
   18 FAIL / 21 PASS — mostly NEW reds from the plan-from-card gates (every offered role × option value). Critic r2 NOT run (rule 0b).

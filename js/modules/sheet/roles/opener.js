@@ -17,7 +17,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart,
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
-    poolItems, answerOf, labelStyleOf, stripExtraMm,
+    poolItems, answerOf, labelStyleOf, stripExtraMm, oneKindFirst, stepsKindOf,
 } from './compose.js';
 import { koMm } from '../layout.js';
 
@@ -211,41 +211,50 @@ export function counts(pools, input) {
     // a count-row page asks for the most it could hold (2 Guided rows, 2 Independent rows); the plan places what fits
     // (critic r5 N13: and one spare row more, so a taller row can be left out without the page coming up short)
     if (countRowFirst(probe)) return { main: (g.twoModels ? 2 : 1) + 5 * g.gc };
-    // (SPILL: three spare stories, so the plan can take the shortest - bestGeometry)
-    if (g.spill) return { main: needOf(g) + 3 };
-    return { main: needOf(g) };
+    // (round-cap r3, critic live1 r2 N3: a mixed-kind deal asks for two rows more, so the Model's kind fills its Guided rows
+    // from the deal - plan() takes them first and leaves the rest unplaced; SPILL: three spare stories, so the plan can take
+    // the shortest - bestGeometry; the two extras add)
+    const kindExtra = mixedKinds(probe) ? 2 * g.gc : 0;
+    if (g.spill) return { main: needOf(g) + 3 + kindExtra };
+    return { main: needOf(g) + kindExtra };
 }
 
-/**
- * PT 2.3 on the Opener (lf-placevalue critic live1 N3): the Model and its Guided band are one kind of problem - the items whose
- * Steps are the same. The pool is reordered, stably, so the kind it deals most comes first (ties: the kind dealt first): the
- * Model, the Steps band (read off the first item) and the Guided band take it, and the other kinds go to the Independent band.
- * A pool of one kind - every skill but a mixed-kind one such as number_word_form at "numbers to 20" - is returned as it was.
- */
-function oneKindFirst(pool) {
-    if (!Array.isArray(pool) || pool.length < 3) return pool;
-    const key = (it) => { try { return JSON.stringify((stringsOf(it) || {}).steps || null); } catch (e) { return ''; } };
-    const keys = pool.map(key);
-    if (new Set(keys).size < 2) return pool;
-    const n = new Map();
-    keys.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
-    let top = keys[0];
-    for (const [k, c] of n) if (c > n.get(top)) top = k;
-    return [...pool.filter((_, i) => keys[i] === top), ...pool.filter((_, i) => keys[i] !== top)];
-}
+/** A pool whose items are of more than one kind (compose.js stepsKindOf): number_word_form's names by kind, a mixed pool. */
+const mixedKinds = (pool) => Array.isArray(pool) && new Set(pool.map(stepsKindOf)).size > 1;
 
 export function plan(input = {}) {
-    const fit = bestGeometry(oneKindFirst(poolItems(input, 'main')), input);
+    const dealt = poolItems(input, 'main');
+    // critic r4 N12: when the deal comes up short of the plan, the Independent rows are filled before the second Guided row
+    // (PT-OPN-7 rows are scored; the second Guided row only fills a page that would otherwise end in a blank band)
+    const split = (fit) => {
+        const nM = fit.g.twoModels ? 2 : 1;
+        const models = fit.items.slice(0, nM), rest = fit.items.slice(nM);
+        const guided1 = rest.slice(0, fit.g.gc);
+        const indep = rest.slice(fit.g.gc, fit.g.gc + fit.g.iRows * fit.g.gc);
+        const guided = guided1.concat(fit.g.gRows > 1 ? rest.slice(fit.g.gc + indep.length, fit.g.gc + indep.length + fit.g.gc) : []);
+        return { fit, models, rest, indep, guided };
+    };
+    let sp = split(bestGeometry(oneKindFirst(dealt), input));
+    // PT 2.3 (round-cap r3, critic live1 r2 N3): the Guided band is the Model's kind - the items whose Steps are the Model's
+    // Steps (compose.js oneKindFirst, the shared rule); the other kinds go to the Independent band. A one-kind pool is as before;
+    // so is a mixed deal whose page as planned before (the planned count, sorted) already has a one-kind Guided band.
+    if (mixedKinds(dealt)) {
+        const oneKind = (x) => [...x.models, ...x.guided].every((it) => stepsKindOf(it) === stepsKindOf(x.models[0]));
+        const need = needOf(sp.fit.g);
+        const sp0 = split(bestGeometry(oneKindFirst(dealt.slice(0, need)), input));
+        if (needOf(sp0.fit.g) === need && oneKind(sp0)) sp = sp0;
+        else {
+            const { g } = sp.fit;
+            const all = oneKindFirst(sp.rest, sp.models[0]).slice(0, g.gc * g.gRows);
+            // (the Independent band keeps the DEAL's order - its mix of kinds is the practice; only the Guided band is sorted)
+            const left = dealt.filter((it) => sp.rest.includes(it) && !all.includes(it));
+            sp = Object.assign({}, sp, { indep: left.slice(0, g.iRows * g.gc), guided: all.slice(0, g.gc).concat(g.gRows > 1 ? all.slice(g.gc) : []) });
+        }
+    }
+    const { fit, models, indep, guided } = sp;
     const { g, items } = fit;
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;
-    const models = items.slice(0, nModel);
-    // critic r4 N12: when the deal comes up short of the plan, the Independent rows are filled before the second Guided row
-    // (PT-OPN-7 rows are scored; the second Guided row only fills a page that would otherwise end in a blank band)
-    const rest = items.slice(nModel);
-    const guided1 = rest.slice(0, g.gc);
-    const indep = rest.slice(g.gc, g.gc + g.iRows * g.gc);
-    const guided = guided1.concat(g.gRows > 1 ? rest.slice(g.gc + indep.length, g.gc + indep.length + g.gc) : []);
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);

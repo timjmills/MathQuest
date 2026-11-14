@@ -50,7 +50,7 @@
 // (lesson-pages/index.js), so a new page job registers itself there without editing this file. The
 // role's earlier exports are re-exported below, unchanged.
 
-import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf } from './compose.js';
+import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf, stringsOf } from './compose.js';
 import { workedStepsOf } from '../anchors.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { hopsSvg } from '../lesson-arch/fact.js';
@@ -115,6 +115,22 @@ export function counts(pools, input) {
     return out;
 }
 
+/**
+ * The lesson data with its Rule (chant) and Remember line taken from what the page DEALS (round-cap r3, lf-placevalue critic
+ * live1 r2 N6: "Rule: Every box gets a digit." printed over words written on a line, "Remember: A number name says the
+ * hundreds, then the rest." over two-digit numbers). Where the lesson routine asks (`ruleFromItems`), the worked example's
+ * provider strings give them for its kind - `lessonRule` the chant ('' = none), `remember` the first concept; the Guided cells
+ * are the example's kind (we-do.js, compose.js oneKindFirst), so both fit every item they sit over. Any other lesson: as it was.
+ */
+export function fitLessonData(data, example) {
+    if (!data || !data.ruleFromItems || !example) return data;
+    const s = stringsOf(example) || {};
+    const out = Object.assign({}, data);
+    if (typeof s.lessonRule === 'string') out.chant = s.lessonRule;
+    if (typeof s.remember === 'string') out.concepts = s.remember ? [{ id: 'kind', text: s.remember }, ...(data.concepts || []).slice(1)] : [];
+    return out;
+}
+
 /* =========================================================================== the extras */
 
 /**
@@ -124,9 +140,10 @@ export function counts(pools, input) {
  */
 export function extras(input = {}) {
     const lesson = input.lesson || {};
-    const data = lesson.data || null;
+    const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const ex = pickExample(main, data);
+    const ex = pickExample(main, data0);
+    const data = fitLessonData(data0, ex);
     // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
     const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
     const out = [];
@@ -315,9 +332,10 @@ function partPlan(def, input) {
 function planOnce(input = {}) {
     const ctx = ctxOf(input);
     const lesson = input.lesson || {};
-    const data = lesson.data || null;
+    const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const example = pickExample(main, data);
+    const example = pickExample(main, data0);
+    const data = fitLessonData(data0, example);
     const exSteps = example ? workedStepsOf(example) : [];
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const extrasList = input.extras || [];
