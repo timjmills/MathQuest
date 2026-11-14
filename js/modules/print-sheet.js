@@ -1039,7 +1039,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (pin) setDealPin(skH.dealPin, pin);
                 // (the sheet's kept chart windows: a window dealt now blanks their gaps and prints none of them - chart-giveaway.js)
                 setChartSheet(_cwAll(seen));
-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: _cwRoleTiles && CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
@@ -3125,9 +3125,14 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols, level }) {
         take(pupil, count) {
             const sigs = new Set(pupil.filter((it) => it && it.q).map((it) => signature(it.q)));
             const sigOf = (a) => signature(a.source.q);
-            const free = () => cands.filter((a) => !sigs.has(sigOf(a))).length;
+            // (CROSS-GIVEAWAY, lead 2026-11-14: an anchor shows its answers, so a chart anchor holds none of the squares a pupil
+            // window on the sheet leaves empty - the anchors join the sheet's chart deal (chart-giveaway.js) at their pick)
+            const pupilCw = pupil.map((it) => it && it.q && chartOfQ(it.q)).filter(Boolean);
+            const cwOk = (a) => { const c = a && a.source && chartOfQ(a.source.q); return !c || !pupilCw.some((p) => p.gaps.some((g) => c.rows.includes(Math.floor((g - 1) / 10)) && c.cols.includes((g - 1) % 10))); };
+            const free = () => cands.filter((a) => !sigs.has(sigOf(a)) && cwOk(a)).length;
             if (free() < count) grow(cands.length + count - free() + 2);
-            return pickDistinct(cands, sigs, count, sigOf, (a) => String((a.source.q && a.source.q.text) || '').replace(/[^0-9]/g, ''));
+            const pool = pupilCw.length && free() >= count ? cands.filter(cwOk) : cands;
+            return pickDistinct(pool, sigs, count, sigOf, (a) => String((a.source.q && a.source.q.text) || '').replace(/[^0-9]/g, ''));
         },
     };
 }
@@ -6366,15 +6371,21 @@ try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catc
  * The result carries `stats`: the build's time, deals, page checks and cell measurements.
  */
 let buildQueue = Promise.resolve();
-// (CROSS-GIVEAWAY, lead 2026-11-14: on a role that opens with a worked Model - Guided, a lesson's anchor, the Scripted Model - the
+// (CROSS-GIVEAWAY, lead 2026-11-14: on a role that opens with a worked Model - Guided, the Scripted Model - the
 // first chart window shows its answers traced, so it is recorded as a SHOWN window: a later window leaves none of its squares empty)
 let _cwShowFirst = false;
+// (lead ruling (a) 2026-11-14: a Guided page's chart windows hold 3 blanks - a scaffold step below Independent's 5; the role
+// overrides the skill's "Numbers to fill in")
+let _cwRoleTiles = null;
+const CW_SKILLS = new Set(['composing:hundreds_chart_fill', 'composing:chart_to_120']);
 // (the sheet's chart windows across ALL its runs - a lesson deals its anchor and each practice section in runs of their own)
 // (keyed by run - its seed and first place - so a run dealt again, a probe then the final deal, replaces its own windows)
 const _cwSheet = new Map();
 const _cwAll = (seen) => { const u = new Set(); for (const ks of _cwSheet.values()) for (const k of ks) u.add(k); for (const k of seen) if (typeof k === 'string' && k.startsWith('cw:')) u.add(k); return u; };
 export function buildSheet(req = {}) {
-    _cwShowFirst = !!(req && ['guided', 'lesson', 'scripted-model'].includes(req.role));
+    // (not a lesson: its first window is a pupil's; its worked examples are anchor items, kept off the pupil gaps in anchorSet.take)
+    _cwShowFirst = !!(req && ['guided', 'scripted-model'].includes(req.role));
+    _cwRoleTiles = req && req.role === 'guided' ? 3 : null;
     _cwSheet.clear();
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
     // queue: it builds its pages through buildSheet itself).

@@ -33,7 +33,7 @@
 //   BLANK-COUNT        every dealt window holds exactly the chosen number of blanks (--tiles, default 5), capped silently at the
 //                      legal maximum min(half, R x min(ceil(C/2), C-2)); row counts differ by at most 1; no whole row blank; never
 //                      more than half the squares; every blank a printed neighbour; the key holds one answer a blank (Score /N =
-//                      SCORE-SLOTS). Every role drawn, the online worksheet, the quiz and the practice card. --seed-list a,b picks seeds.
+//                      SCORE-SLOTS); a Guided page holds 3 (lead ruling (a)). Every role drawn, the online worksheet, the quiz and the practice card. --seed-list a,b picks seeds.
 //   (chart_120 critic r2, 2026-11-14:)
 //   MODEL-STATE-MARKS  every Scripted Model state and lesson-anchor panel whose step says "Write N" (or "Write a, b and c") draws N
 //                      in that state's drawing, and each state adds one mark group: what it draws newly is trace grey, what an
@@ -287,7 +287,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
                         // (BLANK-COUNT: the whole sheet's windows; Score /N equals their blanks is SCORE-SLOTS, judged above)
-                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, pp.flatMap((pg) => pg.items), tilesWant);
+                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, pp.flatMap((pg) => pg.items), role === 'guided' ? 3 : tilesWant);   // (lead ruling (a) 2026-11-14: Guided 3)
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
                         if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {
