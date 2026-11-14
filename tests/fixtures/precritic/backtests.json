@@ -9143,6 +9143,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "nos-browser-settle-reclick",
+  "check": "lead 2026-11-13 (lf-builds chart_to_120, -lf-builds 427e28563): ws-no-size-s --browser FAILed once ('the worksheet M click built at L') and PASSed on the same tree: a size click landed while the last build was still redrawing the controls. A worksheet sheet whose FIRST size click is lost (planted in a copy of the served tree) reproduces it",
+  "kind": "commit-pair",
+  "rule": "ws-no-size-s --browser WORKS: wait for the built size to hold, re-scan, click; on a miss re-click once; only a repeat miss fails (a control that never works still fails: --self-test --browser, 30 mutations)",
+  "browser": true,
+  "fail": {
+   "commit": "3623be10c",
+   "state": "master's tool: the one lost click FAILs WORKS worksheet sheet"
+  },
+  "pass": {
+   "commit": "db3d4c97d",
+   "state": "the de-flaked tool re-clicks once after the build settles: OK"
+  },
+  "command": "bash tests/fixtures/precritic/nos-drop-first-click.sh {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }
