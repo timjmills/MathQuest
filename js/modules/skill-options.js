@@ -4141,6 +4141,17 @@ export function divFactsMaxDividend(opts = {}) {
     const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
     return ticked.length ? Math.max(...ticked) * top : 0;
 }
+// lead ruling 2026-11-13 (critic divarray r1 D1 / D4): mult_facts' array support draws ONE frame per band, as div_facts does. The
+// frame is the band's largest SMALLER factor in rows by its largest LARGER factor in columns, read from the options the way the
+// generator deals (gen-operations.js: a ticked table times 0 to the band's top, 10 on "Tables to 10 x 10", else 12).
+export function multFactsArrayFrame(opts = {}) {
+    const top = Number(opts && opts.band) === 100 ? 10 : 12;
+    let t = opts && opts.constant;
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v >= 0 && v <= top);
+    const maxT = ticked.length ? Math.max(...ticked) : top;
+    return { cols: Math.max(top, maxT), rows: Math.max(1, Math.min(maxT, top)) };
+}
 export const divArrayWhy = (opts) => `An array is drawn while every dividend is ${DIV_ARRAY_MAX} or less; these tables go to ${divFactsMaxDividend(opts)}. Tick the 2 to 4 tables (or 2 to 5 on "to 10 x 10") for it.`;
 {
     const sup = (SKILL_OPTIONS['division:div_facts'] || []).find((o) => o.id === 'support');

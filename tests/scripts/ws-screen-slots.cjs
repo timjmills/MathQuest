@@ -163,7 +163,7 @@ const RULE_SKILLS = (arg('rule-skills', '') || '').split(',').map((x) => x.trim(
 const SW = require('../lib/ws-screen-widths.cjs');
 const DIGIT_FLOORS = Object.fromEntries(Object.keys(SW.DIGIT_FLOOR).map((w) => [w, { h: SW.heightOf(+w), px: SW.digitFloor('card', +w) }]));
 const DIGIT_DEFAULT_WIDTHS = [...SW.SCREEN_WIDTHS];
-const DIGIT_VIEWPORTS = (arg('widths', '') ? arg('widths', '').split(',').map((x) => parseInt(x, 10)) : DIGIT_DEFAULT_WIDTHS)
+const DIGIT_VIEWPORTS = ((arg('widths', '') || arg('digit-widths', '')) ? (arg('widths', '') || arg('digit-widths', '')).split(',').map((x) => parseInt(x, 10)) : DIGIT_DEFAULT_WIDTHS)
     .filter((w) => DIGIT_FLOORS[w]).map((w) => ({ w, h: DIGIT_FLOORS[w].h, px: DIGIT_FLOORS[w].px }));
 /** The verdict on one measured numeral {px, weight, family} at a viewport width: null when it passes, else why. */
 // Lead ruling T2 (2026-11-07): the size floor holds for every skill; weight >= 700 only where the paper prints the numeral
@@ -179,7 +179,9 @@ const NO_NUMERAL = (m) => !m || !(m.px > 0);
 // worksheet already raised above it that passed is held there by a RATCHET pin, design/audit/baselines/screen-digit-ratchet.json
 // {"cat:skill": {"worksheet": px}}: it may not fall back to 29)
 const RATCHET = (() => { try { return JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', '..', 'design/audit/baselines/screen-digit-ratchet.json'), 'utf8')).skills || {}; } catch (e) { return {}; } })();
-const ratchetPx = (key, host) => Number(((RATCHET[key] || {})[host])) || 0;
+// (lf-ops divship merge: an entry is px at every width, or {width: px} for a raise that follows the host's widths - div_facts'
+// worksheet took the card floor, 56 at 1280 / 1366 and 48 at 820 / 1024: lead D8 ruling 2026-11-13, backtest screen-digit-ws-divfacts)
+const ratchetPx = (key, host, width) => { const v = (RATCHET[key] || {})[host]; return Number(v && typeof v === 'object' ? v[width] : v) || 0; };
 function digitVerdict(m, width, bold = true, host = 'card', minPx = 0) {
     const px = Math.max(SW.digitFloor(host, width) || 0, minPx) || 0;
     const vp = px ? { w: width, px } : { w: 1280, px: SW.digitFloor(host, 1280) || 56 };
@@ -325,6 +327,9 @@ if (has('self-test')) {
         ['SCREEN-DIGIT worksheet 28 px at 1280 fails (29)', { px: 28, weight: '700', family: 'Andika', text: '403', host: 'worksheet' }, 1280, /28 px \(want >= 29 px on the worksheet at 1280\)/],
         ['SCREEN-DIGIT card 29 px at 1280 still fails (56)', { px: 29, weight: '700', family: 'Andika', text: '403', host: 'card' }, 1280, /want >= 56 px on the card/],
         ['SCREEN-DIGIT quiz 40 px at 820 fails (48)', { px: 40, weight: '700', family: 'Andika', text: '45', host: 'quiz' }, 820, /want >= 48 px on the quiz/],
+        // (lf-ops divship merge: div_facts' passed worksheet raise is held by the ratchet pin at 56 / 48)
+        ['SCREEN-DIGIT div_facts worksheet 40 px at 1280 fails (ratchet 56)', { px: 40, weight: '700', family: 'Andika', text: '45', host: 'worksheet', minPx: ratchetPx('division:div_facts', 'worksheet', 1280) }, 1280, /want >= 56 px on the worksheet/],
+        ['SCREEN-DIGIT div_facts worksheet 48 px at 820 passes (ratchet 48)', { px: 48, weight: '700', family: 'Andika', text: '45', host: 'worksheet', minPx: ratchetPx('division:div_facts', 'worksheet', 820) }, 820, null],
         ['SCREEN-DIGIT worksheet 40 px at 1280 passes (div_facts)', { px: 40, weight: '700', family: 'Andika', text: '45', host: 'worksheet' }, 1280, null],
     ];
     // the one table: every default width has a floor on every host
@@ -780,7 +785,7 @@ if (arg('digit-fixture', null)) {
                     if (!SCREEN_DIGIT) return;
                     checked++;
                     if (NO_NUMERAL(m)) { console.log(`${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT SKIP (no numeral in the cell)`); return; }
-                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key), host, ratchetPx(key, host));
+                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key), host, ratchetPx(key, host, vp.w));
                     if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:digit`, line: l }); console.log(l); }
                 };
                 try {

@@ -2135,6 +2135,13 @@ html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wro
 .online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-countrow-wrap),
 .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard:has(.k2-countrow-wrap) { grid-column: 1 / -1; }
 
+/* lf-ops divarray r2 (lead 2026-11-13, lf-checks' tablet-width sweep; ws-screen-slots --screen-digit --digit-widths): a div_facts
+   online-worksheet cell takes the host's digit floor for its width - the card's own 40 / 48 / 56 px at its 600 / 1200 px
+   breakpoints (48 at 820 / 1024, 56 at 1280 / 1366) - above the 40 px touch floor. ADDITIVE; worksheet.js sets the marker. */
+html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 40px; }
+@media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 48px; } }
+@media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 56px; } }
+
 /* (lf-hosts critic r1 F1, lead ruling 2026-11-13: hand-off 1's worksheet digit raise to 40 / 48 / 56 px was removed before it
    shipped - it reflowed the online worksheet (placevalue:expand 2 -> 1 column at 1280, answer boxes stretched, fact cards
    28-56 px taller). The worksheet keeps master's grid digit, which holds the contract's 29 px floor (SP table; TY-10b count

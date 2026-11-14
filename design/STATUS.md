@@ -879,3 +879,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Every-role precritic (lf-checks, narrow critic r2 PASS): precritic --skill lints every card role x M/L x drawing-changing option.
 - Ledger: 0 fail before the 13:00 UTC sweep.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy div_facts + add_facts arrays (lf-ops divship; narrow D6/D7 critic PASS; mult_facts hash-equal to master)
+- Division and addition fact pages: landscape arrays, one frame per band, no Scripted Model overflow at L, one answer place on the 820 worksheet; mult_facts pages byte-identical to master (parked for a design pass).
+- Lead fix at deploy: ws-fact-pages / ws-screen-support-eq size lists M,L and card widths 820/1024/1280 (no S, no 390).
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, sm-array / screen-answer-place backtests, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.
