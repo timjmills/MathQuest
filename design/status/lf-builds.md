@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- POST-RESET priority 1 (lead 2026-11-14): chart_to_120 overlap giveaway (critic r3 n1 made a defect). Extend CROSS-GIVEAWAY to any value missing in one window and printed in another on a sheet (print + screen) → fix the deal (spread windows apart, or blank shared values consistently) → narrow critic. Repro: master 448bc5e74, independent M, seed 18144. Ledger row added.
 - 2026-11-14: chart_120 PASSED (critic r3, chart120/critic-r3.md). Deploy branch for the lead's train: claude/sweet-newton-c8wrv1-lf-builds-deploy @ 62adcaa29 (merged master 369173bc2). redesign-passed: hundreds_chart_fill, chart_to_120.
 - word-stories: PARKED at 16b5d8ccd (resume notes below).
 - STOPPED at the budget stop (cost_usd ≈ $595 / $609.70). The lane folds into lf-algebra.
