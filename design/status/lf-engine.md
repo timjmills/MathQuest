@@ -133,3 +133,14 @@ The Prerequisite Check's NARROW item forms, for the k2 / pv lanes (LR-17a (2)): 
 "30 + 10 = [ ]" / "40 - 10 = [ ]", both ways (1.NBT.C.5; PC-NAME must then read + 10 / - 10 as 10 more / 10 less).
 Not added to js/modules/build-list.js: ws-standards requires every proposal to be named by an audit verdict in
 standards-audit.js and 3-5 problem types - the standards lane adds the verdict link with the entry.
+
+## Resume here (lf-engine PC r6, 2026-11-14, owner budget stop)
+Head merged with origin/master 1531d0728. DONE: checks first + fixes for critic r5 R1-R5, P1 and the builder's own finds (cross-skill
+repeats, empty Mixed guard, compare numbers, pv-support check items after w2); 11 r6 backtest rows PASS; ledgers; packet + proof PNGs
+(design/lessons/proof/pc-r6, M and L, 13 lessons) and CRITIC-READY r6. On the head: ws-lesson-samples forced 8 / 64 seeds and live 64
+seeds OK; --all-lessons only master's 3 vocab PM-CONT; live diff 492 of 1,772 keys vs master's pin, no part grows.
+NOT DONE: precritic --role lesson --strict on the head (stopped mid-run; the 636afcd84-era run had 10 FAIL, master comparison not
+finished); the re-pin commit; combine L PM-FOOT awaits a lead ruling (KNOWN).
+NEXT: node tests/scripts/ws-precritic.cjs --role lesson --strict, re-run its FAIL rows on a master worktree to confirm they are
+master's, then node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write
+design/audit/baselines/lesson-baseline.json in its own commit naming the changed pages (CRITIC-READY "LIVE pages changed").
