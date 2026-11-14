@@ -43,15 +43,30 @@ It runs on every anchor chart page, pupil and key, at sizes M and L:
 
 ## Backtest
 
-The row is `chart-name-line` in `tests/fixtures/precritic/backtests.json` (commit-pair: fail = 22752843c, pass = the fix
-commit). The command is `ws-lesson-samples --check --seeds 1 --only add,round,div --rules CHART-HEAD --sizes M,L`. The
-verdict is in the report.
+The row is `chart-name-line` in `tests/fixtures/precritic/backtests.json` (commit-pair: fail = 22752843c, pass =
+cb5e5bd94). The command is `ws-lesson-samples --check --seeds 1 --only add,round,div --rules CHART-HEAD --sizes M,L`.
+
+`ws-backtest --row chart-name-line` gives FAIL on 22752843c and OK on cb5e5bd94, so the row PASSES.
+`ws-precritic-plan` is OK: the row is on the `--role lesson` path, and its ledger row in CHECKS_FROM_CRITICS.md passes.
 
 ## Gates
 
-See the lane report for the results. The gates run are: `node --input-type=module --check` on every changed JS file,
-`ws-boot-smoke`, `ws-precritic --role lesson --strict`, CHART-HEAD over all lessons at M and L, `ws-lesson-baseline`
-(re-pinned), and `ws-precritic-plan`.
+- `node --input-type=module --check`: OK on `chart.js` and `print-sheet.js`. `node --check` is OK on the two test scripts.
+- `ws-boot-smoke`: OK.
+- CHART-HEAD over all 30 lessons at M and L: PASS. It also passes inside `lesson-samples-check`.
+- `ws-lesson-baseline`: the `--check` before the re-pin found 512 of 1772 hashes differing, all of them chart pages (listed
+  below). The baseline is re-pinned in cb5e5bd94.
+- `ws-precritic --role lesson --strict`: 17 PASS and 9 FAIL. All 9 FAILs are reds that master already has:
+  - `lesson-unit`: D13 and D18, the same 3 failures on master.
+  - `empty-band-role-lesson`: master gives the identical 138 failures (re-run with MQ_ROOT = 22752843c).
+  - `print-lint-role-lesson` and `-M`:
+    - The only page-1 (chart) finding is L-OVERLAP SECTION on add_fractions_like and perimeter_intro. Master has it
+      byte-for-byte (same mm).
+    - Every other finding is on the sheet and practice pages. The lesson baseline shows those pages unchanged.
+  - `raster-fit-role-lesson` and `cell-checks-role-lesson`: the f_to_d and prime_composite key pages 2-5.
+  - `lesson-samples-check`: PC-H13 on round L sheet pages 2 and 3.
+  - `lesson-samples-all`: PM-CONT on the vocab_grade_pictures Practice and Mixed pages.
+  - `lesson-samples-key-L`: CL40-INK on nearest_10 pages 3 and 7.
 
 ## Changed pages (ws-lesson-baseline, re-pinned in the fix commit)
 
