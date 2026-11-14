@@ -239,7 +239,9 @@ function PROBE() {
                 const t = el.getBoundingClientRect().top;
                 if (t < ft) { ft = t; first = el; }
             }
-            if (first) { const r = first.getBoundingClientRect(); if (out(r)) findings.push({ rule: 'FIT-TOP', msg: `the cell's first row (${name(first)}) is not in view at ${W} x ${H} (top ${Math.round(r.top)}, bottom ${Math.round(r.bottom)}; the top bar ends at ${Math.round(barB)})` }); }
+            // the first row's TOP edge must be in view (a tall drawing that starts in view and runs below the fold is the
+            // card's scroll, not a lost row: fact_family_sort's triangle at 1280 x 900)
+            if (first) { const r = first.getBoundingClientRect(); if (r.top < barB - TOL || r.top > H - 24) findings.push({ rule: 'FIT-TOP', msg: `the cell's first row (${name(first)}) is not in view at ${W} x ${H} (top ${Math.round(r.top)}, bottom ${Math.round(r.bottom)}; the top bar ends at ${Math.round(barB)})` }); }
         }
     }
     // CELL-READ (lf-checks queue 20): the card's B&W cell carries [data-ws-cell] like the worksheet's and the quiz's, or every
@@ -333,7 +335,8 @@ function GEOM(rootSel) {
     for (const rt of roots) for (const el of [rt, ...rt.querySelectorAll('*')]) {
         const r = el.getBoundingClientRect();
         if (el.closest('.zoom-icon-btn') || r.width === 0 || r.height === 0) continue;
-        const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter((c) => c && !/^mq-(active|live-|wd-)/.test(c)).slice(0, 3).join('.') : '';
+        // (zoom-trigger: the zoom wiring's transient class, added on a timer after load; critic tt-r1 D5)
+        const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter((c) => c && c !== 'zoom-trigger' && !/^mq-(active|live-|wd-)/.test(c)).slice(0, 3).join('.') : '';
         lines.push(`${el.tagName.toLowerCase()}${cls ? '.' + cls : ''} ${r2(r.left - o.left)},${r2(r.top - o.top)} ${r2(r.width)}x${r2(r.height)}`);
     }
     let h = 2166136261;
@@ -726,7 +729,7 @@ function geomDiff(base, head, passed = new Set()) {
     const index = (j) => { const m = new Map(); for (const r of j.rows || []) if (r.geom) m.set(key(r, 'card'), r.geom); for (const r of j.hostRows || []) if (r.geom) m.set(key(r, r.host), r.geom); return m; };
     const A = index(base), B = index(head);
     const nums = (l) => (l.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
-    const tag = (l) => l.split(' ')[0];
+    const tag = (l) => l.split(' ')[0].replace(/\.zoom-trigger(?=\.|$)/, '');   // the transient class (also left out by GEOM)
     const out = []; let n = 0, same = 0;
     for (const k of [...A.keys()].filter((k) => B.has(k)).sort()) {
         n++;

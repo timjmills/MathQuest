@@ -2189,6 +2189,11 @@ html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-height: 50px !imp
     html body .mq-scell .ws-ops-division.mq-opsdiv [data-mq-cell] > input.mq-cellslot { min-width: 48px !important; min-height: 48px !important; }
     /* the word-work sign circle (sentence frame, "5 ( ) 3 = 8"): the pupil writes the sign, so it is an answer place */
     html body .mq-scell input.mq-wwork.mq-gl-sign { min-width: 48px !important; min-height: 48px !important; }
+    /* ... and, as an answer place, it rings like the frame's other answer boxes when focused (critic tt-r1 D4: one touch
+       classifier made ws-phone-card FOCUS-RING read it as an answer place - black 3 px beside the blue 4 px answer ring) */
+    html body :is(#gameView #questionCard, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) input.mq-wwork.mq-gl-sign.mq-gl-sign:is(:focus, :focus-visible):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+        box-shadow: none !important; outline: var(--mq-next-w, 4px) solid var(--mq-next-color, #1565d8) !important; outline-offset: calc(0px - var(--mq-next-w, 4px)) !important;
+    }
     /* legacy answer inputs drawn below the floor: fact families, the ordering row, the box-division scaffold */
     html body .mq-scell input.fact-family-input, html body .mq-scell input.number-family-input { min-width: 48px !important; min-height: 48px !important; }
     html body :is(.online-edition, .mq-scell) input.ws-order-input { min-width: 48px !important; min-height: 48px !important; box-sizing: border-box; }
