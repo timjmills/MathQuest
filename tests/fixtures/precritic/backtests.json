@@ -9925,6 +9925,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "gdpcap-answers",
+   "check": "a Guided page whose cells score 1 to 3 answers each keeps its scored answers within the §12.1 ceiling (lf-builds chart_120 Guided L: 7 answers > 6; ceilFor counted answers only when every cell scored > 1)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GDPCAP-ANSWERS (browser twin: ws-empty-band EB-GDPCAP)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "mixed L: 11 scored answers"
+   },
+   "pass": {
+    "commit": "72d4949bc",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GDPCAP-ANSWERS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
