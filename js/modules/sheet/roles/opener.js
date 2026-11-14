@@ -113,8 +113,24 @@ function geometry(items, input, cap = {}) {
     // Model the fallback let into the half-width cell (solve_eq_addsub) is one master sized Infinity too)
     const legacy = items.some((it) => !it.template || it.template === 'legacy');
     const halfLayout = !!first && Number.isFinite(hMinAt([first], 2, ctx));
-    const split = used > m.budget && pagesFit && (!legacy || !halfLayout);
-    const parity = legacy && !halfLayout && !twoModels && !split;
+    // (lf-engine roles r3, critic r2 F1: before a second page, the Model and the first Guided cell side by side - each in a half
+    // (93 mm) cell, as tall as the item MEASURED there (its printed ink fits the half cell: coordinate_q1's grid is about 78 mm
+    // wide), the Steps band under them, then the Say band and the Independent rows full width. hMinAt reads Infinity there for a
+    // legacy footprint that declares one column, so the measurement decides. One column of practice only.)
+    const halfH = (it) => { const x = it && it.measured && it.measured[2]; return x && Number(x.hMm) > 0 ? Number(x.hMm) + 1 : Infinity; };
+    const stepsFullH = steps.length ? stepLines(steps, m.textPt, 186) * (m.pitch + 1.2) + steps.length * 2.2 + 4 : 0;
+    const sideMm = !twoModels && gc === 1 && items.length > nModel ? Math.max(halfH(first), halfH(items[nModel])) : Infinity;
+    const sideUsed = (whatsNew ? m.strip + 2 : 0) + m.strip + sideMm + (steps.length ? m.strip + stepsFullH : 0) + sayMm;
+    const side = used > m.budget && !cap.noSide && Number.isFinite(sideMm) && sideUsed <= m.budget;
+    const split = !side && used > m.budget && pagesFit && (!legacy || !halfLayout);
+    const parity = legacy && !halfLayout && !twoModels && !split && !side;
+    if (side) {
+        modelFull = false;
+        mc = 2;
+        modelH = sideMm;
+        modelBand = m.strip + sideMm;
+        used = sideUsed;
+    }
     if (parity) {
         modelFull = false;
         mc = 2;
@@ -145,8 +161,11 @@ function geometry(items, input, cap = {}) {
     // (lf-engine-roles critic B1: this was built for count rows only, so expand / unit_form / combine printed a "We do" of ONE
     // cell; any one-column practice now takes it, and when it does not fit the plan says so - ws-print-lint L-DENSITY OPN-6)
     let gRows = 1;
-    if (first && gc === 1 && !legacy && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= budget) { gRows = 2; used += gH; }
-    const spare = Math.max(0, budget - used - held);
+    // (a split page 2 fills to the deal: the second Guided row there too, legacy or not - critic r2 F1; a side-by-side page holds its
+    // one Guided cell beside the Model)
+    if (first && gc === 1 && (!legacy || split) && !side && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= budget) { gRows = 2; used += gH; }
+    // (critic r2 F2: a split page 2 keeps 3 mm in hand - multi_step_word L's page 2 ran 2.1 mm past its body on the grow)
+    const spare = Math.max(0, budget - used - held - (split ? 3 : 0));
     const rowsThatGrow = gRows + iRows;
     const tight = tightRows(practice);
     const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first), tight ? tightCapMm(gH) : Infinity);
@@ -154,7 +173,7 @@ function geometry(items, input, cap = {}) {
     // (lf-engine-roles critic N2: ONE Model only - two Model cells side by side keep the band's height, so the rule between
     // them runs down to the band's bottom rule; held short, it stopped 2.5 mm above it: ws-print-lint L-OVERLAP RULE)
     const modelTight = !twoModels && tightRows(items.slice(0, 1)) ? modelH + tightCapMm(modelH) : null;
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy, side, sideMm, stepsFullH };
 }
 
 /**
@@ -243,7 +262,14 @@ export function plan(input = {}) {
     // (generic operation steps were wrong for half the skills), and the Model takes the row.
     const modelCellH = g.modelTight ? Math.min(modelContentH, g.modelTight) : modelContentH;
     const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelCellH, labels: 'none', style: modelCellH < modelContentH ? 'flex:none' : '' }) };
-    if (g.steps.length && g.modelFull) {
+    const guidedBand = (list, cols, cellH) => ({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
+        content: gridPart(list.map((it) => planItem(it, { cols, level: 2, nolabel: true })), { cols: Math.min(g.gc, list.length || 1), rows: Math.max(1, Math.ceil(list.length / g.gc)), cellH, labels: 'none' }) });
+    if (g.side) {
+        // (critic r2 F1: the Model and the first Guided cell side by side, each in a half cell at its measured height; the Steps
+        // under them; the Say band and the Independent rows full width below)
+        sections.push({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-modelrow', parts: [modelBandPart, guidedBand(guided, 2, g.sideMm)] });
+        if (g.steps.length) sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsFullH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` });
+    } else if (g.steps.length && g.modelFull) {
         sections.push(modelBandPart);
         sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` });
     } else if (g.steps.length) {
@@ -258,7 +284,7 @@ export function plan(input = {}) {
     sections.push({ kind: 'say', frame: oralFrameOf(items[0] || {}), digits: 2 });
     // (split: the practice bands open page 2)
     const practiceSections = g.split ? [] : sections;
-    practiceSections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
+    if (!g.side) practiceSections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
         content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH + g.grow, labels: 'none' }) });
     if (indep.length) {
         practiceSections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
@@ -268,11 +294,11 @@ export function plan(input = {}) {
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     // (PT-OPN-6, ws-print-lint OPN-6: a Guided band of one cell says why - the row did not fit, or the skill dealt too few items)
-    if (guided.length < 2) notes.push(g.legacy && g.gc === 1 ? 'The second Guided row did not fit: a legacy drawing takes one Guided row until it migrates.' : g.gc === 1 && g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
-    if (g.split) notes.push('The Model and one Guided row are taller than one page at this size: the practice is on page 2.');
+    if (guided.length < 2) notes.push(g.side ? 'The second Guided row did not fit: the first Guided cell sits beside the Model (side by side).' : g.legacy && g.gc === 1 && !g.split ? 'The second Guided row did not fit: a legacy drawing takes one Guided row until it migrates.' : g.gc === 1 && g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
+    if (g.split) notes.push('The Model and one Guided row are taller than one page at this size, and the Model and one Guided cell side by side did not fit: the practice is on page 2.');
     return assemble(ROLE_ID, input, frame, g.split ? [{ sections }, { sections: practiceSections }] : [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, onePageMm: g.onePage, budgetMm: m.budget, modelMm: g.modelH, split: g.split, parity: g.parity, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, onePageMm: g.onePage, budgetMm: m.budget, modelMm: g.modelH, split: g.split, parity: g.parity, side: g.side, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 
