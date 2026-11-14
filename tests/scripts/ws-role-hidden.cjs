@@ -102,7 +102,7 @@ if (has('self-test')) {
                         // (`when`: the other option values the decision holds under - grid rows at band 120; the control is a role
                         // that does not hide the value - independent, else true-false)
                         const W = j.when || {};
-                        const ctl = ['independent', 'true-false', 'error-analysis'].find((r) => !j.roles.includes(r));
+                        const ctl = ['independent', 'true-false', 'error-analysis'].find((r) => !j.roles.includes(r) && String((so.optsForRole(cat, id, { ...W, [j.option]: v }, r) || {})[j.option]) === String(v)) || 'true-false';
                         try {
                             const a = await build(cat, id, ctl, size, { ...W, [j.option]: v });
                             const b = await build(cat, id, ctl, size, { ...W, [j.option]: dflt });
