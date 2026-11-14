@@ -11022,6 +11022,46 @@
    }
   },
   {
+   "id": "c120r3-overlap-giveaway",
+   "check": "no value missing in one chart window is printed in another window of the same sheet, overlapping windows included (lead 2026-11-14, chart_120 r3 n1 upgraded: chart_to_120 independent M seed 18144 - item 1 missing 94, item 3 prints 94; item 6 missing 95 / 105, items 1 and 5 print them)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY (overlap)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "overlapping band-120 windows dealt with their own gaps (only identical windows were refused)"
+   },
+   "pass": {
+    "commit": "8c42961f1",
+    "state": "chart-giveaway.js setChartSheet: the dealers blank shared squares consistently (band 120 one pattern every five columns); a window that still gives one away is never dealt"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seed-list 18144 --sizes M --score-roles independent --only CROSS-GIVEAWAY --screen-seeds 0",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-blank-count",
+   "check": "every dealt chart window holds exactly the chosen 'Numbers to fill in' (default 5, capped silently at the legal maximum), spread across its rows, no whole row, at most half its squares, every blank a printed neighbour, one key answer a blank - print roles, online worksheet, quiz and practice card (lead ruling 2026-11-14)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo BLANK-COUNT",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "'Empty boxes' default null dealt 1 to 3 a window, bunched by row"
+   },
+   "pass": {
+    "commit": "8c42961f1",
+    "state": "tiles 'Numbers to fill in' default 5 (2-8), dealt spread across the rows under the half / row / neighbour cap"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 1 --sizes M --score-roles independent,guided --only BLANK-COUNT --screen-seeds 1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "ldiv-join",
    "check": "the long-division bracket is ONE connected stroke: the arc's top end runs into the vinculum with no white at the outer corner (<= 0.3 mm) and no step (<= 0.1 mm), paper M/L pupil + key and screen 1366 / 820 (owner request 2026-11-14: 'disconnected'; master paper gap 0.67 mm, fact rows 0.33 mm, screen step 0.25 mm)",
    "kind": "commit-pair",
