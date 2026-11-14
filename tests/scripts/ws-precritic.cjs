@@ -356,7 +356,9 @@ function shownCmd(g) {
 // a non-zero exit (the tool exits 1 because of exactly those findings). judge() turns any other non-zero exit, and any
 // time-out, into FAIL whatever the parser read: a gate that crashed or was killed never shows PASS (critic r1, D1/D8).
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
+// a gate's verdict line: "<tool>: OK|FAIL ..." or, for a tool run in one of its modes, "<tool> --mode[ --mode2]: OK|FAIL ..."
+// (lf-ops 2026-11-13: `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output" and turned every --strict run red)
+const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}(?: --[\\w-]+)*: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
 const NOISE = /MODULE_TYPELESS_PACKAGE_JSON|Reparsing as ES module|eliminate this warning|--trace-warnings|^\$ /;
 const tailLines = (out, n = 6) => String(out).split('\n').map((l) => l.trimEnd()).filter((l) => l.trim() && !NOISE.test(l)).slice(-n);
 const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output (${what})`, detail: tailLines(out), explainsExit: false });
@@ -368,6 +370,14 @@ const fmtMin = (m) => String(+(+m).toFixed(3));
 const mentioned = (out, k) => new RegExp(`(^|[\\s,;()\\[\\]{}"'])${reEsc(k)}($|[\\s,;:()\\[\\]{}"'.])`, 'm').test(out);
 
 if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more cases go here
+    // the verdict line of a tool run in a mode (lf-ops 2026-11-13: ws-no-size-s --browser read as unparsed)
+    const vl = (out, name) => { const v = lastVerdict(out, name); return v ? v[1] : null; };
+    const tv = [['plain verdict', vl('x\nws-no-size-s: OK (205 app files)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict', vl('  ok   no page errors\nws-no-size-s --browser: OK (73 checks)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict FAIL', vl('ws-no-size-s --browser: FAIL - 2 finding(s)\n', 'ws-no-size-s'), 'FAIL'],
+        ['two modes', vl('ws-x --a --b-c: OK\n', 'ws-x'), 'OK'],
+        ['another tool is not this one', vl('ws-no-size-s-extra: OK\n', 'ws-no-size-s'), null],
+        ['a non-flag word is not a mode', vl('ws-no-size-s browser: OK\n', 'ws-no-size-s'), null]];
     const t = [['one per line', mentioned('vocabulary:vocab_grade_pictures OK\n', 'vocabulary:vocab_grade_pictures'), true],
         ['comma list on one line', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_words'), true],
         ['last in the list', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_pictures'), true],
@@ -376,6 +386,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
         ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
     const bad = t.filter(([, got, want]) => got !== want);
     for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
+    for (const [n, got, want] of tv) if (got !== want) { bad.push([`verdict ${n}`, got, want]); console.log(`self-test FAIL: verdict ${n}: ${got}, want ${want}`); }
     // the copy-light eligibility, batch and sample cases (owner rule 2026-11-13) live in ws-copy-light --self-test
     const cl = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-copy-light.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const clLine = String(cl.stdout || '').trim().split('\n').pop();
@@ -384,7 +395,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const dkLine = String(dk.stdout || '').trim().split('\n').pop();
     if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -578,10 +589,11 @@ const PARSE = {
         const v = lastVerdict(out, g.script);
         // "[<mode> sweep (...), ][shard i/n, ]N skills, R host renders, D doubled answer area(s), P paper verb(s) on screen[, C low-contrast host(s)]"
         // (", K screen-digit miss(es)": the opt-in SCREEN-DIGIT, opt-in-rules.json; its "host@width:digit" findings count with the rest)
-        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?$/m.exec(out);
+        // (", U unread host(s)": CELL-READ, lf-checks queue 20 - a host render that read 0 [data-ws-cell] cells; "host:read")
+        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?(?:, (\d+) unread host\(s\))?$/m.exec(out);
         if (!v) return unparsed(`no "${g.script}: OK|FAIL" line`, out);
         if (!sm) return unparsed('no "N skills, R host renders, ..." summary', out);
-        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0);
+        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0) + +(sm[7] || 0);
         const want = (g.expect && g.expect.skills) || 0, hosts = (g.expect && g.expect.hosts) || 4;
         const errs = out.split('\n').filter((l) => /^\S+:\S+\s+ERR /.test(l));
         if (nSk < want) return { result: 'FAIL', findings: `only ${nSk} of ${want} skill(s) in scope found by the script`, detail: tailLines(out), explainsExit: false };
@@ -600,8 +612,8 @@ const PARSE = {
         const found = [];
         for (const l of out.split('\n')) {
             // the pin's entries are "host:kind" (kinds doubled, paper, contrast), as ws-screen-slots --baseline reads them
-            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT )/.exec(l);
-            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
+            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT |CELL-READ )/.exec(l);
+            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : m[3].startsWith('CELL') ? 'read' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
         }
         if (found.length !== dbl + pv + lc) return unparsed(`${found.length} finding line(s) for a summary of ${dbl + pv + lc}`, out);
         const explainsExit = code === 0 || found.length > 0; // the script exits 1 on any doubled area or paper verb
@@ -881,6 +893,9 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
+        // below with no overlap, TITLE-LONG never shrinks / at most two lines / cut with a warning - on every role, M and L)
+        add(gate('frame-title', 'ws-frame-title (the page-title option on every role and key: TITLE-IDENT, TITLE-PLACE, TITLE-LONG)', `${scope} × every role × M/L`, 'browser', 'ws-frame-title', ['--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-frame-title.cjs' }));
         // (lf-roles 2026-11-13, lead: CAPACITY-NO-DROP - a page never prints fewer items than the pinned master page)
         add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(','), ...(ctx.role ? ['--roles', ctx.role] : [])], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
@@ -902,7 +917,7 @@ function buildPlan(ctx) {
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
-        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
         // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
         // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
         add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));
@@ -1077,7 +1092,10 @@ function buildPlan(ctx) {
         cl.after = 'sibling-compare';
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
-        add(gate('phone-card', 'ws-phone-card (the tablet card check: practice card at 820 / 1024 px: clip, first-box focus, 48 px answer boxes)', `${scope} × 820x1180, 1024x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
+        // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
+        // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
+        add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        add(gate('phone-card', 'ws-phone-card (the screen card check: practice card, worksheet and quiz at 820 / 1024 / 1280 / 1366 px: clip, first-box focus, 48 px answer boxes, real taps, focus ring, cell read)', `${scope} × 820x1180, 1024x768, 1280x900, 1366x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
@@ -1241,11 +1259,19 @@ function buildPlan(ctx) {
         // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
         add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
+        // (lf-roles 2026-11-13: the page title travels with the simple print's share code; old codes decode unchanged)
+        add(gate('title-code', 'ws-title-code (TITLE-CODE-RT / -OLD / -REQ: the page title in the quick-print share code)', 'quick-print codes', 'browser', 'ws-title-code', [], { missingMsg: 'no tests/scripts/ws-title-code.cjs' }));
+        // (critic title r1 T1 / T4 / T5: the title boxes driven by real keystrokes - the cursor survives the redraw; Title off
+        // disables its controls; the simple print box is wide enough)
+        add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
         addPartOpts(add, ctx);
     }
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
     // a tracked file holding one (node, < 1 s)
     add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
+    // lf-hosts critic r2 F2: every screen gate of the plan (phone-card, screen-slots --screen-digit, screen-ink-size, worksheet-reflow)
+    // renders at exactly the owner's set, read from tests/lib/ws-screen-widths.cjs (node, a few seconds)
+    add(gate('screen-widths-plan', 'ws-screen-widths-plan (every screen gate at 820 / 1024 / 1280 / 1366, the one table)', 'screen gates', 'node', 'ws-screen-widths-plan', [], { missingMsg: 'ws-screen-widths-plan is not in this tree' }));
     // owner 2026-11-13 (CLAUDE.md plan item 9: two print sizes, M and L; S dropped): no size picker offers S, no gate's default
     // run includes S, and the kit reads a stored S as M (node, < 1 s)
     add(gate('no-size-s', 'ws-no-size-s (no picker offers size S, no gate default runs S, S decodes as M)', 'js/modules, index.html, tests/scripts, tests/lib, live instruction docs', 'node', 'ws-no-size-s', ['--docs-advisory'], { needFlags: ['docs-advisory'] }));

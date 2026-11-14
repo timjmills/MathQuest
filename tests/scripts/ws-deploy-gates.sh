@@ -884,6 +884,7 @@ build_list() {
   node_gate 1 "ws-plain-words --check" ws-plain-words.mjs --check
   node_gate 1 ws-node-lint "$(first_of ws-node-lint.mjs ws-node-lint.cjs)"
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
+  node_gate 1 "ws-precritic --self-test" ws-precritic.cjs --self-test   # its gate verdict reader (a mode line "tool --mode: OK"), mention matcher, copy-light and drawing-key cases (lf-ops 2026-11-13)
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
   node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
