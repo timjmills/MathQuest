@@ -997,7 +997,8 @@ if (pvR2On('N4', 'placevalue:identify')) {
 //   WRONG-MULTI      a wrong answer: a number in every slot, differing from the key in exactly one slot (L27, slot by slot)
 //                    - `num("91, 101")` was NaN, so every multi-gap window had none and True or False? dealt all True (F1, F2)
 //   STEPS-ALL-SLOTS  worked steps that name the gap's value, each step one grammatical sentence or two (F3: "Write <first gap>.")
-//   SAY-AGREE        a Say line naming every gap and agreeing in number ("The missing numbers are 101 and 104.", F3)
+//   SAY-AGREE        a Say line naming every gap and agreeing in number ("The missing numbers are 101 and 104.", F3), and the
+//                    UNFILLED frame too, one blank a gap ("The missing numbers are __ and __.", r2 N3: the opener's frame)
 //   HINT-ALL         on the option sets Guided deals (grid=window), the Model's grey work lines name every gap (F3b)
 // Runs whenever composing:hundreds_chart_fill / chart_to_120 / number_chart_fill is in scope (or no --skill is given).
 const CHART_KEYS = ['composing:hundreds_chart_fill', 'composing:chart_to_120', 'composing:number_chart_fill'];
@@ -1065,6 +1066,12 @@ if (chartInScope.length) {
             const sayOk = gaps.length === 1 ? new RegExp(`^The missing number is ${gaps[0]}\\.$`).test(say)
                 : /^The missing numbers are (\d+, )*\d+ and \d+\.$/.test(say) && gaps.every((g) => said(say, g));
             if (!sayOk) bad.Y.push(`${tag}: Say "${say}"`);
+            // SAY-AGREE on the UNFILLED frame (chart_120 critic r2 N3: the opener prints the frame with its blanks, and it was the
+            // fixed "The missing number is __." under a two-gap Model): singular for one gap, else plural with one blank a gap
+            const frame = String(p.strings({ q }).say || '');
+            const nBl = (frame.match(/__/g) || []).length;
+            const frameOk = gaps.length === 1 ? frame === 'The missing number is __.' : /^The missing numbers are (__, )*__ and __\.$/.test(frame) && nBl === gaps.length;
+            if (!frameOk) bad.Y.push(`${tag}: unfilled Say frame "${frame}" (${nBl} blank${nBl === 1 ? '' : 's'}) for ${gaps.length} gap${gaps.length === 1 ? '' : 's'}`);
             // HINT-ALL (the option sets Guided deals: the window)
             if (!o.grid || o.grid === 'window') {
                 const lines = workLinesOf({ q, template: 'chartwindow' });

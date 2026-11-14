@@ -358,6 +358,11 @@ export const chartSay = (q) => {
     if (!g.length) return null;
     return g.length === 1 ? `The missing number is ${g[0]}.` : `The missing numbers are ${andList(g)}.`;
 };
+/** The UNFILLED Say frame of a chart window, one blank a gap (chart_120 critic r2 N3): "The missing numbers are __ and __.". */
+export const chartSayFrame = (q) => {
+    const g = chartGaps(q);
+    return g.length > 1 ? `The missing numbers are ${andList(g.map(() => '__'))}.` : null;
+};
 
 /**
  * The worked steps of a chart window, reading only the numbers the WINDOW prints (2026-09-25:
@@ -481,6 +486,7 @@ const HC_DEF = {
         say: 'The missing number is __.',
         // (the Say line agrees with the gaps: "The missing numbers are 101 and 104." - chart_120 critic r1 F3)
         sayValues: chartSay,
+        sayFrame: chartSayFrame,
     };
 const HC_DEF_120 = { ...HC_DEF, iCan: 'I Can find missing numbers on a chart to 120' };
 /** Band 120: from the option (an item-less page, L28), the item's window (rows past 9) or its label. */

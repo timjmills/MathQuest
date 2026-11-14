@@ -152,6 +152,7 @@ export function chooseWrong(q, candidates, { rotate = true } = {}) {
  *   steps           2-4 general steps for the Steps band, right for THIS skill
  *   say / oralFrame the `Say:` frame (both names, one value): blanks `__` only, never `{unit}`
  *   sayFill         (q) -> the frame with THIS item's numbers (and unit word) in its blanks
+ *   sayFrame        (q) -> optional: THIS item's unfilled frame (its blanks agree with the item), else `say`
  *   whatsNew, vocabulary, rule   when the skill has them
  */
 export function strings(def) {
@@ -175,6 +176,11 @@ export function strings(def) {
         // in the Steps band is the Model's, never a fixed "24 ÷ 6" beside a 24 ÷ 12 model.
         if (q && typeof def.stepsFor === 'function') {
             try { const st = def.stepsFor(q); if (Array.isArray(st) && st.length) out.steps = st.slice(); } catch (e) { /* keep the fixed steps */ }
+        }
+        // (chart_120 critic r2 N3: the UNFILLED frame agrees with the item too - "The missing numbers are __ and __." under a
+        // two-gap Model, never the fixed singular frame; `sayFrame(q)` derives it, SAY-AGREE)
+        if (q && typeof def.sayFrame === 'function') {
+            try { const f = def.sayFrame(q); if (f) { out.say = f; out.oralFrame = f; } } catch (e) { /* keep the fixed frame */ }
         }
         out.sayFill = (item) => sayFill(def, item);
         if (def.instructionVars) out.instructionVars = def.instructionVars;

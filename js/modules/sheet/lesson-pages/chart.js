@@ -122,7 +122,8 @@ export function stateDrawing(it, steps, groups, k, c) {
     }
     // A count row (F5, lf-algebra r8 via the lead): state k draws the marks of steps 1..k in trace (`traceSlots`, as the Scripted
     // Model's states do, PT-MOD-1; a provider's mark `blankN` is the row's slot `bN`), never a blank row then the answer.
-    if (it.q && it.q.cell && it.q.cell.template === 'count-row' && merged.some((g) => (g.marks || []).length)) {
+    // (a chart window's squares the same way: chart_120 critic r2 N1 - panel 2 "Write 94." drew an empty square)
+    if (it.q && it.q.cell && (it.q.cell.template === 'count-row' || it.q.cell.template === 'chartwindow') && merged.some((g) => (g.marks || []).length)) {
         const acc = {};
         const idOf = (m) => String(m.slot).replace(/^blank(\d+)$/, 'b$1');
         merged.slice(0, k).forEach((g) => (g.marks || []).forEach((m) => { if (m && m.slot !== undefined) acc[idOf(m)] = String(m.value); }));

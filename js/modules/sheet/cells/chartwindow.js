@@ -80,6 +80,19 @@ register('chartwindow', {
             : { w: cellW(p, sizeOf(ctx), pt), h: (CELL[sizeOf(ctx)] || CELL.L).h };
         const blanks = (p.blanks || []).map(Number);
         const shown = shownParts(ctx, blanks);
+        // A model STATE (chart_120 critic r2 N1, PT-MOD-1): the squares steps 1..k wrote, the newest grey and the earlier ones
+        // black - `traceSlots` / `traceNew`, as a count row's (the Scripted Model's states, the lesson anchor's panels). A
+        // one-gap step writes the slot 'answer', which is the first square.
+        const ts = ctx.state === 'blank' && p.traceSlots && typeof p.traceSlots === 'object' ? p.traceSlots : null;
+        const tsNew = ts && Array.isArray(p.traceNew) ? new Set(p.traceNew.map(String)) : null;
+        const markOf = (k) => {
+            if (ts) {
+                const id = ts[`b${k}`] !== undefined ? `b${k}` : k === 0 && ts.answer !== undefined ? 'answer' : null;
+                const v = id ? String(ts[id] ?? '') : '';
+                return v ? { v, ink: tsNew && !tsNew.has(id) ? 'solid' : 'trace' } : { v: '', ink: null };
+            }
+            return null;
+        };
         // A row of ten stays one row of ten in the screen twin (SP-10: 34.5 x 44 px cells on a phone).
         const ten = isTwin(ctx) && (p.cols || []).length === 10;
         const halves = [p.cols || []];
@@ -101,8 +114,9 @@ register('chartwindow', {
                         // baselines jumped about 1 mm beside a heavy-bordered empty cell).
                         tds += `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};"><span style="${FILL}">${fmt(n)}</span></td>`;
                     } else {
-                        const v = shown[k];
-                        const ink = v !== '' ? inkOf(ctx) : null;
+                        const mk = markOf(k);
+                        const v = mk ? mk.v : shown[k];
+                        const ink = mk ? mk.ink : v !== '' ? inkOf(ctx) : null;
                         const hook = isTwin(ctx) ? ' data-mq-cell="1"' : '';
                         // The writing place is the square's own heavier border (no overlay layer to spill
                         // into a neighbour); its text is filled like every number, so rows keep one baseline.

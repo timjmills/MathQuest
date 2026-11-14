@@ -22,6 +22,17 @@
 //                      grid=rows - one window, three items copying each other's answers; F9: band 10). With --variants it also
 //                      runs hundreds_chart_fill's band x grid values on independent / more-practice. Overlapping (not identical)
 //                      windows that share an answer are counted and reported (OVERLAP-INFO), not failed.
+//                      (chart_120 critic r2 N2) and on the SCREEN hosts: the online worksheet's cards (initWorksheet, 6 cards) and
+//                      the quiz builder's questions (addMultipleQuestions, 3), over --screen-seeds (default 20) - the screen deal
+//                      repeated a band-120 window, so two cards printed each other's answers (L13 paper = screen).
+//   (chart_120 critic r2, 2026-11-14:)
+//   MODEL-STATE-MARKS  every Scripted Model state and lesson-anchor panel whose step says "Write N" (or "Write a, b and c") draws N
+//                      in that state's drawing, and each state adds one mark group: what it draws newly is trace grey, what an
+//                      earlier state drew is solid. Judged when the Model's template is one of scripted-model.js TRACE_TEMPLATES
+//                      (N1: a two-gap chart window's "Write 101." state drew no 101, and its last state traced 101 and 104 both).
+//   SAY-AGREE          every Say frame a page prints - the opener's UNFILLED one among them - agrees in number with the page's
+//                      Model item (N3: "The missing number is __." under a two-gap Model): an item of k > 1 answer parts
+//                      (`keyParts`) prints a plural frame, with k blanks when it is unfilled. Judged on chart windows.
 //   CHART-SQUARE       on Reason It / True or False? / Error analysis, laid out at its printed size, no chart square is narrower
 //                      than the 14 mm writing floor (F10: band 100 Reason It L squeezed A | B beside the response to 10.4 mm squares).
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
@@ -43,19 +54,38 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const sizes = list(arg('sizes', 'M,L'));
     const only = arg('only', null) ? list(arg('only')) : null;
     const scoreTpl = list(arg('score-templates', 'chartwindow'));
-    const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false,reason-it'));
+    const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false,reason-it,scripted-model'));
     const variants = argv.includes('--variants');
     const H = require('../lib/ws-harness.cjs');
-    const app = await H.open({});
+    // (a seeded Math.random: the screen deals - the worksheet and the quiz builder - draw from it; `__wsReseed` per seed)
+    const app = await H.open({ seed: 1 });
     let res;
     try {
         // (one evaluate per key x size x seed, and per key x band for --variants: a whole run in one call passed the browser's
         // protocol timeout once --variants was added; the TF / EA / overlap tallies live on window.__geState between calls)
         const call = (part) => app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, part }) => {
-            const { seedFrom = 1, seedTo = N, vBand = null, finalize = false } = part || {};
+            const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0 } = part || {};
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
+            // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
+            let TRACE = null;
+            try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
+            // MODEL-STATE-MARKS: states = [{text, drawn: Map(value -> ink)}] in order
+            const writeVals = (t) => { const m = String(t).match(/\bWrite ((?:\d[\d,]*)(?:(?:, | and )\d[\d,]*)*)\./); return m ? m[1].split(/, | and /).map((x) => x.replace(/,/g, '')) : []; };
+            const drawnOf = (el) => { const d = new Map(); el.querySelectorAll('[data-ws-slot], [data-ws-aslot]').forEach((e) => { const v = e.textContent.replace(/[,\s]/g, ''); if (!v) return; const inkEl = e.hasAttribute('data-ws-ink') ? e : e.querySelector('[data-ws-ink]'); d.set(v, inkEl ? inkEl.getAttribute('data-ws-ink') : (/949494/i.test(e.getAttribute('style') || '') ? 'trace' : 'solid')); }); return d; };
+            const judgeStates = (label, states) => {
+                let prev = new Map();
+                states.forEach((st, k) => {
+                    const miss = writeVals(st.text).filter((v) => !st.drawn.has(v));
+                    if (miss.length) out.push(`MODEL-STATE-MARKS ${label} state ${k + 1}: "${st.text}" but its drawing shows no ${miss.join(', ')}`);
+                    const oldGrey = [...st.drawn].filter(([v, ink]) => prev.has(v) && ink === 'trace').map(([v]) => v);
+                    const newSolid = [...st.drawn].filter(([v, ink]) => !prev.has(v) && ink !== 'trace' && writeVals(st.text).includes(v)).map(([v]) => v);
+                    if (oldGrey.length) out.push(`MODEL-STATE-MARKS ${label} state ${k + 1}: ${oldGrey.join(', ')} (written in an earlier state) is still trace grey - one new mark group a state, earlier marks solid`);
+                    if (newSolid.length) out.push(`MODEL-STATE-MARKS ${label} state ${k + 1}: ${newSolid.join(', ')} is new in this state but not trace grey`);
+                    prev = st.drawn;
+                });
+            };
             const out = []; let pages = 0;
             // a cell's PICTURE with its answers taken out. A chart window (table.k2-chart): its shape and the number its first
             // square stands for, read from any printed square (across +1, down +10) - so two windows with other blanks are one
@@ -95,7 +125,9 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                 return { items, htmls };
             });
             const winOf = (q) => {
-                const w = q && q.chartWindow;
+                // (a quiz question keeps the chartwindow cell, not `chartWindow`: its payload is the window)
+                const cp = q && q.cell && q.cell.template === 'chartwindow' && q.cell.payload;
+                const w = (q && q.chartWindow) || (cp ? { rows: cp.rows, cols: cp.cols } : null);
                 if (!w || !Array.isArray(w.rows) || !Array.isArray(w.cols)) return null;
                 const raw = Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : String(q.ans === undefined ? '' : q.ans).split(/\s*,\s*/);
                 return { rows: w.rows.map(Number), cols: w.cols.map(Number), gaps: raw.map((x) => Number(String(x).replace(/,/g, ''))).filter(Number.isFinite) };
@@ -124,6 +156,37 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     else st.overlap++;
                 }
             };
+            if (screen) {
+                // CROSS-GIVEAWAY on the screen hosts (r2 N2): the app's own deals, Math.random reseeded per seed
+                if (window.__mqLoadWorksheet) await window.__mqLoadWorksheet();
+                if (window.__mqLoadDeferred) await window.__mqLoadDeferred();
+                for (const key of keys) {
+                    const [categoryId, skillId] = key.split(':');
+                    for (let s = 1; s <= screen; s++) {
+                        const st0 = window.state;
+                        try {
+                            if (window.__wsReseed) window.__wsReseed(s);
+                            st0.category = categoryId; st0.skill = skillId; st0.gameMode = 'worksheet'; st0.isMixedMode = false; st0.problemCount = 6;
+                            st0.skillOptions = null;
+                            await window.initWorksheet();
+                            pages++;
+                            judgeGiveaway(`${key} online worksheet seed ${s}`, (st0.worksheetQs || []).map((q) => ({ q })));
+                        } catch (e) { out.push(`${key} worksheet seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); }
+                        try {
+                            if (window.__wsReseed) window.__wsReseed(s);
+                            window.openQuizBuilder();
+                            window.addMultipleQuestions(skillId, 3, categoryId);
+                            await window.saveQuiz();
+                            const tests = (await window.listTests()) || [];
+                            const t = tests.slice().sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))[0];
+                            pages++;
+                            judgeGiveaway(`${key} quiz seed ${s}`, (t ? t.sections.flatMap((x) => x.questions) : []).map((x) => ({ q: x.questionData })));
+                            if (t && window.deleteTest) await window.deleteTest(t.id);
+                        } catch (e) { out.push(`${key} quiz seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); }
+                    }
+                }
+                return { out, pages };
+            }
             for (const key of keys) {
                 const [categoryId, skillId] = key.split(':');
                 if (variantsOnly && on('CROSS-GIVEAWAY') && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(skillId)) {
@@ -170,6 +233,35 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             }
                         }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
+                        const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
+                        const modelTpl = modelIt && modelIt.q.cell.template;
+                        if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {
+                            const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');
+                            const states = [];
+                            if (role === 'lesson') {
+                                const p1 = d.querySelector('section.ws-page');
+                                (p1 ? [...p1.querySelectorAll('.mq-cstate')] : []).forEach((e) => { const h = e.querySelector('.mq-chead b'); const dr = e.querySelector('.mq-cdraw'); if (h && dr) states.push({ text: h.textContent.trim(), drawn: drawnOf(dr) }); });
+                            } else {
+                                // a state cell holds its drawing and (one column) its step text; beside it (two columns) a text cell
+                                cellsOf(r.pupilHtml).forEach((c) => {
+                                    const t = c.querySelector('.mq-steptext span');
+                                    const draws = c.querySelector('[data-ws-slot], [data-ws-aslot], table, svg');
+                                    if (draws) states.push({ text: t ? t.textContent.trim() : '', drawn: drawnOf(c) });
+                                    else if (t && states.length && !states[states.length - 1].text) states[states.length - 1].text = t.textContent.trim();
+                                });
+                            }
+                            if (states.length >= 2) judgeStates(`${key} ${role} ${size} seed ${s}`, states);
+                        }
+                        if (on('SAY-AGREE') && modelIt && /chartwindow/.test(String(modelTpl))) {
+                            const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');
+                            const f = d.querySelector('.ws-sayframe');
+                            const kp = Array.isArray(modelIt.q.keyParts) ? modelIt.q.keyParts.length : 1;
+                            if (f && kp > 1) {
+                                const txt = f.textContent;
+                                const blanks = f.querySelectorAll('.ws-line, [data-ws-blank], .ws-sayblank').length || (txt.match(/_{2,}/g) || []).length;
+                                if (/\bnumber is\b/.test(txt) || (blanks && blanks !== kp)) out.push(`SAY-AGREE ${key} ${role} ${size} seed ${s}: the Say frame "${txt.trim()}" (${blanks} blank${blanks === 1 ? '' : 's'}) under a Model of ${kp} answers`);
+                            }
+                        }
                         if (on('CHART-SQUARE') && ['reason-it', 'true-false', 'error-analysis'].includes(role) && /chartwindow/.test(r.pupilHtml)) {
                             // laid out on the page at its printed size: no square of a chart window narrower than the 14 mm writing floor (H9)
                             const host = document.createElement('div');
@@ -208,12 +300,14 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                 for (const b of bands) add(await call({ keys: [key], vBand: b, seedFrom: 1, seedTo: 0 }).then((r) => r, (e) => ({ out: [`${key} band ${b}: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
             }
         }
+        const screenSeeds = Number(arg('screen-seeds', '20'));
+        for (const key of keys) if (screenSeeds > 0 && (!only || only.includes('CROSS-GIVEAWAY')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(key.split(':')[1])) add(await call({ keys: [key], screen: screenSeeds }));
         for (const key of keys) for (const size of sizes) for (let s = 1; s <= N; s++) add(await call({ keys: [key], sizes: [size], seedFrom: s, seedTo: s }));
         add(await call({ finalize: true }));
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);

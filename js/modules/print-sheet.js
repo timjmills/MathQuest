@@ -24,6 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
+import { chartOfQ, cwKey, chartGivesAway } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -951,40 +952,9 @@ const POOL_LEGACY_TRIES = 16;
 /** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
 const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
 
-/* CROSS-GIVEAWAY (chart_120 critic r1 F4 / F9): a chart window must never print, as a chart number, a square another window
- * of the sheet leaves empty - the pupil copies the answer across. Band 120's three-rows grid and the chart to 10 have ONE
- * window, so every second window gave the first one's answers away; overlapping 3 x 5 windows could too. Each kept window is
- * recorded in the run's `seen` (`cw:` keys, so a later run of the same sheet reads it); a draw that gives an answer away
- * is passed over while tries remain; when every try still shows the SAME squares as a kept window with other gaps (a
- * one-window chart) the item is not dealt: the sheet holds the windows it can hold without giving an answer away. */
-function chartOfQ(q) {
-    const w = q && q.chartWindow;
-    if (!w || !Array.isArray(w.rows) || !Array.isArray(w.cols)) return null;
-    const raw = Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : String(q.ans === undefined ? '' : q.ans).split(/\s*,\s*/);
-    return { rows: w.rows.map(Number), cols: w.cols.map(Number), gaps: raw.map((x) => Number(String(x).replace(/,/g, ''))).filter(Number.isFinite) };
-}
-const cwKey = (c) => `cw:${c.rows.join('.')}:${c.cols.join('.')}:${c.gaps.join('.')}`;
-const cwParse = (k) => { const [, r, c, g] = k.split(':'); const L = (x) => (x ? x.split('.').map(Number) : []); return { rows: L(r), cols: L(c), gaps: L(g) }; };
-/** Does window `c` print `n` as a chart number (in it, and not one of its own empty squares)? */
-const cwPrints = (c, n) => !c.gaps.includes(n) && c.rows.includes(Math.floor((n - 1) / 10)) && c.cols.includes((n - 1) % 10);
-/**
- * Would `q` give an answer away to, or take one from, a window already kept on the sheet? `same` (the hard rule): is a
- * window of the SAME squares already kept - with other gaps it gives the answers away, with the same gaps it is the same
- * problem (GUIDED-MODEL-ECHO). Without it, an overlapping window that prints a kept window's answer counts (the dealer's
- * preference only: band 120's 30 squares cannot hold six windows that never overlap, so overlap is avoided while tries remain).
- */
-export function chartGivesAway(q, seen, { same = false } = {}) {
-    const a = chartOfQ(q);
-    if (!a || !seen) return false;
-    for (const k of seen) {
-        if (typeof k !== 'string' || !k.startsWith('cw:')) continue;
-        const b = cwParse(k);
-        const twin = a.rows.join('.') === b.rows.join('.') && a.cols.join('.') === b.cols.join('.');
-        if (same) { if (twin) return true; continue; }
-        if (a.gaps.some((n) => cwPrints(b, n)) || b.gaps.some((n) => cwPrints(a, n))) return true;
-    }
-    return false;
-}
+/* CROSS-GIVEAWAY (chart_120 critic r1 F4 / F9; r2 N2): the window rule lives in chart-giveaway.js, shared with the screen deal
+ * (the online worksheet and the quiz), so paper and screen never repeat a window's squares. */
+export { chartGivesAway };
 
 /**
  * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
