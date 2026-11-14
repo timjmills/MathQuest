@@ -35,6 +35,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed,
 } from './compose.js';
+import { slotScore } from '../paginate.js';
 
 export const ROLE_ID = 'pre-skill-check';
 const PER_QUAD = 4;
@@ -274,7 +275,7 @@ function planCheck(input, cut) {
     };
     const skillsOn = (input.skills || []).filter((s) => all.some((it) => it.q && it.q.skillId === s.skillId && (!it.q.categoryId || it.q.categoryId === s.categoryId)));
     const frame = frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
-        tabId: `Check ${form}`, title: titleOf(), score: all.length, twoLine: false });
+        tabId: `Check ${form}`, title: titleOf(), score: slotScore(all), twoLine: false });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     const labels = labelStyleOf(ctx.look, input.labels);
@@ -295,7 +296,7 @@ function planCheck(input, cut) {
         const r = routed ? routeOf(input, qi) : null;
         const b = {
             // (a routed question carries its own score, __/n - P-25, critic r2 N3: the routing table reads it)
-            kind: 'band', label: '', instr, extra: input.perQuestion && !routed ? '' : scoreTag(its.length),
+            kind: 'band', label: '', instr, extra: input.perQuestion && !routed ? '' : scoreTag(slotScore(its)),
             // (the detailed lesson's check centres each item in its grown cell, H13)
             content: routed ? { kind: 'col', cls: 'mq-lprecol', parts: [grid, { kind: 'html', html: (bandNo === 1 ? routeCssHtml() : '') + routeTagHtml(r, tagLines) }] } : grid,
         };
@@ -351,7 +352,7 @@ function planCheck(input, cut) {
                 cur.used += uh;
                 if (u.qs.length === 2) cur.sections.push({ kind: 'row', widths: u.qs.map((q) => `${q.length}fr`), cls: 'mq-quadrow mq-lprerow', parts: u.qs.map((q) => band(q, q.length, 1, u.h, u.cols, u.tagLines)) });
                 else cur.sections.push(band(u.qs[0], u.cols, u.rows, u.h, u.cols, u.tagLines));
-                kept += u.qs.reduce((t, q) => t + q.length, 0);
+                kept += u.qs.reduce((t, q) => t + slotScore(q), 0);
             });
             routedFoot = lay.foot;
             routedFits = lay.fits;
@@ -361,7 +362,7 @@ function planCheck(input, cut) {
             const h = hMinAt(q0, cols, ctx) * grow;
             const share = (m.budget / quads.length - m.strip - TAG) * cut;
             const q = whole ? q0 : q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
-            kept += q.length;
+            kept += slotScore(q);
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + TAG + rows * h;
             if (!input.perQuestion) { stacked.push({ h: bandH, n: q.length, sec: band(q, cols, rows, h, cols) }); continue; }
@@ -380,8 +381,9 @@ function planCheck(input, cut) {
         // as a missing item - critic r2 R7)
         if (input.perQuestion && !routed && grow >= GROW_MAX) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
     }
-    const n = kept || all.length;
-    const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
+    // (kept and n count answer slots - a chart window its empty squares, critic r1 F6; one a cell for every other template)
+    const n = kept || slotScore(all);
+    const finalFrame = n === slotScore(all) ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
         tabId: `Check ${form}`, title: titleOf(), score: n, twoLine: false });
     const rp = routed ? routePlan(input, routeRows) : null;
     // (lead ruling R13: a check that runs to a second page prints the FULL header on every page - name, date, score, title)

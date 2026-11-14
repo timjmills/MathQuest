@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 729 live skills; 620 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 732 live skills; 623 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 78 of 177 standards FULL, 88 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 105 FULL, 90 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 277 entries — 132 new skills, 89 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 61 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 278 entries — 132 new skills, 90 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
 | K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
-| 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
-| 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
+| 1 | 10 / 11 / 0 of 21 (48% full) | 12 / 11 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
+| 2 | 11 / 11 / 4 of 26 (42% full) | 11 / 10 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
 | 3 | 13 / 12 / 0 of 25 (52% full) | 19 / 14 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 15 / 12 / 1 of 28 (54% full) | 20 / 12 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **78 / 88 / 11 of 177 (44% full)** | **105 / 90 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -231,7 +231,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 36 | **Faces, Edges or Vertices (option)** (`shape_faces`) | option on `shapes_early:count_edges_faces_vertices` | - | 1 |
 | 37 | **3-D Shapes: Names and Properties** (`shapes_3d_props`) | new `shapes_classify:3d_shape_properties` | - | 1 |
 
-### Operations (39)
+### Operations (41)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
@@ -243,59 +243,39 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 6 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
 | 7 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
 | 8 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
-| 9 | **Multi-Digit Multiplication: Standard Algorithm** (`mult_standard`) | new `multiplication:mult_standard` | 4.NBT.B.5, 5.NBT.B.5 | - |
-| 10 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
-| 11 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
-| 12 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
-| 13 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
-| 14 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
-| 15 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
-| 16 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
-| 17 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
-| 18 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
-| 19 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
-| 20 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
-| 21 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
-| 22 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
-| 23 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
-| 24 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
-| 25 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
-| 26 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
-| 27 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
-| 28 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
-| 29 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
-| 30 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
-| 31 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
-| 32 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
-| 33 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
-| 34 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
-| 35 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
-| 36 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
-| 37 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | - | 1 |
-| 38 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
-| 39 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
-
-### Counting and early number (17)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
-| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
-| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
-| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
-| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
-| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
-| 7 | **Zero Means None** (`zero`) | new `counting:zero_none` | K.CC.A.3 | 1 |
-| 8 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
-| 9 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
-| 10 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
-| 11 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
-| 12 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
-| 13 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
-| 14 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 15 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
-| 16 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
-| 17 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
+| 9 | **How Many Were Added? How Many Went? (change unknown)** (`map_change_unknown_story`) | option on `addition:add_word_problems` | 1.OA.A.1, 2.OA.A.1 | - |
+| 10 | **Compare Stories: Find the Smaller Amount** (`map_compare_smaller_unknown`) | option on `subtraction:sub_word_problems` | 1.OA.A.1, 2.OA.A.1 | - |
+| 11 | **Multi-Digit Multiplication: Standard Algorithm** (`mult_standard`) | new `multiplication:mult_standard` | 4.NBT.B.5, 5.NBT.B.5 | - |
+| 12 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
+| 13 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
+| 14 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
+| 15 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
+| 16 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
+| 17 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
+| 18 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
+| 19 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
+| 20 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
+| 21 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
+| 22 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 23 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
+| 24 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
+| 25 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
+| 26 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
+| 27 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
+| 28 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
+| 29 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
+| 30 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
+| 31 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
+| 32 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
+| 33 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
+| 34 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
+| 35 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
+| 36 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
+| 37 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
+| 38 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
+| 39 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | - | 1 |
+| 40 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
+| 41 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
 ### Fractions (22)
 
@@ -323,6 +303,27 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 20 | **Understand the Whole** (`frac_whole`) | new `fractions:understand_the_whole` | - | 1 |
 | 21 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
 | 22 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
+
+### Counting and early number (16)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
+| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
+| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
+| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
+| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
+| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
+| 7 | **Zero Means None** (`zero`) | new `counting:zero_none` | K.CC.A.3 | 1 |
+| 8 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
+| 9 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
+| 10 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
+| 11 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
+| 12 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
+| 13 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
+| 14 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
+| 15 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
+| 16 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Place value (12)
 
@@ -495,6 +496,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 ### Level 1
 
+- **1.OA.A.1** — PARTIAL. Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
+  Taught in part by: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); How Many More/Fewer? (Visual) (`addition:comparison_word`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 20) (`addition:add_wp_20`); Subtraction Word Problems (within 20) (`subtraction:sub_wp_20`)  
+  Missing: change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today); compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known)  
+  Build: How Many Were Added? How Many Went? (change unknown) (`map_change_unknown_story`); Compare Stories: Find the Smaller Amount (`map_compare_smaller_unknown`)
 - **1.OA.A.2** — PARTIAL. Solve word problems that call for addition of three whole numbers whose sum is less than or equal to 20, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
   Taught in part by: Add Three Numbers (≤20) (`addition:add_three`)  
   Missing: word problems with three addends (the skill is bare sums)  
@@ -512,9 +517,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: decide whether equations are true or false: addition:equal_sign is tagged but deals plain column addition (it routes to the operations generator); the forms 6 = 6 and 7 = 8 − 1  
   Build: True or False Equations (repair) (`equal_sign_repair`); Compare Number Sentences (`compare_sentences`)
 - **1.NBT.A.1** — PARTIAL. Count to 120, starting at any number less than 120. In this range, read and write numerals and represent a number of objects with a written numeral.  
-  Taught in part by: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
-  Missing: counting across 100 to 120 on a chart; writing the numeral for a counted set above 20  
-  Build: Count to 120 on the Chart (option) (`chart_120`); Count by Making Tens (`tens_ones_group`)
+  Taught in part by: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`); Count to 120 on the Chart (`composing:chart_to_120`)  
+  Missing: writing the numeral for a counted set above 20  
+  Build: Count by Making Tens (`tens_ones_group`)
 - **1.NBT.C.4** — PARTIAL. Add within 100, including adding a two-digit number and a one-digit number, and adding a two-digit number and a multiple of 10, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used. Understand that in adding two-digit numbers, one adds tens and tens, ones and ones; and sometimes it is necessary to compose a ten.  
   Taught in part by: Add within 50 (`addition:add_50_mixed`); Add within 100 (`addition:add_100_mixed`); Add & Subtract by 10s (`addition:add_sub_10s`)  
   Missing: concrete models or drawings for 2-digit addition, related to the written method; a 2-digit number plus a multiple of 10 as its own step  
@@ -561,6 +566,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 ### Level 2
 
+- **2.OA.A.1** — PARTIAL. Use addition and subtraction within 100 to solve one- and two-step word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using drawings and equations with a symbol for the unknown number to represent the problem.  
+  Taught in part by: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 100) (`addition:add_wp_100`); Subtraction Word Problems (within 100) (`subtraction:sub_wp_100`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`)  
+  Missing: change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today); compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known)  
+  Build: How Many Were Added? How Many Went? (change unknown) (`map_change_unknown_story`); Compare Stories: Find the Smaller Amount (`map_compare_smaller_unknown`)
 - **2.OA.C.3** — PARTIAL. Determine whether a group of objects (up to 20) has an odd or even number of members, e.g., by pairing objects or counting them by 2s; write an equation to express an even number as a sum of two equal addends.  
   Taught in part by: Odd or Even? (Visual) (`composing:odd_even`); Circle the Even or Odd Numbers (MAP) (`composing:select_even_odd`); Doubling (`patterns:double`)  
   Missing: decide odd or even for a group of objects (up to 20) by pairing or counting in 2s (the skills use the last digit); write an even number as a sum of two equal addends  
@@ -1116,8 +1125,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 *A. Represent and solve problems involving addition and subtraction.*
 
-- **1.OA.A.1** — FULL. Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
-  Taught by: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); How Many More/Fewer? (Visual) (`addition:comparison_word`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 20) (`addition:add_wp_20`); Subtraction Word Problems (within 20) (`subtraction:sub_wp_20`) — every situation and unknown position at range 20; bar and equation supports  
+- **1.OA.A.1** — PARTIAL. Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
+  In part: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); How Many More/Fewer? (Visual) (`addition:comparison_word`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 20) (`addition:add_wp_20`); Subtraction Word Problems (within 20) (`subtraction:sub_wp_20`) — lf-builds 2026-11-12: change-unknown and compare-smaller branches unreachable (word-stories card); was full. Range 20, bar and equation supports and unknown position at range 20; bar and equation supports  
+  Missing: change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today); compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known) → `map_change_unknown_story`, `map_compare_smaller_unknown`  
   Also tagged: `addition:add_word_problems_plain`, `addition:add_wp_20_plain`, `subtraction:sub_word_problems_plain`, `subtraction:sub_wp_20_plain`, `subtraction:sub_wp_compare`, `subtraction:sub_wp_start_unknown`
 - **1.OA.A.2** — PARTIAL. Solve word problems that call for addition of three whole numbers whose sum is less than or equal to 20, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
   In part: Add Three Numbers (≤20) (`addition:add_three`)  
@@ -1152,8 +1162,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 *A. Extend the counting sequence.*
 
 - **1.NBT.A.1** — PARTIAL. Count to 120, starting at any number less than 120. In this range, read and write numerals and represent a number of objects with a written numeral.  
-  In part: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
-  Missing: counting across 100 to 120 on a chart; writing the numeral for a counted set above 20 → `chart_120`, `tens_ones_group`  
+  In part: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`); Count to 120 on the Chart (`composing:chart_to_120`)  
+  Missing: writing the numeral for a counted set above 20 → `tens_ones_group`  
 *B. Understand place value.*
 
 - **1.NBT.B.2** — FULL. Understand that the two digits of a two-digit number represent amounts of tens and ones. Understand the following as special cases:  
@@ -1216,8 +1226,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 *A. Represent and solve problems involving addition and subtraction.*
 
-- **2.OA.A.1** — FULL. Use addition and subtraction within 100 to solve one- and two-step word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using drawings and equations with a symbol for the unknown number to represent the problem.  
-  Taught by: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 100) (`addition:add_wp_100`); Subtraction Word Problems (within 100) (`subtraction:sub_wp_100`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`) — one step: every situation and unknown to 100; two steps: multi_step_word (+ and −)  
+- **2.OA.A.1** — PARTIAL. Use addition and subtraction within 100 to solve one- and two-step word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using drawings and equations with a symbol for the unknown number to represent the problem.  
+  In part: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 100) (`addition:add_wp_100`); Subtraction Word Problems (within 100) (`subtraction:sub_wp_100`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`) — lf-builds 2026-11-12: was full. One step every situation and unknown to 100; two steps: multi_step_word (+ and −)  
+  Missing: change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today); compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known) → `map_change_unknown_story`, `map_compare_smaller_unknown`  
   Also tagged: `addition:add_word_problems_plain`, `addition:add_wp_50`, `addition:add_wp_50_plain`, `addition:add_wp_100_plain`, `subtraction:sub_word_problems_plain`, `subtraction:sub_wp_50`, `subtraction:sub_wp_50_plain`, `subtraction:sub_wp_100_plain`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`, `algebra:multi_step_word_plain`, `algebra:build_expr_addsub`, `subtraction:sub_wp_compare`, `subtraction:sub_wp_start_unknown`
 *B. Add and subtract within 20.*
 
@@ -1344,24 +1355,24 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.OA.B.5** — PARTIAL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
   In part: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
   Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0 → `mult_three`  
-  Also tagged: `multiplication:mult_break_apart`
+  Also tagged: `multiplication:mult_break_apart`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 - **3.OA.B.6** — FULL. Understand division as an unknown-factor problem. For example, find 32 ÷ 8 by finding the number that makes 32 when multiplied by 8.  
   Taught by: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
   Also tagged: `multiplication:number_families_mult`, `division:div_check_by_multiplying`, `number_ops_mixed:number_families_mixed`
 *C. Multiply and divide within 100.*
 
 - **3.OA.C.7** — FULL. Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division (e.g., knowing that 8 × 5 = 40, one knows 40 ÷ 5 = 8) or properties of operations. By the end of Grade 3, know from memory all products of two one-digit numbers.  
-  Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`); Division Facts (1-12) (`division:div_facts`)  
+  Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`); Division Facts (÷1 to ÷12) (`division:div_facts`)  
   Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `division:div_facts_long`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
 *D. Solve problems involving the four operations, and identify and explain patterns in arithmetic.*
 
 - **3.OA.D.8** — FULL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
   Taught by: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Multi-Step Word Problems (No Pictures) (`algebra:multi_step_word_plain`); Two-Step Word Problems: Multiply or Divide First (`algebra:two_step_mult_div_first`); Two-Step Word Problems: Add or Take Away, Then Multiply (`algebra:two_step_add_then_mult`); Two-Step Word Problems: Add or Take Away, Then Divide (`algebra:two_step_add_then_div`); Two-Step Word Problems: One Equation With a Letter (`algebra:two_step_letter_equation`); Two-Step Word Problems: Estimate to Check (`algebra:two_step_estimate_check`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`) — two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)  
-  Also tagged: `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`
+  Also tagged: `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`); What Do You Notice? Even and Odd Products, Pattern Features (`patterns:notice_patterns`) — lf-algebra 2026-11-07: explaining a multiplication-table pattern (even products, a times-table sentence true or false) is patterns:notice_patterns  
   Missing: patterns in the addition table → `addition_table_patterns`  
-  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
+  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 #### Number and Operations in Base Ten (3.NBT)
 
 *A. Use place value understanding and properties of operations to perform multi-digit arithmetic.*

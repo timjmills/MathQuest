@@ -9,6 +9,7 @@ import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
+import { chartSeen, chartGivesAway } from './chart-giveaway.js';
 import { syncWorksheetRefLine } from './refline-screen.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
@@ -862,14 +863,22 @@ function _wsGenerate(i) {
     const prevMember = i > 0 ? memberOf(earlier[i - 1]) : '';
     const fairMember = (m) => !m || (m !== prevMember && win.filter((x) => x === m).length < 2);
     let kitFallback = null;              // a kit cell that broke only the variety rule
-    const tries = kitPool ? 24 : 12;
+    // CROSS-GIVEAWAY on the screen (chart_120 critic r2 N2): a chart window never repeats the squares of an earlier card's
+    // window - with other gaps it prints that card's answers - as the paper deal (chart-giveaway.js). Band 120 has six
+    // windows, so a chart sheet draws more tries before it relaxes.
+    const cwSeen = chartSeen(earlier);
+    const tries = kitPool ? 24 : cwSeen.size ? 48 : 12;
     for (let attempt = 0; attempt < tries; attempt++) {
         const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
         let cand = null;
         try {
+            // (a chart sheet whose tries at this card's place all repeat a window draws the second half of its tries at the
+            // next places of the ladder: band 120's crossing items - one in three - have only the two edge windows, and two
+            // of them with cards between can find both taken; r2 N2)
+            const at = cwSeen.size && attempt >= tries / 2 ? i + 1 + (attempt % 2) : i;
             cand = generateQuestionFor({
                 category: state.category, skill: state.skill, opts: state.skillOptions,
-                seed, itemIndex: i, gameMode: 'worksheet',
+                seed, itemIndex: at, gameMode: 'worksheet',
             });
         } catch (e) {
             console.error('worksheet: generateQuestionFor failed', e);
@@ -884,6 +893,7 @@ function _wsGenerate(i) {
             if (!kitFallback && !seen.has(_wsItemKey(cand))) kitFallback = cand;
             continue;
         }
+        if (cwSeen.size && attempt < tries - 1 && chartGivesAway(cand, cwSeen, { same: true })) { if (!q) q = cand; continue; }
         const key = _wsItemKey(cand);
         if (!seen.has(key)) { q = cand; break; }
         if (!fallback && key !== prevKey) fallback = cand;
@@ -1005,6 +1015,7 @@ export function layoutWorksheetGrid(grid) {
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
     _wsOneDigit(cards);
     _wsOneSupportPlace(cards, true);
+    _wsOneAnswerPlace(cards, true);
     for (let cols = maxCols; cols >= 1; cols--) {
         grid.style.setProperty('--mq-wscols', String(cols));
         let ok = true;
@@ -1012,7 +1023,45 @@ export function layoutWorksheetGrid(grid) {
         if (ok) break;
     }
     _wsOneSupportPlace(cards);
+    _wsOneAnswerPlace(cards);
     _wsEvenRows(cards);
+}
+
+/**
+ * One answer place per worksheet (critic divarray r2 D7; ws-screen-support-eq SCREEN-ANSWER-PLACE): a ÷ sentence's answer
+ * line stands beside its "=" while the row has room and wraps under the sentence when it has not - at 820 px with the 48 px
+ * digit floor a 1-digit dividend kept it beside and a 2-digit one wrapped, so one sheet had two answer places and three cell
+ * heights. When any ÷ card of the sheet wraps, every ÷ card puts its answer line under its sentence (the slot takes the
+ * full line, its box centred, as a natural wrap draws it). `reset` clears the choice before the columns are measured again.
+ */
+function _wsOneAnswerPlace(cards, reset = false) {
+    const eqs = cards.map((c) => c.querySelector('.ws-card-visual .ws-eq.mq-eq[aria-label*="divided by"]')).filter(Boolean);
+    const slotOf = (eq) => eq.querySelector(':scope > .mq-eqslot');
+    if (reset) eqs.forEach((eq) => { const sl = slotOf(eq); if (sl && sl.dataset.mqOnePlace) { delete sl.dataset.mqOnePlace; sl.style.flexBasis = ''; sl.style.justifyContent = ''; } });
+    // (the same for the sign box drawn BEFORE a ÷ sentence: on screen it wraps above a sentence too wide for the row - "108 ÷ 12"
+    // at 1280 - so when one card's sign box wraps above, every ÷ card's does, one support place and one cell height)
+    const befores = cards.map((c) => {
+        const eq = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+        return eq ? eq.closest('.ws-with-pane[data-ws-pane-place="before"]') : null;
+    }).filter(Boolean);
+    if (reset) {
+        befores.forEach((wp) => { if (wp.dataset.mqOnePlace) { delete wp.dataset.mqOnePlace; wp.style.flexDirection = ''; wp.style.alignItems = ''; } });
+    } else if (befores.length >= 2) {
+        const above = (wp) => {
+            const prob = wp.querySelector(':scope > .ws-pane-problem');
+            const pane = prob && prob.previousElementSibling;
+            return !!pane && pane.getBoundingClientRect().height > 0 && prob.getBoundingClientRect().top >= pane.getBoundingClientRect().bottom - 2;
+        };
+        if (befores.some(above)) befores.forEach((wp) => { wp.dataset.mqOnePlace = 'above'; wp.style.flexDirection = 'column'; wp.style.alignItems = 'center'; });
+    }
+    if (reset || eqs.length < 2) return;
+    const wrapped = (eq) => {
+        const slot = slotOf(eq), first = eq.firstElementChild;
+        if (!slot || !first || slot === first) return false;
+        return slot.getBoundingClientRect().top >= first.getBoundingClientRect().bottom - 2;
+    };
+    if (!eqs.some(wrapped)) return;
+    eqs.forEach((eq) => { const sl = slotOf(eq); if (sl) { sl.dataset.mqOnePlace = 'under'; sl.style.flexBasis = '100%'; sl.style.justifyContent = 'center'; } });
 }
 
 /**
@@ -1021,22 +1070,29 @@ export function layoutWorksheetGrid(grid) {
  * screen wraps under it when the card is too narrow; when any card of the sheet wraps, every ÷ card puts it under.
  * `reset` clears the choice before the columns are measured again.
  */
+/** A card's ÷ fact (the ÷ sentence's .ws-eq "divided by"). (The × landscape array's wrap is parked with the mult_facts arrays,
+ *  lead 2026-11-13 / lf-ops divship: × cards keep master's layout.) */
+function _wsDivOrTimes(c) {
+    return c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+}
 function _wsOneSupportPlace(cards, reset = false) {
     const wps = cards.map((c) => {
-        const eq = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+        const eq = _wsDivOrTimes(c);
         return eq ? eq.closest('.ws-with-pane[data-ws-pane-place="beside"]') : null;
     }).filter(Boolean);
+    // (a card whose support the kit already put UNDER its fact - a wide landscape array - counts as wrapped)
+    const under0 = cards.some((c) => _wsDivOrTimes(c) && c.querySelector('.ws-card-visual .ws-with-pane[data-ws-pane-place="under"]'));
     if (reset) {
         wps.forEach((wp) => { if (wp.dataset.mqOnePlace) { delete wp.dataset.mqOnePlace; wp.style.flexDirection = ''; wp.style.alignItems = ''; } });
         return;
     }
-    if (wps.length < 2) return;
+    if (wps.length < (under0 ? 1 : 2)) return;
     const wrapped = (wp) => {
         const prob = wp.querySelector(':scope > .ws-pane-problem');
         const pane = prob && prob.nextElementSibling;
         return !!pane && pane.getBoundingClientRect().height > 0 && pane.getBoundingClientRect().top >= prob.getBoundingClientRect().bottom - 2;
     };
-    if (!wps.some(wrapped)) return;
+    if (!under0 && !wps.some(wrapped)) return;
     wps.forEach((wp) => { wp.dataset.mqOnePlace = 'under'; wp.style.flexDirection = 'column'; wp.style.alignItems = 'center'; });
 }
 
@@ -1637,6 +1693,13 @@ function _wsRenderCard(grid, q, i) {
         if (kind && rungsFor(q, { categoryId: state.category, skillId: state.skill }).some((r) => r.id === 'touch' || r.id === 'touchall')) {
             const sc = card.querySelector('.ws-card-visual.mq-scell');   // R3-3: THIS card's own cell
             if (sc) sc.setAttribute('data-mq-touch-floor', '1');
+        }
+        // (lf-ops divarray r2, lead 2026-11-13 via lf-checks' tablet sweep: div_facts' worksheet numeral takes the HOST digit floor
+        // for its width - 56 px at 1200 px and wider, 48 px from 600 px - as the card and quiz do, not the 40 px touch floor;
+        // css/screen-cell.css [data-mq-host-floor]. lf-checks' general per-cell floor, when it lands, covers the same cells.)
+        if (state.category === 'division' && state.skill === 'div_facts') {
+            const sc = card.querySelector('.ws-card-visual.mq-scell');
+            if (sc) sc.setAttribute('data-mq-host-floor', '1');
         }
     } catch (e) { /* optional */ }
     if (cellEl) {

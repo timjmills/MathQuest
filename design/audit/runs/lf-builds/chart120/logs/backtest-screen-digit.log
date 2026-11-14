@@ -1,0 +1,8 @@
+ws-backtest row c120-screen-digit: PASS  fail state FAIL 30.0s, pass state OK 29.8s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-screen-digit           commit-pair  FAIL 30.0s          OK 29.8s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 69.7 s
+ws-backtest: OK

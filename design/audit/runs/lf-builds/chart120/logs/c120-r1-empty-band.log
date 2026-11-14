@@ -1,0 +1,38 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill composing:chart_to_120
+
+mq-browser-run: slot 1 after 68s
+note: composing:chart_to_120: card (none: default roles); 9 roles x S/M/L + 0 option variant(s) of 0 + hosts card, worksheet, quiz
+note: composing:chart_to_120 card 390: no kit cell on the host (legacy screen item?)
+note: composing:chart_to_120 card 820: no kit cell on the host (legacy screen item?)
+note: composing:chart_to_120 card 1280: no kit cell on the host (legacy screen item?)
+EB-BAND  PASS
+EB-SIDE  PASS
+EB-EDGE  FAIL 1
+   composing:chart_to_120 true-false L p1 cell 1: ink 1.4 mm from the cell's border (a divider or the page frame; limit 1.5 mm) [chartwindow]
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  FAIL 36
+   composing:chart_to_120 independent M p1 cell 1: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   composing:chart_to_120 independent M p1 cell 2: drawn 67.6 mm, footprint hMm 58.9 mm at 2 columns (15 %)
+   composing:chart_to_120 independent M p1 cell 3: drawn 67.6 mm, footprint hMm 58.9 mm at 2 columns (15 %)
+   composing:chart_to_120 independent M p1 cell 4: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   composing:chart_to_120 independent M p1 cell 5: drawn 67.5 mm, footprint hMm 58.8 mm at 2 columns (15 %)
+   composing:chart_to_120 independent M p1 cell 6: drawn 67.6 mm, footprint hMm 58.9 mm at 2 columns (15 %)
+   composing:chart_to_120 independent L p1 cell 1: drawn 68.8 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:chart_to_120 independent L p1 cell 2: drawn 68.9 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:chart_to_120 independent L p1 cell 3: drawn 68.9 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:chart_to_120 independent L p1 cell 4: drawn 68.8 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:chart_to_120 independent L p1 cell 5: drawn 68.8 mm, footprint hMm 61.8 mm at 2 columns (11 %)
+   composing:chart_to_120 independent L p1 cell 6: drawn 68.9 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:chart_to_120 more-practice M p1 cell 1: drawn 67.6 mm, footprint hMm 58.9 mm at 2 columns (15 %)
+   composing:chart_to_120 more-practice M p1 cell 2: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   composing:chart_to_120 more-practice M p1 cell 3: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   ... 21 more
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(1 skill(s), 32 renders, 167 cells, 75 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (37)

@@ -553,7 +553,11 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         st.range = range; st.decimalPlaces = DP;
         let res;
         try {
-            const r = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
+            // (a value a role HIDES - card §7a role-scoped, lead ruling (a) 2026-11-14: band 10 / band-120 rows off the practice
+            // pages - is printed on a role that deals it, True or False?, so the control is still seen working)
+            let role = 'independent';
+            try { const so = await import('/js/modules/skill-options.js'); if (opts && JSON.stringify(so.optsForRole(categoryId, skillId, opts, 'independent')) !== JSON.stringify(opts)) role = 'true-false'; } catch (e) { /* independent */ }
+            const r = await W.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
             const marksIn = (html) => { const d = document.createElement('div'); d.innerHTML = html; return d.querySelectorAll('[data-ws-support-on], .ws-td-svg').length; };
             res = { pupilMarks: marksIn(r.pupilHtml), keyMarks: marksIn(r.keyHtml), items: r.items.map(i => ({ text: i.text, ans: i.ans })), pupil: normVisual(r.pupilHtml), key: plain(r.keyHtml).replace(/(\d),(?=\d{3}\b)/g, '$1'), pupilText: plain(r.pupilHtml).replace(/(\d),(?=\d{3}\b)/g, '$1'), title: plain(r.pupilHtml).slice(0, 400) };
         } catch (e) { res = { error: String(e && e.message || e) }; }

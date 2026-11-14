@@ -1,0 +1,36 @@
+ws-backtest row c120-tagink: PASS  fail state FAIL 31.7s, pass state OK 33.0s
+ws-backtest row c120-lesson-wide: FAIL  fail state FAIL 39.5s, pass state FAIL 37.1s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-cell-checks: FAIL - 286 finding(s) (OVERFLOW 286) on 36 page(s), 36s; pass: ws-cell-checks: FAIL - 10 finding(s) (OVERFLOW 10) on 36 page(s), 33s
+    last 20 line(s) of the pass state:
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"tiles":4}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"tiles":5}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"tiles":6}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"tiles":7}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"grid":"rows"}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"grid":"whole"}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"gaps":"row"}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"gaps":"column"}: 4p 1x? per undefined
+      |   ok   composing:hundreds_chart_fill lesson M {"band":10,"gaps":"pattern"}: 4p 1x? per undefined
+      |   FAIL OVERFLOW composing:hundreds_chart_fill opener M {"band":10}: pupil page 1 cell 1: content overflows its cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill opener M {"band":10}: pupil page 1 cell 1: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill opener M {"band":10}: key page 1 cell 1: content overflows its cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill opener M {"band":10}: key page 1 cell 1: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill reason-it M {"band":10}: pupil page 1 cell 1: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill reason-it M {"band":10}: pupil page 1 cell 2: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill reason-it M {"band":10}: pupil page 1 cell 3: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill reason-it M {"band":10}: key page 1 cell 1: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill reason-it M {"band":10}: key page 1 cell 2: <div> leaves the cell
+      |   FAIL OVERFLOW composing:hundreds_chart_fill reason-it M {"band":10}: key page 1 cell 3: <div> leaves the cell
+      | ws-cell-checks: FAIL - 10 finding(s) (OVERFLOW 10) on 36 page(s), 33s
+ws-backtest: 2 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-tagink                 commit-pair  FAIL 31.7s          OK 33.0s            PASS
+c120-lesson-wide            commit-pair  FAIL 39.5s          FAIL 37.1s          FAIL
+
+c120-lesson-wide: expected {"fail":"FAIL","pass":"OK"}
+  fail state (e3733905c): ws-cell-checks: FAIL - 286 finding(s) (OVERFLOW 286) on 36 page(s), 36s
+  pass state (032e07ec6): ws-cell-checks: FAIL - 10 finding(s) (OVERFLOW 10) on 36 page(s), 33s
+
+1 PASS, 1 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 181.7 s
+ws-backtest: FAIL (1)

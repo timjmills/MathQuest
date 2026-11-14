@@ -171,7 +171,7 @@ export function renderCell(q, ctx = {}) {
                 // the frame's own - the largest divisor times the band's top - not 144 ÷ 12)
                 const af = payload.supports && payload.supports.arrayFrame;
                 const widePayload = af && Number(af.cols) > 0 && Number(af.rows) > 0
-                    ? Object.assign(withoutSupports(payload), { a: af.cols * af.rows, b: af.cols, ans: af.rows })
+                    ? Object.assign(withoutSupports(payload), { a: af.cols * af.rows, b: af.rows, ans: af.cols })   // (landscape: rows = the largest divisor)
                     : Object.assign(withoutSupports(payload), { a: 144, b: 12, ans: 12 });
                 const wide = tpl.footprint.call(tpl, widePayload, c);
                 if (wide && wide.wMm > fp.wMm) fp = Object.assign({}, fp, { wMm: wide.wMm });

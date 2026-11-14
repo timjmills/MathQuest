@@ -3233,8 +3233,8 @@
     "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
    },
    "pass": {
-    "commit": "d377e32b",
-    "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+    "commit": "fc04ba58",
+    "state": "0 findings: frame-array 43.0x14.4 (landscape, the divisor's rows) on every host, 'no dots' frame on 0 ÷ n (re-pointed from d377e32b: since the owner's landscape ruling of 2026-11-13 EQ wants the divisor's rows)"
    },
    "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ --widths 1280,820,390",
    "expect": {
@@ -3452,9 +3452,8 @@
     "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
    },
    "pass": {
-    "fixture": "tests/fixtures/precritic/screen-ink/div-facts-wide.pass.html",
-    "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
-    "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
+    "commit": "393db090",
+    "state": "0 findings: the div_facts array landscape (fc04ba58 / a7f44d18) and screen cues at one CSS mm per paper mm (393db090); lf-ops-divarray, the pin 99 -> 0"
    },
    "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline --widths 390,820,1280",
    "expect": {
@@ -9861,6 +9860,1322 @@
     "state": "CHART-HEAD OK: chartBare removed, every chart takes the frame header"
    },
    "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules CHART-HEAD --detailed g2-nbt3-read-write-1000,g3-oa5-mult-properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-orient-divfacts",
+   "check": "div_facts' framed ÷ array with 2 or more rows is drawn landscape (width >= height) on every screen host and on the Independent page at S / M / L, the empty 0 ÷ n frame too (facts card §5.9, owner 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.9, RP-81)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "FAIL: the frame is the quotient's rows of the divisor's dots, 41 x 122 px on screen (12.0 x 35.8 mm on paper)"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: frame 43.0 x 14.4 mm at M, the divisor's rows"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ORIENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-dot-min-divfacts",
+   "check": "div_facts' screen array dot stands to the fact digit at >= paper's ratio - never smaller than the print dot (facts card §5.9, owner 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-DOT-MIN (facts card 5.9, RUBRIC C1)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "FAIL: screen dot 0.167 x the fact digit, paper 0.252"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: the screen dot 1.5 x paper's ratio, capped by the cell"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only DOTMIN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-caption-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: x arrays min rows of max, the fact named, and one row reads \"1 row of n\" (re-pointed from 393db090: CAPTION now also holds the r1 N1 grammar, which 393db090 broke - \"1 rows of 1\")"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-orient-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "24 findings: 7 × 10 drawn 10 rows of 7, 75 x 105 px"
+   },
+   "pass": {
+    "commit": "393db090",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only ORIENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-stack-side-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
+   "browser": true,
+   "fail": {
+    "commit": "55e7d0f2f",
+    "state": "6 findings, over the pin of 4: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
+   },
+   "pass": {
+    "commit": "4e2e4c988",
+    "state": "4 findings, within the pin (master's 4 x 46 mm cells, 30 %): the stacks in their own 4 columns"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --opts '{\"support\":[\"array\"]}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-zero-row-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
+   "browser": true,
+   "fail": {
+    "commit": "05875e169",
+    "state": "1 finding: \"4 × 0\" p1 cell 8, 22.7 mm empty under the item in a 62.8 mm cell (32 %), H13-ROW"
+   },
+   "pass": {
+    "commit": "792e5ca30",
+    "state": "0 findings: \"4 × 0\" draws the empty frame"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports array --size S --roles review --skills multiplication:mult_facts --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-frame-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "669c41cea",
+    "state": "11 findings: 8 x 0 on paper S / M / L, 10 x 0 on the card and quiz draw nothing"
+   },
+   "pass": {
+    "commit": "792e5ca30",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only FRAME,EQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-not-slot-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "on an array-support band no support draws an empty closed box the size/shape of the answer slot, and a frame on only some cells (the x 0 frame, the lone framed support in a band of unframed arrays) is a finding - on paper and every screen host (critic divarray r1 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SUPPORT-NOT-SLOT; ws-print-lint SUPPORT-NOT-SLOT",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 paper findings (S/M/L): 1 framed and 9 unframed array supports in one band - the x 0 frame reads as the lone slot-like box"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: every x array draws in the band's one frame and the x 0 fact draws that frame empty - no lone slot-like box"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only NOTSLOT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-caption-grammar-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a one-row array caption reads \"1 row of n\", never \"1 rows of n\" (it is spoken aloud) (critic divarray r1 N1, fact.js:242)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-CAPTION (row/rows grammar)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 findings (card 1280/820/390): caption \"1 rows of 1, for 1 x 1\" says \"1 rows\""
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: the one-row caption says \"1 row of 1, for 1 x 1\""
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "size-order-opt-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "the ruled option pages are judged by SIZE-ORDER: an option page whose cells measure smaller at S must fit more at S (strict S > L), never the same page at every size (critic divarray r1 D3; mult_facts {support:array} printed 10/10/10 and 12/12/12 at S/M/L)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin SIZE-ORDER-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 findings: mult_facts {support:array} independent/test/more-practice S==L (10/10/10, 12/12/12) - same page at every size. (master also fails: pre-existing, 10/10/10)"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: the x array page sizes from its measured band-frame cells - Independent / Test / More practice S 10 > M 8 >= L 8"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-eq-ind-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1; lead ruling 2026-11-13: the div_facts rule of 2026-11-09 extends to mult_facts - TEST-EQ-IND runs by default)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin TEST-EQ-IND (on by default)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "mult_facts array Test 12 != Independent 10 (S/M/L); touch Test 20/16 != Independent 25/20 (S/M). (master also fails touch 20!=25)"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: mult_facts Test = Independent on array, touch, skip, boxsign and no support (S/M/L), div_facts array as before"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pagefill-review-multfacts-touch",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "print-lint's PAGEFILL (and the PG-23 orphan) run on the Review / Test roles for fact skills with supports (--fill-roles), so a support page that leaves a 30% blank strip under the grid is caught (critic divarray r1 D2: mult_facts Review S touch at the ruled 15 left a 71 mm, 30% strip)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL on review/test (--fill-roles)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "PAGEFILL fires on mult_facts Review S touch: an empty strip ~30% of the problem area under the grid"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 PAGEFILL findings: Review S touch prints 4 x 3 facts + 4 stacks = 16 and fills the page"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports touch --size S --roles review --fill-roles review --skills multiplication:mult_facts --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "supband-below-support-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item - an unframed x array in a Test cell sized for a 10-12-row one left 36-44 % empty below it (critic divarray r1 D4). A support BESIDE taller ink (the fact beside the x band frame) has no band under it. Run on the Test role, where D4 was graded (on precritic's path via --role test)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SUPBAND (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "EB-SUPBAND fires on mult_facts {support:array} Test S/M/L (e.g. Test S cell 4 ~38 %)"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: the x array draws in the band frame beside the fact (no band under a short array)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --roles test --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "capacity-ruled-review-touch-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a RULED option page prints at least its ruled count: mult_facts Review S with touch is ruled 16 (master's count; lead ruling 2026-11-13 withdrew the 16 -> 15 re-pin that left a 30 % blank strip, critic divarray r1 D2)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin ruled page (CAPACITY-NO-DROP)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "mult_facts review S {support:[touch]}: 15 items, under its RULED 16"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "16 items: 4 x 3 facts + 4 stacks (review.js geometry)"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts --roles review --sizes S --no-test-eq-ind",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-page-divfacts-test",
+   "check": "division:div_facts fact Test pages half empty (critic r6 R6-1: Test S 117 mm white, M 116, L 91)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAGE (white under the grid vs one row pitch)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: Test S 4 x 5, 119 mm white under the grid (pitch 23 mm); M 118 mm; L 93 mm"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "owner ruling 2026-11-08 (a): the Test takes the Independent capacity (4a07ada1), 3 columns at M for 3-digit facts (c05a5dae); EB-PAGE OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^test [SML]$' --rules EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-page-divfacts-fade",
+   "check": "division:div_facts fade packet page 3 at M 40 % used (critic r6 R6-4: 129 mm white)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAGE on the faded packet",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: fade packet M p3 131.5 mm white (12 bare facts, the 2 x page-1 stage cap)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "div_facts' stages uncapped: page 3 takes its page; EB-PAGE OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-pad-divfacts-M",
+   "check": "division:div_facts skip / think at M: the answer line 0.5-0.8 mm from the right rule on 3-digit facts (critic r6 R6-2)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAD (CL-8 3 mm side pad, probed with the widest facts)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: skip / think Independent and Test M, ink 0.72 mm from the right rule"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the beside line counts the tab keep-out (skip / think M print the line under the fact); EB-PAD OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^(independent|test) M .support: (skip|think)}$' --sizes M --rules EB-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-pad-page-divfacts-L",
+   "check": "division:div_facts at L: the skip page 2.35 mm from the right rule (\"1xx ÷ 1x =\" beside the w2 tab inset) and the fade packet page 3 in 2 x 5 with 53 mm white (div_facts aids r8, owner ruling 2026-11-09 (a))",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAD + EB-PAGE at L",
+   "browser": true,
+   "fail": {
+    "commit": "be028660",
+    "state": "lf-ops r8: EB-PAD 8 (skip Independent / Test L, 2.35 mm), EB-PAGE 1 (fade packet L p3, 53.3 mm white, 2 x 5)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "a supported / faded section reaching 5-digit facts starts each fact under the number tab at L (3 mm pad, taller row, 3 columns); EB-PAD / EB-PAGE OK (re-pointed a4c6b694 -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^((independent|test) L .support: skip|fade packet)\" --rules EB-PAD,EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-cols-divfacts-array",
+   "check": "division:div_facts array (tables 2-4) at L in 4 columns where M takes 3, the fact 1.85 mm from the rule (critic r6 R6-3)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-COLS (columns(L) <= columns(M) for no fewer problems) + EB-PAD",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: L 4 x 3 = 12 against M 3 x 4 = 12; EB-PAD 1.48 mm in 8 of 12 L cells"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the measure guard (w2 tab inset + 3 mm pad) gives L 3 columns; EB-COLS / EB-PAD OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^independent [ML] .support: array, .constant' --sizes M,L --rules EB-COLS,EB-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-factx-divfacts",
+   "check": "division:div_facts fade packet: the fact's left edge moves 5.0 mm between page 1 and pages 2-3 (critic r6 R6-5)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-FACTX (fact left x spread across all packet pages <= 0.5 mm)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: spread 5.30 mm (p1 8.5 mm, p2 13.8 mm in the cell)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "every packet cell takes the one w2 left inset; EB-FACTX OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-FACTX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-eq-ind-divfacts",
+   "check": "division:div_facts: every support's Test page prints the same count as its Independent page at S / M / L (lead / owner ruling 2026-11-09; critic r7 R7-1)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-TESTEQ (TEST-EQ-IND: Test count = Independent count, per support and size)",
+   "browser": true,
+   "fail": {
+    "commit": "c127c3e6",
+    "state": "lf-ops r7: EB-TESTEQ 5 - off M 21 / 24, skip S 18 / 21, array (default) M 21 / 24, think S 21 / 24, boxsign M 12 / 16"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the div_facts Test takes its Independent page's grid when its own holds a different count, rows 1.1 x the footprint; EB-TESTEQ OK (re-pointed a5c78f9d -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only \"^(independent|test) [SML]\" --rules EB-TESTEQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-gap-divfacts",
+   "check": "division:div_facts fade packet at L: the bare page 3 puts its line 16.9 mm under the fact (under-tab start) against 9.0 mm on pages 1-2 (critic r7 R7-2)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-GAP (fact-to-answer-line distance within 1 mm across a render with an under-tab fact)",
+   "browser": true,
+   "fail": {
+    "commit": "c127c3e6",
+    "state": "lf-ops r7: EB-GAP 1 (fade packet 3p L: 9.04 mm p1, 16.92 mm p3)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the under-tab bare stage keeps the line under the fact, rows 1.1 x footprint, page 3 holds 18; EB-GAP OK (re-pointed f471ecb2 -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^fade packet\" --rules EB-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-gap-divfacts",
+   "check": "an array of more than 5 columns or rows draws the 1.5 mm subitising gap after every 5th (WDS RP-81 / RP-21; critic div_facts r5 R5-3), on paper S/M/L and every screen host - div_facts and mult_facts arrays",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-GAP",
+   "browser": true,
+   "fail": {
+    "commit": "9a8acc59c",
+    "state": "ARRAY-GAP: 27 / 3, 40 / 4, 20 / 2 ... arrays drawn with no gap between rows 5 and 6 (paper S)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "0 findings: the gap after every 5th row and column (the R5-3 fix e81243f99, deployed at 4c5de5a27)"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-label-facts",
+   "check": "every support text on screen (the sign box's word, the number line's labels, the skip strip's terms) is >= 8 pt and >= 95 % of the same text on paper (lf-checks TEXT-SIZE findings routed to lf-ops, lead 2026-11-13: add / sub number-line labels 7.6 pt, mult skip-strip terms, div \"divide\" 8.9 pt)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SUPPORT-LABEL",
+   "browser": true,
+   "fail": {
+    "commit": "850b686b5",
+    "state": "origin/master: number-line labels 10.2 px (7.6 pt) on add / sub, skip-strip terms 10.9 px (8.2 pt, print 8.9) on mult, the sign box at 89 % on the div 390 card"
+   },
+   "pass": {
+    "commit": "b92e5ab29",
+    "state": "0 findings: support cues at one CSS mm per paper mm (r1 SIZE-INK) and the sign box never shrinks on screen"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts --only LABEL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-ws-divfacts",
+   "check": "the div_facts online-worksheet numeral is at least the host digit floor for its width - 56 px at 1366 / 1280, 48 px at 1024 / 820 - as the card and quiz are (lead 2026-11-13, lf-checks' tablet-width sweep: it was 40 px, the touch floor)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (--digit-widths; the div_facts worksheet ratchet in design/audit/baselines/screen-digit-ratchet.json)",
+   "browser": true,
+   "fail": {
+    "commit": "369173bc2",
+    "state": "origin/master at the divship merge: the div_facts worksheet numeral 40 px at 1366 / 1280 / 1024 / 820 (want the ratchet 56 / 48); 4 misses, no other finding"
+   },
+   "pass": {
+    "commit": "fded88800",
+    "state": "0 misses: the div_facts worksheet cell takes the host floor (data-mq-host-floor), held by the ratchet pin screen-digit-ratchet.json (re-pointed on the merge with master: 850b686b5 / 898f800d7 predate master's card [data-ws-cell] (46a7c3c45), so CELL-READ failed both states)"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --screen-digit --digit-widths 1366,1280,1024,820 --rule-skills division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-answer-place-divfacts",
+   "check": "on one div_facts online worksheet every ÷ card puts its answer line in ONE place relative to its sentence (beside \"=\" or under it) and the kit cells are one height within 5 %, at 1366 / 1280 / 1024 / 820, the defaults and each support (critic divarray r2 D7: at 820 with the 48 px floor 1-digit dividends kept the line beside \"=\", 2-digit ones wrapped under, cells 212 / 255 / 269 px)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-ANSWER-PLACE",
+   "browser": true,
+   "fail": {
+    "commit": "62f5bec01",
+    "state": "lf-ops-divarray r2: 820 default places mixed (103 / 150 px), 820 array mixed (212 / 255 / 269 px), boxsign sign box wrapped above 108 ÷ 12 only (110 / 204 px)"
+   },
+   "pass": {
+    "commit": "441e10189",
+    "state": "one answer place and one sign-box place per sheet; one cell height per sheet"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ANSWER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sm-array-overflow-divfacts",
+   "check": "the div_facts Scripted Model with the array support on the 10s band (tables 2-5) overflows no cell at M or L, pupil page and key (critic divarray r2 D6: at L the third trace jot ran onto the cell rule, 16 overflow problems, with 25 % of the page free)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate OVERFLOW (precritic render-gate-div_facts-sm-array)",
+   "browser": true,
+   "fail": {
+    "commit": "62f5bec01",
+    "state": "lf-ops-divarray r2: scripted-model L 32 overflow findings (mq-mjots ws-trace leaves the cell)"
+   },
+   "pass": {
+    "commit": "7bb99d3c1",
+    "state": "no overflow at M or L"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills division:div_facts --roles scripted-model --size M,L --supports array --opts '{\"band\":100,\"constant\":[2,3,4,5]}' --gate --no-screen --out /tmp/mq-bt-sm-array",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-ws-floor-table",
+   "check": "SCREEN-DIGIT holds each host to the shared floor table (8727ef7b4: tests/lib/ws-digit-floors.cjs; since the merge with master 369173bc2: master's ONE table tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR plus the ratchet pin design/audit/baselines/screen-digit-ratchet.json): card / quiz 56 / 48 px, the online worksheet 29 px (LEAD_DECISIONS 2026-11-13), a passed worksheet raise (div_facts 56 / 48) as a ratchet - the add_facts worksheet at 40 px passes (critic divarray r2 D8, lead ruling: the check was in error)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (shared floor table; a CHECK fix, so each state runs its own tree's script via {root})",
+   "browser": true,
+   "fail": {
+    "commit": "6ec6c8601",
+    "state": "add_facts worksheet flagged at 40 px (want >= 56 / 48) at 1366 / 1280 / 1024 / 820"
+   },
+   "pass": {
+    "commit": "8727ef7b4",
+    "state": "0 misses: add_facts worksheet 40 px >= 29; div_facts worksheet and every card / quiz still at 56 / 48"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --skills division:div_facts,addition:add_facts --screen-digit --digit-widths 1366,1280,1024,820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-wrong-fits",
+   "check": "a chart window's wrong answer fits its square: one value per square, no more digits than the window's widest number (chart_120 'writes-ten-ten' 1011 printed '1,011' over the next square, True or False? L)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint WRONG-FITS (chartwindow payload)",
+   "fail": {
+    "commit": "e3733905c",
+    "state": "WRONG-FITS too-long #12, #20 (4>3) on composing:chart_to_120"
+   },
+   "pass": {
+    "commit": "ac88be08e",
+    "state": "the chart square no longer deals writes-ten-ten"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules WRONG-FITS --no-baseline --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-tagink",
+   "check": "a lettered chart square on Error analysis keeps its written number clear of the A / B tag (gate seed, L)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TAGINK",
+   "browser": true,
+   "fail": {
+    "commit": "e3733905c",
+    "state": "TAGINK 8 on chart_to_120 error-analysis L"
+   },
+   "pass": {
+    "commit": "ac88be08e",
+    "state": "k2-chartwindow [data-ws-tagged] padding under the tag"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --rules TAGINK --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-lesson-wide",
+   "check": "the fallback lesson draws a row of ten (hundreds_chart_fill band 10) in full-width chart rows, never a 92 mm anchor-chart panel or beside the Steps (OVERFLOW 54, lesson S/M/L)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (card option value on the lesson role)",
+   "browser": true,
+   "fail": {
+    "commit": "e3733905c",
+    "state": "OVERFLOW 18 on hundreds_chart_fill lesson M {band: 10}"
+   },
+   "pass": {
+    "commit": "032e07ec6",
+    "state": "lesson.js chartDataOf: a fallback lesson takes chartWide for an example wider than half the page"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=10 --opt-roles lesson --size M --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-centred-band",
+   "check": "a CENTRED cell (chartwindow) is judged by its white above + under as one band, and its centring is not drawn height (EB-FOOT read a 59 mm window in a 76.5 mm row as 'drawn 67.5 mm', 60 false reds; EB-BAND passed a 42 % band around a window beside the Guided Model)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (centred) / EB-FOOT (centred cells)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/eb-centred/fail.json",
+    "state": "guided M p1 cell 2: 24.5 + 23.9 mm of 115.1 (42 %), passed by the under-only measure"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/eb-centred/pass.json",
+    "state": "independent M p1 cell 1: 8.7 + 8.8 mm of 76.5 (23 %), the row stretch EB-FOOT failed"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-title-band",
+   "check": "a band-120 chart names 'a chart to 120' on every role, not 'a hundreds chart' (L6 / L28; print-sheet reads the band for the I Can)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE (the lesson title follows the option)",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "lesson {band:120} key printed 'on a hundreds chart' and the key 101 left its square (KEYFIT)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "'a chart to 120'; the window states its width so it never squeezes"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=120 --opt-roles lesson --size L --rules KEYFIT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-ri-under",
+   "check": "Reason It holds more than one chart-window item a page: a window past 100 states its true width (inkWMm) and takes the A|B-under layout, not the stacked one-a-page form (H5)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks LONE-PAGE",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "reason-it L one item a page where the role holds 2 (LONE-PAGE)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "chartwindow footprint inkWMm -> reason-it UNDER layout, 2 a page"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles reason-it --size L --rules LONE-PAGE --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-pupiltag",
+   "check": "the 'Sam wrote:' label sits 2 mm over a chart-window error-analysis item, not 6.5 mm (PT-ERR-4): the window drops its own letter keep-out inside the work block",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "error-analysis M label 6.5 mm from its work (PUPILTAG 8)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "css/sheet-kit.css .mq-judge-work .k2-chart margin-top 0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --card-opts --size M --rules PUPILTAG --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-role-hidden",
+   "check": "an option value a signed card hides on a role (chartwindow §7a: grid rows / whole on lesson, guided, test) is never dealt there: the role's page with the value is byte-identical to its page with the default (lead ruling 2026-11-13; the whole chart overflowed lesson 18/24, guided 8-12, and printed one a page on the test)",
+   "kind": "commit-pair",
+   "rule": "ws-role-hidden ROLE-HIDDEN (card role-scoped hidden decisions)",
+   "browser": true,
+   "fail": {
+    "commit": "e1389d1f3",
+    "state": "grid=rows / whole drawn on lesson, guided, test of hundreds_chart_fill and chart_to_120"
+   },
+   "pass": {
+    "commit": "25e62c6d6",
+    "state": "skill-options hiddenOnRoles + print-sheet optsForRole: the roles fall back to the window"
+   },
+   "command": "node tests/scripts/ws-role-hidden.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-text-misc",
+   "check": "a misconception a card re-scopes to TEXT (chartwindow M-C1 'writes-ten-ten', textOnly) reaches the screen practice card and Reason It's statements in words within 16 seeds, and no chart square ever holds more digits than its window's widest number (lead ruling 2026-11-13: re-scoped, not dropped)",
+   "kind": "commit-pair",
+   "rule": "ws-text-misconception REACH-SCREEN / REACH-TEXT / SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "e1389d1f3",
+    "state": "writes-ten-ten taught nowhere (dropped from the square with no text form)"
+   },
+   "pass": {
+    "commit": "25e62c6d6",
+    "state": "provider wrongText + Reason It text pairs + screen distractorTags; squares unchanged"
+   },
+   "command": "node tests/scripts/ws-text-misconception.cjs --skills composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-guided-echo",
+   "check": "no try on a Guided page shows the Model's own picture: the chart_to_120 Model's 96-120 window with 100 traced came back as a try with 100 blank (lf-roles critic r8b D5)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo GUIDED-MODEL-ECHO",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "guided L seeds 3 and 7: a try draws the Model's window (3x5@96, 3x5@91)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "the window is the generator's dupKey: no window twice on a page while another is left"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 8 --only GUIDED-MODEL-ECHO",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-score-slots",
+   "check": "a page's Score equals the answer places of its scored chart windows: Guided printed Score /3 over three windows holding 5 empty squares (lf-roles critic r8b n5); Error analysis stays one judgement a cell",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "every scored chart page counted one point a window (guided /3 vs 5-7 squares, independent /6 vs 11-13)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "chartwindow footprint points = its blanks (slotPoints); error-analysis.js keeps 1 a cell"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 4 --only SCORE-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-card-plan-preset",
+   "check": "a PRESET skill is planned from its host's signed card (every role it offers, the host's other option values): composing:chart_to_120 fell back to the 9 default roles and no option values, so opener / scripted-model / pre-skill-check / mixed-practice / stretch were never rendered before a critic (L25)",
+   "kind": "commit-pair",
+   "rule": "ws-card-plan preset plan",
+   "fail": {
+    "commit": "f80dfd9d6",
+    "state": "cardPlanFor(composing:chart_to_120): no card, 0 card roles (the 9 default roles)"
+   },
+   "pass": {
+    "commit": "a810a6cbc",
+    "state": "preset planned from the chartwindow card: 14 roles"
+   },
+   "command": "node -e \"const o=JSON.parse(require('child_process').execFileSync('node',['{root}/tests/lib/ws-card-plan.mjs','--skill','composing:chart_to_120','--root','{root}'],{stdio:['ignore','pipe','ignore']}).toString())[0];const ok=!!(o.preset&&o.roles.length>9);console.log('ws-card-plan --preset: '+(ok?'OK':'FAIL'));process.exit(ok?0:1)\"",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-screen-digit",
+   "check": "a chart window's screen numerals reach their host's floor: practice card and quiz 48 px at 820 / 1024, 56 px at 1280 / 1366; online worksheet 29 px (LEAD_DECISIONS 2026-11-13). They were 29-34 px on the card and quiz and 24.7 px on the worksheet at 1024",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "34419f4d1",
+    "state": "card@1280 34 px, quiz@820 28.9 px, worksheet@1024 24.7 px"
+   },
+   "pass": {
+    "commit": "4b464e322",
+    "state": "squares sized from the digits on the card / quiz (48 / 56 px) and the worksheet (30 px), scoped to the window"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-wrong-multi",
+   "check": "every chart window, every gap count the skill deals, has a wrong answer that is a number in every slot and differs from the key in exactly one slot (chart_120 critic r1 F1: num('91, 101') was NaN, no multi-gap window had a wrong answer, True or False? dealt all True; L27)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit WRONG-MULTI",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "wrongAnswer null on every 2- and 3-gap window"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartWrong: one gap written wrong per candidate, the others kept"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules WRONG-MULTI",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-steps-all-slots",
+   "check": "a chart window's worked steps name EVERY gap's value in grammatical sentences (critic r1 F3: steps ended 'Write <first gap>.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit STEPS-ALL-SLOTS",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the second and third gaps never named"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartSteps works every gap (relation + Write per gap; row runs for 4+ gaps)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules STEPS-ALL-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-say-agree",
+   "check": "the Say line names every gap and agrees in number ('The missing numbers are 101 and 104.'; critic r1 F3: 'The missing number is 101, 104.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "'The missing number is 101, 104.'"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayValues: chartSay (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-hint-all",
+   "check": "the Guided Model's grey work lines name every traced gap (critic r1 F3b: hints explained only 100 of 100, 107, 117)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit HINT-ALL",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "work lines name the first gap only"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "one relation line per gap"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules HINT-ALL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-tf-false",
+   "check": "True or False? deals True and False statements on every chart page (2+ statements) and 35-65 % False over the seeds (critic r1 F1, PT-TOF-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo TF-FALSE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "4 of 4 True on chart_to_120 pages"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "per-slot wrong answers deal False on multi-gap windows"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only TF-FALSE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-pattern",
+   "check": "Error analysis cannot be answered by counting gaps: windows of 2+ gaps are judged both Correct and Fix it over the seeds (critic r1 F2)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo EA-PATTERN",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "every multi-gap window Correct"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "per-slot wrong answers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only EA-PATTERN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-score-roles",
+   "check": "Score /N counts answer slots on opener, review, mixed-practice, pre-skill-check and lesson as on independent / test (critic r1 F6: opener /2 over 4 squares, mixed /6 over 13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS (every scored role)",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "opener / review / mixed / pre-skill-check / lesson count windows"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "paginate.js slotScore on those roles"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only SCORE-SLOTS --score-roles opener,review,mixed-practice,pre-skill-check,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-cross-giveaway",
+   "check": "no chart window prints, as a chart number, an empty square of another window of the same squares on the sheet - every band x grid value (critic r1 F4: band 120 grid=rows, one window, items copying each other's answers; F9: band 10)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY --variants",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "band 120 rows and band 10 pages give answers away item to item"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "the dealer never deals a window of squares already on the sheet (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-strip-numbers",
+   "check": "a lesson sheet's Steps zone and strip name no number (11+) that is not printed in, or a key of, a cell of its page (critic r1 F5: 'The number before is 109 ... Write 110.' beside windows with no 109 / 110)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo STRIP-NUMBERS",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the strip walks the example, not on the page"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "stripStepsFor: the skill's general steps when the example's steps name its own numbers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 2 --only STRIP-NUMBERS --score-roles lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-chart-square",
+   "check": "a chart window on Reason It / True or False? / Error analysis is never squeezed under the 14 mm writing floor (critic r1 F10: band 100 Reason It L at 10.4 mm squares)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CHART-SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "hundreds_chart_fill reason-it L 10.4 mm"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartwindow footprint states inkWMm for a 1-100 window, so Reason It takes its wide form"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes M,L --only CHART-SQUARE --score-roles reason-it,true-false,error-analysis",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-touch-hit",
+   "check": "a chart window's empty square takes a real tap 1 px inside every edge and corner on the practice card / quiz at 820-1366 (master's TOUCH-HIT on the lane's digit-sized chart window: a neighbour's number span lay 1 px over the input, and the card's .visual-aid scrolled the window 1 px)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-HIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "eb28a8960",
+    "state": "TOUCH-HIT 9 on hundreds_chart_fill (bottom edge 820-1366, top corners 1280)"
+   },
+   "pass": {
+    "commit": "00bafd629",
+    "state": "the empty square's slot z-index 1; .visual-aid overflow visible for a fitting window"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill --sizes 820x1180,1280x900",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-rowx",
+   "check": "Error analysis of chart windows with 1, 2 and 3 gaps on one page: the Correct / Fix it judgement starts at one x a column (the 3-box fix widened its centred cell: 100.7-113.2 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "00bafd629",
+    "state": "EA-ROWX 4 on chart_to_120 error-analysis M/L"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "error-analysis.js: one fix width a one-column page (fixWBy / o.fixW)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles error-analysis --rules EA-ROWX,EA-PAD --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-one-window-hidden",
+   "check": "lead ruling (a) 2026-11-14: a chart with ONE window (band 120 grid=rows, band 10) is not dealt on the multi-item practice pages - one item a sheet left the page 68 % empty (options-verify --render L-DENSITY PAGEFILL on grid=rows)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render PAGEFILL (+ ws-role-hidden on the card decision)",
+   "browser": true,
+   "fail": {
+    "commit": "427e28563",
+    "state": "chart_to_120 grid=rows @M/@L PAGEFILL (one window a sheet)"
+   },
+   "pass": {
+    "commit": "af76fc570",
+    "state": "grid=rows@band=120 and band 10 hidden on independent / more-practice / review / mixed-practice (+ test for band 10)"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-model-state-marks",
+   "check": "every Scripted Model state and lesson-anchor panel whose step says 'Write N' draws N in that state, the newest marks trace grey and the earlier ones solid; judged for the templates in scripted-model.js TRACE_TEMPLATES (chart_120 critic r2 N1: a two-gap window's 'Write 101.' state drew no 101; PT-MOD-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo MODEL-STATE-MARKS",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "chartwindow not in TRACE_TEMPLATES: states 2-3 blank, state 4 traces both gaps"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chartwindow draws traceSlots / traceNew on the Scripted Model and the lesson anchor"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only MODEL-STATE-MARKS --screen-seeds 0 --score-roles scripted-model,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-screen-giveaway",
+   "check": "the online worksheet's cards and the quiz builder's questions never repeat a chart window's squares, so no card prints another's answers (chart_120 critic r2 N2: the screen deal repeated band-120 windows; CROSS-GIVEAWAY on the screen hosts, L13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY (screen)",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "worksheet.js / quiz-builder deal without the window rule"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chart-giveaway.js shared by print-sheet, the worksheet and the quiz builder"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 0 --only CROSS-GIVEAWAY --screen-seeds 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-say-frame",
+   "check": "the UNFILLED Say frame of a chart window agrees with its gaps: one blank a gap, plural for 2+ ('The missing numbers are __ and __.'; chart_120 critic r2 N3: the opener printed 'The missing number is __.' under a two-gap Model)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE (unfilled frame)",
+   "fail": {
+    "commit": "03c811eed",
+    "state": "fixed strings.say 'The missing number is __.' (k2.js:481)"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayFrame(q): chartSayFrame"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join",
+   "check": "the long-division bracket is ONE connected stroke: the arc's top end runs into the vinculum with no white at the outer corner (<= 0.3 mm) and no step (<= 0.1 mm), paper M/L pupil + key and screen 1366 / 820 (owner request 2026-11-14: 'disconnected'; master paper gap 0.67 mm, fact rows 0.33 mm, screen step 0.25 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join LDIV-JOIN",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "butt-capped arc under a separate vinculum: white wedge at the corner on every bracket"
+   },
+   "pass": {
+    "commit": "bf0814473",
+    "state": "bracketSvg: arc and bar one path with a mitre join, on paper and screen"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --skills division:long_div_2digit,division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join-raster",
+   "check": "the screen long-division bar has no anti-aliased seam: inside the bar's central 1 px, from the arc's corner to the vinculum's end, no pixel brighter than 80 at DSF 2 or 3, on card / worksheet / quiz at 1366, 1280, 1024 and 820 (ldiv critic r1 F1: div_remainders bracket card at 1366, brightest 103 at DSF 2 / 155 at DSF 3; LDIV-JOIN read gap 0.00)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --raster LDIV-JOIN-RASTER",
+   "browser": true,
+   "fail": {
+    "commit": "654606ae3",
+    "state": "svg bar butt end meets the dividend's border at a fractional x: div_remainders card + quiz 1366 brightest 103 (DSF 2) / 155 (DSF 3)"
+   },
+   "pass": {
+    "commit": "ba835be98",
+    "state": "overlapping bar pieces (rembrk rule span, .mq-ldiv path bar runs under the border): brightest 0"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --raster --skills division:div_remainders",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-shape",
+   "check": "the long-division bracket's side is near-straight: its greatest distance from the chord between its ends is <= 0.6 mm on paper (M/L, pupil + key) and on screen (card / worksheet / quiz 1366 / 820) (owner 2026-11-14: 'I don't like the big curve ... make it straight or almost straight'; 0176d774f bows 1.60-3.30 mm on paper, 5.04 mm on the screen worked bracket)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --shape LDIV-SHAPE",
+   "browser": true,
+   "fail": {
+    "commit": "0176d774f",
+    "state": "quadratic arc x 1.5 / q 9 of a 10-wide box: bow 2.64 mm at M, 3.30 mm at L"
+   },
+   "pass": {
+    "commit": "b7ee41f3a",
+    "state": "bracketLine: near-straight side, apex at the old apex, bow <= 0.34 mm"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --shape --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-room",
+   "check": "the long-division work grid uses the room a 4-a-page cell gives: grid >= 80 % of the cell's free height or rows at the 2x cap, block centred; 6 / 8 a page keep the floor row with no overflow (owner 2026-11-14: 'a lot of white area to work with'; d82acc06f grid 45 % M / 56 % L at 1x)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --room LDIV-ROOM",
+   "browser": true,
+   "fail": {
+    "commit": "d82acc06f",
+    "state": "work grid at its footprint size in a 106 mm cell: 45 % (M) / 56 % (L) of the free height, 25 mm white above and below"
+   },
+   "pass": {
+    "commit": "86950d488",
+    "state": "writing boxes grow to the cell (M rows 1.87x, 93 %; L 1.54x, 94 %), centred; 6 a page unchanged"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --room --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-stem",
+   "check": "an Error Analysis story sentence on an item the key judges correct is true of its numbers: the operands combined give the shown result (lead 2026-11-14, the class of TOF-STEM; no live skill prints a story sentence today, so this is a planted guard)",
+   "kind": "fixture",
+   "rule": "ws-ea-stem EA-STEM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ea-stem.fail.html",
+    "state": "a correct unknown-start item whose work reads '44 - 8 = 44'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ea-stem.pass.html",
+    "state": "'44 - 8 = 36' on the correct item; the Fix-it item keeps the pupil's wrong result"
+   },
+   "command": "node tests/scripts/ws-ea-stem.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-frame-fit",
+   "check": "a one-column Guided page of 31 mm count rows takes the rows the page DRAWS room for (Model + 6 tries at M and L), never past the drawn room or the L ceiling (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL: the frame reserve over-reserved instruction / Steps / body by 11 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-FRAME-FIT (browser twin: ws-empty-band EB-REFILL guided)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "M no drawnFrameMm; L 6 cells"
+   },
+   "pass": {
+    "commit": "a64d0e285",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-FRAME-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-lone-story",
+   "check": "a one-column Guided page holding ONE two-step story sizes the cell to the story it draws, never stretched to content / 0.7 (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: the lone story 25-31 % empty in its frame)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-LONE-STORY (browser twin: ws-empty-band EB-BAND guided, >= 30 % only)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "lone 135 mm story in a 186.1 mm cell at M and L"
+   },
+   "pass": {
+    "commit": "f8e338139",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-LONE-STORY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "gdpcap-answers",
+   "check": "a Guided page whose cells score 1 to 3 answers each keeps its scored answers within the §12.1 ceiling (lf-builds chart_120 Guided L: 7 answers > 6; ceilFor counted answers only when every cell scored > 1)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GDPCAP-ANSWERS (browser twin: ws-empty-band EB-GDPCAP)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "mixed L: 11 scored answers"
+   },
+   "pass": {
+    "commit": "72d4949bc",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GDPCAP-ANSWERS",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

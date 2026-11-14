@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 401 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 402 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1433,6 +1433,7 @@ whatever happens to the WRM gaps.
 
 - **Y1.B12.S1** Count from 50 to 100 — covered. _K.CC.A.1, 1.NBT.A.1, M.EE.K.CC.1, M.EE.1.NBT.1_  
   Skills: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 100}; Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
+  Partial: Count to 120 on the Chart (`composing:chart_to_120`), missing the chart rows 91-120: counting on across 100 to 120 (WRM has no step to 120)  
   Vocabulary: after, before, forwards, backwards  
 - **Y1.B12.S2** Tens to 100 — covered. _K.CC.A.1, 1.NBT.B.2, M.EE.K.CC.1, M.EE.1.NBT.2_  
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`) {tens to 90}; Count by 10s (`patterns:seq_10`)  

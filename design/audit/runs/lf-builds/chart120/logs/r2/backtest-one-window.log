@@ -1,0 +1,8 @@
+ws-backtest row c120r2-one-window-hidden: PASS  fail state FAIL 79.3s, pass state OK 77.7s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120r2-one-window-hidden    commit-pair  FAIL 79.3s          OK 77.7s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 169.1 s
+ws-backtest: OK
