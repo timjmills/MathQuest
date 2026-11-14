@@ -1,0 +1,49 @@
+== 1280 px: 724 skills
+grown frames: 166; scale < 0.30: 166; < 0.25: 13; sideways scroll: 0
+footer below the window: 11
+  comparing:classify_count: panel top 155, footer bottom 1007 (window 1000), frame 140 px
+  addition:add_5_pictures: panel top 234, footer bottom 1024 (window 1000), frame 140 px
+  subtraction:sub_5_pictures: panel top 234, footer bottom 1007 (window 1000), frame 140 px
+  subtraction:sub_2d_1d: panel top 102, footer bottom 1007 (window 1000), frame 140 px
+  integers:order_negatives: panel top 188, footer bottom 1007 (window 1000), frame 140 px
+  integers:abs_value: panel top 140, footer bottom 1007 (window 1000), frame 140 px
+  integers:opposite_numbers: panel top 140, footer bottom 1007 (window 1000), frame 140 px
+  number_ops_mixed:mixed: panel top 50, footer bottom 1007 (window 1000), frame 140 px
+  shapes_early:shape_attributes: panel top 78, footer bottom 1007 (window 1000), frame 140 px
+  coordinates:coord_distance_q1: panel top 255, footer bottom 1007 (window 1000), frame 168 px grown
+  algebra:evaluate_expression: panel top 114, footer bottom 1007 (window 1000), frame 140 px
+scale < 0.25:
+  coordinates:geo_reflect: k 0.2267, frame 260 px
+  coordinates:geo_rotate: k 0.2267, frame 260 px
+  coordinates:geo_translate: k 0.2267, frame 260 px
+  coordinates:reflect_x_axis: k 0.2267, frame 260 px
+  coordinates:reflect_y_axis: k 0.2267, frame 260 px
+  coordinates:rotate_half_turn: k 0.2267, frame 260 px
+  coordinates:rotate_quarter_turn: k 0.2267, frame 260 px
+  coordinates:rotate_three_quarter_turn: k 0.2267, frame 260 px
+  coordinates:translate_right_up: k 0.2267, frame 260 px
+  coordinates:translate_left_up: k 0.2267, frame 260 px
+  coordinates:translate_right_down: k 0.2267, frame 260 px
+  coordinates:translate_left_down: k 0.2267, frame 260 px
+  algebra:two_step_add_then_div: k 0.2462, frame 260 px
+== 390 px: 724 skills
+grown frames: 164; scale < 0.30: 164; < 0.25: 17; sideways scroll: 0
+footer below the window: 0
+scale < 0.25:
+  coordinates:geo_reflect: k 0.2056, frame 236 px
+  coordinates:geo_rotate: k 0.2056, frame 236 px
+  coordinates:geo_translate: k 0.2056, frame 236 px
+  coordinates:reflect_x_axis: k 0.2056, frame 236 px
+  coordinates:reflect_y_axis: k 0.2056, frame 236 px
+  coordinates:rotate_half_turn: k 0.2056, frame 236 px
+  coordinates:rotate_quarter_turn: k 0.2056, frame 236 px
+  coordinates:rotate_three_quarter_turn: k 0.2056, frame 236 px
+  coordinates:translate_right_up: k 0.2056, frame 236 px
+  coordinates:translate_left_up: k 0.2056, frame 236 px
+  coordinates:translate_right_down: k 0.2056, frame 236 px
+  coordinates:translate_left_down: k 0.2056, frame 236 px
+  algebra:two_step_add_then_div: k 0.224, frame 236 px
+  algebra_mixed:algebra_all: k 0.2339, frame 236 px
+  algebra:multi_step_word: k 0.2392, frame 236 px
+  algebra:multi_step_word_plain: k 0.2392, frame 236 px
+  algebra:two_step_add_then_mult: k 0.2458, frame 236 px

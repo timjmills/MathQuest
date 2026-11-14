@@ -1,10 +1,10 @@
 {
- "note": "ws-screen-ink-size pin: per key (skill {option} host width|rule|mark name|size bucket) the count and the WORST % accepted (lead ruling 2026-11-13, keyed per critic sis-r1 D5); a new key, a higher count or a worse % FAILS. The owning lane shrinks it. Re-pin only with a STATUS note. Re-pinned 2026-11-13 (critic sis-r2 D1/D3): add_facts marks renamed only (\"dot\" -> \"counter (ten frame)\" / \"ring (ten frame)\" / \"dot (dot tile)\"), same findings and worst %. Re-pinned 2026-11-13 (owner rule: no phone width, CLAUDE.md Fastest-implementation plan 7): the 9 card 390px keys removed and the 18 new card 1366px / 1024px keys appended (ws-screen-ink-size --passed --widths 1366,1024); every other key unchanged. The new keys are the owning lane's (lf-ops, the fact supports) to shrink. Merged 2026-11-13 into lf-hosts (critic r2 F2): the union of lf-hosts' TEXT-SIZE keys and lf-tools' keys, the card 390px keys dropped. Re-pinned 2026-11-13 (lf-hosts critic r2 F2: the worksheet and the quiz now render at 1280 / 1366 / 820 / 1024, not 1280 only): every earlier key unchanged (0 worse, 0 gone); 90 keys appended at the newly judged widths (worksheet / quiz 820 / 1024 / 1366, card 1366 / 1024 TEXT-SIZE), the owning lanes' (lf-ops fact supports, lf-checks TEXT-SIZE) to shrink.",
+ "note": "ws-screen-ink-size pin: per key (skill {option} host width|rule|mark name|size bucket) the count and the WORST % accepted (lead ruling 2026-11-13, keyed per critic sis-r1 D5); a new key, a higher count or a worse % FAILS. The owning lane shrinks it. Re-pin only with a STATUS note. Re-pinned 2026-11-13 (critic sis-r2 D1/D3): add_facts marks renamed only (\"dot\" -> \"counter (ten frame)\" / \"ring (ten frame)\" / \"dot (dot tile)\"), same findings and worst %. Re-pinned 2026-11-13 (owner rule: no phone width, CLAUDE.md Fastest-implementation plan 7): the 9 card 390px keys removed and the 18 new card 1366px / 1024px keys appended (ws-screen-ink-size --passed --widths 1366,1024); every other key unchanged. The new keys are the owning lane's (lf-ops, the fact supports) to shrink. Merged 2026-11-13 into lf-hosts (critic r2 F2): the union of lf-hosts' TEXT-SIZE keys and lf-tools' keys, the card 390px keys dropped. Re-pinned 2026-11-13 (lf-hosts critic r2 F2: the worksheet and the quiz now render at 1280 / 1366 / 820 / 1024, not 1280 only): every earlier key unchanged (0 worse, 0 gone); 90 keys appended at the newly judged widths (worksheet / quiz 820 / 1024 / 1366, card 1366 / 1024 TEXT-SIZE), the owning lanes' (lf-ops fact supports, lf-checks TEXT-SIZE) to shrink. Re-pinned 2026-11-14 (lf-ops divship merge with master 369173bc2): the 24 division:div_facts {support array} keys (64 findings) dropped - the div_facts landscape array fix clears them (ws-screen-ink-size --skill division:div_facts on the merged tree: 0 findings, 24 keys now clear); every other key is master's, unchanged.",
  "written": "2026-11-13",
  "commit": "1de0dd56",
  "totals": {
-  "keys": 163,
-  "findings": 347
+  "keys": 139,
+  "findings": 283
  },
  "skills": [
   "addition:add_facts",
@@ -593,102 +593,6 @@
   "placevalue:value {defaults} worksheet 1024px|TEXT-SIZE|label text|label print 15 pt+": {
    "n": 4,
    "worst": 92
-  },
-  "division:div_facts {support array} card 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "division:div_facts {support array} card 1280px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 3,
-   "worst": 11
-  },
-  "division:div_facts {support array} card 1366px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "division:div_facts {support array} card 1366px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 3,
-   "worst": 11
-  },
-  "division:div_facts {support array} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "division:div_facts {support array} card 820px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 3,
-   "worst": 10
-  },
-  "division:div_facts {support array} card 1024px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "division:div_facts {support array} card 1024px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 3,
-   "worst": 10
-  },
-  "division:div_facts {support array} worksheet 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 4,
-   "worst": 90
-  },
-  "division:div_facts {support array} worksheet 1280px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 4,
-   "worst": 13
-  },
-  "division:div_facts {support array} worksheet 1366px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 4,
-   "worst": 90
-  },
-  "division:div_facts {support array} worksheet 1366px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 4,
-   "worst": 13
-  },
-  "division:div_facts {support array} worksheet 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 4,
-   "worst": 90
-  },
-  "division:div_facts {support array} worksheet 820px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 4,
-   "worst": 13
-  },
-  "division:div_facts {support array} worksheet 1024px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 4,
-   "worst": 90
-  },
-  "division:div_facts {support array} worksheet 1024px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 4,
-   "worst": 16
-  },
-  "division:div_facts {support array} quiz 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 1,
-   "worst": 90
-  },
-  "division:div_facts {support array} quiz 1280px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 1,
-   "worst": 12
-  },
-  "division:div_facts {support array} quiz 1366px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 1,
-   "worst": 90
-  },
-  "division:div_facts {support array} quiz 1366px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 1,
-   "worst": 12
-  },
-  "division:div_facts {support array} quiz 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 1,
-   "worst": 90
-  },
-  "division:div_facts {support array} quiz 820px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 1,
-   "worst": 10
-  },
-  "division:div_facts {support array} quiz 1024px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 1,
-   "worst": 90
-  },
-  "division:div_facts {support array} quiz 1024px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 1,
-   "worst": 10
   }
  },
  "status": "2026-11-13 lf-checks queue 14-17 re-pin: the old 42 keys kept as they were; 29 NEW keys from the new TEXT-SIZE rule only (real findings, routed to the owning lanes in design/status/lf-checks.md: add_facts / sub_facts line labels, mult_facts skip labels, div_facts boxsign label -> lf-ops; placevalue identify / unit_form / value -> lf-placevalue). Owning lanes shrink them."

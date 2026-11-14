@@ -111,7 +111,8 @@ export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
 export const GR_FLAGS = ['--raster-fit'];
 // tools whose gate with NO --roles flag renders every offered role of the skill (ws-empty-band: "every offered role x
 // S/M/L + hosts"), so that line plans any one role R when no card roles are given (lf-placevalue checks pass, 2026-11-13)
-const EVERY_ROLE_TOOLS = new Set(['ws-empty-band']);
+// (ws-role-cover, lf-checks 2026-11-14: with no --roles it runs every role the card offers, else every buildSheet role)
+const EVERY_ROLE_TOOLS = new Set(['ws-empty-band', 'ws-role-cover']);
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
  *  comma list, or the line has no --roles and so renders every role - `cardRoles` given: the roles the signed card offers,
  *  R among them; not given: any role, for an EVERY_ROLE_TOOLS tool), carrying every flag of `flags`. `roles` may itself be a
@@ -138,6 +139,8 @@ function selfTest() {
     eq('print-lint lesson', readCommand("node tests/fixtures/x.cjs -- /tmp/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup --size S"), { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' });
     eq('category + bare skill', readCommand('node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup --category subtraction'), { tool: 'ws-content-audit', skills: ['subtraction:sub_50_no_regroup'], roles: null });
     eq('no skill', readCommand('node tests/scripts/ws-spec-card.mjs --fixture {fixture}'), null);
+    eq('options-shots, repeated --skill', readCommand('node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems --skill coordinates:geo_translate --skip-no-panel --workers 1'), { tool: 'ws-options-shots', skills: ['addition:add_word_problems', 'coordinates:geo_translate'], roles: null });
+    eq('options-shots planned', planHas('  [browser] ws-options-shots (Options panel sample) — tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1', { tool: 'ws-options-shots', skills: ['addition:add_word_problems', 'coordinates:geo_translate'], roles: null }).length, 1);
     eq('bare skill, no category', readCommand('node tests/scripts/ws-x.cjs --skill foo'), null);
     const plan = '  [browser] lint — node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup\n  [node] x — node tests/scripts/ws-dealer-uniform.mjs --skill subtraction:sub_50_no_regroup';
     eq('planned lesson', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' }).length, 1);
