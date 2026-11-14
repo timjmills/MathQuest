@@ -691,6 +691,51 @@ function signRow(ctx, op, pick, idx, traceIt = false) {
 /** The value in a column row at track i (0 = leftmost digit track), right-aligned. */
 const at = (value, T, i) => { const p = String(value).padStart(T, ' '); return p[i] === ' ' ? '' : p[i]; };
 
+/**
+ * A BASIC FACT step (owner 2026-11-14, ws-two-step STEP-FORM): + / − within 20 with no regrouping (or two one-digit numbers: 6 + 4,
+ * 15 − 7), × / ÷ within the 10 x 10 facts. A two-step story draws such a step as a horizontal number sentence, never columns (the
+ * stray carry box over 6 + 4) or a long-division frame (10 ÷ 2); columns stay for regrouping / multi-digit work, long division for
+ * a multi-digit dividend that is no fact.
+ */
+export function isFactStep(st) {
+    if (!st) return false;
+    const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+    if (st.op === '+') return st.ans <= 20 && ((x < 10 && y < 10) || (x % 10) + (y % 10) < 10);
+    if (st.op === '-') return x <= 20 && ((y < 10 && st.ans < 10) || (x % 10) >= (y % 10));
+    if (st.op === '*') return x <= 10 && y <= 10;
+    if (st.op === '/') return y >= 1 && y <= 10 && !st.r && st.q <= 10;
+    return false;
+}
+/** A two-step column story's step drawn as a fact sentence (a two-step story only: one-step stories keep their pages). */
+const factHere = (p, st) => !!p && Array.isArray(p.steps) && p.steps.length === 2 && !p.layout && isFactStep(st);
+/** The digits of a step's answer (the answer boxes of a fact sentence: the answer's own digits, no spare leading box). */
+const factAnsT = (st) => String(st.op === '/' ? st.q : st.ans).length;
+
+/**
+ * One fact step as a horizontal number sentence: [a] (sign) [b] = [answer]. The pupil writes the two story numbers and the
+ * sign (as in the columns), the answer in its box(es); the last step's answer is the one graded answer place (`ans-i`, one box a
+ * digit, the host's digit boxes on screen), Step 1's result a working box. Every size from ctx.metrics; nothing shrinks.
+ */
+function factSentence(ctx, st, show, idx, p = {}, isAnswer = false) {
+    const bx = boxMm(ctx), pt = digitPt(ctx);
+    const put = filled(ctx);
+    const x = (s) => (s.op === '*' ? s.a : s.top), y = (s) => (s.op === '*' ? s.b : s.bottom), res = (s) => (s.op === '/' ? s.q : s.ans);
+    const nw = (v) => Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx)));
+    const num = (id, v, e) => wbox(ctx, { id, value: put ? String(v) : '', expect: String(e), w: nw(e), h: bx, pt, kind: 'number' });
+    const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
+    const sign = wbox(ctx, { id: `w${idx}-sign`, value: put ? GLYPH[show.op] : '', expect: GLYPH[st.op], w: bx * 0.9, h: bx * 0.9, pt: pt * 0.85, kind: 'sign', round: true });
+    let ansHtml;
+    if (isAnswer) {
+        const T = factAnsT(st);
+        const sv = String(res(show)).padStart(T, ' ').slice(-Math.max(T, String(res(show)).length));
+        const ev = String(res(st));
+        const boxes = Array.from({ length: Math.max(T, sv.length) }, (_, i) => abox(ctx, { id: `ans-${i}`, value: put ? (sv[i] || '').trim() : '', expect: ev[i] || '', w: bx, pt })).join('');
+        ansHtml = `<span style="display:inline-flex;gap:${L(ctx, GAP)};"${isTwin(ctx) ? ' data-mq-join=""' : ''}>${boxes}</span>`;
+    } else ansHtml = num(`w${idx}-res`, res(show), res(st));
+    return `<div class="mq-wwfact" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;flex-wrap:${isTwin(ctx) ? 'wrap' : 'nowrap'};gap:${L(ctx, 2.2)};">`
+        + `${num(`w${idx}-fa`, x(show), x(st))}${sign}${num(`w${idx}-fb`, y(show), y(st))}${sym('=')}${ansHtml}</div>`;
+}
+
 /** The + − × column work of one step: a CSS grid of boxes, the sign box on the bottom row. */
 function columnWork(ctx, st, show, idx, p = {}, isAnswer = false) {
     const minT = Math.max(Number(p.tracks) || 0, columnRows(st).T);
@@ -809,7 +854,11 @@ function blockWidthMm(ctx, st, p = {}) {
     const bx = boxMm(ctx);
     const signs = 4 * bx * 0.72 + 3 * 2.6 + 3.2;
     let work;
-    if (st.op === '/') {
+    if (factHere(p, st)) {
+        const nw = (v) => Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx)));
+        const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+        work = nw(x) + bx * 0.9 + nw(y) + 4 + factAnsT(st) * (bx + GAP) + 4 * 2.2;
+    } else if (st.op === '/') {
         const Dx = digitsOf(st.top).length, Dy = digitsOf(st.bottom).length;
         work = (Dx + Dy) * (bx + GAP) + bx * 0.45 + (st.top % st.bottom ? bx + 6 : 0);
     } else {
@@ -821,7 +870,8 @@ function blockWidthMm(ctx, st, p = {}) {
 /** One step's work block: its sign row over its columns. */
 function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', noSigns = false, sub = '') {
     const isAnswer = !!unitBlock || (p.inRow && idx === (p.steps || []).length - 1);
-    const grid = st.op === '/' ? divisionWork(ctx, st, show, idx, p, isAnswer) : columnWork(ctx, st, show, idx, p, isAnswer);
+    const grid = factHere(p, st) ? factSentence(ctx, st, show, idx, p, isAnswer)
+        : st.op === '/' ? divisionWork(ctx, st, show, idx, p, isAnswer) : columnWork(ctx, st, show, idx, p, isAnswer);
     // The unit line stands beside the answer row (the bottom row; the quotient row of ÷), its
     // word bank beside it: one answer place, number and label together.
     const work = unitBlock
@@ -1467,7 +1517,7 @@ const WW_DEF = {
         // the answer row's digit boxes (the one answer place when the answer is the row's result)
         if (p.inRow !== false && p.layout !== 'bar' && p.layout !== 'frames' && p.layout !== 'sentence' && Array.isArray(p.steps) && p.steps.length) {
             const st = p.steps[p.steps.length - 1];
-            const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
+            const T = factHere(p, st) ? factAnsT(st) : st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
             const d = String(p.ans).padStart(T, ' ');
             for (let i = 0; i < T; i++) slots[`ans-${i}`] = { value: d[i] === ' ' ? '' : d[i], graded: d[i] !== ' ' };
         }
