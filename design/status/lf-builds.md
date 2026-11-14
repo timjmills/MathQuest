@@ -6,18 +6,14 @@ Owner of files: design/cards/chartwindow/*, the chart_120 band on composing:hund
 State: building (chart_120) / parked (word-stories)
 Updated: 2026-11-13
 Builder profile: mq-opus-medium (first card on the chartwindow template)
-Critic rounds: 1, word-stories r1 FAIL
+Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
-- 2026-11-14: STOPPED at the owner's budget stop (cost_usd ≈ $600 of $609.70). The lane folds into lf-algebra's "patterns + word problems" lane per the lead.
-- chart_120: critic r2 FAIL (design/audit/runs/lf-builds/chart120/critic-r2.md, 77c32817f). F1–F10 are all closed. Every page type passes at ≥ 8 (M/L) except the three below. Branch HEAD on -lf-builds; card signed at 03c811eed.
-  - N1 major: the Model/anchor names a value it does not draw on 2-gap items. Fix: add chartwindow to TRACE_TEMPLATES (scripted-model.js:49).
-  - N2 major (F4 class again): screen worksheet and quiz repeat a band-120 window. Fix: run print-sheet's repeat-skip in the screen deal.
-  - N3 (F3 class again): the opener's unfilled Say frame is singular (k2.js:481).
-  - Round cap: N2 and N3 repeat round-1 classes, so this is a root-cause stop. Build the 3 checks in CHECKS_FROM_CRITICS (2026-11-14 rows, PROPOSED), fix, then ONE more critic round.
-  - Not rendered in r2: worksheet/quiz at 1366/820 (the renderer gave 1280 only), hcf {band:120}, grid=whole.
+- 2026-11-14: chart_120 PASSED (critic r3, chart120/critic-r3.md). Deploy branch for the lead's train: claude/sweet-newton-c8wrv1-lf-builds-deploy @ 62adcaa29 (merged master 369173bc2). redesign-passed: hundreds_chart_fill, chart_to_120.
+- word-stories: PARKED at 16b5d8ccd (resume notes below).
+- STOPPED at the budget stop (cost_usd ≈ $595 / $609.70). The lane folds into lf-algebra.
 
-## Resume notes — chart_120 (stopped 2026-11-14)
+## chart_120 (done 2026-11-14) — open notes
 - Next: one low/medium fixer for N1–N3 with backtests (FAIL 03c811eed → PASS), precritic on both skills, then critic r3 (narrow: N1–N3 + the screen hosts at 1366/820), then the deploy branch with PNGs.
 - Routed reds (lf-engine / lf-roles / lf-checks) are listed in chart120/precritic-diff.md.
 
