@@ -1,0 +1,22 @@
+ws-backtest row c120-tagink: PASS  fail state FAIL 30.6s, pass state OK 36.8s
+ws-backtest row c120-lesson-wide: PASS  fail state FAIL 52.0s, pass state OK 45.6s
+ws-backtest row eb-centred-band: PASS  fail state FAIL 0.3s, pass state OK 0.2s
+ws-backtest row c120-title-band: PASS  fail state FAIL 80.7s, pass state OK 60.6s
+ws-backtest row c120-ri-under: PASS  fail state FAIL 67.4s, pass state OK 102.5s
+ws-backtest row c120-pupiltag: PASS  fail state FAIL 117.3s, pass state OK 132.2s
+ws-backtest row c120-role-hidden: PASS  fail state FAIL 120.3s, pass state OK 71.5s
+ws-backtest row c120-text-misc: PASS  fail state FAIL 98.9s, pass state OK 125.2s
+ws-backtest: 8 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-tagink                 commit-pair  FAIL 30.6s          OK 36.8s            PASS
+c120-lesson-wide            commit-pair  FAIL 52.0s          OK 45.6s            PASS
+eb-centred-band             fixture      FAIL 0.3s           OK 0.2s             PASS
+c120-title-band             commit-pair  FAIL 80.7s          OK 60.6s            PASS
+c120-ri-under               commit-pair  FAIL 67.4s          OK 102.5s           PASS
+c120-pupiltag               commit-pair  FAIL 117.3s         OK 132.2s           PASS
+c120-role-hidden            commit-pair  FAIL 120.3s         OK 71.5s            PASS
+c120-text-misc              commit-pair  FAIL 98.9s          OK 125.2s           PASS
+
+8 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 1292.1 s
+ws-backtest: OK

@@ -5492,6 +5492,10 @@
       "band": 100
      },
      "missing": "rows 50-100: band 100 deals 5 of 8 below 50"
+    },
+    {
+     "key": "composing:chart_to_120",
+     "missing": "the chart rows 91-120 only: counting on across 100; 50-90 come from hundreds_chart_fill band 100"
     }
    ],
    "verdict": "partial",
@@ -5724,7 +5728,12 @@
     }
    ],
    "preBuild": [],
-   "related": [],
+   "related": [
+    {
+     "key": "composing:chart_to_120",
+     "why": "counting on across 100 on the chart to 120 (1.NBT.A.1), the next count past this unit"
+    }
+   ],
    "note": "Related: none; the candidate links are number_line_add (taught at an earlier step (Y1.B4.S9), but addition sentences are taught from week 11)."
   },
   "Y1.B12.S5": {
@@ -5788,7 +5797,12 @@
     }
    ],
    "preBuild": [],
-   "related": [],
+   "related": [
+    {
+     "key": "composing:chart_to_120",
+     "why": "1 more on the chart past 100 (1.NBT.A.1): the square after 109 is 110"
+    }
+   ],
    "note": "Related: none; the candidate links are count_sequence (a pre-skill here); hundreds_chart_fill (taught at an earlier step (Y1.B6.S1), but not a building block of this step)."
   },
   "Y1.B12.S6": {

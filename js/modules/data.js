@@ -294,6 +294,7 @@ export const SKILL_GRADES = {
     'div_sharing_word_problems': 3, 'div_grouping_word_problems': 3, 
     'sub_wp_compare': 1, 'sub_wp_start_unknown': 2, 'add_negative': 6, 'sub_negative': 6,
     'sub_2d_1d': 2,                                                       // 2.NBT.B.5 (2026-10-23 preset, SU-C C3)
+    'chart_to_120': 1,                                                    // 1.NBT.A.1 to 120 (2026-11-12 preset, chartwindow card)
     'div_facts_long': 3,                                                  // 3.OA.C.7 facts in the 4.NBT.B.6 bracket (2026-10-31 preset, facts card Q4)
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
@@ -314,6 +315,10 @@ export const SKILL_GRADES = {
     'clock_hands': 1, 'minutes_by_fives_all': 2, 'order_notes': 1, 'money_amount_in_words': 2, 'sort_prime_composite': 4,
     'list_multiples': 4, 'missing_multiples': 4, 'common_factors': 5, 'common_multiples': 5,
     'ten_times_value': 4, 'one_tenth_value': 4, 'ten_times_story': 4,   // 4.NBT.A.1 (2026-10-30 presets, detailed lesson 6)
+    'notice_patterns': 3,
+    'growing_shape_patterns': 4,
+    'pattern_features': 4,
+    'follow_given_rule': 4,
     'vocab_grade_pictures': 'M',
     'vocab_pick3_words': 'M',
 };
@@ -615,6 +620,8 @@ export const SKILLS = {
         { v: "number_chart_fill", l: "Number Chart - Find the Missing Number (to 1,000 and beyond)" },
         // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
         { v: "write_numbers_in_words", l: "Write Numbers in Words", presetOf: "number_word_form" },
+        // APPENDED 2026-11-12 — preset (chartwindow card §9.1): hundreds_chart_fill at band 120.
+        { v: "chart_to_120", l: "Count to 120 on the Chart", presetOf: "hundreds_chart_fill" },
     ],
     counting_mixed: [
         { v: "counting_all", l: "All Counting & Cardinality" },
@@ -1254,6 +1261,10 @@ export const SKILLS = {
         { v: "mixed_patterns", l: "Mixed Patterns" },
         // APPENDED 2026-09-25 (owner): count on / back / double from ones to thousands, with the rule.
         { v: "number_patterns_rule", l: "Number Patterns: Count On, Count Back, Double" },
+        { v: "notice_patterns", l: "What Do You Notice? Even and Odd Products, Pattern Features" },
+        { v: "growing_shape_patterns", l: "Growing Shape Patterns: Draw and Count the Next Term" },
+        { v: "pattern_features", l: "Features of a Number Pattern: Odd, Even and Ones Digits", presetOf: "notice_patterns" },
+        { v: "follow_given_rule", l: "Follow a Given Rule: Extend a Number Pattern", presetOf: "number_patterns_rule" },
     ],
     algebra: [
         { v: "tape_diagram", l: "Tape Diagrams / Bar Models (Visual)" },
@@ -1781,6 +1792,7 @@ export const SKILL_TIME_CATEGORY = {
     heavier_lighter_visual: "quick", pictograph_intro: "quick",
     tens_foundation_visual: "quick", bar_graph_intro: "quick", shape_corners_count: "quick",
     // Phase 5 batch 2: mid-band MAP skills
+    chart_to_120: "quick",
     hundreds_chart_fill: "quick", unknown_start_wp: "extended", number_chart_fill: "quick",
     count_edges_faces_vertices: "quick", coord_distance_q1: "quick",
     count_sides_vertices_2d: "quick",
@@ -2181,6 +2193,7 @@ export const SKILL_PRINT_SIZE = {
     heavier_lighter_visual: "compact", pictograph_intro: "medium",
     tens_foundation_visual: "medium", bar_graph_intro: "wide", shape_corners_count: "medium",
     // Phase 5 batch 2: mid-band MAP skills
+    chart_to_120: "medium",
     hundreds_chart_fill: "medium", unknown_start_wp: "spacious", number_chart_fill: "medium",
     count_edges_faces_vertices: "medium", coord_distance_q1: "wide",
     count_sides_vertices_2d: "medium",
@@ -2353,6 +2366,8 @@ export const SKILL_PRINT_SIZE = {
     vocab_grade_6_operations: "wide", vocab_grade_6_fractions: "wide",
     vocab_grade_6_geometry: "wide", vocab_grade_6_data: "wide",
     vocab_grade_6_algebra: "wide", vocab_grade_6_measurement: "wide",
+    notice_patterns: "medium",
+    growing_shape_patterns: "wide",
     vocab_grade_pictures: "wide",
 };
 

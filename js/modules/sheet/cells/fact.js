@@ -104,7 +104,7 @@ export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (li
  *   frame  ten frames (+: a solid then b open; −: a with the last b crossed out)
  *   line   a number line 0 to 20 (or to the answer's decade), the start marked
  *   skip   a skip-count strip: the first five multiples of the table number (÷: the divisor)
- *   array  a dot array, b rows of a (÷: rows of the divisor)
+ *   array  a dot array: × b rows of a; ÷ landscape, the divisor's rows (facts card §5.9)
  *   think  the think box of a ÷ fact: b × [ ] = a
  * `px` > 0 draws it for a screen host at that many CSS px per mm; 0 is paper (mm).
  */
@@ -203,26 +203,43 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
         if (!full) body += text(n * (bw + gap) + 1, 4.4, '…', 3.2, 'start');
         return wrap(w, h, body, `count by ${step}${full ? ` to ${step * n}` : ''}`).replace('<svg class="ws-factcue-svg"', `<svg class="ws-factcue-svg" data-ws-skipstrip="${step}"`);
     }
-    if (kind === 'array') {
-        const cols = div ? b : a, rows = div ? (b ? a / b : 0) : b;
-        // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): on a ÷ fact the support is a TRUE array - the
-        // quotient's rows of the divisor's dots - drawn top-left in ONE frame for the section (`p.frame`: the largest
-        // divisor's columns by the band's top rows), so every cell of the section has one geometry and one answer place.
-        if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
-            const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = Number(p.frame.pitch) || 2.6, r = Math.min(0.98, pitch * 0.377), pad = 0.8;
-            // WDS RP-81 (critic r5 R5-3): a 1.5 mm subitising gap after every 5th row and column of an array over 5
-            const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
-            const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
-            const w = span(fc) + 2 * pad, h = span(fr) + 2 * pad;
-            let body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
-            if (Number.isInteger(rows) && rows > 0) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2 + (fc > 5 ? gap(x) : 0), pad + y * pitch + pitch / 2 + (fr > 5 ? gap(y) : 0), r, false);
-            return wrap(w, h, body, rows > 0 ? `array, ${rows} rows of ${cols}` : 'no dots');
-        }
+    if (kind === 'array' && !div) {
+        // A × fact's array: b rows of a, as master draws it (lf-ops divship, lead 2026-11-13: the mult_facts landscape arrays,
+        // their band frame and the × 0 frame are PARKED - mult_facts stays hash-equal to master until its own lane ships them)
+        const cols = a, rows = b;
         if (!cols || !rows) return '';
         const pitch = Math.min(3, 36 / Math.max(cols, rows)), r = pitch * 0.32;
         let body = '';
         for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(0.5 + x * pitch + pitch / 2, 0.5 + y * pitch + pitch / 2, r, false);
         return wrap(cols * pitch + 1, rows * pitch + 1, body, `${rows} rows of ${cols}`);
+    }
+    if (kind === 'array') {
+        // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): on a ÷ fact the support is a TRUE array, drawn
+        // top-left in ONE frame for the section, so every cell of the section has one geometry and one answer place.
+        // LANDSCAPE (facts card §5.9, owner 2026-11-13: "arrays landscape so they can be bigger"): the divisor is the
+        // number of ROWS, the quotient's dots across each (28 ÷ 4 = 4 rows of 7); the frame (`p.frame`) is the band's top
+        // quotient's columns by the largest divisor's rows, so it is wider than tall, and 0 ÷ n is a short wide frame.
+        const cols = b ? a / b : 0, rows = b;
+        const rowsWord = (n) => `${n} ${n === 1 ? 'row' : 'rows'}`;
+        if (p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
+            const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = Number(p.frame.pitch) || 2.6, r = pitch * 0.377, pad = 0.8;   // (r: 0.98 mm at the old 2.6 pitch)
+            // WDS RP-81 (critic r5 R5-3): a 1.5 mm subitising gap after every 5th row and column of an array over 5
+            const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
+            const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
+            const w = span(fc) + 2 * pad, h = span(fr) + 2 * pad;
+            let body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
+            const some = Number.isInteger(cols) && cols > 0 && rows > 0;
+            if (some) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2 + (fc > 5 ? gap(x) : 0), pad + y * pitch + pitch / 2 + (fr > 5 ? gap(y) : 0), r, false);
+            return wrap(w, h, body, some ? `array, ${rowsWord(rows)} of ${cols}` : 'no dots');
+        }
+        if (!cols || !rows) return '';
+        const pitch = Math.min(3, 36 / Math.max(cols, rows)), r = pitch * 0.32;
+        // WDS RP-81: the 1.5 mm subitising gap after every 5th row and column of an array over 5
+        const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
+        const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
+        let body = '';
+        for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(0.5 + x * pitch + pitch / 2 + (cols > 5 ? gap(x) : 0), 0.5 + y * pitch + pitch / 2 + (rows > 5 ? gap(y) : 0), r, false);
+        return wrap(span(cols) + 1, span(rows) + 1, body, `${rowsWord(rows)} of ${cols}`);
     }
     if (kind === 'think') {
         // (critic r2 R2-4: "= 108" ran over the 36 mm box's border and the box touched the "x". The box is

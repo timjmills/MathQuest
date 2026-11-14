@@ -19,6 +19,7 @@ import { mountSample, mountQuestion } from './teacher-preview.js';
 import { isTeacher, note, goQuizzes } from './teacher-quiz-ui.js';
 import { quizQuestionData } from './quiz-take.js';
 import { roleOptions } from './sheet/index.js';
+import { dealPastWindows } from './chart-giveaway.js';
 
 // ========= MODULE STATE =========
 const qb = {
@@ -896,7 +897,8 @@ export function addMultipleQuestions(skillId, count, categoryId) {
             // (the question's place in its section, for a generator that deals by place - gen-pv's compare never opens a quiz on
             // "=": lf-placevalue compare r4, critic r2 N7; no other generator reads it)
             state.setPosition = section.questions.length;
-            const qData = safeGenerateQuestion(catKey, skillId);
+            // (CROSS-GIVEAWAY on the quiz, chart_120 critic r2 N2: never the squares of a chart window already in the section)
+            const qData = dealPastWindows(() => safeGenerateQuestion(catKey, skillId), section.questions.map((x) => x.questionData));
             if (qData) {
                 section.questions.push({
                     id: section.questions.length,
@@ -928,7 +930,8 @@ export function regenerateQuizQuestion(sectionIdx, questionIdx) {
 
     try {
         state.setPosition = questionIdx;
-        const qData = safeGenerateQuestion(catKey, q.skillId);
+        const others = builderTest.sections[sectionIdx].questions.filter((x) => x !== q).map((x) => x.questionData);
+        const qData = dealPastWindows(() => safeGenerateQuestion(catKey, q.skillId), others);
         if (qData) {
             q.questionData = quizQuestionData(qData);
             qbRenderSectionList();
@@ -951,7 +954,7 @@ export function duplicateQuizQuestion(sectionIdx, questionIdx) {
     if (!catKey) return;
 
     try {
-        const qData = safeGenerateQuestion(catKey, q.skillId);
+        const qData = dealPastWindows(() => safeGenerateQuestion(catKey, q.skillId), section.questions.map((x) => x.questionData));
         if (qData) {
             section.questions.splice(questionIdx + 1, 0, {
                 id: section.questions.length,

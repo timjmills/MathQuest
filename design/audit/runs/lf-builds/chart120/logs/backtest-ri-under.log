@@ -1,0 +1,8 @@
+ws-backtest row c120-ri-under: PASS  fail state FAIL 60.5s, pass state OK 38.8s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-ri-under               commit-pair  FAIL 60.5s          OK 38.8s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 117.4 s
+ws-backtest: OK

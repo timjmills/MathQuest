@@ -1,0 +1,569 @@
+{
+  "id": "partition",
+  "kind": "template",
+  "title": "Draw the cuts: partition a shape into equal areas (template `partition`, build-list `partition_draw`)",
+  "template": {
+    "id": "partition",
+    "source": "js/modules/sheet/cells/shape-grid.js",
+    "also": "NEW file (to build): the `partition` template is the first mode of the new kit template `shape-grid` (build-list newTemplates; the other shape-grid entries, vis_migrate_shapes, points_lines_rays, area_* and the rest, are decided on their own cards). The fraction slot reuses the `frac-model` fraction boxes (`js/modules/sheet/cells/frac-model.js`). Generator `js/modules/gen-geometry.js` (the partition_shapes branch: legacy colour SVG, printFormat geometry-partitions, no q.cell today), options `js/modules/skill-options.js` (P12 `shapes_early:partition_shapes`: forms, parts), no provider today (a new `registerSkill` in `js/modules/sheet/providers/`), screen `js/modules/screen-cell.js` (a new cut-drawing mount, RM-18)"
+  },
+  "families": [
+    "shapes_early"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "partition",
+      "shape-grid"
+    ],
+    "families": []
+  },
+  "skills": {
+    "include": [
+      "shapes_early:partition_shapes"
+    ]
+  },
+  "excerptChars": 150,
+  "sourceChars": 90,
+  "summary": "A shape (rectangle, square, circle or regular hexagon) with no partition lines, on a grid, a dot lattice or edge guide dots only. The pupil draws the cuts that make n equal-area parts and writes the unit fraction of one part in a fraction slot. Equal AREA, not equal shape: on the grid a quarter of a 6 x 4 rectangle may be an L or a step, and the squares make that countable. The drawing is the production; the written slot (1/n) is the graded answer on paper; on screen both the cuts and the fraction are checked. The key draws one correct partition and says other equal cuts are right too. The same template, with the cuts printed, also draws the skill's two existing tasks (how many equal parts; what fraction is shaded), migrated off the legacy colour SVG in the same build (open question 1).",
+  "teaches": "Partition a shape into parts with equal areas and express the area of each part as a unit fraction of the whole (3.G.A.2; M.EE.3.G.2 \"recognize shapes that have been partitioned into equal areas\", at target \"when given a shape, cut the shape into equal areas\"). Builds on 1.G.A.3 / 2.G.A.3 (halves, thirds, fourths of circles and rectangles; equal shares need not have the same shape), which the skill already teaches. Lesson fed: G3 \"Partition shapes into equal areas\" (design/lessons-first/BUILD_QUEUE.md row 11, lesson G3-Y4.B7, overdue).",
+  "research": "No premium logins this round. From knowledge of the reference sites: MathWorksheets4Kids \"partitioning shapes\" / \"equal parts\" pages (draw lines to split rectangles, circles and squares into 2, 3, 4 equal parts; partition on a grid; identify equal and unequal parts), K5 Learning grade 2-3 \"fractions of shapes\" / \"equal parts\" worksheets (divide shapes into halves, thirds, quarters; shade and name a part), IXL grade 3 \"Equal parts\" and \"Fractions of shapes\" skills (is the shape divided into equal parts?; which shape is divided into fourths?; on screen IXL mostly chooses among drawn partitions, it rarely lets the pupil draw). Repo sources: WORKSHEET_DESIGN_STANDARD RP-93 (partition items: guide dots, never the lines), RP-120 (0.75 pt outline on a shape to partition), PROBLEM_TYPES FR-06 / RM-18 (partition: tap two guide dots to add a cut) / RL-19 (circles carry 12 or 24 guide dots). The sites deal 6-12 shapes a page with free-hand cuts and no area support; we deal 4-6 boxed cells, give the grid first (equal area made countable by squares), fade it to dots and then edge dots, and keep production on screen (RM-18) where IXL turns it into multiple choice.",
+  "problemTypes": [
+    "Draw the cuts (new, forms=2): \"Cut the rectangle into 4 equal parts.\" A 6 x 4 rectangle (or 4 x 4 square, circle, hexagon) with no partition lines; the pupil draws the cuts and writes \"Each part is [1]/[4] of the shape.\" in two fraction boxes.",
+    "Two ways (draw, Stretch and Reason It, and one item in four on Independent at support=grid): two copies of the same shape side by side, \"Cut each one into 4 equal parts. Make the parts a different shape each time.\" One fraction slot for the pair.",
+    "How many equal parts? (forms=0, existing, migrated): the shape drawn with its cuts; write the number of parts.",
+    "What fraction is shaded? (forms=1, existing, migrated): the shape drawn with its cuts, k parts grey; write the fraction.",
+    "Out of scope here: \"are these parts equal in area?\" (judge, Yes / No on a grid) belongs to build-list fraction_parts (2.G.A.3, M.EE.3.G.2 \"recognise equal areas\"); this card's True or False? and Error Analysis pages already ask it of a drawn partition."
+  ],
+  "progression": [
+    "O2 parts: halves and quarters -> thirds and sixths -> eighths (the existing \"Equal parts\" option, values Halves / Thirds / Fourths, gains Sixths and Eighths). Each shape deals only the n it can cut fairly on its guides: rectangle 6 x 4 (2, 3, 4, 6, 8), square 4 x 4 (2, 4, 8), circle 24 rim dots (2, 3, 4, 6, 8), hexagon (2, 3, 6).",
+    "O3 support (new option, rectangles and squares): grid (unit squares drawn under the shape: count the squares in each part) -> dots (the same lattice as dots, no lines) -> edge (only the guide dots on the outline). Circles and hexagons always carry their guide dots (RP-93) and take no support value.",
+    "O6 shape (new option): rectangles and squares -> circles -> hexagons (a page of one shape, or mixed).",
+    "One change a step (P-1): the parts count, the support and the shape are three controls; a ladder step changes one. The response (draw the cuts, write 1/n) never changes."
+  ],
+  "drawing": {
+    "sizes": "Grid pitch (one unit square) 7 / 8 / 9 mm at S / M / L (RP-5: a part of the thinnest legal shape, 1 square wide, is >= 6 mm across at S). Rectangle 6 x 4 units = 42 x 28 / 48 x 32 / 54 x 36 mm; square 4 x 4 = 28 / 32 / 36 mm. Circle diameter 36 / 42 / 50 mm (frac-model DIM, section 11.2), 24 rim guide dots (every 15 deg, the first at 12 o'clock) and a centre dot; an eighth is 7.1 mm across at mid-radius at S (RP-93 >= 6). Regular hexagon 40 / 46 / 54 mm vertex to vertex (side 20 / 23 / 27 mm), guide dots at the 6 vertices, the 6 edge midpoints and the centre. Fraction slot: two digit boxes and a 1.5 pt bar at the working digit size (TY-10, 16 / 22 / 28 pt), beside the shape when the cell is >= 55 mm wide past it, else under it. Cell: one shape + its slot, 2 columns at S / M / L for rectangles, squares and circles (cell width <= 93 mm), 2 columns for a hexagon at S / M, 1 at L if the measured cell is over 93 mm; a \"two ways\" item is one cell a row.",
+    "notes": [
+      "Ink (INK-10 set only): the outline of the shape to cut 0.75 pt (RP-120), no fill; grid lines inside the shape 0.5 pt black (a line inside a visual that never bounds a writing place); lattice dots 0.8 mm solid black, rim / vertex / centre guide dots 1.2 mm solid black (INK-5 anchor dots); no grey on the pupil page. The grid stops at the outline; nothing is drawn outside the shape.",
+      "Never draw the answer (RP-1, L3): no partition line on the pupil page; the grid, dots and the shape are the same on every item of a section whatever n is (a 6 x 4 rectangle carries every n it can deal), so neither the lattice nor the dot count tells n. n is printed in the instruction (3.G.A.2 asks the pupil to cut into a given number and name the part); the fraction is the written answer.",
+      "Key (AK-1, AK-2): the pupil's own cell with ONE correct partition drawn at 1.5 pt black (heavier than the grid and the outline so it reads over them), the fraction written bold in the pupil's boxes, and under the cell, key only, the line \"Other equal cuts are right too.\" in the text size. A \"two ways\" key draws two partitions whose parts differ in shape (equal-area, non-congruent: an L or a step quarter on the 6 x 4).",
+      "Model cell (PT-MOD-1, RP-1): the completed cuts are dotted (LS-1, 1 pt round dots at 1.2 mm), the squares of one part counted in small digits inside them (\"6, 6, 6, 6\"), the Say band \"I cut it into 4 equal parts. Each part is one quarter, 1/4.\"",
+      "Pre-cut tasks (forms 0 / 1, migrated): the same shape with its cuts printed 0.75 pt (partitions, ink table), shaded parts flat grey (INK-3, hatch when photocopy-safe); outline 1.5 pt (a shape to judge, RP-120). The guide dots and grid are not drawn on pre-cut items.",
+      "Screen (RM-18): the same drawing; tap one guide dot then another to add a straight cut between them (snaps to dots; on support=grid the grid nodes are the dots); tap a cut to remove it. Cuts are chained segments, so an L or step cut on the lattice is drawn dot to dot. The fraction boxes are data-mq-cell joined \"/\" (frac-model). The item is right when the cuts make exactly n faces of equal area (computed: unit squares flood-filled across cut edges on the lattice; sector angles on a circle; polygon areas on a hexagon, tolerance 1 %) AND the fraction is 1/n. Never multiple choice (a drawn production on paper stays a production on screen). The dots are >= 9 mm apart on screen at 390 px (touch target via an invisible 9 mm hit circle).",
+      "Footprint: the cell is measured, never fixed (L1): S fits more cells a page than L (rectangles: 8 / 6 / 6 a page at S / M / L, two columns, four / three rows); the I Can and the instruction follow the option (L6, L28: \"I Can cut a shape into equal parts and name one part\" for forms=2).",
+      "Distractors (wrongAnswer, error analysis / true-false): a drawn partition with n parts of UNEQUAL area (M-P2), a correct equal-area non-congruent partition offered as \"wrong\" for the pupil to defend (M-P1, the answer is True), and the fraction n/1 or 1/(cuts) (M-P3, M-P4). Every wrong answer differs from the right one per slot (L27)."
+    ]
+  },
+  "ruleGroups": [
+    {
+      "title": "Partition items (quoted)",
+      "core": true,
+      "chars": 330,
+      "rules": [
+        "RP-93",
+        "RP-120",
+        "RM-18",
+        "FR-06",
+        "RP-5",
+        "RL-19"
+      ]
+    },
+    {
+      "title": "Never the answer, ink, key (quoted)",
+      "core": true,
+      "chars": 260,
+      "rules": [
+        "RP-1",
+        "INK-10",
+        "LS-1",
+        "AK-1",
+        "AK-2",
+        "TY-10",
+        "H9",
+        "H13"
+      ]
+    },
+    {
+      "title": "Fraction models and shapes",
+      "chars": 120,
+      "rules": [
+        "RP-90",
+        "RP-91",
+        "RP-2",
+        "RL-27",
+        "RL-G-03",
+        "INK-1",
+        "INK-3",
+        "INK-5",
+        "FR-01",
+        "FR-02",
+        "GAP-5-03",
+        "GE-09"
+      ]
+    },
+    {
+      "title": "Cited by critics on this family's findings (ids only)",
+      "chars": 80,
+      "rules": [
+        "BD-11",
+        "H1@RUBRIC",
+        "H2@RUBRIC",
+        "H3@RUBRIC",
+        "H4@RUBRIC",
+        "H5@RUBRIC",
+        "H6",
+        "H11",
+        "H12",
+        "OC14",
+        "OC15",
+        "P-23",
+        "PT-CMP-1",
+        "PT-GDP-1",
+        "SC-3",
+        "TY-11"
+      ]
+    },
+    {
+      "title": "Pedagogy, options and lessons learned",
+      "chars": 120,
+      "rules": [
+        "P-1",
+        "O2",
+        "O3",
+        "O6",
+        "L1",
+        "L2",
+        "L3",
+        "L5",
+        "L6",
+        "L10",
+        "VQ-1",
+        "VQ-2",
+        "VQ-3",
+        "VQ-6",
+        "VQ-8",
+        "VQ-10",
+        "H14",
+        "H16",
+        "SCC-01",
+        "SC-4",
+        "SP-10",
+        "PT-MOD-1",
+        "PT-ERR-1",
+        "CL-4b"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-17",
+      "ruling": "A distinct option is ALSO a findable skill when it is a distinct new difficulty or skill (a harder size class, a new task kind, a new representation); small tweaks stay plain options. partition_draw is checked against this rule in open question 2.",
+      "source": "owner rule, CLAUDE.md"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Build only the CCSS BUILD lessons for now; G3 \"Partition shapes into equal areas\" (3.G.A.2) is one, overdue, and this entry is its build.",
+      "source": "owner decisions 2026-11-07, design/lessons-first/BUILD_QUEUE.md"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M-P1",
+      "error": "equal parts must be the same shape (an L-shaped quarter of a 6 x 4 rectangle is \"not a quarter\")",
+      "wrong": "marks an equal-area, non-congruent partition \"not equal\"; True or False? says False"
+    },
+    {
+      "id": "M-P2",
+      "error": "counts parts that are not equal (any n pieces are n \"quarters\")",
+      "wrong": "cuts a rectangle into 4 strips of 1, 1, 2 and 2 squares and writes 1/4"
+    },
+    {
+      "id": "M-P3",
+      "error": "counts the cuts, not the parts",
+      "wrong": "draws 3 cuts for quarters and writes 1/3; or draws 4 cuts and makes 5 parts"
+    },
+    {
+      "id": "M-P4",
+      "error": "writes the fraction upside down or as the count",
+      "wrong": "4/1 or 4 for one quarter"
+    },
+    {
+      "id": "M-P5",
+      "error": "cuts a circle across, not through the centre, for thirds (parallel chords)",
+      "wrong": "three slices of a circle by two parallel lines, called thirds"
+    }
+  ],
+  "options": [
+    "forms (the existing P12 variant option \"What the items ask\", variantKey partition_shapes): add value 2 \"Draw the cuts\" (variant `draw`). The default stays 0 + 1 so old pages and share codes are unchanged; ws-code-snapshot must show no MOVED / DELETED line.",
+    "parts (existing \"Equal parts\", a match on the answer): add Sixths (=> \\d/6) and Eighths (=> \\d/8) after Fourths; values 0-2 keep their place.",
+    "support (NEW, O3, rectangles and squares only): grid / dots / edge, default grid. On a circle or hexagon item the value has no effect and the panel says so (\"circles and hexagons always show their guide dots\").",
+    "shape (NEW, O6): rectangles and squares / circles / hexagons, a tick list (all ticked mixes them), default all. Pre-cut tasks (forms 0 / 1) take rectangles and circles as today.",
+    "Preset skill: see open question 2 (recommended yes: `shapes_early:partition_equal_areas`, \"Cut Shapes Into Equal Areas\", grade 3, 3.G.A.2 / M.EE.3.G.2, WRM Y3.B6.S1 partial, opens partition_shapes with forms=[2], support grid)."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill shapes_early:partition_shapes --strict",
+      "note": "rule 0b; and the preset skill if signed"
+    },
+    {
+      "cmd": "node tests/scripts/ws-empty-band.cjs --skill shapes_early:partition_shapes",
+      "note": "every role and host offered, every shape and support at S / M / L (L25)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-cell-checks.cjs --skill shapes_early:partition_shapes --card --card-opts",
+      "note": "every §7a option value, the hexagon at L and the two-ways cell included (L26)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-options-verify.cjs --skill shapes_early:partition_shapes",
+      "note": "forms=2, support, shape, Sixths, Eighths each change print AND screen, round-trip a share code; predicates: no partition line on a draw item, each shape deals only its fair n, the key's cuts make n equal areas (L29)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-screen-answer.cjs",
+      "note": "the cut-drawing mount: equal faces + 1/n right, unequal faces wrong, no multiple choice"
+    },
+    {
+      "cmd": "node tests/scripts/ws-screen-slots.cjs",
+      "note": "one answer area per cell, screen verbs (tap, not draw with a pencil)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill shapes_early:partition_shapes",
+      "note": "VQ-NOLEGACY: the skill emits q.cell on every form"
+    },
+    {
+      "cmd": "node tests/scripts/ws-print-lint.cjs --source kit",
+      "note": "INK widths, no dashes, no grey on the pupil page"
+    },
+    {
+      "cmd": "node tests/scripts/ws-content-audit.cjs --category shapes_early"
+    },
+    {
+      "cmd": "node tests/scripts/ws-search-terms.cjs",
+      "note": "the preset, if signed, is findable (\"equal areas\", \"partition shapes\", \"cut into equal parts\")"
+    },
+    {
+      "cmd": "node tests/scripts/ws-standards.cjs",
+      "note": "3.G.A.2 / M.EE.3.G.2 tags; the 3.G.A.2 verdict flipped to full and partition_draw deleted from the build list"
+    },
+    {
+      "cmd": "node tests/scripts/ws-wrm.cjs --report-only",
+      "note": "the WRM tag decided in open question 5"
+    },
+    {
+      "cmd": "node tests/scripts/ws-wrm-page-unit.mjs",
+      "note": "the preset linked (direct, pre, related)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+      "note": "share codes still decode"
+    },
+    {
+      "cmd": "node tests/scripts/ws-detailed-lesson.cjs --check",
+      "note": "every passed lesson that deals partition_shapes"
+    },
+    {
+      "cmd": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --check",
+      "note": "no live packet moves"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/partition/partition.md",
+      "note": "build-start gate"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-coverage design/cards/partition/partition.md"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "The two existing tasks (how many equal parts; what fraction is shaded) are legacy colour SVG and are listed on vis_migrate_shapes. Migrate them onto this template in this build, or leave them to that migration?",
+      "recommended": "Migrate them here: they are the same drawing with the cuts printed, a mixed page of the skill would otherwise print two looks (L7, L15), and the critic grades the skill on every page type. Take partition_shapes off vis_migrate_shapes' list in the same change."
+    },
+    {
+      "q": "Owner rule 2026-10-17: is \"draw the cuts\" a distinct new task that must ALSO be a findable preset skill? The build list says preset: false.",
+      "recommended": "Yes: `shapes_early:partition_equal_areas` \"Cut Shapes Into Equal Areas\", grade 3. It is a new task kind (a drawn production, not reading a drawn partition), a new grade and standard (3.G.A.2 vs the host's 1.G.A.3) and it has its own lesson; teachers search \"partition shapes into equal areas\". The preset opens partition_shapes with forms=[2], support grid, every shape; options stay editable."
+    },
+    {
+      "q": "Screen: how does the pupil give a drawn answer?",
+      "recommended": "Draw it (RM-18): tap a guide dot, tap another, a cut appears; tap a cut to remove it; the machine checks the faces are n equal areas and the fraction is 1/n. Do NOT offer \"choose the picture that shows quarters\": a production on paper is never multiple choice on screen. Choosing among drawn partitions belongs to the judge items of fraction_parts."
+    },
+    {
+      "q": "The build-list O3 ladder ends at \"none\". With no guides at all the screen has nothing to snap to and a paper cut has nothing to aim at. Keep edge dots at the last rung?",
+      "recommended": "Yes: the last rung is \"edge\" (the lattice's dots on the outline only, no interior dots or lines); it is the same for every n, so it never shows the answer (RP-1), and RP-93 already keeps guide dots on circles at every rung."
+    },
+    {
+      "q": "WRM tag: the build list names Y3.B6.S1. It exists (\"Understand the denominators of unit fractions\", 2.G.A.3 / 3.NF.A.1); no WRM step carries 3.G.A.2.",
+      "recommended": "Keep Y3.B6.S1 as {step, partial: \"cut a whole into equal parts; the denominator names how many\"}; add Y2.B8.S2 \"Equal and unequal parts\" to its pre list and the school-site lesson G3 \"Partition shapes into equal areas\" as direct in data/curriculum/links."
+    },
+    {
+      "q": "Judge items (\"are these parts equal in area?\", Yes / No on a grid): add a forms value here?",
+      "recommended": "No: it is build-list fraction_parts (2.G.A.3, M.EE.3.G.2 recognise). This card asks it only on True or False? and Error Analysis pages of a drawn partition."
+    },
+    {
+      "q": "Two ways (two copies, different-shaped equal parts): a dealt problem type of forms=2 or its own value?",
+      "recommended": "Dealt, not a value: one item in four at support=grid on Independent and More Practice, every item on Stretch and Reason It; never at support=edge (two free-hand equal-area partitions without squares cannot be checked by the pupil)."
+    }
+  ],
+  "decisions": {
+    "options": [
+      {
+        "option": "forms",
+        "values": [
+          "0",
+          "1"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js P12 partition_shapes; open question 1",
+        "why": "how many equal parts / what fraction is shaded, migrated onto the template (cuts printed); the default mix"
+      },
+      {
+        "option": "forms",
+        "values": [
+          "2"
+        ],
+        "d": "offered",
+        "source": "build-list partition_draw; this card §3",
+        "why": "NEW (to build): draw the cuts, write 1/n. Not offered by the repo yet, so --check-signed NOTEs it until the build lands"
+      },
+      {
+        "option": "parts",
+        "values": [
+          "0",
+          "1",
+          "2"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js P12 partition_shapes",
+        "why": "O2 halves / thirds / fourths; each shape deals only the n it can cut fairly on its guides"
+      },
+      {
+        "option": "parts",
+        "values": [
+          "3",
+          "4"
+        ],
+        "d": "offered",
+        "source": "build-list partition_draw ladder O2; this card §7",
+        "why": "NEW (to build): sixths, eighths (rectangle, circle; hexagon sixths)"
+      },
+      {
+        "option": "support",
+        "values": [
+          "grid",
+          "dots",
+          "edge"
+        ],
+        "d": "offered",
+        "source": "build-list partition_draw ladder O3; open question 4",
+        "why": "NEW (to build): the area support fades; rectangles and squares only"
+      },
+      {
+        "option": "shape",
+        "values": [
+          "rect",
+          "circle",
+          "hex"
+        ],
+        "d": "offered",
+        "source": "build-list partition_draw ladder O6",
+        "why": "NEW (to build): the appearance choice; each shape a page of its own judged on its own (L29)"
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card"
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR"
+      }
+    ],
+    "roles": [
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "the pass bar"
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "the pass bar"
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "the pass bar; test-a / test-b deal different shapes and n"
+      },
+      {
+        "key": "role:lesson",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "the pass bar; lesson data is the FALLBACK today (prereqs.js 0/1): the G3 lesson \"Partition shapes into equal areas\" is built by the lessons-first engine, and this role must still pass on the fallback warm-up"
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider workedSteps NEW (default today): count the squares, draw the cut, count the parts, name one part; cuts dotted in the model"
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider workedSteps NEW; the first cut dotted to trace on the first item, then none (hint fades, the grid stays)"
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider wrongAnswer and misconceptions NEW: an unequal drawn partition, a cuts-not-parts fraction"
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider wrongAnswer NEW: \"Each part is 1/4\" on an equal non-congruent partition (True, M-P1) or an unequal one (False, M-P2)"
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider workedSteps and wrongAnswer NEW; the two-ways item"
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "the two-ways item; eighths and hexagons"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "provider stories: default 0/1",
+        "why": "no stories for a drawn partition; the role falls back"
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts",
+        "why": "not a fact skill: the role reports unsupported"
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts",
+        "why": "not a fact skill: the role reports unsupported"
+      }
+    ],
+    "hosts": [
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; cuts drawn by tapping guide dots (RM-18) at 390 / 820 / 1280; the fraction typed in its boxes"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; cuts drawn by tapping guide dots (RM-18) at 390 / 820 / 1280; the fraction typed in its boxes"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; cuts drawn by tapping guide dots (RM-18) at 390 / 820 / 1280; the fraction typed in its boxes"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "why": "display modes draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "why": "display modes draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      }
+    ]
+  }
+}

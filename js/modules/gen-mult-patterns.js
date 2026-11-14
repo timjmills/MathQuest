@@ -345,6 +345,16 @@ export function genNumberPatterns(q) {
         row = patternRow(kind0, place, cap);
         if (!row) place = places[(places.indexOf(place) + 1) % places.length];
     }
+    // lf-algebra r1: Highest number is a promise. × 10 runs on to the thousands (patternRow), so where the teacher set Max
+    // Number lower, a row above it is re-dealt as a count-on row inside it.
+    const hardCap = pvCap(9999, state.range);
+    if (row && hardCap < 9999 && Math.max(...row.values) > hardCap) {
+        const kept = row.values.filter((v) => v <= hardCap);
+        row = row.kind === 'times10' && kept.length >= 3 && kept.length === row.values.indexOf(row.values.find((v) => v > hardCap))
+            ? Object.assign({}, row, { values: kept })
+            : patternRow('add', place, Math.min(hardCap, pvCap(PLACE_CAP[place], state.range)));
+    }
+    if (!row) row = patternRow('add', 1, Math.min(99, hardCap));
     if (!row) row = patternRow('add', 1, 99);
     const values = row.values;
     const n = values.length;
@@ -353,6 +363,9 @@ export function genNumberPatterns(q) {
     let blanks;
     if (pct === null || pct === undefined) {
         blanks = Array.from({ length: Math.max(0, n - 3) }, (_, i) => i + 3);   // continue: first three shown
+        // lf-algebra r1: a three-term row (× 10 inside the thousands) still has a number to write: its last (the rule box
+        // names the operation, so two printed numbers decide it)
+        if (!blanks.length && n >= 3) blanks = [n - 1];
     } else {
         // Gaps anywhere. The first number always shows; a hidden rule keeps the first three, so
         // the rule can be found (3, 6 is +3 or ×2 until the third number decides it).
@@ -380,6 +393,9 @@ export function genNumberPatterns(q) {
             : 'Compare two numbers side by side. Is the next one double, half or ten times as big?';
     q.skillLabel = 'Number Pattern';
     const payload = { values, blanks, look: 'train', shape };
+    // (lf-ops-props r3b, lf-algebra minor: a slot grew to 3 digits on the rows that pass 100 - one page, two slot widths.
+    // Every row of the page is sized from the widest number its BAND can reach: the highest place ticked, capped by range.)
+    payload.bandDigits = fmt(pvCap(PLACE_CAP[places[places.length - 1]] || 99, state.range)).length;
     if (hideRule) payload.ruleBox = { pre: rule.pre, post: rule.post, value: String(rule.value) };
     else payload.rule = RULE_TEXT[row.kind](row);
     q.cell = { template: 'count-row', v: 1, payload };

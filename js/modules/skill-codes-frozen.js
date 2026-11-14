@@ -372,8 +372,15 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-10-31 facts card Q4 preset (division facts, long-division form). ZF, the next free code after ZE (NOT the
     // auto assigner's VH, a dropped draft). APPEND ONLY. ----
     "division:div_facts_long": "ZF",
+    "patterns:notice_patterns": "ZW",
+    "patterns:growing_shape_patterns": "ZX",
+    "patterns:pattern_features": "ZY",
+    "patterns:follow_given_rule": "ZZ",
     "vocabulary:vocab_grade_pictures": "VS",
     "vocabulary:vocab_pick3_words": "VZ",
+    // ---- 2026-11-12 chartwindow card preset (hundreds_chart_fill band 120). ZG, the next free code after ZF (ZW-ZZ
+    // are taken by the lf-algebra lane). APPEND ONLY. ----
+    "composing:chart_to_120": "ZG",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

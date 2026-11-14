@@ -1246,6 +1246,15 @@ function _gridOptions() {
             values: [{ v: 'window', l: 'A small piece (3 rows of 5)' }, { v: 'rows', l: 'Three whole rows of ten' },
                 { v: 'whole', l: 'The whole chart (to "Numbers to")' }],
             help: 'A small piece is cut from anywhere in the chart. Whole rows of ten show the down-ten pattern in full. The whole chart is one grid to a page.',
+            // Lead ruling 2026-11-13 (chartwindow card §7a, role-scoped hidden): the whole chart and three rows of ten are
+            // one chart to a page by design, so they stay on Independent, More practice and the simple print; the Lesson,
+            // Guided and Test pages share the page with Steps / a Model / other items and draw the window instead
+            // (optsForRole). ws-role-hidden holds every role's deal to this.
+            // Lead ruling 2026-11-14 (chart_120 r2): at band 120 three rows of ten are the chart's ONE window - one item a
+            // sheet or a giveaway - so the multi-item practice pages draw the window there ('value@option=value': hidden only
+            // when that other option holds that value).
+            hiddenOnRoles: { lesson: ['rows', 'whole'], guided: ['rows', 'whole'], test: ['rows', 'whole'],
+                independent: ['rows@band=120'], 'more-practice': ['rows@band=120'], review: ['rows@band=120'], 'mixed-practice': ['rows@band=120'] },
         },
         {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
@@ -1990,6 +1999,13 @@ const _ftOptions = (easy) => [
             ..._FT_TASKS.flatMap(([v, l]) => [{ v, l }, { v: `${v}-check`, l: `${l.replace(/ \(.*$/, '')}, then a Check row` }]),
             { v: 'make', l: 'Make your own (the rule is given, the pupil chooses the In numbers)' },
         ],
+        // lf-algebra r1 (options-render H13): a Check row is a second small table drawn under or beside the main one, so a
+        // page of them may hold fewer tables (6 at S where 9 plain tables fit)
+        // lf-algebra r2: 'rule' too - its machine holds the pupil's write frame for the rule (an answer place the given-rule
+        // tasks print as text), 1.6 mm taller at S; that is the frame, not spare room
+        // lf-algebra r3: 'make' too - both columns are the pupil's writing places (the In numbers are chosen and written,
+        // under an In head that prints their range "In: 1–15"), 9 tables at S where 12 given-In tables fit
+        addsDrawingValues: [..._FT_TASKS.map(([v]) => `${v}-check`), 'rule', 'make'],
         helpShort: 'One task per page. A Check row adds one more In number under the table to test the rule on.',
         help: 'One task per page, so the instruction says one thing. A Check row gives one more In number under the table to test the rule on. "Make your own" accepts any rows that follow the rule.',
     },
@@ -2010,6 +2026,8 @@ const _ftOptions = (easy) => [
             { v: ftTableValue(r, false), l: `${r} rows, In numbers in order` },
             { v: ftTableValue(r, true), l: `${r} rows, In numbers out of order` },
         ]),
+        // lf-algebra r1 (options-render H13): a five-row table is a taller drawing, so a page holds fewer of them
+        addsDrawingValues: [ftTableValue(5, false), ftTableValue(5, true)],
         helpShort: 'Three rows are enough to find a rule. Out of order stops the pupil just reading down the Out column.',
         help: 'Three rows are enough to find a rule. Out of order stops the pupil just following the Out column down. A tall table fits four to a page instead of six.',
     },
@@ -2090,6 +2108,11 @@ SKILL_OPTIONS['algebra:function_table_easy'] = _ftOptions(true);
 SKILL_OPTIONS['algebra:function_table_hard'] = _ftOptions(false);
 OPTION_FOLDS['algebra:function_table_easy'] = _ftFold(true);
 OPTION_FOLDS['algebra:function_table_hard'] = _ftFold(false);
+// Two-step stories (lead ruling R2 2026-11-13): band 100 is no longer offered; a share code, saved page or quiz written with it
+// (B100, between the two-step build and R2) reads as "no band" - at Max Number 100 the same deal (ws-two-step BAND-ALIAS).
+const _twoStepBandFold = (raw) => { const next = { ...raw }; if (Number(next.band) === 100) next.band = null; return next; };
+OPTION_FOLDS['algebra:multi_step_word'] = _twoStepBandFold;
+OPTION_FOLDS['algebra:multi_step_word_plain'] = _twoStepBandFold;
 // ============================ end function tables ============================
 // ===========================================================================
 // P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
@@ -2327,13 +2350,28 @@ function _vocabForms() {
     return _P12_VOCAB;
 }
 
+// A value of the host's control that a preset does not offer (it would deal the same page as the preset's default). The
+// value is gone from the preset's panel and normalizeOptions reads an old code's copy as the default, so codes still decode.
+// Two-step card, lead ruling 2026-11-13 (band 50, ruling (a)): on ÷-last and the letter equation only ~6 % of items
+// (37 / 600, 38 / 600) pass 50, so "Numbers to 50" printed the "to 30 / as dealt" page under a different name.
+export const PRESET_HIDE_VALUES = {
+    'algebra:two_step_add_then_div': { band: [50] },
+    'algebra:two_step_letter_equation': { band: [50] },
+    // Lead ruling 2026-11-13 (step 0, round 3b): band 50 on ×/÷-first and +-then-× changes only 5.7 % / 9.3 % of items,
+    // under the BAND-BITES 10 % bar, so it is hidden the same way.
+    'algebra:two_step_mult_div_first': { band: [50] },
+    'algebra:two_step_add_then_mult': { band: [50] },
+};
 // A PRESET skill (skill-presets.js) shows its HOST's controls with the preset values as their
 // defaults: "preset values under any explicit opts", and a share code packs only the changes.
 function _presetDefs(categoryId, skillId, fn) {
     const p = presetOf(categoryId, skillId);
     if (!p) return null;
+    const hide = PRESET_HIDE_VALUES[`${categoryId}:${skillId}`] || null;
     return fn(categoryId, p.skillId).map((o) => (o && o.id in p.opts
-        ? { ...o, default: JSON.parse(JSON.stringify(p.opts[o.id])), presetValue: true } : o));
+        ? { ...o, default: JSON.parse(JSON.stringify(p.opts[o.id])), presetValue: true } : o))
+        .map((o) => (o && hide && hide[o.id] && Array.isArray(o.values)
+            ? { ...o, values: o.values.filter((v) => !hide[o.id].includes(v.v)) } : o));
 }
 
 /** A skill's own declared options: its registry entry, else its mixed-pool control, else none. */
@@ -3012,6 +3050,8 @@ const _o2Add = (key, ...defs) => {
     // A tape diagram's whole runs to about twice the Max Number: it draws at half the band.
     ['algebra:tape_diagram', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
     ['algebra:tape_diagram_plain', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
+    // (band 100 was appended for the G2 lesson and dropped again, lead ruling R2 2026-11-13: at Max Number 100 it dealt the same
+    // as "no band", which the lesson now takes; a code written with B100 decodes to "no band" through the fold below)
     ['algebra:multi_step_word', _o2RangeBand([30, 50])],
     ['algebra:multi_step_word_plain', _o2RangeBand([30, 50])],
     ['algebra:algebra_word_mixed_plain', _o2RangeBand([20, 50])],
@@ -3261,10 +3301,17 @@ _ap1Put('composing:number_bonds', {
 // hundreds_chart_fill (owner, 2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100. Each chart
 // is the first N numbers in rows of ten; the window is cut from inside it (1 to 10 is its one
 // row, drawn whole). 100 stays the default, so every old page and code is unchanged.
-_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100], 100, {
-    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)' },
-    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50 or 100 numbers, ten to a row. '
-        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20).',
+// chart_120 (card chartwindow, signed 2026-11-12): band 120 cuts every window from rows 91-120,
+// so every window crosses 100; the whole chart is 12 rows on one page.
+_ap1Put('composing:hundreds_chart_fill', Object.assign(_opsBand([10, 20, 30, 40, 50, 100, 120], 100, {
+    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)', 120: '120 (91 to 120, across 100)' },
+    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50, 100 or 120 numbers, ten to a row. '
+        + 'A small chart holds fewer empty boxes. '
+        + 'At 120 every window is cut from 91 to 120, so it crosses 100.',
+}), {
+    // Lead ruling 2026-11-14 (chart_120 r2): the chart to 10 is ONE window (its one row) - one item a sheet or a giveaway -
+    // so the multi-item practice pages deal the 1-100 window instead; the card, the quiz and the lesson keep it.
+    hiddenOnRoles: { independent: [10], 'more-practice': [10], review: [10], 'mixed-practice': [10], test: [10] },
 }));
 // number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
 // thousands). "Numbers in" names the stretch of the chart; every number in the window is in it.
@@ -3455,6 +3502,29 @@ for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
         { id: 'msChoose', label: 'Choose the answer (A to D)', type: 'bool', default: false, group: 'layout',
             appliesTo: (cur) => ['mult', 'div', 'multdiv'].includes(cur.msOps), appliesBase: { msOps: 'mult' },
             help: 'Multiply or divide first, then take away. The pupil checks one of four answers: the right one and the three two-step mistakes (stopped after Step 1, a story number in Step 2, one sign for both).' }];
+}
+// The two-step bar model (two-step card 2026-11-13, decision 5): multi_step_word is the "(Visual)" twin -
+// it draws the bar model by default (wpBar on); multi_step_word_plain keeps it off. The option stays editable.
+{
+    const k = 'algebra:multi_step_word';
+    const o = (SKILL_OPTIONS[k] || []).find((x) => x.id === 'wpBar');
+    if (o) { o.default = true; o.help = 'The two-step bar model under each story: the Step 1 bar (equal groups or parts and whole) and the Step 2 bar that uses the Step 1 answer, with empty boxes to fill. On by default on this skill; the plain twin draws none.'; }
+    const op = (SKILL_OPTIONS['algebra:multi_step_word_plain'] || []).find((x) => x.id === 'wpBar');
+    if (op) op.help = 'The two-step bar model under each story: the Step 1 bar (equal groups or parts and whole) and the Step 2 bar that uses the Step 1 answer, with empty boxes to fill.';
+    // The keyword supports are hidden on the two-step stories (two-step card §7a, lead ruling 2026-10-31, P-21): a keyword list
+    // teaches "in all means +" instead of the two steps' structure. `hidden` keeps them in the model, so a share code or a
+    // saved page that carries them still decodes; the teacher is no longer shown them.
+    for (const key of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((x) => (x.id === 'wpCues' || x.id === 'wpBank' ? { ...x, hidden: true } : x));
+    }
+    // `forms` (the four + / − orders) applies when the first step is + / − (card §7a): the panel hides it on the × / ÷ presets.
+    for (const key of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((x) => (x.id === 'forms' ? { ...x, appliesTo: (cur) => !cur.msOps || cur.msOps === 'addsub', appliesBase: { msOps: 'addsub' } } : x));
+        // msCheck estimates + / − stories only (card decision 8): hidden on the x / ÷ presets; wpFrames is the column fade,
+        // so it applies where the letter or the estimate (already one sentence a step) is off - caught by ws-options-verify
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((x) => (x.id === 'msCheck' ? { ...x, appliesTo: (cur) => !cur.msOps || cur.msOps === 'addsub', appliesBase: { msOps: 'addsub' } }
+            : x.id === 'wpFrames' ? { ...x, appliesTo: (cur) => !cur.msLetter && !cur.msCheck, appliesBase: { msLetter: false, msCheck: false } } : x));
+    }
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
@@ -3875,6 +3945,77 @@ export function numberLineSummary(cur = {}, spec = null) {
     return `On · ${ends} · steps ${st}`;
 }
 
+// ===========================================================================
+// lane lf-algebra (2026-11-07) · APPEND ONLY · patterns:notice_patterns, patterns:growing_shape_patterns
+// ===========================================================================
+// Read by js/modules/gen-patterns-notice.js. Keys (skill-option-keys.js, sub-range 4P-4Z): patTask 4U, patShow 4V,
+// growShape 4W; `band` is the shared one-letter B. The preset patterns:pattern_features opens notice_patterns with
+// patTask 'feature' (skill-presets.js). Card: design/cards/patterns/patterns.md.
+const LF_ALGEBRA_OPTIONS = {
+    'patterns:notice_patterns': [
+        {
+            id: 'patTask', label: 'Task', type: 'enum', default: 'parity', group: 'difficulty',
+            values: [
+                { v: 'parity', l: 'Even or odd product (6 × 7: circle Even or Odd)' },
+                { v: 'feature', l: 'What a number pattern shows (start 5, add 5: check the true sentence)' },
+                { v: 'truefalse', l: 'True or false about a times-table (every product in the 5s ends in 0 or 5)' },
+            ],
+            // (r2, options-render H13: the pattern task draws a six-number track and three sentences, the true / false task a
+            // sentence box and the times-table row - drawings the parity fact does not have, so a page holds fewer)
+            addsDrawingValues: ['feature', 'truefalse'],
+            helpShort: 'One task a page. Each has one answer: a circled word or one checked sentence.',
+            help: 'One task a page, so the instruction says one thing. Even or odd: a multiplication fact, the pupil circles whether the product is even or odd '
+                + '(half the products are odd). Pattern: a rule and its first numbers; three sentences, exactly one true. True or false: one sentence about one times-table.',
+        },
+        {
+            id: 'band', label: 'Numbers to', type: 'enum', default: 100, group: 'difficulty',
+            values: [
+                { v: 25, l: '25 (tables to 5 × 5)' }, { v: 50, l: '50 (the 2 to 5 tables)' },
+                { v: 100, l: '100 (tables to 10 × 10)' }, { v: 144, l: '144 (tables to 12 × 12)' },
+            ],
+            help: 'The biggest product, or the biggest number in a pattern. Even or odd at 25 uses factors 2 to 5; at 100 factors 2 to 10; at 144 factors 2 to 12.',
+        },
+        {
+            id: 'patShow', label: 'Show the working', type: 'bool', default: true, group: 'support',
+            helpShort: 'On: even / odd under each factor, the pattern\'s numbers, the times-table row. Off: the pupil works them out.',
+            help: 'A hint that fades. Even or odd: the word even or odd under each number of the fact. Pattern: the first six numbers printed '
+                + '(off: the first number only and five boxes to fill). True or false: the row of products printed under the sentence (off: the sentence alone).',
+        },
+    ],
+    'patterns:growing_shape_patterns': [
+        {
+            id: 'patTask', label: 'Task', type: 'enum', default: 'next', group: 'difficulty',
+            values: [
+                { v: 'next', l: 'Draw Term 4 and write how many it has' },
+                { v: 'rule', l: 'Term 4 and the rule (+ 2)' },
+                { v: 'far', l: 'How many Term 10 has (find the rule first)' },
+            ],
+            // (r2, options-render H13: 'rule' adds the line "Rule: + [ ]", 'far' the line "Term 10 has [ ]" under the terms)
+            addsDrawingValues: ['rule', 'far'],
+            helpShort: 'Draw the next term and count it; then also write the rule; then jump to Term 10.',
+            help: 'Terms 1, 2 and 3 are drawn; the box for Term 4 is empty for the pupil to draw in (working, not marked). '
+                + 'The answer is a number: how many Term 4 has, plus the rule on the second task, or how many Term 10 has on the third.',
+        },
+        {
+            id: 'band', label: 'Answers to', type: 'enum', default: 20, group: 'difficulty',
+            values: [{ v: 10, l: '10 (grows by 1, 2 or 3)' }, { v: 20, l: '20' }, { v: 50, l: '50 (for Term 10)' }],
+            help: 'The biggest answer: the number in Term 4, or in Term 10 on the Term 10 task.',
+        },
+        {
+            id: 'patShow', label: 'Counts of Terms 1 to 3', type: 'bool', default: true, group: 'support',
+            helpShort: 'On: the number under Terms 1, 2 and 3 is printed. Off: the pupil counts and writes them.',
+            help: 'A hint that fades. On, the count under each drawn term is printed, so the pupil sees the numbers grow. Off, those boxes are empty for the pupil to count and fill (working, not marked).',
+        },
+        {
+            id: 'growShape', label: 'Picture', type: 'enum', default: 'dots', group: 'appearance',
+            values: [{ v: 'dots', l: 'Dots' }, { v: 'squares', l: 'Squares' }, { v: 'mixed', l: 'Dots and squares, mixed' }],
+            help: 'What each term is made of. Black outlines only.',
+        },
+    ],
+};
+Object.assign(SKILL_OPTIONS, LF_ALGEBRA_OPTIONS);
+// ---- end lf-algebra
+
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
     const pre = _presetDefs(categoryId, skillId, optionsFor);
@@ -3918,6 +4059,45 @@ export function offeredOptionsFor(categoryId, skillId) {
 }
 
 /** The defaults for a skill: what it generates when the teacher chooses nothing. */
+/**
+ * The option values a page ROLE must not deal (an option def's `hiddenOnRoles: {role: [values]}`): {optionId: [values]}.
+ * A role-scoped hidden decision of a signed card (§7a `roles`) is mirrored here; ws-role-hidden checks the two agree and
+ * that the role's deal never holds a hidden value.
+ */
+export function roleHiddenValues(categoryId, skillId, role) {
+    const out = {};
+    if (!role) return out;
+    for (const def of optionsFor(categoryId, skillId)) {
+        const vs = def && def.hiddenOnRoles && def.hiddenOnRoles[role];
+        if (Array.isArray(vs) && vs.length) out[def.id] = vs.slice();
+    }
+    return out;
+}
+
+/**
+ * A skill's opts as a page ROLE deals them: a value the role hides (`hiddenOnRoles`) falls back to the option's default
+ * (grid whole / rows on a Lesson, Guided or Test page draw the window). Other values pass through untouched.
+ */
+export function optsForRole(categoryId, skillId, opts, role) {
+    const hid = roleHiddenValues(categoryId, skillId, role);
+    const ids = Object.keys(hid);
+    if (!ids.length || !opts || typeof opts !== 'object') return opts;
+    // a preset's own values count too (chart_to_120 is hundreds_chart_fill with band 120): read through normalizeOptions
+    let norm;
+    try { norm = normalizeOptions(categoryId, skillId, opts); } catch (e) { norm = opts; }
+    let out = opts;
+    for (const id of ids) {
+        const v = id in opts ? opts[id] : norm[id];
+        // ('value@option=x': hidden only while that option holds x - grid rows at band 120)
+        const hit = (h) => { const [hv, cond] = String(h).split('@'); if (hv !== String(v)) return false; if (!cond) return true; const [ck, cv] = cond.split('='); return String(ck in opts ? opts[ck] : norm[ck]) === cv; };
+        if (!hid[id].some(hit)) continue;
+        const def = optionsFor(categoryId, skillId).find((d) => d.id === id);
+        if (out === opts) out = { ...opts };
+        out[id] = def ? def.default : undefined;
+    }
+    return out;
+}
+
 export function defaultOptions(categoryId, skillId) {
     const out = {};
     for (const o of optionsFor(categoryId, skillId)) out[o.id] = o.default;
@@ -4140,6 +4320,17 @@ export function divFactsMaxDividend(opts = {}) {
     if (typeof t === 'number' || typeof t === 'string') t = [t];
     const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
     return ticked.length ? Math.max(...ticked) * top : 0;
+}
+// lead ruling 2026-11-13 (critic divarray r1 D1 / D4): mult_facts' array support draws ONE frame per band, as div_facts does. The
+// frame is the band's largest SMALLER factor in rows by its largest LARGER factor in columns, read from the options the way the
+// generator deals (gen-operations.js: a ticked table times 0 to the band's top, 10 on "Tables to 10 x 10", else 12).
+export function multFactsArrayFrame(opts = {}) {
+    const top = Number(opts && opts.band) === 100 ? 10 : 12;
+    let t = opts && opts.constant;
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v >= 0 && v <= top);
+    const maxT = ticked.length ? Math.max(...ticked) : top;
+    return { cols: Math.max(top, maxT), rows: Math.max(1, Math.min(maxT, top)) };
 }
 export const divArrayWhy = (opts) => `An array is drawn while every dividend is ${DIV_ARRAY_MAX} or less; these tables go to ${divFactsMaxDividend(opts)}. Tick the 2 to 4 tables (or 2 to 5 on "to 10 x 10") for it.`;
 {

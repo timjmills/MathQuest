@@ -594,6 +594,14 @@ Master dropped every Independent row on expand/combine/unit_form L (Model sized 
 
 Single-skill Mixed: 16 of 81 builds changed, 14 item rises, value / combine S 2 pages -> 1; 4-skill sweep unchanged by MIX-S;
 lessons 1596 hashes identical.
+### lf-algebra critic r2 (2026-11-13): 6 skills, FAIL (2nd critic round); fix r10 (mq-opus-medium)
+| Finding | Check that catches it | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| precritic r9 listed npr / fgr card + worksheet "clean" with F2 open, and reason-it / EA / test clean with no page-fill lint (G1, G4) | ws-precritic-clean OPEN / LINT (new) | precritic-clean-list | gate precritic-clean | 1 round |
+| G5 pattern_features EA Fix-it A / B / C beside unlettered sentences | ws-patterns-cells LABEL-REF (new) | patterns-cells-g5-g6-g8 | gate patterns-cells | 1 round |
+| G6 feature working tiles 9 x 8.5 mm against the card's 10 / 11.5 / 13 | ws-patterns-cells TILE-CARD (new) | patterns-cells-g5-g6-g8 | gate patterns-cells | 1 round |
+| G8 growing S one cell a row (2 + 2 wrap behind a fixed 6 mm keep-out, measured as reflow) | ws-patterns-cells ROW2-S (new, node); ws-columns --templates growing-pattern --sizes S (browser, not on a path: proposed) | patterns-cells-g5-g6-g8 | gate patterns-cells | 1 round |
+| G11 / F8 option-panel sample blank | proposed: ws-options-shots as a gate (stage rect inside the frame, ink > 0.5 %) - lf-partopts | - | no | - |
 | r14 | Opus medium builder (V-NUM single, V-PLACE, V-TWIN runs, screen size fixes); narrow critic r14 PASS min 8. Narrow rounds after r5: r6-r14 = 9 (r6, r7, r9-r14), 1 pass |
 
 ### lf-engine roles OPENER-OVERFLOW (lead ruling 2026-11-13)

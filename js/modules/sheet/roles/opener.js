@@ -19,6 +19,7 @@ import {
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
     poolItems, answerOf, labelStyleOf, stripExtraMm, oneKindFirst, stepsKindOf,
 } from './compose.js';
+import { slotScore } from '../paginate.js';
 import { tightRows, IN_PLACE_FILL, koMm, cellWidthMm, LIVE_W_MM } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -387,7 +388,7 @@ export function plan(input = {}) {
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;
     const lesson = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: slotScore(indep) });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);
     const traced = (it) => (c, o) => it.render(c, Object.assign({}, o, c.state === 'blank' && answerOf(it) ? { shown: answerOf(it), ink: 'trace' } : {}));
     // keyList (critic r2, R2-2): the second Model cell is the pupil's to write - the short key lists it
@@ -457,7 +458,7 @@ export function plan(input = {}) {
     if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size, and the Model and one Guided cell side by side did not fit (the story is wider than a half cell): the Guided and Independent rows continue on page 2.');
     const pages = g.spill ? [{ sections }, { sections: page2, header: spillHeader(frame, indep.length > 0) }] : g.split ? [{ sections }, { sections: practiceSections }] : [{ sections }];
     return assemble(ROLE_ID, input, frame, pages, {
-        meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
+        meta: { items: models.length + guided.length + indep.length, scoreOutOf: slotScore(indep), models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, onePageMm: g.onePage, budgetMm: m.budget, modelMm: g.modelH, split: g.split, parity: g.parity, side: g.side, halfBand: g.halfBand, ...(g.spill ? { spillFreeMm: g.spillFreeMm, p1WhiteMm: g.p1WhiteMm, p1BodyMm: g.p1BodyMm, p1NextMm: g.p1NextMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }

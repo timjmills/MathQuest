@@ -1,0 +1,18 @@
+$ node tests/scripts/ws-sibling-compare.cjs --run /tmp/mq-precritic/20261113-064906-24433/coverage-matrix.json --skills composing:chart_to_120 --run-siblings --json /tmp/mq-precritic/20261113-064906-24433/sibling-compare.json
+
+ws-sibling-compare: 1 lane skill(s) on this tree; 33 row(s), 0 RED, 3 PENDING(no-baseline), 0 ERROR; comparing every printed row with findings (RED, OK, PENDING(no-baseline)) with the paired siblings (all approved where the skill has no pair)
+  composing:chart_to_120: template chartwindow; siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  sibling counts from: pins (design/audit/matrix/baseline.json): 0 sibling row(s)
+NO-SIBLING composing:chart_to_120|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING composing:chart_to_120|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S
+NO-SIBLING composing:chart_to_120|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING composing:chart_to_120|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING composing:chart_to_120|sections/pages-2 M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING composing:chart_to_120|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING composing:chart_to_120|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING composing:chart_to_120|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING composing:chart_to_120|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING composing:chart_to_120|single/ex-each S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/ex-each at S
+NO-SIBLING composing:chart_to_120|single/ex-group S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/ex-group at S
+  no approved siblings for composing:chart_to_120: every red count of theirs is unproven
+ws-sibling-compare: FAIL - worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 11 unproven (no sibling), 0 ERROR (3 row(s) with findings compared (PENDING(no-baseline) 3); 0 count(s) at or below the siblings (engine red, non-blocking), 0 above, 11 with no sibling measured, 0 ERROR row(s), 0 partner-skill count(s) (non-blocking); 0.5 s (lane matrix 0 s, sibling matrix 0 s))

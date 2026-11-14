@@ -453,6 +453,19 @@ function judge(g, run, p) {
 }
 
 const PARSE = {
+    // ws-screen-support-eq (lf-hosts 2026-11-13): its verdict comes from ONE place, the tool's own verdict() line, which
+    // accounts for every skill in scope (checked / no supports / not run). The row maps it 1:1 - OK PASS, N/A N/A, FAIL FAIL -
+    // and applies no rule of its own (the generic skill-mention rule read "algebra:x: no supports" as an absent skill, so the
+    // log said OK and the row FAIL). ws-gate-agree holds the two together.
+    screenSupportEq(g, out, code) {
+        const m = [...out.matchAll(/^ws-screen-support-eq: (OK|N\/A|FAIL)\b(.*)$/gm)];
+        if (!m.length) return unparsed('no "ws-screen-support-eq: OK|N/A|FAIL" line', out);
+        const v = m[m.length - 1];
+        const says = v[2].trim().replace(/^\(|\)$/g, '').trim().slice(0, 200);
+        if (v[1] === 'OK') return { result: 'PASS', findings: says || '-', detail: [], explainsExit: false };
+        if (v[1] === 'N/A') return { result: 'N/A', findings: says || 'no supports model in scope', detail: [], explainsExit: code === 0 };
+        return { result: 'FAIL', findings: v[0].slice(0, 200), detail: out.split('\n').filter((l) => /^\s+SCREEN-|^\s+\S+: /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: true };
+    },
     // ws-detailed-lesson prints `ws-detailed-lesson: OK|FAIL` (--check), `ws-detailed-lesson --repeats|--lp|--sweep: OK|FAIL (n)`;
     // the last such line is the verdict, and the FAIL rows (E.. / LP-.. / seed ..) are the findings
     lessonSamples(g, out, code) {
@@ -978,9 +991,41 @@ function buildPlan(ctx) {
         add(gate('key-json', 'ws-key-json (L-KEY: no raw JSON answer on any key or page, every role)', scope, 'browser', 'ws-key-json', ['--skills', keys.join(',')], { missingMsg: 'ws-key-json is not in this tree' }));
         // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
         add(gate('tof-stem', 'ws-tof-stem (TOF-STEM: a True or False? "a op b =" stem only over the one number it equals)', scope, 'browser', 'ws-tof-stem', ['--skills', keys.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
+        // LDIV-JOIN (owner 2026-11-14, lf-ops: the long-division bracket was "disconnected"): the arc and the vinculum are ONE
+        // stroke - no white at the outer corner, no step - on paper (M/L, pupil + key, the card roles) and on screen (1366, 820)
+        const ldivKeys = keys.filter((k) => /^division:(long_div_2digit|div_facts|div_facts_long|divide|div_remainders)$/.test(k));
+        if (ldivKeys.length) add(gate('ldiv-join', 'ws-ldiv-hug --join --raster (LDIV-JOIN: the bracket arc runs into the vinculum, gap <= 0.3 mm, no step; LDIV-JOIN-RASTER: no pixel > 80 in the bar at DSF 2 / 3; LDIV-SHAPE: the side bows <= 0.6 mm)', `${ldivKeys.length} bracket skill(s)`, 'browser', 'ws-ldiv-hug', ['--join', '--raster', '--shape', '--skills', ldivKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
+        // LDIV-ROOM (owner 2026-11-14: "a lot of white area to work with"): the long-division work grid fills a 4-a-page cell
+        // (>= 80 % of its free height or the 2x cap, centred); 6 / 8 a page keep the floor row and stay inside the cell
+        const roomKeys = keys.filter((k) => /^division:(long_div_2digit|divide)$/.test(k));
+        if (roomKeys.length) add(gate('ldiv-room', 'ws-ldiv-hug --room (LDIV-ROOM: the work grid uses a 4-a-page cell, M/L)', `${roomKeys.length} work-grid skill(s)`, 'browser', 'ws-ldiv-hug', ['--room', '--skills', roomKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        // (lf-algebra r10, lead rule after lf-algebra critic r2: precritic r9's "Clean for the critic" list named pages with an open
+        // critic finding (F2, npr / fgr card + worksheet) and roles no page-fill lint ran on (G4 Reason It one item a page). The lane
+        // status file's clean list may name only pages with no open finding of the latest critic and a print-lint row in the run.)
+        add(gate('precritic-clean', 'ws-precritic-clean (the lane status clean list: no open critic finding, every claimed role page-fill linted)', scope, 'node', 'ws-precritic-clean', ['--skill', keys.join(',')], { missingMsg: 'ws-precritic-clean is not in this tree' }));
+        // (lf-algebra r10, critic r2 G5 / G6 / G8: the patterns cells against the page - Fix-it letters printed in the item, the card's
+        // feature tile size, the growing row two across at S; OK (n/a) for a skill outside the patterns card)
+        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
+        // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
+        // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
+        add(gate('two-step', 'ws-two-step (WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM)', scope, 'node', 'ws-two-step', ['--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra, lead ruling R1 2026-11-13: multi_step_word (Visual) practice pages hold the card's ruled capacity S 2 / M 1 / L 1
+        // with no cell stretched past a 30 % band under its work; browser, OK (n/a) without multi_step_word)
+        add(gate('two-step-print', 'ws-two-step --print (CAP-BAND: (Visual) capacity S 2 / M 1 / L 1, no 30 % band on independent / more-practice / test)', scope, 'browser', 'ws-two-step', ['--print', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra r13, precritic two-step r12 EB-ROLE / lead ruling D: the Error analysis page composes on every two-step skill
+        // at M / L - a wrong answer that does not fit the box made the role refuse two_step_add_then_div; browser, OK (n/a) off the card)
+        add(gate('two-step-ea', 'ws-two-step --ea (EA-COMPOSES: Error analysis composes on every two-step skill at M / L)', scope, 'browser', 'ws-two-step', ['--ea', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (owner 2026-11-14, two-step round 3b: a long-division frame left on a two-step step is one connected stroke - the bracket's top
+        // end meets the bar within 0.3 mm at M / L, print and screen; lf-ops' LDIV-JOIN rule on word-work's ÷ frame; browser, OK (n/a) off ÷)
+        add(gate('two-step-ldiv', 'ws-two-step --ldiv (LDIV-JOIN: the ÷ bracket meets its bar within 0.3 mm)', scope, 'browser', 'ws-two-step', ['--ldiv', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lead 2026-11-14 + STEP-FORM critic F1: two fact-sentence steps top-align, blocks and sentences within 1 mm; browser, OK (n/a) off the card)
+        add(gate('two-step-align', 'ws-two-step --align (STEP-ALIGN: fact-pair step blocks and sentences top-align)', scope, 'browser', 'ws-two-step', ['--align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (STEP-FORM critic r3 F6: a two-step fact sentence never wraps on the worksheet / card at 820-1366; browser, OK (n/a) off the card)
+        add(gate('two-step-screen-align', 'ws-two-step --screen-align (STEP-ALIGN-SCREEN: a fact sentence on one line on screen)', scope, 'browser', 'ws-two-step', ['--screen-align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
         // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
         // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
         add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));
@@ -1027,6 +1072,11 @@ function buildPlan(ctx) {
         // (the fraction's numerator sat in the L tab's keep-out on the Opener, Review and Reason It; the card's own gate
         // line listed only fact rows). One run per form and size, every fact-family role, against the size's pin.
         const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
+        // (lf-ops divarray r2, owner rule 2026-11-13: the div_facts support-aid page rules of critics r6 / r7 - EB-PAGE on Test and the
+        // fade packet, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX - restored as ws-fact-pages after the deploy dropped them)
+        const factPageKeys = keys.filter((k) => k === 'division:div_facts');
+        if (factPageKeys.length) add(gate('fact-pages', 'ws-fact-pages --page-only (div_facts support-aid page rules: EB-PAGE, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX)', factPageKeys.join(','), 'browser', 'ws-fact-pages',
+            ['--skill', factPageKeys.join(','), '--page-only', '--hosts', 'none', '--no-baseline', '--rules', 'EB-PAGE,EB-PAD,EB-COLS,EB-TESTEQ,EB-GAP,EB-FACTX'], { missingMsg: 'no tests/scripts/ws-fact-pages.cjs' }));
         if (divFormKeys.length) {
             const DF_ROLES = 'fact-rows,independent,more-practice,test,fact-probe,mixed-practice,opener,guided,review,reason-it,true-false,stretch';
             for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) {
@@ -1060,8 +1110,10 @@ function buildPlan(ctx) {
             const singles = [...new Set(factKeys.flatMap((k) => FACT_SUPPORTS[k] || []))];
             for (const sup of singles) {
                 const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
-                add(gate(`print-lint-supports-${sup}-M`, `ws-print-lint --source kit --supports ${sup} --size M --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
-                    ['--source', 'kit', '--supports', sup, '--size', 'M', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
+                // --fill-roles runs PAGEFILL / the PG-23 orphan on review + test too (critic divarray r1 D2: a support page -
+                // mult_facts Review S touch at the ruled 15 - left a 30 % blank strip under the grid that no gate measured)
+                add(gate(`print-lint-supports-${sup}-M`, `ws-print-lint --source kit --supports ${sup} --size M --roles ${SUP_ROLES} --fill-roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section; D2: PAGEFILL on review/test)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'M', '--roles', SUP_ROLES, '--fill-roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
             }
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
@@ -1135,6 +1187,10 @@ function buildPlan(ctx) {
             const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
             if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × M/L`, 'browser', 'ws-grade-render',
                 ['--skills', k, '--roles', more.join(','), '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            // (critic divarray r2 D6: the Scripted Model with a support DRAWN - div_facts' landscape array on the 10s band, tables 2-5 -
+            // ran its trace jots onto the cell rule at L; the card-role gate above renders the default, support-free page only)
+            if (k === 'division:div_facts') add(gate('render-gate-div_facts-sm-array', 'ws-grade-render --gate on the Scripted Model with the array support (10s band, tables 2-5) at M, L (critic divarray r2 D6: overflow)', `${k} × scripted-model × array × M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', 'scripted-model', '--size', 'M,L', '--supports', 'array', '--opts', JSON.stringify({ band: 100, constant: [2, 3, 4, 5] }), '--gate', '--no-screen', '--out', path.join(ctx.logs, 'render-gate-div_facts-sm-array')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
             add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × M/L`, 'browser', 'ws-cell-checks',
                 ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
         }
@@ -1151,7 +1207,14 @@ function buildPlan(ctx) {
         add(gate('screen-slots', `ws-screen-slots --skills${ss.includes('--screen-digit') ? ' --screen-digit' : ''}`, scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
-        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE, ARRAY-ORIENT, ARRAY-DOT-MIN, ARRAY-CAPTION, SCREEN-ANSWER-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        // (lf-hosts 2026-11-13) the screen grades a word-work story's letter equation / estimate exactly as its paper key does
+        if (skills.some((sk) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(sk.key))) {
+            const ww = keys.filter((k) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(k));
+            // (and the screen-support-eq row agrees with its tool's own verdict line on them: ws-gate-agree)
+            add(gate('gate-agree', 'ws-gate-agree screen-support-eq (the precritic row = the tool\'s own verdict line)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'node', 'ws-gate-agree', ['--gate', 'screen-support-eq', '--skills', ww.join(',')], { missingMsg: 'no tests/scripts/ws-gate-agree.mjs' }));
+            add(gate('screen-grade', 'ws-screen-grade (screen verdict = paper key verdict: right, wrong, equivalent, every graded part)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'browser', 'ws-screen-grade', ['--skills', ww.join(','), '--n', '20'], { expect: { mention: ww }, missingMsg: 'no tests/scripts/ws-screen-grade.cjs' }));
+        }
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];
@@ -1183,6 +1246,24 @@ function buildPlan(ctx) {
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
+        // ---- lead ruling 2026-11-13 (chart_120): an option value a card hides ON A ROLE (§7a `roles`) is never dealt there
+        // (ws-role-hidden: the role's page with the value is byte-identical to its page with the default), and a misconception
+        // a card re-scopes to TEXT (`textOnly`) reaches the screen card and Reason It and never sits in a chart square
+        // (ws-text-misconception). No card decision for the scope: N/A.
+        add(gate('role-hidden', 'ws-role-hidden (an option value the card hides on a role is never dealt on that role)', `${scope} × hidden roles × L`, 'browser', 'ws-role-hidden', ['--skills', keys.join(',')], { missingMsg: 'ws-role-hidden is not in this tree', parse: (g, out, code) => {
+            const m = /^ws-role-hidden: (OK|FAIL|INCOMPLETE|NO-DECISIONS)\b ?-? ?(.*)$/m.exec(out);
+            if (!m) return unparsed('no "ws-role-hidden: OK|FAIL|INCOMPLETE|NO-DECISIONS" line', out);
+            const det = out.split('\n').filter((l) => /^ {2}(FAIL|INCOMPLETE)/.test(l)).slice(0, 10).map((l) => l.trim());
+            if (m[1] === 'NO-DECISIONS' && code === 4) return { result: 'N/A', findings: m[2].slice(0, 200), detail: [], explainsExit: true };
+            if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].slice(0, 200), detail: [], explainsExit: false };
+            return { result: m[1] === 'INCOMPLETE' ? 'INCOMPLETE' : 'FAIL', findings: m[2].slice(0, 200), detail: det, explainsExit: true };
+        } }));
+        add(gate('text-misconception', 'ws-text-misconception (a text-only misconception reaches the screen card and Reason It; no chart square holds more digits than its window)', `${scope} × reason-it, error-analysis, true-false × M/L`, 'browser', 'ws-text-misconception', ['--skills', keys.join(',')], { missingMsg: 'ws-text-misconception is not in this tree' }));
+        // ---- lf-roles critic r8b on chart_120 (D5, n5): no Guided try shows the Model's own picture (GUIDED-MODEL-ECHO), and
+        // a page's Score equals the answer places of its scored cells (SCORE-SLOTS; chartwindow, the template that scores slots)
+        // (chart_120 critic r1, 2026-11-13: + TF-FALSE, EA-PATTERN, STRIP-NUMBERS, SCORE-SLOTS on every scored role, and
+        // CROSS-GIVEAWAY over the chart's band x grid values - `--variants`)
+        add(gate('guided-echo', 'ws-guided-echo (GUIDED-MODEL-ECHO: no try repeats the Model; SCORE-SLOTS: Score = answer places on every scored role; TF-FALSE; EA-PATTERN; CROSS-GIVEAWAY incl. the screen worksheet / quiz deals; STRIP-NUMBERS; MODEL-STATE-MARKS; SAY-AGREE)', `${scope} × guided + scored roles + scripted model × M/L × 6 seeds + band x grid values + 20 screen deals`, 'browser', 'ws-guided-echo', ['--skills', keys.join(','), '--seeds', '6', '--variants'], { missingMsg: 'ws-guided-echo is not in this tree' }));
         // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
         add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
         // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,
@@ -1304,10 +1385,19 @@ function buildPlan(ctx) {
         {
             const rk = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
             add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
+            if (ctx.role === 'error-analysis') add(gate('ea-stem-fixture', 'ws-ea-stem --fixture (EA-STEM guard: a correct story sentence is true of its numbers)', 'planted key', 'node', 'ws-ea-stem', ['--fixture', 'tests/fixtures/precritic/ea-stem.pass.html'], { missingMsg: 'ws-ea-stem is not in this tree' }));
             if (ctx.role === 'true-false') add(gate('tof-stem-role', 'ws-tof-stem (TOF-STEM) on the role sample', `role true-false × ${rk.length} skill(s)`, 'browser', 'ws-tof-stem', ['--skills', rk.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }
         add(gate(`print-lint-role-${ctx.role}-M`, `ws-print-lint --source kit --roles ${ctx.role} --size M`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // (lf-ops divarray r2, owner rule 2026-11-13 "every finding a check on precritic's path": a lane that touches role R
+        // runs the empty-band check and the capacity pin on ITS skills' R pages - the Review stack side band, the Test
+        // support band (EB-SUPBAND) and a ruled Review capacity were backtested but off this path)
+        if (ctx.skills.length) {
+            const lk = ctx.skills.map((s) => s.key).join(',');
+            add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (the lane skills' ${ctx.role} pages at M / L)`, `${lk} × ${ctx.role}`, 'browser', 'ws-empty-band', ['--skill', lk, '--roles', ctx.role], { missingMsg: 'ws-empty-band is not in this tree' }));
+            add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role} (the lane skills' ${ctx.role} pages never fall; ruled option pages)`, `${lk} × ${ctx.role}`, 'browser', 'ws-capacity-pin', ['--check', '--skills', lk, '--roles', ctx.role], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
+        }
         // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
         // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
         // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
