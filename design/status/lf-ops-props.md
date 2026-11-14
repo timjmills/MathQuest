@@ -515,3 +515,18 @@ All four are ledgered as parked, with their planned checks. **To resume:** land 
 ## Queued after the weekly reset (lead 2026-11-14), continued
 - division:divide with notation bracket at range 1000 still renders on the OLD non-kit template: an orphan cell 4 spanning 3 columns, empty space, an offset quotient box. It is also on master (ldiv-room critic N3). Move it onto the kit's division template: check first, then the fix.
 - The bigger long-division boxes (LDIV-ROOM) were approved by the owner as they are. Deploying ldiv 0b98813ea; no refinements (b) / (c).
+
+## Multiplication size pairs: area model and standard algorithm (lead request 2026-11-14; next build list after the reset)
+From data.js on master 448bc5e74: a skill or preset id per pair.
+
+| Pair | Area model | Standard algorithm (column) |
+|---|---|---|
+| 2×1 | `area_model_2by1` (preset of area_model_mult) | `mult_2by1_column` (preset of multiply) |
+| 3×1 | `area_model_3by1` (preset) | `mult_3by1_column` (preset) |
+| 4×1 | **MISSING** | **MISSING** |
+| 2×2 | partial: only inside `area_model_mult_hard` ("2×2 and 2×3", mixed); **no findable 2×2 preset** | `mult_2by2_standard` (preset) |
+| 3×2 | partial: only inside `area_model_mult_hard` (as 2×3); **no findable 3×2 preset** | **MISSING** |
+
+Next build list (each a PRESET of the host skill with its option values, per the owner rule that a distinct option is also a findable skill):
+`area_model_4by1`, `mult_4by1_column`, `area_model_2by2`, `area_model_3by2`, `mult_3by2_standard`.
+Check first that `area_model_mult` and `multiply` already have option values for these sizes. A missing size class is an option to add, plus its preset.
