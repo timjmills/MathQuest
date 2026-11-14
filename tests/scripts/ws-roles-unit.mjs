@@ -58,6 +58,10 @@
 //                it draws (its work, writing room, tab clearance), never stretched to content / 0.7: a lone cell <= its measure / 0.9
 //                (lf-roles r10 item 2, live deploy-7 algebra:two_step_add_then_div Guided M seed 694812: the lone story ~25-31 %
 //                empty in its frame; EB-BAND sees only >= 30 %). Control: a page of two stories keeps its rows.
+//   GDPCAP-ANSWERS a Guided page whose cells score 1 to 3 answers each (chart_120's squares) keeps its SCORED answers within the
+//                §12.1 ceiling (10 / 8 / 6 + the Model): the ceiling counted answers only when EVERY cell scored > 1 (pointsOf), so
+//                chart_120 Guided L dealt 7 answers against 6 (lf-builds precritic EB-GDPCAP; lf-roles r10 item 3a). Control:
+//                1-point cells keep their tries (the Model and 3 at least).
 //   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
@@ -571,6 +575,22 @@ if (on('GUIDED-LONE-STORY')) {
             for (const f of lone) if (f.cellH > (135 + 1) / 0.9) findings.push(`GUIDED-LONE-STORY ${size}: a lone 135 mm story in a ${f.cellH.toFixed(1)} mm cell (${Math.round((1 - 136 / f.cellH) * 100)} % of it empty under the work; want <= ${((135 + 1) / 0.9).toFixed(1)} mm)`);
             if (!fits.some((f) => f.rows === 2)) findings.push(`GUIDED-LONE-STORY ${size} control: no page of two plain tries (${fits.map((f) => f.rows).join(' + ')})`);
         } catch (e) { findings.push(`GUIDED-LONE-STORY ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GDPCAP-ANSWERS')) {
+    const ptCell = (i, pts) => ({ q: { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted chart', answerType: 'number', seed: i },
+        key: { value: '42', display: '42', slots: {} }, render: () => '<div class="ws-cell-work">chart</div>', template: 'planted', pool: 'main',
+        footprint: Object.assign({ wMm: 80, hMm: 30, maxCols: 2 }, pts > 1 ? { points: pts } : {}), fclass: 'standard' });
+    for (const [tag, pts] of [['mixed', [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]], ['ones', Array(12).fill(1)]]) for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: SK1, items: pts.map((p, i) => ptCell(i, p)) });
+            const cap = { M: 8, L: 6 }[size];
+            const got = Number(pl.meta.scoreOutOf);
+            if (got > cap) findings.push(`GDPCAP-ANSWERS ${tag} ${size}: ${got} scored answers on the Guided page(s); the §12.1 ceiling is ${cap} plus the Model (EB-GDPCAP)`);
+            if (tag === 'ones' && got < 3) findings.push(`GDPCAP-ANSWERS ones ${size} control: ${got} tries (want the Model and 3 tries at least)`);
+        } catch (e) { findings.push(`GDPCAP-ANSWERS ${tag} ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 

@@ -120,7 +120,21 @@ const mixRowAdd = (r, cols, nM, pEnd, extra, hint) => Math.max(r * cols < nM ? e
 // (a cell that scores several tries - Match 3, footprint `points` 3, owner ruling Q-C - counts them against the ceiling:
 // 10 / 8 / 6 scored tries hold 3 / 2 / 2 such cells plus the Model; lf-vocab r9, ws-empty-band EB-GDPCAP)
 const pointsOf = (items) => { const its = (items || []).filter(Boolean); const p = its.length && its.every((it) => it.footprint && Number(it.footprint.points) > 1) ? Math.max(...its.map((it) => Number(it.footprint.points))) : 1; return p; };
-const ceilFor = (ctx, items) => { const p = pointsOf(items); return (p > 1 ? Math.floor(CEILING[ctx.size] / p) + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1); };
+const ceilFor = (ctx, items) => {
+    const p = pointsOf(items);
+    const its = (items || []).filter(Boolean);
+    const ptsOf = (it) => (it.anchor ? 0 : Number(it.footprint && it.footprint.points) || 1);
+    // GDPCAP-ANSWERS (lf-roles r10 item 3a; lf-builds chart_120 Guided L: 7 answers > 6): a page whose cells score 1 to 3 answers
+    // each (a chart's squares) counts its ceiling in ANSWERS too - the tries after the Model(s) are dealt while their answers stay
+    // within it (paginate.scorePoints, the page's Score). Pages of 1-point cells, or of cells all scoring the same, are unchanged.
+    if (p === 1 && its.some((it) => ptsOf(it) > 1)) {
+        const nM = Math.max(1, mixModels(its));
+        let sum = 0, k = nM;
+        for (; k < its.length; k++) { const q = ptsOf(its[k]); if (sum + q > CEILING[ctx.size]) break; sum += q; }
+        return k < its.length ? k : k + (CEILING[ctx.size] - sum);
+    }
+    return (p > 1 ? Math.floor(CEILING[ctx.size] / p) + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1);
+};
 /**
  * The fact pages (lf-ops facts-roles task, RUBRIC H13): add / sub / mult facts, div_facts_long and div_facts. Their cells are
  * short, so the shared ceiling (10 / 8 / 6 tries) and the row stretch (up to FILL_CAP) left 31-58 % empty bands under every
