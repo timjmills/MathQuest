@@ -8748,6 +8748,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "role-cover-buildsheet-variants",
+  "check": "critic roles r1 D1: ws-drawing-variants signed a value from the generator's cell only, so options buildSheet draws round the problem (supports: frame, touch, tile, line, boxsign) read 'same as defaults' (add_facts 1 of 30) and add_facts guided + support=frame (L-SUPPORT SCC-T10 at M and L) was never role-covered. The --skill dry run must plan add_facts' support=frame variant on the guided role",
+  "kind": "commit-pair",
+  "rule": "ws-drawing-variants signs each value on the cell AND the buildSheet pupil page vocabulary (role independent, M, seed 7000); read by ws-role-cover --plan-check --variant",
+  "browser": false,
+  "fail": {
+   "commit": "ac526b6b2",
+   "state": "cell-only signature: add_facts 1 drawing variant of 30 (notation=across); no support variant planned"
+  },
+  "pass": {
+   "commit": "b153ae21e",
+   "state": "page-vocabulary signature: add_facts 8 of 30 (notation=across + 7 support values, support=frame among them) on all 17 card roles, guided included"
+  },
+  "command": "node {root}/tests/scripts/ws-precritic.cjs --skill addition:add_facts --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill addition:add_facts --roles guided --variant support=frame",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "role-cover-e3e5e6-pass-can-fail",
+  "check": "critic roles r1 D2: expect-e3-e5-e6.sh turned any FAIL without all of E3 / E5 / E6 into OK on BOTH sides, so the pass side of role-cover-cbt-e3-e5-e6 could never fail. A planted unrelated FAIL given to the wrapper without --expect-e3e5e6 must stay FAIL",
+  "kind": "commit-pair",
+  "rule": "expect-e3-e5-e6.sh re-states a FAIL only with --expect-e3e5e6 (the fail side); without it OK needs the run OK and none of E3 / E5 / E6",
+  "browser": false,
+  "fail": {
+   "commit": "ac526b6b2",
+   "state": "the wrapper prints 'OK (a FAIL without all of E3, E5 and E6 ...)' for a planted unrelated FAIL"
+  },
+  "pass": {
+   "commit": "b153ae21e",
+   "state": "the planted FAIL passes through as FAIL"
+  },
+  "command": "bash {root}/tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh bash -c \"echo 'ws-role-cover: FAIL (planted unrelated)'\" | tail -1 | grep -q 'FAIL (planted unrelated)' && echo 'expect-e3-e5-e6 --pass-side: OK (a planted unrelated red stays red)' || echo 'expect-e3-e5-e6 --pass-side: FAIL (a planted unrelated red read as green)'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "precritic-copy-light-role-cover-size",
+  "check": "critic roles r1 D3: a --copy-light --dry-run planned the role-cover rows but returned before the 'role cover size: ... est N min' line, so a copy-light lane did not see the role cover's cost",
+  "kind": "commit-pair",
+  "rule": "ws-precritic --dry-run prints the role cover and its size before the copy-light branch; read by ws-role-cover --plan-check",
+  "browser": false,
+  "fail": {
+   "commit": "ac526b6b2",
+   "state": "copy-light dry run: no 'role cover:' or 'role cover size:' line"
+  },
+  "pass": {
+   "commit": "b153ae21e",
+   "state": "copy-light dry run prints count_by_tables' role cover (17 roles, 8 variants) and its size and minutes"
+  },
+  "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --copy-light --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

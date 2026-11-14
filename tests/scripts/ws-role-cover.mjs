@@ -74,6 +74,13 @@ export function unitsOf(p, o) {
     }
     return groups;
 }
+/** (critic roles r1 D1) print-lint runs L-SUPPORT (S2: the answer zone, a support showing the answer) only with --supports, so a
+ *  support variant lints with --supports <its values>, not --opts alone (which draws the support and never checks it). Pure. */
+export function supportArgs(opts) {
+    const v = opts && opts.support;
+    const vals = (Array.isArray(v) ? v : v ? [v] : []).map(String).filter((x) => x && x !== 'none');
+    return vals.length ? ['--supports', vals.join(',')] : [];
+}
 /** Estimated seconds of a group. Pure. */
 export function costOf(g) {
     let s = 0;
@@ -151,6 +158,7 @@ async function selfTest() {
     const PV = 'ws-precritic role cover: a:b 3 roles (card c; roles=independent,guided) + 2 drawing variant(s) of 9 offered value(s) [notation=across, support=frame]';
     eq('plan-check: variant planned / missing', [planCheck(PV, ['a:b'], [], ['support=frame']).length, planCheck(PV, ['a:b'], [], ['support=tile']).length, planCheck(PV.replace(', support=frame', ''), ['a:b'], [], ['support=frame']).length], [2, 3, 3]);   // 2 = this snippet has no row and no size line
     eq('--variants focuses', unitsOf({ ...p, variants: [{ option: 'x', value: '1' }, { option: 's', value: 'frame' }] }, { tools: ['lint'], sizes: ['L'], roles: ['opener'], variants: ['s=frame'] }).map((x) => `${x.variant}:${x.units.lint.length}`), ['s=frame:1']);
+    eq('support variant lints with --supports', [supportArgs({ support: ['frame'] }), supportArgs({ support: ['touchall', 'tile'] }), supportArgs({ notation: ['across'] }), supportArgs(null)], [['--supports', 'frame'], ['--supports', 'touchall,tile'], [], []]);
     // (critic roles r1 D1, live) add_facts support=frame is drawn by buildSheet, not the generator: it must be a variant
     try {
         const DV = await import(pathToFileURL(join(HERE, '..', 'lib', 'ws-drawing-variants.mjs')).href);
@@ -158,7 +166,7 @@ async function selfTest() {
         const r = await DV.drawingVariantsFor(await DV.loadApp(root), root, 'addition:add_facts');
         eq('live: add_facts support=frame is a drawing variant', r.variants.some((v) => v.option === 'support' && v.value === 'frame'), true);
     } catch (e) { bad.push(`live add_facts: ${e.message}`); }
-    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length})` : 'OK (17 cases)'}`);
+    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length})` : 'OK (18 cases)'}`);
     for (const b of bad) console.log(`  - ${b}`);
     return bad.length ? 1 : 0;
 }
@@ -237,7 +245,7 @@ async function main() {
         for (const g of mine.groups) for (const u of g.units.lint || []) {
             const id = docId(g, u);
             meta[id] = { g, u };
-            jobs.push({ id, args: ['--skills', g.skill, '--roles', u.role, '--size', u.size, ...(g.opts ? ['--opts', JSON.stringify(g.opts)] : [])] });
+            jobs.push({ id, args: ['--skills', g.skill, '--roles', u.role, '--size', u.size, ...(g.opts ? ['--opts', JSON.stringify(g.opts)] : []), ...supportArgs(g.opts)] });
         }
         const jf = join(outDir, 'lint-jobs.json'), jo = join(outDir, 'lint.json');
         writeFileSync(jf, JSON.stringify(jobs));
