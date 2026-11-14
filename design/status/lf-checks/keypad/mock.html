@@ -69,6 +69,18 @@ body.teacher-mode #gameView .mq-kp { --kp-key: 72px; --kp-gap: 10px; padding: 14
 @media (max-width: 1199px) { body.teacher-mode #gameView .mq-kp { --kp-key: 66px; --kp-gap: 8px; } }
 /* below the card when the side column would squeeze the card under 560 px (tablet portrait) */
 @media (max-width: 899px) { .mq-kp-host { grid-template-columns: minmax(0, 1fr); } .mq-kp { justify-self: center; } }
+
+/* ---- CLASS VIEW REACH (owner ruling 2026-11-14): the card and the pad sit in the bottom third ---- */
+body.teacher-mode #gameView.mq-kp-low { display: flex !important; flex-direction: column; height: calc(100vh - 32px); }
+body.teacher-mode #gameView.mq-kp-low > .game-header { margin-bottom: 8px; }
+body.teacher-mode #gameView.mq-kp-low > .boss-arena { flex: 1 1 auto; min-height: 80px; margin-bottom: 12px; }
+body.teacher-mode #gameView.mq-kp-low > .mq-kp-host { flex: 0 0 auto; height: max(232px, calc(33.34vh - 24px)); align-items: end; }
+body.teacher-mode #gameView.mq-kp-low .question-card { height: 100%; box-sizing: border-box; padding: 10px; display: flex; }
+body.teacher-mode #gameView.mq-kp-low .mk-cell { flex: 1; padding: 12px 20px 14px; display: flex; flex-direction: column; justify-content: flex-end; }
+body.teacher-mode #gameView.mq-kp-low .mk-instr { margin: 0 0 4px; }
+body.teacher-mode #gameView .mq-kp--class { grid-template-columns: repeat(6, var(--kp-key)) calc(var(--kp-key) * 1.5); grid-template-rows: repeat(2, var(--kp-key)); }
+body.teacher-mode #gameView .mq-kp--class .mq-kp-check { grid-column: 7; grid-row: 1 / span 2; height: auto; flex-direction: column; gap: 4px; }
+@media (max-width: 1199px) { body.teacher-mode #gameView .mq-kp--class { --kp-key: 64px; } }
 </style>
 </head>
 <body class="teacher-mode" data-scene="class">
@@ -76,7 +88,7 @@ body.teacher-mode #gameView .mq-kp { --kp-key: 72px; --kp-gap: 10px; padding: 14
 
 <!-- ========== Scene 1: CLASS VIEW, Boss Battle, "6 + 4 = [ ]" ========== -->
 <div class="scene scene-class">
-  <div class="view active" id="gameView">
+  <div class="view active mq-kp-low" id="gameView">
     <div class="game-header">
       <div style="display:flex; gap:10px; align-items:center;">
         <button class="btn btn-sm btn-secondary">Exit</button>
@@ -88,24 +100,22 @@ body.teacher-mode #gameView .mq-kp { --kp-key: 72px; --kp-gap: 10px; padding: 14
       </div>
     </div>
     <div class="boss-status" style="display:block">Keep answering to defeat the boss!</div>
-    <div class="boss-arena" style="display:block; height:90px;">
+    <div class="boss-arena" style="display:block;">
       <div class="char-sprite hero" style="left:22%">🦸</div>
       <div class="char-sprite monster">🦖</div>
       <div class="boss-track"></div>
     </div>
-    <div class="mq-kp-host" style="margin-top:14px">
+    <div class="mq-kp-host">
       <div class="question-card" style="padding:22px">
         <div class="mk-cell">
           <p class="mk-instr">Add.</p>
           <div class="mk-eq"><span>6</span><span>+</span><span>4</span><span>=</span><span class="mk-box is-focus"></span></div>
         </div>
       </div>
-      <div class="mq-kp" role="group" aria-label="On-screen keypad">
-        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button>
-        <button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key">6</button>
-        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button>
-        <button class="mq-kp-key mq-kp-key--wide">0</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button>
+      <div class="mq-kp mq-kp--class" role="group" aria-label="On-screen keypad">
+        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button>
         <button class="mq-kp-key mq-kp-check">✓ Check</button>
+        <button class="mq-kp-key">6</button><button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><button class="mq-kp-key">0</button><span></span>
       </div>
     </div>
   </div>
@@ -128,9 +138,9 @@ body.teacher-mode #gameView .mq-kp { --kp-key: 72px; --kp-gap: 10px; padding: 14
         </div>
       </div>
       <div class="mq-kp" data-extra="sign" role="group" aria-label="On-screen keypad">
-        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><button class="mq-kp-key mq-kp-key--op" aria-label="plus">+</button>
+        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><button class="mq-kp-key mq-kp-key--op" aria-label="plus">+</button>
         <button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key">6</button><button class="mq-kp-key mq-kp-key--op" aria-label="minus">−</button>
-        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><button class="mq-kp-key mq-kp-key--op" aria-label="times">×</button>
+        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><button class="mq-kp-key mq-kp-key--op" aria-label="times">×</button>
         <button class="mq-kp-key mq-kp-key--wide">0</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button><button class="mq-kp-key mq-kp-key--op" aria-label="divided by">÷</button>
         <button class="mq-kp-key mq-kp-check">✓ Check</button>
       </div>
@@ -158,9 +168,9 @@ body.teacher-mode #gameView .mq-kp { --kp-key: 72px; --kp-gap: 10px; padding: 14
         </div>
       </div>
       <div class="mq-kp" data-extra="fraction" role="group" aria-label="On-screen keypad">
-        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><button class="mq-kp-key mq-kp-key--op" aria-label="fraction bar, next box">/</button>
+        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><button class="mq-kp-key mq-kp-key--op" aria-label="fraction bar, next box">/</button>
         <button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key">6</button><button class="mq-kp-key mq-kp-key--op mq-kp-key--next" aria-label="next box">Next →</button>
-        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><span></span>
+        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><span></span>
         <button class="mq-kp-key mq-kp-key--wide">0</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button><span></span>
         <button class="mq-kp-key mq-kp-check">✓ Check</button>
       </div>

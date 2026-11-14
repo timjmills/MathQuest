@@ -1,6 +1,6 @@
 # On-screen keypad: design card (DESIGN ONLY, unsigned)
 
-Lane: lf-tools-keypad · designer: Opus medium · 2026-11-14 · status: **DRAFT, awaiting owner sign-off**
+Lane: lf-tools-keypad · designer: Opus medium · 2026-11-14 · status: **owner rulings 2026-11-14 applied (section 9)**
 Mock: `design/status/lf-checks/keypad/mock.html` (the app's real CSS; the proposed `css/keypad.css` is inline in it).
 Screenshots (deviceScaleFactor 2): `class-1366x768.png`, `class-1024x768.png`, `practice-sign-1366x768.png`,
 `practice-fraction-1366x768.png` (all beside the mock).
@@ -8,8 +8,8 @@ Screenshots (deviceScaleFactor 2): `class-1366x768.png`, `class-1024x768.png`, `
 ## 1. What it is
 
 Owner request: in the class view (teacher-launched play on the whiteboard or projector, e.g. Boss Battle "Add. 6 + 4 = [ ]"),
-pupils have no keyboard. A large calculator-style keypad sits beside the card (or below it when the window is too narrow),
-never on top of it. Typing on it is the same as typing on a keyboard: it fills the focused answer box and moves on.
+pupils have no keyboard. A large keypad sits beside the card and never on top of it. In the class view the card and the pad
+both sit LOW, in the bottom third of the screen, so pupils can reach them on a wall board (owner ruling 2026-11-14). Typing on it is the same as typing on a keyboard: it fills the focused answer box and moves on.
 
 The keypad is **chrome, not paper**. The black-and-white cell is not touched. Digits on the keys use Andika, so the pupil sees
 the same glyphs as in the cell. The extra keys a question needs sit in a grey column (the single grey). ✓ Check is the one accent.
@@ -18,13 +18,34 @@ the same glyphs as in the cell. The extra keys a question needs sit in a grey co
 
 | Host | Where in code | When it counts | Key size | Pad position |
 |---|---|---|---|---|
-| **Class view** | `#gameView` with `body.teacher-mode` (Run practice: Practice / Boss / Race) | teacher-launched play | **72 px** at ≥ 1200 px wide, **66 px** at 900–1199 px (both ≥ 64) | right of the card |
-| Board display | `body.tv-bigboard` (launch-chrome.js) | the class answers aloud, so there is no answer box | none | **hidden**, toggle hidden (see Q2) |
+| **Class view** | `#gameView` with `body.teacher-mode` (Run practice: Practice / Boss / Race) | teacher-launched play | **72 px** at ≥ 1200 px wide, **64 px** at 900–1199 px | **bottom third**: the card at bottom-left, a wide two-row pad at bottom-right |
+| Board display | `body.tv-bigboard` (launch-chrome.js) | the class answers aloud, so there is no answer box | none | **hidden**, toggle hidden (owner ruling R5) |
 | Practice card | `#gameView`, pupil | pupil play | 56 px on a computer, **48 px minimum** on a tablet | right of the card at ≥ 900 px, below it otherwise |
 | Online worksheet | `#worksheetView` `.problems-grid` | pupil or teacher | 48 px | docked strip at the bottom of the view. The grid gets `padding-bottom` equal to the strip height, so no cell is ever under it. The strip follows the focused cell. |
 | Quiz | `#quizTakeView` `.qt-answer-area` | pupil | 48–56 px | below the answer area, centred |
 
-**Layout per width** (class view and practice). A grid wrapper `.mq-kp-host` holds `[card | pad]` as `minmax(0,1fr) auto`.
+**Class view: the reach layout (owner ruling R1).**
+
+- `#gameView` gets `.mq-kp-low` while the pad is on. It becomes a flex column one viewport tall.
+- The top bar, boss status and dots stay at the top. The boss arena (or race track) takes `flex: 1` and fills the space between.
+- `.mq-kp-host` is a fixed band at the bottom: `max(232px, 33.34vh − 24px)` tall, with the card and the pad bottom-aligned in it.
+- The card is laid out bottom-up (`justify-content: flex-end`), so the answer box is the lowest thing in it.
+- The pad is two rows in phone order: `1 2 3 4 5 ⌫` / `6 7 8 9 0 ·`. Extra keys add columns to the right, two per column.
+  **✓ Check** is a tall key spanning both rows on the far right (1.5 keys wide).
+- At 1366 px the pad is 72 px keys and 635 px wide; at 1024 px it is 64 px keys and 558 px wide. The card keeps 466 / 400 px.
+- An item whose cell is taller than the band, such as a stack, may raise the band. It must still pass KEYPAD-REACH. If it
+  cannot, the cell is drawn at the board-fit zoom that lets it pass, and is never covered.
+
+**Measured in the mock (2026-11-14, `?scene=class`, deviceScaleFactor 2):**
+
+| Viewport | Pad top | Answer box top | Card top | Key size | Overlap | Fits without scrolling |
+|---|---|---|---|---|---|---|
+| 1366×768 | 568 px = **0.740** | 629 px = **0.819** | 0.677 | 72 px | none | yes |
+| 1024×768 | 586 px = **0.763** | 629 px = **0.819** | 0.677 | 64 px | none | yes |
+
+All values are at or above 2/3 (0.667).
+
+**Layout per width** (practice, worksheet, quiz). A grid wrapper `.mq-kp-host` holds `[card | pad]` as `minmax(0,1fr) auto`.
 
 - **1366×768:** the pad is 276 px wide (3 columns × 72 + gaps), or 358 px with an extra column. The card keeps about 1040 px.
 - **1024×768:** keys are 66 px and the pad is 246/320 px. The card keeps about 700 px.
@@ -34,12 +55,12 @@ The board-fit zoom (`fitBoard`, launch-chrome.js) measures the card inside the w
 out of scope (FASTEST_PLAN rule 7).
 
 **Anatomy, top to bottom:**
-- the digit rows `7 8 9` / `4 5 6` / `1 2 3`;
+- the digit rows in **phone order** (owner ruling R4): `1 2 3` / `4 5 6` / `7 8 9`;
 - `0` (two columns wide) and `⌫`;
 - an optional 4th column for the question's extra keys (grey);
 - **✓ Check**, the full width of the pad and 1.1 × the key height.
 
-The digit layout is the calculator layout, not the phone layout (Q1).
+The class view uses the two-row form above.
 
 ## 3. Key set per answer type
 
@@ -55,7 +76,7 @@ two or more boxes.
 | `fraction-input` (`#fiNum` / `#fiDen`) | `/`, `Next →` | `/` in the numerator box moves to the denominator. In a whole box (mixed number) `/` moves to the numerator. |
 | single-box fraction text (`3/4` typed) | `/`, `space` | `space` separates the whole part of a mixed number |
 | `dual`, `dual-fraction` | `Next →` (+ `/` for dual-fraction) | |
-| sign circle `mq-slot--circle` with `data-mq-signs` | those signs | e.g. `= ≠`. The card's sign tiles (`.mq-signbank`) stay. |
+| sign circle `mq-slot--circle` with `data-mq-signs` | those signs | e.g. `= ≠`. The card's sign tiles (`.mq-signbank`) stay **as well** (owner ruling R3). |
 | sign circle, operation (`signsFor(q)` gives + − × ÷) | `+ − × ÷` | |
 | compare circle (`signsFor` gives < = >) | `< = >` | |
 | cell slot `data-mq-kind="sign"` / `"rule"` | `+ − × ÷` (rule: also `space`) | |
@@ -105,7 +126,8 @@ The setting is `mq_keypad`: `auto` (default) | `on` | `off`. It is stored in loc
 
 - **auto** turns the pad on when `matchMedia('(any-pointer: coarse)')` matches and `matchMedia('(any-pointer: fine)')` does not,
   meaning a touch-only device. An interactive whiteboard usually reports a *fine* pointer (it acts as a mouse), so auto alone will
-  often leave the pad off on the board. **Proposal:** in the class view (`body.teacher-mode #gameView`) auto means **on** (Q3).
+  often leave the pad off on the board. So in the class view (`body.teacher-mode #gameView`) the pad is **on by default**,
+  whatever the device, and the teacher toggle turns it off (owner ruling R2).
 - **The toggle lives in four places:**
   - **class view:** a `Keypad: On/Off` button (`.mq-kp-toggle`, `aria-pressed`) at the right of `#gameView .game-header`, in the
     chrome and off the card;
@@ -169,20 +191,27 @@ These checks are written before the build, and each must fail on master (`ws-bac
   under the docked strip after scrolling to the end.
 - **KEYPAD-6 (shows when):**
   - auto with a touch-only context (Playwright `hasTouch`) shows the pad;
-  - auto with a mouse hides it, except in the class view (Q3);
+  - auto with a mouse hides it, except in the class view, where it is on by default;
   - the toggle flips it and survives a reload;
   - `tv-bigboard` never shows it.
 - **KEYPAD-7 (no OS keyboard):** with the pad on, every answer input has `inputmode="none"`. With the pad off, the original
   `inputmode` is back.
 - **KEYPAD-8 (additive):** with the pad off, screenshots of the practice card, worksheet and quiz are pixel-identical to master.
 
+- **KEYPAD-REACH (owner ruling R1):** on the class view at 1366×768 and 1024×768, for the sampled items:
+  - the pad's top edge is ≥ 2/3 of the way down the viewport;
+  - the top edge of the first answer box is ≥ 2/3 of the way down;
+  - the pad and card end inside the viewport, with no scrolling.
+
+  The mock passes at 0.740 / 0.819 (1366) and 0.763 / 0.819 (1024).
+
 `ws-boot-smoke` must stay clean, with no console errors.
 
-## 9. Open questions for the owner
+## 9. Owner rulings (2026-11-14)
 
-- **Q1:** the digit order. The calculator order (7-8-9 on top) is drawn here; the phone order puts 1-2-3 on top. Which does the
-  class know?
-- **Q2:** the Board display (whole class answers aloud) has no answer box. Should the keypad stay hidden there?
-- **Q3:** a whiteboard usually reports a mouse-like pointer. Should the class view default to keypad **on** whatever the device?
-- **Q4:** sign questions show the sign tiles on the card **and** the same signs on the pad. Keep both, or drop the pad's sign
-  column when the card has tiles?
+- **R1 Reach:** in the class view the keypad AND the problem sit low. Their top edge is in the bottom third of the viewport; the
+  top bar, boss strip and dots move or compress above them. Gate: KEYPAD-REACH.
+- **R2 Default:** the pad is ON by default in the class view, with the teacher toggle.
+- **R3 Signs:** sign questions keep BOTH the card's sign tiles and the pad's sign keys.
+- **R4 Digit order:** phone order, 1-2-3 on top.
+- **R5 Board display:** with no answer box, the pad is hidden.
