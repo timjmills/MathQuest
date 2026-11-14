@@ -96,6 +96,36 @@ export const ROUTINES = Object.freeze({
         },
         example: { match: '[\\s\\S]' },
     },
+    // ------------------------------------------- Area-model division, 2-digit divisor (lane lf-ops, 2026-11-14)
+    // division:area_model_div_4by2 (signed card design/cards/area-model-div): 5.NBT.B.6. Four steps, one per worked step
+    // of the provider (read the parts, the tens side, the ones side, add). The worked example must show a
+    // 2-digit x multiple-of-ten fact (34 × 40 = 1360), the one new thing against area_model_div_3by1.
+    'area-div-two-digit': {
+        archetype: 'fact',
+        casesPending: 'Lane lf-ops amdiv: one case (two parts, exact); the band and form options are page options, not lesson cases.',
+        concepts: [
+            { id: 'parts', text: 'The number is split into two parts.' },
+            { id: 'side', text: 'Each side length times the divisor makes its part.' },
+            { id: 'add', text: 'The side lengths add up to the quotient.' },
+        ],
+        vocab: [
+            { word: 'divisor', meaning: 'the number you divide by', picture: { kind: 'text', text: '1564 ÷ 34' } },
+            { word: 'quotient', meaning: 'the answer when you divide', picture: { kind: 'text', text: '= 46' } },
+            { word: 'side length', meaning: 'the number on top of each part', picture: { kind: 'text', text: '40 | 6' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the two parts.' },
+            { icon: 'count', text: 'Find the first side.' },
+            { icon: 'write', text: 'Find the second side.' },
+            { icon: 'check', text: 'Add the side lengths.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'icons + very short steps',
+            why: 'Four actions, one per worked step; the Say band (divided by ... is ... plus ...) is the oral frame, so no chant.',
+        },
+        example: { match: '× \\d+0 = \\d{3,4}' },
+    },
 });
 
 export const LESSONS = Object.freeze({
@@ -128,6 +158,16 @@ export const LESSONS = Object.freeze({
             { key: 'multiplication:mult_chart_easy', why: 'The times table the words describe.' },
         ],
         mixWith: [{ key: 'vocabulary:vocab_grade_pictures' }, { key: 'multiplication:mult_facts' }],
+    },
+    'skill:division:area_model_div_4by2': {
+        routine: 'area-div-two-digit',
+        practice: { skill: 'division:area_model_div_4by2' },
+        prereqsPending: 'Lane lf-ops amdiv: Warm-up from the card (3by1 and the multiple-of-ten facts) until its Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'division:area_model_div_3by1', why: 'The same area model with a one-digit divisor.' },
+            { key: 'multiplication:mult_multiples_of_ten', why: 'Each side length comes from a times-ten fact (34 × 40).' },
+        ],
+        mixWith: [{ key: 'division:area_model_div_3by1' }, { key: 'division:long_div_2digit' }],
     },
 });
 

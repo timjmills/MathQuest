@@ -1342,6 +1342,10 @@
     {
      "key": "division:long_div_2digit",
      "why": "the other method for a 2-digit divisor (Y6.B2.S11)"
+    },
+    {
+     "key": "division:area_model_div_4by2",
+     "why": "another way to divide by a 2-digit number: split the dividend, not the divisor"
     }
    ],
    "note": "",
@@ -1368,7 +1372,12 @@
      "opts": {}
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "division:area_model_div_4by2",
+     "missing": "the long-division layout itself: the area model splits the dividend into the tens and ones parts of the quotient (partial quotients), the bridge to long division"
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -1411,6 +1420,10 @@
     {
      "key": "division:remainder_too_big",
      "why": "is the remainder finished?"
+    },
+    {
+     "key": "division:area_model_div_3by1",
+     "why": "the area model with a 1-digit divisor (the step before area_model_div_4by2)"
     }
    ],
    "note": "long_div_2digit draws a genuine long-division bracket with divide-multiply-subtract-bring-down work rows, 3-4 digit dividends, 2-digit divisors."
@@ -1441,6 +1454,10 @@
     {
      "key": "division:box_division_hard",
      "why": "Y5.B5.S7 Short division (prior learning wk W04): 3-digit ÷ 1-digit with remainders in a box grid"
+    },
+    {
+     "key": "division:area_model_div_4by2",
+     "why": "Y6.B2.S11: dividing by a 2-digit number with the area model (partial quotients) before the long-division layout"
     }
    ],
    "preBuild": [],

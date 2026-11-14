@@ -4222,6 +4222,10 @@
       "range": 100
      },
      "why": "check the result"
+    },
+    {
+     "key": "division:area_model_div_4by2",
+     "why": "the same area model with a 2-digit divisor (Y6, 5.NBT.B.6)"
     }
    ],
    "note": "",

@@ -316,3 +316,65 @@ for (const id of ['division:area_model_div_2by1', 'division:area_model_div_3by1'
         stories: storiesFor('/'),
     });
 }
+
+/* ================================================================ area_model_div_4by2 (2026-11-14) */
+// Signed card design/cards/area-model-div. The same cell with a 2-digit divisor: the tens part is
+// the divisor x the quotient's tens (34 x 40 = 1360), the ones part the divisor x its ones
+// (34 x 6 = 204). The ONE new thing against 3by1 is the 2-digit x multiple-of-ten fact, so every
+// step names the multiplication the pupil checks. Numbers are written as the cell prints them (no
+// thousands comma). No stories: word problems are out of scope on the card (§7a).
+const AREA_DIV_42 = {
+    iCan: 'I Can divide by a two-digit number with an area model',
+    instructionKey: 'divide',
+    steps: [
+        'Read the two parts inside the model.',
+        'Divide each part by the number on the side: what times it makes the part?',
+        'Write each side length in its box on top.',
+        'Add the side lengths. Write the quotient.',
+    ],
+    say: '__ divided by __ is __ plus __. That is __.',
+    sayValues: (q) => { const A = areaDiv(q); return A && A.qs.length === 2 ? [A.dividend, A.divisor, A.qs[0], A.qs[1], A.quotient] : null; },
+};
+/** The model's slots for a set of side lengths and a quotient (compared slot by slot, L27). */
+const amSlots = (a, b, t) => ({ 'q-0': String(a), 'q-1': String(b), total: String(t) });
+function areaDiv42Wrong(q) {
+    const A = areaDiv(q);
+    if (!A || A.qs.length !== 2) return null;
+    const [qt, qo] = A.qs, v = A.divisor, [pt, po] = A.parts;
+    const ones = v % 10, tens = Math.floor(v / 10);
+    const one = [ones, tens].find((d) => d > 1 && pt % d === 0 && po % d === 0);
+    return chooseWrong(q, [
+        // M1: the parts copied above as the side lengths, so the "quotient" is the dividend.
+        { value: pt + po, misconception: 'wrote-part-not-side', slot: 'total', slots: amSlots(pt, po, pt + po),
+            explain: `Wrote the parts ${pt} and ${po} on top. The side lengths are what times ${v} makes each part.` },
+        // M2: the tens part's side length written without its zero (4, not 40).
+        { value: qt / 10 + qo, misconception: 'dropped-place-value', slot: 'total', slots: amSlots(qt / 10, qo, qt / 10 + qo),
+            explain: `Wrote ${qt / 10} for ${pt} ÷ ${v}. ${v} × ${qt / 10} is only ${v * qt / 10}; ${v} × ${qt} = ${pt}.` },
+        // M3: the side lengths multiplied, not added.
+        { value: qt * qo, misconception: 'multiplied-parts', slot: 'total', slots: amSlots(qt, qo, qt * qo),
+            explain: `Multiplied ${qt} × ${qo}. The side lengths are added: ${qt} + ${qo}.` },
+        // M4: divided by one digit of the divisor only.
+        one ? { value: pt / one + po / one, misconception: 'one-digit-divisor', slot: 'total', slots: amSlots(pt / one, po / one, pt / one + po / one),
+            explain: `Divided by ${one}, one digit of ${v}. Divide by the whole number ${v}.` } : null,
+    ]);
+}
+function areaDiv42Steps(q) {
+    const A = areaDiv(q);
+    if (!A || A.qs.length !== 2) return [];
+    const v = A.divisor;
+    return clampSteps([
+        (q.cell && q.cell.payload && q.cell.payload.edges === 'blank')
+            ? step(`${A.dividend} is ${A.parts[0]} and ${A.parts[1]}. Write the divisor ${v} on the side.`, [{ slot: 'side', value: String(v) }])
+            : step(`${A.dividend} is ${A.parts[0]} and ${A.parts[1]}. The side is ${v}.`),
+        step(`${v} × ${A.qs[0]} = ${A.parts[0]}. Write ${A.qs[0]} on top of the first part.`, [{ slot: 'q0', value: String(A.qs[0]) }]),
+        step(`${v} × ${A.qs[1]} = ${A.parts[1]}. Write ${A.qs[1]} on top of the second part.`, [{ slot: 'q1', value: String(A.qs[1]) }]),
+        step(`Add the side lengths: ${A.qs[0]} + ${A.qs[1]} = ${A.quotient}. ${A.dividend} ÷ ${v} = ${A.quotient}.`, [{ slot: 'total', value: String(A.quotient) }]),
+    ]);
+}
+registerSkill('division:area_model_div_4by2', {
+    strings: strings(AREA_DIV_42),
+    misconceptions: ['wrote-part-not-side', 'dropped-place-value', 'multiplied-parts', 'one-digit-divisor'],
+    workedSteps: areaDiv42Steps,
+    wrongAnswer: areaDiv42Wrong,
+    footprint: { kind: 'area-model-div', factLike: false, maxCols: 2, measure: true },
+});

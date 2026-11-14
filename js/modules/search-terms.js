@@ -622,6 +622,8 @@ export const SKILL_TERMS = {
     'placevalue:ten_times_story': ['how many times as many', 'how many times more', '700 divided by 70', 'times as many word problem', 'ten times as many story', 'how many times bigger'],
     'placevalue:count_pv_disks': ['count place value disks', 'place value counters', 'how many hundreds disks', 'count the disks', 'place value chips', 'place value counters count'],
     'composing:chart_to_120': ['120 chart', 'count to 120', 'hundred twenty chart', 'one hundred twenty chart', 'numbers to 120', 'count past 100', 'missing numbers to 120', '120 square'],
+    'division:area_model_div_4by2': ['area model division 2 digit divisor', 'area model division', 'partial quotients', 'partial quotients 2 digit divisor',
+        'box method division 2 digit', 'divide 4 digit by 2 digit', '4 digit by 2 digit division', 'divide by 2 digit numbers area model', 'rectangle division'],
     'composing:write_numbers_in_words': ['write numbers in words', 'number words', 'numbers to words', 'spell numbers', 'write forty one', 'word form'],
     'measurement:count_notes': ['count notes', 'count bills', 'count dollar bills', 'counting banknotes', 'count paper money', 'count riyal notes'],
     'measurement:count_notes_and_coins': ['count notes and coins', 'count bills and coins', 'dollars and cents', 'count money notes coins', 'count mixed money', 'riyals and dirhams'],
