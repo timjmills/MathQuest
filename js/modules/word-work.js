@@ -20,6 +20,7 @@
 
 import { state } from './state.js';
 import { pageConstant } from './page-deal.js';
+import { defaultOptions } from './skill-options.js';
 import { renderCell, wordWorkPayload, wordWorkTwin, wordWorkWrongs, WW_TEMPLATE } from './sheet/index.js';
 
 /** The word-problem skills the cell is for (the ids a generated item carries). */
@@ -39,6 +40,16 @@ export const isWordWorkSkill = (skillId) => WP_RANGED.test(String(skillId || '')
 function opt(id) {
     const o = state.skillOptions;
     return !!(o && typeof o === 'object' && o[id] === true);
+}
+
+/**
+ * A support option that is ON by default on a skill (the two-step bar model on multi_step_word, two-step card decision 5):
+ * live play with no teacher's set leaves state.skillOptions unset, so the skill's own default is read here.
+ */
+function optOrDefault(id) {
+    const o = state.skillOptions;
+    if (o && typeof o === 'object') return o[id] === true;
+    try { return (defaultOptions(state.category, state.skill) || {})[id] === true; } catch (e) { return false; }
 }
 
 /**
@@ -103,7 +114,7 @@ export function applyWordWork(q) {
     try {
         payload = wordWorkPayload(q, {
             variant,
-            hl: opt('wpCues'), kb: opt('wpBank'), bar: opt('wpBar') || barSupport(), pic, twoStep: two,
+            hl: opt('wpCues'), kb: opt('wpBank'), bar: (two ? optOrDefault('wpBar') : opt('wpBar')) || barSupport(), pic, twoStep: two,
             divFirst: /^remainder_/.test(skill) || /^remainder_/.test(outer),
             // the K picture story keeps its own (already controlled) words
             retell: !(/^add_wp_10(_plain)?$/.test(skill) || wp), seed: k,
@@ -201,15 +212,16 @@ export function applyWordWork(q) {
         q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, sentence: true };
         return q;
     }
-    if (payload.letter) { q.printText = 'Read the story. Write the equation. Find n.'; }
-    else if (payload.check) { q.printText = 'Solve. Estimate. Circle Yes or No.'; }
+    // (the two-step card's strings, decision 10: contract.js 'story-letter' / 'story-estimate')
+    if (payload.letter) { q.printText = 'Write one equation with n. Then find n.'; }
+    else if (payload.check) { q.printText = 'Solve. Then estimate. Is your answer close?'; }
     else if (payload.layout === 'frames') { q.printText = 'Read the story. Write each step. Solve.'; }
     // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
     q.screenInstr = payload.signs === false ? 'Type the numbers in the boxes. Divide. Answer the question.'
         : ring ? 'Type the sign in the circle. Type the numbers. Solve.'
         : 'Tap the sign. Type the numbers in the boxes. Solve.';
-    if (payload.letter) q.screenInstr = 'Read the story. Type the equation. Find n.';
-    else if (payload.check) q.screenInstr = 'Solve. Estimate. Tap Yes or No.';
+    if (payload.letter) q.screenInstr = 'Type one equation with n. Then find n.';
+    else if (payload.check) q.screenInstr = 'Solve. Then estimate. Is your answer close?';
     else if (payload.layout === 'frames') q.screenInstr = 'Read the story. Type each step. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };

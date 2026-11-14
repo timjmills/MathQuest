@@ -92,7 +92,9 @@ const CARDS_REL = 'design/cards';
 const MAX_LINES = 60;
 const MAX_CHARS = 4000;
 const UNSIGNED = 'Signed: (not yet signed)';
-const SIGNED_RE = /^Signed: owner, (\d{4}-\d{2}-\d{2})\s*$/;
+// `Signed: owner (delegated to lead), YYYY-MM-DD`: the lead signs on the owner's delegation (owner rule 2026-11-12,
+// LESSONS_LEARNED process rule 3a; each such signature is listed in design/decisions/LEAD_DECISIONS.md)
+const SIGNED_RE = /^Signed: owner(?: \(delegated to lead\))?, (\d{4}-\d{2}-\d{2})\s*$/;
 const SHA_LEN = 6;    // a card stores 6 hex digits of each rule's excerpt sha: enough to see a change (1 in 16 M misses)
 const BODY_SHA_LEN = 16;
 const CORE_BYTES = 5120;   // section 4 (a), the rules quoted for the builder, is at most 5 KB (IMPROVEMENT_PLAN §1.2 row 8)

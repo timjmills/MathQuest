@@ -1321,6 +1321,12 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `read-ruler` | Read the ruler. Write the number the arrow points to. | read an inch ruler at true scale: one answer slot, a whole box and a stacked fraction on a half / quarter ruler (added 2026-09-25, O6 lane AP2) |
 | `add-sides` | Add the lengths of all the sides. Write the perimeter. | perimeter of a drawn rectangle, square or triangle (added 2026-09-25, O6 lane AP2) |
 | `tally` | Use the tally chart. Answer the questions. | read a tally chart: one box, or one check box for the row with the most / least (added 2026-09-25, O6 lane AP2) |
+| `product-even-odd` | Is the product even or odd? Circle one. | notice_patterns: the parity of a product, circle Even / Odd (lane lf-algebra, added 2026-11-07) |
+| `pattern-true-one` | Read the pattern. Check the sentence that is true. | notice_patterns / pattern_features: one true sentence of three about a rule's numbers (screen: Tap the sentence that is true.) |
+| `row-true-false` | Read the sentence. Circle True or False. | notice_patterns: a sentence about one times-table |
+| `grow-next` | Draw Term 4. Write how many it has. | growing_shape_patterns: the next term (screen: Make Term 4 on the grid. Type how many it has.) |
+| `grow-rule` | Draw Term 4. Write how many it has. Write the rule. | growing_shape_patterns: the next term and the rule |
+| `grow-far` | Find the rule. Write how many Term 10 has. | growing_shape_patterns: a later term |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
