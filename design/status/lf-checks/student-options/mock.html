@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student skill options - mock</title>
+<!-- DESIGN MOCK (lf-tools-stuopts, 2026-11-14). Static: it links the app's real stylesheets for the student home
+     (brand, variables, base, role-toggle, ui-components, Andika, screen-cell) and adds the proposed .stu-sko rules
+     inline below, scoped and additive. The skill is the real addition:add_facts and its real option values
+     (skill-options.js L1065). States: #open (default), #collapsed, #off, #none.  Card: design/cards/student-options/student-options.md -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../../css/brand.css">
+<link rel="stylesheet" href="../../../../css/variables.css">
+<link rel="stylesheet" href="../../../../css/base.css">
+<link rel="stylesheet" href="../../../../css/role-toggle.css">
+<link rel="stylesheet" href="../../../../css/ui-components.css">
+<link rel="stylesheet" href="../../../../css/fonts/andika.css">
+<link rel="stylesheet" href="../../../../css/screen-cell.css">
+<style>
+/* ---- mock page frame only (not proposed) ---- */
+body { padding: 20px; }
+.mock-wrap { max-width: 1120px; margin: 0 auto; }
+.mock-section { background: #fff; border: 2px solid var(--mq-purple-l); border-radius: 24px; padding: 22px 28px; box-shadow: 0 4px 0 0 var(--mq-purple-l); }
+.mock-h { font-weight: 900; font-size: 1.15rem; margin: 0 0 14px; color: var(--mq-ink); }
+.mock-qs { border: 2px solid var(--mq-purple-l); border-radius: 18px; padding: 14px 18px 18px; }
+.mock-qs-h { font-weight: 900; color: var(--mq-purple); font-size: 1.15rem; margin: 0 0 4px; }
+.mock-qs .quick-skills-grid { grid-template-columns: repeat(4, 1fr); }
+.mock-note { font: 600 13px/1.4 Nunito, sans-serif; color: #555; margin: 14px 2px 0; }
+
+/* ================= PROPOSED: css/student-options.css (additive, scoped to .stu-sko) ================= */
+.stu-sko { grid-column: 1 / -1; position: relative; margin: 4px 0 6px; background: #fff;
+  border: 3px solid var(--mq-purple); border-radius: 20px; box-shadow: 0 6px 0 0 var(--mq-purple-d);
+  padding: 16px 20px 18px; font-family: Nunito, sans-serif; color: var(--mq-ink); }
+.stu-sko::before { content: ''; position: absolute; top: -14px; left: var(--caret, 12%); width: 22px; height: 22px;
+  background: #fff; border-left: 3px solid var(--mq-purple); border-top: 3px solid var(--mq-purple); transform: rotate(45deg); }
+.stu-sko-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.stu-sko-title { flex: 1; margin: 0; font-size: 1.3rem; font-weight: 900; line-height: 1.2; }
+.stu-sko-x { width: 48px; height: 48px; border-radius: 14px; border: 2px solid var(--mq-purple-l); background: #fff;
+  font-size: 1.6rem; font-weight: 900; color: var(--mq-ink); cursor: pointer; line-height: 1; }
+.stu-sko-start { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 72px;
+  font: 900 1.6rem/1 Nunito, sans-serif; color: #fff; background: var(--mq-orange); border: 2px solid var(--mq-orange-d);
+  border-radius: 18px; box-shadow: 0 6px 0 0 var(--mq-orange-d); cursor: pointer; }
+.stu-sko-start svg { width: 30px; height: 30px; }
+.stu-sko-start:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
+.stu-sko-more { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin-top: 16px; padding: 8px 16px;
+  background: var(--mq-purple-soft); border: 2px solid var(--mq-purple-l); border-radius: 14px; cursor: pointer;
+  font: 800 1.1rem/1.2 Nunito, sans-serif; color: var(--mq-ink); text-align: left; }
+.stu-sko-more .chev { margin-left: auto; font-size: 1.2rem; transition: transform .15s; }
+.stu-sko-more[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.stu-sko-sum { font-weight: 700; color: #4b4766; font-size: 1rem; }
+.stu-sko-body { padding: 4px 4px 0; }
+.stu-sko-row { padding: 14px 0 12px; border-bottom: 2px solid #ecebf3; }
+.stu-sko-row:last-of-type { border-bottom: 0; }
+.stu-sko-lab { display: block; font-size: 1.1rem; font-weight: 900; margin: 0 0 8px; }
+.stu-sko-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.stu-sko-chip { min-width: 48px; min-height: 48px; padding: 0 14px; border-radius: 12px; border: 2px solid #2B2840;
+  background: #fff; color: #000; font: 700 1.25rem/1 'Andika', sans-serif; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.stu-sko-chip.word { font-family: Nunito, sans-serif; font-size: 1.05rem; font-weight: 800; }
+.stu-sko-chip[aria-pressed="true"], .stu-sko-chip[aria-checked="true"] { background: #2B2840; color: #fff; }
+.stu-sko-chip[aria-pressed="true"]::before, .stu-sko-chip[aria-checked="true"]::before { content: '\2713'; font-family: Nunito, sans-serif; font-size: 1rem; }
+.stu-sko-chip.all { font-family: Nunito, sans-serif; font-size: 1rem; font-weight: 800; }
+.stu-sko-eg { font-family: 'Andika', sans-serif; font-weight: 700; display: inline-grid; line-height: 1; text-align: right; font-size: 0.95rem; }
+.stu-sko-eg .rule { border-top: 2px solid currentColor; margin-top: 2px; }
+.stu-sko-foot { display: flex; justify-content: flex-end; margin-top: 12px; }
+.stu-sko-reset { min-height: 48px; padding: 0 16px; border-radius: 12px; border: 2px solid var(--mq-purple-l); background: #fff;
+  font: 800 1rem Nunito, sans-serif; color: var(--mq-ink); cursor: pointer; }
+.stu-sko :focus-visible { outline: 4px solid #1a5fff; outline-offset: 3px; }
+@media (max-width: 1100px) { .stu-sko { padding: 14px 16px 16px; } .stu-sko-start { min-height: 64px; font-size: 1.45rem; } }
+</style>
+</head>
+<body class="student-mode">
+<div class="mock-wrap">
+  <div class="mock-section">
+    <p class="mock-h">&#9881;&#65039; Game Setup</p>
+    <div class="mock-qs">
+      <p class="mock-qs-h">&#9889; Quick Start</p>
+      <div id="quickSkillsGrid" class="quick-skills-grid">
+        <div class="quick-skill-card pastel-coral selected" aria-expanded="true" aria-controls="stuSko" id="card0" role="button" tabindex="0"><span class="skill-icon">&#10133;</span><span class="skill-name"><span class="qs-name-text">Addition Facts (within 20)</span></span></div>
+        <div class="quick-skill-card pastel-peach" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#10134;</span><span class="skill-name"><span class="qs-name-text">Subtraction Facts (within 20)</span></span></div>
+        <div class="quick-skill-card pastel-lemon" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#10006;&#65039;</span><span class="skill-name"><span class="qs-name-text">Mult Facts</span></span></div>
+        <div class="quick-skill-card pastel-mint" role="button" tabindex="0" aria-expanded="false" id="card3"><span class="skill-icon">&#10135;</span><span class="skill-name"><span class="qs-name-text">Division Facts (&divide;1 to &divide;12)</span></span></div>
+
+        <section class="stu-sko" id="stuSko" role="region" aria-labelledby="stuSkoTitle">
+          <div class="stu-sko-head">
+            <h3 class="stu-sko-title" id="stuSkoTitle">Addition Facts (within 20)</h3>
+            <button type="button" class="stu-sko-x" aria-label="Close">&times;</button>
+          </div>
+          <button type="button" class="stu-sko-start"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Start</button>
+
+          <div id="stuSkoOpts">
+            <button type="button" class="stu-sko-more" id="stuSkoMore" aria-expanded="true" aria-controls="stuSkoBody">
+              <span aria-hidden="true">&#9881;</span><span>Change it</span>
+              <span class="stu-sko-sum" id="stuSkoSum">Add 7, 8 &middot; Facts to 20 &middot; Stacked</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </button>
+            <div class="stu-sko-body" id="stuSkoBody">
+              <div class="stu-sko-row" role="group" aria-labelledby="lAdd">
+                <span class="stu-sko-lab" id="lAdd">Add</span>
+                <div class="stu-sko-chips">
+                  <button type="button" class="stu-sko-chip all" aria-pressed="false">All</button>
+                  <button type="button" class="stu-sko-chip" aria-pressed="false">0</button><button type="button" class="stu-sko-chip" aria-pressed="false">1</button><button type="button" class="stu-sko-chip" aria-pressed="false">2</button><button type="button" class="stu-sko-chip" aria-pressed="false">3</button><button type="button" class="stu-sko-chip" aria-pressed="false">4</button><button type="button" class="stu-sko-chip" aria-pressed="false">5</button><button type="button" class="stu-sko-chip" aria-pressed="false">6</button><button type="button" class="stu-sko-chip" aria-pressed="true">7</button><button type="button" class="stu-sko-chip" aria-pressed="true">8</button><button type="button" class="stu-sko-chip" aria-pressed="false">9</button><button type="button" class="stu-sko-chip" aria-pressed="false">10</button><button type="button" class="stu-sko-chip" aria-pressed="false">11</button><button type="button" class="stu-sko-chip" aria-pressed="false">12</button><button type="button" class="stu-sko-chip" aria-pressed="false">13</button>
+                </div>
+              </div>
+              <div class="stu-sko-row" role="radiogroup" aria-labelledby="lBand">
+                <span class="stu-sko-lab" id="lBand">Facts to</span>
+                <div class="stu-sko-chips">
+                  <button type="button" role="radio" class="stu-sko-chip" aria-checked="false">5</button><button type="button" role="radio" class="stu-sko-chip" aria-checked="false">10</button><button type="button" role="radio" class="stu-sko-chip" aria-checked="false">12</button><button type="button" role="radio" class="stu-sko-chip" aria-checked="false">15</button><button type="button" role="radio" class="stu-sko-chip" aria-checked="true">20</button>
+                </div>
+              </div>
+              <div class="stu-sko-row" role="group" aria-labelledby="lNot">
+                <span class="stu-sko-lab" id="lNot">How it looks</span>
+                <div class="stu-sko-chips">
+                  <button type="button" class="stu-sko-chip word" aria-pressed="true" aria-label="Stacked"><span class="stu-sko-eg"><span>8</span><span>+ 7</span><span class="rule"></span></span>Stacked</button>
+                  <button type="button" class="stu-sko-chip word" aria-pressed="false" aria-label="Across"><span class="stu-sko-eg">8 + 7 =</span>Across</button>
+                </div>
+              </div>
+              <div class="stu-sko-row" role="group" aria-labelledby="lHelp">
+                <span class="stu-sko-lab" id="lHelp">Help</span>
+                <div class="stu-sko-chips">
+                  <button type="button" class="stu-sko-chip word" aria-pressed="false">Touch dots</button><button type="button" class="stu-sko-chip word" aria-pressed="false">Dot tiles</button><button type="button" class="stu-sko-chip word" aria-pressed="false">Ten frames</button><button type="button" class="stu-sko-chip word" aria-pressed="false">Number line</button>
+                </div>
+              </div>
+              <div class="stu-sko-foot"><button type="button" class="stu-sko-reset">&#8634; Back to my teacher's choice</button></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="quick-skill-card pastel-sky" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#128336;</span><span class="skill-name"><span class="qs-name-text">Tell the Time</span></span></div>
+        <div class="quick-skill-card pastel-lavender" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#189;</span><span class="skill-name"><span class="qs-name-text">Fractions of a Shape</span></span></div>
+        <div class="quick-skill-card pastel-rose" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#128207;</span><span class="skill-name"><span class="qs-name-text">Measure Length</span></span></div>
+        <div class="quick-skill-card pastel-aqua" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#128290;</span><span class="skill-name"><span class="qs-name-text">Count to 100</span></span></div>
+      </div>
+    </div>
+    <p class="mock-note" id="mockNote"></p>
+  </div>
+</div>
+<script>
+// Mock state switcher only. #open | #collapsed | #off | #none
+(function () {
+  var s = (location.hash || '#open').slice(1);
+  var more = document.getElementById('stuSkoMore'), body = document.getElementById('stuSkoBody');
+  var note = document.getElementById('mockNote');
+  if (s === 'collapsed') { more.setAttribute('aria-expanded', 'false'); body.hidden = true; note.textContent = 'MOCK state: collapsed (the default each time the panel opens). Start is first; the summary line says what is set.'; }
+  else if (s === 'off') { document.getElementById('stuSkoOpts').hidden = true; note.textContent = 'MOCK state: teacher setting "Let students change options" is OFF. The panel shows only Start; the teacher\'s choices still apply.'; }
+  else if (s === 'none') {
+    document.getElementById('stuSkoOpts').hidden = true;
+    document.getElementById('stuSkoTitle').textContent = 'Division Facts (÷1 to ÷12)';
+    document.getElementById('stuSko').style.setProperty('--caret', '86%');
+    document.getElementById('card0').classList.remove('selected'); document.getElementById('card3').classList.add('selected');
+    note.textContent = 'MOCK state: a skill with no pupil options (layout shown on the Division card for illustration only; division facts does have options). Same panel, Start only.';
+  }
+  else note.textContent = 'MOCK state: open, options expanded. Pupil chose Add 7 and 8. Every target is 48 px or more.';
+})();
+</script>
+</body>
+</html>
