@@ -446,12 +446,17 @@ async function ldivMode() {
                 if (!div) { host.remove(); return { none: true }; }
                 const path = div.querySelector('svg path');
                 const pt = (len) => { const m = path.getScreenCTM(); const q0 = path.getPointAtLength(len); return { x: q0.x * m.a + q0.y * m.c + m.e, y: q0.x * m.b + q0.y * m.d + m.f }; };
-                const ends = [pt(0), pt(path.getTotalLength())].sort((u, v) => u.y - v.y);
-                const top = ends[0];
+                // the bracket's TOP: the topmost point of its stroke (an arc's top end; or, for the one-stroke bracket that runs on
+                // into the bar - lf-ops' bracketSvg, "M x foot Q ... x 0 H bar" - its corner: the leftmost point on the top line)
+                const T = path.getTotalLength(), pts = Array.from({ length: 201 }, (_, i) => pt(T * i / 200));
+                const yTop = Math.min(...pts.map((u) => u.y));
+                const top = pts.filter((u) => u.y <= yTop + 0.2).sort((u, v) => u.x - v.x)[0];
                 // the bar: a separate element with a solid top border (the vinculum), else the path itself draws it (one stroke)
                 const bar = [...div.querySelectorAll('span')].find((e) => getComputedStyle(e).borderTopStyle === 'solid' && getComputedStyle(e).borderBottomStyle === 'none' && getComputedStyle(e).borderLeftStyle === 'none' && parseFloat(getComputedStyle(e).borderTopWidth) > 0.5 && e.getBoundingClientRect().height < 4);
                 let gap = 0;
-                if (bar) { const b = bar.getBoundingClientRect(); const bw = parseFloat(getComputedStyle(bar).borderTopWidth); const bx = b.left, by = b.top + bw / 2; gap = Math.hypot(top.x - bx, top.y - by); }
+                // the bar meets the top: its left end at or before the corner (a bar that starts left of the corner and runs over it
+                // is one line with it), on the same centre line
+                if (bar) { const b = bar.getBoundingClientRect(); const bw = parseFloat(getComputedStyle(bar).borderTopWidth); const by = b.top + bw / 2; gap = Math.hypot(Math.max(0, b.left - top.x), top.y - by); }
                 host.remove();
                 return { gapMm: gap * 25.4 / 96, sep: !!bar };
             }, { size, twin });
