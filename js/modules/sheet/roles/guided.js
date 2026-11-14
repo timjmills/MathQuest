@@ -1332,7 +1332,9 @@ export function plan(input = {}) {
         // (`tightRows` - layout.tightRows, lf-placevalue pv debt via the lead: in-place rows held to their ink keep their own
         // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND;
         // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
-        const tight = guidedTight(host);
+        // (GUIDED-COUNT-TIGHT, lf-roles r11 X1: a continuation page of count rows holds them to their measure - count_by_tables
+        // Guided L page 2 stretched 4 rows to 45.8 mm for ~30 mm of ink, EB-BAND 33 %; white under a Guided grid is allowed, PT-ENG-3)
+        const tight = guidedTight(host) || (pi > 0 && host.length > 0 && host.every((it) => it && it.template === 'count-row'));
         let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
         let modelRow = null;
         // GUIDED-MODEL-ROW (lf-roles r8b (a), lead via the coordinator; lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %): the
