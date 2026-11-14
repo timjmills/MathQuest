@@ -7047,7 +7047,7 @@
   },
   {
    "id": "wp-bar-word-stories",
-   "check": "a sentence story on the Word problems page draws its bar in the work space (blank on the pupil page, worked on the key): no 37-67 % band under three in-place stories (word-stories precritic r3)",
+   "check": "a sentence story on the Word problems page draws its bar in the work space (blank on the pupil page, worked on the key): no 37-67 % band under three in-place stories (word-stories precritic r3) (M and L: size S dropped, owner 76bc11c6)",
    "kind": "commit-pair",
    "rule": "ws-empty-band EB-BAND on word-problems (RUBRIC H13, PAGE_TYPES 3.7)",
    "browser": true,
@@ -7059,7 +7059,7 @@
     "commit": "09802d0c4",
     "state": "0 findings"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles word-problems --hosts none",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles word-problems --sizes M,L --hosts none",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

@@ -1,5 +1,119 @@
-$ node tests/scripts/ws-backtest.mjs --row card-not-offered-word-stories,tf-eval-word-stories,max-number-band-word-stories,story-ladder-word-stories,vq-live-bands-word-stories,eb-guided-word-stories,f7-signmatch-word-stories,f11-stretch-story-word-stories,f12-coins-word-stories,inplace-rows-m-word-stories,inplace-rows-l-word-stories,model-across-word-stories,wp-bar-word-stories,stretch-cell-word-stories,lesson-guided-centre-word-stories,ea-pad-unit-word-stories,pupiltag-column-word-stories,eb-pin-hosts-word-stories,fixit-words-word-stories,lesson-nocap-rows-word-stories  [a8cff55cf]
-ws-backtest row card-not-offered-word-stories: PASS  fail state FAIL 0.3s, pass state OK 0.3s
-ws-backtest row tf-eval-word-stories: PASS  fail state FAIL 3.7s, pass state OK 3.6s
-ws-backtest: killed by SIGTERM
-exit 130
+$ node tests/scripts/ws-backtest.mjs --row card-not-offered-word-stories,tf-eval-word-stories,max-number-band-word-stories,story-ladder-word-stories,vq-live-bands-word-stories,eb-guided-word-stories,f7-signmatch-word-stories,f11-stretch-story-word-stories,f12-coins-word-stories,inplace-rows-m-word-stories,inplace-rows-l-word-stories,model-across-word-stories,wp-bar-word-stories,stretch-cell-word-stories,lesson-guided-centre-word-stories,ea-pad-unit-word-stories,pupiltag-column-word-stories,eb-pin-hosts-word-stories,fixit-words-word-stories,lesson-nocap-rows-word-stories  [7944a2292]
+ws-backtest row card-not-offered-word-stories: PASS  fail state FAIL 0.6s, pass state OK 0.5s
+ws-backtest row tf-eval-word-stories: PASS  fail state FAIL 4.5s, pass state OK 5.0s
+ws-backtest row max-number-band-word-stories: PASS  fail state FAIL 56.5s, pass state OK 17.9s
+ws-backtest row story-ladder-word-stories: PASS  fail state FAIL 1.4s, pass state OK 2.0s
+ws-backtest row vq-live-bands-word-stories: PASS  fail state FAIL 1.3s, pass state OK 1.6s
+ws-backtest row eb-guided-word-stories: FAIL  fail state FAIL 102.5s, pass state FAIL 31.9s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-empty-band: FAIL (10); pass: ws-empty-band: FAIL (1)
+    last 20 line(s) of the pass state:
+      | note: subtraction:sub_wp_compare_smaller: slot ink on; card --roles; 1 roles x S/L + 0 option variant(s) of 0 + hosts none
+      | EB-BAND  FAIL 1
+      |    addition:add_wp_change_unknown guided L p1 cell 2: empty band 45.2 mm under the ink of a 138.7 mm cell (32.6 %; limit 30 % = 41.6 mm; the 3.0 mm top pad excluded) [word-work]
+      | EB-SIDE  PASS
+      | EB-EDGE  PASS
+      | MOD-MARKS PASS
+      | MOD-LINES PASS
+      | MOD-GRID PASS
+      | EB-GAP   PASS
+      | EB-FOOT  PASS
+      | EB-ROLE  PASS
+      | EB-READ  PASS
+      | EB-VOCAB PASS
+      | EB-PAGE  PASS
+      | EB-GDPCAP PASS
+      | EB-PARITY PASS
+      | EB-ITEMKEY PASS
+      | EB-ITEMPARITY PASS
+      | (3 skill(s), 6 renders, 26 cells, 22 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+      | ws-empty-band: FAIL (1)
+ws-backtest row f7-signmatch-word-stories: PASS  fail state FAIL 5.6s, pass state OK 5.4s
+ws-backtest row f11-stretch-story-word-stories: PASS  fail state FAIL 5.2s, pass state OK 4.7s
+ws-backtest row f12-coins-word-stories: PASS  fail state FAIL 4.1s, pass state OK 5.0s
+ws-backtest row inplace-rows-m-word-stories: PASS  fail state FAIL 119.0s, pass state OK 96.2s
+ws-backtest row inplace-rows-l-word-stories: PASS  fail state FAIL 27.4s, pass state OK 67.3s
+ws-backtest: model-across-word-stories (fail state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 12180 (up 198 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill
+    slot.2: pid 13444 (up 141 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-empty-band.cjs --skill composing:chart_to_120 --vocab
+    queue: pid 13904 (up 121 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-fixit-words.cjs --skills composing:chart_to_120
+    queue: pid 14829 (up 71 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-GXdrBx/jobs-0.jso
+    queue: pid 14830 (up 71 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-GXdrBx/jobs-1.jso
+    queue: pid 14832 (up 71 s) flock 10
+    queue: pid 14834 (up 71 s) flock 10
+    queue: pid 15755 (up 0 s) sleep 1
+ws-backtest row model-across-word-stories: PASS  fail state FAIL 231.3s, pass state OK 148.6s
+ws-backtest row wp-bar-word-stories: FAIL  fail state FAIL 105.2s, pass state FAIL 98.2s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-empty-band: FAIL (27); pass: ws-empty-band: FAIL (9)
+    last 20 line(s) of the pass state:
+      |    subtraction:sub_wp_compare_smaller word-problems S p1 cell 1: empty band 21.2 mm under the ink of a 61.8 mm cell (34.2 %; limit 30 % = 18.5 mm; the 3.0 mm top pad excluded) [word-work]
+      |    subtraction:sub_wp_compare_smaller word-problems S p1 cell 2: empty band 21.3 mm under the ink of a 61.8 mm cell (34.5 %; limit 30 % = 18.5 mm; the 2.9 mm top pad excluded) [word-work]
+      |    subtraction:sub_wp_compare_smaller word-problems S p1 cell 3: empty band 21.2 mm under the ink of a 61.8 mm cell (34.3 %; limit 30 % = 18.5 mm; the 3.0 mm top pad excluded) [word-work]
+      | EB-SIDE  PASS
+      | EB-EDGE  PASS
+      | MOD-MARKS PASS
+      | MOD-LINES PASS
+      | MOD-GRID PASS
+      | EB-GAP   PASS
+      | EB-FOOT  PASS
+      | EB-ROLE  PASS
+      | EB-READ  PASS
+      | EB-VOCAB PASS
+      | EB-PAGE  PASS
+      | EB-GDPCAP PASS
+      | EB-PARITY PASS
+      | EB-ITEMKEY PASS
+      | EB-ITEMPARITY PASS
+      | (3 skill(s), 9 renders, 27 cells, 24 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+      | ws-empty-band: FAIL (9)
+ws-backtest: stretch-cell-word-stories (pass state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 20394 (up 442 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120
+    slot.2: pid 25192 (up 151 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-grade-render.cjs --skills composing:chart_to_120 --ro
+    queue: pid 26139 (up 99 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --car
+    queue: pid 26141 (up 99 s) flock 10
+ws-backtest row stretch-cell-word-stories: PASS  fail state FAIL 78.8s, pass state OK 141.5s
+ws-backtest row lesson-guided-centre-word-stories: PASS  fail state FAIL 40.5s, pass state OK 33.3s
+ws-backtest row ea-pad-unit-word-stories: PASS  fail state FAIL 58.1s, pass state OK 42.7s
+ws-backtest: pupiltag-column-word-stories (pass state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 1164 (up 133 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120
+    queue: pid 1590 (up 86 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-role-hidden.cjs --skills composing:chart_to_120
+    queue: pid 1592 (up 86 s) flock 10
+    slot.2: pid 945 (up 139 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-phone-card.cjs --skills composing:chart_to_120
+ws-backtest row pupiltag-column-word-stories: PASS  fail state FAIL 20.8s, pass state OK 345.3s
+ws-backtest row eb-pin-hosts-word-stories: PASS  fail state FAIL 73.6s, pass state OK 89.2s
+ws-backtest row fixit-words-word-stories: PASS  fail state FAIL 9.8s, pass state OK 9.1s
+ws-backtest row lesson-nocap-rows-word-stories: PASS  fail state FAIL 107.2s, pass state OK 113.8s
+ws-backtest: 20 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+card-not-offered-word-stori commit-pair  FAIL 0.6s           OK 0.5s             PASS
+tf-eval-word-stories        commit-pair  FAIL 4.5s           OK 5.0s             PASS
+max-number-band-word-storie commit-pair  FAIL 56.5s          OK 17.9s            PASS
+story-ladder-word-stories   commit-pair  FAIL 1.4s           OK 2.0s             PASS
+vq-live-bands-word-stories  commit-pair  FAIL 1.3s           OK 1.6s             PASS
+eb-guided-word-stories      commit-pair  FAIL 102.5s         FAIL 31.9s          FAIL
+f7-signmatch-word-stories   commit-pair  FAIL 5.6s           OK 5.4s             PASS
+f11-stretch-story-word-stor commit-pair  FAIL 5.2s           OK 4.7s             PASS
+f12-coins-word-stories      commit-pair  FAIL 4.1s           OK 5.0s             PASS
+inplace-rows-m-word-stories commit-pair  FAIL 119.0s         OK 96.2s            PASS
+inplace-rows-l-word-stories commit-pair  FAIL 27.4s          OK 67.3s            PASS
+model-across-word-stories   commit-pair  FAIL 231.3s         OK 148.6s           PASS
+wp-bar-word-stories         commit-pair  FAIL 105.2s         FAIL 98.2s          FAIL
+stretch-cell-word-stories   commit-pair  FAIL 78.8s          OK 141.5s           PASS
+lesson-guided-centre-word-s commit-pair  FAIL 40.5s          OK 33.3s            PASS
+ea-pad-unit-word-stories    commit-pair  FAIL 58.1s          OK 42.7s            PASS
+pupiltag-column-word-storie commit-pair  FAIL 20.8s          OK 345.3s           PASS
+eb-pin-hosts-word-stories   commit-pair  FAIL 73.6s          OK 89.2s            PASS
+fixit-words-word-stories    commit-pair  FAIL 9.8s           OK 9.1s             PASS
+lesson-nocap-rows-word-stor commit-pair  FAIL 107.2s         OK 113.8s           PASS
+
+eb-guided-word-stories: expected {"fail":"FAIL","pass":"OK"}
+  fail state (e82499a5e): ws-empty-band: FAIL (10)
+  pass state (453bff211): ws-empty-band: FAIL (1)
+
+wp-bar-word-stories: expected {"fail":"FAIL","pass":"OK"}
+  fail state (f8afbb142): ws-empty-band: FAIL (27)
+  pass state (09802d0c4): ws-empty-band: FAIL (9)
+
+18 PASS, 2 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 2709.4 s
+ws-backtest: FAIL (2)
+exit 1
