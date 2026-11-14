@@ -72,7 +72,7 @@ integers:add_negative M | 1/1/0 1p | 1/2/2 1p
 integers:add_negative L | 1/1/0 1p | 1/1/2 1p
 integers:sub_negative M | 1/1/0 1p | 1/2/2 1p
 integers:sub_negative L | 1/1/0 1p | 1/1/2 1p
-fractions:fraction_of_set L | 1/1/0 1p | 1/1/0 2p
+fractions:fraction_of_set L | 1/1/0 1p | 1/1/0 1p   (r3 erratum: 1 page at seed 4242 run alone; "2p" was the long-run leak)
 fractions:fraction_of_set_hard L | 1/1/0 1p | 1/1/0 2p
 fractions:mixed_fractions M | 1/1/0 1p | 1/1/0 1p
 fractions:mixed_fractions L | 1/1/0 1p | 1/1/0 1p

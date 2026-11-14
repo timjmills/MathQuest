@@ -1,5 +1,16 @@
 # lf-engine-roles — before/after proof for the critic (round 2)
 
+## Errata (round 3, critic r2 F7)
+
+Two claims of this round-2 proof did not reproduce; both are corrected here and in `opener-sweep-all-skills.txt`:
+
+- `placevalue:mixed_placevalue` M is **1 / 2 / 0 → 1 / 2 / 0** (no change; the deal holds 3 items, PT-OPN-6 / PT-OPN-7 ruling F4).
+  It is not one of the changed skills.
+- `fractions:fraction_of_set` L prints on **1 page** on both trees at seed 4242 (1 / 1 / 0 → 1 / 1 / 0); the sweep line that read
+  "2p" came from the long run's leaked render state (the harness flake, CHECKS_FROM_CRITICS lf-checks row).
+
+The round-3 proof (split Openers, OPN-SPLIT, the page-keyed ratchet) is in `../proof-r3/`.
+
 ## Re-run on the MERGED master (7a5bc902c: w2, size S dropped) — sizes M and L only (owner, 2026-11-13)
 
 - **Opener, every live skill (727 x M, L = 1454 builds)**: 263 changed; 103 now print the practice on page 2 (the Model + Say +

@@ -19,7 +19,7 @@ import {
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
     poolItems, answerOf, labelStyleOf, stripExtraMm, oneKindFirst, stepsKindOf,
 } from './compose.js';
-import { tightRows, IN_PLACE_FILL, koMm } from '../layout.js';
+import { tightRows, IN_PLACE_FILL, koMm, cellWidthMm, LIVE_W_MM } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -104,12 +104,21 @@ function geometry(items, input, cap = {}) {
     // cell, so a taller Model row never blocks a practice row (other skills keep the probe-wide sizing they always had)
     const nModel = twoModels ? 2 : 1;
     const practice = first && first.template === 'count-row' && items.length > nModel ? items.slice(nModel) : items;
-    const gc = bestCols(practice, [gcWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= gcWanted), ctx);
-    const gH = hMinAt(practice, gc, ctx);
+    let gc = bestCols(practice, [gcWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= gcWanted), ctx);
+    let gH = hMinAt(practice, gc, ctx);
     // critic r6 N15: the Say band of a count-row page is one line of four short blanks, drawn Hw + 2.6 mm tall (measured 8.4 / 10.5 /
     // 12.6 mm at S / M / L), not the generic estimate (Hw + 4.5): with the taller practice rows its 2 mm decide whether a row fits
     const sayMm = first && first.template === 'count-row' ? m.writeMm + 2.6 : m.say;
     let used = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm + m.strip + gH;
+    // (lf-engine roles r3: a page a few mm over with a Guided row of 3 or 4 takes FEWER, shorter Guided cells - down to 2, PT-OPN-6's
+    // floor - before it splits: round_sort_10 at M ran 2.8 mm over with 3 cells of 110 mm and split into a 49 % page 1; 2 cells of
+    // 98 mm close the page)
+    if (used > m.budget && gc > 2 && !cap.noFewer) {
+        for (let c = gc - 1; c >= 2; c--) {
+            const h = hMinAt(practice, c, ctx);
+            if (Number.isFinite(h) && used - gH + h <= m.budget) { used = used - gH + h; gc = c; gH = h; break; }
+        }
+    }
     // SPILL (lf-roles r9): a full-width Model whose page cannot also hold its Guided row (a two-step story: 135 mm Model, 135 mm
     // Guided try at M against a 236 mm budget) never runs off the page: the Model, its Steps and the Say band fill page 1, and
     // the Guided row - with the Independent rows that fit, each at the height it draws - goes to page 2 under the continuation
@@ -171,13 +180,41 @@ function geometry(items, input, cap = {}) {
     // (93 mm) cell, as tall as the item MEASURED there (its printed ink fits the half cell: coordinate_q1's grid is about 78 mm
     // wide), the Steps band under them, then the Say band and the Independent rows full width. hMinAt reads Infinity there for a
     // legacy footprint that declares one column, so the measurement decides. One column of practice only.)
-    const halfH = (it) => { const x = it && it.measured && it.measured[2]; return x && Number(x.hMm) > 0 ? Number(x.hMm) + 1 : Infinity; };
+    // (r3, critic r2 F1: the half cell must hold the MEASURED ink. A kit cell: the host's fit at 2 columns, and its ink inside the half
+    // cell's inner width - add_wp_10k's 117 mm story went side by side at M / L and ran out of its cell. A LEGACY cell: its ink width
+    // only, under the inner width - its fit flag reads its one-column footprint, not the drawing (coordinate_q1's grid draws 86 mm
+    // in a 92 mm inner half cell))
+    const inner2 = cellWidthMm(2, LIVE_W_MM, ctx.look).inner;
+    const halfH = (it) => {
+        const x = it && it.measured && it.measured[2];
+        if (!x || !(Number(x.hMm) > 0)) return Infinity;
+        const isLegacy = !it.template || it.template === 'legacy';
+        const ink = Number(x.inkMm);
+        const ok = isLegacy ? ink > 0 && ink < inner2 : x.fits !== false && !(ink > inner2);
+        return ok ? Number(x.hMm) + 1 : Infinity;
+    };
     const stepsFullH = steps.length ? stepLines(steps, m.textPt, 186) * (m.pitch + 1.2) + steps.length * 2.2 + 4 : 0;
     const sideMm = !twoModels && gc === 1 && items.length > nModel ? Math.max(halfH(first), halfH(items[nModel])) : Infinity;
     const sideUsed = (whatsNew ? m.strip + 2 : 0) + m.strip + sideMm + (steps.length ? m.strip + stepsFullH : 0) + sayMm;
-    const side = used > m.budget && !cap.noSide && Number.isFinite(sideMm) && sideUsed <= m.budget;
-    const split = !side && used > m.budget && pagesFit && (!legacy || !halfLayout);
-    const parity = legacy && !halfLayout && !twoModels && !split && !side;
+    // (r3, critic r2 F3: a full-width LEGACY Model whose measured ink fits the half cell first takes the split Model band - Model |
+    // Steps, PT-OPN-2 - when that frees enough of page 1 for the Guided row: the page then needs no second page and no side row.
+    // A kit Model reaches the half cell through modelHAt already; a story wider than the half cell (add_wp_10k, 117 mm) never does.)
+    const firstLegacy = !!first && (!first.template || first.template === 'legacy');
+    const halfModelMm = firstLegacy && modelFull && !twoModels && steps.length ? halfH(first) : Infinity;
+    const stepsH93 = stepLines(steps, m.textPt, 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
+    const bandUsed = (whatsNew ? m.strip + 2 : 0) + m.strip + Math.max(halfModelMm, stepsH93) + sayMm + m.strip + gH;
+    const halfBand = used > m.budget && !cap.noSide && Number.isFinite(halfModelMm) && bandUsed <= m.budget;
+    if (halfBand) {
+        modelFull = false;
+        mc = 2;
+        modelH = halfModelMm;
+        stepsH = stepsH93;
+        modelBand = m.strip + Math.max(modelH, stepsH);
+        used = bandUsed;
+    }
+    const side = !halfBand && used > m.budget && !cap.noSide && Number.isFinite(sideMm) && sideUsed <= m.budget;
+    const split = !side && !halfBand && used > m.budget && pagesFit && (!legacy || !halfLayout);
+    const parity = legacy && !halfLayout && !twoModels && !split && !side && !halfBand;
     if (side) {
         modelFull = false;
         mc = 2;
@@ -227,7 +264,7 @@ function geometry(items, input, cap = {}) {
     // (lf-engine-roles critic N2: ONE Model only - two Model cells side by side keep the band's height, so the rule between
     // them runs down to the band's bottom rule; held short, it stopped 2.5 mm above it: ws-print-lint L-OVERLAP RULE)
     const modelTight = !twoModels && tightRows(items.slice(0, 1)) ? modelH + tightCapMm(modelH) : null;
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy, side, sideMm, stepsFullH, stepPairs };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy, side, sideMm, stepsFullH, stepPairs, halfBand };
 }
 
 /**
@@ -414,12 +451,14 @@ export function plan(input = {}) {
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     // (PT-OPN-6, ws-print-lint OPN-6: a Guided band of one cell says why - the row did not fit, or the skill dealt too few items)
     if (guided.length < 2) notes.push(g.spill ? 'The second Guided row did not fit: page 2 holds the Guided row and the Independent rows at their drawn heights.' : g.side ? 'The second Guided row did not fit: the first Guided cell sits beside the Model (side by side).' : g.legacy && g.gc === 1 && !g.split ? 'The second Guided row did not fit: a legacy drawing takes one Guided row until it migrates.' : g.gc === 1 && g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
-    if (g.split) notes.push('The Model and one Guided row are taller than one page at this size, and the Model and one Guided cell side by side did not fit: the practice is on page 2.');
-    if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size: the Guided and Independent rows continue on page 2.');
+    // (ws-print-lint OPN-SPLIT, critic r2 F1: a split page under half used passes only when the plan says the side-by-side row was
+    // tried; the note says why it did not fit)
+    if (g.split) notes.push(`The Model and one Guided row are taller than one page at this size, and the Model and one Guided cell side by side did not fit${g.gc > 1 ? ` (the Guided row holds ${g.gc} cells)` : g.sideMm === Infinity ? ' (the half cell does not hold the measured drawing)' : ''}: the practice is on page 2.`);
+    if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size, and the Model and one Guided cell side by side did not fit (the story is wider than a half cell): the Guided and Independent rows continue on page 2.');
     const pages = g.spill ? [{ sections }, { sections: page2, header: spillHeader(frame, indep.length > 0) }] : g.split ? [{ sections }, { sections: practiceSections }] : [{ sections }];
     return assemble(ROLE_ID, input, frame, pages, {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, onePageMm: g.onePage, budgetMm: m.budget, modelMm: g.modelH, split: g.split, parity: g.parity, side: g.side, ...(g.spill ? { spillFreeMm: g.spillFreeMm, p1WhiteMm: g.p1WhiteMm, p1BodyMm: g.p1BodyMm, p1NextMm: g.p1NextMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, onePageMm: g.onePage, budgetMm: m.budget, modelMm: g.modelH, split: g.split, parity: g.parity, side: g.side, halfBand: g.halfBand, ...(g.spill ? { spillFreeMm: g.spillFreeMm, p1WhiteMm: g.p1WhiteMm, p1BodyMm: g.p1BodyMm, p1NextMm: g.p1NextMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 

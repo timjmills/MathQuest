@@ -179,6 +179,8 @@ const fs = require('fs');
 const { spawn, spawnSync, execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
+/** OPENER-OVERFLOW (lf-engine roles): the lint families its ratchet compares with the master pin opener-overflow.<size>.json. */
+const OPENER_RATCHET_LINTS = 'L-OVERFLOW,L-SPLIT,L-DENSITY';
 const TOOL = 'ws-precritic';
 const ARGV = process.argv.slice(2);
 const has = (f) => ARGV.includes(`--${f}`);
@@ -1275,7 +1277,9 @@ function buildPlan(ctx) {
         // counts - an engine change never adds a split or an overflow to any opener, passed or legacy
         if (ctx.role === 'opener') for (const sz of ['M', 'L']) {
             const pin = path.join(ROOT, 'design', 'audit', 'baselines', `opener-overflow.${sz}.json`);
-            if (fs.existsSync(pin)) add(gate(`opener-overflow-${sz}`, `ws-print-lint --source kit --roles opener --size ${sz} --lints L-OVERFLOW,L-SPLIT against the master pin (OPENER-OVERFLOW)`, sc, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'opener', '--size', sz, '--lints', 'L-OVERFLOW,L-SPLIT', '--baseline', rel(pin), '--skills', sample.join(',')], { parse: PARSE.printLint, expect: { ids: sample.map(docId) } }));
+            // (lf-engine roles r3, critic r2 F1 / F2: L-DENSITY joins the ratchet - DN-2, LONE, PAGEFILL, OPN-SPLIT - and it is kept per
+            // (lint, rule, page), so a split page's overflow is never hidden by master's findings on another page)
+            if (fs.existsSync(pin)) add(gate(`opener-overflow-${sz}`, `ws-print-lint --source kit --roles opener --size ${sz} --lints ${OPENER_RATCHET_LINTS} --ratchet-pages against the master pin (OPENER-OVERFLOW)`, sc, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'opener', '--size', sz, '--lints', OPENER_RATCHET_LINTS, '--ratchet-pages', '--baseline', rel(pin), '--skills', sample.join(',')], { parse: PARSE.printLint, expect: { ids: sample.map(docId) } }));
         }
         // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at the small size
         // too - M since the owner dropped S (2026-11-13) - against the M pin (print-lint.M.json); a role page that pin does

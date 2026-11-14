@@ -58,6 +58,7 @@
 //                             --lints (all lints when not given)
 //   --json out.json           machine-readable findings for the critic loop
 //   --baseline base.json      RATCHET: fail only where a (document, lint, rule) count rose above the
+//   --ratchet-pages           ... per (document, lint, rule, page) instead (the OPENER-OVERFLOW gate)
 //                             baseline written by an earlier --json run (P7.5 "as a ratchet")
 //   --report-only             print everything, exit 0 (never prints OK when something failed)
 //   --verbose                 print every finding group, not just the first 12 per document
@@ -1677,6 +1678,23 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // L-DENSITY OPN-SPLIT (lf-engine roles r3, critic r2 F1 / F3): how much of the page body the ink uses - from the body's top
+            // to the lowest INK in it: a text run, a drawing, an answer place (a cell box counts only by what it holds - a 130 mm cell
+            // round 100 mm of drawing is 30 mm of white, as the critic reads it)
+            const bodyEl = pg.querySelector('.ws-body');
+            const usedFrac = (() => {
+                if (!bodyEl) return null;
+                const br = bodyEl.getBoundingClientRect();
+                if (br.height <= 0) return null;
+                let bot = br.top;
+                for (const e of bodyEl.querySelectorAll('*')) {
+                    const own = e.matches('svg, img, canvas, input, [data-ws-slot]') || [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+                    if (!own) continue;
+                    const r = e.getBoundingClientRect();
+                    if (r.height > 0 && r.width > 0) bot = Math.max(bot, Math.min(r.bottom, br.bottom));
+                }
+                return Math.round(((bot - br.top) / br.height) * 1000) / 1000;
+            })();
             // (ONE-ROW, lead ruling R1 / R4a 2026-11-13: a practice page of ONE row held to its work - layout.oneRowMm, `mq-onerow` -
             // leaves the ruled strip under it; PAGEFILL does not read that strip as a page left unfilled)
             // (critic r9: the class alone is not enough - the strip is accepted only while it is SHORTER than the one row it holds, i.e.
@@ -1771,7 +1789,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, oneRowH, holes, repeats,
+                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, oneRowH, holes, repeats, usedFrac,
                 skills: [...new Set(items.map(c => c.skill).filter(Boolean))], attributed: items.every(c => !!c.skill),
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
@@ -2201,6 +2219,9 @@ function sectionOverlapFindings(hits, F) {
 function lintLone(parts, F) {
     for (const pt of parts) {
         if (pt.key || pt.pages.length < 2) continue;
+        // (lf-engine roles r3: an Opener printed on two pages - its Model page, then its practice - is judged by page FILL, OPN-SPLIT:
+        // the Model cell alone on page 1 is the split's design, and a cell count cannot say whether its page is used)
+        if (pt.pages.every(p => p.role === 'opener')) continue;
         const n = pt.pages.map(p => p.cells.length);
         const total = n.reduce((a, b) => a + b, 0);
         const max = Math.max(...n);
@@ -2310,7 +2331,9 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const fill = body > 0 && p.gridBottom !== null && p.gridTop !== null ? (p.gridBottom - p.gridTop) / body : null;
                 if (comparable && !last && fill !== null && fill < 0.5) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} of a sections sheet: its problems fill ${Math.round(fill * 100)}% of the page body while page ${pt.pages[pt.pages.length - 1].idx} follows: a page is never less than half used (PG-20, PG-23; sub-section fill)`, 'half-empty page');
             } else
-            if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : subSec ? 'sub-section' : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
+            // (lf-engine roles r3: a kit Opener's pages are judged by page FILL - OPN-SPLIT below - not by item count: its page 1 holds
+            // the Model, which is no item, so DN-2 read every split Opener's Model page as "0 items")
+            if (comparable && !(info.mode === 'kit' && p.role === 'opener') && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : subSec ? 'sub-section' : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
             const secPages = secOf(pt.pages);
             const secMax = subSec ? Math.max(...secPages.map(q => q.items)) : max;
             const secLast = subSec ? secPages[secPages.length - 1] === p : last;
@@ -2320,6 +2343,14 @@ function lintKitGeometry(dom, pdf, info, F) {
             // (a page that holds no Guided band - page 1 of an Opener whose practice moved to page 2 - is not judged)
             if (info.mode === 'kit' && !pt.key && p.role === 'opener' && (p.bands || []).some(b => /^Guided Practice\s*:/i.test(b)) && p.guidedCells < 2 && !(info.notes || []).some(t => /second Guided row did not fit/i.test(t)))
                 F('L-DENSITY', 'OPN-6', 'major', { page: p.idx }, `page ${p.idx}: the Opener's Guided band holds ${p.guidedCells} cell(s); Guided holds 2 to 4 cells (1 column gives 2 rows), or the plan notes that the second row did not fit (PT-OPN-6)`, 'one-cell Guided band');
+            // L-DENSITY OPN-SPLIT (lf-engine roles r3, critic r2 F1 / F3 "two half-blank pages where a side-by-side row fits"): a page of
+            // an Opener printed on two or more pages that uses under half its body fails, unless the plan's notes say the Model and one
+            // Guided cell side by side were tried and did not fit (the role writes that note when it splits)
+            if (info.mode === 'kit' && !pt.key && p.role === 'opener' && pt.pages.length > 1 && p.usedFrac !== null && p.usedFrac !== undefined) {
+                info.notes.push(`OPN-SPLIT page ${p.idx}: ${Math.round(p.usedFrac * 100)} % of the body used`);
+                if (p.usedFrac < 0.5 && !(info.notes || []).some(t => /side by side[^.]*did not fit/i.test(t)))
+                    F('L-DENSITY', 'OPN-SPLIT', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener uses ${Math.round(p.usedFrac * 100)}% of its body: a split Opener page is at least half used, or the plan notes that the Model and one Guided cell side by side did not fit (RUBRIC H5, PT-OPN-2)`, 'half-blank split page');
+            }
             if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
             // print screen's default; --count N fixes it and turns this off), a practice page whose
@@ -2975,12 +3006,16 @@ function ratchet(results, file) {
     // design/audit/baselines/opener-overflow.<size>.json holds L-OVERFLOW / L-SPLIT - is judged on that family)
     const only = (arg('lints', '') || '').split(',').map(s => s.trim()).filter(Boolean);
     const kept = (f) => !only.length || only.includes(f.lint);
+    // (lf-engine roles r3, critic r2 F2: with --ratchet-pages - the OPENER-OVERFLOW gate - a count is kept per (lint, rule, PAGE):
+    // multi_step_word L's page 2 overflow hid behind master's PG-12 x2 on page 1 of the same document when only counts were compared)
+    const byPage = has('ratchet-pages');
+    const keyOf = (f) => (byPage ? `${f.lint} ${f.rule} p${f.page || 0}` : `${f.lint} ${f.rule}`);
     const idx = new Map();
-    for (const d of base.documents) { const m = new Map(); for (const f of d.findings) if (!f.waived && kept(f)) { const k = `${f.lint} ${f.rule}`; m.set(k, (m.get(k) || 0) + 1); } idx.set(d.id, m); }
+    for (const d of base.documents) { const m = new Map(); for (const f of d.findings) if (!f.waived && kept(f)) { const k = keyOf(f); m.set(k, (m.get(k) || 0) + 1); } idx.set(d.id, m); }
     const rises = [];
     for (const r of results) {
         const m = new Map();
-        for (const f of r.findings) if (!f.waived && kept(f)) { const k = `${f.lint} ${f.rule}`; m.set(k, (m.get(k) || 0) + 1); }
+        for (const f of r.findings) if (!f.waived && kept(f)) { const k = keyOf(f); m.set(k, (m.get(k) || 0) + 1); }
         const b = idx.get(r.info.id) || new Map();
         for (const [k, n] of m) if (n > (b.get(k) || 0)) rises.push(`${r.info.id} ${k}: ${b.get(k) || 0} -> ${n}`);
     }
@@ -3098,6 +3133,23 @@ const SELF_TESTS = [
         const band = document.createElement('div'); band.className = 'ws-band';
         band.innerHTML = '<div class="ws-strip"><b>Guided Practice:</b> Write it.</div>';
         c.before(band); band.appendChild(c);
+    } },
+    // L-DENSITY OPN-SPLIT (lf-engine roles r3, critic r2 F1): an Opener split over two pages whose page 2 holds one cell (under
+    // half its body used) fails ...
+    { name: 'split opener with a half-blank page (OPN-SPLIT)', mode: 'kit', expect: ['L-DENSITY', 'OPN-SPLIT'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => { p.setAttribute('data-ws-role', 'opener'); p.querySelector('.ws-foot b').textContent = `${i + 1}/2`; });
+        [...p2.querySelectorAll('[data-ws-cell]')].filter(x => !x.parentElement.closest('[data-ws-cell]')).slice(1).forEach(c => c.remove());
+    } },
+    // ... unless the plan notes that the Model and one Guided cell side by side were tried and did not fit
+    { name: 'split opener with a half-blank page, side by side noted (OPN-SPLIT control)', mode: 'kit', notes: ['The Model and one Guided row are taller than one page at this size, and the Model and one Guided cell side by side did not fit: the practice is on page 2.'], expect: [], absent: ['L-DENSITY', 'OPN-SPLIT'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => { p.setAttribute('data-ws-role', 'opener'); p.querySelector('.ws-foot b').textContent = `${i + 1}/2`; });
+        [...p2.querySelectorAll('[data-ws-cell]')].filter(x => !x.parentElement.closest('[data-ws-cell]')).slice(1).forEach(c => c.remove());
     } },
     // L-LONE (H5; skip-count critic r4 D12): the second page of a two-page sheet holds one cell alone
     { name: 'lone cell on the last page (L-LONE)', expect: ['L-DENSITY', 'LONE'], fn: () => {
