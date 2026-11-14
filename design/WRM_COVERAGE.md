@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 398 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 399 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -3428,6 +3428,7 @@ whatever happens to the WRM gaps.
   Vocabulary: factor, factor pair, partition  
 - **Y6.B2.S11** Introduction to long division — covered. _5.NBT.B.6, M.EE.5.NBT.6_  
   Skills: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`); Divide 3-Digit by 2-Digit Numbers (Long Division) (`division:div_3by2_long`)  
+  Partial: Area Model Division (4÷2 digit) (`division:area_model_div_4by2`), missing the area model (partial quotients) for a 2-digit divisor, before the long-division layout (WRM has no area-model division step at Y6)  
   Vocabulary: multiple, exchange, bring down  
 - **Y6.B2.S12** Long division with remainders — PARTIAL. _5.NBT.B.6, M.EE.5.NBT.6_  
   Partial: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`), missing remainders written as r, a fraction or a decimal  

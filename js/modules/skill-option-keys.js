@@ -183,7 +183,8 @@ export const MULTI_KEYS = Object.freeze({
     // NEXT FREE IN BLOCK 3: 3C.
     // Sub-range 3N-3Z (build lane operations): SU-C pilot, 2026-10-23.
     zeros: '3N',         // sub_*_no_regroup from within 1,000: zero cases off / on (a section of them)
-    // NEXT FREE IN 3N-3Z: 3P.
+    amDivisor: '3P',     // area_model_div_4by2 (lane lf-ops, 2026-11-14): the 2-digit divisor band, tens / 11-59 / 11-99
+    // NEXT FREE IN 3N-3Z: 3Q.
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
@@ -374,6 +375,7 @@ export const VALUE_TOKENS = Object.freeze({
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
     amEdges: Object.freeze({ given: 'G', blank: 'B', mixed: 'M' }),
     amForm: Object.freeze({ sign: 'S', long: 'L', fraction: 'F' }),
+    amDivisor: Object.freeze({ tens: 'T', 59: 'L', 99: 'H' }),
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),

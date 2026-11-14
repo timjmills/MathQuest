@@ -211,6 +211,7 @@ export const DERIVED_OPTIONS = {
     "decimals:sub_decimal": {"range":[100,1000],"decimals":[1,2,3]},
     "division:area_model_div_2by1": {},
     "division:area_model_div_3by1": {},
+    "division:area_model_div_4by2": {},
     "division:box_division_easy": {},
     "division:box_division_hard": {},
     "division:div_check_by_multiplying": {"range":[100,1000]},
