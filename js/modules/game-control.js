@@ -900,7 +900,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'mult_div_fact_family': 'Fact Fam ×÷', 'number_families_mult': 'Num Fam',
         // Division
         'div_facts': 'Div Facts', 'divide': 'Divide', 'div_word_problems': 'Div Word',
-        'area_model_div_2by1': 'Area Div', 'area_model_div_3by1': 'Area Div',
+        'area_model_div_2by1': 'Area Div', 'area_model_div_3by1': 'Area Div', 'area_model_div_4by2': 'Area Div',
         'missing_mult_div': 'Missing ×÷',
         // Integers
         'number_line_int': 'Int Line', 'compare_int': 'Int Compare',

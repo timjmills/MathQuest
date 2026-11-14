@@ -296,6 +296,7 @@ export const SKILL_GRADES = {
     'sub_2d_1d': 2,                                                       // 2.NBT.B.5 (2026-10-23 preset, SU-C C3)
     'chart_to_120': 1,                                                    // 1.NBT.A.1 to 120 (2026-11-12 preset, chartwindow card)
     'div_facts_long': 3,                                                  // 3.OA.C.7 facts in the 4.NBT.B.6 bracket (2026-10-31 preset, facts card Q4)
+    'area_model_div_4by2': 5,                                             // 5.NBT.B.6 area model, 4-digit / 2-digit (2026-11-14, area-model-div card)
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
     'round_to_hundredth': 5, 'ratio_part_to_part': 6, 'ratio_simplest_form': 6, 'ratio_equivalent_or_not': 6,
@@ -866,6 +867,9 @@ export const SKILLS = {
         { v: "div_grouping_word_problems", l: "Division Word Problems: Grouping", presetOf: "div_word_problems" },
         // APPENDED 2026-10-31 — PRESET (owner, facts card Q4): division facts in the long-division bracket.
         { v: "div_facts_long", l: "Divide: Long-Division Form", presetOf: "div_facts" },
+        // APPENDED 2026-11-14 (owner request; signed card design/cards/area-model-div): area-model division,
+        // 4-digit by 2-digit, dealing long_div_2digit's 4-digit class on the area-model-div cell. A skill, not a preset.
+        { v: "area_model_div_4by2", l: "Area Model Division (4÷2 digit)" },
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },
@@ -1960,7 +1964,7 @@ export const SKILL_TIME_CATEGORY = {
     box_division_easy: "extended", box_division_hard: "extended",
     // Area models
     area_model_mult: "extended", area_model_mult_hard: "extended",
-    area_model_div_2by1: "extended", area_model_div_3by1: "extended",
+    area_model_div_2by1: "extended", area_model_div_3by1: "extended", area_model_div_4by2: "extended",
     // Mult properties & remainders
     mult_properties: "quick", div_remainders: "quick",
     mult_chart: "quick",
@@ -2167,7 +2171,7 @@ export const SKILL_PRINT_SIZE = {
     base10_build: "wide", base10_regroup: "wide", base10_build_hundreds: "wide",
     reading_ruler: "medium", reading_ruler_hard: "medium",
     area_model_mult: "medium", area_model_mult_hard: "medium",
-    area_model_div_2by1: "medium", area_model_div_3by1: "medium",
+    area_model_div_2by1: "medium", area_model_div_3by1: "medium", area_model_div_4by2: "medium",
     add_sub_fact_family: "wide", mult_div_fact_family: "wide",
     number_families_add: "wide", number_families_add_med: "wide", number_families_add_hard: "wide",
     number_families_mult: "wide", number_families_mult_med: "wide", number_families_mult_hard: "wide",

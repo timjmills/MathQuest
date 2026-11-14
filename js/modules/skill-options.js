@@ -2215,6 +2215,14 @@ const P12_OPTIONS = {
     ],
     'division:area_model_div_2by1': [_p12DivBy(2, 9), _amEdgesOpt(true), _amFormOpt()],
     'division:area_model_div_3by1': [_p12DivBy(2, 9), _amEdgesOpt(true), _amFormOpt()],
+    // area_model_div_4by2 (signed card design/cards/area-model-div, 2026-11-14): the divisor band is the number-size
+    // ladder (O2, a plain option, card §9 q3); no `constant` set (89 ticks, card §9 q4).
+    'division:area_model_div_4by2': [_p12Enum('amDivisor', 'Divide by', [
+        { v: 'tens', l: 'Multiples of ten (20, 30 … 90)' },
+        { v: '59', l: '11 to 59' },
+        { v: '99', l: '11 to 99' }], '59',
+    'The size of the two-digit divisor. Multiples of ten make each side length a scaled times fact (70 × 30 = 2100); 11 to 59 and 11 to 99 deal any two-digit divisor. The dividend always has four digits.'),
+    _amEdgesOpt(true), _amFormOpt()],
     'division:share_into_groups': [_opsBand([12, 24], 24, { label: 'Counters to', help: 'The most counters in the picture. 12 keeps it to 2 to 4 groups.' })],
     'division:div_equation_parts': [
         formsOption([{ v: 0, l: 'How many in all' }, { v: 1, l: 'How many in each group' }, { v: 2, l: 'How many groups' }],

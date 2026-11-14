@@ -377,6 +377,9 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-11-12 chartwindow card preset (hundreds_chart_fill band 120). ZG, the next free code after ZF (ZW-ZZ
     // are taken by the lf-algebra lane). APPEND ONLY. ----
     "composing:chart_to_120": "ZG",
+    // ---- 2026-11-14 area-model-div card skill (area-model division, 4-digit / 2-digit). ZR: ZH-ZM are taken on the
+    // lf-builds-stories and ops-family branches, ZW-ZZ by the lf-algebra lane; ZR leaves room. APPEND ONLY. ----
+    "division:area_model_div_4by2": "ZR",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

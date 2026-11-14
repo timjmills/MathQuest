@@ -5290,6 +5290,46 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             }
             
+            // Area Model Division - 4-digit by 2-digit (e.g., 1564 ÷ 34), owner request 2026-11-14,
+            // signed card design/cards/area-model-div. It deals long_div_2digit's 4-digit class: a
+            // 2-digit divisor (11-59 by default, as long_div_2digit at its default Max Number; 11-99 on
+            // the wider band; 20-90 in tens for the entry step), a 2-digit quotient, exact, the dividend
+            // always 1,000-9,999. The model splits by the quotient's place value: the tens part
+            // (divisor x the quotient's tens) and the ones part (divisor x its ones). A quotient ending
+            // in 0 would leave a one-part model (the answer given away, L3), so it is never dealt.
+            if (mappedSkill === "area_model_div_4by2") {
+                const _band = String(_opt('amDivisor') || '59');
+                const _divs = _band === 'tens' ? [20, 30, 40, 50, 60, 70, 80, 90]
+                    : Array.from({ length: (_band === '99' ? 99 : 59) - 10 }, (_, i) => 11 + i);
+                const divisor = dealPick(`amd42-div:${_band}`, _divs);
+                const _qs = [];
+                for (let k = Math.max(11, Math.ceil(1000 / divisor)); k <= Math.min(99, Math.floor(9999 / divisor)); k++) {
+                    if (k % 10) _qs.push(k);
+                }
+                const quotient = _qs[dealIndex(`amd42-q:${_band}:${divisor}`, _qs.length)];
+                const dividend = divisor * quotient;
+                const qT = Math.floor(quotient / 10) * 10, qO = quotient % 10;
+                const parts = [
+                    { value: divisor * qT, quotient: qT },
+                    { value: divisor * qO, quotient: qO }
+                ];
+                q.ans = quotient;
+                q.text = `Use the area model to find ${dividend} ÷ ${divisor}`;
+                q.hint = `Break ${dividend} into parts: ${parts[0].value} + ${parts[1].value}. ${divisor} × ? = ${parts[0].value} and ${divisor} × ? = ${parts[1].value}. Then add the side lengths.`;
+                q.answerType = "area-model";
+                q.areaModelDivData = { divisor, dividend, quotient, parts };
+                q.areaModelData = q.areaModelDivData;
+                q.printFormat = "area-model-div";
+                q.a = dividend;
+                q.b = divisor;
+                const _amdPayload = { dividend, divisor, parts: parts.map(p => p.value),
+                    form: _amForm('area_model_div_4by2'), edges: _amEdges('area_model_div_4by2'), uid: `amd${dividend}d${divisor}` };
+                q.cell = { template: 'area-model-div', v: 1, payload: _amdPayload };
+                q.visual = _kitTwin('area-model-div', _amdPayload);
+                q.options = [];
+                return;
+            }
+
             // ===== WORD PROBLEMS WITH VISUALS =====
             
             // Addition Word Problems
