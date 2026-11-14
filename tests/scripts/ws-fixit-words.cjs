@@ -9,26 +9,37 @@
 // FIX-WORDS: on each error-analysis cell whose finished work is an "N = ..." words frame, the words after "Fix it" (letters only)
 // must equal the words of the frame the pupil wrote in, in order. A word the frame does not print - a singular where the frame is
 // plural - is a giveaway. Cells with no "=" frame or no "Fix it" are not judged. Prints `ws-fixit-words: OK` / `FAIL (n)`.
+// The cell's text skips a picture's own text (inside an <svg>) and what the pupil wrote in a box ([data-ws-shape="box"]):
+// neither is a words frame (lf-placevalue vocab deploy 2026-11-14: a Match 3 picture printed "5 + 3 = 8", so the pupil's
+// letters A B C and the picture's "Step" were read as the frame and the Fix-it's own bank words, "rule array step", as a
+// giveaway - a false FAIL on vocab_grade_pictures error-analysis M / L cells 2-3).
+//   node tests/scripts/ws-fixit-words.cjs --fixture <file.html>   # judge the .ws-cell elements of a saved page (backtests)
 const { open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const SKILLS = String(arg('skills', arg('skill', 'placevalue:unit_form'))).split(',').map((x) => x.trim()).filter(Boolean);
 const SIZES = String(arg('sizes', 'M,L')).split(','); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const SEED = parseInt(arg('seed', '7'), 10);
+const FIXTURE = arg('fixture', '');
 
 (async () => {
     const { browser, page } = await open();
     let bad = 0, judged = 0;
     try {
         await page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
-        for (const key of SKILLS) for (const size of SIZES) {
+        // (the text nodes joined by spaces: a detached page has no layout, so innerText runs the words of adjacent boxes together;
+        // a picture's svg text and a written box's value are skipped - see the header)
+        const jobs = FIXTURE ? [{ key: FIXTURE, size: '-', html: require('fs').readFileSync(FIXTURE, 'utf8') }]
+            : SKILLS.flatMap((key) => SIZES.map((size) => ({ key, size })));
+        for (const { key, size, html } of jobs) {
             const [categoryId, skillId] = key.split(':');
-            const cells = await page.evaluate(async ({ categoryId, skillId, size, SEED }) => {
-                const r = await window.buildSheet({ role: 'error-analysis', sections: [{ skills: [{ categoryId, skillId }] }], size, seed: SEED, key: false });
-                const d = document.createElement('div'); d.innerHTML = r.pupilHtml;
-                // (the text nodes joined by spaces: a detached page has no layout, so innerText runs the words of adjacent boxes together)
-                return [...d.querySelectorAll('.ws-cell')].map((c) => { const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT); const out = []; while (w.nextNode()) out.push(w.currentNode.nodeValue); return out.join(' '); });
-            }, { categoryId, skillId, size, SEED });
+            const cells = await page.evaluate(async ({ categoryId, skillId, size, SEED, html }) => {
+                if (!html) html = (await window.buildSheet({ role: 'error-analysis', sections: [{ skills: [{ categoryId, skillId }] }], size, seed: SEED, key: false })).pupilHtml;
+                const d = document.createElement('div'); d.innerHTML = html;
+                return [...d.querySelectorAll('.ws-cell')].map((c) => { const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT); const out = [];
+                    while (w.nextNode()) { const p = w.currentNode.parentElement; if (p && p.closest('svg, [data-ws-shape="box"]')) continue; out.push(w.currentNode.nodeValue); }
+                    return out.join(' '); });
+            }, { categoryId, skillId, size, SEED, html: html || '' });
             const words = (t) => (String(t).match(/[A-Za-z]+/g) || []);
             cells.forEach((t, i) => {
                 const txt = String(t).replace(/\s+/g, ' ');
@@ -46,7 +57,7 @@ const SEED = parseInt(arg('seed', '7'), 10);
             });
         }
     } finally { await browser.close(); }
-    console.log(`(${SKILLS.length} skill(s), ${SIZES.length} size(s), ${judged} cell(s) judged)`);
+    console.log(FIXTURE ? `(fixture ${FIXTURE}, ${judged} cell(s) judged)` : `(${SKILLS.length} skill(s), ${SIZES.length} size(s), ${judged} cell(s) judged)`);
     console.log(`ws-fixit-words: ${bad ? `FAIL (${bad})` : 'OK'}`);
     process.exit(bad ? 1 : 0);
 })().catch((e) => { console.error(e); console.log('ws-fixit-words: FAIL (error)'); process.exit(1); });

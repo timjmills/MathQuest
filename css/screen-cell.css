@@ -2175,3 +2175,7 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
     padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
 }
+/* (lf-placevalue vocab deploy, 2026-11-14, H6 TARGET: the Match 3 letter box is a span .mq-vm-box, not .mq-cellbox, so the global
+   50 px floor above missed it: worksheet 820 / 1024 drew a 48 px box holding a 46 x 46 px input. The same floor, additively:
+   this box's border is 2 px a side on screen, so 52 px is 48 px of hit area plus the border.) */
+html body .mq-scell .mq-vm-box:has(> input.mq-cellslot) { min-width: 52px !important; min-height: 52px !important; }
