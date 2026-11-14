@@ -10,6 +10,15 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-14 21:10 UTC: -roles r4 FAILED; the lane is PARKED.**
+  - Code head eb17fe01a; report c32855f68.
+  - r3's add_wp_10k M blocker is fixed (1 page, 90 %).
+  - New blocker, F1: placevalue expand M and combine M put the Model at half width beside Steps, so the equation wraps and a 52 % / 44 % band is left empty (H13).
+  - On resume, check first: EB-BAND for `--roles opener --size M` plus a WRAP rule, with a backtest that FAILs on 1b7280c88. Then the full-width Model at M. Then a critic on at least 20 Openers.
+  - SPILL-P1 follow-ups: read the reserve from the engine constant, and add a boundary backtest.
+- **After the reset, in order:** rowcap stage 2 (F4), then -roles F1, then -pc r6.
+- Parked at about $1,185 (stop $1,240).
+
 - **2026-11-14 19:50 UTC: row-stretch cap stage 1 PASSED re-critic r2.**
   - Branch claude/sweet-newton-c8wrv1-lf-engine-rowcap @ 3b0fdbcbb (code 174c839be).
   - The head is with lf-placevalue and the lead.
