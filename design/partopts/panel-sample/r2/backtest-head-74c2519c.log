@@ -1,0 +1,42 @@
+FAIL coordinates:geo_translate @1280: text drawn at 3.6 px ("Original Shape"; needs >= 9 px; translate(-50%, -50%) scale(0.2267))
+FAIL coordinates:geo_translate @1280 changed +50ms: text drawn at 3.6 px ("Original Shape"; needs >= 9 px; translate(-50%, -50%) scale(0.2267))
+FAIL coordinates:geo_translate @1280 changed +1.5s: text drawn at 3.6 px ("Original Shape"; needs >= 9 px; translate(-50%, -50%) scale(0.2267))
+FAIL algebra:multi_step_word @1280: text drawn at 3.3 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2571))
+FAIL algebra:multi_step_word @1280 changed +50ms: text drawn at 3.3 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2571))
+FAIL algebra:multi_step_word @1280 changed +1.5s: text drawn at 3.3 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2571))
+FAIL addition:add_5_pictures @1280: the panel footer's bottom is at 1024, below the 1000 px window; the Done button (1129,964 80×44) is not inside the 1280×1000 window
+ok   addition:add_5_pictures @1280 changed +50ms: ink 1.79 %, scale 1, text >= 18.0 px, frame 140 px
+ok   addition:add_5_pictures @1280 changed +1.5s: ink 1.79 %, scale 1, text >= 18.0 px, frame 140 px
+FAIL comparing:classify_count @1280: the panel footer's bottom is at 1007, below the 1000 px window; the panel (top 155, bottom 1008) leaves the 1000 px window
+FAIL comparing:classify_count @1280 changed +50ms: text drawn at 8.5 px ("Count only the stars."; needs >= 9 px; translate(-50%, -50%) scale(0.4701)); the panel footer's bottom is at 1007, below the 1000 px window; the panel (top 155, bottom 1008) leaves the 1000 px window
+FAIL comparing:classify_count @1280 changed +1.5s: text drawn at 8.5 px ("Count only the stars."; needs >= 9 px; translate(-50%, -50%) scale(0.4701)); the panel footer's bottom is at 1007, below the 1000 px window; the panel (top 155, bottom 1008) leaves the 1000 px window
+FAIL fractions:fraction_of_set @1280: text drawn at 4.5 px ("4"; needs >= 9 px; translate(-50%, -50%) scale(0.2967))
+FAIL fractions:fraction_of_set @1280 changed +50ms: text drawn at 8.6 px ("Tap 1/5 of the"; needs >= 9 px; translate(-50%, -50%) scale(0.6146))
+FAIL fractions:fraction_of_set @1280 changed +1.5s: text drawn at 8.6 px ("Tap 1/5 of the"; needs >= 9 px; translate(-50%, -50%) scale(0.6146))
+FAIL coordinates:geo_translate @390: text drawn at 3.3 px ("Which figure shows this "; needs >= 9 px; translate(-50%, -50%) scale(0.2056))
+FAIL coordinates:geo_translate @390 changed +50ms: text drawn at 3.3 px ("Which figure shows this "; needs >= 9 px; translate(-50%, -50%) scale(0.2056))
+FAIL coordinates:geo_translate @390 changed +1.5s: text drawn at 3.3 px ("Which figure shows this "; needs >= 9 px; translate(-50%, -50%) scale(0.2056))
+FAIL algebra:multi_step_word @390: text drawn at 3.1 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2392))
+FAIL algebra:multi_step_word @390 changed +50ms: text drawn at 3.0 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2339))
+FAIL algebra:multi_step_word @390 changed +1.5s: text drawn at 3.0 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2339))
+ok   addition:add_5_pictures @390: ink 4.76 %, scale 0.6961, text >= 11.1 px, frame 140 px
+ok   addition:add_5_pictures @390 changed +50ms: ink 1.68 %, scale 1, text >= 16.0 px, frame 140 px
+ok   addition:add_5_pictures @390 changed +1.5s: ink 1.68 %, scale 1, text >= 16.0 px, frame 140 px
+ok   comparing:classify_count @390: ink 4.81 %, scale 0.565, text >= 9.0 px, frame 140 px
+FAIL comparing:classify_count @390 changed +50ms: text drawn at 7.6 px ("Count only the stars."; needs >= 9 px; translate(-50%, -50%) scale(0.4755))
+FAIL comparing:classify_count @390 changed +1.5s: text drawn at 7.6 px ("Count only the stars."; needs >= 9 px; translate(-50%, -50%) scale(0.4755))
+FAIL fractions:fraction_of_set @390: text drawn at 4.5 px ("4"; needs >= 9 px; translate(-50%, -50%) scale(0.2982))
+FAIL fractions:fraction_of_set @390 changed +50ms: text drawn at 8.6 px ("Tap 1/5 of the"; needs >= 9 px; translate(-50%, -50%) scale(0.6146))
+FAIL fractions:fraction_of_set @390 changed +1.5s: text drawn at 8.6 px ("Tap 1/5 of the"; needs >= 9 px; translate(-50%, -50%) scale(0.6146))
+FAIL coordinates:geo_translate @1280x720: text drawn at 2.8 px ("Original Shape"; needs >= 9 px; translate(-50%, -50%) scale(0.1733))
+FAIL algebra:multi_step_word @1280x720: text drawn at 2.5 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.1964))
+ok   addition:add_5_pictures @1280x720: ink 4.12 %, scale 0.6848, text >= 12.3 px, frame 140 px
+ok   comparing:classify_count @1280x720: ink 4.25 %, scale 0.5575, text >= 10.1 px, frame 140 px
+FAIL fractions:fraction_of_set @1280x720: text drawn at 4.5 px ("4"; needs >= 9 px; translate(-50%, -50%) scale(0.2967))
+FAIL coordinates:geo_translate @1280x1000>720: text drawn at 3.6 px ("Original Shape"; needs >= 9 px; translate(-50%, -50%) scale(0.2267)); the panel footer's bottom is at 987, below the 720 px window; the Done button (1129,927 80×44) is not inside the 1280×720 window
+FAIL algebra:multi_step_word @1280x1000>720: text drawn at 3.3 px ("cards"; needs >= 9 px; translate(-50%, -50%) scale(0.2571)); the panel footer's bottom is at 987, below the 720 px window; the Done button (1129,927 80×44) is not inside the 1280×720 window
+FAIL addition:add_5_pictures @1280x1000>720: the panel footer's bottom is at 1024, below the 720 px window; the Done button (1129,964 80×44) is not inside the 1280×720 window
+FAIL comparing:classify_count @1280x1000>720: the panel footer's bottom is at 1007, below the 720 px window; the Done button (1129,947 80×44) is not inside the 1280×720 window
+FAIL fractions:fraction_of_set @1280x1000>720: text drawn at 4.5 px ("4"; needs >= 9 px; translate(-50%, -50%) scale(0.2967)); the panel footer's bottom is at 987, below the 720 px window; the Done button (1129,927 80×44) is not inside the 1280×720 window
+  5 skills × 2 widths (1280, 390 px); spot passes on 5 skill(s): 1280x720, a resize to 720, an option change at 1280 and 390, 40 readings, 1 worker(s), 70 s
+ws-options-shots: FAIL (32)
