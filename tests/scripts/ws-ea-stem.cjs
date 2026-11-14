@@ -8,7 +8,32 @@ const H = require('../lib/ws-harness.cjs');
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
+// --fixture <key.html>: judge one saved key page without the app (a planted state for the backtest row)
+function judgeHtml(html, label) {
+    const OPS = { '+': (a, b) => a + b, '−': (a, b) => a - b, '-': (a, b) => a - b, '×': (a, b) => a * b, 'x': (a, b) => a * b, '÷': (a, b) => a / b };
+    const num = (s) => Number(String(s).replace(/,/g, ''));
+    const bad = [];
+    const cells = String(html).split(/<div class="ws-cell/).slice(1);
+    for (const c of cells) {
+        const w = /class="mq-pupilwork[^"]*"[^>]*>([^<]*)</.exec(c);
+        if (!w) continue;
+        const txt = w[1].replace(/\s+/g, ' ').trim();
+        const m = /^(-?[\d,.]+)((?:\s*[+−\-×x÷]\s*-?[\d,.]+)+)\s*=\s*(-?[\d,.]+)$/.exec(txt);
+        if (!m || !/data-judge="correct"/.test(c)) continue;
+        const terms = [...m[2].matchAll(/\s*([+−\-×x÷])\s*(-?[\d,.]+)/g)];
+        const val = terms.reduce((a, t) => OPS[t[1]](a, num(t[2])), num(m[1]));
+        if (Math.abs(val - num(m[3])) > 1e-9) bad.push(`${label}: correct work "${txt}" is false (= ${val})`);
+    }
+    return bad;
+}
 (async () => {
+    const fx = arg('fixture', '');
+    if (fx) {
+        const bad = judgeHtml(require('fs').readFileSync(fx, 'utf8'), fx);
+        for (const b of bad) console.log('  FAIL ' + b);
+        console.log(bad.length ? `ws-ea-stem: FAIL - ${bad.length} finding(s) (fixture)` : 'ws-ea-stem: OK (fixture)');
+        process.exit(bad.length ? 1 : 0);
+    }
     let app = await H.open({});
     const only = list(arg('skills', ''));
     const all = only.length ? only : await app.page.evaluate(() => Object.entries(window.SKILLS || {}).flatMap(([c, arr]) => (Array.isArray(arr) ? arr : []).filter((s) => s && s.v && !s.retired).map((s) => `${c}:${s.v}`)));

@@ -1213,6 +1213,7 @@ function buildPlan(ctx) {
         {
             const rk = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
             add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
+            if (ctx.role === 'error-analysis') add(gate('ea-stem-fixture', 'ws-ea-stem --fixture (EA-STEM guard: a correct story sentence is true of its numbers)', 'planted key', 'node', 'ws-ea-stem', ['--fixture', 'tests/fixtures/precritic/ea-stem.pass.html'], { missingMsg: 'ws-ea-stem is not in this tree' }));
             if (ctx.role === 'true-false') add(gate('tof-stem-role', 'ws-tof-stem (TOF-STEM) on the role sample', `role true-false × ${rk.length} skill(s)`, 'browser', 'ws-tof-stem', ['--skills', rk.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }

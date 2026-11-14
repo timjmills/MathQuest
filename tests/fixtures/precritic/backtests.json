@@ -9145,6 +9145,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ea-stem",
+   "check": "an Error Analysis story sentence on an item the key judges correct is true of its numbers: the operands combined give the shown result (lead 2026-11-14, the class of TOF-STEM; no live skill prints a story sentence today, so this is a planted guard)",
+   "kind": "fixture",
+   "rule": "ws-ea-stem EA-STEM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ea-stem.fail.html",
+    "state": "a correct unknown-start item whose work reads '44 - 8 = 44'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ea-stem.pass.html",
+    "state": "'44 - 8 = 36' on the correct item; the Fix-it item keeps the pupil's wrong result"
+   },
+   "command": "node tests/scripts/ws-ea-stem.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
