@@ -66,7 +66,9 @@ export function prepare(it, info = {}) {
         return `<div class="mq-judge mq-tf"${beside ? ' style="grid-template-columns:minmax(0,1fr) auto;align-items:center"' : ''}>`
             + `<div class="mq-judge-work">${work}</div>`
             + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`, beside ? 'mq-tfside" style="flex-direction:column;gap:5mm;padding:0 2mm 0 10mm' : '')
-            + (place.kind === 'none' ? '' : `<div class="${answerFrameCls(place)}">${esc(stem)}${answerPlaceHtml(place, 'tf-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
+            // (lead ruling 2026-11-14, cbt r3 L-KEY AK-2: a TRUE statement's frame is blank in the key by design, PT-TOF-2; its
+            // mq-tofblank mark is the only thing ws-print-lint's AK-2 exempts - a False frame left blank still fails)
+            + (place.kind === 'none' ? '' : `<div class="${isFalse ? '' : 'mq-tofblank '}${answerFrameCls(place)}">${esc(stem)}${answerPlaceHtml(place, 'tf-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
             + `</div>`;
     };
     return Object.assign({}, it, {
