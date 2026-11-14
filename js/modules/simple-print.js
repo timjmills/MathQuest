@@ -176,7 +176,7 @@ export function footerName(s) {
         }
     }
     if (sets) {
-        const all = sets.values.map((x) => x.v);
+        const all = visVals(s, sets);
         const cur = setsOf(s, sets);
         if (cur.length !== all.length) name = `${name.replace(/\s*\([^)]*\)/g, '')}: ${s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'tables' : 'fact sets'} ${setWords(cur, all)}`;
     }
@@ -1056,7 +1056,10 @@ export function numberOptionsOf(s) {
     return { band: { def: band, values: bandVals, answer, title: answer ? 'Highest number' : band.label, labelOf: answer ? (v) => v.toLocaleString('en-US') : lbl }, sets: sets || null };
 }
 const optVal = (s, d) => (s.opts && s.opts[d.id] !== undefined && s.opts[d.id] !== null ? s.opts[d.id] : d.default);
-const setsOf = (s, d) => { const v = optVal(s, d); return Array.isArray(v) && v.length ? v.map(Number) : d.values.map((x) => x.v); };
+// t15: a value the skill's other options hide (the x / ÷ 13-15 ticks off "Tables to 15 x 15", `valueHide`) is neither offered
+// nor counted here, so a 12 x 12 page still reads "Tables: all" and its name is unchanged.
+const visVals = (s, d) => { const hide = new Set(typeof d.valueHide === 'function' ? (d.valueHide(s.opts || {}) || []) : []); return d.values.map((x) => x.v).filter((v) => !hide.has(v)); };
+const setsOf = (s, d) => { const vis = visVals(s, d); const v = optVal(s, d); const got = Array.isArray(v) ? v.map(Number).filter((x) => vis.includes(x)) : []; return got.length ? got : vis; };
 /** "0–12", "6–8", "2, 5, 10": a fact-set list in words. */
 function setWords(v, all) {
     if (v.length === all.length) return 'all';
@@ -1317,7 +1320,7 @@ function skillOptsHTML(s, i) {
     }
     if (sets) {
         const sv = setsOf(s, sets);
-        const allV = sets.values.map((x) => x.v);
+        const allV = visVals(s, sets);
         const lbl = s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'Tables' : 'Fact sets';
         out.below = `<details class="sp-skopt"${S.openOpts && S.openOpts.has(i) ? ' open' : ''}><summary data-sp="skopt" data-v="${i}">${lbl}: ${esc(setWords(sv, allV))}</summary><div class="sp-skopt-body">`
             + `<div class="sp-facts" role="group" aria-label="${lbl}">${allV.map((v) => `<button type="button" class="sp-fact" data-sp="fact" data-i="${i}" data-v="${v}" aria-pressed="${sv.includes(Number(v))}">${v}</button>`).join('')}<button type="button" class="sp-link sp-fact-all" data-sp="factall" data-i="${i}">All</button></div></div></details>`;
@@ -1574,7 +1577,7 @@ function onClick(e) {
         const i = Number(t.dataset.i);
         const d = numberOptionsOf(S.list[i]).sets;
         if (!d) return;
-        const all = d.values.map((x) => Number(x.v));
+        const all = visVals(S.list[i], d).map(Number);
         let cur = setsOf(S.list[i], d);
         if (act === 'factall') cur = all;
         else { const x = Number(v); cur = cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x].sort((a, b) => a - b); if (!cur.length) cur = [x]; }

@@ -266,7 +266,12 @@ export function optionControlHTML(def, cur, color, h) {
         // A value another option rules out (div_facts' array past dividends of 50, facts card F2): its box is greyed and
         // disabled, its reason on mouse-over and in a line under the list (`valueLock(cur)` -> {value: why}).
         const vlock = typeof def.valueLock === 'function' ? (def.valueLock(cur || {}) || {}) : {};
+        // A value the other options rule out of the list altogether (the 13-15 ticks of the x / ÷ fact sets under "Tables to"
+        // 10 x 10 or 12 x 12, `valueHide(cur)` -> [values]) is not drawn; the others keep their index, so a toggle still names
+        // the right value.
+        const vhide = new Set(typeof def.valueHide === 'function' ? (def.valueHide(cur || {}) || []) : []);
         const rows = vals.map((x, i) => {
+            if (vhide.has(x.v)) return '';
             const why = vlock[x.v];
             if (why) {
                 return `<label class="sko-set-row sko-set-locked" title="${escHTML(why)}" style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
