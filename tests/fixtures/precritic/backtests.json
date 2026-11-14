@@ -11192,7 +11192,7 @@
     "state": "EB-STRETCH fires on vocab_grade_pictures (Match 3) independent M / L: 57 mm rows for 50 mm works, 5 mm over the 52 mm cap"
    },
    "pass": {
-    "commit": "5006eed64",
+    "commit": "893d95d16",
     "state": "0 findings: the rows are held to 52.5 mm (drawn 50 + 2 mm room); the spare height is white at the foot"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --sizes M,L --roles independent --hosts none --no-baseline --only EB-STRETCH",
