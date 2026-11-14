@@ -8726,6 +8726,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "chart-name-line-detailed",
+  "check": "lead ruling 2026-11-14 (owner: Name / Date on EVERY anchor chart): the detailed lessons' anchor charts (P2, chunk P2b), pupil and key, print frame.js pageHeader's Name / Date line too (40d0df133 exempted them, chartBare)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples CHART-HEAD --detailed",
+  "browser": true,
+  "fail": {
+   "commit": "40d0df133",
+   "state": "CHART-HEAD FAIL: g2-nbt3-read-write-1000 P2 / P2b and g3-oa5-mult-properties P2, pupil + key - no Name / Date field (FAIL 92 over all 7 packs)"
+  },
+  "pass": {
+   "commit": "4e99c262c",
+   "state": "CHART-HEAD OK: chartBare removed, every chart takes the frame header"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules CHART-HEAD --detailed g2-nbt3-read-write-1000,g3-oa5-mult-properties",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
