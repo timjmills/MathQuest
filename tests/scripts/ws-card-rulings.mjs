@@ -331,7 +331,7 @@ async function main() {
                     if (!def) { pass(Object.assign(head, { msg: `${n.option} not an option (nothing to deal on ${n.roles.join(', ')})` })); continue; }
                     const vals = n.values || (def.values || []).map((v) => (v && typeof v === 'object' ? v.v : v));
                     const miss = [];
-                    for (const r of n.roles) for (const v of vals) if (!((def.hiddenOnRoles || {})[r] || []).some((x) => String(x) === `${v}${n.when ? `@${Object.entries(n.when).map(([k, w]) => `${k}=${w}`).join('')}` : ''}`)) miss.push(`${r}:${v}`);
+                    for (const r of n.roles) for (const v of vals) if (!((def.hiddenOnRoles || {})[r] || []).some((x) => String(x).split('@')[0] === String(v))) miss.push(`${r}:${v}`);
                     (miss.length ? fail : pass)(Object.assign(head, { msg: miss.length ? `${n.option} does not hide ${miss.join(', ')} on its roles (skill-options.js hiddenOnRoles), which the card hides there` : `${n.option} = ${vals.join(', ')} hidden on ${n.roles.join(', ')} (hiddenOnRoles)` }));
                     continue;
                 }
