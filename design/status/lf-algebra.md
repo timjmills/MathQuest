@@ -15,6 +15,8 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
   0d7f143cc (LDIV-JOIN 0.00-0.05 mm), backtest two-step-ldiv-join-bracketsvg PASS. Lesson baseline re-pinned (101 pages: g3-oa8
   two-step, g3-oa9 input-output; 13 lane lessons newly pinned). Gates: ws-two-step all modes OK, boot OK, code-snapshot OK (739).
   word-work is not added to ws-ldiv-hug's modes: no dealt two-step step draws long division (all ÷ steps are facts).
+  AFTER THE RESET: the 40 re-pinned g3-oa9-input-output-rule pages (function-table work r1-r8) were NOT graded >= 8 by a critic
+  (patterns critic r1 all FAIL, r2 none pass): a narrow look, folded into patterns critic r3.
 - 2026-11-14 ~07:00 TWO-STEP FAMILY READY TO DEPLOY (owner +10 %, stop $490). F6 closed: check ws-two-step --screen-align
   STEP-ALIGN-SCREEN 339b134df / af490bbe5 (FAIL: the screen host wraps a fact sentence wider than its two-up cell at 820), fix
   85bfa6313 (nowrap; on screen a one-digit box is one box wide, 0.8 mm gaps; digit size and box height unchanged), backtest
