@@ -7367,6 +7367,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-digit-ws-floor-table",
+  "check": "SCREEN-DIGIT holds each host to the shared floor table (tests/lib/ws-digit-floors.cjs): card / quiz 56 / 48 px, the online worksheet 29 px (LEAD_DECISIONS 2026-11-13), a passed worksheet raise (div_facts 56 / 48) as a ratchet - the add_facts worksheet at 40 px passes (critic divarray r2 D8, lead ruling: the check was in error)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-slots SCREEN-DIGIT (shared floor table)",
+  "browser": true,
+  "fail": {
+   "commit": "6ec6c8601",
+   "state": "add_facts worksheet flagged at 40 px (want >= 56 / 48) at 1366 / 1280 / 1024 / 820"
+  },
+  "pass": {
+   "commit": "8727ef7b4",
+   "state": "0 misses: add_facts worksheet 40 px >= 29; div_facts worksheet and every card / quiz still at 56 / 48"
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts,addition:add_facts --screen-digit --digit-widths 1366,1280,1024,820",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
