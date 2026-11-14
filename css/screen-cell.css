@@ -752,6 +752,20 @@ html .mq-scell .mq-work-area .mq-work:focus { box-shadow: inset 0 0 0 3px #000 !
     font-size: var(--mq-text); line-height: 1.6; text-align: left; align-self: stretch; margin: 0 0 10px;
 }
 .mq-scell .mq-ibline .mq-cellbox { font-size: calc(var(--mq-digit) * 0.8); height: max(48px, 1.2em); }
+/* lf-placevalue live1: a number sentence (placevalue:expand) at the host's digit size, bold as on paper; an operator keeps its box */
+.mq-scell .mq-ibline.mq-ibnum { font-size: var(--mq-digit); font-weight: 700; line-height: 1.5; text-align: center; }
+.mq-scell .mq-ibline.mq-ibnum .mq-ibkeep { white-space: nowrap; }
+/* (lf-placevalue critic live1 N4: on the online worksheet the sentence stays on ONE line - the grid then takes the columns that
+   hold it, 2 at 1280 as before - and its boxes keep the size the digit fit gave them before, 103 x 76 px at 1280) */
+@media (min-width: 600px) { .mq-grid-cell .mq-ibline.mq-ibnum { white-space: nowrap; } }
+.mq-grid-cell .mq-ibline.mq-ibnum .mq-cellbox { font-size: var(--mq-digit); width: max(103px, calc(var(--mq-w, 2) * 0.62em + 0.9em)); height: max(76px, 1.3em); }
+/* (critic live1 N5, H6; lead 22:19: global, the touch floor is an engine rule) an answer box's INPUT - its hit area - is at least
+   48 px tall on a tablet. The box is border-box with a 1 px border above and below, so a 48 px box held a 46 px input (measured:
+   unit_form worksheet 820, box 52 x 48, input 50 x 46); 50 px is the floor plus the two border pixels, the least that reaches
+   48 px of hit area. Every boxed slot input (the expand sentence, unit_form's place boxes, lf-tools r1 A1) takes it. */
+html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-height: 50px !important; }
+/* (the card's own inputs on that line: room for a 4-digit part at the digit size) */
+.mq-scell .mq-ibline.mq-ibnum input.ib-cell { min-width: max(56px, 2.4em) !important; }
 
 /* cloze twin: the equation, then the two lists in ink */
 .mq-scell .mq-cloze { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
@@ -2104,6 +2118,13 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
 
+/* lf-ops divarray r2 (lead 2026-11-13, lf-checks' tablet-width sweep; ws-screen-slots --screen-digit --digit-widths): a div_facts
+   online-worksheet cell takes the host's digit floor for its width - the card's own 40 / 48 / 56 px at its 600 / 1200 px
+   breakpoints (48 at 820 / 1024, 56 at 1280 / 1366) - above the 40 px touch floor. ADDITIVE; worksheet.js sets the marker. */
+html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 40px; }
+@media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 48px; } }
+@media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 56px; } }
+
 /* lf-builds chart_120 (SCREEN-DIGIT, LEAD_DECISIONS 2026-11-13: the practice card and the quiz floor 48 px at 820 / 1024, 56 px
    at 1280 / 1366; the online worksheet's 29 px floor already holds): a chart WINDOW (the 3 x 5 of the 1-100 and 1-120 charts;
    not the ten-column chart above) drew its numbers at the shared min(--mq-k2 x 6.4, 4vw) = 29-34 px in squares of the paper's
@@ -2199,3 +2220,9 @@ html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell] 
    square landed outside the clip: ws-phone-card TOUCH-HIT at 1280. A window that fits its card does not scroll. Additive.) */
 html body #questionCard .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)),
 html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)) { overflow: visible !important; }
+
+/* LDIV-JOIN (owner 2026-11-14: the bracket was "disconnected"): the arc and the bar over its column are ONE
+   path (bracketSvg); its y 0 sits on the vinculum's centre (1px into the 2px border), and the column's own
+   border is kept for layout but drawn clear. Additive: saved HTML with .mq-ldiv-arc keeps the old rules. */
+.mq-scell .mq-ldiv-brk.mq-ldiv-brkj { border-top-color: transparent; }
+.mq-scell .mq-ldiv-arcj { position: absolute; left: 0; top: -1px; width: 100%; height: calc(100% + 1px); overflow: visible; }

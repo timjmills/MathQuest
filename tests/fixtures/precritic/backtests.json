@@ -3233,8 +3233,8 @@
     "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
    },
    "pass": {
-    "commit": "d377e32b",
-    "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+    "commit": "fc04ba58",
+    "state": "0 findings: frame-array 43.0x14.4 (landscape, the divisor's rows) on every host, 'no dots' frame on 0 ÷ n (re-pointed from d377e32b: since the owner's landscape ruling of 2026-11-13 EQ wants the divisor's rows)"
    },
    "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ --widths 1280,820,390",
    "expect": {
@@ -3452,9 +3452,8 @@
     "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
    },
    "pass": {
-    "fixture": "tests/fixtures/precritic/screen-ink/div-facts-wide.pass.html",
-    "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
-    "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
+    "commit": "393db090",
+    "state": "0 findings: the div_facts array landscape (fc04ba58 / a7f44d18) and screen cues at one CSS mm per paper mm (393db090); lf-ops-divarray, the pin 99 -> 0"
    },
    "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline --widths 390,820,1280",
    "expect": {
@@ -7365,6 +7364,86 @@
    }
   },
   {
+   "id": "frame-title-place-long",
+   "check": "The teacher's page title (owner request 2026-11-13): titlePos above draws the title before the Name / Date / Score row, a custom title never shrinks, never passes two lines (cut at a word with an ellipsis and reported in res.titleFit for the dialog), and nothing overlaps the field row, the rule or the first row - every role and key, M and L",
+   "kind": "commit-pair",
+   "rule": "ws-frame-title TITLE-PLACE / TITLE-LONG",
+   "browser": true,
+   "fail": {
+    "commit": "f4294f68b",
+    "state": "origin/master + the checks: no title option (the title stays below and the custom words are ignored)"
+   },
+   "pass": {
+    "commit": "cbfb4e9ca",
+    "state": "the title option built (frame.js pageHeader, print-sheet.js fitTitle / withTitleOption)"
+   },
+   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only geom,long",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "frame-title-ident-planted",
+   "check": "TITLE-IDENT detects a no-option page that is no longer byte-identical to origin/master (planted: one pinned hash of addition:add_facts independent L changed); the live pin of master a6883082c passes",
+   "kind": "fixture",
+   "rule": "ws-frame-title TITLE-IDENT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/frame-title/bt-planted-changed-page.json",
+    "state": "planted: the pinned pupil page differs from the render"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/frame-title/master-hashes.json",
+    "state": "the hashes of origin/master a6883082c (no option)"
+   },
+   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only ident --hashes-against {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "title-code-roundtrip",
+   "check": "The page title travels with the simple print's QP1 share code and link and reaches the request; old codes (pinned from origin/master) decode and re-encode unchanged with the defaults",
+   "kind": "commit-pair",
+   "rule": "ws-title-code TITLE-CODE-RT / -OLD / -REQ",
+   "browser": true,
+   "fail": {
+    "commit": "f4294f68b",
+    "state": "origin/master + the checks: the code drops the title"
+   },
+   "pass": {
+    "commit": "cbfb4e9ca",
+    "state": "cleanPrint appends pageTitle / titlePos only when set; titleHeaderOf"
+   },
+   "command": "node tests/scripts/ws-title-code.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "title-ui-caret",
+   "check": "Critic title r1 T1 (and T4 / T5): in both print dialogs the Page title box keeps the cursor across the redraw that follows a keystroke (cursor at 5, X, a rebuild, Y: 'XY' at 5 - the simple print gave 'FractXions and more wordsY'); with Header Title unticked the title controls are disabled and say why; the simple print box is at least 400 px with a one-line label",
+   "kind": "commit-pair",
+   "rule": "ws-frame-title-ui UI-CARET / UI-TITLE-OFF / UI-WIDTH",
+   "browser": true,
+   "fail": {
+    "commit": "aaafcfb67",
+    "state": "critic r1 state: the simple print's render() put the cursor at the end; Title off left the controls live; the box 270 px"
+   },
+   "pass": {
+    "commit": "a2460c266",
+    "state": "render() keeps selectionStart / selectionEnd; syncTitleControls; .sp-ptitle full width"
+   },
+   "command": "node tests/scripts/ws-frame-title-ui.cjs --only caret,off,width",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "cell-read-ss-mult-facts-card",
    "check": "ws-screen-slots CELL-READ: a host render that reads 0 [data-ws-cell] cells is the finding host:read, never a pass",
    "kind": "commit-pair",
@@ -8588,6 +8667,1789 @@
    }
   },
   {
+   "id": "precritic-mode-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
+   "kind": "commit-pair",
+   "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+   },
+   "pass": {
+    "commit": "70d347578",
+    "state": "the mode verdict line reads OK"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-pipe-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+   },
+   "pass": {
+    "commit": "82b8fbf44",
+    "state": "the verdict line is the last line"
+   },
+   "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "one-row-cap",
+   "check": "a practice page (independent / more-practice / test) holding ONE row of a tall story is held to its work, never stretched to the page (lead ruling R1 / R4a; lf-algebra precritic two-step r11 ws-two-step --print CAP-BAND: multi_step_word (Visual) M 41 % / L 32 %, letter + wpBar L 41-45 %)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit ONE-ROW-CAP (browser twin on lf-algebra: ws-two-step --print CAP-BAND)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "one 125 mm story stretched to 214 mm (independent) / 184 mm (test): 41 % / 32 % under it"
+   },
+   "pass": {
+    "commit": "9e3059d18",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only ONE-ROW-CAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-drawn-fit",
+   "check": "a one-column Guided page of two-step stories holds two plain tries a page where they fit at the height they DRAW (level 1), and no one-row page stretches past its ink / 0.72 (lf-algebra precritic two-step r11: Guided 1 story a page, EB-BAND 31-53 %)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-DRAWN-FIT (browser twin: ws-empty-band EB-BAND guided on the 7 two-step skills)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "1 + 1 + 1 stories; one-row rows 200-208 mm"
+   },
+   "pass": {
+    "commit": "2157224a1",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-DRAWN-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "opener-spill",
+   "check": "a two-step story Opener: a Model measured over the half-width cell takes the full width, and a Model + Guided row that cannot share the page spill the Guided / Independent rows to page 2 - never over the budget (lf-algebra precritic two-step r11: Opener OVERFLOW / EB-EDGE 38 at M / L)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit OPENER-SPILL (browser twin: ws-cell-checks OVERFLOW + ws-empty-band EB-EDGE opener)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "one page over its budget, the Model in the 93 mm zone"
+   },
+   "pass": {
+    "commit": "1202510f0",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only OPENER-SPILL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ri-twostep",
+   "check": "a two-step column story on Reason It prints its story once and stands A over B at the full width (lf-algebra precritic two-step r11: Reason It OVERFLOW at M / L - 107-115 mm step columns side by side in half cells)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit RI-TWOSTEP (browser twin: ws-cell-checks OVERFLOW reason-it)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "A | B side by side (1fr 1fr)"
+   },
+   "pass": {
+    "commit": "2157224a1",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only RI-TWOSTEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lone-page-ruled",
+   "check": "ws-cell-checks LONE-PAGE reads design/audit/baselines/capacity.json `ruled`: a page ruled to hold 1 (the two-step Reason It pairs, multi_step_word test M / L; lead 2026-11-13 r9) passes with a note; an unruled lone page still FAILs",
+   "kind": "fixture",
+   "rule": "ws-cell-checks LONE-PAGE (ruled capacities)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lone-page/unruled.fail.json",
+    "state": "no ruling: one item a page where Reason It holds 3 - LONE-PAGE"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lone-page/ruled.pass.json",
+    "state": "ruled 1: passes, the note names the ruling"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --lone-page-probe \"algebra:multi_step_word reason-it M\" --ruled {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "onerow-strip-tight",
+   "check": "the ONE-ROW PAGEFILL exemption (mq-onerow) accepts a strip only while it is shorter than the row it holds; a one-row page with a strip a whole row tall (another row fits) still FAILs (critic r9, lf-roles)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (one-row strip)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/onerow/strip-tall.fail.json",
+    "state": "one-row page, 90 mm strip under a 60 mm row: PAGEFILL"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/onerow/strip-short.pass.json",
+    "state": "one-row page, 45 mm strip under a 172 mm row: accepted"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --onerow-probe {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "spill-p1",
+   "check": "SPILL-P1 (lead 2026-11-13 r9b): page 1 of a spilled Opener may leave over 30 % white only when the next part (the Guided band at its measure) is taller than the white; white that could hold it FAILs",
+   "kind": "fixture",
+   "rule": "ws-roles-unit OPENER-SPILL SPILL-P1 (opener.js spillP1Ok)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/spill-p1/fit-spilled.fail.json",
+    "state": "planted: 120 mm white (52 %) that could hold a 95 mm Guided band"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/spill-p1/honest.pass.json",
+    "state": "letter_equation opener L: 93.7 mm white, the Guided band needs 105 mm - an honest leftover"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --spill-p1-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-hint-leak",
+   "check": "number_word_form Guided: no grey hint gives the answer away - its place phrases built together ('2 tens, 6 ones' -> 26), or every digit of the answer named; the allowed form is the first step's gapped frame (lf-roles critic r8b D3, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M / L, default and every band: '\"twenty-six\": 2 tens, 6 ones.' under twenty-six, 26 more hints"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.' (re-pointed in round-cap r3: the check was tightened to ANY answer digit outside a gap and to the H T O deals in live1 r1 - critic live1 N1, row pv-words-hint-any-digit - so ae83dfbc, which still printed '\"two hundred\": 2 in the hundreds.', fails it; the row already failed at the r2 head)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-one-kind",
+   "check": "number_word_form Guided: one kind of problem per page - no item (teen, tens word alone, one word, two words, hundreds) whose kind the page's Steps do not cover (lf-roles critic r8b D4, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M default: 'eleven' under 'Read the tens word. Read the ones word.'; band 20 pages mixing one-word, teen and decade names"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-eb-band",
+   "check": "number_word_form Guided M / L: no cell 30 % or more empty under its ink (lf-roles critic r8b D2: 35-50 % in all 15 cells)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (--roles guided)",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "EB-BAND 15: M 35-50 %, L 35-59 % (rows stretched to the page)"
+   },
+   "pass": {
+    "commit": "878f5325",
+    "state": "words footprint guidedTight: rows at their measured height, the Model row the larger of its work line and the hint: EB-BAND 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --roles guided --sizes M,L --hosts none --no-baseline --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-numeral",
+   "check": "placevalue:expand on the online worksheet: the number sentence's numerals set and drawn at >= 29 px (the worksheet digit floor), Andika 700, no operator left at a line's end (lf-hosts critic via the lead 2026-11-13: 18 px)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "worksheet 1280 / 820 / 390: '144 =' set at 18 px weight 400 (drawn 22 px at 390), '+' alone at a line's end at 390"
+   },
+   "pass": {
+    "commit": "77b6ce24",
+    "state": "inlineBlanksHTML numeric: the sentence at --mq-digit (29 px), bold, each operator kept with its box"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-floor",
+   "check": "SCREEN-DIGIT holds the online worksheet to the shared table's 29 px floor (tests/lib/ws-screen-widths.cjs), not the card's 56 / 48: a 29 px worksheet numeral passes, 28 px still fails (lead ruling 2026-11-13 21:21 a; the ratchet pin design/audit/baselines/screen-digit-ratchet.json is proved by the --self-test case 'worksheet ratchet')",
+   "kind": "fixture",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (worksheet floor)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-28.html",
+    "state": "expand's worksheet sentence at 28 px, Andika 700: under the 29 px floor"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-29.html",
+    "state": "the same at 29 px: the worksheet floor, passes"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280 --host worksheet",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-no-numeral-skip",
+   "check": "SCREEN-DIGIT SKIPS a screen cell with no numeral (a number-name skill's card or quiz) instead of failing it 'no numeral found' (lead ruling 2026-11-13 21:21 b). Each state runs its OWN ws-screen-slots on the same fixture: the ruling changes the check",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (no numeral: SKIP)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form's card (the name 'twenty-six', no numeral): 'no numeral found in the cell' FAIL"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "SKIP no numeral, OK"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --digit-fixture tests/fixtures/precritic/screen-digit/no-numeral.html --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-chrome",
+   "check": "SCREEN-DIGIT never reads the worksheet card's chrome (the number badge .mq-wsbar, Nunito 16 px; the hint popup) as the item's numeral (lead ruling 2026-11-13 21:21 d: number_word_form's worksheet 'the numeral \"1\" is 16 px, font Nunito' was the badge). Each state runs its OWN ws-screen-slots on the live app",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (chrome excluded)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form worksheet@1280 / 1366 / 820 / 1024: the badge '1' 16 px Nunito; card / quiz 'no numeral found'"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": ".mq-wsbar / .hint-popup excluded, a cell with no numeral SKIPPED: 0 misses"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --skills composing:number_word_form --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-card-numeral",
+   "check": "placevalue:expand's practice card sets its number sentence at the card's digit floor (56 / 48 px at 1280-1366 / 820-1024), bold, every operator with its box (lead ruling 2026-11-13 21:21 c: 24 px regular)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (card)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "expand card@1280 '552 =' 24 px weight 400 (and 22 / 20 px at the narrower widths)"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "question-render.js .mq-ibnum: 56 px Andika 700 at 1280, 48 at 820; worksheet 29, quiz 56: 0 misses"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills placevalue:expand --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-any-digit",
+   "check": "number_word_form Guided: no hint names ANY digit of the answer outside a ruled gap, on every band and answer slot (lf-placevalue critic live1 N1, the class; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK (any digit)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 1000 M / L: '\"two hundred\": 2 in the hundreds.' under 262, '\"nine hundred\": 9 in the hundreds.' under 986"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble",
+   "check": "number_word_form Guided: every hint reads as English - no template filled with 'no' ('the no is'), no doubled word, no hole (critic live1 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words M / L: '26: the no is in the hundreds place.'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-to-words-steps",
+   "check": "number_word_form numeral-to-words Guided: the Steps fit every item's kind and name no place no item has (critic live1 N2: 'Say the hundreds: three hundred.' over 53, 26, 99)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (to_words, places)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words default / band 20 / band 1000 M / L: the hundreds Steps with a literal 'three hundred' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20) (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-one-kind-roles",
+   "check": "number_word_form: every item a Model and Steps are set over is the Model's kind, on the lesson, guided, opener and scripted-model pages, every wordform x band x answer slot; 11 and 12 are their own kind (no ones word), 0-10 one kind (round-cap r3, critic live1 r2 N3 / N6; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (every role, Model kind)",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'twelve' / 'eleven' under the teen Model and Steps 'Find the ones in the word.' (guided / opener band 20); the lesson's Model 39 over Guided 11, Model 'six' over 'sixteen', Model 'fifty' over two-word names; the opener's to_words Model 95 over 50"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "compose.js stepsKindOf / oneKindFirst shared by the opener, the guided page, the lesson's We Do and its example; 11 / 12 their own kind"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-lesson-rule-fits",
+   "check": "number_word_form lesson: no Rule / Remember / Steps line names a box, a place, a teen word or a dash that no number-name item on its sheet has (round-cap r3, critic live1 r2 N6)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages LESSON-RULE-FITS",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'Rule: Every box gets a digit.' over words written on a line (to_words, band 20, band 100); 'Remember: A number name says the hundreds, then the rest.' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "lesson routine pv-number-words ruleFromItems: the Rule and Remember line from the worked example's kind and slot (roles/lesson.js fitLessonData)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only LESSON-RULE-FITS --pages lesson --seeds 1 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-to-words-overflow",
+   "check": "number_word_form Opener L, numeral to words: the Model's answer line stays inside its half-width cell (critic live1 r2 N7, OVERFLOW; ws-grade-render --gate on the to_words deal)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate --roles opener (to_words)",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'page 1 cell 1: content overflows its cell' - the 100 mm L line across the Model cell's edge into the Steps column"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "words.js: the to_words line max-width 100 % of its cell, a long name wraps on it at its own size"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills composing:number_word_form --roles opener --size L --opts '{\"wordform\":[\"to_words\"]}' --gate --no-screen --out /tmp/mq-bt-pv-opener-tw",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-thousand-kind",
+   "check": "number_word_form at band 1,000 (both ways, both answer slots), the FIXED seed 913052 on every role: 'one thousand' is never dealt under a non-thousand Model or under Steps that do not cover it (critic live2 N9; the one-kind class)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (fixed seed 913052, band 1,000)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided M / L 'one thousand' under the Model 233 and the hundreds Steps, both ways; opener M / L the same"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000 is its own kind (pv.js WORDS_TO_NUMBER_1000 / NUMBER_TO_WORDS_1000), so compose.js stepsKindOf / oneKindFirst keep it off a hundreds page"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 0 --seed-list 913052 --deals 'band 1000,band 1000 hto,to_words band 1000' --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-kind-steps-all",
+   "check": "number_word_form, seed-free: over every name 0-1,000, both ways and both answer slots, the provider's Steps are equal exactly when the kinds are (so no seed can deal two kinds under one Model), every quoted step phrase is part of the name, and no step puts two place words in a row (critic live2 N9)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-KIND-STEPS / WORDS-STEPS-TRUE-ALL / WORDS-STEPS-GARBLE",
+   "browser": false,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: one Steps set covers hundreds + thousand (3 ways); '\"one thousand hundred\": 10 in the hundreds.'"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000 has its own Steps and worked steps ('\"one thousand\": 1 thousand.')"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-KIND-STEPS,WORDS-STEPS-TRUE-ALL,WORDS-STEPS-GARBLE --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble-places",
+   "check": "number_word_form Guided: a grey hint with two place words in a row ('\"one thousand hundred\": ___ in the hundreds.') fails GUIDED-HINT-GARBLE (critic live2 N9: the check read it and passed it)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE (place words)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided L band 1000 seed 913052, the hint '\"one thousand hundred\": in the hundreds.'"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000's own worked steps; no such hint"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-GARBLE --seeds 0 --seed-list 913052 --pages guided --deals 'band 1000' --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-one-kind",
+   "check": "number_word_form Opener: the Model and its Guided band are one kind its Steps cover (critic live1 N3: 'twenty' beside a teen Model and the teen Steps at band 20)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND --roles opener",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 20 M: Model 'five' with Guided 'fifteen', 'seventeen', 'ten'; to_words band 20 '15' beside '20'"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-one-line",
+   "check": "placevalue:expand online worksheet at 820 px and wider: the sentence on one line, every answer box at least 100 x 76 px - the size before the twin (critic live1 N4, a ratchet)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-ONE-LINE / WS-SLOT-SIZE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "3 columns at 1280: '+ [ ]' on a second line in every card, boxes 62 x 46"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "nowrap line, 2 columns at 1280 / 1 at 820, boxes 103 x 76"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-touch-target",
+   "check": "placevalue:expand and placevalue:unit_form answer boxes >= 48 px on the worksheet and the builder-made quiz at 820 / 1024 (critic live1 N5, H6; lf-tools r1 A1 - one shared fix)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TOUCH-TARGET (--quiz-builder)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "expand quiz-820 / -1024 and worksheet 46 px inputs; unit_form worksheet-820 / -1024 46 px (30 findings)"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "a boxed slot's box >= 50 px, its input 48 px: 0 findings"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills placevalue:expand,placevalue:unit_form --roles independent --size M --gate --quiz-builder --out /tmp/mq-bt-touch",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tof-stem",
+   "check": "a True or False? frame restates the problem as 'a op b =' only when that equation is true of the answer: one number equal to the operands combined (lf-ops critic-cbt-r2 E1: count_by_tables printed '3 x 12 = 12, 18, 24, 30, 36'; 55 skills on master)",
+   "kind": "commit-pair",
+   "rule": "ws-tof-stem TOF-STEM",
+   "browser": true,
+   "fail": {
+    "commit": "05dbd1149",
+    "state": "count_by_tables True or False? M: 'a x 12 =' stem over a 5-part list on pupil page and key"
+   },
+   "pass": {
+    "commit": "fc02a4642",
+    "state": "list / missing-part / 3-addend answers take the plain stem; true equation stems unchanged"
+   },
+   "command": "node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_missing_digit,addition:add_three --seeds 7,23",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-sample",
+   "check": "the Options panel's live sample, opened the teacher's way at 1280 and 390 px, lies inside its frame and holds ink (lf-algebra F8/G11: fit()'s is-cropped under _tidySample's translate(-50%,-50%) scale(k) put the stage off the frame); precritic's scoped options-shots row, and deploy session 4 for all 725 skills",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots (stage inside, or over 90 % of, .tv-sko-frame; > 0.5 % pixels darker than luma 230 in a 3 px inset)",
+   "browser": true,
+   "fail": {
+    "commit": "389a69c6",
+    "state": "lf-partopts branch base: FAIL 4 - add_word_problems and geo_translate at 1280 and 390, stage off the frame, 0.00 % ink. The same defect as lf-algebra d20c8a003 on patterns:pattern_features / growing_shape_patterns (precritic --only options-shots there: FAIL 4; on d20c8a003 + d7847568's fix: PASS); those skills are not on this branch, so the reachable pair is the branch's own base and fix"
+   },
+   "pass": {
+    "commit": "d7847568",
+    "state": "the fix: 0 findings, both samples inside the frame at a legible scale"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --widths 1280,390 --skip-no-panel --workers 1 --no-spot --checks inside,ink",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-legibility",
+   "check": "critic-panel-r1 F1: the option panel's sample is legible: its smallest visible HTML word or digit is drawn at >= 9 px (computed font-size x effective scale), every part of a sample shown in parts read in turn",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [text]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "round-1 tree: geo_translate drawn at k 0.2267 / 0.2056 (text 3.3-3.6 px), multi_step_word at 0.2571 (3.3 px)"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "the fix: the item one whole part at a time (1 of N), every part >= 9 px"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate,algebra:multi_step_word --widths 1280,390 --skip-no-panel --workers 1 --no-spot --checks text",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-controls",
+   "check": "critic-panel-r1 F2: after both tidies the option panel's footer and Done button are inside the window",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [controls]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "add_5_pictures: footer bottom 1024 in a 1000 px window (Done cut by 24 px); classify_count 1007"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "the panel re-clamped after the tidies and on its own size change"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_5_pictures,comparing:classify_count --widths 1280 --skip-no-panel --workers 1 --no-spot --checks controls",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-resize",
+   "check": "critic-panel-r1 F2 (resize): with the panel open, the window shrinks from 1280x1000 to 1280x720; the footer stays inside it",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [controls] @1280x1000>720",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "geo_translate: footer bottom 987 in a 720 px window (nothing re-places the panel on resize)"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "a window resize re-places the panel and re-fits the sample"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --checks controls",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-frame-scale",
+   "check": "critic-panel-r1 F3: a grown frame draws its sample at scale >= 0.30 and is never shorter than its CSS height (border-box growth)",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [scale]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "coord_distance_q1 at k 0.2979, mult_chart_easy at 0.2984 (want computed from clientHeight, written as a border-box height)"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "growth computed in border-box terms"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:coord_distance_q1,multiplication:mult_chart_easy --widths 1280 --skip-no-panel --workers 1 --no-spot --checks scale",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-option-change",
+   "check": "critic-panel-r1 F4: the first option of the panel is changed and the sample is re-read at +50 ms and +1.5 s (inside, inked, legible)",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots --change --changed-only [text]",
+   "browser": true,
+   "fail": {
+    "commit": "74c2519c",
+    "state": "classify_count at 390: legible when opened (9.0 px) but 7.6 px after its first option changes; fraction_of_set 8.6 px"
+   },
+   "pass": {
+    "commit": "cdf7a76d",
+    "state": "the redrawn sample is tidied to the same floor"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill comparing:classify_count,fractions:fraction_of_set --widths 390 --skip-no-panel --workers 1 --no-spot --change --changed-only --checks text",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-clip",
+   "check": "critic-panel-r1 F4: the stage must lie inside the frame (the 'covers >= 90 %' escape is gone)",
+   "kind": "fixture",
+   "rule": "ws-options-shots [inside]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/oversize.fail.js",
+    "state": "an oversize regression: the stage drawn at scale 1, overflowing a frame it fully covers (the old gate: OK, covers 100 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks inside --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-pageerror",
+   "check": "critic-panel-r1 F4: a page error thrown while the panel opens or redraws fails the check it was thrown in",
+   "kind": "fixture",
+   "rule": "ws-options-shots [pageerror]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/pageerror.fail.js",
+    "state": "the panel throws each time it draws (the old gate printed it and passed)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks pageerror --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-inner-clip",
+   "check": "critic-panel-r2 F1: no box inside the panel sample's stage clips its own content (overflow not visible and scrollWidth/scrollHeight over its client size by more than 1 px), on every part",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [clip]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: the 12 x 12 chart's 765 px table in a 400 px overflow:auto box (div 765>400 wide) on both parts"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the clipping box is opened (_sampleUnclip) and the table paged in tiles"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-cover",
+   "check": "critic-panel-r2 F1/F2, the new class: across all parts every block of the unpaged item (each word outside a drawing, each drawing) is wholly visible on some part",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [cover]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: 73 of 162 blocks on no part (columns 7-12 of the chart)"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the chart in 4 tiles (rows 1-6 / 7-12 x columns 1-6 / 7-12, heading row and row labels on each): every cell on a part"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks cover",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-choices",
+   "check": "critic-panel-r2 F2: the answer choices are one part of their own (never with the question, never spread), each with its letter or label, and split the same way at every width",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [choices]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: 4 unlettered figures packed A | BC | D, A with the question"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the four figures lettered A-D, two to a row, one part of their own"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks choices",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-svgtext",
+   "check": "critic-panel-r2 F3: SVG text in the panel sample is drawn at >= 9 px (font-size x its screen scale), every part",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [svgtext]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: geo_translate's 'original' tag 5.8 px; fraction_of_set's group numbers 8.6 px"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "SVG text counted in _sampleNeed: parts zoomed (<= 2) or sliced, an undividable drawing may grow the frame to 45 %"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate,fractions:fraction_of_set --checks svgtext",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-summary",
+   "check": "critic-panel-r2 F5: a two-line-clamped option summary has an expand control (a button with aria-expanded) reachable by touch and keyboard",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [summary]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: algebra_all's summary clamped after an option change, full text only in the title attribute"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "a 'Show all' button (aria-expanded, aria-controls) opens the summary"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra_mixed:algebra_all --change --changed-only --checks summary",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-repeat",
+   "check": "critic-panel-r2 F6: the panel sample shows no sentence (20+ characters) of its question line again outside it",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [repeat]",
+   "browser": true,
+   "fail": {
+    "commit": "b1a46205",
+    "state": "round-2 tree: the story in the question line and again in the story block ('how many cards does lena have now')"
+   },
+   "pass": {
+    "commit": "19138956",
+    "state": "the preview hides a question line the visual already says (as live play's mq-dup does)"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra:multi_step_word --checks repeat",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-inner-clip-fixture",
+   "check": "critic-panel-r2 F1 (fixture asked by the brief): a table clipped inside the stage fails [clip] though the stage box is inside the frame",
+   "kind": "fixture",
+   "rule": "ws-options-shots [clip]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/inner-clip.fail.js",
+    "state": "the box around the chart set to overflow:hidden at 200 px every 50 ms"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-parts-cap",
+   "check": "critic-panel-r2 soft spot: every part is walked (the old walk stopped at 12); more than 40 parts FAILs [parts]",
+   "kind": "fixture",
+   "rule": "ws-options-shots [parts]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/parts-endless.fail.js",
+    "state": "the Next arrow is never disabled"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks parts --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-part-ink",
+   "check": "critic-panel-r2 soft spot: a part needs 0.5 % ink in its OWN drawn box (the old floor was 0.03 % of the frame)",
+   "kind": "fixture",
+   "rule": "ws-options-shots [ink]",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/options-shots/part-sparse.fail.js",
+    "state": "part 2 replaced by one 14 px digit in a 380 x 260 box"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+    "state": "the panel as it is"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks ink --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-hit",
+   "check": "critic-panel-r3 P1: every visible option control in the panel body takes a pointer at its centre (document.elementFromPoint is the control, inside it, or its own label), and the option-change pass clicks with page.mouse.click",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [hit]",
+   "browser": true,
+   "fail": {
+    "commit": "fdfddfdd",
+    "state": "master: the \"?\" button's 44 px ::after hangs off the whole row (position: static !important); 6 of 6 controls on geo_translate and 15 of 15 on mult_chart_easy hit .sko-tip, and a mouse click on the first tick box / select opens the tip"
+   },
+   "pass": {
+    "commit": "6553e352",
+    "state": "the P1 hotfix: .tv-sko .sko-has-tip > .sko-tip { position: relative !important }"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --change --widths 1280 --skill coordinates:geo_translate,multiplication:mult_chart_easy --checks hit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-slice",
+   "check": "critic-panel-r3 N1: no SVG label or shape of the panel sample is cut - by a viewBox slice window, by its own drawing's clipped edge, or by the frame edge: every drawn leaf (SVG text and shapes, HTML words) lies wholly inside the frame or its scroll area",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [slice], [inside]",
+   "browser": true,
+   "fail": {
+    "commit": "6de83995",
+    "state": "round-3 tree: nl_mult and add_int paged in overlapping viewBox slices - the axis cut on every slice, \"50\" / \"60\" and \"-11\" ... \"-14\" cut at the frame edge, \"-7\" at the slice edge"
+   },
+   "pass": {
+    "commit": "9126cb62",
+    "state": "the slicer removed: each number line shown whole, scaled to the frame (a drawing too wide to read at 9 px is drawn at that floor in a frame that scrolls)"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:nl_mult,integers:add_int --checks slice,inside",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-panel-scroll-cue",
+   "check": "critic-panel-r4 N1-cue: a panel sample frame that scrolls by more than 8 px shows a visible cue beside it (tablet and ChromeOS scrollbars are overlays that show nothing until touched), and no cue shows under a frame that does not scroll",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [scroll-cue]",
+   "browser": true,
+   "fail": {
+    "commit": "30a4674f",
+    "state": "round-4 tree: histogram_read and hotspot_quads drawn whole at 9 px scroll 122 / 213 px at 1024 and 820 with nothing on screen to say so; the hidden part is the last bar and 1-2 of the shapes the question asks about"
+   },
+   "pass": {
+    "commit": "05c287e1",
+    "state": "a line under the frame names the way to scroll (\"Scroll sideways to see the whole drawing\"), and the scrollbar is drawn always"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1024,820 --skill data_analysis:histogram_read,shapes_classify:hotspot_quads --checks scroll-cue",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "nos-browser-settle-reclick",
+   "check": "lead 2026-11-13 (lf-builds chart_to_120, -lf-builds 427e28563): ws-no-size-s --browser FAILed once ('the worksheet M click built at L') and PASSed on the same tree: a size click landed while the last build was still redrawing the controls. A worksheet sheet whose FIRST size click is lost (planted in a copy of the served tree) reproduces it",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s --browser WORKS: wait for the built size to hold, re-scan, click; on a miss re-click once; only a repeat miss fails (a control that never works still fails: --self-test --browser, 30 mutations)",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "master's tool: the one lost click FAILs WORKS worksheet sheet"
+   },
+   "pass": {
+    "commit": "db3d4c97d",
+    "state": "the de-flaked tool re-clicks once after the build settles: OK"
+   },
+   "command": "bash tests/fixtures/precritic/nos-drop-first-click.sh {root} tests/scripts/ws-no-size-s.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "key-json",
+   "check": "no answer key (or page) prints the generator's raw JSON as an answer, on any role: plotted points read 'A (5, 3)', a match reads its tile names numbered by the pictures (lf-engine -roles critic r2 F5: coordinate_q1 and shape_name_match_3d lesson keys printed [{\"label\":\"A\",\"x\":5,...}] / {\"t0\":\"b0\",...})",
+   "kind": "commit-pair",
+   "rule": "ws-key-json L-KEY",
+   "browser": true,
+   "fail": {
+    "commit": "d23423151",
+    "state": "coordinate_q1 / shape_name_match_3d lesson M keys: raw JSON in the Answer: line"
+   },
+   "pass": {
+    "commit": "4b3d2dcf9",
+    "state": "'A (5, 3), B (6, 8)' / '1. cube  2. sphere ...'"
+   },
+   "command": "node tests/scripts/ws-key-json.cjs --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-role-cover-plan",
+   "check": "lf-ops critic cbt r2 root cause (E3 / E5 / E6): precritic --skill linted only the Independent (and lesson) page at defaults, so Scripted Model L (L-OVERLAP SECTION), Opener (CL40-INK) and Error analysis (L-TOPSTART CL-4b) never gated though plain print-lint was red on them. The --skill dry run must plan print-lint / empty-band / raster-fit on every offered role (no card: every buildSheet role) at M and L, and print the plan's size",
+   "kind": "commit-pair",
+   "rule": "ws-precritic --skill plans ws-role-cover (every offered role x M/L x drawing option values; --dry-run prints 'role cover size: N print-lint + N empty-band + N raster-fit unit(s) ... est N min'); read by ws-role-cover --plan-check",
+   "browser": false,
+   "fail": {
+    "commit": "22752843c",
+    "state": "master: print-lint rows only on independent (L, M) and lesson (L, M); no row lints opener, error-analysis or scripted-model"
+   },
+   "pass": {
+    "commit": "d17e76aa7",
+    "state": "the role-cover rows: every buildSheet role of count_by_tables (no signed card on this tree) at M and L, 8 drawing variants"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-cbt-e3-e5-e6",
+   "check": "lf-ops critic cbt r2 E3 / E5 / E6 on the frozen tree 8f76b6401: run with the NEW coverage (ws-role-cover's lint on the card's roles where they live: opener, error-analysis, scripted-model at M and L), print-lint FAILs naming all three - E3 scripted-model@L L-OVERLAP SECTION (the Say band covered), E5 opener CL40-INK (the step tab in the label keep-out), E6 error-analysis L-TOPSTART CL-4b (the gap above 'Sam wrote:'). With the OLD coverage (Independent only, at M and L) the same tree is OK - which is how the three reached the critic",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint units (every offered role x M/L; precritic role-cover-1..n)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "args": "--roles opener,error-analysis,scripted-model --expect-e3e5e6",
+    "state": "the new plan's lint rows on the roles of E3 / E5 / E6: FAIL with all three visible"
+   },
+   "pass": {
+    "commit": "8f76b6401",
+    "args": "--roles independent --with-covered",
+    "state": "the SAME tree under the old plan's lint coverage (Independent at M and L): OK - the coverage, not the tree, is what changed"
+   },
+   "command": "bash tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-buildsheet-variants",
+   "check": "critic roles r1 D1: ws-drawing-variants signed a value from the generator's cell only, so options buildSheet draws round the problem (supports: frame, touch, tile, line, boxsign) read 'same as defaults' (add_facts 1 of 30) and add_facts guided + support=frame (L-SUPPORT SCC-T10 at M and L) was never role-covered. The --skill dry run must plan add_facts' support=frame variant on the guided role",
+   "kind": "commit-pair",
+   "rule": "ws-drawing-variants signs each value on the cell AND the buildSheet pupil page vocabulary (role independent, M, seed 7000); read by ws-role-cover --plan-check --variant",
+   "browser": false,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "cell-only signature: add_facts 1 drawing variant of 30 (notation=across); no support variant planned"
+   },
+   "pass": {
+    "commit": "b153ae21e",
+    "state": "page-vocabulary signature: add_facts 8 of 30 (notation=across + 7 support values, support=frame among them) on all 17 card roles, guided included"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill addition:add_facts --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill addition:add_facts --roles guided --variant support=frame",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-e3e5e6-pass-can-fail",
+   "check": "critic roles r1 D2: expect-e3-e5-e6.sh turned any FAIL without all of E3 / E5 / E6 into OK on BOTH sides, so the pass side of role-cover-cbt-e3-e5-e6 could never fail. A planted unrelated FAIL given to the wrapper without --expect-e3e5e6 must stay FAIL",
+   "kind": "commit-pair",
+   "rule": "expect-e3-e5-e6.sh re-states a FAIL only with --expect-e3e5e6 (the fail side); without it OK needs the run OK and none of E3 / E5 / E6",
+   "browser": false,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "the wrapper prints 'OK (a FAIL without all of E3, E5 and E6 ...)' for a planted unrelated FAIL"
+   },
+   "pass": {
+    "commit": "b153ae21e",
+    "state": "the planted FAIL passes through as FAIL"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --check-wrapper {root}/tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-copy-light-role-cover-size",
+   "check": "critic roles r1 D3: a --copy-light --dry-run planned the role-cover rows but returned before the 'role cover size: ... est N min' line, so a copy-light lane did not see the role cover's cost",
+   "kind": "commit-pair",
+   "rule": "ws-precritic --dry-run prints the role cover and its size before the copy-light branch; read by ws-role-cover --plan-check",
+   "browser": false,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "copy-light dry run: no 'role cover:' or 'role cover size:' line"
+   },
+   "pass": {
+    "commit": "b153ae21e",
+    "state": "copy-light dry run prints count_by_tables' role cover (17 roles, 8 variants) and its size and minutes"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --copy-light --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "role-cover-add-facts-guided-frame",
+   "check": "critic roles r1 D1 proven escape: add_facts guided + support=frame fails L-SUPPORT SCC-T10 (the answer zone moves between cells, supports drawn) at M and L, yet no precritic --skill row ran it. The role cover on that variant must name L-SUPPORT SCC-T10: on ac526b6b2 the variant is not planned (and print-lint got --opts only, so L-SUPPORT never ran)",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint units of support variants run print-lint with --supports (precritic role-cover-1..n)",
+   "browser": true,
+   "fail": {
+    "commit": "ac526b6b2",
+    "state": "the role cover of add_facts guided@L holds no support=frame unit: clean, the escape"
+   },
+   "pass": {
+    "commit": "225d8f049",
+    "state": "the support=frame unit lints with --supports frame and names L-SUPPORT SCC-T10"
+   },
+   "command": "node {root}/tests/scripts/ws-role-cover.mjs --root {root} --skill addition:add_facts --tools lint --roles guided --sizes L --variants support=frame 2>&1 | grep -q 'guided@L~support=frame: L-SUPPORT SCC-T10' && echo 'role-cover --guided-frame: OK (L-SUPPORT SCC-T10 named on guided@L support=frame)' || echo 'role-cover --guided-frame: FAIL (guided + support=frame not linted for L-SUPPORT)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "chart-name-line",
+   "check": "lf-engine chart-name (owner request 2026-11-14): every lesson's ANCHOR CHART, pupil and key, prints frame.js pageHeader's Name / Date line (the same type and rule as an ordinary page), no Score unless the chart is scored, the key's line at the pupil page's places, no overflow, one page inside A4 (master printed the chart's header with no Name / Date)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples CHART-HEAD",
+   "browser": true,
+   "fail": {
+    "commit": "22752843c",
+    "state": "CHART-HEAD FAIL: add / round / div M, L pupil + key - no Name / Date field, the header is not pageHeader's markup"
+   },
+   "pass": {
+    "commit": "cb5e5bd94",
+    "state": "CHART-HEAD PASS: chartPage takes the frame header (Name / Date, Score off); detailed lessons keep their bare header"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only add,round,div --rules CHART-HEAD --sizes M,L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "chart-name-line-detailed",
+   "check": "lead ruling 2026-11-14 (owner: Name / Date on EVERY anchor chart): the detailed lessons' anchor charts (P2, chunk P2b), pupil and key, print frame.js pageHeader's Name / Date line too (40d0df133 exempted them, chartBare)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples CHART-HEAD --detailed",
+   "browser": true,
+   "fail": {
+    "commit": "40d0df133",
+    "state": "CHART-HEAD FAIL: g2-nbt3-read-write-1000 P2 / P2b and g3-oa5-mult-properties P2, pupil + key - no Name / Date field (FAIL 92 over all 7 packs)"
+   },
+   "pass": {
+    "commit": "4e99c262c",
+    "state": "CHART-HEAD OK: chartBare removed, every chart takes the frame header"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules CHART-HEAD --detailed g2-nbt3-read-write-1000,g3-oa5-mult-properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-orient-divfacts",
+   "check": "div_facts' framed ÷ array with 2 or more rows is drawn landscape (width >= height) on every screen host and on the Independent page at S / M / L, the empty 0 ÷ n frame too (facts card §5.9, owner 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.9, RP-81)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "FAIL: the frame is the quotient's rows of the divisor's dots, 41 x 122 px on screen (12.0 x 35.8 mm on paper)"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: frame 43.0 x 14.4 mm at M, the divisor's rows"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ORIENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-dot-min-divfacts",
+   "check": "div_facts' screen array dot stands to the fact digit at >= paper's ratio - never smaller than the print dot (facts card §5.9, owner 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-DOT-MIN (facts card 5.9, RUBRIC C1)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "FAIL: screen dot 0.167 x the fact digit, paper 0.252"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: the screen dot 1.5 x paper's ratio, capped by the cell"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only DOTMIN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-caption-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: x arrays min rows of max, the fact named, and one row reads \"1 row of n\" (re-pointed from 393db090: CAPTION now also holds the r1 N1 grammar, which 393db090 broke - \"1 rows of 1\")"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-orient-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "24 findings: 7 × 10 drawn 10 rows of 7, 75 x 105 px"
+   },
+   "pass": {
+    "commit": "393db090",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only ORIENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-stack-side-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
+   "browser": true,
+   "fail": {
+    "commit": "55e7d0f2f",
+    "state": "6 findings, over the pin of 4: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
+   },
+   "pass": {
+    "commit": "4e2e4c988",
+    "state": "4 findings, within the pin (master's 4 x 46 mm cells, 30 %): the stacks in their own 4 columns"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --opts '{\"support\":[\"array\"]}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-zero-row-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
+   "browser": true,
+   "fail": {
+    "commit": "05875e169",
+    "state": "1 finding: \"4 × 0\" p1 cell 8, 22.7 mm empty under the item in a 62.8 mm cell (32 %), H13-ROW"
+   },
+   "pass": {
+    "commit": "792e5ca30",
+    "state": "0 findings: \"4 × 0\" draws the empty frame"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports array --size S --roles review --skills multiplication:mult_facts --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-frame-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "669c41cea",
+    "state": "11 findings: 8 x 0 on paper S / M / L, 10 x 0 on the card and quiz draw nothing"
+   },
+   "pass": {
+    "commit": "792e5ca30",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only FRAME,EQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-not-slot-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "on an array-support band no support draws an empty closed box the size/shape of the answer slot, and a frame on only some cells (the x 0 frame, the lone framed support in a band of unframed arrays) is a finding - on paper and every screen host (critic divarray r1 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SUPPORT-NOT-SLOT; ws-print-lint SUPPORT-NOT-SLOT",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 paper findings (S/M/L): 1 framed and 9 unframed array supports in one band - the x 0 frame reads as the lone slot-like box"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: every x array draws in the band's one frame and the x 0 fact draws that frame empty - no lone slot-like box"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only NOTSLOT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-caption-grammar-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a one-row array caption reads \"1 row of n\", never \"1 rows of n\" (it is spoken aloud) (critic divarray r1 N1, fact.js:242)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-CAPTION (row/rows grammar)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 findings (card 1280/820/390): caption \"1 rows of 1, for 1 x 1\" says \"1 rows\""
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: the one-row caption says \"1 row of 1, for 1 x 1\""
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "size-order-opt-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "the ruled option pages are judged by SIZE-ORDER: an option page whose cells measure smaller at S must fit more at S (strict S > L), never the same page at every size (critic divarray r1 D3; mult_facts {support:array} printed 10/10/10 and 12/12/12 at S/M/L)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin SIZE-ORDER-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 findings: mult_facts {support:array} independent/test/more-practice S==L (10/10/10, 12/12/12) - same page at every size. (master also fails: pre-existing, 10/10/10)"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: the x array page sizes from its measured band-frame cells - Independent / Test / More practice S 10 > M 8 >= L 8"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-eq-ind-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1; lead ruling 2026-11-13: the div_facts rule of 2026-11-09 extends to mult_facts - TEST-EQ-IND runs by default)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin TEST-EQ-IND (on by default)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "mult_facts array Test 12 != Independent 10 (S/M/L); touch Test 20/16 != Independent 25/20 (S/M). (master also fails touch 20!=25)"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: mult_facts Test = Independent on array, touch, skip, boxsign and no support (S/M/L), div_facts array as before"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pagefill-review-multfacts-touch",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "print-lint's PAGEFILL (and the PG-23 orphan) run on the Review / Test roles for fact skills with supports (--fill-roles), so a support page that leaves a 30% blank strip under the grid is caught (critic divarray r1 D2: mult_facts Review S touch at the ruled 15 left a 71 mm, 30% strip)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL on review/test (--fill-roles)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "PAGEFILL fires on mult_facts Review S touch: an empty strip ~30% of the problem area under the grid"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 PAGEFILL findings: Review S touch prints 4 x 3 facts + 4 stacks = 16 and fills the page"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports touch --size S --roles review --fill-roles review --skills multiplication:mult_facts --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "supband-below-support-multfacts-array",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item - an unframed x array in a Test cell sized for a 10-12-row one left 36-44 % empty below it (critic divarray r1 D4). A support BESIDE taller ink (the fact beside the x band frame) has no band under it. Run on the Test role, where D4 was graded (on precritic's path via --role test)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SUPBAND (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "EB-SUPBAND fires on mult_facts {support:array} Test S/M/L (e.g. Test S cell 4 ~38 %)"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "0 findings: the x array draws in the band frame beside the fact (no band under a short array)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --roles test --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "capacity-ruled-review-touch-multfacts",
+   "pending": true,
+   "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
+   "check": "a RULED option page prints at least its ruled count: mult_facts Review S with touch is ruled 16 (master's count; lead ruling 2026-11-13 withdrew the 16 -> 15 re-pin that left a 30 % blank strip, critic divarray r1 D2)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin ruled page (CAPACITY-NO-DROP)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "mult_facts review S {support:[touch]}: 15 items, under its RULED 16"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "16 items: 4 x 3 facts + 4 stacks (review.js geometry)"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts --roles review --sizes S --no-test-eq-ind",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-page-divfacts-test",
+   "check": "division:div_facts fact Test pages half empty (critic r6 R6-1: Test S 117 mm white, M 116, L 91)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAGE (white under the grid vs one row pitch)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: Test S 4 x 5, 119 mm white under the grid (pitch 23 mm); M 118 mm; L 93 mm"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "owner ruling 2026-11-08 (a): the Test takes the Independent capacity (4a07ada1), 3 columns at M for 3-digit facts (c05a5dae); EB-PAGE OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^test [SML]$' --rules EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-page-divfacts-fade",
+   "check": "division:div_facts fade packet page 3 at M 40 % used (critic r6 R6-4: 129 mm white)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAGE on the faded packet",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: fade packet M p3 131.5 mm white (12 bare facts, the 2 x page-1 stage cap)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "div_facts' stages uncapped: page 3 takes its page; EB-PAGE OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-pad-divfacts-M",
+   "check": "division:div_facts skip / think at M: the answer line 0.5-0.8 mm from the right rule on 3-digit facts (critic r6 R6-2)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAD (CL-8 3 mm side pad, probed with the widest facts)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: skip / think Independent and Test M, ink 0.72 mm from the right rule"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the beside line counts the tab keep-out (skip / think M print the line under the fact); EB-PAD OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^(independent|test) M .support: (skip|think)}$' --sizes M --rules EB-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-pad-page-divfacts-L",
+   "check": "division:div_facts at L: the skip page 2.35 mm from the right rule (\"1xx ÷ 1x =\" beside the w2 tab inset) and the fade packet page 3 in 2 x 5 with 53 mm white (div_facts aids r8, owner ruling 2026-11-09 (a))",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-PAD + EB-PAGE at L",
+   "browser": true,
+   "fail": {
+    "commit": "be028660",
+    "state": "lf-ops r8: EB-PAD 8 (skip Independent / Test L, 2.35 mm), EB-PAGE 1 (fade packet L p3, 53.3 mm white, 2 x 5)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "a supported / faded section reaching 5-digit facts starts each fact under the number tab at L (3 mm pad, taller row, 3 columns); EB-PAD / EB-PAGE OK (re-pointed a4c6b694 -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^((independent|test) L .support: skip|fade packet)\" --rules EB-PAD,EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-cols-divfacts-array",
+   "check": "division:div_facts array (tables 2-4) at L in 4 columns where M takes 3, the fact 1.85 mm from the rule (critic r6 R6-3)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-COLS (columns(L) <= columns(M) for no fewer problems) + EB-PAD",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: L 4 x 3 = 12 against M 3 x 4 = 12; EB-PAD 1.48 mm in 8 of 12 L cells"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the measure guard (w2 tab inset + 3 mm pad) gives L 3 columns; EB-COLS / EB-PAD OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^independent [ML] .support: array, .constant' --sizes M,L --rules EB-COLS,EB-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-factx-divfacts",
+   "check": "division:div_facts fade packet: the fact's left edge moves 5.0 mm between page 1 and pages 2-3 (critic r6 R6-5)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-FACTX (fact left x spread across all packet pages <= 0.5 mm)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: spread 5.30 mm (p1 8.5 mm, p2 13.8 mm in the cell)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "every packet cell takes the one w2 left inset; EB-FACTX OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-FACTX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-eq-ind-divfacts",
+   "check": "division:div_facts: every support's Test page prints the same count as its Independent page at S / M / L (lead / owner ruling 2026-11-09; critic r7 R7-1)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-TESTEQ (TEST-EQ-IND: Test count = Independent count, per support and size)",
+   "browser": true,
+   "fail": {
+    "commit": "c127c3e6",
+    "state": "lf-ops r7: EB-TESTEQ 5 - off M 21 / 24, skip S 18 / 21, array (default) M 21 / 24, think S 21 / 24, boxsign M 12 / 16"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the div_facts Test takes its Independent page's grid when its own holds a different count, rows 1.1 x the footprint; EB-TESTEQ OK (re-pointed a5c78f9d -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only \"^(independent|test) [SML]\" --rules EB-TESTEQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-gap-divfacts",
+   "check": "division:div_facts fade packet at L: the bare page 3 puts its line 16.9 mm under the fact (under-tab start) against 9.0 mm on pages 1-2 (critic r7 R7-2)",
+   "kind": "commit-pair",
+   "rule": "ws-fact-pages EB-GAP (fact-to-answer-line distance within 1 mm across a render with an under-tab fact)",
+   "browser": true,
+   "fail": {
+    "commit": "c127c3e6",
+    "state": "lf-ops r7: EB-GAP 1 (fade packet 3p L: 9.04 mm p1, 16.92 mm p3)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "the under-tab bare stage keeps the line under the fact, rows 1.1 x footprint, page 3 holds 18; EB-GAP OK (re-pointed f471ecb2 -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+   },
+   "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^fade packet\" --rules EB-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-gap-divfacts",
+   "check": "an array of more than 5 columns or rows draws the 1.5 mm subitising gap after every 5th (WDS RP-81 / RP-21; critic div_facts r5 R5-3), on paper S/M/L and every screen host - div_facts and mult_facts arrays",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-GAP",
+   "browser": true,
+   "fail": {
+    "commit": "9a8acc59c",
+    "state": "ARRAY-GAP: 27 / 3, 40 / 4, 20 / 2 ... arrays drawn with no gap between rows 5 and 6 (paper S)"
+   },
+   "pass": {
+    "commit": "4c5de5a27",
+    "state": "0 findings: the gap after every 5th row and column (the R5-3 fix e81243f99, deployed at 4c5de5a27)"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-label-facts",
+   "check": "every support text on screen (the sign box's word, the number line's labels, the skip strip's terms) is >= 8 pt and >= 95 % of the same text on paper (lf-checks TEXT-SIZE findings routed to lf-ops, lead 2026-11-13: add / sub number-line labels 7.6 pt, mult skip-strip terms, div \"divide\" 8.9 pt)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SUPPORT-LABEL",
+   "browser": true,
+   "fail": {
+    "commit": "850b686b5",
+    "state": "origin/master: number-line labels 10.2 px (7.6 pt) on add / sub, skip-strip terms 10.9 px (8.2 pt, print 8.9) on mult, the sign box at 89 % on the div 390 card"
+   },
+   "pass": {
+    "commit": "b92e5ab29",
+    "state": "0 findings: support cues at one CSS mm per paper mm (r1 SIZE-INK) and the sign box never shrinks on screen"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts --only LABEL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-ws-divfacts",
+   "check": "the div_facts online-worksheet numeral is at least the host digit floor for its width - 56 px at 1366 / 1280, 48 px at 1024 / 820 - as the card and quiz are (lead 2026-11-13, lf-checks' tablet-width sweep: it was 40 px, the touch floor)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (--digit-widths; the div_facts worksheet ratchet in design/audit/baselines/screen-digit-ratchet.json)",
+   "browser": true,
+   "fail": {
+    "commit": "369173bc2",
+    "state": "origin/master at the divship merge: the div_facts worksheet numeral 40 px at 1366 / 1280 / 1024 / 820 (want the ratchet 56 / 48); 4 misses, no other finding"
+   },
+   "pass": {
+    "commit": "fded88800",
+    "state": "0 misses: the div_facts worksheet cell takes the host floor (data-mq-host-floor), held by the ratchet pin screen-digit-ratchet.json (re-pointed on the merge with master: 850b686b5 / 898f800d7 predate master's card [data-ws-cell] (46a7c3c45), so CELL-READ failed both states)"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --screen-digit --digit-widths 1366,1280,1024,820 --rule-skills division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-answer-place-divfacts",
+   "check": "on one div_facts online worksheet every ÷ card puts its answer line in ONE place relative to its sentence (beside \"=\" or under it) and the kit cells are one height within 5 %, at 1366 / 1280 / 1024 / 820, the defaults and each support (critic divarray r2 D7: at 820 with the 48 px floor 1-digit dividends kept the line beside \"=\", 2-digit ones wrapped under, cells 212 / 255 / 269 px)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-ANSWER-PLACE",
+   "browser": true,
+   "fail": {
+    "commit": "62f5bec01",
+    "state": "lf-ops-divarray r2: 820 default places mixed (103 / 150 px), 820 array mixed (212 / 255 / 269 px), boxsign sign box wrapped above 108 ÷ 12 only (110 / 204 px)"
+   },
+   "pass": {
+    "commit": "441e10189",
+    "state": "one answer place and one sign-box place per sheet; one cell height per sheet"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ANSWER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sm-array-overflow-divfacts",
+   "check": "the div_facts Scripted Model with the array support on the 10s band (tables 2-5) overflows no cell at M or L, pupil page and key (critic divarray r2 D6: at L the third trace jot ran onto the cell rule, 16 overflow problems, with 25 % of the page free)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate OVERFLOW (precritic render-gate-div_facts-sm-array)",
+   "browser": true,
+   "fail": {
+    "commit": "62f5bec01",
+    "state": "lf-ops-divarray r2: scripted-model L 32 overflow findings (mq-mjots ws-trace leaves the cell)"
+   },
+   "pass": {
+    "commit": "7bb99d3c1",
+    "state": "no overflow at M or L"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills division:div_facts --roles scripted-model --size M,L --supports array --opts '{\"band\":100,\"constant\":[2,3,4,5]}' --gate --no-screen --out /tmp/mq-bt-sm-array",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-ws-floor-table",
+   "check": "SCREEN-DIGIT holds each host to the shared floor table (8727ef7b4: tests/lib/ws-digit-floors.cjs; since the merge with master 369173bc2: master's ONE table tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR plus the ratchet pin design/audit/baselines/screen-digit-ratchet.json): card / quiz 56 / 48 px, the online worksheet 29 px (LEAD_DECISIONS 2026-11-13), a passed worksheet raise (div_facts 56 / 48) as a ratchet - the add_facts worksheet at 40 px passes (critic divarray r2 D8, lead ruling: the check was in error)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (shared floor table; a CHECK fix, so each state runs its own tree's script via {root})",
+   "browser": true,
+   "fail": {
+    "commit": "6ec6c8601",
+    "state": "add_facts worksheet flagged at 40 px (want >= 56 / 48) at 1366 / 1280 / 1024 / 820"
+   },
+   "pass": {
+    "commit": "8727ef7b4",
+    "state": "0 misses: add_facts worksheet 40 px >= 29; div_facts worksheet and every card / quiz still at 56 / 48"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --skills division:div_facts,addition:add_facts --screen-digit --digit-widths 1366,1280,1024,820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "c120-wrong-fits",
    "check": "a chart window's wrong answer fits its square: one value per square, no more digits than the window's widest number (chart_120 'writes-ten-ten' 1011 printed '1,011' over the next square, True or False? L)",
    "kind": "commit-pair",
@@ -9154,6 +11016,166 @@
     "state": "sayFrame(q): chartSayFrame"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join",
+   "check": "the long-division bracket is ONE connected stroke: the arc's top end runs into the vinculum with no white at the outer corner (<= 0.3 mm) and no step (<= 0.1 mm), paper M/L pupil + key and screen 1366 / 820 (owner request 2026-11-14: 'disconnected'; master paper gap 0.67 mm, fact rows 0.33 mm, screen step 0.25 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join LDIV-JOIN",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "butt-capped arc under a separate vinculum: white wedge at the corner on every bracket"
+   },
+   "pass": {
+    "commit": "bf0814473",
+    "state": "bracketSvg: arc and bar one path with a mitre join, on paper and screen"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --skills division:long_div_2digit,division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join-raster",
+   "check": "the screen long-division bar has no anti-aliased seam: inside the bar's central 1 px, from the arc's corner to the vinculum's end, no pixel brighter than 80 at DSF 2 or 3, on card / worksheet / quiz at 1366, 1280, 1024 and 820 (ldiv critic r1 F1: div_remainders bracket card at 1366, brightest 103 at DSF 2 / 155 at DSF 3; LDIV-JOIN read gap 0.00)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --raster LDIV-JOIN-RASTER",
+   "browser": true,
+   "fail": {
+    "commit": "654606ae3",
+    "state": "svg bar butt end meets the dividend's border at a fractional x: div_remainders card + quiz 1366 brightest 103 (DSF 2) / 155 (DSF 3)"
+   },
+   "pass": {
+    "commit": "ba835be98",
+    "state": "overlapping bar pieces (rembrk rule span, .mq-ldiv path bar runs under the border): brightest 0"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --raster --skills division:div_remainders",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-shape",
+   "check": "the long-division bracket's side is near-straight: its greatest distance from the chord between its ends is <= 0.6 mm on paper (M/L, pupil + key) and on screen (card / worksheet / quiz 1366 / 820) (owner 2026-11-14: 'I don't like the big curve ... make it straight or almost straight'; 0176d774f bows 1.60-3.30 mm on paper, 5.04 mm on the screen worked bracket)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --shape LDIV-SHAPE",
+   "browser": true,
+   "fail": {
+    "commit": "0176d774f",
+    "state": "quadratic arc x 1.5 / q 9 of a 10-wide box: bow 2.64 mm at M, 3.30 mm at L"
+   },
+   "pass": {
+    "commit": "b7ee41f3a",
+    "state": "bracketLine: near-straight side, apex at the old apex, bow <= 0.34 mm"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --shape --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-room",
+   "check": "the long-division work grid uses the room a 4-a-page cell gives: grid >= 80 % of the cell's free height or rows at the 2x cap, block centred; 6 / 8 a page keep the floor row with no overflow (owner 2026-11-14: 'a lot of white area to work with'; d82acc06f grid 45 % M / 56 % L at 1x)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --room LDIV-ROOM",
+   "browser": true,
+   "fail": {
+    "commit": "d82acc06f",
+    "state": "work grid at its footprint size in a 106 mm cell: 45 % (M) / 56 % (L) of the free height, 25 mm white above and below"
+   },
+   "pass": {
+    "commit": "86950d488",
+    "state": "writing boxes grow to the cell (M rows 1.87x, 93 %; L 1.54x, 94 %), centred; 6 a page unchanged"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --room --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-stem",
+   "check": "an Error Analysis story sentence on an item the key judges correct is true of its numbers: the operands combined give the shown result (lead 2026-11-14, the class of TOF-STEM; no live skill prints a story sentence today, so this is a planted guard)",
+   "kind": "fixture",
+   "rule": "ws-ea-stem EA-STEM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ea-stem.fail.html",
+    "state": "a correct unknown-start item whose work reads '44 - 8 = 44'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ea-stem.pass.html",
+    "state": "'44 - 8 = 36' on the correct item; the Fix-it item keeps the pupil's wrong result"
+   },
+   "command": "node tests/scripts/ws-ea-stem.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-frame-fit",
+   "check": "a one-column Guided page of 31 mm count rows takes the rows the page DRAWS room for (Model + 6 tries at M and L), never past the drawn room or the L ceiling (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL: the frame reserve over-reserved instruction / Steps / body by 11 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-FRAME-FIT (browser twin: ws-empty-band EB-REFILL guided)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "M no drawnFrameMm; L 6 cells"
+   },
+   "pass": {
+    "commit": "a64d0e285",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-FRAME-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-lone-story",
+   "check": "a one-column Guided page holding ONE two-step story sizes the cell to the story it draws, never stretched to content / 0.7 (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: the lone story 25-31 % empty in its frame)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-LONE-STORY (browser twin: ws-empty-band EB-BAND guided, >= 30 % only)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "lone 135 mm story in a 186.1 mm cell at M and L"
+   },
+   "pass": {
+    "commit": "f8e338139",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-LONE-STORY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "gdpcap-answers",
+   "check": "a Guided page whose cells score 1 to 3 answers each keeps its scored answers within the §12.1 ceiling (lf-builds chart_120 Guided L: 7 answers > 6; ceilFor counted answers only when every cell scored > 1)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GDPCAP-ANSWERS (browser twin: ws-empty-band EB-GDPCAP)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "mixed L: 11 scored answers"
+   },
+   "pass": {
+    "commit": "72d4949bc",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GDPCAP-ANSWERS",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

@@ -36,7 +36,7 @@ export {
 
 /* --------------------------------------------------------------------------- frame */
 export {
-    headerFields, strandTab, pageTitle, pageFooter, page, doc,
+    headerFields, strandTab, pageTitle, pageHeader, HEADER_DEFAULTS, TITLE_POSITIONS, pageFooter, page, doc,
     instruction, BAND_LABELS, band, sayBand, steps, story, sideStrip, withStrip,
 } from './frame.js';
 
@@ -111,7 +111,7 @@ export {
 
 // The operations templates that are not a plain stack or fact (long division, area model,
 // chart window, arrays, remainder, number line, fact family, cloze bank).
-export { divisionSteps } from './cells/long-division.js';
+export { divisionSteps, bracketSvg, bracketLine } from './cells/long-division.js';
 import './cells/pv-times.js';
 import './cells/area-model.js';
 import './cells/area-model-div.js';

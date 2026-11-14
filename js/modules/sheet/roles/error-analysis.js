@@ -36,7 +36,7 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
+    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer, equationStemOf,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
 import { scorePoints } from '../paginate.js';
@@ -310,12 +310,12 @@ function partLabels(it, parts, c) {
 }
 
 /** The number sentence of a story item, as the pupil would have written it. */
-function storyWork(it, shown, wrong, isWrong) {
+function storyWork(it, shown, wrong, isWrong, correct) {
     if (isWrong && wrong && wrong.work) return wrong.work;
-    const q = it.q || {};
-    const o = operandsOf(q);
-    const g = opGlyphOf(opOf(q));
-    return o.length >= 2 && g ? `${o[0]} ${g} ${o[1]} = ${shown}` : '';
+    // (EA-STEM, the class of TOF-STEM: the sentence restates the problem only when its operands give the RIGHT answer, so a
+    // correct item's work is true and a wrong one shows the pupil's error in the result - never "44 - 8 = 44" for a missing start)
+    const stem = equationStemOf(it.q || {}, correct);
+    return stem ? `${stem}${shown}` : '';
 }
 
 /**
@@ -577,7 +577,7 @@ export function prepare(it, info = {}) {
         }
         kind = labels ? 'parts' : REDO.has(it.template) || (it.template === 'clock' && isList(glue)) ? 'redo' : glue ? 'parts' : 'value';
     } else kind = /[A-Za-z]{2}/.test(correct) && !/^\d/.test(correct) ? 'text' : 'value';
-    const work = story ? storyWork(it, shown, wrong, isWrong) : '';
+    const work = story ? storyWork(it, shown, wrong, isWrong, correct) : '';
     // The key's slots: the judgement, and the fix in EVERY slot of its kind (critic round 3: a key
     // that fills only the changed boxes leaves a pupil slot unanswered, and "blank" reads as 0).
     const slots = { 'ea-ok': isWrong ? '' : '✓', 'ea-fix': isWrong ? '✓' : '' };

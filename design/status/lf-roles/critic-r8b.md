@@ -244,3 +244,60 @@ It has four weak points. None blocks this round, because none of them changes a 
 
 **Re-critic r8c verdict:** expand M/L, unit_form M/L and combine L PASS; combine M and the 14 subtraction pages stay PASS
 (byte-identical). Zero counted defects on this lane's pages. EB-REFILL is sound for D1, with the tool debts R1 to R4 above.
+
+## Critic r10 (narrow)
+
+Critic: independent (mq-opus-medium), 2026-11-14. Lane at 159f00ee2 (merged with master 7f2ca5e39). I rendered every page
+myself with seed = fnv("cat__skill:guided") (count_by_tables 972334, vocab_grade_pictures 43858, two_step_add_then_div 694812).
+Renders are in `<scratchpad>/critic-r10/`. algebra:two_step_add_then_div is in this tree, so I graded my own render and the
+builder's lf-algebra PNG.
+
+### Verdicts (C1 ease / C2 teaching / C3 spacing / C4 look)
+
+| Page | C1 | C2 | C3 | C4 | Verdict |
+|---|---|---|---|---|---|
+| count_by_tables Guided M (Model + 4) | 9 | 8 | 8 | 9 | PASS |
+| count_by_tables Guided L (Model + 6 on 2 pages) | 9 | 8 | **6** | 8 | **FAIL** (pre-existing, X1) |
+| vocab_grade_pictures Guided L (Model + 2) | 9 | 8 | 9 | 8 | PASS (still ≥ 8) |
+| two_step_add_then_div Guided M (this tree and lf-algebra PNG) | 8 | 8 | **5** | 8 | **FAIL** (X2) |
+
+**count_by_tables M.** The page holds 4 tries, up from 3 on master. The last row ends 2.3 mm above the body bottom, measured
+in the DOM. On pupil and key, no element passes the body bottom, no cell overflows and no page overflows. The frame is not
+clipped, and the 2-line count rows are full but not crowded. The ladder of tables runs 2, 3, 4, 5, 6. The key is right on every
+box (6 to 72). The Score counts cells (/4), while the page holds 14 answer boxes; this is the r8b nit n5.
+
+**vocab_grade_pictures L.** The page goes from Model + 1 to Model + 2 and stays full: 8.7 mm white under the grid. The key is
+right (rule C, identity A, step B; unknown B, output C, input A). One nit, key only: the grey highlight behind "Step 1" /
+"Step 2" touches the digit after it.
+
+### Findings
+
+- **X1 · count_by_tables L page 2: EB-BAND 33 % on all 4 cells (C3 6, H13).** The rows are stretched to 45.8 mm for about
+  30 mm of ink.
+  - It is pre-existing. `ws-empty-band` reports the same 4 cells at 33.2 to 33.3 % on 66dcb77a0. The L pupil and key are also
+    byte-identical to origin/master. So r10 did not cause it, but the page still fails.
+  - Page 1 holds Model + 2 tries and page 2 holds 4. On a Guided page, white under the grid is allowed (PT-ENG-3), so the
+    rows should be held to their ink, not stretched.
+  - Check: existing **ws-empty-band EB-BAND** catches it. Proposed: the GUIDED-TIGHT rule extends to `count-row` cells
+    (hold the rows to their ink on continuation pages).
+- **X2 · two_step_add_then_div M page 1: the Model is alone on a page (H5, C3 ≤ 5).** GUIDED-LONE-STORY correctly holds the cell
+  to its drawn work. But it now shows plainly that page 1 is the Model alone, with about 40 % of the page white.
+  - PAGE_TYPES §2.3 says: "A Model too tall to leave a row of tries under it takes a cell of its own with a hinted try beside
+    it, never a page alone." The sheet is 3 pages for Model + 4; L is 3 pages for Model + 2.
+  - The builder's lf-algebra PNG shows the same.
+  - In this tree `ws-empty-band` also fails EB-SIDE at 35 % on every cell. The builder says this passes on lf-algebra; I did
+    not verify that.
+  - Check: proposed **GUIDED-MODEL-ALONE** in ws-roles-unit: no Guided page holds the Model and no try. Today EB-BAND sees
+    cells, not pages, and EB-PAGE skips Guided.
+- **x3 (nit) · two_step Model working.** The working covers Step 1 only ("Circle −. Subtract. 26 − 6 = 20.") and leaves the
+  division untold. This is the same class as r8b n2.
+
+### Hashes (pupil and key HTML, SHA-1, origin/master 7f2ca5e39 vs lane 159f00ee2)
+
+- **5 other passed skills are identical at M and L:** add_facts, add_wp_20, placevalue:value, sub_facts and vocab_pick3_words.
+  mult_facts is also identical, which makes 12 pages and 24 documents.
+- vocab_grade_pictures M is identical and only L changed, as the builder said.
+- count_by_tables L is identical to master; only M changed.
+
+**Critic r10 verdict: FAIL** on X2 (two_step_add_then_div, the lone-Model page) and X1 (count_by_tables L, pre-existing).
+count_by_tables M and vocab_grade_pictures L PASS. No passed page regressed.
