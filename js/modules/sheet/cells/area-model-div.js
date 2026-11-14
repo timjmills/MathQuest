@@ -129,8 +129,8 @@ register('area-model-div', {
         const probH = formOf(p) === 'sign' ? g.stripMm : g.stripMm + g.E * 1.3;
         // inkWMm: the model's true width without the cell slack, so a host laying the cell beside other work (Reason It,
         // Error Analysis) knows it and stacks instead of squeezing (area_model_div_4by2 precritic r1: Reason It OVERFLOW).
-        // The print top pad is 1 mm (was 3): the "<Name> wrote:" tag sits 2-4 mm over the ink (PT-ERR-4) and the first row
-        // starts at the top (CL-4b) - precritic r1 PUPILTAG 4.8 mm, L-TOPSTART.
+        // The print top pad is 1 mm (was 3): the "<Name> wrote:" tag sits 2-4 mm over the ink and the first row starts at
+        // the top of the box (precritic r1: PUPILTAG 4.8 mm, L-TOPSTART).
         const inkRaw = Math.max(G.parts.length * G.colMm + G.sideMm, probW);
         return {
             wMm: Math.ceil(inkRaw + 12),
