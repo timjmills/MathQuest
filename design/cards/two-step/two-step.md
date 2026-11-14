@@ -290,7 +290,7 @@ Each runs as `node tests/scripts/<script> …`.
 11. **Lesson data for the seven skills (prereqs.js 0/7: the lesson role falls back today). The G2 BUILD lesson #17 routine as in section 3?** Recommended: Yes: lesson 7's routine for the x / ÷-first skills, the follow-on routines for the presets, the G2 routine for multi_step_word(_plain); the build writes them in prereqs.js.
 12. **WRM tags: the presets have none (no WRM step teaches 3.OA.D.8; lessons-6-7 open question).** Recommended: Keep the presets untagged (site lesson linked direct, as now); tag multi_step_word(_plain) Y2.B4.S10 partial (two-step + / − without money) beside its current Y5 / Y6 tags; search terms as listed in section 7.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-14
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
