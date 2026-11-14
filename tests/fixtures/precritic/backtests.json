@@ -9163,6 +9163,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ldiv-join-raster",
+   "check": "the screen long-division bar has no anti-aliased seam: inside the bar's central 1 px, from the arc's corner to the vinculum's end, no pixel brighter than 80 at DSF 2 or 3, on card / worksheet / quiz at 1366, 1280, 1024 and 820 (ldiv critic r1 F1: div_remainders bracket card at 1366, brightest 103 at DSF 2 / 155 at DSF 3; LDIV-JOIN read gap 0.00)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --raster LDIV-JOIN-RASTER",
+   "browser": true,
+   "fail": {
+    "commit": "654606ae3",
+    "state": "svg bar butt end meets the dividend's border at a fractional x: div_remainders card + quiz 1366 brightest 103 (DSF 2) / 155 (DSF 3)"
+   },
+   "pass": {
+    "commit": "ba835be98",
+    "state": "overlapping bar pieces (rembrk rule span, .mq-ldiv path bar runs under the border): brightest 0"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --raster --skills division:div_remainders",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
