@@ -9079,6 +9079,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120r2-one-window-hidden",
+   "check": "lead ruling (a) 2026-11-14: a chart with ONE window (band 120 grid=rows, band 10) is not dealt on the multi-item practice pages - one item a sheet left the page 68 % empty (options-verify --render L-DENSITY PAGEFILL on grid=rows)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render PAGEFILL (+ ws-role-hidden on the card decision)",
+   "browser": true,
+   "fail": {
+    "commit": "427e28563",
+    "state": "chart_to_120 grid=rows @M/@L PAGEFILL (one window a sheet)"
+   },
+   "pass": {
+    "commit": "af76fc570",
+    "state": "grid=rows@band=120 and band 10 hidden on independent / more-practice / review / mixed-practice (+ test for band 10)"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
