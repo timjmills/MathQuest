@@ -737,3 +737,10 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   exemptions for their ids.
 - PARKED (budget stop from the lead): lf-engine F2, the plan's row listing printing skill-less rows (chart-name-line,
   lesson-pm-cont, lesson-tab-clear) N/A; fix = judge them with idOnPath's tool rule (precritic or deploy gate) and print why.
+## 2026-11-14 — ws-no-size-s --browser de-flake (lead; seen on lf-builds chart_to_120)
+
+- Cause: a size click landed while the previous build still redrew the controls, so the click was lost. Fix: wait until the
+  built size reads the same 3 times, re-scan just before each click (a rebuild drops the old tags), and on a miss re-click
+  once; a re-click is printed as a note, and only a repeat miss fails. 2 of 2 plain runs OK; the 30-mutation browser
+  self-test still catches every planted S / dead control. Row `nos-browser-settle-reclick` (a planted lost first click:
+  master's tool FAIL, this tool OK).

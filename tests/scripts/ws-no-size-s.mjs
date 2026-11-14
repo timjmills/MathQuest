@@ -571,6 +571,7 @@ async function browserMain() {
     const { open, waitFor } = require('../lib/ws-harness.cjs');
     const fails = [];
     const ok = [];
+    const retried = [];   // size options that needed the one re-click after the build settled (reported, not failed)
     const check = (name, cond, detail) => { (cond ? ok : fails).push(`${name}${cond ? '' : ': ' + detail}`); };
     const app = await open({ seed: 1 });
     const { page, base } = app;
@@ -680,6 +681,8 @@ async function browserMain() {
             return null;
         }, how);
         const waitSize = async (how, want, ms = 20000) => { let got = null; for (let t = 0; t < ms; t += 200) { got = await builtSize(how); if (got === want) return got; await new Promise((r) => setTimeout(r, 200)); } return got; };
+        // the built size holds still: the same reading on 3 polls 150 ms apart (a rebuild in flight reads null or the old size)
+        const stableSize = async (how, ms = 8000) => { let last, same = 0; for (let t = 0; t < ms && same < 3; t += 150) { const v = await builtSize(how); same = v != null && v === last ? same + 1 : 0; last = v; await new Promise((r) => setTimeout(r, 150)); } return last; };
         const clickOpt = async (i) => {
             const pt = await page.evaluate((i) => { const el = document.querySelector(`[data-nos-i="${i}"]`); if (!el) return null; const host = el.tagName === 'OPTION' ? el.closest('select') : el; host.scrollIntoView({ block: 'center', inline: 'center' }); const r = host.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, sel: el.tagName === 'OPTION', v: el.value }; }, i);
             if (!pt) return false;
@@ -707,11 +710,22 @@ async function browserMain() {
             // re-scanned after the settle (a rebuild redraws the controls), the checked one last
             const fresh = (await scan(rootSel)).opts.filter((o) => o.vis && o.v !== 'S').sort((a, b) => a.on - b.on);
             for (const o of fresh) {
+                // (lead 2026-11-13, lf-builds chart_to_120: "M" built at L once, then passed on the same tree) wait for the last
+                // build to SETTLE before a click, and on a miss re-scan, re-click and re-read once: only a repeat miss fails
+                await stableSize(how);
                 const before = await builtSize(how);
                 const want = o.v;
-                if (!(await clickOpt(o.i))) { check(`WORKS ${name}: "${o.word}" can be clicked`, false, 'gone before the click'); continue; }
-                const after = await waitSize(how, want);
-                check(`WORKS ${name}: clicking "${o.word}" builds at ${want}`, after === want, `built at ${after} (was ${before})`);
+                // re-scan AFTER the settle: a rebuild redraws the controls and drops the earlier scan's tags
+                const cur = (await scan(rootSel)).opts.find((x) => x.vis && x.v === want);
+                if (!cur || !(await clickOpt(cur.i))) { check(`WORKS ${name}: "${o.word}" can be clicked`, false, 'gone before the click'); continue; }
+                let after = await waitSize(how, want);
+                if (after !== want) {
+                    await stableSize(how);
+                    const again = (await scan(rootSel)).opts.find((x) => x.vis && x.v === want);
+                    if (again && await clickOpt(again.i)) after = await waitSize(how, want);
+                    if (after === want) retried.push(`${name} "${o.word}"`);
+                }
+                check(`WORKS ${name}: clicking "${o.word}" builds at ${want}`, after === want, `built at ${after} (was ${before}; re-clicked once after the build settled)`);
                 await scan(rootSel);   // re-tag after the re-render
             }
             const back = (await scan(rootSel)).opts.find((o) => o.vis && o.v === 'M');
@@ -821,6 +835,7 @@ async function browserMain() {
         fails.push(`could not run: ${String(e && e.message || e).slice(0, 200)}`);
     } finally { await app.close(); }
     for (const o of ok) console.log(`  ok   ${o}`);
+    for (const r of retried) console.log(`  note re-clicked once after the build settled: ${r}`);
     for (const f of fails) console.log(`  FAIL ${f}`);
     console.log(fails.length ? `${TOOL} --browser: FAIL - ${fails.length} finding(s)` : `${TOOL} --browser: OK (${ok.length} checks: S seeded in every restore path reads M; every Size control offers M / L with M checked)`);
     process.exit(fails.length ? 1 : 0);
