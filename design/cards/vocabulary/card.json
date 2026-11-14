@@ -403,9 +403,9 @@
       },
       {
         "key": "role:stretch",
-        "d": "offered",
-        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
-        "why": "any skill on any page type"
+        "d": "out of scope",
+        "source": "lead ruling 2026-11-14 (ws-empty-band EB-ROLE: the card offered Stretch, the app does not compose it), as for chartwindow and count_by_tables",
+        "why": "no open problem of its own; Reason It and True or False? cover the thinking pages"
       },
       {
         "key": "role:word-problems",
