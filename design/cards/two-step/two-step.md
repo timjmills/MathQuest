@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"two-step","kind":"family","template":"word-work","families":["algebra"],"match":{"templates":["word-work"]},"config":"design/cards/two-step/card.json","indexSha":"73c6e123d1432e332c8a0bbf42a9d2c7ac458a52","bodySha":"9fe9f752228b4764","format":2,"configSha":"2b442659a90e"}
+{"card":"two-step","kind":"family","template":"word-work","families":["algebra"],"match":{"templates":["word-work"]},"config":"design/cards/two-step/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"2ba8f9bc41698be3","format":2,"configSha":"df2932af0b26"}
 {"cited":"AX-3 C1 C2 H1 H5 H13 L1 L3 L6 L11 L-LEAK LR-5 LR-6 RP-70 RP-72 SF-50 SL-4 SP-2","rules":"AK-1 a0cc12 2 d4709f H13 36f579 VQ-1 dea36a 2 f15b47 3 db17cc 4 b89965 5 1fa595 6 cc6e7e 7 2253df 8 6d0278 9 0b5532 10 2ed85c P-WP-1 5dae44 3 61ae2b 4 88f1f4 11 e45960 12 b4e26e 17 5f3c57 18 50d9ea 19 468b08 SF-51 76f24d 54 e3b098 PT-WPR-6 ad3a55 8 5862e3 RP-70 0b60b5 71 55103e 72 b10450 LS-3 62bf3d P-21 ce35dc P-TH-1 9c751a 13 bd13de CL-6 102a92 40 2a6dbb PG-21 1ea272 SL-6 7a1453 11 fc569a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 10 256ad3 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H5@RUBRIC b3892d H6 e90105 8 44c23b 9 fd82d1 10 fbd802 L1 4f7d0c 3 901e56 4 6538d6 6 6e19d8 10 d2ca35 11 9ebe19 AX-4 2eb6c1 P-3 833e8c C1 a670d9 2 a51365 SF-50 a0e361 SL-4 911174 SP-2 1f2df0 AX-3 e3ffb9 CL-8 c4e70b DN-10 91ac9d P-WP-20 868eef 21 f3aa89 22 2b6ca8 23 5c17e3 24 c0df8e PG-12 8e75fd RP-20 8888b0 TY-13 3d0f88 VA-61 841427","entries":"R%3AR-ADDSUB-MAX 4703cf R%3AR-BAND-30 6382a0 R%3AR-BAND-50 9eef8a R%3AR-MULTDIV d69ecb R%3AR-ADDMULT 5f21af R%3AR-ADDDIV 80cf9f D%3Aforms%3D0 972948 D%3Aforms%3D1 972948 D%3Aforms%3D2 972948 D%3Aforms%3D3 972948 D%3AmsOps%3Daddsub bcefeb D%3AmsOps%3Dmult bcefeb D%3AmsOps%3Ddiv bcefeb D%3AmsOps%3Dmultdiv bcefeb D%3AmsOps%3Daddmult bcefeb D%3AmsOps%3Dadddiv bcefeb D%3Aband%3Dnull 972948 D%3Aband%3D30 972948 D%3Aband%3D50 972948 D%3AwpCues%3Dtrue d55128 D%3AwpCues%3Dfalse d55128 D%3AwpBank%3Dtrue d55128 D%3AwpBank%3Dfalse d55128 D%3AwpBar%3Dtrue 972948 D%3AwpBar%3Dfalse 972948 D%3AwpFrames%3Dtrue bcefeb D%3AwpFrames%3Dfalse bcefeb D%3AmsLetter%3Dtrue bcefeb D%3AmsLetter%3Dfalse bcefeb D%3AmsCheck%3Dtrue bcefeb D%3AmsCheck%3Dfalse bcefeb D%3AmsChoose%3Dtrue 972948 D%3AmsChoose%3Dfalse 972948 D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Alesson 972948 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
@@ -26,6 +26,7 @@
  {"id":"T-5.6","source":"§5.6","text":"No owner sign-off of skill cards in the lessons-first program: lanes decide from the st..."},
  {"id":"T-5.7","source":"§5.7","text":"'Within N' bounds the answer, never the operands; a skill's NAME is its declaration."},
  {"id":"T-5.8","source":"§5.8","text":"Card signed by the lead under the owner's delegation: decisions 1-12 as recommended, de..."},
+ {"id":"T-5.9","source":"§5.9","text":"Decision 4 amended (lead ruling 2026-11-14, GUIDED-MODEL-ALONE): the two-step bar model..."},
  {"id":"T-9.1","source":"§9.1","text":"Accept every option value, role and host decision marked PROPOSED in section 7a?"},
  {"id":"T-9.3","source":"§9.3","text":"Any new preset skill under the 2026-10-17 rule (msOps mult / div alone, msChoose, wpFra..."},
  {"id":"T-9.4","source":"§9.4","text":"Build the two-step bar model (a new graphic: Step 1 bar - equal groups or part-whole - ..."},
@@ -80,7 +81,7 @@ Seven skills on one drawing: algebra:multi_step_word_plain (the host) and its tw
 
 1. 1 G2: add then take away, answers to 30 (band 30), two step columns with sign rows, bar model on the teaching pages -> 2 all four + / − orders mixed (forms) -> 3 answers to 50 -> 4 answers to 100 (one change a step: the order kind OR the number size)
 2. 5 G3: x first then + / − (msOps mult) -> 6 ÷ first (div) -> 7 x or ÷ first mixed (multdiv = two_step_mult_div_first) -> 8 + / − first then x (addmult) -> 9 + / − first then ÷ (adddiv) -> 10 one equation with a letter, x / ÷ first (two_step_letter_equation) -> 11 the letter with brackets (msLetter + addmult / adddiv) -> 12 estimate to check (two_step_estimate_check, + / − stories to 100)
-3. Fade within each step (P-1: the scaffold changes alone, never with the content): bar model drawn (teaching pages) -> bar off, column boxes (independent) -> frames (wpFrames: the pupil still produces every number and sign); the printed middle question (P-WP-11 v1, PROPOSED Q6) and the grey Step 1 sign trace are hints that go first; the two titled step columns, the sign rows, the answer row with its unit bank are structural and stay
+3. Fade within each step (P-1: the scaffold changes alone, never with the content): bar model drawn (Opener, Scripted Model, the lesson chart) -> bar off on the Guided page (its Model and tries: the first fade step, lead ruling 2026-11-14) -> bar off, column boxes (independent) -> frames (wpFrames: the pupil still produces every number and sign); the printed middle question (P-WP-11 v1, PROPOSED Q6) and the grey Step 1 sign trace are hints that go first; the two titled step columns, the sign rows, the answer row with its unit bank are structural and stay
 4. G4 4.OA.A.3 continues on the division family (remainder_interpret) and on the build entry multi_step_four_ops (G4-Y5.B3, G5-Y6.B2 parts not on this card)
 
 **Build-list entries on this template** (standards, ladder and full spec of each in `design/BUILD_LIST.md`)
@@ -102,6 +103,8 @@ Seven skills on one drawing: algebra:multi_step_word_plain (the host) and its tw
 - `function_machine` (new) Function Machines — host `algebra:function_machines`
 - `inequality_write_graph` (option) Write and Graph Inequalities — host `algebra:inequalities`
 - `length_ops` (new) Length Word Problems — host `measurement:length_word_problems`
+- `map_change_unknown_story` (option) How Many Were Added? How Many Went? (change unknown) — host `addition:add_word_problems`
+- `map_compare_smaller_unknown` (option) Compare Stories: Find the Smaller Amount — host `subtraction:sub_word_problems`
 - `mass_ops` (new) Mass and Capacity Word Problems — host `measurement:mass_capacity_word_problems`
 - `metric_calc` (new) Calculate with Metric Measures — host `measurement:metric_measure_problems`
 - `money_2step` (new) Two-Step Money Problems — host `measurement:money_two_step`
@@ -137,7 +140,7 @@ Template `word-work` — `js/modules/sheet/cells/word-work.js`; also A COPY on t
 
 ## 4. Rules that apply
 
-From the rule-id index (`design/cards/rule-index.json`, sha `73c6e123d143`). An id written `ID@SRC` is defined in more than one standard.
+From the rule-id index (`design/cards/rule-index.json`, sha `5eb60f823a61`). An id written `ID@SRC` is defined in more than one standard.
 
 ### 4a. Core rules — apply every one (3 rules; ✱ = quoted in full, the rest cut at a sentence)
 
@@ -189,6 +192,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-11-07** — No owner sign-off of skill cards in the lessons-first program: lanes decide from the standards, the lead signs on the recommended answers under the owner's delegation, the owner reviews finished work. (`lead brief 2026-11-07; design/STATUS.md 2026-11-07 owner decisions`)
 - **2026-10-02** — 'Within N' bounds the answer, never the operands; a skill's NAME is its declaration. (`CLAUDE.md governing rules`)
 - **2026-11-13** — Card signed by the lead under the owner's delegation: decisions 1-12 as recommended, decision 3 amended (wpBar findable as multi_step_word '(Visual)'; msChoose read in the code: a response mode on the same task, so a plain option, no preset). (`design/decisions/LEAD_DECISIONS.md (2026-11-13, two-step card)`)
+- **2026-11-14** — Decision 4 amended (lead ruling 2026-11-14, GUIDED-MODEL-ALONE): the two-step bar model is drawn on the Opener, the Scripted Model and the lesson chart; the Guided page drops it from its Model (and its tries) - a scaffold fade (P-1) - so the Model and one try share the Guided page at M. At L the Model still stands alone on its page: the ruled lone-Model exception, recorded as an exempt GUIDED-MODEL-ALONE row for the two-step family at L only. (`lead ruling 2026-11-14 (lf-algebra GUIDED-MODEL-ALONE options a + d)`)
 
 ## 6. Misconceptions
 
@@ -290,7 +294,7 @@ Each runs as `node tests/scripts/<script> …`.
 11. **Lesson data for the seven skills (prereqs.js 0/7: the lesson role falls back today). The G2 BUILD lesson #17 routine as in section 3?** Recommended: Yes: lesson 7's routine for the x / ÷-first skills, the follow-on routines for the presets, the G2 routine for multi_step_word(_plain); the build writes them in prereqs.js.
 12. **WRM tags: the presets have none (no WRM step teaches 3.OA.D.8; lessons-6-7 open question).** Recommended: Keep the presets untagged (site lesson linked direct, as now); tag multi_step_word(_plain) Y2.B4.S10 partial (two-step + / − without money) beside its current Y5 / Y6 tags; search terms as listed in section 7.
 
-Signed: owner, 2026-11-14
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
@@ -330,12 +334,12 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 - `role:independent` — the skill's own items (all 7) [offered]
 - `role:more-practice` — the skill's own items (all 7) [offered]
-- `role:opener` (also lesson-opener) — the skill's own items (all 7) [offered]
+- `role:opener` (also lesson-opener) — provider stories: real 0/7 (default on multi_step_word, multi_step_word_plain, two_step_add_then_div, two_step_add_then_mult, two_step_estimate_check, two_step_letter_equation, two_step_mult_div_first) (all 7) [offered]
 - `role:scripted-model` (also model) — provider workedSteps: real 7/7 (all 7) [offered]
-- `role:guided` — provider workedSteps: real 7/7 (all 7) [offered]
+- `role:guided` — provider workedSteps: real 7/7; provider stories: real 0/7 (default on multi_step_word, multi_step_word_plain, two_step_add_then_div, two_step_add_then_mult, two_step_estimate_check, two_step_letter_equation, two_step_mult_div_first) (all 7) [offered]
 - `role:error-analysis` (also check-it) — provider wrongAnswer: real 7/7; provider misconceptions: real 7/7 (all 7) [offered]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 7) [offered]
-- `role:test` (also test-a, test-b) — the skill's own items (all 7) [offered]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 0/7 (default on multi_step_word, multi_step_word_plain, two_step_add_then_div, two_step_add_then_mult, two_step_estimate_check, two_step_letter_equation, two_step_mult_div_first) (all 7) [offered]
+- `role:test` (also test-a, test-b) — provider stories: real 0/7 (default on multi_step_word, multi_step_word_plain, two_step_add_then_div, two_step_add_then_mult, two_step_estimate_check, two_step_letter_equation, two_step_mult_div_first) (all 7) [offered]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 7) [offered]
 - `role:word-problems` — provider stories: real 0/7 (default on multi_step_word, multi_step_word_plain, two_step_add_then_div, two_step_add_then_mult, two_step_estimate_check, two_step_letter_equation, two_step_mult_div_first) (all 7) [out of scope, PROPOSED]
 - `role:fact-rows` — provider stories: real 0/7 (default on multi_step_word, multi_step_word_plain, two_step_add_then_div, two_step_add_then_mult, two_step_estimate_check, two_step_letter_equation, two_step_mult_div_first) (all 7) [out of scope]
