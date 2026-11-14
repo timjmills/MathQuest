@@ -199,6 +199,11 @@
       "date": "2026-11-13",
       "ruling": "role:stretch is OUT OF SCOPE on the chartwindow card (hundreds_chart_fill and its preset chart_to_120), the same as count_by_tables: the window has no open problem of its own and the app composes no Stretch page for it; Reason It and True or False? are its thinking pages.",
       "source": "lead ruling 2026-11-13 (via the coordinator; chart_120 precritic r8 EB-ROLE)"
+    },
+    {
+      "date": "2026-11-14",
+      "ruling": "'Numbers to fill in' (the tiles option, extended - no second option): 5 numbers to fill in per window by default, with 2, 3, 4, 6 and 8 offered; 1 and 7 decode but are hidden; null means 5. A window too small for N holds the legal maximum silently (no note on the page or the key; the panel help says so). On one sheet no missing value is printed in any other window (print and screen): band 120's windows share one pattern repeating every five columns; other bands blank shared squares consistently.",
+      "source": "owner request; lead ruling 2026-11-14 (via the coordinator)"
     }
   ],
   "misconceptions": [
@@ -366,19 +371,37 @@
       {
         "option": "tiles",
         "values": [
-          "null",
-          "1",
           "2",
           "3",
           "4",
           "5",
           "6",
-          "7"
+          "8"
         ],
         "d": "offered",
         "proposed": true,
-        "source": "skill-options.js P11 hundreds_chart_fill tiles",
-        "why": "how many squares the pupil writes; capped per window by the gap rules (R x min(ceil(C/2), C-2))"
+        "skills": [
+          "composing:hundreds_chart_fill",
+          "composing:chart_to_120"
+        ],
+        "source": "owner request, lead ruling 2026-11-14 (extend tiles, do not add an option)",
+        "why": "'Numbers to fill in': how many numbers the pupil writes in each window, 5 by default. A window that cannot hold the number under the rules (never more than half its squares, never a whole row, no two side by side in a row, every gap a printed neighbour: R x min(ceil(C/2), C-2), at most half) holds the most it can, SILENTLY on the pupil page and the key; the cap is said only in the panel's help text (lead 2026-11-14). ws-guided-echo BLANK-COUNT holds every dealt window to it"
+      },
+      {
+        "option": "tiles",
+        "values": [
+          "null",
+          "1",
+          "7"
+        ],
+        "d": "hidden",
+        "proposed": true,
+        "skills": [
+          "composing:hundreds_chart_fill",
+          "composing:chart_to_120"
+        ],
+        "source": "owner request, lead ruling 2026-11-14 (extend tiles, do not add an option)",
+        "why": "kept so old share codes decode (ws-code-snapshot: nothing MOVED), not offered in the panel (a value's hidden: true, offeredOptionsFor). null - the old '1 to 3, dealt' - now deals the default, 5"
       },
       {
         "option": "grid",

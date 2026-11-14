@@ -39,6 +39,7 @@ import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
 import { onNewPage } from './page-deal.js';
+import { chartSheet, chartGapCap, CHART_TILES_DEFAULT } from './chart-giveaway.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -62,7 +63,7 @@ function _kOpt(id) {
  * grid one in every row. Returns [] when it cannot place any (the caller falls back to scatter).
  */
 function _chartGaps({ R, C, grid, gaps, per, tiles, neighbours, rng }) {
-    const given = [1, 2, 3, 4, 5, 6, 7].includes(tiles);
+    const given = [1, 2, 3, 4, 5, 6, 7, 8].includes(tiles);
     const n = given ? tiles : per;
     const rowsWithGaps = grid === 'window' ? [rng(0, R - 1)] : Array.from({ length: R }, (_, i) => i);
     const out = new Set();
@@ -70,7 +71,7 @@ function _chartGaps({ R, C, grid, gaps, per, tiles, neighbours, rng }) {
         // A run along a row of at least two boxes (one box is scatter), kept one square in from each
         // edge so a printed number stands on both sides of it: count on by 1 from the left one.
         if (C < 4) return [];
-        const len = Math.max(2, Math.min(given ? n : Math.max(2, n), C - 2));
+        const len = Math.max(2, Math.min(given ? n : Math.max(2, n), C - 2, Math.floor(C / 2)));   // (never more than half a row: lead ruling 2026-11-14)
         for (const r of rowsWithGaps) { const c0 = rng(1, C - len - 1); for (let k = 0; k < len; k++) out.add(r * C + c0 + k); }
     } else if (gaps === 'column') {
         // A run down a column, one square in from the top and the bottom: count on by 10 from above.
@@ -926,16 +927,19 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // The big chart's numbers need wider boxes (three to five digits at the working size), so
         // its window is four columns wide: two windows still share a row at size L.
         const C = big ? 4 : (band === 10 || _grid !== 'window') ? 10 : 5;
-        const r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0;
-        const c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
-        const rows = Array.from({ length: R }, (_, k) => r0 + k);
-        const cols = Array.from({ length: C }, (_, k) => c0 + k);
+        const pickWin = () => {
+            const r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
+            const c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
+            return { rows: Array.from({ length: R }, (_, k) => r0 + k), cols: Array.from({ length: C }, (_, k) => c0 + k) };
+        };
         const N = R * C;
-        const _hcWant = Number(_kOpt('tiles'));
-        const cap = R * Math.min(Math.ceil(C / 2), C - 2);
-        const want = Math.min(cap, [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)]);
-        const at = (i) => rows[Math.floor(i / C)] * 10 + cols[i % C] + 1;
+        // "Numbers to fill in" (lead ruling 2026-11-14): 2-8 a window, default 5 (null - an old code's "1 to 3, dealt" - is 5;
+        // 1 and 7 still decode). A window that cannot hold it under the rules (never more than half its squares, no whole row,
+        // no two side by side in a row, every gap a printed neighbour) holds the most it can, silently.
+        const _hcRaw = Number(_kOpt('tiles'));
+        const _hcWant = [1, 2, 3, 4, 5, 6, 7, 8].includes(_hcRaw) ? _hcRaw : big ? [1, 2, 2, 3][_kDeal(4)] : CHART_TILES_DEFAULT;   // (number_chart_fill keeps its own "1 to 3, dealt")
+        const want = Math.min(chartGapCap(R, C), _hcWant);
         const neighbours = (i) => {
             const r = Math.floor(i / C), c = i % C, out = [];
             if (c > 0) out.push(i - 1);
@@ -944,20 +948,67 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             if (r < R - 1) out.push(i + C);
             return out;
         };
-        let pickIdx = [];
-        if (_gaps !== 'scatter' || _grid !== 'window') pickIdx = _chartGaps({ R, C, grid: _grid, gaps: _gaps, per: [1, 2, 2, 3][_kDeal(4)], tiles: _hcWant, neighbours, rng });
-        for (let t = 0; pickIdx.length === 0 && t < 400; t++) {
-            const cand = shuffle(Array.from({ length: N }, (_, i) => i)).slice(0, want);
-            const set = new Set(cand);
-            // every gap keeps a printed neighbour, and no two gaps sit side by side in a row
-            if (!cand.every(i => neighbours(i).some(j => !set.has(j)))) continue;
-            if (cand.some(i => i % C < C - 1 && set.has(i + 1))) continue;
-            if (_cross && t < 300 && !cand.some(i => [100, 101, 110, 111].includes(at(i)))) continue;
-            pickIdx = cand;
-            break;
+        // The sheet's kept windows (chart-giveaway.js setChartSheet): a square a kept window leaves empty is empty here too, a
+        // square it prints is never empty here, and a window of a kept window's own squares is not dealt again.
+        const kept = (_gaps === 'scatter' && chartSheet()) || [];
+        let rows, cols, at, pickIdx = [];
+        for (let w = 0; w < (kept.length ? 40 : 1) && !pickIdx.length; w++) {
+            const win = pickWin();
+            rows = win.rows; cols = win.cols;
+            const atW = (i) => rows[Math.floor(i / C)] * 10 + cols[i % C] + 1;
+            at = atW;
+            if (_gaps !== 'scatter') { pickIdx = _chartGaps({ R, C, grid: _grid, gaps: _gaps, per: [1, 2, 2, 3][_kDeal(4)], tiles: _hcWant, neighbours, rng }); break; }
+            const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
+            const idxOf = (n) => rows.indexOf(Math.floor((n - 1) / 10)) * C + cols.indexOf((n - 1) % 10);
+            if (kept.some((k) => k.rows.join() === rows.join() && k.cols.join() === cols.join())) continue;
+            const forced = new Set(), barred = new Set();
+            for (const k of kept) {
+                // (a SHOWN window - the worked Model - prints every square, its traced answers too: none is left empty here)
+                if (k.shows) { for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n)) barred.add(idxOf(n)); } continue; }
+                k.gaps.filter(inWin).forEach((n) => forced.add(idxOf(n)));
+                for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n) && !k.gaps.includes(n)) barred.add(idxOf(n)); }
+            }
+            // Band 120's windows all lie on rows 91-120 (six of them, side by side), so a sheet's gaps repeat every five columns: a
+            // later window blanks exactly the squares of the first kept window's pattern (row, column mod 5) - every window then
+            // holds the same count, spread the same way, and no window prints another's gap.
+            const _per5 = _to120 && R === 3 && C === 5;
+            const resKey = (n) => `${Math.floor((n - 1) / 10)}:${((n - 1) % 10) % 5}`;
+            if (_per5 && kept.some((k) => !k.shows)) {
+                const k0 = kept.find((k) => !k.shows);
+                const P = new Set(k0 ? k0.gaps.map(resKey) : []);
+                forced.clear();
+                for (let i = 0; i < N; i++) if (P.has(resKey(atW(i)))) forced.add(i);
+            }
+            if ([...forced].some((i) => barred.has(i)) || forced.size > want) continue;
+            // spread across the rows: each row holds floor(want / R) or one more, the extra rows dealt
+            for (let t = 0; t < 300 && !pickIdx.length; t++) {
+                const extra = shuffle(Array.from({ length: R }, (_, r) => r)).slice(0, want % R);
+                const quota = Array.from({ length: R }, (_, r) => Math.floor(want / R) + (extra.includes(r) ? 1 : 0));
+                const set = new Set(forced);
+                let ok = true;
+                for (let r = 0; r < R && ok; r++) {
+                    const have = [...set].filter((i) => Math.floor(i / C) === r).length;
+                    if (have > quota[r]) { ok = false; break; }
+                    for (const c of shuffle(Array.from({ length: C }, (_, k) => k))) {
+                        if ([...set].filter((i) => Math.floor(i / C) === r).length >= quota[r]) break;
+                        const i = r * C + c;
+                        if (set.has(i) || barred.has(i) || (c > 0 && set.has(i - 1)) || (c < C - 1 && set.has(i + 1))) continue;
+                        set.add(i);
+                    }
+                    if ([...set].filter((i) => Math.floor(i / C) === r).length !== quota[r]) ok = false;
+                }
+                if (!ok) continue;
+                const cand = [...set];
+                if (cand.some((i) => i % C < C - 1 && set.has(i + 1))) continue;
+                if (!cand.every((i) => neighbours(i).some((j) => !set.has(j)))) continue;
+                // (band 120: no row blank in both its first and last column - repeated five columns on, they would sit side by side)
+                if (_per5 && Array.from({ length: R }, (_, r) => r).some((r) => set.has(r * C) && set.has(r * C + C - 1))) continue;
+                if (_cross && t < 200 && w < 20 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                pickIdx = cand;
+            }
         }
-        // Fallback (never expected): a checkerboard of gaps honours both rules at any count to 7.
-        if (!pickIdx.length) pickIdx = shuffle(R === 3 && C === 5 ? [0, 2, 4, 6, 8, 10, 12, 14] : Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0)).slice(0, want);
+        // Fallback (never expected): alternate squares of each row honour every rule, up to the cap.
+        if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, want);
         const blanks = pickIdx.sort((x, y) => x - y).map(at);
         const top = (rowHi + 1) * 10;
         q.chartWindow = { rows, cols };

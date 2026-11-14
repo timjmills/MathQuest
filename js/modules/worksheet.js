@@ -9,7 +9,7 @@ import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
-import { chartSeen, chartGivesAway } from './chart-giveaway.js';
+import { chartSeen, chartGivesAway, setChartSheet } from './chart-giveaway.js';
 import { syncWorksheetRefLine } from './refline-screen.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
@@ -876,13 +876,14 @@ function _wsGenerate(i) {
             // next places of the ladder: band 120's crossing items - one in three - have only the two edge windows, and two
             // of them with cards between can find both taken; r2 N2)
             const at = cwSeen.size && attempt >= tries / 2 ? i + 1 + (attempt % 2) : i;
+            if (cwSeen.size) setChartSheet(cwSeen);
             cand = generateQuestionFor({
                 category: state.category, skill: state.skill, opts: state.skillOptions,
                 seed, itemIndex: at, gameMode: 'worksheet',
             });
         } catch (e) {
             console.error('worksheet: generateQuestionFor failed', e);
-        }
+        } finally { setChartSheet(null); }
         if (!cand) continue;
         // D7 (wave 1 lane D): a K-2 counting & cardinality POOL deals the kit members only, as
         // the paper deal does (print-sheet.js generateRun): a member drawn in the legacy look
@@ -893,7 +894,7 @@ function _wsGenerate(i) {
             if (!kitFallback && !seen.has(_wsItemKey(cand))) kitFallback = cand;
             continue;
         }
-        if (cwSeen.size && attempt < tries - 1 && chartGivesAway(cand, cwSeen, { same: true })) { if (!q) q = cand; continue; }
+        if (cwSeen.size && chartGivesAway(cand, cwSeen)) continue;   // (never dealt: lead ruling 2026-11-14)
         const key = _wsItemKey(cand);
         if (!seen.has(key)) { q = cand; break; }
         if (!fallback && key !== prevKey) fallback = cand;

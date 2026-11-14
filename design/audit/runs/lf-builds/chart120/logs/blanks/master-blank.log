@@ -1,0 +1,81 @@
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 1 item 1: 3 blank(s), want 5; blanks bunched by row (0/2/1)
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 1 item 2: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 1 item 3: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 1 item 4: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 1 item 5: 3 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 1 item 6: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 quiz seed 1 item 1: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 quiz seed 1 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 quiz seed 1 item 3: 2 blank(s), want 5; blanks bunched by row (0/0/2)
+  BLANK-COUNT composing:chart_to_120 practice card seed 1 item 1: 3 blank(s), want 5; blanks bunched by row (2/0/1)
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 2 item 1: 3 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 2 item 2: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 2 item 3: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 2 item 4: 2 blank(s), want 5; blanks bunched by row (0/0/2)
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 2 item 5: 3 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 online worksheet seed 2 item 6: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 quiz seed 2 item 1: 3 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 quiz seed 2 item 2: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 quiz seed 2 item 3: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 practice card seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 1 item 1: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 1 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 1 item 3: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 1 item 4: 3 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 1 item 5: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 1 item 6: 2 blank(s), want 5; blanks bunched by row (2/0/0)
+  BLANK-COUNT composing:hundreds_chart_fill quiz seed 1 item 1: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill quiz seed 1 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill quiz seed 1 item 3: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill practice card seed 1 item 1: 3 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 2 item 2: 3 blank(s), want 5; blanks bunched by row (0/2/1)
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 2 item 3: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 2 item 4: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 2 item 5: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill online worksheet seed 2 item 6: 3 blank(s), want 5; blanks bunched by row (2/0/1)
+  BLANK-COUNT composing:hundreds_chart_fill quiz seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill quiz seed 2 item 2: 3 blank(s), want 5; blanks bunched by row (1/2/0)
+  BLANK-COUNT composing:hundreds_chart_fill quiz seed 2 item 3: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill practice card seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 1 item 1: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 1 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 1 item 3: 2 blank(s), want 5; blanks bunched by row (0/0/2)
+  BLANK-COUNT composing:chart_to_120 independent M seed 1 item 4: 3 blank(s), want 5; blanks bunched by row (2/1/0)
+  BLANK-COUNT composing:chart_to_120 independent M seed 1 item 5: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 1 item 6: 2 blank(s), want 5; blanks bunched by row (0/0/2)
+  BLANK-COUNT composing:chart_to_120 guided M seed 1 item 1: 1 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 guided M seed 1 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 guided M seed 1 item 3: 2 blank(s), want 5; blanks bunched by row (0/0/2)
+  BLANK-COUNT composing:chart_to_120 guided M seed 1 item 4: 3 blank(s), want 5; blanks bunched by row (2/1/0)
+  BLANK-COUNT composing:chart_to_120 independent M seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 2 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 2 item 3: 3 blank(s), want 5; blanks bunched by row (1/0/2)
+  BLANK-COUNT composing:chart_to_120 independent M seed 2 item 4: 3 blank(s), want 5; blanks bunched by row (1/2/0)
+  BLANK-COUNT composing:chart_to_120 independent M seed 2 item 5: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 independent M seed 2 item 6: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 guided M seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 guided M seed 2 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:chart_to_120 guided M seed 2 item 3: 3 blank(s), want 5; blanks bunched by row (1/0/2)
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 1 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 1 item 2: 3 blank(s), want 5; blanks bunched by row (2/0/1)
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 1 item 3: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 1 item 4: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 1 item 5: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 1 item 6: 3 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 1 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 1 item 2: 3 blank(s), want 5; blanks bunched by row (2/0/1)
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 1 item 3: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 1 item 4: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 2 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 2 item 3: 3 blank(s), want 5; blanks bunched by row (1/2/0)
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 2 item 4: 1 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 2 item 5: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill independent M seed 2 item 6: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 2 item 1: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 2 item 2: 2 blank(s), want 5
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 2 item 3: 3 blank(s), want 5; blanks bunched by row (1/2/0)
+  BLANK-COUNT composing:hundreds_chart_fill guided M seed 2 item 4: 1 blank(s), want 5
+  OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 0/0 False; EA multi-gap Correct 0 / Fix it 0
+ws-guided-echo: FAIL - 79 finding(s) (20 pages, composing:chart_to_120, composing:hundreds_chart_fill, sizes M, 2 seeds)

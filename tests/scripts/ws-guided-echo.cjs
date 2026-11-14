@@ -25,6 +25,15 @@
 //                      (chart_120 critic r2 N2) and on the SCREEN hosts: the online worksheet's cards (initWorksheet, 6 cards) and
 //                      the quiz builder's questions (addMultipleQuestions, 3), over --screen-seeds (default 20) - the screen deal
 //                      repeated a band-120 window, so two cards printed each other's answers (L13 paper = screen).
+//   (lead 2026-11-14, chart_120 r3 n1 upgraded; "Numbers to fill in" ruling:)
+//   CROSS-GIVEAWAY     now ANY value missing in one window and printed in another window of the same sheet FAILS, the same squares
+//                      or only overlapping (chart_to_120 independent M seed 18144 on 448bc5e74: item 1 missing 94, item 3 prints it);
+//                      a Model / anchor's traced answers count as printed. The dealers blank shared squares consistently
+//                      (chart-giveaway.js setChartSheet; band 120 repeats one pattern every five columns).
+//   BLANK-COUNT        every dealt window holds exactly the chosen number of blanks (--tiles, default 5), capped silently at the
+//                      legal maximum min(half, R x min(ceil(C/2), C-2)); row counts differ by at most 1; no whole row blank; never
+//                      more than half the squares; every blank a printed neighbour; the key holds one answer a blank (Score /N =
+//                      SCORE-SLOTS). Every role drawn, the online worksheet, the quiz and the practice card. --seed-list a,b picks seeds.
 //   (chart_120 critic r2, 2026-11-14:)
 //   MODEL-STATE-MARKS  every Scripted Model state and lesson-anchor panel whose step says "Write N" (or "Write a, b and c") draws N
 //                      in that state's drawing, and each state adds one mark group: what it draws newly is trace grey, what an
@@ -56,6 +65,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const scoreTpl = list(arg('score-templates', 'chartwindow'));
     const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false,reason-it,scripted-model'));
     const variants = argv.includes('--variants');
+    const tilesOpt = arg('tiles', null) ? Number(arg('tiles')) : null;   // (BLANK-COUNT: "Numbers to fill in" to deal and judge)
     const H = require('../lib/ws-harness.cjs');
     // (a seeded Math.random: the screen deals - the worksheet and the quiz builder - draw from it; `__wsReseed` per seed)
     const app = await H.open({ seed: 1 });
@@ -64,10 +74,12 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
         // (one evaluate per key x size x seed, and per key x band for --variants: a whole run in one call passed the browser's
         // protocol timeout once --variants was added; the TF / EA / overlap tallies live on window.__geState between calls)
         const call = (part) => app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, part }) => {
-            const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0 } = part || {};
+            const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0, tilesOpt = null } = part || {};
+            // (BLANK-COUNT's chosen number: --tiles, else the skill's default 5; number_chart_fill keeps "1 to 3, dealt" - not judged)
+            const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -146,15 +158,46 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const st = window.__geState || (window.__geState = { tf: { pages: 0, falseN: 0, all: 0 }, ea: { multiCorrect: 0, multiFix: 0 }, overlap: 0 });
             const tf = st.tf, ea = st.ea;
             const judgeGiveaway = (label, items) => {
-                const ws = items.map((it) => winOf(it.q)).filter(Boolean);
+                // (lead 2026-11-14, chart_120 r3 n1 upgraded: ANY value missing in one window and printed in another window of the
+                // same sheet fails - the same squares or only overlapping ones. A Model / anchor draws its answers (traced), so
+                // its gaps count as printed.)
+                const ws = items.map((it) => { const w = winOf(it.q); return w && Object.assign(w, { shows: !!(it.anchor || it.model) }); }).filter(Boolean);
                 for (let i = 0; i < ws.length; i++) for (let j = 0; j < ws.length; j++) {
                     if (i === j) continue;
                     const a = ws[i], b = ws[j];
-                    const hit = a.gaps.filter((n) => printsN(b, n));
+                    if (a.shows) continue;
+                    const hit = a.gaps.filter((n) => printsN(b, n) || (b.shows && b.gaps.includes(n)));
                     if (!hit.length) continue;
-                    if (a.rows.join() === b.rows.join() && a.cols.join() === b.cols.join()) out.push(`CROSS-GIVEAWAY ${label}: window ${i + 1}'s answer ${hit.join(', ')} is printed in window ${j + 1} (the same squares)`);
-                    else st.overlap++;
+                    const twin = a.rows.join() === b.rows.join() && a.cols.join() === b.cols.join();
+                    out.push(`CROSS-GIVEAWAY ${label}: window ${i + 1}'s missing ${hit.join(', ')} is printed in window ${j + 1}${twin ? ' (the same squares)' : ' (an overlapping window)'}`);
                 }
+            };
+            // BLANK-COUNT (lead ruling 2026-11-14, "Numbers to fill in"): every dealt window holds exactly the chosen number of
+            // blanks - capped, silently, at the most its R x C squares can legally hold - spread across its rows (row counts differ
+            // by at most 1), no whole row blank, never more than half its squares, every blank a printed neighbour in the window.
+            const capOf = (R, C) => Math.max(1, Math.min(Math.floor(R * C / 2), R * Math.min(Math.ceil(C / 2), Math.max(1, C - 2))));
+            const judgeBlanks = (label, items, want) => {
+                if (/number_chart_fill/.test(label)) return;
+                items.forEach((it, k) => {
+                    const q = it && it.q; const w = winOf(q); if (!w) return;
+                    const cp = q.cell && q.cell.template === 'chartwindow' && q.cell.payload;
+                    const blanks = cp && Array.isArray(cp.blanks) ? cp.blanks.map(Number) : w.gaps;
+                    const R = w.rows.length, C = w.cols.length;
+                    const exp = Math.min(capOf(R, C), want);
+                    const f = [];
+                    if (blanks.length !== exp) f.push(`${blanks.length} blank(s), want ${exp}${exp < want ? ` (${want} capped)` : ''}`);
+                    if (w.gaps.length !== blanks.length) f.push(`key holds ${w.gaps.length} answer(s) for ${blanks.length} blank(s)`);
+                    if (blanks.length * 2 > R * C) f.push(`${blanks.length} of ${R * C} squares blank (more than half)`);
+                    const per = w.rows.map((r) => blanks.filter((n) => Math.floor((n - 1) / 10) === r).length);
+                    if (per.some((x) => x >= C)) f.push('a whole row is blank');
+                    if (Math.max(...per) - Math.min(...per) > 1 && blanks.length >= R) f.push(`blanks bunched by row (${per.join('/')})`);
+                    if (blanks.length < R && per.some((x) => x > 1)) f.push(`blanks bunched by row (${per.join('/')})`);
+                    const isB = new Set(blanks);
+                    const inW = (n) => w.rows.includes(Math.floor((n - 1) / 10)) && w.cols.includes((n - 1) % 10);
+                    const lone = blanks.filter((n) => { const c = (n - 1) % 10; return ![c > 0 ? n - 1 : null, c < 9 ? n + 1 : null, n - 10, n + 10].some((m) => m && inW(m) && !isB.has(m)); });
+                    if (lone.length) f.push(`blank ${lone.join(', ')} has no printed neighbour`);
+                    if (f.length) out.push(`BLANK-COUNT ${label} item ${k + 1}: ${f.join('; ')}`);
+                });
             };
             if (screen) {
                 // CROSS-GIVEAWAY on the screen hosts (r2 N2): the app's own deals, Math.random reseeded per seed
@@ -167,10 +210,11 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         try {
                             if (window.__wsReseed) window.__wsReseed(s);
                             st0.category = categoryId; st0.skill = skillId; st0.gameMode = 'worksheet'; st0.isMixedMode = false; st0.problemCount = 6;
-                            st0.skillOptions = null;
+                            st0.skillOptions = tilesOpt ? { tiles: tilesOpt } : null;
                             await window.initWorksheet();
                             pages++;
-                            judgeGiveaway(`${key} online worksheet seed ${s}`, (st0.worksheetQs || []).map((q) => ({ q })));
+                            if (on('CROSS-GIVEAWAY')) judgeGiveaway(`${key} online worksheet seed ${s}`, (st0.worksheetQs || []).map((q) => ({ q })));
+                            if (on('BLANK-COUNT')) judgeBlanks(`${key} online worksheet seed ${s}`, (st0.worksheetQs || []).map((q) => ({ q })), tilesWant);
                         } catch (e) { out.push(`${key} worksheet seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); }
                         try {
                             if (window.__wsReseed) window.__wsReseed(s);
@@ -180,9 +224,17 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             const tests = (await window.listTests()) || [];
                             const t = tests.slice().sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))[0];
                             pages++;
-                            judgeGiveaway(`${key} quiz seed ${s}`, (t ? t.sections.flatMap((x) => x.questions) : []).map((x) => ({ q: x.questionData })));
+                            const qq = (t ? t.sections.flatMap((x) => x.questions) : []).map((x) => ({ q: x.questionData }));
+                            if (on('CROSS-GIVEAWAY')) judgeGiveaway(`${key} quiz seed ${s}`, qq);
+                            if (on('BLANK-COUNT')) judgeBlanks(`${key} quiz seed ${s}`, qq, tilesWant);
                             if (t && window.deleteTest) await window.deleteTest(t.id);
                         } catch (e) { out.push(`${key} quiz seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); }
+                        // (the practice card: one window, BLANK-COUNT)
+                        if (on('BLANK-COUNT')) try {
+                            const q = window.generateQuestionFor({ category: categoryId, skill: skillId, seed: s, ...(tilesOpt ? { opts: { tiles: tilesOpt } } : {}) });
+                            pages++;
+                            judgeBlanks(`${key} practice card seed ${s}`, [{ q }], tilesWant);
+                        } catch (e) { out.push(`${key} card seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); }
                     }
                 }
                 return { out, pages };
@@ -195,17 +247,18 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     const bands = skillId === 'chart_to_120' ? [120] : skillId === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : [undefined];
                     const grids = skillId === 'number_chart_fill' ? [undefined] : ['window', 'rows', 'whole'];
                     for (const band of bands.filter((b) => vBand === 'all' || String(b) === String(vBand))) for (const grid of grids) for (const role of ['independent', 'more-practice']) for (let s = 1; s <= Math.min(N, 4); s++) {
-                        const opts = Object.assign({}, base, band !== undefined ? { band } : {}, grid ? { grid } : {});
+                        const opts = Object.assign({}, base, band !== undefined ? { band } : {}, grid ? { grid } : {}, tilesOpt ? { tiles: tilesOpt } : {});
                         let r; try { r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId, opts }] }], size: 'L', paper: 'A4', seed: s, key: false }); } catch (e) { continue; }
                         pages++;
                         planPages(r.plan).forEach((pg, pi) => judgeGiveaway(`${key} ${JSON.stringify(opts)} ${role} L seed ${s} p${pi + 1}`, pg.items));
+                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${JSON.stringify(opts)} ${role} L seed ${s}`, planPages(r.plan).flatMap((pg) => pg.items), tilesWant);
                     }
                 }
                 if (!variantsOnly && !finalize) for (const size of sizes) for (let s = seedFrom; s <= seedTo; s++) {
                     for (const role of pageRule ? scoreRoles : ['guided']) {
                         if (role !== 'guided' && !pageRule) continue;
                         let r;
-                        try { r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId }] }], size, paper: 'A4', seed: s, key: false }); } catch (e) { out.push(`${key} ${role} ${size} seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); continue; }
+                        try { r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId, ...(tilesOpt ? { opts: { tiles: tilesOpt } } : {}) }] }], size, paper: 'A4', seed: s, key: false }); } catch (e) { out.push(`${key} ${role} ${size} seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); continue; }
                         pages++;
                         const meta = (r.plan && r.plan.meta) || {};
                         const cells = cellsOf(r.pupilHtml);
@@ -233,6 +286,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             }
                         }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
+                        // (BLANK-COUNT: the whole sheet's windows; Score /N equals their blanks is SCORE-SLOTS, judged above)
+                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, pp.flatMap((pg) => pg.items), tilesWant);
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
                         if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {
@@ -297,17 +352,18 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const sk = key.split(':')[1];
             if (variants && (!only || only.includes('CROSS-GIVEAWAY')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(sk)) {
                 const bands = sk === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : ['all'];
-                for (const b of bands) add(await call({ keys: [key], vBand: b, seedFrom: 1, seedTo: 0 }).then((r) => r, (e) => ({ out: [`${key} band ${b}: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
+                for (const b of bands) add(await call({ keys: [key], vBand: b, seedFrom: 1, seedTo: 0, tilesOpt }).then((r) => r, (e) => ({ out: [`${key} band ${b}: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
             }
         }
         const screenSeeds = Number(arg('screen-seeds', '20'));
-        for (const key of keys) if (screenSeeds > 0 && (!only || only.includes('CROSS-GIVEAWAY')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(key.split(':')[1])) add(await call({ keys: [key], screen: screenSeeds }));
-        for (const key of keys) for (const size of sizes) for (let s = 1; s <= N; s++) add(await call({ keys: [key], sizes: [size], seedFrom: s, seedTo: s }));
+        for (const key of keys) if (screenSeeds > 0 && (!only || only.includes('CROSS-GIVEAWAY') || only.includes('BLANK-COUNT')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(key.split(':')[1])) add(await call({ keys: [key], screen: screenSeeds, tilesOpt }));
+        const seedList = arg('seed-list', null) ? list(arg('seed-list')).map(Number) : Array.from({ length: N }, (_, i) => i + 1);
+        for (const key of keys) for (const size of sizes) for (const s of seedList) add(await call({ keys: [key], sizes: [size], seedFrom: s, seedTo: s, tilesOpt }));
         add(await call({ finalize: true }));
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);

@@ -1363,9 +1363,14 @@ const P11_K2_OPTIONS = {
     'composing:hundreds_chart_fill': [
         _opsBand([50, 100], 100, { label: 'Numbers to', help: 'Which part of the hundreds chart the window is cut from.' }),
         {
-            id: 'tiles', label: 'Empty boxes', type: 'enum', default: null, group: 'difficulty',
-            values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6, 7].map(n => ({ v: n, l: `${n} boxes` }))],
-            help: 'How many numbers the pupil writes in each window.',
+            // Owner request, lead ruling 2026-11-14 (card chartwindow): 5 a window by default, 2-8 offered. null (an old code's
+            // "1 to 3, dealt"), 1 and 7 still decode (hidden: true keeps them out of the panel); null deals the default, 5.
+            id: 'tiles', label: 'Numbers to fill in', type: 'enum', default: 5, group: 'difficulty',
+            values: [{ v: null, l: '5 (default)', hidden: true }, { v: 1, l: '1 number', hidden: true },
+                ...[2, 3, 4, 5, 6, 7, 8].map(n => ({ v: n, l: n === 5 ? '5 numbers (default)' : `${n} numbers`, ...(n === 7 ? { hidden: true } : {}) }))],
+            help: 'How many numbers the pupil writes in each window. A window too small to hold them all (the row 1 to 10, '
+                + 'or more than half its squares) holds as many as it can: never more than half the squares, never a whole row, '
+                + 'and every empty box keeps a printed number beside it.',
         },
         ..._gridOptions(),
     ],
@@ -3924,6 +3929,8 @@ export function offeredOptionsFor(categoryId, skillId) {
         // stays in the model so an old share code still decodes, but the teacher never sees it.
         if (o.hidden) continue;
         if (sized && o.id === 'range' && !ownIds.has('range')) continue;
+        // (a value flagged `hidden` - kept so an old share code decodes - is not offered: "Numbers to fill in" 1 and 7)
+        if (Array.isArray(o.values) && o.values.some((x) => x && x.hidden)) { out.push({ ...o, values: o.values.filter((x) => !(x && x.hidden)) }); continue; }
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
         // A review's own "Support, for the whole review" sets every member's level already.
         if (ownIds.has('poolSupport')) continue;

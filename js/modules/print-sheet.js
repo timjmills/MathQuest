@@ -24,7 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
-import { chartOfQ, cwKey, chartGivesAway } from './chart-giveaway.js';
+import { chartOfQ, cwKey, chartGivesAway, setChartSheet } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -1035,7 +1035,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 // only, so a place deals one of them on its first try; absent on every other ref: no pin)
                 const pin = skH !== sk && skH.dealPin ? skH.onlyKeys.map((x) => String(x).split('+').map(Number)) : null;
                 if (pin) setDealPin(skH.dealPin, pin);
-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); }
+                // (the sheet's kept chart windows: a window dealt now blanks their gaps and prints none of them - chart-giveaway.js)
+                setChartSheet(_cwAll(seen));
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
@@ -1061,7 +1063,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 // (a case the last row WANTS is kept for it: no other place of the page deals it)
                 if (strict && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
                 // (CROSS-GIVEAWAY: a window that would print another window's answer is passed over while tries remain)
-                if (k < tries && chartGivesAway(cand, seen)) {
+                if (k < tries && chartGivesAway(cand, _cwAll(seen))) {
                     // (a NEW window that only overlaps a kept one is the fallback: never a repeat of a kept window)
                     if (!altCw && !seen.has(signature(cand)) && !chartGivesAway(cand, seen, { same: true })) altCw = cand;
                     if (!got) got = cand;
@@ -1071,6 +1073,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (!seen.has(signature(cand))) break;
             }
             if (altCw && got && got !== altCw && (seen.has(signature(got)) || chartGivesAway(got, seen))) got = altCw;
+            // (lead ruling 2026-11-14: a window that prints another window's missing number is never dealt, the last try too)
+            if (got && chartGivesAway(got, _cwAll(seen))) got = null;
             return got;
         };
         // (a detailed lesson's ref - `avoidKeys` - rotates the generator's case before it relaxes: a
@@ -1084,7 +1088,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         if (!q) return;
         // (CROSS-GIVEAWAY: every try drew a window of squares already on the sheet - a one-window chart, or more items than the
         // chart has windows - so this item is not dealt)
-        if (chartGivesAway(q, seen, { same: true })) return;
+        if (chartGivesAway(q, _cwAll(seen))) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
@@ -1103,7 +1107,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
-        { const cw = chartOfQ(q); if (cw) seen.add(cwKey(cw)); }
+        { const cw = chartOfQ(q); if (cw) { const k = cwKey(cw, _cwShowFirst && !_cwAll(seen).size); seen.add(k); _cwSheet.add(k); } }
         // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
         if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
@@ -6360,7 +6364,15 @@ try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catc
  * The result carries `stats`: the build's time, deals, page checks and cell measurements.
  */
 let buildQueue = Promise.resolve();
+// (CROSS-GIVEAWAY, lead 2026-11-14: on a role that opens with a worked Model - Guided, a lesson's anchor, the Scripted Model - the
+// first chart window shows its answers traced, so it is recorded as a SHOWN window: a later window leaves none of its squares empty)
+let _cwShowFirst = false;
+// (the sheet's chart windows across ALL its runs - a lesson deals its anchor and each practice section in runs of their own)
+const _cwSheet = new Set();
+const _cwAll = (seen) => { const u = new Set(_cwSheet); for (const k of seen) if (typeof k === 'string' && k.startsWith('cw:')) u.add(k); return u; };
 export function buildSheet(req = {}) {
+    _cwShowFirst = !!(req && ['guided', 'lesson', 'scripted-model'].includes(req.role));
+    _cwSheet.clear();
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
     // queue: it builds its pages through buildSheet itself).
     if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
