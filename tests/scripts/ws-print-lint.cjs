@@ -1714,6 +1714,17 @@ function wsLintPage(cfg) {
                 }
                 return Math.round(((bot - br.top) / br.height) * 1000) / 1000;
             })();
+            // L-DENSITY SPILL-P1 (lf-engine roles r4, critic r3 F3): the RENDERED page-1 white - the body's height under its last section -
+            // and the height of the page's first band (on page 2 of a split Opener, the part that might have fitted page 1)
+            const spillMeas = (() => {
+                if (!bodyEl) return null;
+                const br = bodyEl.getBoundingClientRect();
+                const kids = [...bodyEl.children].filter(e => e.getBoundingClientRect().height > 0);
+                if (!kids.length || br.height <= 0) return null;
+                const last = Math.max(...kids.map(e => e.getBoundingClientRect().bottom));
+                const band = bodyEl.querySelector('.ws-band');
+                return { bodyMm: mm(br.height), whiteMm: mm(Math.max(0, br.bottom - last)), firstBandMm: band ? mm(band.getBoundingClientRect().height) : null };
+            })();
             // (ONE-ROW, lead ruling R1 / R4a 2026-11-13: a practice page of ONE row held to its work - layout.oneRowMm, `mq-onerow` -
             // leaves the ruled strip under it; PAGEFILL does not read that strip as a page left unfilled)
             // (critic r9: the class alone is not enough - the strip is accepted only while it is SHORTER than the one row it holds, i.e.
@@ -1808,7 +1819,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, oneRowH, holes, repeats, usedFrac,
+                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, oneRowH, holes, repeats, usedFrac, spillMeas,
                 skills: [...new Set(items.map(c => c.skill).filter(Boolean))], attributed: items.every(c => !!c.skill),
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
@@ -2370,6 +2381,8 @@ function lintKitGeometry(dom, pdf, info, F) {
             // L-DENSITY OPN-SPLIT (lf-engine roles r3, critic r2 F1 / F3 "two half-blank pages where a side-by-side row fits"): a page of
             // an Opener printed on two or more pages that uses under half its body fails, unless the plan's notes say the Model and one
             // Guided cell side by side were tried and did not fit (the role writes that note when it splits)
+            // (r4: every kit Opener page's ink fill is noted, so a proof's % used table reads one-page Openers too)
+            if (info.mode === 'kit' && !pt.key && p.role === 'opener' && pt.pages.length === 1 && p.usedFrac != null) info.notes.push(`USED page ${p.idx}: ${Math.round(p.usedFrac * 100)} % of the body used`);
             if (info.mode === 'kit' && !pt.key && p.role === 'opener' && pt.pages.length > 1 && p.usedFrac !== null && p.usedFrac !== undefined) {
                 info.notes.push(`OPN-SPLIT page ${p.idx}: ${Math.round(p.usedFrac * 100)} % of the body used`);
                 // (... and a split page whose practice is ONE Guided cell alone - coordinate_q1 / shape_name_match_3d L at 27b8e540c, "one
@@ -2378,6 +2391,16 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const sideNoted = (info.notes || []).some(t => /side by side[^.]*did not fit/i.test(t));
                 if ((p.usedFrac < 0.5 || loneGuided) && !sideNoted)
                     F('L-DENSITY', 'OPN-SPLIT', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener uses ${Math.round(p.usedFrac * 100)}% of its body${loneGuided ? ' and holds one Guided cell alone' : ''}: a split Opener page is at least half used and never one practice cell alone, or the plan notes that the Model and one Guided cell side by side did not fit (RUBRIC H5, PT-OPN-2)`, 'half-blank split page');
+            }
+            // L-DENSITY SPILL-P1 (lf-engine roles r4, critic r3 F3; the lead's r9b rule opener.js spillP1Ok, measured in the RENDER): page 1
+            // of a multi-page kit Opener may leave over 30 % of its body white only when page 2's first band is taller than that white -
+            // add_wp_10k M at 1b7280c88 printed 97 mm white on page 1 and an 89 mm Guided band on page 2 (the plan estimated 84 / 90.8)
+            if (info.mode === 'kit' && !pt.key && p.role === 'opener' && pt.pages.length > 1 && j === 0 && p.spillMeas) {
+                const nx = pt.pages[1].spillMeas;
+                const next = nx && nx.firstBandMm;
+                info.notes.push(`SPILL-P1 page ${p.idx}: ${p.spillMeas.whiteMm} mm white of ${p.spillMeas.bodyMm} mm; page 2's first band ${next} mm`);
+                if (next && !spillP1Ok(p.spillMeas.whiteMm, p.spillMeas.bodyMm, next))
+                    F('L-DENSITY', 'SPILL-P1', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener leaves ${p.spillMeas.whiteMm} mm of its ${p.spillMeas.bodyMm} mm body white (over 30 %) and page 2's first band is ${next} mm: it fits page 1 (RUBRIC H5, PT-OPN-10 SPILL-P1)`, 'spill page 1 white');
             }
             if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
@@ -3204,6 +3227,15 @@ const SELF_TESTS = [
         band.innerHTML = '<div class="ws-strip"><b>Guided Practice:</b> Write it.</div>';
         c.before(band); band.appendChild(c);
     } },
+    // L-DENSITY SPILL-P1 (critic r3 F3): page 1 of a two-page Opener with most of its body white, and page 2's first band short enough to fit
+    { name: 'spill opener whose page-2 band fits page 1 (SPILL-P1)', mode: 'kit', expect: ['L-DENSITY', 'SPILL-P1'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => { p.setAttribute('data-ws-role', 'opener'); p.querySelector('.ws-foot b').textContent = `${i + 1}/2`; });
+        const b1 = p1.querySelector('.ws-body'); b1.innerHTML = '<div class="ws-band" style="height:40mm"><div class="ws-strip"><b>Model:</b></div><p>model</p></div>';
+        const b2 = p2.querySelector('.ws-body'); b2.innerHTML = '<div class="ws-band" style="height:60mm"><div class="ws-strip"><b>Guided Practice:</b> Write it.</div><p>try</p></div>';
+    } },
     // ... unless the plan notes that the Model and one Guided cell side by side were tried and did not fit
     { name: 'split opener with a half-blank page, side by side noted (OPN-SPLIT control)', mode: 'kit', notes: ['The Model and one Guided row are taller than one page at this size, and the Model and one Guided cell side by side did not fit: the practice is on page 2.'], expect: [], absent: ['L-DENSITY', 'OPN-SPLIT'], fn: () => {
         const p1 = document.querySelector('.ws-page');
@@ -3626,6 +3658,8 @@ const LEGACY_SELF_TESTS = [
 
 /** ONE-ROW strip (lead R1 / R4a; tightened after critic r9): a ruled one-row page's strip passes PAGEFILL only while it is shorter than
  * the row it holds - a strip a whole row tall means another row fits, and the page is under-filled. */
+/** SPILL-P1: the same test as js/modules/sheet/roles/opener.js spillP1Ok (lead r9b), on rendered numbers. */
+function spillP1Ok(whiteMm, bodyMm, nextMm) { return !(Number(whiteMm) > 0.3 * Number(bodyMm) && Number(whiteMm) >= Number(nextMm)); }
 function oneRowStripOk(oneRow, stripMm, rowMm) { return !!oneRow && Number(rowMm) > 0 && Number(stripMm) < Number(rowMm); }
 
 async function selfTest() {

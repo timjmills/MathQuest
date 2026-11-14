@@ -182,7 +182,7 @@ const ROOT = path.resolve(__dirname, '..', '..');
 /** OPENER-OVERFLOW (lf-engine roles): the lint families its ratchet compares with the master pin opener-overflow.<size>.json. */
 const OPENER_RATCHET_LINTS = 'L-OVERFLOW,L-SPLIT,L-DENSITY';
 /** ... and the L-DENSITY rules it ratchets (critic r2 F1 / F2): a split Opener's half-blank or lone pages, never another density rule. */
-const OPENER_RATCHET_DENSITY = 'DN-2,LONE,PAGEFILL,OPN-SPLIT';
+const OPENER_RATCHET_DENSITY = 'DN-2,LONE,PAGEFILL,OPN-SPLIT,SPILL-P1';
 const TOOL = 'ws-precritic';
 const ARGV = process.argv.slice(2);
 const has = (f) => ARGV.includes(`--${f}`);

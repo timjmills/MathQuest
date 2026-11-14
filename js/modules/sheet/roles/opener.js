@@ -68,6 +68,22 @@ function stepLines(list, textPt, zoneMm = 93) {
 }
 
 /**
+ * The two-column Steps zone (mq-steps-rows) under a full-width Model, as it PRINTS (lf-engine roles r4, critic r3 F3: the old estimate
+ * - 0.5 em a character in a 77 mm line, each line pitch + 1.2, + 4 mm - read every step of add_wp_10k M as two lines and drew 37.2 mm
+ * where 22.6 mm printed; with it, page 1's white was put at 84 mm where the render left 108 mm, and the 89 mm Guided band that fitted
+ * page 1 went to page 2). Measured on the rendered zone at M and L: each column holds about 75 mm of text (85 mm less the outlined
+ * marker); Andika runs about 0.44 em a character here - 0.47 is taken, so a step near the line's end is counted as wrapping; a
+ * row's first line is pitch + 1, each further line 1.07 x the text size; rows are 2.2 mm apart and the zone pads 1.5 mm.
+ */
+function stepPairsMm(steps, m) {
+    const em = m.textPt * 25.4 / 72;
+    const lines = (t) => Math.max(1, Math.ceil((String(t || '').length * 0.47 * em) / 75));
+    const rows = [];
+    for (let i = 0; i < steps.length; i += 2) rows.push(Math.max(lines(steps[i]), steps[i + 1] ? lines(steps[i + 1]) : 1));
+    return rows.reduce((a, n) => a + m.pitch + 1 + (n - 1) * 1.07 * em, 0) + Math.max(0, rows.length - 1) * 2.2 + 1.5;
+}
+
+/**
  * Every height decision of the page, from the probe (or final) items. `cap` ({gMax, iMax}) holds the Guided and Independent row
  * counts at most at those of a page already chosen (critic r5 N13: the placed rows are re-fitted, never re-counted).
  */
@@ -97,7 +113,7 @@ function geometry(items, input, cap = {}) {
     // so the Model, its Steps and the Say band share page 1: one column of four steps cost 45 mm and ran page 1 over at L)
     const stepPairs = halfOver && steps.length > 2;
     let stepsH = stepPairs
-        ? Array.from({ length: Math.ceil(steps.length / 2) }, (_, i) => Math.max(stepLines([steps[2 * i]], m.textPt), steps[2 * i + 1] ? stepLines([steps[2 * i + 1]], m.textPt) : 1)).reduce((a, b) => a + b, 0) * (m.pitch + 1.2) + Math.ceil(steps.length / 2) * 2.2 + 4
+        ? stepPairsMm(steps, m)
         : stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
     let modelBand = modelFull ? m.strip + modelH + (steps.length ? m.strip + stepsH : 0) : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];

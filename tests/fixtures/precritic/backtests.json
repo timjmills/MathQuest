@@ -12023,6 +12023,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "roles-opener-spill-p1-render",
+   "check": "lf-engine roles critic r3 F3: add_wp_10k M printed page 1 with 108 mm white (render) and the 90 mm Guided band on page 2, because the plan estimated 84 mm white (the two-column Steps read as 37 mm where 23 mm printed); ws-print-lint L-DENSITY SPILL-P1 applies the lead's spillP1Ok to the RENDERED page-1 white and page 2's first band",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY SPILL-P1 (RUBRIC H5, PT-OPN-10)",
+   "browser": true,
+   "fail": {
+    "commit": "1b7280c88",
+    "state": "add_wp_10k M: 107.8 mm of 239 mm white on page 1, page 2's first band 90.4 mm"
+   },
+   "pass": {
+    "commit": "PENDING_FIX",
+    "state": "add_wp_10k M one page (Model, Steps, Say, Guided)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_wp_10k --roles opener --size M --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
