@@ -1484,6 +1484,13 @@ function wsLintPage(cfg) {
                 if (l === Infinity || !(innerW > 0)) continue;
                 const k = (r - l) / innerW;
                 if (k < 0.8) F('L-DENSITY', 'CHART-WIDTH', 'major', cell, `the chart's count row spans ${Math.round(k * 100)} % of its ${mm(innerW)} mm panel (at least 80 %: the row keeps the chart's working size; critic cbt r1 D8)`, 'chart row shrunk');
+                // (critic cbt r2 E4, TY-10a: a 15-jump row drawn 9 + 6 in the chart panel, 9-11 mm boxes and touching arrows. A count row
+                // holds at most 6 numbers a line - 12 is 6 + 6, 15 is 5 + 5 + 5 - grouped by the numbers' centre lines)
+                const nums = [...row.querySelectorAll('[data-ws-slot], .k2-given')].filter(e => !e.parentElement.closest('[data-ws-slot], .k2-given, .k2-timeslbl'));
+                const ys = [];
+                for (const e of nums) { const q = e.getBoundingClientRect(); if (!q.height) continue; const y = (q.top + q.bottom) / 2; const g = ys.find(o => Math.abs(o.y - y) < 3 * 96 / 25.4); if (g) g.n++; else ys.push({ y, n: 1 }); }
+                const per = ys.map(o => o.n);
+                if (per.length && Math.max(...per) > 6) F('L-DENSITY', 'CHART-WIDTH', 'major', cell, `the chart's count row prints ${per.join(' + ')} numbers a line (at most 6 a line: 12 is 6 + 6, 15 is 5 + 5 + 5, TY-10a; critic cbt r2 E4)`, 'chart row lines');
             }
         }
     }
@@ -1515,6 +1522,11 @@ function wsLintPage(cfg) {
                 const shapes = new Set([...c.querySelectorAll('[data-ws-shape], [class*="k2-shape-"]')].map(e => { const m = /\bk2-shape-(\w+)/.exec(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className || ''); return m ? m[1] : (e.closest('[class*="k2-shape-"]') ? null : e.getAttribute('data-ws-shape')); }).filter(Boolean));
                 if (shapes.size > 1) F('L-ANSAREA', 'SHAPE-ONE', 'minor', c, `a Warm-up cell mixes writing shapes (${[...shapes].join(', ')}): one shape per cell (critic cbt r1 m2)`, 'mixed writing shapes');
             }
+            // (critic cbt r2 m2: the same mix on the Review and the Pre-skill check, cell by cell - a page writes in ONE outline
+            // shape: the outline shapes box / circle / hex across every cell of the pupil page, any role)
+            const OUT = new Set(['box', 'circle', 'hex', 'hexagon']);
+            const pageShapes = new Set([...ri.el.querySelectorAll('[data-ws-cell] [data-ws-shape], [data-ws-cell] [class*="k2-shape-"]')].map(e => { const m = /\bk2-shape-(\w+)/.exec(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className || ''); return m ? m[1] : e.getAttribute('data-ws-shape'); }).filter(v => v && OUT.has(v)).map(v => (v === 'hexagon' ? 'hex' : v)));
+            if (pageShapes.size > 1) F('L-ANSAREA', 'SHAPE-ONE', 'minor', ri.el, `the page mixes writing shapes (${[...pageShapes].join(', ')}): one outline shape per page (critic cbt r2 m2)`, 'mixed writing shapes on the page');
         }
     }
     /* REVIEW-LADDER (OPT-IN, --rules REVIEW-LADDER; critic cbt r1 m4): a Review's "Mixed Review:" items stay within the skill's own

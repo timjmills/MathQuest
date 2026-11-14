@@ -100,7 +100,10 @@ const INSET_MM = 1.5;
 /** mm a compact (one-page) paper row keeps clear on its left for the cell's label keep-out (--ws-koin is at most 3 mm). */
 const KO_RESERVE_MM = 3;
 const koReserve = (p, ctx) => (p && p.compact && !isTwin(ctx) && !insetOf(ctx) ? KO_RESERVE_MM : 0);
-const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
+// (critic cbt r2 E5, CL-40: at 1.5 mm the Opener's step tab still painted into the label keep-out - 6 x 6 mm at M, 7 x 7 at L -
+// ws-print-lint CL40-INK. The row starts just past the keep-out: its square less the cell's ~2.5 mm pad, plus 1 mm.)
+const KO_INSET_MM = { S: 4.5, M: 4.5, L: 5.5 };
+const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? (KO_INSET_MM[sizeOf(ctx)] || INSET_MM) : 0);
 /**
  * critic r6 N15: on the Opener (the role sizes the cell to the row), a count row of three or more lines - the wide practice rows
  * and the Model of a wide count - keeps 2 mm between its lines (1.5 mm for Lines, which have no box tops; 2.5 elsewhere), and a step
@@ -437,9 +440,9 @@ function widePerRow(n, cands, boxFor, need) {
 
 function arcsGeom(p, ctx, c) {
     const { size, n, shape, tabBody, tab, baseH, live, lblPt: lblPt0, lblChars, hasLbl, lblH } = c;
-    let perRow = p.axis ? n : n >= 13 && !p.twoLines ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
-    // (critic cbt r1 D8: a lesson chart's full-width panel - payload `twoLines`, set by chart.js - holds a 15-jump row in TWO lines (8 + 7), so the
-    // chart's three panels fit their page at the working size; in three lines of five it was zoomed to 13 pt at 60 % of the width)
+    let perRow = p.axis ? n : n >= 13 ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
+    // (critic cbt r2 E4, TY-10a: the chart's `twoLines` 8 + 7 split - the r1 D8 fix - drew 9 + 6 with 9-11 mm boxes and touching
+    // arrows; a 15-jump row is three lines of five in the chart panel too. `twoLines` no longer changes a 15-jump row.)
     let rows = Math.ceil(n / perRow);
     const chars = maxDigits(p);
     // critic skip-count r4 N10: a wide (6+ digit) paper row's numbers print at >= GIVEN_MIN_PT (11 pt, the rubric's reading floor;
