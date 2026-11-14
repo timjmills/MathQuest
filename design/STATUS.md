@@ -907,3 +907,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Lesson baseline re-pinned by the lane (eaf317317): g3-oa8 two-step detailed lesson (61 pages, STEP-FORM / STEP-ALIGN / bracket) and g3-oa9 input-output (40 pages, function-table work NOT yet critic-graded: first on patterns critic r3 after the reset); 13 lane lessons newly pinned.
 - Ledger: 1 stale row restored from master; 7 lane rows written before the 13:00 sweep given reasoned exemptions (ids attached at patterns r3).
 - Known: a lone-Model Guided page on two_step_add_then_div is a ruled exception until the Model is shortened (lf-algebra, after the reset).
+
+## 2026-11-14 — Deploy lf-roles round 11 (narrow critic r11 PASS: count rows held to ink on continuation pages; X2 ruled; ctx.guided plumbing)
+- Guided continuation pages hold count rows to their ink (GUIDED-COUNT-TIGHT); ctx.guided carried in render and measure (no page change); X2 lone-Model Guided page ruled for the two-step family.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
