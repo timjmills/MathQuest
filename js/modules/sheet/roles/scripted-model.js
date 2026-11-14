@@ -434,14 +434,17 @@ export function plan(input = {}) {
     const stT = !marks && !story ? statesOf(it) : null;
     const stWs = stT ? providerWorkedSteps(it, 6) : [];
     const stAt = (i) => (stT && stWs.length === steps.length ? stT.statePayload(it.q.cell.payload || {}, stWs, i) : null);
-    const stateItem = (i) => planItem(it, {
+    const smState = (x) => Object.assign(x, { cls: [x.cls || '', 'mq-smstate'].filter(Boolean).join(' ') });
+    // (lead ruling 2026-11-14, cbt r3: a state cell is the teacher's worked model, blank by design - `mq-smstate` marks it, so the
+    // key lint's AK-2 skips its slots and judges every other key slot)
+    const stateItem = (i) => smState(planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
             + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : stAt(i) ? Object.assign({ payload: Object.assign({}, o && o.payload, stAt(i).payload) }, stAt(i).answer && ans ? { shown: ans, ink: 'trace' } : {})
                         : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
-    });
+    }));
     const textItem = (i) => ({
         render: () => stepText(i),
         drawsAnswer: true, nolabel: true, cls: 'mq-stepcell', skill: it.skill,

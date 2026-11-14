@@ -1785,6 +1785,8 @@ function wsLintPage(cfg) {
                 return {
                     tag: c.id, rect: mmRect(c.getBoundingClientRect(), pr), slots: slots.length,
                     answered: slots.filter(slotAnswered).length, weightOk: slots.every(slotWeightOk),
+                    // (lead ruling 2026-11-14, cbt r3 L-KEY AK-2: a Scripted Model STATE cell - mq-smstate - is blank by design)
+                    smState: c.classList.contains('mq-smstate'),
                     shapes: [...new Set(slots.map(s => s.getAttribute('data-ws-shape')))],
                     item: !model && !ITEM_BANDS.test(bandLabel),
                     // a one-line fact, equation or number track: one short answer (PT 2.9 packs 20)
@@ -2536,7 +2538,9 @@ function lintKitGeometry(dom, pdf, info, F) {
         }
     }
     for (const p of pages.filter(q => q.key)) {
-        const empty = p.cells.reduce((n, c) => n + (c.slots - c.answered), 0);
+        // (lead ruling 2026-11-14, cbt r3: a Scripted Model state cell's slots are blank by design and not judged; every other
+        // key slot is - the exemption is the cell's mq-smstate mark only, scripted-model.js stateItem)
+        const empty = p.cells.reduce((n, c) => n + (c.smState ? 0 : c.slots - c.answered), 0);
         if (empty > 0) F('L-KEY', 'AK-2', 'critical', { page: p.idx }, `key page ${p.idx}: ${empty} of ${p.slots} answer slot(s) carry no answer (AK-2, AK-4)`, 'unanswered slot');
         if (p.cells.some(c => !c.weightOk)) F('L-KEY', 'AK-2', 'minor', { page: p.idx }, `key page ${p.idx}: answers not in weight 700 (AK-2)`, 'key weight');
         for (const o of (p.keyOver || [])) F('L-KEY', 'AK-2', 'major', { page: p.idx }, `key page ${p.idx}: the answer "${o.text}" runs ${o.mm} mm outside its box: a key writes each answer inside the slot the pupil writes in (AK-2, critic r6 D6-1)`, 'key answer outside its box');
@@ -3409,6 +3413,19 @@ const SELF_TESTS = [
     { name: 'unanswered key slot', expect: ['L-KEY', 'AK-2'], fn: () => {
         const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
         k.querySelector('[data-ws-cell] [data-ws-slot]').querySelectorAll('.p11-key').forEach(e => e.remove());
+    } },
+    // (lead ruling 2026-11-14, cbt r3: the Scripted Model state exemption is the cell's mq-smstate mark - a blank slot in any
+    // other key cell still fails, and a blank slot in a marked state cell does not)
+    { name: 'unanswered key slot beside a scripted-model state cell', expect: ['L-KEY', 'AK-2'], fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
+        const cs = [...k.querySelectorAll('[data-ws-cell]')].filter(c => c.querySelector('[data-ws-slot]'));
+        cs[0].classList.add('mq-smstate'); cs[0].querySelectorAll('.p11-key').forEach(e => e.remove());
+        cs[1].querySelectorAll('.p11-key').forEach(e => e.remove());
+    } },
+    { name: 'blank slot in a scripted-model state cell (by design)', absent: ['L-KEY', 'AK-2'], expect: [], fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
+        const c = [...k.querySelectorAll('[data-ws-cell]')].find(x => x.querySelector('[data-ws-slot]'));
+        c.classList.add('mq-smstate'); c.querySelectorAll('.p11-key').forEach(e => e.remove());
     } },
     { name: 'screen verb on paper', expect: ['L-VERBS', 'BD-12'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Click the right answer.'; } },
     { name: 'instruction over 12 words', expect: ['L-VERBS', 'BD-10'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Add the two numbers and then write the answer in the boxes below the line.'; } },

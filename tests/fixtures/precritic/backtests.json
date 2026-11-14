@@ -10387,6 +10387,26 @@
  }
 },
 {
+ "id": "cbt-r3-ak2-smstate",
+ "check": "critic cbt r2 N4 / lead ruling 2026-11-14: L-KEY AK-2 on the count_by_tables Scripted Model key was a reasoned false positive (its state cells are blank by design); the exemption is the state cell's mq-smstate mark only, so a key slot in any other cell left blank still FAILs",
+ "kind": "fixture",
+ "rule": "ws-print-lint L-KEY AK-2 (smState: cells marked mq-smstate by scripted-model.js stateItem are not counted)",
+ "browser": true,
+ "fail": {
+  "fixture": "tests/fixtures/precritic/ak2-smstate/fail.html",
+  "state": "the count_by_tables Scripted Model L document with the mq-smstate mark stripped: its 8 blank slots are ordinary key slots - AK-2 critical"
+ },
+ "pass": {
+  "fixture": "tests/fixtures/precritic/ak2-smstate/pass.html",
+  "state": "the same document as built (state cells marked): AK-2 not fired"
+ },
+ "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-KEY",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
  "id": "cbt-r2-e3-scripted-say",
  "check": "critic cbt r2 E3 (H2): Scripted Model L - the fourth count-row state covered the Say band (L-OVERLAP SECTION); the role cover lints scripted-model at M and L",
  "kind": "commit-pair",
