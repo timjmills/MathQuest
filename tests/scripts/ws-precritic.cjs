@@ -997,6 +997,9 @@ function buildPlan(ctx) {
         if (roomKeys.length) add(gate('ldiv-room', 'ws-ldiv-hug --room (LDIV-ROOM: the work grid uses a 4-a-page cell, M/L)', `${roomKeys.length} work-grid skill(s)`, 'browser', 'ws-ldiv-hug', ['--room', '--skills', roomKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
+        // SOUND-ONCE (owner request 2026-11-14, "B, power-up"): the correct-answer sound plays exactly once on a correct answer
+        // with Sound on, never on a wrong one, never with Sound off - card, worksheet and quiz at 1280 / 1024; SOUND-PLAN: the notes
+        add(gate('correct-sound', 'ws-correct-sound (SOUND-PLAN, SOUND-ONCE: the power-up once on a correct answer, card / worksheet / quiz at 1280 / 1024)', scope, 'browser', 'ws-correct-sound', ['--skill', keys.join(',')], { missingMsg: 'ws-correct-sound is not in this tree' }));
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
         // (lf-algebra r10, lead rule after lf-algebra critic r2: precritic r9's "Clean for the critic" list named pages with an open
         // critic finding (F2, npr / fgr card + worksheet) and roles no page-fill lint ran on (G4 Reason It one item a page). The lane

@@ -158,8 +158,9 @@ function celebrateCorrect(xpAmount = 10) {
             window.flashStreakPop();
         }
         const isStreakMilestone = streak >= 5 && (streak % 5 === 0 || streak === 5);
-        if (typeof window.playSfx === 'function') {
-            window.playSfx(isStreakMilestone ? 'streak' : 'correct');
+        // owner 2026-11-14: the "B, power-up" correct sound replaces the old correct / streak cue (correct-sound.js)
+        if (typeof window.playCorrectSound === 'function') {
+            window.playCorrectSound();
             // Stamp so the MAP engine's recordMapAnswer can dedupe its own
             // SFX call when a correct path here was followed by recordMapAnswer.
             window._mapLastSfxAt = Date.now();
@@ -212,8 +213,8 @@ export function _celebrateCorrectAnswer(opts) {
             if (!opts.skipConfetti && typeof window.confetti === 'function') {
                 window.confetti();
             }
-            if (typeof window.playSfx === 'function') {
-                window.playSfx('correct');
+            if (typeof window.playCorrectSound === 'function') {
+                window.playCorrectSound();   // owner 2026-11-14 power-up (correct-sound.js)
                 window._mapLastSfxAt = Date.now();
             }
             if (typeof window.flashMascotCheer === 'function') {
