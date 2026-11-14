@@ -43,6 +43,8 @@
 //   STEP-ALIGN screen (--screen-align, browser; STEP-FORM critic r3 F6: worksheet-1280 mult_div_first item 4, Step 2's fact
 //              sentence broke its 2-digit answer boxes onto a second line) every slot and = of a fact sentence stand on one line
 //              on the online worksheet and the practice card at 820 / 1024 / 1280 / 1366
+//   GUIDED-MODEL-ALONE (--guided, browser; lf-roles critic r8b / lead 2026-11-14, PAGE_TYPES 2.3: a Guided page holds the Model AND
+//              tries) the first Guided page of a two-step skill holds the Model and at least one try, at M / L
 //   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
 //              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
 //   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
@@ -71,6 +73,7 @@ if (args.includes('--ea')) await eaMode();
 if (args.includes('--ldiv')) await ldivMode();
 if (args.includes('--align')) await alignMode();
 if (args.includes('--screen-align')) await screenAlignMode();
+if (args.includes('--guided')) await guidedMode();
 
 const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
 const app = await loadApp(ROOT);
@@ -591,4 +594,37 @@ async function screenAlignMode() {
     for (const f of uniq.slice(0, 30)) console.log(`  ${f}`);
     console.log(uniq.length ? `${TOOL}: FAIL (--screen-align: ${uniq.length} finding(s))` : `${TOOL}: OK (--screen-align: STEP-ALIGN-SCREEN, ${judged} sentence(s))`);
     process.exit(uniq.length ? 1 : 0);
+}
+
+// GUIDED-MODEL-ALONE (--guided, browser; lf-roles critic r8b X2 / lead 2026-11-14: two_step_add_then_div's Guided Model needed
+// 219.8 mm against the page's 193.7 mm, so page 1 printed the Model alone - "we do" with no try beside the worked example,
+// PAGE_TYPES 2.3). The first Guided page of every two-step skill holds the Model plus at least one try, at M and L, over seeds.
+async function guidedMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const out = [];
+    let judged = 0;
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
+        for (const key of mine) for (const size of SIZES) for (const seed of [7, 11, 26]) {
+            const sk = key.split(':')[1];
+            const r = await app.page.evaluate(async (a) => {
+                let s;
+                try { s = await window.buildSheet({ role: 'guided', sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true }); } catch (e) { return { err: String(e && e.message || e) }; }
+                const d = document.createElement('div'); d.innerHTML = s.pupilHtml || '';
+                const p1 = d.querySelector('.ws-page');
+                const cells = p1 ? [...p1.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]')).length : 0;
+                return { cells, pages: d.querySelectorAll('.ws-page').length };
+            }, { sk, size, seed });
+            if (r.err) { out.push(`GUIDED-MODEL-ALONE ${sk} ${size} seed ${seed}: buildSheet threw ${r.err}`); continue; }
+            judged++;
+            if (r.cells < 2) out.push(`GUIDED-MODEL-ALONE ${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (${r.cells} cell, ${r.pages} pages)`);
+        }
+    } finally { await app.close(); }
+    console.log(`GUIDED-MODEL-ALONE ${out.length ? `FAIL ${out.length}` : 'PASS'} (${judged} Guided sheet(s))`);
+    for (const f of out.slice(0, 40)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--guided: ${out.length} finding(s))` : `${TOOL}: OK (--guided: GUIDED-MODEL-ALONE, ${judged} sheet(s))`);
+    process.exit(out.length ? 1 : 0);
 }
