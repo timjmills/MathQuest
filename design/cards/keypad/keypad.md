@@ -1,4 +1,4 @@
-# On-screen keypad: design card (DESIGN ONLY, unsigned)
+# On-screen keypad: design card (signed)
 
 Lane: lf-tools-keypad · designer: Opus medium · 2026-11-14 · status: **owner rulings 2026-11-14 applied (section 9)**
 Mock: `design/status/lf-checks/keypad/mock.html` (the app's real CSS; the proposed `css/keypad.css` is inline in it).
@@ -215,3 +215,5 @@ These checks are written before the build, and each must fail on master (`ws-bac
 - **R3 Signs:** sign questions keep BOTH the card's sign tiles and the pad's sign keys.
 - **R4 Digit order:** phone order, 1-2-3 on top.
 - **R5 Board display:** with no answer box, the pad is hidden.
+
+Signed: owner, 2026-11-14
