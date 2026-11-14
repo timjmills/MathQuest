@@ -1,0 +1,10 @@
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 1 p1: window 3's missing 72, 74 is printed in window 1 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 1 p1: window 3's missing 65 is printed in window 2 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 2 p1: window 3's missing 55 is printed in window 1 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 2 p1: window 3's missing 66, 76 is printed in window 2 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 3 p1: window 3's missing 75 is printed in window 2 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 3 p1: window 3's missing 75 is printed in window 4 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson M seed 4 p1: window 1's missing 75 is printed in window 2 (an overlapping window)
+  CROSS-GIVEAWAY composing:hundreds_chart_fill lesson L seed 4 p1: window 1's missing 75 is printed in window 2 (an overlapping window)
+  OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 28/56 False; EA multi-gap Correct 16 / Fix it 16
+ws-guided-echo: FAIL - 8 finding(s) (520 pages, composing:chart_to_120, composing:hundreds_chart_fill, sizes M/L, 4 seeds)

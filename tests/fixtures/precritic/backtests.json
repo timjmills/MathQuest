@@ -10993,8 +10993,8 @@
     "state": "worksheet.js / quiz-builder deal without the window rule"
    },
    "pass": {
-    "commit": "de7225b14",
-    "state": "chart-giveaway.js shared by print-sheet, the worksheet and the quiz builder"
+    "commit": "8c42961f1",
+    "state": "chart-giveaway.js shared by print-sheet, the worksheet and the quiz builder; re-pointed 2026-11-14 from de7225b14, which the stricter CROSS-GIVEAWAY (overlapping windows too) now fails"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 0 --only CROSS-GIVEAWAY --screen-seeds 20",
    "expect": {

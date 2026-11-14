@@ -1,0 +1,42 @@
+ws-backtest row c120r3-model-state-marks: PASS  fail state FAIL 15.1s, pass state OK 14.8s
+ws-backtest row c120r3-screen-giveaway: FAIL  fail state FAIL 5.4s, pass state FAIL 7.0s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-guided-echo: FAIL - 428 finding(s) (40 pages, composing:chart_to_120, sizes M/L, 0 seeds); pass: ws-guided-echo: FAIL - 443 finding(s) (40 pages, composing:chart_to_120, sizes M/L, 0 seeds)
+    last 20 line(s) of the pass state:
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 3's missing 117 is printed in window 1 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 3's missing 94, 96 is printed in window 2 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 3's missing 94 is printed in window 4 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 3's missing 94, 96, 117 is printed in window 5 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 3's missing 96, 117 is printed in window 6 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 5's missing 95, 103 is printed in window 2 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 5's missing 95 is printed in window 3 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 5's missing 95, 103 is printed in window 4 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 5's missing 95 is printed in window 6 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 6's missing 119 is printed in window 1 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 6's missing 115 is printed in window 2 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 6's missing 115 is printed in window 3 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 6's missing 115 is printed in window 4 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 online worksheet seed 20: window 6's missing 115 is printed in window 5 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 quiz seed 20: window 1's missing 115 is printed in window 2 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 quiz seed 20: window 1's missing 115 is printed in window 3 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 quiz seed 20: window 2's missing 105 is printed in window 1 (an overlapping window)
+      |   CROSS-GIVEAWAY composing:chart_to_120 quiz seed 20: window 2's missing 92, 94, 105 is printed in window 3 (an overlapping window)
+      |   OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 0/0 False; EA multi-gap Correct 0 / Fix it 0
+      | ws-guided-echo: FAIL - 443 finding(s) (40 pages, composing:chart_to_120, sizes M/L, 0 seeds)
+ws-backtest row c120r3-say-frame: PASS  fail state FAIL 1.3s, pass state OK 1.3s
+ws-backtest row c120r3-overlap-giveaway: PASS  fail state FAIL 6.9s, pass state OK 6.9s
+ws-backtest row c120-blank-count: PASS  fail state FAIL 8.8s, pass state OK 20.1s
+ws-backtest: 5 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120r3-model-state-marks    commit-pair  FAIL 15.1s          OK 14.8s            PASS
+c120r3-screen-giveaway      commit-pair  FAIL 5.4s           FAIL 7.0s           FAIL
+c120r3-say-frame            commit-pair  FAIL 1.3s           OK 1.3s             PASS
+c120r3-overlap-giveaway     commit-pair  FAIL 6.9s           OK 6.9s             PASS
+c120-blank-count            commit-pair  FAIL 8.8s           OK 20.1s            PASS
+
+c120r3-screen-giveaway: expected {"fail":"FAIL","pass":"OK"}
+  fail state (03c811eed): ws-guided-echo: FAIL - 428 finding(s) (40 pages, composing:chart_to_120, sizes M/L, 0 seeds)
+  pass state (de7225b14): ws-guided-echo: FAIL - 443 finding(s) (40 pages, composing:chart_to_120, sizes M/L, 0 seeds)
+
+4 PASS, 1 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 168.7 s
+ws-backtest: FAIL (1)

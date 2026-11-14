@@ -1,0 +1,11 @@
+ws-boot-smoke: OK
+ws-content-audit: FAIL - no skill matched composing:chart_to_120
+ws-content-audit: FAIL - no skill matched composing:hundreds_chart_fill
+(Use `node --trace-warnings ...` to show where the warning was created)
+(Use `node --trace-warnings ...` to show where the warning was created)
+ws-options-verify: OK
+ws-options-verify: OK
+ws-guided-echo: FAIL - 8 finding(s) (520 pages, composing:chart_to_120, composing:hundreds_chart_fill, sizes M/L, 4 seeds)
+ws-lesson-baseline: wrote 1772 hashes to design/audit/runs/lf-builds/chart120/logs/blanks/master-lesson-baseline.json
+ws-lesson-baseline: OK (1772 hashes identical)
+ALLDONE

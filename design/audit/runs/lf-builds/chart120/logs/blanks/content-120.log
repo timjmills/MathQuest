@@ -1,0 +1,22 @@
+note composing/chart_to_120  "Count to 120 on the Chart"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [not-checked] this skill's name is about counting, but NOT ONE of its 240 items was in a form whose answer could be checked against its picture. The picture check did not pass here; it never ran.
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+     2  not-checked
+     1  unaudited
+
+By family:
+  k2            1 skills, 0 failing
+
+Coverage: 1 skills where NOTHING could be checked against the name (composing/chart_to_120); 1 more with at least one check that could not be applied.
+
+MC-ALL (P-29 / RM-P-01, every live skill): 1 skills, 60 items each
+baseline: design/audit/baselines/content-audit-mc.json (23 pinned (skill, kind) pairs)
+ws-content-audit --mc-all: OK (1 skills, 60 items each: 0 with production items as buttons (0 pinned), 0 new, 0 label-bank notes)
+
+ws-content-audit: OK (1 chart_to_120 skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 3 notes)

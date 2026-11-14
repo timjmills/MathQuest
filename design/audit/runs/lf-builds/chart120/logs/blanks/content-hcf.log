@@ -1,0 +1,17 @@
+ ok  composing/hundreds_chart_fill  "Hundreds Chart - Find the Missing Number (Visual)"
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+
+By family:
+  k2            1 skills, 0 failing
+
+Coverage: 0 skills where NOTHING could be checked against the name; 0 more with at least one check that could not be applied.
+
+MC-ALL (P-29 / RM-P-01, every live skill): 1 skills, 60 items each
+baseline: design/audit/baselines/content-audit-mc.json (23 pinned (skill, kind) pairs)
+ws-content-audit --mc-all: OK (1 skills, 60 items each: 0 with production items as buttons (0 pinned), 0 new, 0 label-bank notes)
+
+ws-content-audit: OK (1 hundreds_chart_fill skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 0 notes)
