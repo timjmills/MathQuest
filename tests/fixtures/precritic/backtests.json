@@ -9143,6 +9143,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ldiv-join",
+   "check": "the long-division bracket is ONE connected stroke: the arc's top end runs into the vinculum with no white at the outer corner (<= 0.3 mm) and no step (<= 0.1 mm), paper M/L pupil + key and screen 1366 / 820 (owner request 2026-11-14: 'disconnected'; master paper gap 0.67 mm, fact rows 0.33 mm, screen step 0.25 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join LDIV-JOIN",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "butt-capped arc under a separate vinculum: white wedge at the corner on every bracket"
+   },
+   "pass": {
+    "commit": "bf0814473",
+    "state": "bracketSvg: arc and bar one path with a mitre join, on paper and screen"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --skills division:long_div_2digit,division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
