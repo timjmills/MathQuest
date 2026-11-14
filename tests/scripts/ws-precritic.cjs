@@ -1023,6 +1023,11 @@ function buildPlan(ctx) {
         // (the fraction's numerator sat in the L tab's keep-out on the Opener, Review and Reason It; the card's own gate
         // line listed only fact rows). One run per form and size, every fact-family role, against the size's pin.
         const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
+        // (lf-ops divarray r2, owner rule 2026-11-13: the div_facts support-aid page rules of critics r6 / r7 - EB-PAGE on Test and the
+        // fade packet, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX - restored as ws-fact-pages after the deploy dropped them)
+        const factPageKeys = keys.filter((k) => k === 'division:div_facts');
+        if (factPageKeys.length) add(gate('fact-pages', 'ws-fact-pages --page-only (div_facts support-aid page rules: EB-PAGE, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX)', factPageKeys.join(','), 'browser', 'ws-fact-pages',
+            ['--skill', factPageKeys.join(','), '--page-only', '--hosts', 'none', '--no-baseline', '--rules', 'EB-PAGE,EB-PAD,EB-COLS,EB-TESTEQ,EB-GAP,EB-FACTX'], { missingMsg: 'no tests/scripts/ws-fact-pages.cjs' }));
         if (divFormKeys.length) {
             const DF_ROLES = 'fact-rows,independent,more-practice,test,fact-probe,mixed-practice,opener,guided,review,reason-it,true-false,stretch';
             for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) {
@@ -1056,8 +1061,10 @@ function buildPlan(ctx) {
             const singles = [...new Set(factKeys.flatMap((k) => FACT_SUPPORTS[k] || []))];
             for (const sup of singles) {
                 const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
-                add(gate(`print-lint-supports-${sup}-M`, `ws-print-lint --source kit --supports ${sup} --size M --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
-                    ['--source', 'kit', '--supports', sup, '--size', 'M', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
+                // --fill-roles runs PAGEFILL / the PG-23 orphan on review + test too (critic divarray r1 D2: a support page -
+                // mult_facts Review S touch at the ruled 15 - left a 30 % blank strip under the grid that no gate measured)
+                add(gate(`print-lint-supports-${sup}-M`, `ws-print-lint --source kit --supports ${sup} --size M --roles ${SUP_ROLES} --fill-roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section; D2: PAGEFILL on review/test)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'M', '--roles', SUP_ROLES, '--fill-roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
             }
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
@@ -1131,6 +1138,10 @@ function buildPlan(ctx) {
             const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
             if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × M/L`, 'browser', 'ws-grade-render',
                 ['--skills', k, '--roles', more.join(','), '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            // (critic divarray r2 D6: the Scripted Model with a support DRAWN - div_facts' landscape array on the 10s band, tables 2-5 -
+            // ran its trace jots onto the cell rule at L; the card-role gate above renders the default, support-free page only)
+            if (k === 'division:div_facts') add(gate('render-gate-div_facts-sm-array', 'ws-grade-render --gate on the Scripted Model with the array support (10s band, tables 2-5) at M, L (critic divarray r2 D6: overflow)', `${k} × scripted-model × array × M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', 'scripted-model', '--size', 'M,L', '--supports', 'array', '--opts', JSON.stringify({ band: 100, constant: [2, 3, 4, 5] }), '--gate', '--no-screen', '--out', path.join(ctx.logs, 'render-gate-div_facts-sm-array')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
             add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × M/L`, 'browser', 'ws-cell-checks',
                 ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
         }
@@ -1147,7 +1158,7 @@ function buildPlan(ctx) {
         add(gate('screen-slots', `ws-screen-slots --skills${ss.includes('--screen-digit') ? ' --screen-digit' : ''}`, scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
-        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE, ARRAY-ORIENT, ARRAY-DOT-MIN, ARRAY-CAPTION, SCREEN-ANSWER-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];
@@ -1295,6 +1306,14 @@ function buildPlan(ctx) {
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }
         add(gate(`print-lint-role-${ctx.role}-M`, `ws-print-lint --source kit --roles ${ctx.role} --size M`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // (lf-ops divarray r2, owner rule 2026-11-13 "every finding a check on precritic's path": a lane that touches role R
+        // runs the empty-band check and the capacity pin on ITS skills' R pages - the Review stack side band, the Test
+        // support band (EB-SUPBAND) and a ruled Review capacity were backtested but off this path)
+        if (ctx.skills.length) {
+            const lk = ctx.skills.map((s) => s.key).join(',');
+            add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (the lane skills' ${ctx.role} pages at M / L)`, `${lk} × ${ctx.role}`, 'browser', 'ws-empty-band', ['--skill', lk, '--roles', ctx.role], { missingMsg: 'ws-empty-band is not in this tree' }));
+            add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role} (the lane skills' ${ctx.role} pages never fall; ruled option pages)`, `${lk} × ${ctx.role}`, 'browser', 'ws-capacity-pin', ['--check', '--skills', lk, '--roles', ctx.role], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
+        }
         // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
         // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
         // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
