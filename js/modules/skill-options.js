@@ -1250,7 +1250,11 @@ function _gridOptions() {
             // one chart to a page by design, so they stay on Independent, More practice and the simple print; the Lesson,
             // Guided and Test pages share the page with Steps / a Model / other items and draw the window instead
             // (optsForRole). ws-role-hidden holds every role's deal to this.
-            hiddenOnRoles: { lesson: ['rows', 'whole'], guided: ['rows', 'whole'], test: ['rows', 'whole'] },
+            // Lead ruling 2026-11-14 (chart_120 r2): at band 120 three rows of ten are the chart's ONE window - one item a
+            // sheet or a giveaway - so the multi-item practice pages draw the window there ('value@option=value': hidden only
+            // when that other option holds that value).
+            hiddenOnRoles: { lesson: ['rows', 'whole'], guided: ['rows', 'whole'], test: ['rows', 'whole'],
+                independent: ['rows@band=120'], 'more-practice': ['rows@band=120'], review: ['rows@band=120'], 'mixed-practice': ['rows@band=120'] },
         },
         {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
@@ -3268,11 +3272,15 @@ _ap1Put('composing:number_bonds', {
 // row, drawn whole). 100 stays the default, so every old page and code is unchanged.
 // chart_120 (card chartwindow, signed 2026-11-12): band 120 cuts every window from rows 91-120,
 // so every window crosses 100; the whole chart is 12 rows on one page.
-_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100, 120], 100, {
+_ap1Put('composing:hundreds_chart_fill', Object.assign(_opsBand([10, 20, 30, 40, 50, 100, 120], 100, {
     labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)', 120: '120 (91 to 120, across 100)' },
     help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50, 100 or 120 numbers, ten to a row. '
         + 'A small chart holds fewer empty boxes. '
         + 'At 120 every window is cut from 91 to 120, so it crosses 100.',
+}), {
+    // Lead ruling 2026-11-14 (chart_120 r2): the chart to 10 is ONE window (its one row) - one item a sheet or a giveaway -
+    // so the multi-item practice pages deal the 1-100 window instead; the card, the quiz and the lesson keep it.
+    hiddenOnRoles: { independent: [10], 'more-practice': [10], review: [10], 'mixed-practice': [10], test: [10] },
 }));
 // number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
 // thousands). "Numbers in" names the stretch of the chart; every number in the window is in it.
@@ -3955,7 +3963,9 @@ export function optsForRole(categoryId, skillId, opts, role) {
     let out = opts;
     for (const id of ids) {
         const v = id in opts ? opts[id] : norm[id];
-        if (!hid[id].some((h) => String(h) === String(v))) continue;
+        // ('value@option=x': hidden only while that option holds x - grid rows at band 120)
+        const hit = (h) => { const [hv, cond] = String(h).split('@'); if (hv !== String(v)) return false; if (!cond) return true; const [ck, cv] = cond.split('='); return String(ck in opts ? opts[ck] : norm[ck]) === cv; };
+        if (!hid[id].some(hit)) continue;
         const def = optionsFor(categoryId, skillId).find((d) => d.id === id);
         if (out === opts) out = { ...opts };
         out[id] = def ? def.default : undefined;

@@ -414,6 +414,46 @@
         "why": "three rows of ten and the whole chart are one chart to a page by design; on a Lesson (beside the Steps and the anchor chart), a Guided page (under the Model) and a Test (many items a page) they overflowed (OVERFLOW lesson 18 / 24, guided 8-12) or printed one item a page (LONE-PAGE test 3). These roles never deal them: the option falls back to the window (skill-options.js hiddenOnRoles, print-sheet optsForRole); ws-role-hidden holds every hidden role's deal to it"
       },
       {
+        "option": "grid",
+        "values": [
+          "rows"
+        ],
+        "when": {
+          "band": 120
+        },
+        "d": "hidden",
+        "roles": [
+          "independent",
+          "more-practice",
+          "review",
+          "mixed-practice"
+        ],
+        "skills": [
+          "composing:hundreds_chart_fill"
+        ],
+        "source": "lead ruling 2026-11-14 (chart_120 r2, ruling (a))",
+        "why": "one possible window means one item a sheet or a giveaway (lead 2026-11-14): band 120's three rows of ten and the chart to 10 have ONE window, so a second item prints the first one's answers (critic r1 F4 / F9). The multi-item practice pages deal the window / the 1-100 chart instead (skill-options.js hiddenOnRoles, print-sheet optsForRole); the screen card, the quiz and the lesson keep them; ws-role-hidden holds every hidden role's deal to it"
+      },
+      {
+        "option": "band",
+        "values": [
+          10
+        ],
+        "d": "hidden",
+        "roles": [
+          "independent",
+          "more-practice",
+          "review",
+          "mixed-practice",
+          "test"
+        ],
+        "skills": [
+          "composing:hundreds_chart_fill"
+        ],
+        "source": "lead ruling 2026-11-14 (chart_120 r2, ruling (a))",
+        "why": "one possible window means one item a sheet or a giveaway (lead 2026-11-14): band 120's three rows of ten and the chart to 10 have ONE window, so a second item prints the first one's answers (critic r1 F4 / F9). The multi-item practice pages deal the window / the 1-100 chart instead (skill-options.js hiddenOnRoles, print-sheet optsForRole); the screen card, the quiz and the lesson keep them; ws-role-hidden holds every hidden role's deal to it"
+      },
+      {
         "option": "gaps",
         "values": [
           "scatter",

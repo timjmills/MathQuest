@@ -35,7 +35,7 @@ function roleHiddenOf(cfg, file = '') {
         if (e.d !== 'hidden' || !Array.isArray(e.roles) || !e.roles.length) continue;
         const option = e.option || String(e.key || '').split('=')[0];
         const values = e.option ? (e.values || []).map(String) : [String(e.key || '').split('=').slice(1).join('=')];
-        out.push({ card: file, option, values, roles: e.roles.map((r) => String(r).replace(/^role:/, '')), skills: e.skills || (cfg.skills && cfg.skills.include) || [] });
+        out.push({ card: file, option, values, roles: e.roles.map((r) => String(r).replace(/^role:/, '')), skills: e.skills || (cfg.skills && cfg.skills.include) || [], when: e.when && typeof e.when === 'object' ? e.when : null });
     }
     return out;
 }
@@ -99,15 +99,19 @@ if (has('self-test')) {
                     if (String(v) === String(dflt)) { out.push({ key: j.key, role: '-', value: v, verdict: 'FAIL', msg: `the hidden value is the option's default (${dflt}): a role cannot fall back from it` }); continue; }
                     for (const size of sizes) {
                         // control: a role that offers the value draws something else (else the judge is blind)
+                        // (`when`: the other option values the decision holds under - grid rows at band 120; the control is a role
+                        // that does not hide the value - independent, else true-false)
+                        const W = j.when || {};
+                        const ctl = ['independent', 'true-false', 'error-analysis'].find((r) => !j.roles.includes(r));
                         try {
-                            const a = await build(cat, id, 'independent', size, { [j.option]: v });
-                            const b = await build(cat, id, 'independent', size, { [j.option]: dflt });
-                            out.push({ key: j.key, role: 'independent (control)', value: v, size, verdict: a.html !== b.html ? 'ok' : 'INCOMPLETE', msg: a.html !== b.html ? `offered: draws its own page (${a.pages} vs ${b.pages} page(s))` : `${j.option}=${v} draws the same page as ${dflt}: the judge cannot see the value` });
+                            const a = await build(cat, id, ctl, size, { ...W, [j.option]: v });
+                            const b = await build(cat, id, ctl, size, { ...W, [j.option]: dflt });
+                            out.push({ key: j.key, role: `${ctl} (control)`, value: v, size, verdict: a.html !== b.html ? 'ok' : 'INCOMPLETE', msg: a.html !== b.html ? `offered: draws its own page (${a.pages} vs ${b.pages} page(s))` : `${j.option}=${v} draws the same page as ${dflt}: the judge cannot see the value` });
                         } catch (e) { out.push({ key: j.key, role: 'independent (control)', value: v, size, verdict: 'INCOMPLETE', msg: `threw: ${String(e && e.message || e).slice(0, 100)}` }); }
                         for (const role of j.roles) {
                             try {
-                                const a = await build(cat, id, role, size, { [j.option]: v });
-                                const b = await build(cat, id, role, size, { [j.option]: dflt });
+                                const a = await build(cat, id, role, size, { ...W, [j.option]: v });
+                                const b = await build(cat, id, role, size, { ...W, [j.option]: dflt });
                                 const same = a.html === b.html;
                                 out.push({ key: j.key, role, value: v, size, verdict: same ? 'ok' : 'FAIL', msg: same ? `falls back to ${j.option}=${dflt} (identical page and key)` : `DEALT: ${j.option}=${v} draws its own page on ${role} (${a.pages} page(s) vs ${b.pages} with ${dflt}); the card hides it there (${j.card})` });
                             } catch (e) { out.push({ key: j.key, role, value: v, size, verdict: 'FAIL', msg: `threw: ${String(e && e.message || e).slice(0, 100)}` }); }
