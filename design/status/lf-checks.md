@@ -9,6 +9,26 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-13 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-touch, builder Opus medium; lf-hosts hand-over d23e42fa6 merged in):
+  1. TOUCH-HIT de-flake (ws-phone-card). Measured on d23e42fa6, 3 runs of sub_100_no_regroup + placevalue:expand + add_facts
+     (--only TOUCH-HIT, 4 widths x card/worksheet/quiz): run 1 sub_100 1280 card item 1 bottom-right; run 2 expand 1280 item 2
+     bottom; run 3 sub_100 1280 item 1 bottom + add_facts 1280 item 3 bottom. Every miss "focuses nothing (body)", at 1280 x 900,
+     on a bottom edge / corner, never the same twice. Cause: the tap point was read in the same task as the blur and the
+     scrollIntoView, so a scroll / focusout layout that settled on the next frames left the point stale. Fix in the CHECK: the
+     point is read after two frames and once the scroll and the box rect hold still; a miss is re-tapped the same way and only
+     a REPEATED miss is a finding (`--no-retap` = the old tap, `--touch-debug` prints misses that held). After: 3 of 3 runs OK
+     with 0 re-taps needed (settling alone removed them). Rows `touch-hit-settle-retap` (stale single tap FAIL -> settled OK) and
+     `touch-hit-overlay-true-miss` (a planted overlay on the box's bottom 12 px FAILs every run, 3 of 3) PASS; ledger row added.
+  2. WS-REFLOW per-slot x (ws-worksheet-reflow): each typed answer place's left edge inside its card vs the baseline's slotXs,
+     tolerance 1.5 px; self-test 1 px holds / 2 px fails; `--pin-slots` adds slotXs only (pinned from master a8258e3f3);
+     sub_word_problems' slotXs pinned from d23e42fa6 (lf-hosts' word-work gap moved its working boxes 3-4 px; passed critic r3,
+     so re-pinned in this change per the ratchet rule). Row `ws-reflow-slot-x` (`--judge-fixture`, 2 px FAIL -> 1 px OK).
+  3. `ws-backtest --help` prints the usage and exits 0 (its --self-test asserts it). New `tests/scripts/ws-touch-diff.mjs`:
+     one command runs today's ws-phone-card (TOUCH-HIT by default, `--rules`) on HEAD and on origin/master (temporary worktree)
+     and prints only the cells that differ (`--self-test`).
+  WAITING until the de-flaked TOUCH-HIT is live on master (lf-hosts hand-over item 4): the touch-target re-check at 820 / 1024 of
+  box_division_hard, time_hour, money, vocab_grade_pictures, the mult_chart family, long_div_2digit, order_negatives, the fact
+  families, arrays_groups / mult_arrays.
 - 2026-11-13 (lf-tools, branch claude/sweet-newton-c8wrv1-lf-tools): COPY-LIGHT and BATCH critic routes (owner rule, fastest plan 2-3).
   `tests/scripts/ws-copy-light.mjs` (new): eligibility = every kit template the generator draws (defaults + the card's option values,
   q.cell via kitCellSpec) has an ANCHOR in redesign-passed.js whose signed card offers every role and host the skill's card offers
@@ -425,6 +445,10 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 - CHECKS_FROM_CRITICS SWEEP (builder, Opus medium, 11-13; queue item 0): `ws-precritic-plan --checks-from-critics` (also in its default run; `--no-sweep` skips). Lives in ws-precritic-plan because "on the lane's path" is decided there: the per-row verdict is now one function (rowPath) that the path check and the sweep share; a no-skill fixture row is on the path when its tool is a precritic or deploy gate. Each ledger row's "Backtest row" cell names ids in backticks (older bare ids still read; free text reads as an unknown id), or `exempt:` / `not machine-measurable:` / a process rule. Self-test: 12 planted rows (missing, unknown, off-path, exempt, good, legacy, same row, process rule, free text, empty reason, column kept) - 37 cases. On every precritic plan (node gate checks-from-critics) and deploy session 1. Ledger: 29 lf-checks rows added (eb-r3..r7, sis-r1..r3, ebitem-r1) + ids filled on the 11-07 and owner SCREEN-INK-SIZE rows. Today: 43 pass, 12 exempt, 16 FAIL (lf-checks 3 queued minors with no row yet; other lanes 13) - the gate is RED until the owning lanes fill their ids.
 - Sweep HYBRID (lead 11-13): precritic --skill/--role runs --checks-from-critics --skills <its skills> and BLOCKS on rows naming them (div_facts: 2 open, unit_form: 1 open); deploy session 1 / the default plan judge every row but WARN until the ledger header's 'Blocks globally from: 2026-11-14 13:00 UTC', then block (MQ_NOW overrides for tests). Self-test 43 cases.
 - NO DROPPED ROW (lead / lf-ops 11-13): ws-precritic-plan --checks-from-critics now FAILS, always (past the warning date), when the tree lacks a backtest row id the baseline held (origin/master, or --rows-before <file>). It runs in deploy session 1 on the deploy tree. Row no-dropped-row (fixtures in tests/fixtures/precritic/no-dropped-row/) PASS; ledger row added; self-test 46.
+- 2026-11-13 queue 10 / 11+18+21 / 20 (builder, Opus medium; branch worktree-agent-af010c942e0eb2056): checks first (1fbdb8eca), fixes (46a7c3c45), rows (6 PASS in ws-backtest).
+  - 20a CELL-READ: ws-screen-slots (host:read; a host that did not render, a worksheet of 0 cards, a cell with no [data-ws-cell]), ws-screen-answer (--cell-read-self-test), ws-phone-card (card + worksheet/quiz); ws-empty-band already EB-READ. ws-screen-ink-size (read only, other owner) still passes a host with 0 drawings / 0 cells (`if (!sc.drawings.length) continue`): routed.
+  - 20b the card paper carries data-ws-cell (kit kind, else legacy). 10: ws-phone-card TOUCH-TARGET on card, worksheet and quiz at 390 (answer >= 48 x 48, working box >= 44); .mq-wwans inputs fixed. A 39-skill sample still shows 33 under-48 groups (mostly [data-mq-cell] > input.mq-cellslot 44-47 px tall: time, money, mult_chart, long_div, arrays_groups, div_remainders, count_sequence, fact_family, add_three worksheet) - owning lanes.
+  - 11/18/21: #worksheetView grid cells take the host floor 40 / 48 / 56 px (additive CSS). screen-digit-npr-worksheet re-armed: pass b6107d339 = this fix + lf-ops-props 63b26321a (contains 85c694896; npr already passes from lf-ops' count-row rule, the floor covers mult_facts / div_facts / mult_properties / pv).
 - OPEN LEDGER ROWS CLOSED (builder, Opus medium, 11-13; commits 7bd6f3d31, 96ba50e36, c484ffca7, 5a8e27ec9 + this note):
   - eb-r6 m2: ws-screen-answer `--focus-gap-html <file>` judges a saved page. Row `sa-focus-gap-fixture-below`: "tens" 1 px under the ring gives no finding with 8dc176e6's FOCUS_GAP (proven by running that commit's function on the fixture) and FAILs now; 10 px clear is OK.
   - eb-r7 m1: FOCUS-GAP reads text above and below the ring LINE BY LINE (a Range per character on each line box). Self-test: 12 cases. Row `sa-focus-gap-wrap-line`: its pass fixture ("wer once" 5 px clear over "Tall") read 0 px at 7bd6f3d31 and is OK now.
@@ -687,3 +711,36 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
   `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
 - CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
+
+## 2026-11-13 — precritic "unparsed" verdict fix (lead, urgent; reported by lf-ops)
+
+- `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output": precritic's verdict reader accepted only
+  `<tool>: OK|FAIL`. It now accepts `<tool>[ --mode]*: OK|FAIL` (self-test: 6 verdict cases). Row `precritic-mode-verdict`.
+- copy-light "unparsed": NOT reproduced on master 7a5bc902c (precritic's parser reads `ws-copy-light --skill
+  multiplication:count_by_tables` as PASS); asked the lead for lf-ops' log line and branch.
+- copy-light "unparsed" (lf-ops log, 594642d49): reproduced. ws-copy-light ended with process.exit(), which drops stdout
+  still queued for a pipe; precritic's reader got no verdict line. Fix: process.exitCode, plus the drawings / reasons lists
+  capped at 12. Row `copy-light-pipe-verdict` (30 skills through a slow pipe). The count-row key granularity lf-ops noted
+  (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
+- Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
+  exit uses exitCode when its output can exceed the 64 KB pipe buffer).
+
+## 2026-11-14 ledger sweep before the 13:00 UTC flip (branch claude/sweet-newton-c8wrv1-lf-tools-ledger)
+
+- `ws-precritic-plan --checks-from-critics`: 15 failing rows -> 0 (222 pass, 58 exempt). Only backtest cells edited.
+- (a) named existing on-path ids: 6 rows (49, 51, 60, 137, 302 by id; 178 as a process rule).
+- (b) brought from lf-partopts: 0 (the partopts step-A / panel rows were already green on master; options-panel-sample's
+  fix d7847568 and ws-options-shots gate are not on master, so it could not run here).
+- (c) reasoned exemptions: 9 rows - div_facts 27/45/46/47/48 (ws-fact-pages.cjs + 8 rows parked on lf-ops-divarray
+  6e5fe3415), 43 (nits under the bar), 131 (overflowOf runs in every precritic run and its --self-test), 140 (open, needs a
+  PDF-raster check), 141 (parked with the partopts panel). When lf-ops-divarray or the partopts panel deploys, swap these
+  exemptions for their ids.
+- PARKED (budget stop from the lead): lf-engine F2, the plan's row listing printing skill-less rows (chart-name-line,
+  lesson-pm-cont, lesson-tab-clear) N/A; fix = judge them with idOnPath's tool rule (precritic or deploy gate) and print why.
+## 2026-11-14 — ws-no-size-s --browser de-flake (lead; seen on lf-builds chart_to_120)
+
+- Cause: a size click landed while the previous build still redrew the controls, so the click was lost. Fix: wait until the
+  built size reads the same 3 times, re-scan just before each click (a rebuild drops the old tags), and on a miss re-click
+  once; a re-click is printed as a note, and only a repeat miss fails. 2 of 2 plain runs OK; the 30-mutation browser
+  self-test still catches every planted S / dead control. Row `nos-browser-settle-reclick` (a planted lost first click:
+  master's tool FAIL, this tool OK).

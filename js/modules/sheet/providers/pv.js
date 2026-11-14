@@ -1284,11 +1284,32 @@ const WORDS_TO_NUMBER = { iCan: 'I Can write a number from its name', instructio
     steps: ['Read the hundreds word.', 'Read the last words as one number.', 'No tens or ones word? Write 0.', 'Write the digits.'],
     say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.words, p.n] : null; } };
 const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey: 'number-words',
-    steps: ['Say the hundreds: three hundred.', 'Say the last two digits as one number.', 'Write the words.'],
+    // (lf-placevalue critic live1 N2: "Say the hundreds: three hundred." - a literal from one example - printed over 53, 26, 99;
+    // each kind of number has its own Steps below, and none names a number)
+    steps: ['Say the hundreds word.', 'Say the last two digits as one number.', 'Write the words.'],
     say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.n, p.words] : null; } };
 // (critic nwf r1 opener / scripted-model C2: "Read the hundreds word." beside "eleven" - a name under 100 has no hundreds word;
 // its steps read the tens word, then the ones word)
 const WORDS_TO_NUMBER_2 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'Read the ones word.', 'Write the digits.'] });
+// (lf-roles critic r8b D4: "eleven" sat on a Guided page whose Steps read "the tens word, the ones word" - a teen, a tens word
+// alone ("forty") and a one-word name under ten are each their own kind of problem, with Steps that fit them. Their own Steps
+// also make them their own kind to the Guided page (guided.js kindOf), which keeps one kind: PT 2.3, GUIDED-ONE-KIND.)
+const WORDS_TO_NUMBER_TEEN = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Eleven to nineteen: 1 ten.', 'Find the ones in the word.', 'Write 1, then the ones.'] });
+const WORDS_TO_NUMBER_TENS = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'No ones word? Write 0 ones.', 'Write the digits.'] });
+const WORDS_TO_NUMBER_1 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the word.', 'Write its digit.'] });
+/** The kind of a words-to-numeral name: one word under ten, a teen, a tens word alone, two words (tens and ones), 100 and up. */
+export const wordsKind = (n) => (n < 10 ? 'one-word' : n < 20 && n !== 10 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
+const WORDS_STRINGS = { 'one-word': WORDS_TO_NUMBER_1, teen: WORDS_TO_NUMBER_TEEN, decade: WORDS_TO_NUMBER_TENS, 'two-word': WORDS_TO_NUMBER_2 };
+// numeral to words, one string set a kind (critic live1 N2: the hundreds Steps over two-digit numbers)
+const TO_WORDS_STRINGS = {
+    'one-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its word.'] }),
+    teen: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Eleven to nineteen: one word.', 'Write the teen word.'] }),
+    decade: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'No ones? Write the tens word alone.'] }),
+    'two-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'Say the ones word.', 'Write them with a dash.'] }),
+};
+// ("numbers to 20" numeral to words: every name from zero to twenty is ONE word, so one Steps set fits every item of the page -
+// its kinds need not be dealt apart; critic live1 N3 on the band-20 Opener)
+const TO_WORDS_UPTO20 = Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its name: one word up to twenty.'] });
 const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
 
 /** Every named wrong answer of a words-to-numeral item (`fits`: in H T O boxes, the claim has the boxes' digit count). */
@@ -1320,7 +1341,7 @@ function wordsWrongs(q) {
 }
 
 registerSkill('composing:number_word_form', {
-    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : Number(pvOf(q).n) < 100 ? WORDS_TO_NUMBER_2 : null), WORDS_TO_NUMBER),
+    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? (q.cell && q.cell.payload && q.cell.payload.pool === 20 ? TO_WORDS_UPTO20 : Number(pvOf(q).n) < 100 ? TO_WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : NUMBER_TO_WORDS) : Number(pvOf(q).n) < 100 ? WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : null), WORDS_TO_NUMBER),
     misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
     workedSteps: (q) => {
         const p = pvOf(q);
@@ -1328,7 +1349,14 @@ registerSkill('composing:number_word_form', {
         if (!Number.isFinite(n)) return [];
         const h = Math.floor(n / 100), r = n % 100;
         if (p.way === 'to_words') {
-            return clampSteps([step(`${f(n)}: the ${h || 'no'} is in the hundreds place.`), step(`The last two digits read ${r}.`), step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
+            // (critic live1 N2: "26: the no is in the hundreds place." - a template filled with 'no'. The first step names the
+            // number's places from its digits only - it holds no word of the answer, so it is the Guided hint as it stands)
+            const t = Math.floor(r / 10), o = r % 10;
+            const pl = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+            if (!h) return clampSteps([step(n < 10 ? `${f(n)}: ${pl(o, 'one', 'ones')}.` : `${f(n)}: ${pl(t, 'ten', 'tens')}, ${pl(o, 'one', 'ones')}.`),
+                step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
+            return clampSteps([step(`${f(n)}: ${pl(h, 'hundred', 'hundreds')}, then ${r ? `the rest, ${r}` : 'no tens or ones'}.`),
+                step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
         }
         // H T O boxes (option answerSlot, the chart's words panels): each step writes its boxes. (No "Read it: 403." step: it
         // wrote nothing, so the lesson's model drew it as a bare full-width row, 64 % beside its text - ws-empty-band EB-SIDE;
@@ -1347,6 +1375,8 @@ registerSkill('composing:number_word_form', {
                 step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }])]);
         }
         // (critic nwf r1 N3: a name under 100 has no hundreds word - "thirty-five hundred: 0 in the hundreds" was false)
+        // (critic live1 nit: a one-word name under ten is its ones alone - "seven": 7 ones - as its Steps read it)
+        if (!h && r < 10) return clampSteps([step(`"${p.words}": ${r} one${r === 1 ? '' : 's'}.`), step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
         if (!h) return clampSteps([step(`"${p.words}": ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'}, ${r % 10} one${r % 10 === 1 ? '' : 's'}.`),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
         return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'} ${r % 10} one${r % 10 === 1 ? '' : 's'}.` : 'No tens or ones words: 0 tens 0 ones.'),

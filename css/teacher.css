@@ -755,6 +755,25 @@ html.dark body.teacher-mode .tv-sko { box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
 .tv-sko select.tv-select { width: 100%; }
 @media (max-height: 640px) { .tv-sko-sample.is-pinned .tv-sko-frame { height: 110px; } }
 .tv-sko-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--tv-rule); background: var(--tv-surface); }
+/* critic-panel-r1 F1: a sample too big to read whole is shown one whole part at a time, "1 of N" with arrows beside
+   the "Sample question" label (skill-options-ui _tidySample). */
+.tv-sko-samplehead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tv-sko-samplehead .tv-label { margin: 0; }
+.tv-sko-part { display: inline-flex; align-items: center; gap: 2px; }
+.tv-sko-part[hidden] { display: none; }
+.tv-sko-part-n { min-width: 48px; text-align: center; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-text-2); font-variant-numeric: tabular-nums; }
+.tv-sko-part .tv-icon-btn:disabled { opacity: .35; cursor: default; }
+/* The summary of a skill with many options ticked ("Solve one-step ... · ... · ...") is two lines at most: a long one
+   filled a phone's sheet and pushed Done off the window (ws-options-shots, algebra_all at 390 after an option change).
+   The whole summary is the line's title. */
+.tv-sko-head .tv-sko-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+/* critic-panel-r2 F5: a cut summary has a "Show all" button (touch and keyboard), and opens to its full text. */
+.tv-sko-head .tv-sko-sum.is-open { display: block; -webkit-line-clamp: unset; line-clamp: none; overflow: visible; }
+.tv-sko-more { margin: 2px 0 0; padding: 0; min-height: 24px; border: 0; background: none; font: inherit; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-accent); cursor: pointer; text-decoration: underline; }
+.tv-sko-more[hidden] { display: none; }
+.tv-sko-more:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; border-radius: 4px; }
+/* critic-panel-r2 F2: a figure answer choice in the option panel's sample carries its letter (black and white, Andika). */
+.tv-sko-frame .tv-sko-optletter { font-family: 'Andika', sans-serif; font-weight: 700; font-size: var(--mq-text, 22px); line-height: 1; color: #000; margin-right: 8px; align-self: flex-start; }
 
 /* ---------------------------------------------------------------- board code overlay */
 .tv-boardcode {
@@ -1013,6 +1032,12 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     .tv-part-sup-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 
+/* critic-panel-r3 N1 (additive): a sample drawing too wide to read whole at 9 px is drawn whole at that floor and its
+   frame scrolls (skill-options-ui _tidySample place); it is never cut into viewBox slices. */
+.tv-sko-frame.is-scroll { overflow: auto !important; overscroll-behavior: contain; }
+/* (N1) a label a drawing sets past its own edge ("minutes" left of a double number line) is drawn whole in the sample, never
+   clipped to "inutes"; the stage pads out to it (skill-options-ui _sampleOverhang). */
+.tv-sko-frame .tvp-stage svg { overflow: visible; }
 /* Preview page tabs at phone width (lane lf-partopts, critic A r3 R4): more pages made the one-row segmented strip wider
    than the screen, so the whole Print page scrolled sideways (10 px on master, 31 px with a 42-problem Mixed). The tabs
    wrap inside their own box instead; additive, phone only. */
@@ -1020,3 +1045,9 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     #tvPageTabs { display: flex; flex-wrap: wrap; align-content: flex-start; }
     #tvPageTabs > button { flex: 1 1 auto; min-width: 0; }
 }
+/* critic-panel-r4 N1-cue (additive): a sample frame that scrolls says so in a line under it (skill-options-ui
+   _sampleScrollCue), and its scrollbar is drawn always, not as a fading overlay. Scoped to the panel's sample frame. */
+.tv-sko-scroll-cue { margin: 4px 0 0; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-text-2, #444); text-align: center; }
+.tv-sko-frame.is-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.tv-sko-frame.is-scroll::-webkit-scrollbar-track { background: #eee; border-radius: 5px; }
+.tv-sko-frame.is-scroll::-webkit-scrollbar-thumb { background: #888; border-radius: 5px; }

@@ -472,10 +472,11 @@ I Can cell (2 x 3 grid, 93 x 76 mm)            Daily cell (3 x 3 grid, 62 x 76 m
 
 ### 8.2 Title grammar
 
-- **HD-10** Lesson titles follow `I Can <verb> <object> (<constraint>)`, with the constraint optional and in parentheses (P-3), for example "I Can subtract two-digit numbers (no regrouping)". "I Can" is capitalised; the rest is sentence case; no closing period; at most 60 characters.
+- **HD-10** Lesson titles follow `I Can <verb> <object> (<constraint>)`, with the constraint optional and in parentheses (P-3), for example "I Can subtract two-digit numbers (no regrouping)". "I Can" is capitalised; the rest is sentence case; no closing period; at most 60 characters. **Amendment (owner request 2026-11-13, lf-roles title):** a teacher may type the page's own title in the print dialog (`req.header.titleText`); it replaces the skill's "I Can" title (and a fixed HD-13 title) on every page and key of the job. The teacher's words are not held to this grammar or length: they are drawn with `data-ws-title="custom"`, at the size's title token, and HD-14a governs their fit. Placement: above or below the Name / Date / Score line (`titlePos`, default below; the band keeps its height either way).
 - **HD-11** The title is **identical on every page of one lesson packet** (opener, model, guided, independent, more practice). The lesson phase is a band label or tab line 3, never part of the title.
 - **HD-13** Fixed exceptions: `Review: <topic>`, `Test A: <topic>` / `Test B: <topic>`, `Pre-skill check: <topic>`, `Mixed practice`, `Daily review`, `Daily 4`, `True or False?`, `Reason It`, `Stretch`, `Today's Number`, and fact pages, which use the short fact stub ("Add 7", "Multiply by 3", "Fact family 3, 4, 7").
 - **HD-14** A title that does not fit one line at the preset size wraps to two lines and takes 6 mm from the body. It never shrinks and is never truncated.
+- **HD-14a** (owner request 2026-11-13) A **teacher-written** title (HD-10 amendment) never shrinks either and wraps to at most two lines (the second takes 6 mm from the body, as HD-14). Past two lines it is cut at the last whole word that fits, ending in "…", and the print dialog warns with the exact words that print, so the teacher can shorten it. The fit is measured in Andika 700 at the size the page prints (a lesson packet at L). Checked by `ws-frame-title` TITLE-LONG / TITLE-PLACE.
 - **HD-15** The title is plain bold Andika. No display lettering, no banner shape, no icon.
 
 ### 8.3 Reflow for every check box combination

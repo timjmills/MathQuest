@@ -81,6 +81,9 @@ export function readLessonCommand(cmd) {
 export const LANE_TOOLS = {
     'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--lessons'] },
     'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
+    // (lane lf-roles, 2026-11-13: the page title in the simple print's share code is a teacher-site check)
+    'ws-title-code': { scope: ['--teacher'], flags: [] },
+    'ws-frame-title-ui': { scope: ['--teacher'], flags: [] },
 };
 /** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
 export function readLaneCommand(cmd) {
@@ -135,6 +138,8 @@ function selfTest() {
     eq('print-lint lesson', readCommand("node tests/fixtures/x.cjs -- /tmp/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup --size S"), { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' });
     eq('category + bare skill', readCommand('node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup --category subtraction'), { tool: 'ws-content-audit', skills: ['subtraction:sub_50_no_regroup'], roles: null });
     eq('no skill', readCommand('node tests/scripts/ws-spec-card.mjs --fixture {fixture}'), null);
+    eq('options-shots, repeated --skill', readCommand('node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems --skill coordinates:geo_translate --skip-no-panel --workers 1'), { tool: 'ws-options-shots', skills: ['addition:add_word_problems', 'coordinates:geo_translate'], roles: null });
+    eq('options-shots planned', planHas('  [browser] ws-options-shots (Options panel sample) — tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1', { tool: 'ws-options-shots', skills: ['addition:add_word_problems', 'coordinates:geo_translate'], roles: null }).length, 1);
     eq('bare skill, no category', readCommand('node tests/scripts/ws-x.cjs --skill foo'), null);
     const plan = '  [browser] lint — node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup\n  [node] x — node tests/scripts/ws-dealer-uniform.mjs --skill subtraction:sub_50_no_regroup';
     eq('planned lesson', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' }).length, 1);
@@ -407,6 +412,9 @@ function idOnPath(id) {
     if (v.status === 'OK') return { ok: true, why: '' };
     if (v.status === 'FAIL') return { ok: false, why: v.fail.replace(`${id}: `, '') };
     const tool = commandTool(row.command);
+    // a wrapper's own --self-test (ws-precritic's verdict reader, lf-ops 2026-11-13) is on the path when deploy session 1 runs it
+    const wrapSelf = /tests\/scripts\/(ws-precritic(?:-plan)?|ws-backtest)\.(?:c?js|mjs) --self-test\b/.exec(row.command);
+    if (!tool && wrapSelf && C.deploy.includes(`${wrapSelf[1]}.`) && new RegExp(`${wrapSelf[1]}\\.(?:c?js|mjs) --self-test`).test(C.deploy)) return { ok: true, why: '' };
     if (!tool) return { ok: false, why: 'its command runs no tests/scripts/ws-* check' };
     const inPre = C.precriticSrc.includes(`'${tool}'`) || C.precriticSrc.includes(`tests/scripts/${tool}.`);
     const inDeploy = C.deploy.includes(`${tool}.`);
