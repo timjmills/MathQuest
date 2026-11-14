@@ -10367,6 +10367,26 @@
    }
   },
 {
+ "id": "cbt-r2-e7-chart-panels",
+ "check": "critic cbt r2 E7 (P-1): times each / given and 15 jumps merged chart steps 1 and 2 (Read the jump, Add the jump) into one panel; lead ruling 2026-11-14: the look step is a numbered HEAD line above the two panels (headFirst), so head line + panels + tail line number every worked step",
+ "kind": "commit-pair",
+ "rule": "ws-node-lint CHART-PANELS (opt-in; precritic node-lint-s1)",
+ "browser": false,
+ "fail": {
+  "commit": "8f76b6401",
+  "state": "critic cbt r2 frozen tree: chartMaxStates 2, the look step merged into panel 1"
+ },
+ "pass": {
+  "commit": "0479ee673",
+  "state": "lf-ops cbt r3: headFirst - step 1 a head line, steps 2 and 3 a panel each, step 4 the tail line"
+ },
+ "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill multiplication:count_by_tables --rules CHART-PANELS --no-baseline",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
  "id": "cbt-r2-e3-scripted-say",
  "check": "critic cbt r2 E3 (H2): Scripted Model L - the fourth count-row state covered the Say band (L-OVERLAP SECTION); the role cover lints scripted-model at M and L",
  "kind": "commit-pair",
