@@ -342,7 +342,14 @@ Builder Opus medium. Base master fdfddfdd2; -divarray 62f5bec01 merged (b0a8d8e2
   Backtest screen-answer-place-divfacts.
 - **Gates.** ws-backtest --row sm-array-overflow-divfacts, screen-answer-place-divfacts, screen-digit-ws-divfacts, array-orient-divfacts,
   support-label-facts: 5 PASS. ws-boot-smoke OK. ws-code-snapshot OK (734 codes, 35 categories). node --check on every changed file.
-  ws-precritic --skill division:div_facts,addition:add_facts --strict: see the result line below.
+  ws-precritic --skill division:div_facts,addition:add_facts --strict (63adc1f80's tree less the ledger fix): 45 PASS, 23 FAIL, 1 skipped.
+  render-gate-div_facts-sm-array (D6) and screen-support-eq (with SCREEN-ANSWER-PLACE, D7) PASS. checks-from-critics failed on the
+  parked mult_facts ledger row and passes after 63adc1f80 (its exemption). Every other FAIL fails the same on master fdfddfdd2, run with
+  the same tool (MQ_ROOT) or master's own: dealer-uniform (add_facts), options-verify array gen, options-verify --render (add_facts
+  across @S), cell-checks (add_facts guided L across, 8 OVERFLOW, same), print-lint lesson S (add_facts CL-4b 32), the 10 divForm
+  print-lint runs (identical rose lines), sections S / L, supports touch / touchall S (same counts), sibling-compare (the same 3 ABOVE
+  counts on add_facts single/ex-each; master's matrix has 8 RED rows), screen-slots --screen-digit (add_facts worksheet 40 px = critic
+  D8; master also misses div_facts, which this branch fixes). Nothing that passes on master fails here.
 - **Renders:** scratchpad/divship-renders/ (D6 page and key, before / after; the div worksheet at 1366 / 1280 / 1024 / 820, default,
   array 10s band, boxsign: one answer place and one cell height on each sheet).
 - **Not done here (parked or other lanes):** critic r2 D1-D5, D8, D9 (mult_facts / add_facts digit floor) are mult_facts or ruling items.
