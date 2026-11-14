@@ -306,7 +306,24 @@ export function answerOf(it) {
     if (q.ans !== undefined && q.ans !== null && typeof q.ans !== 'object') return String(q.ans);
     // A several-part answer (a cloze's two parts): its parts in order, comma separated - the
     // form the host writes into a cell's boxes one part per box.
-    if (Array.isArray(q.ans) && q.ans.length && q.ans.every((v) => v !== null && typeof v !== 'object')) return q.ans.map(String).join(', ');
+    if (Array.isArray(q.ans) && q.ans.length && q.ans.every((v) => v !== null && typeof v !== 'object')) {
+        // (L-KEY: an order / pick answer keyed by the generator's tile or option ids - "t3", "opt1" - reads as their labels,
+        // never as the ids; when an id has no label the item has no one-line answer)
+        const idLike = (v) => /^(t|opt)\d+$/.test(String(v));
+        if (q.ans.some(idLike)) {
+            const labelOf = (id) => {
+                for (const arr of [q.tiles, q.options, q.items, q.choices]) {
+                    if (!Array.isArray(arr)) continue;
+                    const hit = arr.find((x) => x && typeof x === 'object' && String(x.id) === String(id));
+                    if (hit) return String(hit.label ?? hit.text ?? hit.name ?? '');
+                }
+                return '';
+            };
+            const labs = q.ans.map(labelOf);
+            return labs.every(Boolean) ? labs.join(', ') : '';
+        }
+        return q.ans.map(String).join(', ');
+    }
     if (k.value !== undefined && k.value !== null && typeof k.value !== 'object') return String(k.value);
     return '';
 }
