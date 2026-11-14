@@ -12178,6 +12178,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-pack-lesson",
+   "check": "ws-vocab-unit --browser V-PACK: each vocabulary lesson packet (practicePages 1, mixed; M / L; seeds 4242 and 1) prints its Practice on the one page asked for and its Mixed page on the pages its packing counted. Critic lf-engine-rowcap r2 F1: with the row-stretch cap the vocab_grade_pictures L lesson ran 9 -> 10 pages - Practice 4 + 2 one-across Match 3 rows (the default [6, 2] shape), and a 4th Match 3 Mixed shelf counted without its strip spilled the anchor chart (Mixed 3 -> 4 pages, one Match 3 cell alone on page 2: L-LONE / PAGEFILL)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-vocab-unit --browser V-PACK (precritic gate vocab-unit-browser); node twin ws-layout-unit MIX-PAGES",
+   "fail": {
+    "commit": "9b97befbb",
+    "state": "lf-placevalue + master + lf-engine rowcap merged: vocab_grade_pictures L packet 10 pages (Practice 2 pages, Mixed 4 pages)"
+   },
+   "pass": {
+    "commit": "fbca1a582",
+    "state": "Practice one page of 4 Match 3 rows; Mixed packing counts a page-opening shelf with its strip: L packet 8 pages"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-PACK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
