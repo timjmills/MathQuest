@@ -897,3 +897,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-14 — Deploy bigger long-division work boxes (owner request; lf-ops LDIV-ROOM critic 9/9/8/9)
 - At 4 a page the long-division quotient boxes and work grid grow to fill the cell (M rows 1.87x, grid 93 % of the free height; L 1.54x), centred; printed digits unchanged; 6 a page unchanged. Owner approved as is.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy lf-roles round 10 (narrow critic PASS on the changed pages)
+- Guided fit by the drawn frame (count_by_tables M Model + 4), a lone Guided story sized to its work (two_step_add_then_div), the tries ceiling counts answers consistently; vocab_grade_pictures Guided L gains a try (graded >= 8). Open: X1 count-row stretch on continuation pages, X2 Model alone on a Guided page.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
