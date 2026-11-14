@@ -301,3 +301,29 @@ right (rule C, identity A, step B; unknown B, output C, input A). One nit, key o
 
 **Critic r10 verdict: FAIL** on X2 (two_step_add_then_div, the lone-Model page) and X1 (count_by_tables L, pre-existing).
 count_by_tables M and vocab_grade_pictures L PASS. No passed page regressed.
+
+## Critic r11 (narrow)
+
+Critic: independent (mq-opus-medium), 2026-11-14. Lane at 0ca1e460d. I rendered every page myself. Renders are in
+`<scratchpad>/critic-r11/`.
+
+| Page | C1 / C2 / C3 / C4 | Verdict |
+|---|---|---|
+| count_by_tables Guided L, seed 972334 (pupil and key) | 9 / 8 / 8 / 8 | **PASS**: X1 closed |
+
+**What I checked on count_by_tables L page 2:**
+- **Rows:** the 4 count rows are now held to their content, about 36 mm each instead of 45.8 mm. Ink fills about 80 % of each
+  row.
+- **White under the grid:** about 55 mm, all of it below the grid. PT-ENG-3 allows this ("rows gain at most 8 mm each; the
+  remainder stays blank at the foot"), and the sheet is at the L ceiling of Model + 6 tries. I accept it.
+- **Key:** the key has the same plan as the pupil page, and every box is right (×5, ×6, ×7 and ×8 rows).
+- **`ws-empty-band`** for count_by_tables, skip_count_grid and skip_count_line (guided, M and L): **OK**, with EB-BAND clean.
+- **Nit, not counted:** "Guided Practice:" wraps onto two lines at L.
+
+**Spot check of skip_count_grid and skip_count_line, Guided M and L.** I looked for overflow and clipping on the pupil page
+and key, page by page, in the DOM:
+- No element passes the body bottom, and no cell or page overflows.
+- Only skip_count_grid L has a page 2. It renders cleanly, with the same tight rows and white under the grid.
+- skip_count_grid L page 2 deals the ×2 table twice (rows 2 and 4). This is a variety nit, outside this lane's scope.
+
+X2 (two_step_add_then_div, the Model alone on page 1) is waiting on a lead ruling and was not graded here.
