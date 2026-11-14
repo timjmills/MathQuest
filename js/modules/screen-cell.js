@@ -434,8 +434,9 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
 export function divisionHTML(k, slotHtml) {
     // ONE stroke (owner 2026-11-14, LDIV-JOIN): the kit's bracketSvg, its y 0 on the vinculum's centre
     // (`.mq-ldiv-arcj`); the bracket column's own border stays for layout but is clear (`.mq-ldiv-brkj`), so the
-    // bar over the arc is the path's and it starts at the arc's corner.
-    const arc = bracketSvg({ x: 1, q: 11, w: 12, h: 48, foot: 47, qy: 23.5, ink: '#000', stroke: 2, cls: 'mq-ldiv-arcj', style: '' });
+    // bar over the arc is the path's and it starts at the arc's corner; it runs 1/12 of the column on under the
+    // dividend's border (LDIV-JOIN-RASTER: butt end against border at a fractional x drew a light seam).
+    const arc = bracketSvg({ x: 1, q: 11, w: 12, h: 48, bar: 13, foot: 47, qy: 23.5, ink: '#000', stroke: 2, cls: 'mq-ldiv-arcj', style: '' });
     return `<div class="ws-sheet mq-kit"><div class="mq-ldiv" role="group" aria-label="${attr(`${k.a} divided by ${k.b}`)}">`
         + `<span class="mq-ldiv-q">${slotHtml || ''}</span>`
         + `<span class="mq-ldiv-dsr">${k.b}</span><span class="mq-ldiv-brk mq-ldiv-brkj">${arc}</span>`
@@ -3198,6 +3199,9 @@ export function ringCellHTML(p) {
                 + at(1, 2, String(p.b), 'align-items:center;padding-right:0.1em;')
                 + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block;position:relative;top:1px">${arc}</span>`
                 + at(3, 2, String(p.a), 'align-self:stretch;align-items:center;border-top:2px solid #000;padding:0 0.12em;')
+                // LDIV-JOIN-RASTER (ldiv critic r1 F1): one rule from the arc's corner over the dividend, laid over the
+                // svg's bar, so the svg's butt end and the dividend's border never meet at a fractional x (a light seam)
+                + '<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(0.55em * 0.15);border-top:2px solid #000"></span>'
                 + '</div></div>';
         }
         return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
