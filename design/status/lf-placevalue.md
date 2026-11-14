@@ -77,6 +77,29 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-14 **HAND-OVER (budget stop, lead option C; session cost $601 of the $640 hard stop).**
+  Live on master: compare (w2), live1 (expand / unit_form screens, the global 50 px touch rule, number_word_form Guided
+  D2-D4), live2 (number_word_form one-kind root cause, N3 / N6 / N7 / N9 closed; critic-live2 + critic-n9 PASS).
+  Open, for the reset:
+  1. **Vocab deploy head** `claude/lf-placevalue-vocab-deploy` @ 31d41507 (lf-vocab deploy-2 + master 7f2ca5e39).
+     - FIXED, each with a check, a backtest and a ledger row: no-phone-width (V-LETTER at 1280 / 1024 / 820), TARGET (mq-vm-box 52 px
+       box = 48 hit at worksheet 820 / 1024), FIX-WORDS (a check false positive: SVG text / answer values now skipped).
+     - NOT FIXED: EB-BAND <= 28 % on Match 3 independent L (28.1 %; fillLimit 72.5 mm against the EB-FOOT 1.1F cap).
+       Lead ruling: a per-template row-stretch cap in layout.js (a row stretches only to its drawn height + writing room,
+       like ONE-ROW-CAP); owner lf-engine.
+     - Still red on the vocab head: EB-PAGE (grade_pictures scripted-model M 32 %), ws-role-cover (L-KEY AK-2 on the scripted-model p3 /
+       true-false p2 keys, L-SIZE TY-11 picture digits on the opener, L-OVERFLOW PG-12, L-TOPSTART), sibling-compare NO-SIBLING.
+     - The lesson baseline on that head is re-pinned for 72 vocab pages (grade_pictures 48, pick3 24); every other page is identical.
+     - Notes: design/status/lf-vocab.md "Deploy takeover".
+  2. **placevalue:mixed_placevalue**: its Opener M deals only 3 items (1 Guided / 2 Independent, H5), on master too. Deal enough
+     for PT-OPN-6 (2-4 Guided) plus an Independent band. Check first.
+  3. **Pixel EB pass** on combine / unit_form / expand / value / identify. Their pv-owned cells: lesson pages, expand
+     Independent L, value's practice / test / review. Measured with lf-checks' tool, value had 257 findings.
+  4. **pv-words-rowy** (ROW-SLOT-Y): it fails both states, from master too; it needs its own look.
+  5. **Minors:** the to_words I Can title ("write a number from its name"); 1,000 dealt in an Opener's Independent band
+     under hundreds Steps; compare N10 (box grazes its digit, 0.3 mm) and N11 (lesson Guided pad 3.2 mm); combine "+" spacing.
+  Worktrees: /home/user/mq-live1 (live2, deployed) and /home/user/mq-vocab (vocab head) can be removed with
+  `git worktree remove --force <path>`.
 - 2026-11-13 **placevalue:compare PASSED** (critic compare r4 PASS; r1 FAIL F1-F6, r2 FAIL N1-N3, r3 FAIL N9 only -> round cap 2
   root cause: every relation a step writes is one no-break unit, WRAP-SIGN runs the wide bands). redesign-passed.js PVC. Rounds: 4 critic
   (r4 narrow), 5 builder passes (r1, r2, r3, checks pass, r4) + 2 merges. Every finding is in CHECKS_FROM_CRITICS with a backtest row
