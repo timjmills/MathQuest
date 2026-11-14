@@ -111,7 +111,8 @@ export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
 export const GR_FLAGS = ['--raster-fit'];
 // tools whose gate with NO --roles flag renders every offered role of the skill (ws-empty-band: "every offered role x
 // S/M/L + hosts"), so that line plans any one role R when no card roles are given (lf-placevalue checks pass, 2026-11-13)
-const EVERY_ROLE_TOOLS = new Set(['ws-empty-band']);
+// (ws-role-cover, lf-checks 2026-11-14: with no --roles it runs every role the card offers, else every buildSheet role)
+const EVERY_ROLE_TOOLS = new Set(['ws-empty-band', 'ws-role-cover']);
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
  *  comma list, or the line has no --roles and so renders every role - `cardRoles` given: the roles the signed card offers,
  *  R among them; not given: any role, for an EVERY_ROLE_TOOLS tool), carrying every flag of `flags`. `roles` may itself be a
