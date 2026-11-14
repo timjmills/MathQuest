@@ -11180,6 +11180,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-stretch-rowcap",
+   "check": "ws-empty-band EB-STRETCH: a print row of a template that declares its writing room (layout.js ROW_ROOM_MM) is never taller than the cell's natural height (laid out with no row stretch) + that room, + 1.5 mm. Lead ruling 2026-11-14 (lf-placevalue vocabulary deploy item (d)): spare page height was shared into rows - the Match 3 practice row 57 mm for a 50 mm work, the Opener count row 31.7 -> 39.2 / 43.4 mm, the lesson Vocabulary 39.4 -> 50.7 mm",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH (lead ruling 2026-11-14, ROW-STRETCH CAP)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "EB-STRETCH fires on vocab_grade_pictures (Match 3) independent M / L: 57 mm rows for 50 mm works, 5 mm over the 52 mm cap"
+   },
+   "pass": {
+    "commit": "5006eed64",
+    "state": "0 findings: the rows are held to 52.5 mm (drawn 50 + 2 mm room); the spare height is white at the foot"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --sizes M,L --roles independent --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

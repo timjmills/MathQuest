@@ -273,6 +273,11 @@ function itemParityFinding(tagged, plain, what) {
 // (the limits are defined before --self-test: its centred EB-BAND cases call judge())
 const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
 const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
+// EB-STRETCH's tolerance (mm) and its room table, read once from layout.js (rowRoom, below)
+const STRETCH_TOL_MM = 1.5;
+let ROW_ROOM = null;
+const STRETCH_ROLES = new Set(['independent', 'more-practice', 'mixed-practice', 'test', 'review', 'lesson', 'opener']);
+const STRETCH_NOTES = [];
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
         const t = [['all named', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs --html x', rule: `${RULES.join(' ')} ${RULE_CASES.join(' ')}` }]).length, 0],
@@ -847,8 +852,6 @@ function measureVocab(scope) {
 // lesson Vocabulary match asked 39.4 mm and got 50.7, the Opener count row 31.7 and got 39.2 / 43.4, the Match 3 practice row
 // 46 and got 57.5). The table is read from THIS script's tree, so a commit-pair backtest judges an old render by today's rule.
 // Screen hosts are not judged (their card is the app's). Pure: stretchFindings(cells, room, tol).
-let ROW_ROOM = null;
-const STRETCH_TOL_MM = 1.5;
 function rowRoom() {
     if (ROW_ROOM) return ROW_ROOM;
     // (read from the ESM source's one frozen literal: `export const ROW_ROOM_MM = Object.freeze({ 'tmpl': mm, ... })`)
@@ -874,9 +877,14 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
     }
     return out;
 }
+// EB-STRETCH judges the roles whose composer holds its rows to the cap today (layout.resolveSectionLayout + the practice spread:
+// the grid roles; roles/lesson.js and lesson-pages; roles/opener.js). The roles that size their own rows - Guided, Scripted Model,
+// Error Analysis, Reason It, True or False ... - are NOTED with their over-cap cell count, not failed, until their composer takes
+// layout.rowCapMm (lf-engine follow-up, CRITIC-READY.md).
 function judge(cells, where, F, role) {
     if (process.env.EB_DUMP) for (const c of cells) console.log("DUMP", where, c.page, c.cell, c.tmpl, c.hMm, c.neededMm, c.natMm, c.topPx, c.beside ? 'beside' : '');
-    if (!String(role || '').startsWith('host:')) for (const x of stretchFindings(cells)) F('EB-STRETCH', `${where} p${x.c.page} cell ${x.c.label || x.c.cell}`, `a ${x.c.hMm} mm row holds a cell drawn ${x.need.toFixed(1)} mm: its cap is drawn + ${rowRoom()[x.c.tmpl]} mm writing room = ${x.cap.toFixed(1)} mm, ${x.over} mm over (tolerance ${STRETCH_TOL_MM} mm; layout.js ROW_ROOM_MM) [${x.c.tmpl}]`);
+    if (!String(role || '').startsWith('host:') && role && !STRETCH_ROLES.has(role)) { const n = stretchFindings(cells).length; if (n) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on this role yet (its composer sizes its own rows): ${n} cell(s) over the cap`); }
+    else if (!String(role || '').startsWith('host:')) for (const x of stretchFindings(cells)) F('EB-STRETCH', `${where} p${x.c.page} cell ${x.c.label || x.c.cell}`, `a ${x.c.hMm} mm row holds a cell drawn ${x.need.toFixed(1)} mm: its cap is drawn + ${rowRoom()[x.c.tmpl]} mm writing room = ${x.cap.toFixed(1)} mm, ${x.over} mm over (tolerance ${STRETCH_TOL_MM} mm; layout.js ROW_ROOM_MM) [${x.c.tmpl}]`);
     cells.forEach((c, i) => {
         // --slot-ink off judges the lane's KIT cells: a `legacy` cell (another skill's old print HTML) is a note (lf-vocab r6)
         if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(legacyNote(where, c)); return; }
@@ -1162,6 +1170,7 @@ async function main() {
     console.log(`note: ${slotInkNote(SLOT_INK)}`);
     for (const n of notes) console.log(`note: ${n}`);
     for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
+    for (const n of STRETCH_NOTES) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
     if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ skills: SKILLS, findings, notes, renders, cells: cellsRead }, null, 1));

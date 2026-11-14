@@ -42,6 +42,7 @@ import { interleave, dealCounts } from '../interleave.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
 import { slotScore } from '../paginate.js';
+import { rowCapMm, drawnRowMm } from '../layout.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -541,7 +542,8 @@ function planMixed(input, pools) {
         // H13: the shortest skill's cells on the shelf keep its drawing at least 70 % of the
         // shelf's height, so the spare height shared in below never opens a 30 % empty band.
         const short = Math.min(...[...new Set(chunk.map((it) => it.pool))].map((id) => hAtK(chunk.filter((it) => it.pool === id), k, ctx)).filter((x) => Number.isFinite(x) && x > 0), h);
-        shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
+        // (ROW-STRETCH CAP, layout.rowCapMm: a shelf of declared templates grows at most their writing room past what it draws)
+        shelves.push({ items: chunk, h, room: Math.max(0, Math.min(short / 0.7, rowCapMm(drawnRowMm(chunk, k) || h, chunk)) - h) });
     }
     const n = queue.length;
     const nScore = slotScore(queue);   // (answer slots: critic r1 F6)
@@ -667,17 +669,21 @@ export function plan(input = {}) {
         return g;
     })();
     for (const [i, sh] of shelves.entries()) {
-        const grow = fillShares ? fillShares[i] : growOf(sh);
+        // (ROW-STRETCH CAP, layout.rowCapMm: a shelf of declared templates grows at most their writing room past what it draws)
+        // (the shelf's own height too, when a skill floor lifted it past what its items draw: shH)
+        const capH = rowCapMm(drawnRowMm(sh.items.filter((it) => !it.anchor), Math.min(sh.k, 6)) || sh.h, sh.items);
+        const shH = Math.min(sh.h, capH);
+        const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), Math.max(0, capH - shH));
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
-        let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+        let bandH = m.strip + shH + grow + (sh.anchor ? sh.bandMm : 0);
         let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
         if (joins) bandH -= m.strip;
         if (!cur || cur.used + bandH > budget) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
-            bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+            bandH = m.strip + shH + grow + (sh.anchor ? sh.bandMm : 0);
         }
         const first = sh.items.find((it) => !it.anchor);
         // A preset skill's items carry the host's id in q.skillId and the preset's in q.presetId
@@ -688,7 +694,7 @@ export function plan(input = {}) {
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
-        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
+        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: shH + grow, labels, start });
         if (joins) {
             // A further shelf of the same skill on the same page: its grid under the last one.
             const prev = cur.sections[cur.sections.length - 1];

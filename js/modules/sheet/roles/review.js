@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, cellWidthMm, LIVE_W_MM, capRowsToInk, isStoryWork } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, cellWidthMm, LIVE_W_MM, capRowsToInk, isStoryWork, rowCapMm, drawnRowMm } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 import { slotScore } from '../paginate.js';
 
@@ -381,10 +381,12 @@ export function plan(input = {}) {
     // page's share: combine's two-line frames in 32-41 mm rows were 37-40 % empty under the answer line, read on the pixels, and
     // a one-line expand row at IN_PLACE_FILL still 32 % - its measured height already holds the pads; the rest stays under the grid)
     const tight = (gr, hs, c) => (tightRows(gr) && hs.length ? Math.min(c, sum(hs) / hs.length) : c);
-    const cellsM = hsM.map((hs, gi) => tight(groups[gi], hs, factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
+    // (ROW-STRETCH CAP, layout.rowCapMm: a band of declared templates stops at what its rows draw + their writing room)
+    const capped = (gr, cols, hs, c) => (hs.length ? Math.min(c, rowCapMm(drawnRowMm(gr, cols) || Math.max(...hs), gr)) : c);
+    const cellsM = hsM.map((hs, gi) => capped(groups[gi], g.cols, hs, tight(groups[gi], hs, factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM))));
     const cellM = cellsM[0] || hM;
-    const cellE = tight(useE, hsE, cellOf(hsE, hE));
-    const cellEW = tight(useEW, hsEW, cellOf(hsEW, g.ehw || hE));
+    const cellE = capped(useE, eCols, hsE, tight(useE, hsE, cellOf(hsE, hE)));
+    const cellEW = capped(useEW, 1, hsEW, tight(useEW, hsEW, cellOf(hsEW, g.ehw || hE)));
     const labels = labelStyleOf(ctx.look, input.labels);
     const shaped = (part, items, cols, rows, cellH) => {
         // Each row as tall as what IT holds (layout.rowShape).
