@@ -660,3 +660,26 @@ ws-vocab-unit and --browser, ws-next-box, both ws-empty-band modes. precritic --
 Not done (stopped by budget): r17 (5 ledger rows planned: letter anchor on every host, trio (picture, letter) repeat, 3-digit
 padding, Guided top-start, 27 % band guard) and the gate failures above. Resume here: fold into lf-placevalue's
 "number sense + words" lane (lead, 2026-11-13).
+
+## Deploy takeover (2026-11-14, lf-placevalue builder, branch claude/lf-placevalue-vocab-deploy)
+From 3cce171d; master 7f2ca5e39 merged (ledger: master's rows, the r5-nits row as built in r16, our r16 EB-FOOT row; backtests:
+master's text plus our 13 rows). Master's gates, the lead's four:
+- (a) no-phone-width FIXED: ws-vocab-unit V-LETTER measures the card at 1280 / 1024 / 820; V-BOX390 (card 390 only) retired,
+  its backtest row removed and the r5-nits ledger cell updated. Backtest vocab-no-phone-width (3cce171d FAIL -> 6fca59a73 OK).
+- (b) TARGET FIXED: the Match 3 letter box is span.mq-vm-box with a 2 px screen border, outside the global .mq-cellbox 50 px
+  floor; css/screen-cell.css (additive) gives it min 52 x 52 px on screen: input 48 x 48 at worksheet 820 / 1024. Print
+  unchanged. Backtest vocab-match3-target-820 (3cce171d FAIL -> d3033648e OK).
+- (c) FIX-WORDS FIXED (a false positive of the check): the Match 3 Fix-it already prints the work's own bank words in order (the
+  unit_form way); ws-fixit-words read a picture's svg text ("5 + 3 = 8") as an "=" words frame and the pupil's letters as frame
+  words. The check now skips svg text and written box values, and takes --fixture. Backtest fixit-words-picture-text (fixture:
+  the real Match 3 cells + a unit_form singular FAIL; the same cells + "hundreds" OK); pv-unit-form-fixit-words unchanged.
+- (d) EB-BAND <= 28 % on Match 3 independent L NOT FIXED: the ratio is the layout's, not the cell's. A practice row stretches to
+  layout.js fillLimit(F) = 1.5 (F - 7) + 7 (72.5 mm at the 50 mm measure), EB-FOOT holds the drawn height to 1.1 F (55 mm), so the
+  band under the words is at least R - 1.1 F + pads = 28.1 %. Tried: a 52 mm work (EB-FOOT 14 %), a 46 mm least height (F 52 ->
+  R 76.1, band 28.8 %), footprint inPlace at L (fill floor 0.82 G / rows -> 74.8 mm, band 30.4 %). Ways out are engine or design
+  calls for the lead: a per-template row-stretch cap in layout.js, 4 Match 3 a page at L, or a CL-4b exemption to centre the work.
+Other reds (not fixed, per the brief): EB-PAGE scripted-model M p1 32 % (vocab_grade_pictures); ws-sibling-compare NO-SIBLING
+(no approved vocab-match3 sibling exists: 10 unproven rows). The five r16 / r16b minors planned for r17 carry exemptions in the
+ledger (critic minors under the bar). Shared roles vs master: ws-role-sweep error-analysis + guided, M / L, 30 passed skills:
+34 of 240 differ - 14 vocab, and 5 non-vocab EA pages (add_wp_10_plain, fact_family_sort, div_facts_long, placevalue:identify,
+sub_1k_no_regroup), each only a pupil name: r16 V-NAMES gives a repeated name the next unused one (critic r16 PASS).
