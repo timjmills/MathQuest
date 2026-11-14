@@ -20,6 +20,19 @@
 //
 //   node tests/scripts/ws-ldiv-hug.cjs                 # prints one line per bracket, then OK / FAIL
 //   node tests/scripts/ws-ldiv-hug.cjs --shots <dir>   # also screenshots each host
+//
+// LDIV-JOIN (owner 2026-11-14, lf-ops: "the long-division sign is not good because it's disconnected"):
+//   node tests/scripts/ws-ldiv-hug.cjs --join [--skills division:long_div_2digit,division:div_facts,...] [--shots <dir>]
+// The bracket is ONE connected stroke: the arc's top end runs into the vinculum with no gap and no step. For every bracket
+// drawn on paper (the kit's pupil page AND key, at M and L, on every role in JOIN_ROLES, plus div_facts' compact fact-rows
+// page) and on screen (practice card, online worksheet, quiz at 1366 and 820), measured in the rendered page:
+//   gap   the white (mm) at the bracket's outer corner: from the point K where the arc's outer edge, continued along its
+//         top-end tangent, meets the vinculum's top edge, to the nearest ink of the arc stroke (its butt cap, or its join
+//         when the arc and the bar are one path) or the vinculum. A butt-capped arc set under a separate bar leaves a
+//         wedge of white there (master 3623be10c); a joined path closes it (miter: K is the corner itself). <= 0.3 mm.
+//   step  the arc's top end against the vinculum's centre line, and the vinculum's pieces against each other (mm). <= 0.1 mm.
+// A skill x host that draws no bracket FAILS (it would pass unseen). word-work.js's own divide frame (M2 1 Q...) is
+// lf-algebra's and is not measured here.
 const fs = require('fs');
 const path = require('path');
 const { open, hideOverlays } = require('../lib/ws-harness.cjs');
@@ -142,9 +155,110 @@ function MEASURE(rootSel, frameSel) {
     return { brackets: out };
 }
 
+// LDIV-JOIN, in the page: every bracket arc under `rootSel` against its vinculum (mm).
+function JOIN(rootSel, frameSel) {
+    const doc = frameSel ? document.querySelector(frameSel).contentDocument : document;
+    const root = doc.querySelector(rootSel);
+    if (!root) return { error: 'no root ' + rootSel };
+    const win = doc.defaultView, MM = 25.4 / 96;
+    const parse = (d) => {
+        const t = String(d).match(/[A-Za-z]|-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+        const segs = []; let i = 0, cur = null, sub = -1, cmd = null;
+        while (i < t.length) {
+            if (/[A-Za-z]/.test(t[i])) cmd = t[i++];
+            if (cmd === 'M') { cur = { x: +t[i], y: +t[i + 1] }; i += 2; sub++; cmd = 'L'; }
+            else if (cmd === 'H') { const p = { x: +t[i], y: cur.y }; i++; segs.push({ k: 'L', a: cur, b: p, sub }); cur = p; }
+            else if (cmd === 'V') { const p = { x: cur.x, y: +t[i] }; i++; segs.push({ k: 'L', a: cur, b: p, sub }); cur = p; }
+            else if (cmd === 'L') { const p = { x: +t[i], y: +t[i + 1] }; i += 2; segs.push({ k: 'L', a: cur, b: p, sub }); cur = p; }
+            else if (cmd === 'Q') { const c = { x: +t[i], y: +t[i + 1] }, p = { x: +t[i + 2], y: +t[i + 3] }; i += 4; segs.push({ k: 'Q', a: cur, c, b: p, sub }); cur = p; }
+            else return null;
+        }
+        return segs;
+    };
+    const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+    const sub = (p, q) => ({ x: p.x - q.x, y: p.y - q.y });
+    const len = (v) => Math.hypot(v.x, v.y);
+    const unit = (v) => { const l = len(v) || 1; return { x: v.x / l, y: v.y / l }; };
+    const segDist = (p, a, b) => { const ab = sub(b, a), t = Math.max(0, Math.min(1, ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / ((ab.x * ab.x + ab.y * ab.y) || 1))); return len(sub(p, { x: a.x + t * ab.x, y: a.y + t * ab.y })); };
+    const rectDist = (p, r) => Math.hypot(Math.max(r.l - p.x, 0, p.x - r.r), Math.max(r.t - p.y, 0, p.y - r.b));
+    const alpha = (c) => { const m = String(c).match(/rgba?\(([^)]*)\)/); if (!m) return 1; const v = m[1].split(',').map(Number); return v.length > 3 ? v[3] : 1; };
+    const out = [];
+    root.querySelectorAll('svg path').forEach((path) => {
+        const d = path.getAttribute('d') || '';
+        if (!/Q/.test(d) || /^\s*M\s*2[ ,]1\s*Q/.test(d)) return;            // not an arc, or word-work's own frame (lf-algebra)
+        const svg = path.ownerSVGElement;
+        if (!svg || !vis(svg)) return;
+        const segs = parse(d);
+        if (!segs) return;
+        const qi = segs.findIndex((s) => s.k === 'Q');
+        const q = segs[qi];
+        if (Math.abs(q.a.x - q.b.x) > 0.5 || Math.abs(q.a.y - q.b.y) < 10) return;   // a bracket arc: both ends on one vertical
+        const m = path.getScreenCTM();
+        const P = (p) => { const r = new DOMPoint(p.x, p.y).matrixTransform(m); return { x: r.x, y: r.y }; };
+        const cs = win.getComputedStyle(path);
+        const hw = (parseFloat(cs.strokeWidth) || 1) / 2;
+        const topIsA = q.a.y < q.b.y;
+        const T = P(topIsA ? q.a : q.b), C = P(q.c);
+        const u = unit(sub(C, T));                                            // into the curve, downward
+        // the arc's top end is a cap unless a segment of the same subpath continues from it (a join)
+        const nb = topIsA ? segs[qi - 1] : segs[qi + 1];
+        const joined = !!(nb && nb.sub === q.sub && nb.k === 'L');
+        // the vinculum: the path's own horizontal lines, and the drawn top borders in the bracket's group
+        const bars = [];
+        segs.filter((s) => s.k === 'L' && Math.abs(s.a.y - s.b.y) < 1e-6).forEach((s) => {
+            const a = P(s.a), b = P(s.b);
+            bars.push({ l: Math.min(a.x, b.x), r: Math.max(a.x, b.x), t: a.y - hw, b: a.y + hw, src: 'path' });
+        });
+        let group = svg.parentElement;
+        for (let k = 0; k < 4 && group && group.parentElement; k++) {
+            const disp = win.getComputedStyle(group).display;
+            if (/grid/.test(disp)) break;
+            group = group.parentElement;
+        }
+        [group, ...group.querySelectorAll('*')].forEach((el) => {
+            if (el === svg || svg.contains(el)) return;
+            const st = win.getComputedStyle(el);
+            const bw = parseFloat(st.borderTopWidth) || 0;
+            if (bw <= 0 || st.borderTopStyle === 'none' || alpha(st.borderTopColor) === 0) return;
+            const r = el.getBoundingClientRect();
+            if (r.width <= 0) return;
+            bars.push({ l: r.left, r: r.right, t: r.top, b: r.top + bw, src: 'border' });
+        });
+        const near = bars.filter((b) => b.r > T.x - 4 * hw && Math.abs((b.t + b.b) / 2 - T.y) < 8 * hw);
+        if (!near.length) { out.push({ error: 'no vinculum at the arc', d }); return; }
+        const first = near.slice().sort((p, q2) => p.l - q2.l)[0];
+        const yTop = Math.min(...near.map((b) => b.t));
+        const cents = near.map((b) => (b.t + b.b) / 2);
+        const step = Math.max(Math.abs(T.y - (first.t + first.b) / 2), Math.max(...cents) - Math.min(...cents));
+        // K: the arc's outer (left) edge, continued up along its top tangent, meets the vinculum's top edge
+        const nOut = { x: -u.y, y: u.x };
+        const E0 = { x: T.x + hw * nOut.x, y: T.y + hw * nOut.y };
+        const s = (yTop - E0.y) / (u.y || 1e-9);
+        const K = { x: E0.x + s * u.x, y: E0.y + s * u.y };
+        let gap = Math.min(...near.map((b) => rectDist(K, b)));
+        const A0 = P(q.a), A1 = P(q.c), A2 = P(q.b);
+        for (let i = 0; i <= 400; i++) {
+            const t = i / 400, w0 = (1 - t) * (1 - t), w1 = 2 * t * (1 - t), w2 = t * t;
+            const c = { x: w0 * A0.x + w1 * A1.x + w2 * A2.x, y: w0 * A0.y + w1 * A1.y + w2 * A2.y };
+            const dv = unit({ x: 2 * (1 - t) * (A1.x - A0.x) + 2 * t * (A2.x - A1.x), y: 2 * (1 - t) * (A1.y - A0.y) + 2 * t * (A2.y - A1.y) });
+            const n = { x: -dv.y * hw, y: dv.x * hw };
+            gap = Math.min(gap, segDist(K, { x: c.x - n.x, y: c.y - n.y }, { x: c.x + n.x, y: c.y + n.y }));
+        }
+        if (joined) {
+            const lj = cs.strokeLinejoin || 'miter';
+            const nbDir = unit(sub(P(topIsA ? nb.a : nb.b), T));              // from the join along the bar
+            const phi = Math.acos(Math.max(-1, Math.min(1, u.x * nbDir.x + u.y * nbDir.y)));   // interior angle at the join
+            if (lj === 'round') gap = Math.min(gap, Math.max(0, len(sub(K, T)) - hw));
+            else if (/miter/.test(lj) && 1 / Math.sin(phi / 2) <= (parseFloat(cs.strokeMiterlimit) || 4)) gap = 0;
+        }
+        out.push({ gap: gap * MM, step: step * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40) });
+    });
+    return { arcs: out };
+}
+
 async function viewport(page, w, h) { await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 }); await sleep(150); }
 
-async function card(page, s, w, seed) {
+async function card(page, s, w, seed, fn = MEASURE) {
     await viewport(page, w, 900);
     await hideOverlays(page);
     const r = await page.evaluate(({ s, seed }) => {
@@ -160,10 +274,10 @@ async function card(page, s, w, seed) {
     }, { s, seed });
     if (r.error) return r;
     await sleep(250);
-    return page.evaluate(MEASURE, '#questionCard');
+    return page.evaluate(fn, '#questionCard');
 }
 
-async function worksheet(page, s, w) {
+async function worksheet(page, s, w, fn = MEASURE) {
     await viewport(page, w, 900);
     await hideOverlays(page);
     const r = await page.evaluate((s) => {
@@ -177,11 +291,11 @@ async function worksheet(page, s, w) {
     }, s);
     if (r.error) return r;
     await sleep(400);
-    return page.evaluate(MEASURE, '#worksheetGrid');
+    return page.evaluate(fn, '#worksheetGrid');
 }
 
-async function quiz(page, s) {
-    await viewport(page, 1280, 900);
+async function quiz(page, s, fn = MEASURE, w = 1280) {
+    await viewport(page, w, 900);
     await hideOverlays(page);
     const r = await page.evaluate((s) => {
         const questions = [];
@@ -204,7 +318,7 @@ async function quiz(page, s) {
     }, s);
     if (r.error) return r;
     await sleep(400);
-    return page.evaluate(MEASURE, '#quizTakeView');
+    return page.evaluate(fn, '#quizTakeView');
 }
 
 // The paper reference: the kit's Independent page at L, printed (sheetDocument) in an iframe.
@@ -235,7 +349,114 @@ async function shot(page, sel, file) {
     await (el || page).screenshot({ path: path.join(SHOTS, file) });
 }
 
-(async () => {
+// ---- LDIV-JOIN (--join) ----
+const JOIN_TOL = { gap: 0.3, step: 0.1 };
+const JOIN_ROLES = ['independent', 'guided', 'review', 'test'];
+const JOIN_SKILLS = {
+    'division:long_div_2digit': [{ opts: null, tag: 'long_div_2digit' }],
+    'division:div_facts': [{ opts: { divForm: 'long' }, tag: 'div_facts-long', roles: ['fact-rows'] }],
+    'division:div_facts_long': [{ opts: null, tag: 'div_facts_long', roles: ['fact-rows'] }],
+    'division:divide': [{ opts: { notation: ['bracket'], tiles: 31 }, tag: 'divide-31' }],
+    'division:div_remainders': [{ opts: { notation: ['bracket'] }, tag: 'div_remainders-bracket' }],
+};
+async function paperJoin(page, s, size, role, key) {
+    const ok = await page.evaluate(async ({ s, size, role, key }) => {
+        let res;
+        try {
+            res = await window.buildSheet({ role, size, seed: 4242, key,
+                sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts || {} }], count: 6 }] });
+        } catch (e) { return 'build threw: ' + e.message; }
+        const html = key ? res.keyHtml : res.pupilHtml;
+        if (!html) return 'no ' + (key ? 'key' : 'pupil page');
+        let f = document.getElementById('mqJoinPaper');
+        if (!f) {
+            f = document.createElement('iframe');
+            f.id = 'mqJoinPaper';
+            f.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:1300px;border:0;z-index:-1;visibility:hidden';
+            document.body.appendChild(f);
+        }
+        await new Promise((r) => { f.onload = r; f.srcdoc = window.sheetDocument(html, 'paper'); });
+        await f.contentDocument.fonts.ready;
+        return 'ok';
+    }, { s, size, role, key });
+    if (ok !== 'ok') return { error: ok };
+    await sleep(150);
+    return page.evaluate(JOIN, 'body', '#mqJoinPaper');
+}
+async function shotJoin(page, frameSel, file) {
+    if (!SHOTS) return;
+    fs.mkdirSync(SHOTS, { recursive: true });
+    const box = await page.evaluate((frameSel) => {
+        const doc = frameSel ? document.querySelector(frameSel).contentDocument : document;
+        const fr = frameSel ? document.querySelector(frameSel) : null;
+        if (fr) fr.style.visibility = 'visible', fr.style.zIndex = '99999';
+        const p = Array.from(doc.querySelectorAll('svg path')).find((x) => /Q/.test(x.getAttribute('d') || '') && x.ownerSVGElement.getBoundingClientRect().width > 0);
+        if (!p) return null;
+        const r = p.ownerSVGElement.getBoundingClientRect();
+        return { x: Math.max(0, r.left - 20), y: Math.max(0, r.top - 20), width: r.width + 90, height: r.height + 40 };
+    }, frameSel);
+    if (box) await page.screenshot({ path: path.join(SHOTS, file), clip: box });
+    if (frameSel) await page.evaluate((frameSel) => { const fr = document.querySelector(frameSel); fr.style.visibility = 'hidden'; fr.style.zIndex = '-1'; }, frameSel);
+}
+async function joinMain() {
+    const want = String(arg('skills', Object.keys(JOIN_SKILLS).join(','))).split(',').map((x) => x.trim()).filter(Boolean);
+    const app = await open({ seed: 1, viewport: { width: 1366, height: 900, deviceScaleFactor: SHOTS ? 4 : 1 } });
+    const { page } = app;
+    let fails = 0, n = 0, worstGap = 0, worstStep = 0;
+    const judge = (where, res, needOne) => {
+        if (!res || res.error) { fails++; console.log(`FAIL ${where}: ${res ? res.error : 'no result'}`); return; }
+        if (!res.arcs.length) { if (needOne) { fails++; console.log(`FAIL ${where}: no bracket measured`); } return; }
+        for (const a of res.arcs) {
+            n++;
+            if (a.error) { fails++; console.log(`FAIL ${where}: ${a.error} (${a.d})`); continue; }
+            worstGap = Math.max(worstGap, a.gap); worstStep = Math.max(worstStep, a.step);
+        }
+        const g = Math.max(...res.arcs.map((a) => a.gap || 0)), st = Math.max(...res.arcs.map((a) => a.step || 0));
+        const bad = [];
+        if (g > JOIN_TOL.gap) bad.push(`gap ${g.toFixed(2)} mm > ${JOIN_TOL.gap}`);
+        if (st > JOIN_TOL.step) bad.push(`step ${st.toFixed(2)} mm > ${JOIN_TOL.step}`);
+        if (bad.length) fails++;
+        console.log(`${bad.length ? 'FAIL' : 'PASS'} LDIV-JOIN ${where}: ${res.arcs.length} arc(s) gap ${g.toFixed(2)} mm step ${st.toFixed(2)} mm${bad.length ? '  <- ' + bad.join(', ') : ''}`);
+    };
+    try {
+        for (const key of want) {
+            const cases = JOIN_SKILLS[key];
+            if (!cases) { fails++; console.log(`FAIL ${key}: not a bracket skill of LDIV-JOIN`); continue; }
+            const [categoryId, skillId] = key.split(':');
+            for (const c of cases) {
+                const s = { categoryId, skillId, opts: c.opts, tag: c.tag };
+                for (const size of ['M', 'L']) {
+                    for (const role of [...JOIN_ROLES, ...(c.roles || [])]) {
+                        for (const k of [false, true]) {
+                            const res = await paperJoin(page, s, size, role, k);
+                            judge(`paper ${c.tag} ${role} ${size} ${k ? 'key' : 'pupil'}`, res, role === 'independent' || (c.roles || []).includes(role));
+                            if (role === 'independent' && !k) await shotJoin(page, '#mqJoinPaper', `${c.tag}-paper-${size}.png`);
+                        }
+                    }
+                }
+                for (const w of [1366, 820]) {
+                    judge(`card-${w} ${c.tag}`, await card(page, s, w, 11, JOIN), true);
+                    await shotJoin(page, null, `${c.tag}-card-${w}.png`);
+                    judge(`worksheet-${w} ${c.tag}`, await worksheet(page, s, w, JOIN), true);
+                    judge(`quiz-${w} ${c.tag}`, await quiz(page, s, JOIN, w), true);
+                }
+            }
+        }
+        const errs = app.problems.filter((p) => p.type !== 'requestfailed');
+        if (errs.length) { fails++; errs.slice(0, 5).forEach((e) => console.log(`FAIL console: ${e.text}`)); }
+        console.log(`LDIV-JOIN: ${n} arcs measured; worst gap ${worstGap.toFixed(2)} mm, worst step ${worstStep.toFixed(2)} mm`);
+    } catch (e) {
+        console.log('FAIL ' + (e.stack || e.message));
+        fails++;
+    } finally {
+        await app.close();
+    }
+    console.log(fails ? `ws-ldiv-hug: FAIL (${fails})` : 'ws-ldiv-hug: OK');
+    process.exit(fails ? 1 : 0);
+}
+
+if (process.argv.includes('--join')) joinMain();
+else (async () => {
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
     const { page } = app;
     let fails = 0, n = 0;

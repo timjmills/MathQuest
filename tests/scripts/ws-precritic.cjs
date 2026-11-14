@@ -917,6 +917,10 @@ function buildPlan(ctx) {
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
         add(gate('tof-stem', 'ws-tof-stem (TOF-STEM: a True or False? "a op b =" stem only over the one number it equals)', scope, 'browser', 'ws-tof-stem', ['--skills', keys.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
+        // LDIV-JOIN (owner 2026-11-14, lf-ops: the long-division bracket was "disconnected"): the arc and the vinculum are ONE
+        // stroke - no white at the outer corner, no step - on paper (M/L, pupil + key, the card roles) and on screen (1366, 820)
+        const ldivKeys = keys.filter((k) => /^division:(long_div_2digit|div_facts|div_facts_long|divide|div_remainders)$/.test(k));
+        if (ldivKeys.length) add(gate('ldiv-join', 'ws-ldiv-hug --join (LDIV-JOIN: the bracket arc runs into the vinculum, gap <= 0.3 mm, no step)', `${ldivKeys.length} bracket skill(s)`, 'browser', 'ws-ldiv-hug', ['--join', '--skills', ldivKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
