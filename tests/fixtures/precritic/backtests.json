@@ -8667,46 +8667,183 @@
     "pass": "OK"
    }
   },
- {
-  "id": "precritic-mode-verdict",
-  "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
-  "kind": "commit-pair",
-  "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
-  "browser": false,
-  "fail": {
-   "commit": "7a5bc902c",
-   "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+  {
+   "id": "precritic-mode-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
+   "kind": "commit-pair",
+   "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+   },
+   "pass": {
+    "commit": "70d347578",
+    "state": "the mode verdict line reads OK"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "70d347578",
-   "state": "the mode verdict line reads OK"
+  {
+   "id": "copy-light-pipe-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+   },
+   "pass": {
+    "commit": "82b8fbf44",
+    "state": "the verdict line is the last line"
+   },
+   "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "copy-light-pipe-verdict",
-  "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
-  "kind": "commit-pair",
-  "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
-  "browser": false,
-  "fail": {
-   "commit": "7a5bc902c",
-   "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+  {
+   "id": "one-row-cap",
+   "check": "a practice page (independent / more-practice / test) holding ONE row of a tall story is held to its work, never stretched to the page (lead ruling R1 / R4a; lf-algebra precritic two-step r11 ws-two-step --print CAP-BAND: multi_step_word (Visual) M 41 % / L 32 %, letter + wpBar L 41-45 %)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit ONE-ROW-CAP (browser twin on lf-algebra: ws-two-step --print CAP-BAND)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "one 125 mm story stretched to 214 mm (independent) / 184 mm (test): 41 % / 32 % under it"
+   },
+   "pass": {
+    "commit": "9e3059d18",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only ONE-ROW-CAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "82b8fbf44",
-   "state": "the verdict line is the last line"
+  {
+   "id": "guided-drawn-fit",
+   "check": "a one-column Guided page of two-step stories holds two plain tries a page where they fit at the height they DRAW (level 1), and no one-row page stretches past its ink / 0.72 (lf-algebra precritic two-step r11: Guided 1 story a page, EB-BAND 31-53 %)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-DRAWN-FIT (browser twin: ws-empty-band EB-BAND guided on the 7 two-step skills)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "1 + 1 + 1 stories; one-row rows 200-208 mm"
+   },
+   "pass": {
+    "commit": "2157224a1",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-DRAWN-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
+  {
+   "id": "opener-spill",
+   "check": "a two-step story Opener: a Model measured over the half-width cell takes the full width, and a Model + Guided row that cannot share the page spill the Guided / Independent rows to page 2 - never over the budget (lf-algebra precritic two-step r11: Opener OVERFLOW / EB-EDGE 38 at M / L)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit OPENER-SPILL (browser twin: ws-cell-checks OVERFLOW + ws-empty-band EB-EDGE opener)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "one page over its budget, the Model in the 93 mm zone"
+   },
+   "pass": {
+    "commit": "1202510f0",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only OPENER-SPILL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ri-twostep",
+   "check": "a two-step column story on Reason It prints its story once and stands A over B at the full width (lf-algebra precritic two-step r11: Reason It OVERFLOW at M / L - 107-115 mm step columns side by side in half cells)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit RI-TWOSTEP (browser twin: ws-cell-checks OVERFLOW reason-it)",
+   "browser": false,
+   "fail": {
+    "commit": "bc32eecc9",
+    "state": "A | B side by side (1fr 1fr)"
+   },
+   "pass": {
+    "commit": "2157224a1",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only RI-TWOSTEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lone-page-ruled",
+   "check": "ws-cell-checks LONE-PAGE reads design/audit/baselines/capacity.json `ruled`: a page ruled to hold 1 (the two-step Reason It pairs, multi_step_word test M / L; lead 2026-11-13 r9) passes with a note; an unruled lone page still FAILs",
+   "kind": "fixture",
+   "rule": "ws-cell-checks LONE-PAGE (ruled capacities)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lone-page/unruled.fail.json",
+    "state": "no ruling: one item a page where Reason It holds 3 - LONE-PAGE"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lone-page/ruled.pass.json",
+    "state": "ruled 1: passes, the note names the ruling"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --lone-page-probe \"algebra:multi_step_word reason-it M\" --ruled {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "onerow-strip-tight",
+   "check": "the ONE-ROW PAGEFILL exemption (mq-onerow) accepts a strip only while it is shorter than the row it holds; a one-row page with a strip a whole row tall (another row fits) still FAILs (critic r9, lf-roles)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (one-row strip)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/onerow/strip-tall.fail.json",
+    "state": "one-row page, 90 mm strip under a 60 mm row: PAGEFILL"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/onerow/strip-short.pass.json",
+    "state": "one-row page, 45 mm strip under a 172 mm row: accepted"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --onerow-probe {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "spill-p1",
+   "check": "SPILL-P1 (lead 2026-11-13 r9b): page 1 of a spilled Opener may leave over 30 % white only when the next part (the Guided band at its measure) is taller than the white; white that could hold it FAILs",
+   "kind": "fixture",
+   "rule": "ws-roles-unit OPENER-SPILL SPILL-P1 (opener.js spillP1Ok)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/spill-p1/fit-spilled.fail.json",
+    "state": "planted: 120 mm white (52 %) that could hold a 95 mm Guided band"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/spill-p1/honest.pass.json",
+    "state": "letter_equation opener L: 93.7 mm white, the Guided band needs 105 mm - an honest leftover"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --spill-p1-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
   {
    "id": "pv-words-guided-hint-leak",
    "check": "number_word_form Guided: no grey hint gives the answer away - its place phrases built together ('2 tens, 6 ones' -> 26), or every digit of the answer named; the allowed form is the first step's gapped frame (lf-roles critic r8b D3, PT 2.3)",
@@ -9106,6 +9243,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "tof-stem",
+   "check": "a True or False? frame restates the problem as 'a op b =' only when that equation is true of the answer: one number equal to the operands combined (lf-ops critic-cbt-r2 E1: count_by_tables printed '3 x 12 = 12, 18, 24, 30, 36'; 55 skills on master)",
+   "kind": "commit-pair",
+   "rule": "ws-tof-stem TOF-STEM",
+   "browser": true,
+   "fail": {
+    "commit": "05dbd1149",
+    "state": "count_by_tables True or False? M: 'a x 12 =' stem over a 5-part list on pupil page and key"
+   },
+   "pass": {
+    "commit": "fc02a4642",
+    "state": "list / missing-part / 3-addend answers take the plain stem; true equation stems unchanged"
+   },
+   "command": "node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_missing_digit,addition:add_three --seeds 7,23",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
-]
+ ]
 }
