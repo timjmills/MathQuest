@@ -9026,6 +9026,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ws-reflow-countrow-exempt",
+   "check": "ws-worksheet-reflow WS-REFLOW template exemption (lead ruling 2026-11-13, lf-ops-props cbt r1 D2): a sheet whose cards draw the count-row TEMPLATE is not judged (its full-width train is a pupil-reading fix); a sheet of any other template whose card grows still FAILs",
+   "kind": "fixture",
+   "rule": "ws-worksheet-reflow WS-REFLOW EXEMPT_TEMPLATES ['count-row']",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/countrow-exempt-other-grows.fail.json",
+    "state": "a NON-count-row (k2kit) sheet whose tallest card grows 359.3 -> 396.1 px: still a finding under the exemption"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/countrow-exempt-countrow-spans.pass.json",
+    "state": "the same growth (and 2 -> 1 column) on a count-row sheet: exempt"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -53,10 +53,22 @@ const TOL_D = 0.5;    // px a numeral may shrink (rounding)
 const TOL_X = 1.5;    // px a typed answer place may move sideways inside its card (lf-hosts critic r3: the r1 F4 4 px gap
                       // moves boxes by up to 1 px; a 2 px move is a layout change)
 
+/**
+ * Templates exempt from the ratchet (lead ruling 2026-11-13, lf-ops-props critic cbt r1 D2): a worksheet card that draws a
+ * count-row train takes the whole grid row so its wrapped train holds >= 3 numbers a line (ws-screen-slots TRAIN-FIT) - a
+ * pupil-reading finding, where this ratchet exists to stop ACCIDENTAL reflow. Keyed on the TEMPLATE (the drawing's
+ * data-mq-template / its k2-countrow root), never on skill ids: a sheet any of whose cards draws an exempt template is not
+ * judged (the spanning card reflows the grid around it); every other card and sheet is judged as before.
+ */
+const EXEMPT_TEMPLATES = ['count-row'];
+/** The exempt templates a measured sheet draws ([] when none). */
+const exemptOf = (m) => (m && Array.isArray(m.templates) ? [...new Set(m.templates.flat())].filter((t) => EXEMPT_TEMPLATES.includes(t)) : []);
+
 /** The verdicts on one measure against its baseline: [] when it holds. */
 function judge(m, b) {
     const out = [];
     if (!m || m.error) return [`WS-REFLOW nothing measured (${m ? m.error : 'no render'})`];
+    if (exemptOf(m).length) return [];
     if (!b) return ['WS-REFLOW no baseline for this key (pin it from master with --pin)'];
     if (m.cols < b.cols) out.push(`WS-REFLOW columns ${b.cols} -> ${m.cols} (the grid dropped a column)`);
     if (m.cardH > b.cardH + TOL_H) out.push(`WS-REFLOW tallest card ${b.cardH} -> ${m.cardH} px (+${Math.round(m.cardH - b.cardH)}, want <= +${TOL_H})`);
@@ -122,10 +134,12 @@ function MEASURE() {
     // each card's typed answer places, left edge from the card's left edge, in DOM order (lf-hosts critic r3: per-slot x)
     const slotXs = cards.map((c) => { const cl = c.getBoundingClientRect().left; return Array.from(c.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=button]), textarea')).filter((el) => vis(el) && !el.closest('.mq-wsbar')).map((el) => Math.round((el.getBoundingClientRect().left - cl) * 10) / 10); });
     const perCard = cards.map(digitOf);
+    // each card's drawn kit templates (the EXEMPT_TEMPLATES test; the count-row root class where the twin carries no attribute)
+    const templates = cards.map((c) => [...new Set([...c.querySelectorAll('[data-mq-template]')].map((e) => e.getAttribute('data-mq-template')).concat(c.querySelector('.k2-cell.k2-countrow') ? ['count-row'] : []))]);
     const ds = perCard.filter((x) => x > 0);
     const r1 = (x) => Math.round(x * 10) / 10;
     return { cards: cards.length, cols, cardH: r1(cardH), cardW: r1(cardW), boxW: r1(boxW), boxH: r1(boxH), digit: ds.length ? r1(Math.min(...ds)) : 0,
-        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1), slotXs };
+        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1), slotXs, templates };
 }
 
 function selfTest() {
@@ -149,6 +163,9 @@ function selfTest() {
         ['r3 a slot 1 px sideways holds', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, slotXs: [[40, 101], [40]] }, []],
         ['r3 a slot 2 px sideways fails', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, slotXs: [[40, 102], [40]] }, [/1 answer place\(s\) moved sideways.*card 1 slot 2 x 100 -> 102/]],
         ['r3 a card that lost an answer place fails', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, slotXs: [[40], [40]] }, [/card 1 has 1 answer place\(s\), master 2/]],
+        // lead ruling 2026-11-13 (cbt r1 D2): a sheet drawing the count-row template is exempt; any other template is judged
+        ['D2 a count-row sheet that spans and grows is exempt', { cols: 1, cardH: 396, cardW: 600, boxW: 144, boxH: 192, digit: 29, templates: [['count-row'], ['count-row']] }, []],
+        ['D2 a non-count-row card that grows still fails', { cols: 2, cardH: 337, boxW: 144, boxH: 192, digit: 29, templates: [['k2kit'], []] }, [/tallest card/]],
     ];
     let bad = 0;
     for (const [name, m, want] of cases) {
@@ -229,7 +246,7 @@ async function main() {
                 rows[key] = m;
                 const v = pin ? (m.error ? [`WS-REFLOW nothing measured (${m.error})`] : []) : judge(m, base.keys[key]);
                 for (const f of v) fails.push(`${key}: ${f}`);
-                say(`${key.padEnd(40)} ${m.error ? 'ERR ' + m.error : `${m.cols} col(s), tallest card ${m.cardH} px (w ${m.cardW}), answer place ${m.boxW} x ${m.boxH}, numeral ${m.digit} px, ${m.slotXs.flat().length} slot x`}${v.length ? '\n    ' + v.join('\n    ') : ''}`);
+                say(`${key.padEnd(40)} ${m.error ? 'ERR ' + m.error : `${exemptOf(m).length ? `EXEMPT (draws ${exemptOf(m).join(', ')}: lead ruling 2026-11-13) ` : ''}${m.cols} col(s), tallest card ${m.cardH} px (w ${m.cardW}), answer place ${m.boxW} x ${m.boxH}, numeral ${m.digit} px, ${m.slotXs.flat().length} slot x`}${v.length ? '\n    ' + v.join('\n    ') : ''}`);
             }
         }
     } finally { await app.close(); }

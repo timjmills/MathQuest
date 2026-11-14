@@ -1,0 +1,5 @@
+{
+ "about": "lead ruling 2026-11-13 (lf-ops-props cbt r1 D2): the same growth on a sheet whose cards draw the count-row template (the D2 full-width train: 2 -> 1 column, card 560 -> 1136 px, +37 px) is exempt. OK.",
+ "baseline": { "cols": 2, "cardH": 359.3, "cardW": 560, "boxW": 67.4, "boxH": 48.5, "digit": 29, "cardHs": [359.3, 359.3], "digits": [29, 29] },
+ "measured": { "cols": 1, "cardH": 396.1, "cardW": 1136, "boxW": 116, "boxH": 60.8, "digit": 48, "cardHs": [396.1, 396.1], "digits": [48, 48], "templates": [["count-row"], ["count-row"]] }
+}
