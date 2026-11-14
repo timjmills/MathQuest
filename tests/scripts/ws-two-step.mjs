@@ -40,6 +40,9 @@
 //   STEP-ALIGN (--align, browser; lead 2026-11-14 on the STEP-FORM Opener: Step 2 stood ~80 px above Step 1) in a two-step cell whose two
 //              steps are both fact sentences, the two step blocks top-align and their sentences sit on one line (tops within 1 mm), on
 //              the Opener, Guided and Independent pages and the key at M / L
+//   STEP-ALIGN screen (--screen-align, browser; STEP-FORM critic r3 F6: worksheet-1280 mult_div_first item 4, Step 2's fact
+//              sentence broke its 2-digit answer boxes onto a second line) every slot and = of a fact sentence stand on one line
+//              on the online worksheet and the practice card at 820 / 1024 / 1280 / 1366
 //   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
 //              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
 //   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
@@ -67,6 +70,7 @@ if (args.includes('--print')) await printMode();
 if (args.includes('--ea')) await eaMode();
 if (args.includes('--ldiv')) await ldivMode();
 if (args.includes('--align')) await alignMode();
+if (args.includes('--screen-align')) await screenAlignMode();
 
 const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
 const app = await loadApp(ROOT);
@@ -517,4 +521,61 @@ async function alignMode() {
     for (const f of out.slice(0, 30)) console.log(`  ${f}`);
     console.log(out.length ? `${TOOL}: FAIL (--align: ${out.length} finding(s))` : `${TOOL}: OK (--align: STEP-ALIGN, ${judged} cell(s))`);
     process.exit(out.length ? 1 : 0);
+}
+
+// STEP-ALIGN on the screen hosts (--screen-align; STEP-FORM critic r3 F6, worksheet-1280 two_step_mult_div_first item 4: in the
+// three-up worksheet cell the Step 2 sentence "45 ÷ 5 = 9 / 9 + 3 = 12" dropped its 2-digit answer boxes to a second line). A fact
+// sentence never wraps: its slots and its = share one line (tops within 1 mm), on the online worksheet and the practice card at
+// 820 / 1024 / 1280 / 1366, over seeded deals.
+async function screenAlignMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const WIDTHS = String(arg('--widths', '820,1024,1280,1366')).split(',').map(Number).filter(Boolean);
+    const SEEDS = Number(arg('--seeds', 6));
+    const out = [];
+    let judged = 0;
+    const app = await H.open({ seed: 1 });
+    try {
+        await app.page.waitForFunction(() => typeof window.initWorksheet === 'function', { timeout: 60000 });
+        const probe = () => {
+            const mm = (px) => px / 96 * 25.4;
+            const res = [];
+            for (const f of document.querySelectorAll('#worksheetGrid .mq-wwfact, #questionCard .mq-wwfact')) {
+                const kids = [...f.children].map((c) => c.getBoundingClientRect()).filter((r) => r.width > 1 && r.height > 1);
+                if (kids.length < 2) continue;
+                const tops = kids.map((r) => r.top + r.height / 2);
+                res.push({ host: f.closest('#worksheetGrid') ? 'worksheet' : 'card', spread: mm(Math.max(...tops) - Math.min(...tops)), text: f.textContent.replace(/\s+/g, ' ').trim().slice(0, 40) });
+            }
+            return res;
+        };
+        for (const key of mine) for (const w of WIDTHS) {
+            const sk = key.split(':')[1];
+            await app.page.setViewport({ width: w, height: w === 1366 ? 768 : 900, deviceScaleFactor: 1 });
+            for (let seed = 1; seed <= SEEDS; seed++) {
+                for (const host of ['worksheet', 'card']) {
+                    const err = await app.page.evaluate(({ sk, seed, host }) => {
+                        try {
+                            if (window.__wsReseed) window.__wsReseed(seed * 7919);
+                            const st = window.state; st.category = 'algebra'; st.skill = sk; st.isMixedMode = false;
+                            if (host === 'worksheet') { st.gameMode = 'worksheet'; st.problemCount = 6; window.initWorksheet(); }
+                            else { st.gameMode = 'practice'; window.showView('gameView'); const q = window.generateQuestion(); st.currentQ = q; window.renderQuestion(); }
+                            return '';
+                        } catch (e) { return String(e && e.message || e); }
+                    }, { sk, seed, host });
+                    if (err) { out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w}: ${err}`); continue; }
+                    await new Promise((r) => setTimeout(r, host === 'worksheet' ? 1000 : 250));
+                    for (const x of await app.page.evaluate(probe)) {
+                        if (x.host !== host) continue;
+                        judged++;
+                        if (x.spread > 1) out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w} seed ${seed}: the fact sentence "${x.text}" wraps (its slots ${x.spread.toFixed(1)} mm apart; one line)`);
+                    }
+                }
+            }
+        }
+    } finally { await app.close(); }
+    const uniq = [...new Set(out)];
+    console.log(`STEP-ALIGN-SCREEN ${uniq.length ? `FAIL ${uniq.length}` : 'PASS'} (${judged} sentence(s) judged)`);
+    for (const f of uniq.slice(0, 30)) console.log(`  ${f}`);
+    console.log(uniq.length ? `${TOOL}: FAIL (--screen-align: ${uniq.length} finding(s))` : `${TOOL}: OK (--screen-align: STEP-ALIGN-SCREEN, ${judged} sentence(s))`);
+    process.exit(uniq.length ? 1 : 0);
 }
