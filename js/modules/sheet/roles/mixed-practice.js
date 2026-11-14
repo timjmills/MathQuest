@@ -105,9 +105,13 @@ function packing(poolsIn, input) {
         let cur = 0;
         for (const id of ids) {
             for (let k = 0; k < shelf[id].n; k++) {
-                const hh = bandH(id, k === 0) + (k === 0 ? shelf[id].band : 0);
+                let hh = bandH(id, k === 0) + (k === 0 ? shelf[id].band : 0);
                 const budget = pages === 1 ? m.budget : mCont.budget;
-                if (cur && cur + hh > budget) { pages++; cur = 0; }
+                // (MIX-PAGES, lf-placevalue vocab deploy: a skill's further shelf that starts a page opens a band of its own,
+                // under its strip, as plan() lays it out - counted without the strip, a Match 3 shelf joined the anchor chart's
+                // page on paper only, and the chart spilled to a page of its own: vocab_grade_pictures L Mixed 3 -> 4 pages, a
+                // lone Match 3 cell on page 2; ws-layout-unit MIX-PAGES)
+                if (cur && cur + hh > budget) { pages++; cur = 0; if (k > 0) hh += m.strip; }
                 cur += hh;
             }
         }
@@ -723,7 +727,7 @@ export function plan(input = {}) {
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
-        meta: { items: n, scoreOutOf: nScore, units: p.N, achieved, arrangement: 'sections',
+        meta: { items: n, scoreOutOf: nScore, units: p.N, achieved, arrangement: 'sections', packedPages: p.pages,
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }
