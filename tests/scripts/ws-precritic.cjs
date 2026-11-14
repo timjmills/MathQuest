@@ -982,6 +982,8 @@ function buildPlan(ctx) {
         add(gate('two-step-ldiv', 'ws-two-step --ldiv (LDIV-JOIN: the ÷ bracket meets its bar within 0.3 mm)', scope, 'browser', 'ws-two-step', ['--ldiv', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
         // (lead 2026-11-14 + STEP-FORM critic F1: two fact-sentence steps top-align, blocks and sentences within 1 mm; browser, OK (n/a) off the card)
         add(gate('two-step-align', 'ws-two-step --align (STEP-ALIGN: fact-pair step blocks and sentences top-align)', scope, 'browser', 'ws-two-step', ['--align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (STEP-FORM critic r3 F6: a two-step fact sentence never wraps on the worksheet / card at 820-1366; browser, OK (n/a) off the card)
+        add(gate('two-step-screen-align', 'ws-two-step --screen-align (STEP-ALIGN-SCREEN: a fact sentence on one line on screen)', scope, 'browser', 'ws-two-step', ['--screen-align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
         // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
         // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
         add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));

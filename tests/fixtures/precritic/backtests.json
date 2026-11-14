@@ -10188,6 +10188,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-screen-sentence",
+   "check": "ws-two-step --screen-align STEP-ALIGN-SCREEN: a two-step fact sentence's slots and = stand on one line on the online worksheet and practice card at 820 / 1024 / 1280 / 1366",
+   "kind": "commit-pair",
+   "rule": "STEP-ALIGN-SCREEN (STEP-FORM critic r3 F6: worksheet-1280 mult_div_first item 4, the Step 2 sentence dropped its 2-digit answer boxes a line)",
+   "fail": {
+    "commit": "af490bbe5",
+    "state": "the twin sentence was flex-wrap: wrap and 1-2 px too wide for the two-up worksheet cell, so the host wrapped it"
+   },
+   "pass": {
+    "commit": "85bfa6313",
+    "state": "nowrap; one-digit boxes one box wide, 0.8 mm gaps on screen: every sentence on one line"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --screen-align --skill algebra:two_step_add_then_div,algebra:two_step_add_then_mult,algebra:two_step_mult_div_first --widths 820,1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
