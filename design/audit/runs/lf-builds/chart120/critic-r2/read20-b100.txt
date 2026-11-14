@@ -1,0 +1,104 @@
+#0 skill=hundreds_chart_fill win={r:[0,1,2],c:[2,3,4,5,6]} ans=[4, 13, 17] wrong="3, 13, 17"(one-less)
+   steps: One more than 3 is 4. | Ten more than 3 is 13. | One more than 16 is 17. | Write 4, 13 and 17.
+   say: The missing numbers are 4, 13 and 17.
+   lines: One more than 3 is 4. / Ten more than 3 is 13. / One more than 16 is 17.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#1 skill=hundreds_chart_fill win={r:[3,4,5],c:[5,6,7,8,9]} ans=[56] wrong=65(reversed-digits)
+   steps: The number above is 46. | Ten more is 56. | The number after is 57. One less is 56. | Write 56.
+   say: The missing number is 56.
+   lines: The number above is 46. / Ten more is 56. / The number after is 57. One less is 56.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#2 skill=hundreds_chart_fill win={r:[4,5,6],c:[3,4,5,6,7]} ans=[55, 58] wrong="55, 57"(one-less)
+   steps: One more than 54 is 55. | Write 55. | One more than 57 is 58. | Write 58.
+   say: The missing numbers are 55 and 58.
+   lines: One more than 54 is 55. / One more than 57 is 58.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#3 skill=hundreds_chart_fill win={r:[4,5,6],c:[1,2,3,4,5]} ans=[42, 54] wrong="52, 54"(wrong-row)
+   steps: Ten less than 52 is 42. | Write 42. | One more than 53 is 54. | Write 54.
+   say: The missing numbers are 42 and 54.
+   lines: Ten less than 52 is 42. / One more than 53 is 54.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#4 skill=hundreds_chart_fill win={r:[4,5,6],c:[4,5,6,7,8]} ans=[49, 59, 67] wrong="94, 59, 67"(reversed-digits)
+   steps: One more than 48 is 49. | One more than 58 is 59. | One more than 66 is 67. | Write 49, 59 and 67.
+   say: The missing numbers are 49, 59 and 67.
+   lines: One more than 48 is 49. / One more than 58 is 59. / One more than 66 is 67.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#5 skill=hundreds_chart_fill win={r:[5,6,7],c:[2,3,4,5,6]} ans=[76] wrong=67(reversed-digits)
+   steps: The number before is 75. | One more is 76. | The number above is 66. Ten more is 76. | Write 76.
+   say: The missing number is 76.
+   lines: The number before is 75. / One more is 76. / The number above is 66. Ten more is 76.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#6 skill=hundreds_chart_fill win={r:[2,3,4],c:[5,6,7,8,9]} ans=[37, 48] wrong="37, 58"(wrong-row)
+   steps: One more than 36 is 37. | Write 37. | One more than 47 is 48. | Write 48.
+   say: The missing numbers are 37 and 48.
+   lines: One more than 36 is 37. / One more than 47 is 48.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#7 skill=hundreds_chart_fill win={r:[0,1,2],c:[3,4,5,6,7]} ans=[18, 25] wrong="81, 25"(reversed-digits)
+   steps: One more than 17 is 18. | Write 18. | One more than 24 is 25. | Write 25.
+   say: The missing numbers are 18 and 25.
+   lines: One more than 17 is 18. / One more than 24 is 25.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#8 skill=hundreds_chart_fill win={r:[4,5,6],c:[3,4,5,6,7]} ans=[47, 54, 64] wrong="47, 45, 64"(reversed-digits)
+   steps: One more than 46 is 47. | Ten more than 44 is 54. | One less than 65 is 64. | Write 47, 54 and 64.
+   say: The missing numbers are 47, 54 and 64.
+   lines: One more than 46 is 47. / Ten more than 44 is 54. / One less than 65 is 64.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#9 skill=hundreds_chart_fill win={r:[4,5,6],c:[3,4,5,6,7]} ans=[47] wrong=74(reversed-digits)
+   steps: The number before is 46. | One more is 47. | The number below is 57. Ten less is 47. | Write 47.
+   say: The missing number is 47.
+   lines: The number before is 46. / One more is 47. / The number below is 57. Ten less is 47.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#10 skill=hundreds_chart_fill win={r:[7,8,9],c:[5,6,7,8,9]} ans=[86, 88] wrong="96, 88"(wrong-row)
+   steps: Ten more than 76 is 86. | Write 86. | One more than 87 is 88. | Write 88.
+   say: The missing numbers are 86 and 88.
+   lines: Ten more than 76 is 86. / One more than 87 is 88.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#11 skill=hundreds_chart_fill win={r:[2,3,4],c:[0,1,2,3,4]} ans=[21, 34] wrong="21, 44"(wrong-row)
+   steps: Ten less than 31 is 21. | Write 21. | One more than 33 is 34. | Write 34.
+   say: The missing numbers are 21 and 34.
+   lines: Ten less than 31 is 21. / One more than 33 is 34.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#12 skill=hundreds_chart_fill win={r:[0,1,2],c:[0,1,2,3,4]} ans=[12, 21, 23] wrong="12, 12, 23"(reversed-digits)
+   steps: One more than 11 is 12. | Ten more than 11 is 21. | One more than 22 is 23. | Write 12, 21 and 23.
+   say: The missing numbers are 12, 21 and 23.
+   lines: One more than 11 is 12. / Ten more than 11 is 21. / One more than 22 is 23.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#13 skill=hundreds_chart_fill win={r:[5,6,7],c:[3,4,5,6,7]} ans=[56] wrong=66(wrong-row)
+   steps: The number before is 55. | One more is 56. | The number below is 66. Ten less is 56. | Write 56.
+   say: The missing number is 56.
+   lines: The number before is 55. / One more is 56. / The number below is 66. Ten less is 56.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#14 skill=hundreds_chart_fill win={r:[2,3,4],c:[0,1,2,3,4]} ans=[34, 45] wrong="34, 54"(reversed-digits)
+   steps: One more than 33 is 34. | Write 34. | One more than 44 is 45. | Write 45.
+   say: The missing numbers are 34 and 45.
+   lines: One more than 33 is 34. / One more than 44 is 45.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#15 skill=hundreds_chart_fill win={r:[0,1,2],c:[4,5,6,7,8]} ans=[26, 28] wrong="26, 27"(one-less)
+   steps: One more than 25 is 26. | Write 26. | One more than 27 is 28. | Write 28.
+   say: The missing numbers are 26 and 28.
+   lines: One more than 25 is 26. / One more than 27 is 28.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#16 skill=hundreds_chart_fill win={r:[6,7,8],c:[2,3,4,5,6]} ans=[67, 73, 83] wrong="77, 73, 83"(wrong-row)
+   steps: One more than 66 is 67. | Ten more than 63 is 73. | One less than 84 is 83. | Write 67, 73 and 83.
+   say: The missing numbers are 67, 73 and 83.
+   lines: One more than 66 is 67. / Ten more than 63 is 73. / One less than 84 is 83.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#17 skill=hundreds_chart_fill win={r:[4,5,6],c:[3,4,5,6,7]} ans=[68] wrong=78(wrong-row)
+   steps: The number before is 67. | One more is 68. | The number above is 58. Ten more is 68. | Write 68.
+   say: The missing number is 68.
+   lines: The number before is 67. / One more is 68. / The number above is 58. Ten more is 68.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#18 skill=hundreds_chart_fill win={r:[4,5,6],c:[1,2,3,4,5]} ans=[54, 65] wrong="54, 64"(one-less)
+   steps: One more than 53 is 54. | Write 54. | One more than 64 is 65. | Write 65.
+   say: The missing numbers are 54 and 65.
+   lines: One more than 53 is 54. / One more than 64 is 65.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#19 skill=hundreds_chart_fill win={r:[3,4,5],c:[1,2,3,4,5]} ans=[44, 46] wrong="44, 45"(one-less)
+   steps: One more than 43 is 44. | Write 44. | One more than 45 is 46. | Write 46.
+   say: The missing numbers are 44 and 46.
+   lines: One more than 43 is 44. / One more than 45 is 46.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+(node:24492) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/js/modules/generate-question.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
