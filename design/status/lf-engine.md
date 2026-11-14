@@ -10,6 +10,17 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-14 19:50 UTC: row-stretch cap stage 1 PASSED re-critic r2.**
+  - Branch claude/sweet-newton-c8wrv1-lf-engine-rowcap @ 3b0fdbcbb (code 174c839be).
+  - The head is with lf-placevalue and the lead.
+  - Open: the vocab_grade_pictures L lesson grows from 9 to 10 pages, and pages 9–10 have not been seen.
+- **First item after the reset: stage 2 (F4).**
+  - Invert ROW_ROOM_MM, so every template is capped by default with explicit exceptions.
+  - EB-STRETCH becomes a FAIL for Guided, Scripted Model, Error Analysis and Pre-skill check.
+  - Wide critic.
+- **Then:** -roles SPILL-P1, then -pc r6, then the queue below.
+- Parked at about $1,170 (owner stop $1,200).
+
 - **2026-11-14 09:00 UTC: lf-engine is PARKED (budget stop, about $1,135).**
   - The chart Name/Date line is LIVE (master 7f2ca5e39).
   - -roles r3 is HELD by the lead at 1b7280c88; the critic r3 report is at 421a78fed. It scored C3 6 on add_wp_10k M, and its change set covers 263 Openers but the graded sample was only 10 pages.
