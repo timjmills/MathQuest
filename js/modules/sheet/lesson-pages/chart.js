@@ -66,6 +66,11 @@ export function pickExample(items, data) {
     // move to the nearer ten is seen, not a 1-tick hop from 79).
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     if (pref && pool.some((x) => pref.test(String((x.it.q && x.it.q.text) || '')))) pool = pool.filter((x) => pref.test(String((x.it.q && x.it.q.text) || '')));
+    // CROSS-GIVEAWAY (critic blanks B2): a chart window example prints its answers, so it holds none of the squares the pool's
+    // other windows leave empty
+    const cwOf = (q) => (q && q.chartWindow && Array.isArray(q.keyParts) ? { rows: q.chartWindow.rows, cols: q.chartWindow.cols, gaps: q.keyParts.map(Number) } : null);
+    const cwFree = (x) => { const c = cwOf(x.it.q); return !c || items.every((o) => { const w = o === x.it ? null : cwOf(o.q); return !w || !w.gaps.some((n) => c.rows.includes(Math.floor((n - 1) / 10)) && c.cols.includes((n - 1) % 10)); }); };
+    if (pool.some((x) => cwOf(x.it.q)) && pool.some(cwFree)) pool = pool.filter(cwFree);
     const sorted = pool.slice().sort((a, b) => easeScore(a.it.q) - easeScore(b.it.q) || a.i - b.i);
     // Two digits beat one for a column skill: the example has the widest operands the skill deals.
     const widest = Math.max(...sorted.map((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0)));

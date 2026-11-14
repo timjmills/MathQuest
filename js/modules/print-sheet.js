@@ -1039,7 +1039,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (pin) setDealPin(skH.dealPin, pin);
                 // (the sheet's kept chart windows: a window dealt now blanks their gaps and prints none of them - chart-giveaway.js)
                 setChartSheet(_cwAll(seen));
-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: _cwRoleTiles && CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && (_cwRoleTiles || (_cwLessonPractice && (Number(sk.opts && sk.opts.band) === 120 || (sk.skillId === 'chart_to_120' && !(sk.opts && sk.opts.band))))) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles || 3 }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
@@ -3340,6 +3340,10 @@ async function buildSheetDeal(req = {}) {
     };
     if (n.role === 'lesson') return buildLesson(n, metaOf);
     if (!PRACTICE_ROLES.has(n.role)) return buildRoleSheet(n, metaOf);
+    // (a practice page - a lesson's practice page among them: its step strip / lesson tab marks it; lead ruling (a), band 120 = 3)
+    _cwPart = n.role || '';
+    _cwLessonPractice = !!(n.stepStrip || n.lesson || /^Practice/.test(String(n.tabId || '')));
+    if (_cwLessonPractice) for (const k of [..._cwSheet.keys()]) if (String(k).startsWith(`${_cwPart}|`)) _cwSheet.delete(k);
 
     // DN-31 / DN-34: a section of several skills is GROUPED, never silently mixed - one
     // sub-section per skill, in the order the teacher listed them, each with its own library
@@ -4405,6 +4409,9 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
  */
 async function buildRoleSheet(n, metaOf) {
     _cwPart = (n && n.lessonInput && n.lessonInput.part) || (n && n.role) || '';
+    // (a lesson's practice page: built again for each shape it tries - its own earlier tries' windows are dropped)
+    _cwLessonPractice = !!(n && (n.lesson || n.stepStrip || n.tabId === 'practice' || /^Practice/.test(String(n.tabId || ''))) && !n.lessonInput);
+    if (_cwLessonPractice) for (const k of [..._cwSheet.keys()]) if (String(k).startsWith(`${_cwPart}|`)) _cwSheet.delete(k);
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
@@ -5125,6 +5132,10 @@ async function buildLesson(n, metaOf) {
     let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
+    // (critic blanks B2: the teaching sheet's worked examples are SHOWN windows too, registered before the practice pages deal)
+    // (band 120 - rows 91-120, 30 squares: two examples of different windows print all ten columns and leave practice no square;
+    // there the chart page's example alone stands for the packet - an open question for the lead)
+    { const ex = ((teach.plan && teach.plan.meta && teach.plan.meta.exampleQs) || []).map(chartOfQ).filter((c) => c && c.rows.join() !== '9,10,11'); if (ex.length) _cwSheet.set('lesson-examples-sheet', new Set(ex.map((c) => cwKey(c, true)))); }
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
     // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
     const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
@@ -6390,6 +6401,9 @@ let buildQueue = Promise.resolve();
 let _cwShowFirst = false;
 // (the lesson part being built - its chart page, teaching sheet and practice pages deal under the same seed: runs keyed apart)
 let _cwPart = '';
+// (lead ruling (a) 2026-11-14: a band-120 LESSON practice page holds 3 blanks a window - the worked example prints five of the
+// ten columns, so 5 a window cannot fill a page without giving an answer away)
+let _cwLessonPractice = false;
 // (lead ruling (a) 2026-11-14: a Guided page's chart windows hold 3 blanks - a scaffold step below Independent's 5; the role
 // overrides the skill's "Numbers to fill in")
 let _cwRoleTiles = null;
