@@ -11200,6 +11200,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "rowcap-fill",
+   "check": "ws-rowcap-fill ROWCAP-FILL: a capped template's section (layout.js ROW_ROOM_MM) counts its rows at the height they are drawn (rowCapMm: drawn + room), so rows x cellH leaves at most one row of the grid free. Critic lf-engine-rowcap r1 F1 / F2 / F3: Review L (master) and Match 3 L (31d41507 + fix) printed 3 rows of 52.5 mm and a ~75 mm white foot where 4 fit - the fill counted on the 48 mm footprint (58 mm asked), the cap drew 50 + 2",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL (critic rowcap r1 F3)",
+   "fail": {
+    "commit": "1b5c3b9c9",
+    "state": "Match 3 footprint 48 mm at M and L: 3 rows of 53 mm leave 68-69 mm of a 227-228 mm grid free"
+   },
+   "pass": {
+    "commit": "f5c025e4c",
+    "state": "4 rows of 53 mm: under one row free at M and L"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
