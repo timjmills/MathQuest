@@ -9099,6 +9099,65 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120r3-model-state-marks",
+   "check": "every Scripted Model state and lesson-anchor panel whose step says 'Write N' draws N in that state, the newest marks trace grey and the earlier ones solid; judged for the templates in scripted-model.js TRACE_TEMPLATES (chart_120 critic r2 N1: a two-gap window's 'Write 101.' state drew no 101; PT-MOD-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo MODEL-STATE-MARKS",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "chartwindow not in TRACE_TEMPLATES: states 2-3 blank, state 4 traces both gaps"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chartwindow draws traceSlots / traceNew on the Scripted Model and the lesson anchor"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only MODEL-STATE-MARKS --screen-seeds 0 --score-roles scripted-model,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-screen-giveaway",
+   "check": "the online worksheet's cards and the quiz builder's questions never repeat a chart window's squares, so no card prints another's answers (chart_120 critic r2 N2: the screen deal repeated band-120 windows; CROSS-GIVEAWAY on the screen hosts, L13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY (screen)",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "worksheet.js / quiz-builder deal without the window rule"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chart-giveaway.js shared by print-sheet, the worksheet and the quiz builder"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 0 --only CROSS-GIVEAWAY --screen-seeds 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-say-frame",
+   "check": "the UNFILLED Say frame of a chart window agrees with its gaps: one blank a gap, plural for 2+ ('The missing numbers are __ and __.'; chart_120 critic r2 N3: the opener printed 'The missing number is __.' under a two-gap Model)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE (unfilled frame)",
+   "fail": {
+    "commit": "03c811eed",
+    "state": "fixed strings.say 'The missing number is __.' (k2.js:481)"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayFrame(q): chartSayFrame"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
