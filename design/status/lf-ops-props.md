@@ -511,3 +511,7 @@ Report: design/audit/runs/lf-ops/critic-cbt-r3.md (graded at 3038af154). E1–E9
 - **F1:** the Pre-skill check at L leaves an 84 mm foot. The gate misses it because EB-PAGE skips a role's last page. The planned EB-LASTPAGE and CAP-PARITY checks are for **lf-checks**.
 - **m1** opener title range (TITLE-RANGE); **m2** True or False? "Finish the sentence." wording; **m3** Scripted Model L merges two steps (SM-STATE-PARITY).
 All four are ledgered as parked, with their planned checks. **To resume:** land EB-LASTPAGE first, then fix F1 by filling the L quadrants with a second row; then m1–m3; then a narrow critic on the Pre-skill check at L plus the three minors.
+
+## Queued after the weekly reset (lead 2026-11-14), continued
+- division:divide with notation bracket at range 1000 still renders on the OLD non-kit template: an orphan cell 4 spanning 3 columns, empty space, an offset quotient box. It is also on master (ldiv-room critic N3). Move it onto the kit's division template: check first, then the fix.
+- The bigger long-division boxes (LDIV-ROOM) were approved by the owner as they are. Deploying ldiv 0b98813ea; no refinements (b) / (c).
