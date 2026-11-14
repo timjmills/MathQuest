@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows, rowStretches,
+    tightRows, rowStretches, capRowsToInk, isStoryWork,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -580,6 +580,9 @@ export function sheetHeaders(input, words, score) {
         title: h.title === false ? '' : words.title,
         titleNote: h.titleNote || '',
     };
+    // the teacher's page-title option (lf-roles 2026-11-13): placement and "custom words", only when set (frame.js pageHeader)
+    if (first.title && h.titlePos === 'above') first.titlePos = 'above';
+    if (first.title && h.titleCustom) first.titleCustom = true;
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const cont = { name: on('name'), date: false, score: false, title: '', tab: contTab };
     // Wave 5.2: the reference number line rides under the header of every page (the layout took
@@ -1223,7 +1226,20 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin, spreadMax || SPREAD_CAP);
                 }
             }
-            sections.push({
+            // ONE-ROW (layout.capRowsToInk, lead ruling R1 / R4a): a lone page of ONE row - and every row of a lone page of column
+            // stories (two-step estimate L: two 83 mm stories spread to 114 mm rows, 31 %) - is held where the band under its work
+            // stays under 30 %, top-aligned - never spread or flexed to the page; the strip under it is the ruled page's.
+            let oneRow = null;
+            const rowsN = part.chunk.rows;
+            if (lone && !noCapSec && !capFill && !its.some((it) => it.anchor) && !L.blocks && !(L.cols === 2 && L.pairs) && (rowsN === 1 || (!gap.gap && its.every(isStoryWork)))) {
+                const drawn = spread ? spread.heightMm : gap.gap ? gap.heightMm : shape ? shape.heightMm : fillByFlex ? avail : rowsN * L.cellH;
+                oneRow = capRowsToInk(its, L.cols, rowsN, drawn, rowsN === 1 ? '' : spread ? spread.rowsTpl : shape ? shape.rowsTpl : '');
+            }
+            if (oneRow) sections.push({
+                kind: 'grid', cols: L.cols, rows: rowsN, labels: labelStyle, start, cls: `fixed mq-spread ${rowsN === 1 ? 'mq-onerow' : 'mq-inkrows'}`, height: `${oneRow.heightMm}mm`, rowsTpl: oneRow.rowsTpl,
+                rowGap: 0, availMm: avail, items: its.map((it) => planItem(it, level, L.cols)), _its: its,
+            });
+            else sections.push({
                 kind: 'grid',
                 cols: L.cols,
                 rows: part.chunk.rows,

@@ -3841,6 +3841,70 @@
   "patterns:growing_shape_patterns review L": {
    "items": 5,
    "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
+  },
+  "algebra:multi_step_word_plain reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word_plain reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_mult_div_first reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_mult_div_first reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_mult reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_mult reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_div reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_div reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_letter_equation reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_letter_equation reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_estimate_check reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_estimate_check reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word test M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word test L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
   }
  }
 }

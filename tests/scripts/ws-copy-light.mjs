@@ -528,11 +528,14 @@ async function main() {
     const verdicts = infos.map((i) => eligibility(i, passed));
     for (const [k, v] of verdicts.entries()) {
         const i = infos[k];
-        const drawn = Object.entries(i.templates).map(([t, n]) => `${t} ${n}/${i.items}`).join(', ');
+        // (lf-ops 2026-11-13: count_by_tables drew ~290 distinct skeletons; the full list made one ~100 KB line) - list 12, count the rest
+        const dEnt = Object.entries(i.templates).sort((x, y) => y[1] - x[1]);
+        const drawn = dEnt.slice(0, 12).map(([t, n]) => `${t} ${n}/${i.items}`).join(', ') + (dEnt.length > 12 ? `, … ${dEnt.length - 12} more drawing(s)` : '');
         console.log(`${v.eligible ? 'ELIGIBLE    ' : 'NOT ELIGIBLE'} ${v.skill}  (draws ${drawn}; roles: ${i.roles.length} from ${i.rolesFrom}; hosts: ${i.hosts.join(', ')}; option values: ${i.variants.length})`);
         if (app.rp.REDESIGN_PASSED.has(v.skill)) console.log(`    note: ${v.skill} is already in redesign-passed.js (it is not its own anchor)`);
         for (const an of v.anchors) console.log(`    anchor: ${an.anchor} passed on template ${an.template} (${(app.rp.REDESIGN_EVIDENCE[an.anchor] || '').slice(0, 110)}…)`);
-        for (const r of v.reasons) console.log(`    why not: ${r} -> FULL critic`);
+        for (const r of v.reasons.slice(0, 12)) console.log(`    why not: ${r} -> FULL critic`);
+        if (v.reasons.length > 12) console.log(`    why not: … ${v.reasons.length - 12} more reason(s) (--json for all) -> FULL critic`);
         console.log(`    critic: ${criticRoute(v)}${ADVISORY.on ? ` (${ADVISORY.id}: ${ADVISORY.why})` : ''}`);
     }
     let bv = null;
@@ -572,7 +575,9 @@ async function main() {
     const fail = briefBad.length > 0 || (batch.length ? !bv.ok : require && nNot > 0);
     const summary = briefBad.length ? `the critic brief names its criteria unlike RUBRIC.md (${briefBad.length}; --brief-lint)` : batch.length ? `batch of ${batch.length}${bv.ok ? ` on ${bv.template}` : ''}: ${bv.ok ? 'one passed template' : bv.reasons[0]}` : `${elig.length} eligible, ${nNot} need a full critic${require ? '' : ' (report)'}`;
     console.log(`${TOOL}: ${fail ? 'FAIL' : 'OK'} (${summary}${ADVISORY.on ? `; ${ADVISORY.id}: every skill takes the FULL critic` : ''})`);
-    process.exit(fail ? 1 : 0);
+    // exitCode, not process.exit(): exit() drops stdout still queued for a PIPE, and precritic then read no verdict line
+    // (lf-ops 2026-11-13: the log ended on a 'why not' line - 'unparsed output')
+    process.exitCode = fail ? 1 : 0;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((e) => { console.log(`${TOOL}: ${e && e.stack || e}`); console.log(`${TOOL}: FAIL (error)`); process.exit(1); });

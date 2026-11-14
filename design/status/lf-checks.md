@@ -711,3 +711,86 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
   `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
 - CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
+
+## 2026-11-13 — precritic "unparsed" verdict fix (lead, urgent; reported by lf-ops)
+
+- `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output": precritic's verdict reader accepted only
+  `<tool>: OK|FAIL`. It now accepts `<tool>[ --mode]*: OK|FAIL` (self-test: 6 verdict cases). Row `precritic-mode-verdict`.
+- copy-light "unparsed": NOT reproduced on master 7a5bc902c (precritic's parser reads `ws-copy-light --skill
+  multiplication:count_by_tables` as PASS); asked the lead for lf-ops' log line and branch.
+- copy-light "unparsed" (lf-ops log, 594642d49): reproduced. ws-copy-light ended with process.exit(), which drops stdout
+  still queued for a pipe; precritic's reader got no verdict line. Fix: process.exitCode, plus the drawings / reasons lists
+  capped at 12. Row `copy-light-pipe-verdict` (30 skills through a slow pipe). The count-row key granularity lf-ops noted
+  (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
+- Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
+  exit uses exitCode when its output can exceed the 64 KB pipe buffer).
+
+## 2026-11-14 ledger sweep before the 13:00 UTC flip (branch claude/sweet-newton-c8wrv1-lf-tools-ledger)
+
+- `ws-precritic-plan --checks-from-critics`: 15 failing rows -> 0 (222 pass, 58 exempt). Only backtest cells edited.
+- (a) named existing on-path ids: 6 rows (49, 51, 60, 137, 302 by id; 178 as a process rule).
+- (b) brought from lf-partopts: 0 (the partopts step-A / panel rows were already green on master; options-panel-sample's
+  fix d7847568 and ws-options-shots gate are not on master, so it could not run here).
+- (c) reasoned exemptions: 9 rows - div_facts 27/45/46/47/48 (ws-fact-pages.cjs + 8 rows parked on lf-ops-divarray
+  6e5fe3415), 43 (nits under the bar), 131 (overflowOf runs in every precritic run and its --self-test), 140 (open, needs a
+  PDF-raster check), 141 (parked with the partopts panel). When lf-ops-divarray or the partopts panel deploys, swap these
+  exemptions for their ids.
+- PARKED (budget stop from the lead): lf-engine F2, the plan's row listing printing skill-less rows (chart-name-line,
+  lesson-pm-cont, lesson-tab-clear) N/A; fix = judge them with idOnPath's tool rule (precritic or deploy gate) and print why.
+## 2026-11-14 — ws-no-size-s --browser de-flake (lead; seen on lf-builds chart_to_120)
+
+- Cause: a size click landed while the previous build still redrew the controls, so the click was lost. Fix: wait until the
+  built size reads the same 3 times, re-scan just before each click (a rebuild drops the old tags), and on a miss re-click
+  once; a re-click is printed as a note, and only a repeat miss fails. 2 of 2 plain runs OK; the 30-mutation browser
+  self-test still catches every planted S / dead control. Row `nos-browser-settle-reclick` (a planted lost first click:
+  master's tool FAIL, this tool OK).
+## 2026-11-14 — precritic --skill covers every offered role x M/L x drawing option value (lead; lf-ops critic cbt r2 root cause)
+
+- Root cause (critic-cbt-r2.md, lf-ops-props 319b2ae0b): precritic `--skill` ran print-lint on Independent and the lesson page
+  only, raster-fit on Scripted Model / Guided only, and empty-band on the card's roles at defaults (variants: Independent L, 6
+  at most). E3 (Scripted Model L, L-OVERLAP SECTION), E5 (Opener, CL40-INK) and E6 (Error analysis, L-TOPSTART CL-4b) were red
+  in plain print-lint on roles no row rendered.
+- New: `tests/scripts/ws-role-cover.mjs` (rows `role-cover-1..n` on every --skill run) runs print-lint, empty-band and
+  raster-fit on every role the signed card offers (no card: every buildSheet role) at M and L, AND under every option value
+  that changes the drawing. `tests/lib/ws-drawing-variants.mjs` picks those values in node (~1 s): the card's offered values
+  (no card: the skill's own set / enum / bool values), kept when the cells' drawing VOCABULARY (templates + element
+  signatures of the rendered skeleton, any order or count) or SIZE class (median element count, x1.25 steps) differs from the
+  defaults, or when the option is a page option (group layout); one value a distinct drawing. count_by_tables: 8 of 16
+  (times each / given, onePage, jumps 15, shape circle / hex / mixed, spaces line; fill, missing, order dropped as the same
+  drawing). add_facts: 1 of 30 (notation across; its supports keep their own print-lint-supports rows).
+- No repeat renders: units another row already renders are left out (lint independent / lesson, band the card's roles,
+  raster scripted-model / guided, all at defaults). Each tool still renders its own documents (DOM lint, measured cells,
+  printed PDF): one shared render would need the three tools merged, parked. Lint is one `--jobs` browser start a shard.
+- Pins: a defaults lint document is ratcheted against print-lint.json / print-lint.M.json (id cat:skill#role); variant
+  documents and unpinned roles must be clean. A card role buildSheet cannot compose FAILs (no card: a note).
+- Shards: ~45 min of slot time each (at least 2 above 10 min); each shard one runner slot, the tools inside run in it.
+  `--dry-run` prints `role cover size: N print-lint + N empty-band + N raster-fit unit(s) in N shard(s); est N min`.
+- Backtests: `precritic-role-cover-plan` (FAIL master 22752843c, OK d17e76aa7; read by `ws-role-cover --plan-check`) and
+  `role-cover-cbt-e3-e5-e6` (8f76b6401 both states: the new role lint FAILs with E3 / E5 / E6 visible, the old Independent-only
+  lint is OK). Ledger row in CHECKS_FROM_CRITICS.md. ws-precritic-plan: ws-role-cover is an every-role tool.
+- MEASURED (count_by_tables on 8f76b6401, its signed card: 13 roles, 8 drawing variants; 2 slots shared with another lane):
+  shard 1/2 ran 126 lint + 104 band + 126 raster units in 37.7 min (estimate 40.4): print-lint 4.9 s a document (126 in
+  613 s, one browser start), empty-band ~3.8 s a role x size (26 in ~100 s a group), raster-fit ~9.8 s (26 in ~258 s a
+  group). Whole skill ~70 min of slot time, ~36 min wall on two slots (shard 2 not run; estimate 34.7). With no card on this
+  tree (17 roles) the plan is ~94 min of slot time. add_facts (card, 1 variant): ~18 min. The shard found E3 / E5 / E6 on
+  defaults and under every variant, AK-2 on scripted-model / true-false (N4: likely false positive), CL40-INK on
+  reason-it under onePage, EB-BAND on the opener under onePage (E8 class), EB-VOCAB on lesson M, EB-GDPCAP on guided L.
+- Cost note for the lead: raster-fit is half the time. If ~36 min wall a carded skill is too slow, the next cut is raster on
+  variants at L only (about -20 %), or variants on the roles each option line of §7a names (needs the card to say so).
+
+## 2026-11-14 — role cover after critic roles r1 (FAIL C1 6 / C2 7): rebuild at medium
+
+- **D1** `tests/lib/ws-drawing-variants.mjs` also signs the BUILT page: buildSheet pupil HTML (role independent, size M, seed
+  7000, no key; node, DOM stub removed so its measuring is skipped), skeleton vocabulary (`pg:` tokens), one buildSheet a value.
+  add_facts 1 -> 8 of 30 variants (notation=across + 7 support values); count_by_tables unchanged (8 of 16). Planning cost
+  ~1.2 s for both skills. `ws-role-cover` lints a support variant with `--supports` (print-lint runs L-SUPPORT only then);
+  new `--variants opt=v` focus and `--plan-check --variant`. Proven: `--skill addition:add_facts --roles guided --variants
+  support=frame` names L-SUPPORT SCC-T10 at M and L.
+- **Runtime**: add_facts role cover 2 shards / 18.2 min -> 3 shards, 302 + 272 + 302 units, est 92.6 min slot, ~46.3 min wall;
+  count_by_tables unchanged (93.9 / ~46.9).
+- **D2** expect-e3-e5-e6.sh re-states only with `--expect-e3e5e6` (fail args); the pass side can fail.
+- **D3** every precritic dry run (copy-light too) prints the role cover and its size.
+- Rows: role-cover-buildsheet-variants, role-cover-add-facts-guided-frame (browser), role-cover-e3e5e6-pass-can-fail (ws-role-cover --check-wrapper),
+  precritic-copy-light-role-cover-size: all PASS; role-cover-cbt-e3-e5-e6 and precritic-role-cover-plan re-run PASS.
+- N1 (numbers masked whole) not addressed.
+- checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).
