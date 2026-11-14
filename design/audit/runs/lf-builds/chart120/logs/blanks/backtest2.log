@@ -1,0 +1,16 @@
+ws-backtest row c120r3-model-state-marks: PASS  fail state FAIL 15.2s, pass state OK 15.7s
+ws-backtest row c120r3-screen-giveaway: PASS  fail state FAIL 5.3s, pass state OK 5.2s
+ws-backtest row c120r3-say-frame: PASS  fail state FAIL 1.3s, pass state OK 1.4s
+ws-backtest row c120r3-overlap-giveaway: PASS  fail state FAIL 7.0s, pass state OK 6.6s
+ws-backtest row c120-blank-count: PASS  fail state FAIL 8.9s, pass state OK 14.0s
+ws-backtest: 5 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120r3-model-state-marks    commit-pair  FAIL 15.2s          OK 15.7s            PASS
+c120r3-screen-giveaway      commit-pair  FAIL 5.3s           OK 5.2s             PASS
+c120r3-say-frame            commit-pair  FAIL 1.3s           OK 1.4s             PASS
+c120r3-overlap-giveaway     commit-pair  FAIL 7.0s           OK 6.6s             PASS
+c120-blank-count            commit-pair  FAIL 8.9s           OK 14.0s            PASS
+
+5 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 160.5 s
+ws-backtest: OK

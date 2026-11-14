@@ -11043,7 +11043,7 @@
   },
   {
    "id": "c120-blank-count",
-   "check": "every dealt chart window holds exactly the chosen 'Numbers to fill in' (default 5, capped silently at the legal maximum), spread across its rows, no whole row, at most half its squares, every blank a printed neighbour, one key answer a blank - print roles, online worksheet, quiz and practice card (lead ruling 2026-11-14)",
+   "check": "every dealt chart window holds exactly the chosen 'Numbers to fill in' (default 5, capped silently at the legal maximum), spread across its rows, no whole row, at most half its squares, every blank a printed neighbour, one key answer a blank - print roles, online worksheet, quiz and practice card (lead ruling 2026-11-14); a Guided page holds 3 (lead ruling (a) 2026-11-14, the role overrides the option)",
    "kind": "commit-pair",
    "rule": "ws-guided-echo BLANK-COUNT",
    "browser": true,
@@ -11052,8 +11052,8 @@
     "state": "'Empty boxes' default null dealt 1 to 3 a window, bunched by row"
    },
    "pass": {
-    "commit": "8c42961f1",
-    "state": "tiles 'Numbers to fill in' default 5 (2-8), dealt spread across the rows under the half / row / neighbour cap"
+    "commit": "b74bd2d48",
+    "state": "tiles 'Numbers to fill in' default 5 (2-8) dealt spread across the rows under the cap; Guided 3 (print-sheet _cwRoleTiles)"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 1 --sizes M --score-roles independent,guided --only BLANK-COUNT --screen-seeds 1",
    "expect": {
