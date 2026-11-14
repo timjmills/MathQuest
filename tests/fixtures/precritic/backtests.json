@@ -8892,8 +8892,8 @@
     "state": "'The missing number is 101, 104.'"
    },
    "pass": {
-    "commit": "ee8c6c287",
-    "state": "sayValues: chartSay"
+    "commit": "de7225b14",
+    "state": "sayValues: chartSay (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
    "expect": {
@@ -8991,8 +8991,8 @@
     "state": "band 120 rows and band 10 pages give answers away item to item"
    },
    "pass": {
-    "commit": "ee8c6c287",
-    "state": "the dealer never deals a window of squares already on the sheet"
+    "commit": "de7225b14",
+    "state": "the dealer never deals a window of squares already on the sheet (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
    "expect": {
