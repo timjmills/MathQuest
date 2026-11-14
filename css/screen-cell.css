@@ -2161,3 +2161,32 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
     padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
 }
+
+/* ---- TOUCH FLOOR (engine rule; lf-checks 2026-11-13, lf-placevalue sweep: ~146 TOUCH-TARGET findings on the screen hosts,
+   46 x 46 inputs inside other wrappers). An answer place's hit area - its input's border box - is at least 48 x 48 px on
+   every screen host (SP-10, RUBRIC H6; fastest plan item 7: the tablets 820 / 1024 keep 48 px targets); a carry / working
+   box keeps 44. A slot input fills its wrapper, so the floor sits on the WRAPPER plus that wrapper's own border: 50 px for
+   a 1 px boxed slot (.mq-cellbox), 52 px for the vocabulary letter box (2 px). Additive and screen only: print renders from
+   the sheet kit's own document, and saved quiz HTML keeps its markup (only the sizes grow). The first line is
+   lf-placevalue live1's floor, verbatim, so the two branches merge clean. */
+html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-height: 50px !important; }
+@media screen {
+    html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-width: 50px !important; }
+    html body .mq-scell .mq-vm-box[data-mq-cell]:has(> input.mq-cellslot) { min-width: 52px !important; min-height: 52px !important; }
+    /* the multiplication chart (k2-multgrid) with writable squares: every square's writing span - which its input fills -
+       is at least 48 x 48 px, and so is every printed square's, so the grid stays even; the table lays out by content so
+       its columns and rows widen to hold them */
+    html body .mq-scell table.k2-multgrid:has([data-mq-cell] > input.mq-cellslot) { table-layout: auto !important; }
+    html body .mq-scell table.k2-multgrid:has([data-mq-cell] > input.mq-cellslot) td > span { min-width: 48px !important; min-height: 48px !important; }
+    /* (its rule box, "The rule is [ ]": a 2 px boxed slot, so 52 px) */
+    html body .mq-scell .k2-rulebox > [data-mq-cell]:has(> input.mq-cellslot) { min-width: 52px !important; min-height: 52px !important; }
+    /* long division (the bracket twin): the digit tracks are 0.81 em; 62 px gives 50 px tracks, a 48 px digit input */
+    html body .mq-scell .ws-ops-division.mq-opsdiv:has([data-mq-cell] > input.mq-cellslot) { font-size: max(var(--mq-digit, 40px), 62px) !important; }
+    html body .mq-scell .ws-ops-division.mq-opsdiv [data-mq-cell] > input.mq-cellslot { min-width: 48px !important; min-height: 48px !important; }
+    /* the word-work sign circle (sentence frame, "5 ( ) 3 = 8"): the pupil writes the sign, so it is an answer place */
+    html body .mq-scell input.mq-wwork.mq-gl-sign { min-width: 48px !important; min-height: 48px !important; }
+    /* legacy answer inputs drawn below the floor: fact families, the ordering row, the box-division scaffold */
+    html body .mq-scell input.fact-family-input, html body .mq-scell input.number-family-input { min-width: 48px !important; min-height: 48px !important; }
+    html body :is(.online-edition, .mq-scell) input.ws-order-input { min-width: 48px !important; min-height: 48px !important; box-sizing: border-box; }
+    html body :is(.mq-scell, #visualAid) :is(input.bx-roof, input.bx-rem, input.bx-sub) { min-width: 48px !important; min-height: 48px !important; box-sizing: border-box; }
+}

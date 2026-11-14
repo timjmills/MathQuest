@@ -49,6 +49,11 @@
 //             A tap point is read after two frames and once the scroll and the box hold still; a miss is re-tapped once
 //             the same way and only a REPEATED miss is a finding (lf-checks de-flake; --no-retap = the old single tap,
 //             --touch-debug prints each miss that held on the re-tap).
+//   --geom    record each render's GEOMETRY DIGEST in the --json report (rows[].geom / hostRows[].geom: every element under the
+//             host root as "tag.class x,y wxh" rounded to 0.5 px from the root's corner, plus its hash), read before any probe
+//             moves the focus. Two runs (HEAD and a base tree via MQ_ROOT) diffed by key list exactly which screens a CSS
+//             change moved: the hash-proof of a screen-only change (lf-checks touch-target floor, 2026-11-13). --shots also
+//             saves the worksheet / quiz host (`<WxH>-<cat>-<skill>-<host>.png`).
 //   --print-widths  print the widths the run would render (`widths: 820,...`) and exit (ws-screen-widths-plan)
 //   --fixture FILE  the card checks (PROBE + the CELL-READ kind match) on a saved card page (backtest rows; lf-hosts r2 F3)
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
@@ -281,6 +286,25 @@ function TARGETS(rootSel) {
         }
     }
     return [...groups.entries()].map(([k, n]) => `${n} x ${k}`);
+}
+
+/* In the page: the geometry digest (--geom). Every element under `rootSel` (the roots too), in DOM order, as "tag.class
+   x,y wxh" from the first root's corner, rounded to 0.5 px; caret / focus states do not move boxes, so the list is stable for a
+   seed. Returns {n, hash, lines}. */
+function GEOM(rootSel) {
+    const roots = Array.from(document.querySelectorAll(rootSel));
+    if (!roots.length) return { n: 0, hash: '0', lines: [] };
+    const o = roots[0].getBoundingClientRect();
+    const r2 = (v) => Math.round(v * 2) / 2;
+    const lines = [];
+    for (const rt of roots) for (const el of [rt, ...rt.querySelectorAll('*')]) {
+        const r = el.getBoundingClientRect();
+        const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter((c) => c && !/^mq-(active|live-|wd-)/.test(c)).slice(0, 3).join('.') : '';
+        lines.push(`${el.tagName.toLowerCase()}${cls ? '.' + cls : ''} ${r2(r.left - o.left)},${r2(r.top - o.top)} ${r2(r.width)}x${r2(r.height)}`);
+    }
+    let h = 2166136261;
+    for (const ch of lines.join('\n')) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    return { n: lines.length, hash: h.toString(16), lines };
 }
 
 /* In the page: TOUCH-UNIQUE (lf-hosts critic r1 F4: the word-work answer boxes drew 44 px on a 47 px pitch, so their 48 px
@@ -638,7 +662,7 @@ async function main() {
     if (has('self-test')) return selfTest();
     if (has('fixture')) { ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean); return fixtureRun(arg('fixture')); }
     const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
-    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check', 'print-widths', 'no-retap', 'touch-debug']);
+    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check', 'print-widths', 'no-retap', 'touch-debug', 'geom']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -698,8 +722,10 @@ async function main() {
                         await cardReady(page);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.GEOM = ${GEOM};`);
+                        const geom = has('geom') ? await page.evaluate(() => window.GEOM('#questionCard')) : null;
                         m = await page.evaluate(PROBE);
+                        if (geom) m.geom = geom;
                         // FOCUS-RING moves the focus, so it runs after PROBE (and puts it back)
                         if (!m.error) for (const t of await page.evaluate(() => window.RINGS('#questionCard'))) m.findings.push({ rule: 'FOCUS-RING', msg: t });
                         // CELL-READ kind match (lf-hosts critic r2 F3)
@@ -712,7 +738,7 @@ async function main() {
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
                     if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `${label ? 'sibling-' : ''}${size.w}x${size.h}-${c}-${k}-${it + 1}.png`) }); }
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
-                    out.push({ skill: s, size: `${size.w}x${size.h}`, item: it + 1, focus: m.focus, ones: m.onesHow || null, inputs: m.inputs, findings: m.findings });
+                    out.push({ skill: s, size: `${size.w}x${size.h}`, item: it + 1, focus: m.focus, ones: m.onesHow || null, inputs: m.inputs, findings: m.findings, ...(m.geom ? { geom: m.geom } : {}) });
                     say(`${tag}: ${m.findings.length ? 'FAIL' : 'ok'} (focus ${m.focus}${m.columnItem ? ` (column: ones first, the ones box by ${m.onesHow || 'entry order'})` : ''}, ${m.inputs} answer box(es), paper ${m.paperW} px)${m.findings.length ? '\n' + m.findings.map((f) => `    ${f.rule} ${f.msg}`).join('\n') : ''}`);
                 }
                 // the online worksheet and the quiz at the same width (TOUCH-TARGET and CELL-READ; once per width)
@@ -752,8 +778,12 @@ async function main() {
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await hostReady(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper');
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.GEOM = ${GEOM};`);
+                        const hsel = host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper';
+                        const geom = has('geom') ? await page.evaluate((sel) => window.GEOM(sel), hsel) : null;
+                        if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `${label ? 'sibling-' : ''}${size.w}x${size.h}-${c}-${k}-${host}.png`) }); }
                         m = await page.evaluate(HOST_PROBE, host);
+                        if (geom) m.geom = geom;
                         if (host === 'quiz') for (const t of await page.evaluate((sel) => window.RINGS(sel), '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'FOCUS-RING', msg: t });
                         if (!ONLY.length || ONLY.includes('TOUCH-HIT')) for (const t of await touchHit(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'TOUCH-HIT', msg: t });
                         m = keep(m);
@@ -767,7 +797,7 @@ async function main() {
                     if (!m) continue;
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
-                    hostRows.push({ skill: s, size: `${size.w}x${size.h}`, host, cards: m.cards, findings: m.findings });
+                    hostRows.push({ skill: s, size: `${size.w}x${size.h}`, host, cards: m.cards, findings: m.findings, ...(m.geom ? { geom: m.geom } : {}) });
                     say(`${tag}: ${m.findings.length ? 'FAIL' : 'ok'} (${m.cards} cell(s))${m.findings.length ? '\n' + m.findings.map((f) => `    ${f.rule} ${f.msg}`).join('\n') : ''}`);
                     await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                 }

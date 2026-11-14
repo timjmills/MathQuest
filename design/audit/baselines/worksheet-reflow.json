@@ -7,18 +7,18 @@
   "placevalue:expand@820": {
    "cards": 6,
    "cols": 1,
-   "cardH": 234.8,
+   "cardH": 238,
    "cardW": 756,
    "boxW": 101.1,
-   "boxH": 75.3,
+   "boxH": 78.5,
    "digit": 18,
    "cardHs": [
-    234.8,
-    234.8,
-    234.8,
-    234.8,
-    234.8,
-    234.8
+    238,
+    238,
+    238,
+    238,
+    238,
+    238
    ],
    "digits": [
     18,
@@ -60,7 +60,8 @@
      409.3
     ]
    ],
-   "slotXsFrom": "a8258e3f3"
+   "slotXsFrom": "a8258e3f3",
+   "repinned": "lf-checks touch floor 2026-11-14 (the 50 px boxed-slot floor grew expand's 48 px boxes)"
   },
   "subtraction:sub_100_no_regroup@820": {
    "cards": 6,
@@ -325,18 +326,18 @@
   "placevalue:expand@1024": {
    "cards": 6,
    "cols": 2,
-   "cardH": 312.1,
+   "cardH": 318.6,
    "cardW": 478,
    "boxW": 101.1,
-   "boxH": 75.3,
+   "boxH": 78.5,
    "digit": 18,
    "cardHs": [
-    312.1,
-    312.1,
-    312.1,
-    312.1,
-    312.1,
-    312.1
+    318.6,
+    318.6,
+    318.6,
+    318.6,
+    318.6,
+    318.6
    ],
    "digits": [
     18,
@@ -378,7 +379,8 @@
      36.5
     ]
    ],
-   "slotXsFrom": "a8258e3f3"
+   "slotXsFrom": "a8258e3f3",
+   "repinned": "lf-checks touch floor 2026-11-14 (the 50 px boxed-slot floor grew expand's 48 px boxes)"
   },
   "subtraction:sub_100_no_regroup@1024": {
    "cards": 6,
@@ -643,18 +645,18 @@
   "placevalue:expand@1280": {
    "cards": 6,
    "cols": 2,
-   "cardH": 231.2,
+   "cardH": 235.3,
    "cardW": 560,
    "boxW": 101.1,
-   "boxH": 75.3,
+   "boxH": 78.5,
    "digit": 18,
    "cardHs": [
-    231.2,
-    231.2,
-    231.2,
-    231.2,
-    231.2,
-    231.2
+    235.3,
+    235.3,
+    235.3,
+    235.3,
+    235.3,
+    235.3
    ],
    "digits": [
     18,
@@ -696,7 +698,8 @@
      409.3
     ]
    ],
-   "slotXsFrom": "a8258e3f3"
+   "slotXsFrom": "a8258e3f3",
+   "repinned": "lf-checks touch floor 2026-11-14 (the 50 px boxed-slot floor grew expand's 48 px boxes)"
   },
   "subtraction:sub_100_no_regroup@1280": {
    "cards": 6,
@@ -961,18 +964,18 @@
   "placevalue:expand@1366": {
    "cards": 6,
    "cols": 2,
-   "cardH": 231.2,
+   "cardH": 235.3,
    "cardW": 566,
    "boxW": 101.1,
-   "boxH": 75.3,
+   "boxH": 78.5,
    "digit": 18,
    "cardHs": [
-    231.2,
-    231.2,
-    231.2,
-    231.2,
-    231.2,
-    231.2
+    235.3,
+    235.3,
+    235.3,
+    235.3,
+    235.3,
+    235.3
    ],
    "digits": [
     18,
@@ -1014,7 +1017,8 @@
      409.3
     ]
    ],
-   "slotXsFrom": "a8258e3f3"
+   "slotXsFrom": "a8258e3f3",
+   "repinned": "lf-checks touch floor 2026-11-14 (the 50 px boxed-slot floor grew expand's 48 px boxes)"
   },
   "subtraction:sub_100_no_regroup@1366": {
    "cards": 6,
