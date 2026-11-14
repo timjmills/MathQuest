@@ -27,6 +27,7 @@
 //                        word or a dash that some number-name item ON THAT SHEET has (critic live1 r2 N6: "Rule: Every box gets
 //                        a digit." over written words on a line; "Remember: A number name says the hundreds, then the rest."
 //                        over two-digit numbers).
+// --seeds N (default 8) hashed seeds a role plus --seed-list (default 913052, critic live2 N9); --deals 'band 1000,...' limits the deals.
 // Prints `ws-pv-words-pages: OK` / `FAIL (n)` last; exits 1 on FAIL. --show N prints N findings (default 30).
 const H = require('../lib/ws-harness.cjs');
 
@@ -36,10 +37,14 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
 const ONLY = arg('only', '') ? list(arg('only')) : null;
 const on = (id) => !ONLY || ONLY.includes(id);
 const SIZES = list(arg('sizes', 'M,L'));   // (owner, 2026-11-13: print size S is dropped)
-const NSEED = Number(arg('seeds', 3));
+// (critic live2 N9: 3 seeds missed a band-1000 Guided page with 'one thousand' under the hundreds Steps - seed 913052; 8 seeds
+// find it, and the fixed --seed-list is dealt on every role besides)
+const NSEED = Number(arg('seeds', 8));
+const FIXED = list(arg('seed-list', '913052')).map(Number);
+const DEAL_ONLY = arg('deals', '') ? list(arg('deals')) : null;
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 // (the Scripted Model deals ONE worked example a page: four times the seeds, so its kinds are sampled as widely)
-const seedsFor = (role) => Array.from({ length: role === 'scripted-model' ? NSEED * 4 : NSEED }, (_, k) => (hash(`composing__number_word_form:${role}`) + k * 7919) % 1000000);
+const seedsFor = (role) => [...new Set([...Array.from({ length: role === 'scripted-model' ? NSEED * 4 : NSEED }, (_, k) => (hash(`composing__number_word_form:${role}`) + k * 7919) % 1000000), ...FIXED])];
 // (critic live1 N1 / N2: the to_words deals and the H T O boxes at 1,000 too - the first version read only words to numeral)
 const DEALS = [['default', null], ['band 20', { band: 20 }], ['band 100', { band: 100 }], ['band 1000', { band: 1000 }],
     ['band 1000 hto', { band: 1000, answerSlot: 'hto' }], ['band 100 hto', { band: 100, answerSlot: 'hto' }],
@@ -96,7 +101,8 @@ function leak(hint, n, way, name) {
 /** GUIDED-HINT-GARBLE: a hint that does not read as English - a template filled with 'no' ("the no is"), a doubled word, a hole. */
 function garble(hint) {
     const t = String(hint);
-    const m = /\bthe no\b|\bno is\b|\b(\w+)\s+\1\b|undefined|NaN|\$\{|\bnull\b/i.exec(t);
+    // (critic live2 N9: two place words in a row - '"one thousand hundred": ___ in the hundreds.')
+    const m = /\bthe no\b|\bno is\b|\b(\w+)\s+\1\b|\b(?:thousands?|hundreds?)\s+(?:thousands?|hundreds?|tens|ones)\b|undefined|NaN|\$\{|\bnull\b/i.exec(t);
     return m ? m[0] : '';
 }
 // (round-cap r3, critic live1 r2 N3 / N6: 11 and 12 have no ones word, so they are their own kind; 0 and the one-word names
@@ -199,6 +205,7 @@ function ruleMisfits(text, cells) {
     const bad = [];
     let hints = 0, pages = 0, items = 0;
     for (const role of ROLES) for (const size of SIZES) for (const [tag, opts] of DEALS) for (const seed of seedsFor(role)) {
+        if (DEAL_ONLY && !DEAL_ONLY.includes(tag)) continue;
         const r = await page.evaluate(async ({ role, size, seed, opts }) => {
             try {
                 const r = await window.buildSheet({ role, sections: [{ skills: [Object.assign({ categoryId: 'composing', skillId: 'number_word_form' }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true });
