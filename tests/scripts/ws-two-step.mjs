@@ -603,7 +603,7 @@ async function guidedMode() {
     if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
     const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
     const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
-    const out = [];
+    const out = [], exempts = [];
     let judged = 0;
     const app = await H.open({});
     try {
@@ -613,17 +613,30 @@ async function guidedMode() {
             const r = await app.page.evaluate(async (a) => {
                 let s;
                 try { s = await window.buildSheet({ role: 'guided', sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true }); } catch (e) { return { err: String(e && e.message || e) }; }
-                const d = document.createElement('div'); d.innerHTML = s.pupilHtml || '';
-                const p1 = d.querySelector('.ws-page');
-                const cells = p1 ? [...p1.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]')).length : 0;
-                return { cells, pages: d.querySelectorAll('.ws-page').length };
+                const d = document.createElement('div'); d.innerHTML = s.pupilHtml || ''; document.body.appendChild(d);
+                await document.fonts.ready;
+                const top = (pg) => (pg ? [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]')) : []);
+                const pages = [...d.querySelectorAll('.ws-page')];
+                const mm = (el) => (el ? Math.round(el.getBoundingClientRect().height * 25.4 / 96) : 0);
+                const c1 = top(pages[0]), c2 = top(pages[1]);
+                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]) };
+                d.remove();
+                return r;
             }, { sk, size, seed });
             if (r.err) { out.push(`GUIDED-MODEL-ALONE ${sk} ${size} seed ${seed}: buildSheet threw ${r.err}`); continue; }
             judged++;
-            if (r.cells < 2) out.push(`GUIDED-MODEL-ALONE ${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (${r.cells} cell, ${r.pages} pages)`);
+            // EXEMPT (lead rulings 2026-11-14, two-step card decision 4 amended): the two-step family at L (the Model and a try do not
+            // fit one L page even with the Guided bar off), and multi_step_word (Visual) / multi_step_word_plain at M too ((Visual)
+            // keeps its bar - it is the skill's point; _plain's column work is taller). Reported with the measured heights.
+            const exempt = size === 'L' || /^multi_step_word(_plain)?$/.test(sk);
+            if (r.cells < 2) {
+                const msg = `${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (Model ${r.model} mm, first try ${r.firstTry} mm; ${r.pages} pages)`;
+                if (exempt) exempts.push(msg); else out.push(`GUIDED-MODEL-ALONE ${msg}`);
+            }
         }
     } finally { await app.close(); }
-    console.log(`GUIDED-MODEL-ALONE ${out.length ? `FAIL ${out.length}` : 'PASS'} (${judged} Guided sheet(s))`);
+    console.log(`GUIDED-MODEL-ALONE ${out.length ? `FAIL ${out.length}` : 'PASS'} (${judged} Guided sheet(s), ${exempts.length} exempt by ruling)`);
+    for (const e of exempts.slice(0, VERBOSE ? 99 : 6)) console.log(`  EXEMPT ${e}`);
     for (const f of out.slice(0, 40)) console.log(`  ${f}`);
     console.log(out.length ? `${TOOL}: FAIL (--guided: ${out.length} finding(s))` : `${TOOL}: OK (--guided: GUIDED-MODEL-ALONE, ${judged} sheet(s))`);
     process.exit(out.length ? 1 : 0);
