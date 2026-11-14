@@ -41,6 +41,18 @@ export const MATCH3_PIC_BOX = Object.freeze({ S: [43, 25.4], M: [45, 26.7], L: [
 // stays within 10 % of it with room to spare: EB-FOOT 15 % at the old 46 and the 52.7 mm cell)
 export const MATCH3_H = Object.freeze({ S: 47, M: 46, L: 48 });
 
+/** The tallest picture a Match 3 row draws (mm), read from each picture's printed width and aspect ratio; null when a picture
+ *  does not say (then the row keeps the full-height layout). */
+export function flatDrawnMm(picsHtml) {
+    let max = 0; let n = 0;
+    for (const [, s] of String(picsHtml).matchAll(/<svg class="mq-vpic"[^>]*style="([^"]*)"/g)) {
+        const w = /(?:^|;)width:([\d.]+)mm/.exec(s); const a = /aspect-ratio:([\d.]+) \/ ([\d.]+)/.exec(s);
+        if (!w || !a || !(Number(a[1]) > 0)) return null;
+        max = Math.max(max, Number(w[1]) * Number(a[2]) / Number(a[1])); n++;
+    }
+    return n ? max : null;
+}
+
 /** The letters, in word-row order: the key. */
 export const match3Letters = (p) => (p.order || [0, 1, 2]).map((i) => LET[i]);
 
@@ -115,7 +127,17 @@ register(MATCH3_TEMPLATE, {
         // (lf-vocab r16b, top of the box: and the capped work sits at the TOP of a taller cell - margin-bottom:auto wins over a cell that
         // centres its content (the lesson's practice pages, 76 mm rows: the 50 mm work started 10.7 mm below the top pad);
         // ws-print-lint L-TOPSTART)
-        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:50mm;margin-bottom:auto;';
+        // (lf-vocab deploy-2, ws-empty-band EB-BAND: a row of FLAT pictures - the growing-patterns set, vocabSet 8 - in a row
+        // shorter than the work's 50 mm cap plus its room (a Review's mixed band at M, 56-62 mm: pick3's Review deals a Match 3
+        // item of the earlier step there) put all the work's free height between the pictures and the words: 19.6 mm of a
+        // 61.7 mm cell, 31.7 %. A flat row's work is as tall as the middle of its natural height and the cell's, so the free
+        // height splits evenly between the pictures-words gap and the room under the words; still at most 50 mm (EB-FOOT) and
+        // at least 44 mm. A full-height row draws as before (its natural height is near the cap, the same box), so its markup
+        // is unchanged: ws-vocab-unit V23's pinned pupil pages. ws-backtest row vocab-match3-flat-review-band)
+        const drawnH = flatDrawnMm(pics);
+        const natMm = drawnH === null || drawnH >= picH - 1 ? null : 2 + drawnH + 2 + Math.max(side, (tp + 3) * 1.15 * 0.3528);
+        const capH = natMm === null ? 'height:100%;' : `height:min(50mm, max(44mm, calc((100% + ${Math.round(natMm * 10) / 10}mm) / 2)));`;
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : `min-height:44mm;${capH}max-height:50mm;margin-bottom:auto;`;
         // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
