@@ -865,3 +865,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-14 — Hotfix TOF-STEM: True or False? never states a false equation (lf-roles)
 - The shared True or False? role used an "a op b =" stem whenever a question had two operands, so 55 skills could print a false statement (count_by_tables: "3 x 12 = 12, 18, 24, 30, 36"; missing-part, 3-addend, story and mixed skills). The stem is now used only when it is true of the answer; otherwise "The answer is ...".
 - ws-tof-stem on precritic (--skill and --role true-false): 727 skills, 7,673 frames OK; backtest tof-stem PASS; passed skills' True or False? pages byte-identical; lesson baseline 1772 identical; content-audit OK.
+
+## 2026-11-14 — Deploy options panel (lf-partopts, critic r5 PASS: every criterion >= 8 at 1280/1366/1024/820) + ledger fix + no-size-s browser de-flake (lf-checks)
+- Teacher Options panel: the live sample is drawn whole and scaled (no sliced drawings), a too-wide drawing scrolls with a visible cue; the "?" tip button no longer takes the row's clicks ([hit] check + options-panel-hit row now on master). FU-1 (page count after M->L->M) is held with paused part B: its code (resnapPartOpts) is only on the lane branch.
+- Ledger: lf-checks' checks-from-critics fix (0 fail on master) + the panel's rows; stale duplicate rows from the merge removed. 4 panel rows remain WARNING, routed to lf-checks before 13:00 UTC.
+- ws-no-size-s --browser waits for the built size and re-clicks once on a miss (row nos-browser-settle-reclick).
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, frame-title, simple-print (one load failure, OK when run alone), screen-answer, pdf-preview, teacher-wrm, options-panel rows, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.
