@@ -15,6 +15,9 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
   0d7f143cc (LDIV-JOIN 0.00-0.05 mm), backtest two-step-ldiv-join-bracketsvg PASS. Lesson baseline re-pinned (101 pages: g3-oa8
   two-step, g3-oa9 input-output; 13 lane lessons newly pinned). Gates: ws-two-step all modes OK, boot OK, code-snapshot OK (739).
   word-work is not added to ws-ldiv-hug's modes: no dealt two-step step draws long division (all ÷ steps are facts).
+  POST-RESET QUEUE (lead 17:50): two_step_add_then_div Guided Model too tall to share its page with a try (M 219.8 mm vs 193.7 mm):
+  shorten the Model's worked lines so they cover BOTH steps briefly (critic: they explain Step 1 only), consider a more compact
+  story layout; then the Guided page holds Model + one try (GUIDED-MODEL-ALONE). A lone-Model page is ruled acceptable until then.
   AFTER THE RESET: the 40 re-pinned g3-oa9-input-output-rule pages (function-table work r1-r8) were NOT graded >= 8 by a critic
   (patterns critic r1 all FAIL, r2 none pass): a narrow look, FIRST on patterns critic r3's list (lead 2026-11-14: they ship with the two-step deploy as machine-check fixes to a not-yet-passed lesson).
 - 2026-11-14 ~07:00 TWO-STEP FAMILY READY TO DEPLOY (owner +10 %, stop $490). F6 closed: check ws-two-step --screen-align
