@@ -9,6 +9,45 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-14 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-tt, builder Opus medium: the rebuild after critic tt-r1 FAIL
+  7/8/7/8, design/status/lf-checks/critic-tt-r1.md). Fixes:
+  - D1 (blocker): the k2-multgrid floor (table by content, 48 px square spans) now sits in `@media (max-width: 1100px), (pointer:
+    coarse)`: tablets and touch screens keep 48 px squares, a 1280 / 1366 laptop keeps the chart's compact rows (the c24d
+    "after" grid is gone there). New ws-phone-card rule FIT-TOP (computer widths > 1100 px): the question text and the cell's
+    first row lie in view below the top bar as the card loads. Row `touch-floor-fit-top`: FAIL c24d069f5 (text top -57, "x" row
+    top -5 at 1366 x 768) -> OK 4236381bc. Shots: touch-target/multiplication__mult_chart_easy-card-{1366x768,1024x768}-r1-
+    {before,after}.png. The other floors (sign circle, letter box, boxed slot, long division, fact families, ordering, box
+    division) stay at every width: each moves a 1280 / 1366 screen by 1-5 px and keeps the box the same at every width, and the
+    critic judged those screens acceptable; the touch floor at a computer width is now SP-10's 44 px in both tools (48 is the
+    tablets', RUBRIC H6 / plan item 7).
+  - D4: tests/lib/touch-class.cjs is THE classifier (touchKind: working = carry / regroup / .mq-opswork / .mq-wwork /
+    [data-mq-work], except data-mq-kind sign / answer, an answer place; floorAt: tablet 48 / 44, computer and phone 44), used by
+    ws-phone-card TOUCH-TARGET, TOUCH and FOCUS-RING and by ws-grade-render's TARGET measure. Self-test (`node
+    tests/lib/touch-class.cjs --self-test`, also inside ws-phone-card --self-test). Row `touch-class-sign` (fixture: 46 px sign
+    FAIL, 48 px OK; the c24d tool said OK on the 46 px page).
+  - D5: GEOM leaves out the zoom button and 0-size nodes; `ws-phone-card --geom-diff BASE.json HEAD.json --out FILE` is the
+    committed diff (1 px tolerance; the transient `zoom-trigger` class is left out too), self-tested. changed-screens.txt
+    regenerated with it from two full --geom runs (43 skills: the 30 passed + the re-check list, 820 / 1024 / 1280 / 1366, card /
+    worksheet / quiz; base 7a5bc902c via MQ_ROOT): 516 screens, 114 changed. The mult_chart_easy card / worksheet / quiz at 1280
+    and 1366 are now UNCHANGED. Two listed lines are zoom-wiring timing, not this change (fact_family_sort 1366 card,
+    identify 1366 card: a rerun of both trees gives 0 of 2 changed).
+  - A consequence of D4, fixed here: once the sign circle is an answer place, FOCUS-RING read its black 3 px focus ring beside the
+    blue 4 px answer ring (64 findings on the 8 word-problem skills, base and head alike). The sign circle now takes the answer
+    ring when focused (additive, screen hosts only). Left as found: 24 FOCUS-RING findings on the place-value .pv-slotgroup
+    answer inputs (yellow #f2c200 outline, 1.68:1; on master too; lf-placevalue's).
+  - Verified: ws-backtest --row touch-floor-fit-top / touch-class-sign / touch-floor-wrappers PASS; ws-grade-render --gate
+    --no-print on the 43 skills at 820 / 1024: OK, 0 small targets; ws-lesson-baseline --check vs a 7a5bc902c pin: 334 hashes
+    identical (print untouched); ws-precritic --self-test OK; ws-phone-card --self-test OK (25); touch-class self-test OK (15);
+    ws-precritic-plan --checks-from-critics 190 pass / 48 exempt / 14 fail (was 188 / 47 / 14: none dropped); ws-no-phone-width
+    OK; ws-boot-smoke OK. Next: critic tt-r2.
+  - D3 (minor, not changed): the chart's printed products stay at the chart's own size. The 48 px squares are tablet-only now,
+    and the worksheet digit floor (29 px, SP table) is far above the chart's 13 px on master too: the whole chart's digit size is
+    the multiplication-chart owner's (facts lane) redesign, not this rule's.
+  - D2 (not this class; owner lf-hosts): long_div_2digit TOUCH-HIT bottom-edge misses are the bracket twin's TEXT overflowing
+    its grid track: the next row's digit span (screen-cell.js mq-opsdiv, inline grid, digits at the digit font size in flex
+    spans) paints its line box 1-4 px over the bottom of the quotient input and of the working inputs above it, so a tap 1 px
+    inside the bottom edge lands on that span and focuses body. Same on master (22 / 22). Fix direction for lf-hosts: the printed
+    digit spans of the twin take pointer-events: none (or line-height: 1 inside the track).
 - 2026-11-14 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-tt from master 7a5bc902c, builder Opus medium): TOUCH FLOOR
   engine rule (hand-over item 4, the 820 / 1024 touch-target re-check). lf-placevalue live1's floor
   `html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-height: 50px !important; }` was NOT on master; it is added
