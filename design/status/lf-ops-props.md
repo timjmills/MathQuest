@@ -482,3 +482,26 @@ Each finding: check first (FAILs on 8f76b6401), then the fix; backtest row; ledg
 
 ## Queued after the weekly reset (lead 2026-11-14)
 - integers:add_int, range −23..1: the number-line labels touch (lf-engine -roles critic r2 F6). Planned check LABEL-GAP; the ledger row is in CHECKS_FROM_CRITICS. Fix when the budget returns: check first, then the fix.
+
+## cbt r3 last fix step (2026-11-14, Opus medium, $10 cap) - the three role-cover print-lint reds
+Each check first: the ws-print-lint rule FAILs on 9cf4d4a54 for that role / option and PASSes on the fix (backtests below).
+- Opener M, spaces=line, SL-1 x40 -> 0 (M and L): the Opener's tight row gave a Lines slot only its digits' width (7 mm floor,
+  9.4 mm drawn); count-row tightGeom now floors it at LINE_ROOMY_MM (14 mm) at M / L, as the Independent page does. Digits
+  unchanged; E5 inset kept. Commit 1112b857f; backtest `cbt-r3-opener-lines-sl1`.
+- Error analysis L, spaces=line, CL40-INK x4 -> 0 (M / L, defaults and spaces=line): a top-started REDO count row's
+  "<Name> wrote:" tag starts past --ws-koin + 0.5 mm (the arrays-turn / Reason It inset); the row and cell height do not move,
+  E6 top start kept. Commit b8da2b407; backtest `cbt-r3-ea-lines-cl40`.
+- True or False? L-KEY AK-2 (lead approval 2026-11-14): true-false.js marks a TRUE frame `mq-tofblank`; AK-2 leaves out only blank
+  slots inside `.mq-tf .mq-tofblank`. Self-tests: TRUE frame blank (does not fire); FALSE frame blank, an unmarked slot beside a
+  TRUE frame, a mark outside a True or False? cell (all fire). Commit 39bd019f6; backtest `cbt-r3-ak2-tofblank`. LEAD_DECISIONS
+  row beside the Scripted Model AK-2 entry.
+- Ledger rows: CHECKS_FROM_CRITICS (2026-11-14, lf-ops-props, cbt r3), three rows, armed. ws-backtest 3 PASS; precritic-plan OK.
+- Precritic --skill multiplication:count_by_tables --strict (pre-merge tree 39ba837f9; logs /tmp/mq-precritic/20261114-092926-12833):
+  48 PASS, 5 FAIL. Role-cover has NO print-lint red left. Remaining: sibling-compare NO-SIBLING (structural); empty-band and
+  role-cover band = the routed classes (opener EB-BAND M / L, lesson EB-BAND + EB-VOCAB M p2 (lf-engine), Guided M EB-REFILL
+  (lf-roles)), plus review L jumps=15 EB-BAND 28.3 % (8.7 vs 8.6 mm, cells 4 / 5) - not ledgered, new name in this list;
+  worksheet-reflow: only placevalue:expand@820 / 1024 (not this lane, red with these changes stashed).
+- Master e9cb5797c merged (12e7176c0): conflicts css/screen-cell.css, worksheet.js (both sides kept), backtests.json (rows merged
+  by id; divship's newer screen-support-eq-divfacts / screen-ink-size-divfacts rows taken, our cc-*-cbt rows kept - no size S).
+  After the merge: boot-smoke OK, code-snapshot OK, print-lint self-test OK, the three lints OK, precritic-plan OK. The full
+  precritic was not re-run on the merged tree (budget cap).
