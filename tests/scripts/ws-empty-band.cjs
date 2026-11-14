@@ -61,6 +61,11 @@
 //             same sheet built with no tags (buildSheet `ebItem: false`): the tags change nothing a pupil sees (critic ebitem-r1
 //             m3, its parity probe). With --html: the fixture's <template id="eb-key"> / <template id="eb-plain">.
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
+//   EB-LASTPAGE (with --page-fill; lf-ops critic cbt r3 F1) the LAST (or only) page of a fixed-capacity role (pre-skill-check,
+//             true-false, reason-it, error-analysis, test) with 30 % or more of its body empty when its next row fits; every other
+//             role's last page is measured and noted. --self-test checks it.
+//   CAP-PARITY (with --page-fill; same root cause) items a page at L < ceil(0.7 x items a page at M) for the same skill, role and
+//             seed while the L page is not full (another row fits). The counts are noted. --self-test checks it.
 //   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
 //             its size: 10 / 8 / 6 at S / M / L, plus the Model(s) (lead ruling 2026-11-12, lf-ops facts-roles option b: the fact
@@ -125,6 +130,22 @@ const argv = process.argv.slice(2);
 const GDP_CAP = { S: 10, M: 8, L: 6 };
 const gdpCap = (role, size, tries) => (role === 'guided' && GDP_CAP[size] != null && Number.isFinite(tries) && tries > GDP_CAP[size]
     ? `${tries} scored tries on the Guided page(s) at ${size}; the §12.1 ceiling is ${GDP_CAP[size]} plus the Model` : null);
+// EB-LASTPAGE (lf-ops critic cbt r3 F1, 2026-11-14): EB-PAGE judged only pages BEFORE a role's last, so a ONE-page fixed-capacity
+// role was never measured (count_by_tables Pre-skill check L: an 84 mm foot, ~35 % of the body, 10 items against 16 at M). The last
+// (or only) page of a role whose count the ROLE fixes is judged like any other page: FAIL at >= 30 % empty when its next row fits
+// (white >= one row). A teacher-count role (independent, more-practice ...) may end short on its last page: measured, reported as a note.
+// pg: {pct, whiteMm, rowMm} of the page (rowMm: its median top-level cell height).
+const FIXED_CAP_ROLES = new Set(['pre-skill-check', 'true-false', 'reason-it', 'error-analysis', 'test']);
+const rowFits = (pg) => !!pg && Number.isFinite(pg.rowMm) && pg.rowMm > 0 && pg.whiteMm >= pg.rowMm;
+const lastPageBad = (role, pg) => (FIXED_CAP_ROLES.has(role) && pg && pg.pct >= 30 && rowFits(pg)
+    ? `${pg.pct} % of the last page body is empty under its last block (${pg.whiteMm.toFixed(1)} mm; its next ${pg.rowMm.toFixed(1)} mm row fits; limit 30 %): the role fixes its count, so the page must fill` : null);
+// CAP-PARITY (same root cause): items a page at L >= ceil(0.7 x items a page at M), for the same skill, role and seed, unless the
+// L page is full (its fill measure: no room for another row). m / l: {items, full} of page 1 at M and at L.
+const capParityBad = (m, l) => {
+    if (!m || !l || !(m.items > 0) || !(l.items >= 0)) return null;
+    const need = Math.ceil(0.7 * m.items);
+    return l.items < need && !l.full ? `${l.items} items a page at L against ${m.items} at M (needs >= ${need} = ceil(0.7 x ${m.items})), and the L page is not full (another row fits)` : null;
+};
 // EB-GRIDFOOT (opt-in --grid-foot): the verdict on one Test / Review render (null = fine). pages: its page count; whiteMm: the white
 // under the grid on its page; rowMm: one row's height (the median cell); cols / indCols: its columns and the Independent page's.
 // teacherFootBad: the --columns tolerance (CL-2c): white under the grid over 25 % of the body on a one-page practice / Test / Review.
@@ -162,7 +183,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -384,6 +405,24 @@ if (argv.includes('--self-test')) {
         for (const [n, got, want] of xbad) console.log(`self-test FAIL: ${n}: ${got}, want ${want}`);
         if (xbad.length) { console.log(`ws-empty-band self-test: FAIL (ebitem / slot-ink notes)`); process.exit(1); }
     }
+    {   // EB-LASTPAGE / CAP-PARITY (lf-ops critic cbt r3 F1): the count_by_tables Pre-skill check L (one page, 35 % / 84 mm empty,
+        // rows 42 mm; 10 items vs 16 at M) FAILS both; a full page, a teacher-count role, or a foot shorter than its row PASS
+        const cbtL = { pct: 35, whiteMm: 84, rowMm: 42 };
+        const lc = [['cbt pre-skill-check L one page', !!lastPageBad('pre-skill-check', cbtL), true],
+            ['true-false last page 31 %, row fits', !!lastPageBad('true-false', { pct: 31, whiteMm: 70, rowMm: 50 }), true],
+            ['test last page 29 %', !!lastPageBad('test', { pct: 29, whiteMm: 70, rowMm: 30 }), false],
+            ['reason-it 40 % but the row does not fit', !!lastPageBad('reason-it', { pct: 40, whiteMm: 60, rowMm: 61 }), false],
+            ['independent last page ends short (teacher count)', !!lastPageBad('independent', cbtL), false],
+            ['no measure', !!lastPageBad('test', null), false],
+            ['CAP-PARITY cbt 10 vs 16, L not full', !!capParityBad({ items: 16, full: true }, { items: 10, full: false }), true],
+            ['CAP-PARITY 12 vs 16 (= ceil 11.2)', !!capParityBad({ items: 16 }, { items: 12, full: false }), false],
+            ['CAP-PARITY 11 vs 16 (< 12)', !!capParityBad({ items: 16 }, { items: 11, full: false }), true],
+            ['CAP-PARITY 6 vs 16 but the L page is full', !!capParityBad({ items: 16 }, { items: 6, full: true }), false],
+            ['CAP-PARITY no M count', !!capParityBad({ items: 0 }, { items: 3, full: false }), false]];
+        const lbad = lc.filter(([, v, w]) => v !== w);
+        for (const [n, , want] of lbad) console.log(`self-test FAIL: ${n} should ${want ? 'fail' : 'pass'}`);
+        if (lbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-LASTPAGE / CAP-PARITY)`); process.exit(1); }
+    }
     const cases = [['guided', 'S', 10, false], ['guided', 'S', 11, true], ['guided', 'M', 8, false], ['guided', 'M', 23, true], ['guided', 'L', 6, false],
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
@@ -408,7 +447,7 @@ if (argv.includes('--self-test')) {
         const cbad = cc.filter(([, got, want]) => got !== want);
         for (const [nm, , want] of cbad) console.log(`self-test FAIL: EB-BAND centred ${nm} should ${want ? 'fail' : 'pass'}`);
         const n = bad.length + kbad.length + cbad.length;
-        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length})`);
+        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length}; EB-LASTPAGE 6 + CAP-PARITY 5)`);
         process.exit(n ? 1 : 0);
     }).catch((e) => { console.log(`self-test FAIL: cannot import the sheet kit (${e.message})`); console.log('ws-empty-band self-test: FAIL'); process.exit(1); });
     return;
@@ -883,7 +922,7 @@ async function main() {
             const vlist = plan.variants || [];
             const step = vlist.length > NVAR ? vlist.length / NVAR : 1;
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
-            const jobs = [];
+            const jobs = []; const capRec = {};
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, cols: TCOLS, tag: `${role} ${size}${TCOLS ? ` cols ${TCOLS}` : ''}` });
             const vSize = ['L', 'M'].find((z) => SIZES.includes(z)) || SIZES[0];
             if (arg('roles', null) !== 'none') for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
@@ -963,13 +1002,24 @@ async function main() {
                             // (ONE-ROW, lead ruling R1 / R4a: a page of one row held to its work - layout.oneRowMm, mq-onerow - keeps the ruled strip)
                             // (tightened after critic r9: only while the white under it is shorter than its one row - else another row fits)
                             const og = pg.querySelector('.ws-grid.mq-onerow');
-                            if (og) { const b0 = (pg.querySelector('.ws-body') || pg).getBoundingClientRect(); const gr = og.getBoundingClientRect(); if (b0.bottom - gr.bottom < gr.height) return 0; }
+                            if (og) { const b0 = (pg.querySelector('.ws-body') || pg).getBoundingClientRect(); const gr = og.getBoundingClientRect(); if (b0.bottom - gr.bottom < gr.height) return { pct: 0, whiteMm: (b0.bottom - gr.bottom) / (96 / 25.4), rowMm: gr.height / (96 / 25.4), items: pg.querySelectorAll('.ws-grid.mq-onerow > [data-ws-cell]').length || 1 }; }
                             const body = pg.querySelector('.ws-body') || pg; const br = body.getBoundingClientRect();
                             const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
                             const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
-                            return Math.round(Math.max(0, br.bottom - last) / br.height * 100);
+                            const MM = 96 / 25.4;
+                            const tops = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]') && c.getBoundingClientRect().height > 0);
+                            const hs = tops.map((c) => c.getBoundingClientRect().height).sort((a, b) => a - b);
+                            return { pct: Math.round(Math.max(0, br.bottom - last) / br.height * 100), whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN, items: tops.length };
                         }), 'body > section.ws-page, body > .ws-page');
-                        pf.slice(0, -1).forEach((v, i) => { if (v >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                        pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                        // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
+                        if (pf.length) {
+                            const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp);
+                            if (why) F('EB-LASTPAGE', `${key} ${j.tag} p${pf.length}`, why);
+                            else notes.push(`${key} ${j.tag} EB-LASTPAGE p${pf.length}/${pf.length}: ${lp.pct} % empty (${lp.whiteMm.toFixed(1)} mm, row ${Number.isFinite(lp.rowMm) ? lp.rowMm.toFixed(1) : '-'} mm)${FIXED_CAP_ROLES.has(j.role) ? '' : ' - teacher-count role, measured not judged'}`);
+                        }
+                        // CAP-PARITY: page 1's items and fill, per role and size (judged after the skill's jobs)
+                        if (pf.length && !j.tag.includes('{')) capRec[`${j.role}${j.cols ? ` cols ${j.cols}` : ''}`] = Object.assign(capRec[`${j.role}${j.cols ? ` cols ${j.cols}` : ''}`] || {}, { [j.size]: { items: pf[0].items, full: !rowFits(pf[0]), pages: pf.length } });
                     }
                     if (has('grid-foot') && (j.cols ? /^(independent|more-practice|test|review)$/.test(j.role) : (j.role === 'test' || j.role === 'review')) && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
                         const gf = await sh.evaluate((scope) => {
@@ -1009,6 +1059,12 @@ async function main() {
                         for (const n of fr.notes) notes.push(`${key} ${j.tag} EB-FOOT ${n}`);
                         for (const x of fr.out) F('EB-FOOT', `${key} ${j.tag} p${x.c.page} cell ${x.c.label || x.c.cell}`, `drawn ${x.c.neededMm} mm, footprint hMm ${x.fp} mm at ${x.k} across${fr.mode === 'index' ? `, item ${x.ids.map((i) => i + 1).join('+')}` : ''} (${Math.round((x.c.neededMm - x.fp) / x.fp * 100)} %; limit ${FOOT * 100} %)`); }
                 } finally { await sh.close(); }
+            }
+            // CAP-PARITY (lf-ops critic cbt r3 F1): items a page at L >= ceil(0.7 x M) unless the L page is full; the counts are reported
+            for (const [rk, z] of Object.entries(capRec)) if (z.M && z.L) {
+                const why = capParityBad(z.M, z.L);
+                if (why) F('CAP-PARITY', `${key} ${rk} M/L`, why);
+                else notes.push(`${key} ${rk} CAP-PARITY: M ${z.M.items}/page, L ${z.L.items}/page${z.L.full ? ' (L page full)' : ''} - OK`);
             }
             // screen hosts
             // owner 2026-11-13: no phone width; the card at the computer / Chromebook and tablet widths (--widths overrides)

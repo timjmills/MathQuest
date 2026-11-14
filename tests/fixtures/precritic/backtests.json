@@ -11180,6 +11180,50 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-lastpage-cbt-pre-skill-check",
+   "check": "the last (or only) page of a fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test) is measured: FAIL at >= 30 % of its body empty when its next row fits (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check L, one page, 84 mm empty foot; EB-PAGE skipped a role's last page, so a one-page role was never measured)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check L p1 34 % empty (81.0 mm, its next 25.5 mm row fits)"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "the same commit, its other fixed-capacity roles: every last page full (no fix of F1 has landed: count_by_tables is parked; re-point the pass side to the fixing commit when cbt resumes)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only EB-LASTPAGE {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cap-parity-cbt-pre-skill-check",
+   "check": "for the same skill, role and seed, items a page at L >= ceil(0.7 x items a page at M) unless the L page is full (no room for another row) (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check 10 items at L against 16 at M, the L page not full)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band CAP-PARITY",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check M 16 / L 10 items a page (needs >= 12), L page not full"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "the same commit, its other fixed-capacity roles: L below 0.7 x M only where the L page is full (no fix of F1 has landed: re-point the pass side when cbt resumes)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only CAP-PARITY {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
