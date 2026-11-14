@@ -3,7 +3,7 @@ Title: Engine round on the shared role layouts (opener, mixed-practice, sections
 Session: session_01HVwpAE3g6EZH8idgErP6LP
 Branch: claude/sweet-newton-c8wrv1-lf-engine-roles
 Owner of files: sheet/roles/{opener,mixed-practice}.js, sheet/grid.js, sheet/roles/{answer-key,compose}.js (additive style param), tests/scripts/ws-print-lint.cjs (sections DN-2/PG-23), tests/fixtures/precritic/{backtests,sections-density}
-State: critic-ready (r3)
+State: critic-ready (r4)
 Updated: 2026-11-14
 Builder profile: mq-opus-medium
 Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
@@ -44,7 +44,6 @@ Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
   --all-lessons 1596 hashes identical. Merge with current master (33c7487cd) composes clean (only backtests.json
   appended-both conflict). ws-precritic-plan OK on the two skill backtest rows.
 
-## Resume here (round 3 critic-ready, 2026-11-14)
-Round 3 is built and gated: design/audit/runs/lf-engine-roles/CRITIC-READY-r3.md (gates, the % used table, PNGs in proof-r3/).
-Merged origin/master 7f2ca5e39 (master's SPILL kept beside the split / side-by-side paths). Next: the independent critic r3 on
-the head named in CRITIC-READY-r3.md. Opener-overflow pins re-taken on master 7f2ca5e39 (L-OVERFLOW, L-SPLIT, L-DENSITY, page-keyed).
+## Resume here (round 4 critic-ready, 2026-11-14)
+Round 4 (the lead's final round after critic r3) is built and gated: design/audit/runs/lf-engine-roles/CRITIC-READY-r4.md.
+Root cause of r3 F3 fixed (two-column Steps estimate, stepPairsMm); check SPILL-P1 on the render; proof-r4/ (18 Openers, M / L).

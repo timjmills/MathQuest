@@ -12035,7 +12035,7 @@
     "state": "add_wp_10k M: 107.8 mm of 239 mm white on page 1, page 2's first band 90.4 mm"
    },
    "pass": {
-    "commit": "139009042",
+    "commit": "eac68c891",
     "state": "add_wp_10k M one page (Model, Steps, Say, Guided)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_wp_10k --roles opener --size M --lints L-DENSITY",
