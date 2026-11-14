@@ -36,6 +36,10 @@ export const OPTION_GROUPS = [
     { id: 'difficulty', label: 'Harder / easier' },
     { id: 'support', label: 'Support' },
     { id: 'layout', label: 'Layout' },
+    // lane lf-ops t15 (owner, 2026-11-14): the x / ÷ fact drills' long "Multiply by" / "Divide by" tick list stands LAST, under
+    // its own heading, so "How it is written" and the Support choices are not hidden below 13 to 16 tick rows. Display order
+    // only: the option list (and so every share code) keeps its order.
+    { id: 'facts', label: 'Which facts' },
 ];
 const GROUP_BY_ID = {
     band: 'difficulty', range: 'difficulty', decimals: 'difficulty', constant: 'difficulty', regroup: 'difficulty',

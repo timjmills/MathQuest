@@ -1033,6 +1033,7 @@ export const factTableTop = (band) => (Number(band) === 100 ? 10 : Number(band) 
 const _opsTableConstant = (label, titleVerb) => {
     const c = constantOption(15, label, titleVerb);
     c.tableBand = true;
+    c.group = 'facts';      // the panel draws the tick list last, under "Which facts" (skill-options-ui.js OPTION_GROUPS)
     c.valueHide = (cur) => (factTableTop(cur && cur.band) < 15 ? [13, 14, 15] : []);
     return c;
 };
