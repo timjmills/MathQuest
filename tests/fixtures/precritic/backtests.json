@@ -10325,6 +10325,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "cbt-r2-e2-pre-quadrants",
+   "check": "critic cbt r2 E2 (H5, PT-PRE-1): the count_by_tables Pre-skill check drew ONE quadrant (its hand-named prerequisite list, print-sheet EARLIER_STEPS, named number_seq_fill only), ~75 % of the page empty at M and L; a hand-named prerequisite list names >= 3 live skills",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint PRE-QUADRANTS (opt-in; precritic node-lint-s1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree: EARLIER_STEPS names one prerequisite, no provider preSkills"
+   },
+   "pass": {
+    "commit": "f1d360bd6",
+    "state": "lf-ops cbt r3: provider preSkills - add a jump within 20, count by 10s, 5s, 2s (boxes)"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill multiplication:count_by_tables --rules PRE-QUADRANTS --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r2-e8-role-scope",
+   "check": "critic cbt r2 E8: count_by_tables 'All rows on one page' (for Independent, More practice and Test, its help says) leaked into the lesson anchor chart (one 13 pt line of 12) and Guided (9 compact rows, 9 mm boxes); an option whose help names its page types is off on every other role (provider roleOpts)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint ROLE-SCOPE (opt-in; precritic node-lint-s1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree: no roleOpts, onePage on every role"
+   },
+   "pass": {
+    "commit": "f1d360bd6",
+    "state": "lf-ops cbt r3: provider roleOpts drops onePage outside independent / more-practice / test"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill multiplication:count_by_tables --rules ROLE-SCOPE --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
- ]
+]
 }
