@@ -35,6 +35,18 @@
 //                by >= 2 mm (1 mm for an across fact: the kit's CL-40 contract) (finding 4: the "1" tab touched the "T" head of a rounding cell); ink, not boxes: a drawing by
 //                its shapes, text by its own run (a Range, not its element) from its glyphs' top (canvas text metrics)
 //     SHEET-2PG  a lesson sheet printed on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages ~38 % empty)
+//     CHART-HEAD (lf-engine chart-name, owner 2026-11-14) every ANCHOR CHART page, pupil and key: its header IS frame.js
+//                pageHeader's markup (the Name / Date line, the same type and the same rule as every page; the key's Name rule
+//                reads "Answer Key", AK-3); no Score unless the chart has a graded slot (then Score is there); the key's header
+//                fields and rule at the pupil page's places (+/- 0.5 mm); the header's type, row (height and overflow) and rule
+//                those of an ordinary page() of the same size; no overflow (page, body, cell, ink past the sheet); the chart fits
+//                its page (one pupil page and one key page, the page inside A4, sizing.ok). A detailed lesson's chart is not
+//                read too with --detailed (lead ruling 2026-11-14: Name / Date on EVERY anchor chart). `--rules CHART-HEAD`
+//                alone builds the chart part only (fast).
+//   --detailed all|id,id  (CHART-HEAD) the DETAILED lessons' anchor charts too (js/modules/lessons/detailed, role
+//                detailed-lesson, seed 4242; a detailed pack prints at L only, so --sizes does not apply): every chart of the
+//                pack (P2, and each chunk's P2b ...) and its key. Alone (no --only / --all-lessons) it reads only the detailed
+//                lessons. Each pack is built in the page with no protocol timeout (a pack can take minutes).
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
@@ -54,6 +66,9 @@ const PRACTICE = parseInt(arg('pages', '1'), 10);
 const CHECK = has('check');
 const NSEEDS = Math.max(1, parseInt(arg('seeds', '8'), 10));
 const LP = require('../lib/ws-lesson-lp.cjs');
+// `--rules CHART-HEAD` alone: build only the chart part of each lesson and read only its pages (no content seeds)
+const RULES_ARG = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+const CHART_ONLY = RULES_ARG.length > 0 && RULES_ARG.every((r) => r === 'CHART-HEAD');
 // the route step's title and its block's name, by step id (Y1.B1.S6 -> "Count on from any number", "Place value (within 10)")
 const STEPS = (() => { const m = new Map(); try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/curriculum/wrm-steps.json'), 'utf8'));
     for (const y of d.years || []) for (const b of y.blocks || []) for (const st of b.steps || []) m.set(st.id, { title: st.title, block: b.name }); } catch (e) { /* none */ } return m; })();
@@ -187,6 +202,106 @@ function tabMeasure() {
     });
 }
 
+/** CHART-HEAD (lf-engine chart-name): per page, its sheet id, the header's markup (the title text masked), the header row's
+ *  fields and the rule with their places (mm from the page's top-left), the graded slots, every overflow and whether the
+ *  page lies inside the A4 sheet. Read under print media. */
+function chartHeadMeasure(refs) {
+    const MM = 96 / 25.4;
+    const r1 = (v) => Math.round(v * 10) / 10;
+    // the header of an ordinary kit page (frame.js page()) of the same size, drawn in this document: its type and its rule
+    const typeOf = (head) => { if (!head) return null; const row = head.querySelector(':scope > .ws-rowA'), f = row && row.querySelector('.ws-field'), t = head.querySelector('.ws-title'), ru = head.querySelector(':scope > .ws-headrule');
+        const cs = (el) => (el ? getComputedStyle(el) : null);
+        return { field: f ? `${cs(f).fontFamily.split(',')[0]} ${cs(f).fontSize} ${cs(f).fontWeight}` : '', title: t ? `${cs(t).fontFamily.split(',')[0]} ${cs(t).fontSize} ${cs(t).fontWeight}` : '',
+            // (the row's own overflow: the kit's 11 mm fields in an 11 mm row spill 0.5 mm on EVERY page - the chart's may spill no more)
+            row: row ? `${r1(row.getBoundingClientRect().height / MM)} mm, overflow ${r1(Math.max(0, row.scrollHeight - row.clientHeight, row.scrollWidth - row.clientWidth) / MM)} mm` : '', rule: ru ? `${r1(ru.getBoundingClientRect().height / MM)} mm ${cs(ru).backgroundColor} ${cs(ru).borderTopWidth} ${cs(ru).borderBottomWidth}` : '' }; };
+    const refType = {};
+    for (const [sz, html] of Object.entries(refs || {})) {
+        const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:-3000px;top:0'; box.innerHTML = html; document.body.appendChild(box);
+        refType[sz] = typeOf(box.querySelector('header.ws-head')); box.remove();
+    }
+    return [...document.querySelectorAll('.ws-page')].map((pg) => {
+        const pr = pg.getBoundingClientRect();
+        const at = (el) => { const r = el.getBoundingClientRect(); return { x: r1((r.left - pr.left) / MM), y: r1((r.top - pr.top) / MM), w: r1(r.width / MM), h: r1(r.height / MM) }; };
+        const head = pg.querySelector(':scope > header.ws-head');
+        const row = head && head.querySelector(':scope > .ws-rowA');
+        const rule = head && head.querySelector(':scope > .ws-headrule');
+        const over = [];
+        const ov = (el, what) => { if (!el) return; const dy = el.scrollHeight - el.clientHeight, dx = el.scrollWidth - el.clientWidth;
+            if (dy > 1 || dx > 1) over.push(`${what} overflows by ${r1(Math.max(dy, dx) / MM)} mm ${dy >= dx ? 'down' : 'across'}`); };
+        ov(pg, 'the page'); ov(pg.querySelector(':scope > .ws-body'), 'the body');
+        pg.querySelectorAll('.ws-cell').forEach((c, k) => ov(c, `cell ${k + 1}`));
+        // ink outside the page's own box (a drawing or a strip pushed past the sheet edge)
+        for (const el of pg.querySelectorAll('.ws-body *, .ws-head *, .ws-foot')) {
+            const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+            const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+            const out = Math.max(pr.left - r.left, r.right - pr.right, pr.top - r.top, r.bottom - pr.bottom);
+            if (out > 0.5 * MM) { over.push(`${(el.className && el.className.baseVal !== undefined ? el.className.baseVal : el.className || el.tagName).toString().slice(0, 30)} runs ${r1(out / MM)} mm outside the page`); break; }
+        }
+        const foot = pg.querySelector(':scope > .ws-foot');
+        return {
+            sheet: pg.getAttribute('data-ws-sheet') || '',
+            dl: pg.getAttribute('data-dl-page') || '', dlKind: pg.getAttribute('data-dl-kind') || '',
+            head: head ? head.outerHTML.replace(/<div class="ws-title"[^>]*>[\s\S]*?<\/div>/, '<TITLE>') : '',
+            above: !!(head && head.classList.contains('ws-head--title-above')),
+            fields: row ? [...row.children].map((f) => ({ cls: f.className, text: (f.textContent || '').trim(), at: at(f) })) : [],
+            rule: rule ? Object.assign(at(rule), { bw: getComputedStyle(rule).borderTopWidth, bg: getComputedStyle(rule).backgroundColor, h: r1(rule.getBoundingClientRect().height / MM) }) : null,
+            titleFont: head && head.querySelector('.ws-title') ? getComputedStyle(head.querySelector('.ws-title')).fontSize : '',
+            fieldFont: row && row.querySelector('.ws-field') ? getComputedStyle(row.querySelector('.ws-field')).fontFamily.split(',')[0] + ' ' + getComputedStyle(row.querySelector('.ws-field')).fontSize : '',
+            type: typeOf(head), refType: refType[pg.getAttribute('data-ws-size') || 'L'] || null,
+            graded: pg.querySelectorAll('[data-ws-slot]:not([data-ws-graded="0"])').length,
+            scoreOf: (() => { const b = pg.querySelector('.ws-field.score b'); return b ? Number(String(b.textContent).replace(/\D/g, '')) || 0 : 0; })(),
+            pageMm: { w: r1(pr.width / MM), h: r1(pr.height / MM) },
+            footIn: foot ? foot.getBoundingClientRect().bottom <= pr.bottom + 0.5 * MM : false,
+            over,
+        };
+    });
+}
+
+/** CHART-HEAD's verdict on one lesson at one size: [{where, msg}]. `P` / `K` the pupil / key chart pages (chartHeadMeasure),
+ *  `want` {pupil, key} the pageHeader markup the kit draws for an unscored chart, title masked; `sizing` the build's
+ *  chartSizing; `parts` the build's part list. Pure. */
+function chartHeadVerdict({ id, size, P, K, want, sizing, parts }) {
+    const out = [];
+    const F = (w, msg) => out.push({ where: `${id} ${size} ${w}`, msg });
+    const cp = (parts || []).find((p) => p.part === 'chart');
+    if (!cp) { F('chart', 'no anchor chart part in the build'); return out; }
+    if (cp.pages !== 1 || cp.keyPages !== 1) F('chart', `the chart prints on ${cp.pages} page(s) and ${cp.keyPages} key page(s), not one each`);
+    if (!P.length || !K.length) { F('chart', `no chart page read (pupil ${P.length}, key ${K.length})`); return out; }
+    if (sizing && sizing.ok === false) F('chart', `the chart does not fit at its planned size (mode ${sizing.mode}, zoom ${sizing.zoom}${sizing.fallback ? ', fallback' : ''})`);
+    const one = (pg, kind, i) => {
+        const w = `${kind}-chart${i ? `-p${i + 1}` : ''}`;
+        if (!pg.head) { F(w, 'no header (header.ws-head) on the chart page'); return; }
+        const names = pg.fields.map((f) => f.cls);
+        if (!names.includes('ws-field name')) F(w, `no Name field on the header line (fields: ${names.join(', ') || 'none'})`);
+        if (!names.includes('ws-field date')) F(w, `no Date field on the header line (fields: ${names.join(', ') || 'none'})`);
+        const scored = pg.graded > 0;
+        if (!scored && names.includes('ws-field score')) F(w, 'a Score field on a chart with no graded slot');
+        if (scored && !names.includes('ws-field score')) F(w, `no Score field on a chart with ${pg.graded} graded slot(s)`);
+        // the markup IS pageHeader's (Name / Date, Score as the chart's slots say), title masked
+        const exp = scored ? null : want[kind][pg.above ? 'above' : 'below'];
+        if (exp && pg.head !== exp) F(w, `the header is not frame.js pageHeader's markup:\n      got  ${pg.head.slice(0, 220)}\n      want ${exp.slice(0, 220)}`);
+        if (!pg.rule) F(w, 'no header rule (.ws-headrule)');
+        // the same type and the same rule as an ordinary page's header of its size (frame.js page())
+        if (pg.type && pg.refType) for (const k of ['field', 'title', 'row', 'rule']) if (pg.type[k] !== pg.refType[k]) F(w, `header ${k} ${JSON.stringify(pg.type[k])}, an ordinary page's ${JSON.stringify(pg.refType[k])}`);
+        for (const o of pg.over) F(w, o);
+        if (pg.pageMm.h > 297.5 || pg.pageMm.w > 210.5) F(w, `the page is ${pg.pageMm.w} x ${pg.pageMm.h} mm, past A4`);
+        if (!pg.footIn) F(w, 'the footer is not inside the page');
+    };
+    P.forEach((pg, i) => one(pg, 'pupil', i));
+    K.forEach((pg, i) => one(pg, 'key', i));
+    // the key shows the line as the pupil page does: every field and the rule at the same place (+/- 0.5 mm), same type
+    const a = P[0], b = K[0];
+    if (a.head && b.head) {
+        if (a.fields.length !== b.fields.length) F('key-chart', `${b.fields.length} header fields on the key, ${a.fields.length} on the pupil page`);
+        a.fields.forEach((f, j) => { const g = b.fields[j]; if (!g) return;
+            const d = Math.max(Math.abs(f.at.x - g.at.x), Math.abs(f.at.y - g.at.y), Math.abs(f.at.w - g.at.w), Math.abs(f.at.h - g.at.h));
+            if (g.cls !== f.cls || d > 0.5) F('key-chart', `header field "${f.cls}" at ${JSON.stringify(f.at)} on the pupil page, "${g.cls}" at ${JSON.stringify(g.at)} on the key`); });
+        if (a.rule && b.rule && (Math.abs(a.rule.y - b.rule.y) > 0.5 || a.rule.h !== b.rule.h || a.rule.bw !== b.rule.bw)) F('key-chart', `the header rule at y ${b.rule.y} mm (${b.rule.h} mm) on the key, ${a.rule.y} mm (${a.rule.h} mm) on the pupil page`);
+        if (a.fieldFont !== b.fieldFont || a.titleFont !== b.titleFont) F('key-chart', `header type differs: pupil ${a.fieldFont} / ${a.titleFont}, key ${b.fieldFont} / ${b.titleFont}`);
+    }
+    return out;
+}
+
 function sheetCheck(page) {
     return page.evaluate(() => {
         const out = { pages: 0, problems: [], bands: [], stats: [], fonts: {} };
@@ -296,10 +411,22 @@ async function checkMain() {
             if (!ONLY || ONLY.split(',').includes(k)) LESSONS.push({ id: k, dir: skillId, spot: true, skill: { categoryId, skillId } }); }
     }
     const F = (rule, where, msg) => findings.push({ rule, where, msg });
+    // --detailed alone: the detailed lessons only
+    const DETAILED = arg('detailed', '');
+    if (DETAILED && !ONLY && !has('all-lessons')) LESSONS.length = 0;
+    // CHART-HEAD: the header frame.js pageHeader draws for an unscored page (pupil, and the key's with "Answer Key" on the
+    // Name rule, answer-key.js markKeyName), title masked; and an ordinary page() of each size, whose header type the chart's must match
+    const WANT = await page.evaluate(async () => {
+        const f = await import('./js/modules/sheet/frame.js'); const k = await import('./js/modules/sheet/roles/answer-key.js');
+        const mask = (h) => h.replace(/<div class="ws-title"[^>]*>[\s\S]*?<\/div>/, '<TITLE>');
+        const b = f.pageHeader({ title: 'T' }), a = f.pageHeader({ title: 'T', titlePos: 'above' });
+        return { pupil: { below: mask(b), above: mask(a) }, key: { below: mask(k.markKeyName(b)), above: mask(k.markKeyName(a)) },
+            refs: Object.fromEntries(['L', 'M'].map((sz) => [sz, f.page({ size: sz, header: { title: 'T' }, body: '' })])) };
+    });
     try {
         for (const l of LESSONS) {
             // content: several seeds (no layout)
-            const seeds = l.spot ? [] : Array.from({ length: NSEEDS }, (_, i) => (i === 0 ? 4242 : 1000 + i * 37));
+            const seeds = l.spot || CHART_ONLY ? [] : Array.from({ length: NSEEDS }, (_, i) => (i === 0 ? 4242 : 1000 + i * 37));
             for (const seed of seeds) {
                 const b = await page.evaluate(async ({ skill, seed }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size: 'L', paper: 'A4', seed, key: true, practicePages: 1, mixed: true });
                     return { pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed });
@@ -313,18 +440,23 @@ async function checkMain() {
             }
             // layout: seed 4242 at every size
             for (const size of SIZES) {
-                const built = await page.evaluate(async ({ skill, size }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true });
-                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size });
+                const built = await page.evaluate(async ({ skill, size, chartOnly }) => { try { const r = await window.buildSheet(Object.assign({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true }, chartOnly ? { parts: ['chart'] } : {}));
+                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), sizing: r.chartSizing || null }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, chartOnly: CHART_ONLY });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure), rg: await sh.evaluate(carryMeasure), tb: await sh.evaluate(tabMeasure) }; } finally { await sh.close(); } };
+                    if (CHART_ONLY) return { ch: await sh.evaluate(chartHeadMeasure, WANT.refs) };
+                    return { ch: await sh.evaluate(chartHeadMeasure, WANT.refs), lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure), rg: await sh.evaluate(carryMeasure), tb: await sh.evaluate(tabMeasure) }; } finally { await sh.close(); } };
                 const P = await read2(built.pupil), K = await read2(built.key);
                 // page index -> part, pupil and key
                 const map = (key) => { const o = []; for (const p of built.parts) for (let i = 0; i < (key ? p.keyPages : p.pages); i++) o.push({ part: p.part, i }); return o; };
                 const pm = map(false), km = map(true);
                 const where = (k, n) => `${l.id} ${size} ${k}-p${n + 1}`;
+                // CHART-HEAD (lf-engine chart-name): the anchor chart's Name / Date line, pupil and key
+                for (const x of chartHeadVerdict({ id: l.id, size, P: pm.map((m, n) => (m.part === 'chart' ? P.ch[n] : null)).filter(Boolean),
+                    K: km.map((m, n) => (m.part === 'chart' ? K.ch[n] : null)).filter(Boolean), want: WANT, sizing: built.sizing, parts: built.parts })) F('CHART-HEAD', x.where, x.msg);
+                if (CHART_ONLY) continue;
                 // the sheetCheck rows, per page (page N of the doc)
                 const bandsOf = (sc, n) => sc.bands.filter((x) => x.startsWith(`page ${n + 1} `) || x.startsWith(`page ${n + 1}:`));
                 pm.forEach((m, n) => {
@@ -374,25 +506,62 @@ async function checkMain() {
                 });
             }
         }
+        // --detailed (lead ruling 2026-11-14): every anchor chart of every detailed lesson pack, pupil and key
+        if (DETAILED) {
+            // (a pack can keep the page busy past puppeteer's 180 s protocol timeout: the same page, reconnected without one)
+            const conn = await require('puppeteer').connect({ browserWSEndpoint: app.browser.wsEndpoint(), protocolTimeout: 0, defaultViewport: null });
+            try {
+                const pg0 = (await conn.pages()).find((p) => p.url() === page.url());
+                const all = await pg0.evaluate(async () => (await import('./js/modules/lessons/detailed/index.js')).detailedLessonList().map((d) => d.id));
+                const ids = DETAILED === 'all' ? all : DETAILED.split(',').map((x) => x.trim()).filter(Boolean);
+                for (const id of ids) {
+                    if (!all.includes(id)) { F('CHART-HEAD', `detailed/${id}`, 'no such detailed lesson'); continue; }
+                    await pg0.evaluate(`window.__wsCH = undefined; window.buildSheet({ role: 'detailed-lesson', lessonId: ${JSON.stringify(id)}, seed: 4242, paper: 'A4', year: 2026 }).then((r) => { window.__wsCH = { html: r.html, sizing: r.chartSizing || [] }; }, (e) => { window.__wsCH = { error: String((e && e.message) || e) }; }); 0`);
+                    await pg0.waitForFunction(() => window.__wsCH !== undefined, { timeout: 0, polling: 500 });
+                    const b = await pg0.evaluate(() => window.__wsCH);
+                    if (b.error) { F('PC-BUILD', `detailed/${id}`, b.error.slice(0, 160)); continue; }
+                    const sh = await page.browser().newPage();
+                    let ch;
+                    try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
+                        await sh.setContent(b.html, { waitUntil: 'networkidle0', timeout: 120000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+                        await sh.emulateMediaType('print'); ch = await sh.evaluate(chartHeadMeasure, WANT.refs); } finally { await sh.close(); }
+                    // the pack's charts: P2, then each chunk's (P2b ...); pupil pages carry the id, key pages `<id>-key` (a teacher
+                    // page's small copy of the chart - a .ws-page nested in it, no data-dl-page - is not a printed chart page)
+                    const charts = [...new Set(ch.filter((x) => x.sheet === 'lesson-chart' && x.dl).map((x) => x.dl.replace(/-key$/, '')))];
+                    if (!charts.length) { F('CHART-HEAD', `detailed/${id}`, 'no anchor chart page in the pack'); continue; }
+                    for (const cid of charts) {
+                        const P = ch.filter((x) => x.sheet === 'lesson-chart' && x.dlKind === 'pupil' && x.dl === cid);
+                        const K = ch.filter((x) => x.sheet === 'lesson-chart' && x.dlKind === 'key' && x.dl === `${cid}-key`);
+                        const sz = (b.sizing.find((z) => z.id === cid) || {}).sizing || null;
+                        for (const x of chartHeadVerdict({ id: `detailed/${id}`, size: cid, P, K, want: WANT, sizing: sz, parts: [{ part: 'chart', pages: P.length, keyPages: K.length }] })) F('CHART-HEAD', x.where, x.msg);
+                    }
+                    console.log(`  detailed/${id}: charts ${charts.join(', ')}`);
+                }
+            } finally { conn.disconnect(); }
+        }
     } finally { await app.close(); }
     // one line per (rule, lesson, question, message) across seeds: "seeds 4242, 1037, ..."
     const merged = new Map();
     for (const x of findings) { const w = x.where.replace(/ seed \d+/, ''); const k = `${x.rule}|${w}|${x.msg.replace(/\d+(, \d+)*/g, '#')}`; const seed = (x.where.match(/seed (\d+)/) || [])[1];
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
-    const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const ONLY_RULES = RULES_ARG;
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'CHART-HEAD', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [
         { rule: 'SHEET-2PG', lesson: 'round', size: 'L', note: 'Y4.B1.S14 L lesson sheet re-flow (live-pm2 item 6) reverted after critic FAIL; item 6 redone separately - design/status/lf-engine.md' },
+        // (`msg`: the entry covers only the finding it names - the header findings of the same chart still FAIL)
+        { rule: 'CHART-HEAD', lesson: 'detailed/g3-oa8-two-step-wp', size: 'P2', msg: /does not fit at its planned size/, note: 'lesson 7 D1 (design/status/lessons-6-7.md): chartPage fallback zoom 0.77, open from lesson 7 critic r1; the lesson is paused' },
+        { rule: 'CHART-HEAD', lesson: 'detailed/g3-oa8-two-step-wp', size: 'P2b', msg: /does not fit at its planned size/, note: 'lesson 7 D1 (design/status/lessons-6-7.md): chartPage fallback zoom 0.7, open from lesson 7 critic r1; the lesson is paused' },
     ];
-    const known = findings.filter((x) => KNOWN.some((k) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `)));
+    const isKnown = (k, x) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `) && (!k.msg || k.msg.test(x.msg));
+    const known = findings.filter((x) => KNOWN.some((k) => isKnown(k, x)));
     { const keep = findings.filter((x) => !known.includes(x)); findings.length = 0; findings.push(...keep); }
-    for (const x of known) { const k = KNOWN.find((y) => y.rule === x.rule && x.where.startsWith(`${y.lesson} ${y.size} `)); console.log(`${x.rule.padEnd(12)} KNOWN ${x.where}: ${x.msg} [${k.note}]`); }
+    for (const x of known) { const k = KNOWN.find((y) => isKnown(y, x)); console.log(`${x.rule.padEnd(12)} KNOWN ${x.where}: ${x.msg} [${k.note}]`); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); const kn = known.filter((x) => x.rule === r).length; console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}${kn ? ` (+ KNOWN ${kn})` : ''}` : kn ? `KNOWN ${kn}` : na === CORE_N && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); const SHOWN = has("all") ? 1e9 : 8; for (const x of fs2.slice(0, SHOWN)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > SHOWN) console.log(`   ... ${fs2.length - SHOWN} more`); }
-    if (na < CORE_N && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
-    console.log(`(${LESSONS.length} lessons, ${NSEEDS} seeds, sizes ${SIZES.join(',')}; ${read} prerequisite items read)`);
+    if (!CHART_ONLY && CORE_N && LESSONS.length && na < CORE_N && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
+    console.log(`(${LESSONS.length} lessons${arg('detailed', '') ? ` + detailed ${arg('detailed', '')}` : ''}, ${NSEEDS} seeds, sizes ${SIZES.join(',')}; ${read} prerequisite items read)`);
     console.log(`ws-lesson-samples --check: ${findings.length ? `FAIL (${findings.length})` : 'OK'}`);
     process.exit(findings.length ? 1 : 0);
 }

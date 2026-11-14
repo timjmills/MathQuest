@@ -6,7 +6,7 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
-import { frameOf, layoutHeader, bandMetrics, planItem, gridPart, poolItems, answerOf, oralFrameOf, operandsOf, esc } from '../roles/compose.js';
+import { frameOf, layoutHeader, bandMetrics, planItem, gridPart, poolItems, answerOf, oralFrameOf, operandsOf, esc, stepsKindOf } from '../roles/compose.js';
 import { resolveCtx } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore } from '../anchors.js';
 import { evenGridState } from '../cells/mult-grid.js';
@@ -33,7 +33,20 @@ export function pickExample(items, data) {
     // (an item its generator marks `noModel` is never the worked example while another can be - the compare "=" and a pair
     // the ones place decides, which the M6 error also gets right: lf-placevalue compare r4, critic r2 N4; as the Guided,
     // Opener and Scripted Model pages read it)
-    const all = all0.some((x) => !(x.it.q && x.it.q.noModel)) ? all0.filter((x) => !(x.it.q && x.it.q.noModel)) : all0;
+    const all1 = all0.some((x) => !(x.it.q && x.it.q.noModel)) ? all0.filter((x) => !(x.it.q && x.it.q.noModel)) : all0;
+    // PT 2.3 (round-cap r3, lf-placevalue critic live1 r2 N6): the Guided cells are the example's kind (we-do.js), so the example
+    // is of a kind the pool deals enough of for a Guided set - the example and three more (or the most any kind has): a lone
+    // "fifty" among two-word names left its Guided cells to another kind. A one-kind pool is unchanged.
+    // (distinct problems a kind: a band that deals "one hundred" four times has ONE hundreds problem, not a Guided set of them)
+    const seen = new Map();
+    for (const it of items) { const k = stepsKindOf(it); if (!seen.has(k)) seen.set(k, new Set()); seen.get(k).add(String(answerOf(it))); }
+    const kc = new Map([...seen].map(([k, v]) => [k, v.size]));
+    const enough = Math.min(4, Math.max(0, ...kc.values()));
+    const all2 = kc.size > 1 ? all1.filter((x) => kc.get(stepsKindOf(x.it)) >= enough) : all1;
+    // (no worked example of two steps or more in a well-dealt kind - names to 100 in H T O boxes are worked in ONE step - the
+    // first item of the best-dealt kind models, as the fall-back below takes the first item: never the lone "one hundred")
+    if (kc.size > 1 && !all2.length) return items.find((it) => kc.get(stepsKindOf(it)) >= enough && !(it.q && it.q.noModel)) || items[0] || null;
+    const all = all2;
     const tiers = [
         all.filter((x) => (!re || re.test(x.steps.map((s) => s.text).join(' '))) && (!want || x.steps.length === want)),
         all.filter((x) => !re || re.test(x.steps.map((s) => s.text).join(' '))),
@@ -339,7 +352,13 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
     const f = frameOf({ skills: target, input, tabId: 'Anchor chart', score: 0, footerLeft: lesson.tagLine });
-    const header = Object.assign({}, f.header, { name: false, date: false, score: false });
+    // THE NAME / DATE LINE (lf-engine chart-name, owner 2026-11-14): the chart prints the header of every page - frame.js
+    // pageHeader's own Name / Date fields under the teacher's header options, the same type and the same 2.25 pt rule (the
+    // page renders it through page() -> pageHeader). Score is off: a chart has no graded slot (frameOf, score 0); a chart that
+    // ever deals one passes its count there and the Score field follows. The header's height does not move (the row is 11 mm
+    // with or without its fields, layoutHeader), so the chart's sizing is unchanged. EVERY anchor chart, a detailed lesson's
+    // too (lead ruling 2026-11-14: no exception).
+    const header = f.header;
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
     const lay = chartLayout(n, data);
