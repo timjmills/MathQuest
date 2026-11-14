@@ -27,7 +27,7 @@ if (!gateId || !keys.length) { console.log(`${TOOL}: give --gate <id> --skills c
 const pc = join(root, 'tests/scripts/ws-precritic.cjs');
 if (!existsSync(pc)) { console.log(`${TOOL}: FAIL (no ws-precritic in ${root})`); process.exit(1); }
 const P = createRequire(import.meta.url)(pc);
-const g = P.buildPlan({ skills: keys.map((k) => ({ key: k, cat: k.split(':')[0], id: k.split(':')[1] })), logs: mkdtempSync(join(tmpdir(), 'gate-agree-')), live: [] }).find((r) => r.id === gateId);
+const g = P.buildPlan({ skills: keys.map((k) => ({ key: k, cat: k.split(':')[0], id: k.split(':')[1] })), logs: mkdtempSync(join(tmpdir(), 'gate-agree-')), live: [], batch: [] }).find((r) => r.id === gateId);
 if (!g) { console.log(`${TOOL}: FAIL (the plan of ${root} has no gate ${gateId} on ${keys.join(',')})`); process.exit(1); }
 if (g.missing || !g.file) { console.log(`${TOOL}: FAIL (gate ${gateId}: ${g.missing || 'no script'})`); process.exit(1); }
 const runner = existsSync('/tmp/mq-browser-run.sh') ? '/tmp/mq-browser-run.sh' : join(HERE, 'tests/scripts/mq-browser-run.sh');
