@@ -878,7 +878,7 @@ function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', no
         ? (isTwin(ctx)
             // on screen the label line and its word chips sit in one row right under the columns
             ? `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">${grid}${unitBlock}</div>`
-            : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
+            : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' || factHere(p, st) ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
         : grid;
     const cap = caption ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;">${esc(caption)}</div>` : '';
     return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${sub}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx))}`
@@ -1393,11 +1393,11 @@ function twoStepBarFor(p, ctx) {
  * on the teaching cells only (scaffold level >= 2: Model and Guided) - a hint that fades: never at level 0 or 1 (a test,
  * a practice page) and never on the screen; marked `data-ws-hint="fade"` so a host that hides hints drops it.
  */
-function midQuestion(p, ctx, wMm = 50, k = 0) {
+function midQuestion(p, ctx, wMm = 50, k = 0, minLines = 0) {
     if (!p || !p.mid || isTwin(ctx) || !(Number(ctx.scaffoldLevel) >= 2)) return '';
     // (Step 2's line is the story's own question, so both step columns carry a question line and stand level, P-WP-11)
     const t = k === 0 ? p.mid : String(p.lines[p.lines.length - 1] || '');
-    return `<div class="mq-wwmid" data-ws-hint="fade" style="max-width:${L(ctx, Math.max(56, wMm))};font-size:${P(ctx, zonePt(ctx))};font-weight:400;line-height:1.25;">${esc(t)}</div>`;
+    return `<div class="mq-wwmid" data-ws-hint="fade" style="max-width:${L(ctx, Math.max(56, wMm))};font-size:${P(ctx, zonePt(ctx))};font-weight:400;line-height:1.25;${minLines ? `min-height:${minLines * 1.25}em;` : ''}">${esc(t)}</div>`;
 }
 
 /** The cell body (everything but a pool caption). */
@@ -1443,7 +1443,11 @@ function renderWork(p, ctx) {
     const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
     // The hidden middle question (P-WP-11 v1, two-step card decision 6) under the Step 1 caption: a HINT, printed on the
     // teaching cells only (scaffold level >= 2: Model, Guided) - never on practice, a test (level 0) or the screen.
-    const midQ = (i) => (two ? midQuestion(p, ctx, blockWidthMm(ctx, p.steps[i], p), i) : '');
+    // (STEP-ALIGN, lead 2026-11-14: two fact-sentence steps stand on one row - the blocks top-align and the question lines over them
+    // share one width and a two-line height, so both sign rows and both sentences sit on the same lines)
+    const factPair = two && p.steps.length === 2 && p.steps.every((st) => factHere(p, st));
+    const midW = factPair ? Math.max(...p.steps.map((st) => blockWidthMm(ctx, st, p))) : 0;
+    const midQ = (i) => (two ? midQuestion(p, ctx, factPair ? midW : blockWidthMm(ctx, p.steps[i], p), i, factPair ? 2 : 0) : '');
     const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns, midQ(i))).join('');
     const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
     // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
@@ -1478,7 +1482,7 @@ function renderWork(p, ctx) {
         // (lf-algebra r13, precritic two-step r12 EB-SIDE 31-38 %: a full-width two-step cell's two step columns are 107-126 mm of a
         // 185 mm interior; left-packed they left one 57-70 mm band on the right. Centred under the story, the space splits into
         // two 30-39 mm margins, each under the H13 30 % - the steps still read Step 1 then Step 2, left to right.)
-        : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};${two ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};` : ''}${two && !answer ? 'justify-content:center;' : ''}margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
+        : `<div style="display:flex;align-items:${factPair ? 'flex-start' : 'flex-end'};gap:${L(ctx, 8)};${two ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};` : ''}${two && !answer ? 'justify-content:center;' : ''}margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
     // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
     // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
     // it as not fitting the column and prints it in the full-width group at the bottom
