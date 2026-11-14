@@ -15,8 +15,8 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 | pupil-p5 / key-p6 | Mixed |
 
 ## r6 pass (lf-engine PC r6, 2026-11-13, builder after critic r5 FAIL): every r5 finding, its check, its live pages
-Tree: branch `claude/sweet-newton-c8wrv1-lf-engine-pc`, merged with origin/master 636afcd84 (four times this round: 453, 82,
-64 commits, then lf-placevalue w2; P1). **Sizes M and L only** (owner 2026-11-13: print size S dropped) - the packet's second size is now `M/`, every
+Tree: branch `claude/sweet-newton-c8wrv1-lf-engine-pc`, merged with origin/master 1531d0728 (five times this round: 453, 82,
+64 commits, lf-placevalue w2, then 93 commits with pv live1; P1). **Sizes M and L only** (owner 2026-11-13: print size S dropped) - the packet's second size is now `M/`, every
 gate and proof runs `--sizes M,L`. The Prerequisite Check packet is rendered forced on (seed 4242); the LIVE pages (check off)
 are proved against a pin of master written at M,L on a detached master worktree.
 
@@ -46,8 +46,8 @@ Practice / Mixed page, lesson-r6-empty-part); a CSS selector edit changed every 
 inlined) - replaced by a per-cell inline style, so pages that do not change keep their hash.
 
 ### LIVE pages changed (check off; `ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check`
-against master 636afcd84's own pin (M,L; it re-pinned round, nearest_10, value, the new `compare` and the detailed lessons for
-w2): 492 of 1,772 keys - the 468 of the earlier diffs plus the new lesson `compare`)
+against master 1531d0728's own pin (M,L): 492 of 1,772 keys - the 468 of the earlier diffs plus the new lesson `compare`;
+the same set on master 636afcd84's pin)
 **No part prints more pages anywhere** (no PARTPAGES / NEW / MISSING line); div_facts, the vocabulary lessons, add_facts,
 sub_1k ... sub_1m, sub_wp_* and all 7 detailed lessons are identical to master (w2's detailed-lesson changes included). Changed, by lesson / part / size (both seeds
 unless named), and why:
@@ -64,9 +64,8 @@ unless named), and why:
   (identify), place pattern, page rules, one-item rows centred and grown by measured content (L), pageUnique.
 - compare (new on master, w2): **sheet** (p2) and **Mixed** (p4) M, L - the near-ruled sheet and the Mixed page rules / pageUnique.
 
-### Proof PNGs, before (master 76bc11c61) / after (this branch), M and L, pupil and key (`design/lessons/proof/pc-r6/<lesson>/{before,after}/`,
-files `<size>-<part>-<pupil|key>-pN.png`; before = master 636afcd84 for nearest_10, value and compare, which w2 re-pinned, and master
-76bc11c61 for the rest, whose pages w2 did not change - the pins agree) - a SPREAD (lead condition): at least one Practice AND one Mixed page per affected family
+### Proof PNGs, before (master) / after (this branch), M and L, pupil and key (`design/lessons/proof/pc-r6/<lesson>/{before,after}/`,
+files `<size>-<part>-<pupil|key>-pN.png`; before = master 1531d0728, after = this head, every lesson re-rendered) - a SPREAD (lead condition): at least one Practice AND one Mixed page per affected family
 | Family | Lesson | Parts (M and L) | Why it is here |
 |---|---|---|---|
 | number_sense | nearest_10 | chart, teach, practice, mixed | R1, R2, "78 twice" (named by the critic) |
