@@ -135,17 +135,32 @@ export function compactArc(divisor, dividend, t, g, emMm) {
 }
 
 /**
+ * LDIV-SHAPE (owner 2026-11-14: "I don't like the big curve ... make it straight or almost straight"): the bracket's
+ * side is a near-straight stroke. From the old arc's `x` (its ends) and `q` (its control point) its apex stays at
+ * the old arc's apex, so the white to the dividend (the hug, ws-ldiv-hug CEIL) is unchanged and the white the bow
+ * gave up goes to the divisor's side; it keeps a slight bow of BRACKET_SAG (in units
+ * of a 10-wide box: <= 0.6 mm on the widest gutter, 0.34 mm on the 13.4 mm screen worked bracket). Every caller that
+ * starts a vinculum rule at the corner reads the corner's x from here.
+ */
+export const BRACKET_SAG = 0.25;
+export function bracketLine(x = 1.5, q = 9, w = 10) {
+    const sag = BRACKET_SAG * w / 10;
+    const m = +(x + (q - x) / 2 - sag).toFixed(3);
+    return { x: m, q: +(m + 2 * sag).toFixed(3) };
+}
+/**
  * The long-division bracket as ONE stroke (owner 2026-11-14, "it's disconnected"; LDIV-JOIN): the arc is drawn
  * from its foot up to the vinculum and goes straight on along it in the same path, so the corner is a mitre
- * join, not a butt cap set under a separate bar. `x` is where the arc's centre line meets the bar and its foot,
- * `q` the control point's x (its bow), `w` the viewBox width, `h` the viewBox height, `foot` the arc's foot y and
+ * join, not a butt cap set under a separate bar. `x` and `q` are the OLD arc's ends and control point; the side
+ * is drawn from them by bracketLine (LDIV-SHAPE), `w` the viewBox width, `h` the viewBox height, `foot` the arc's foot y and
  * `qy` the control point's y, `bar` where the path's bar ends (default `w`; past `w` it runs on under the next column's
  * rule, so two pieces never meet at a fractional x - LDIV-JOIN-RASTER)
  * (all in viewBox units; y 0 is the bar's centre line). Every bracket - the kit's division
  * cells and the screen's - draws it through this one function; the caller places the svg so y 0 lies on the
  * vinculum's centre.
  */
-export function bracketSvg({ x = 1.5, q = 9, w = 10, h = 40, bar = w, foot = h, qy = foot / 2, ink = '#000', stroke = HEAVY, cls = '', style = 'display:block;width:100%;height:100%;overflow:visible' } = {}) {
+export function bracketSvg({ x: x0 = 1.5, q: q0 = 9, w = 10, h = 40, bar = w, foot = h, qy = foot / 2, ink = '#000', stroke = HEAVY, cls = '', style = 'display:block;width:100%;height:100%;overflow:visible' } = {}) {
+    const { x, q } = bracketLine(x0, q0, w);   // LDIV-SHAPE: near-straight
     return `<svg${cls ? ` class="${cls}"` : ''} viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"${style ? ` style="${style}"` : ''}>`
         + `<path d="M${x} ${foot} Q${q} ${qy} ${x} 0 H${bar}" fill="none" stroke="${ink}" stroke-width="${stroke}" stroke-linejoin="miter" stroke-miterlimit="10" vector-effect="non-scaling-stroke"/></svg>`;
 }
@@ -319,7 +334,7 @@ register('division', {
         for (let i = 0; i < n; i++) html += cell(esc(D[i]), o + i, 2, `border-top:${HEAVY} solid transparent;`);
         // (it starts over the arc's own top stroke - 15 % into the arc's track, where the path starts -
         // so the arc and the bar meet in one unbroken line, no step at the join)
-        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * ${A.x / 10});border-top:${HEAVY} solid ${INK.ink}"></span>`;
+        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * ${bracketLine(A.x, A.q).x / 10});border-top:${HEAVY} solid ${INK.ink}"></span>`;
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;

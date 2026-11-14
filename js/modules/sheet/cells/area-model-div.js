@@ -22,7 +22,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
-import { bracketSvg } from './long-division.js';
+import { bracketSvg, bracketLine } from './long-division.js';
 import { stepMarks, slotInks, WHOLE_SLOTS } from '../steps.js';
 
 const NOWRAP = 'area-model-total-row';   // the online worksheet's no-wrap opt-out (see area-model.js)
@@ -102,7 +102,7 @@ register('area-model-div', {
                 + `<span style="grid-column:1;grid-row:2;padding-right:0.05em">${V}</span>`
                 + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`
                 + `<span style="grid-column:3;grid-row:2;padding:0 0.2em">${D}</span>`
-                + `<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(${g.em(gut)} * 0.15);border-top:${HEAVY} solid ${INK.ink}"></span></span>`;
+                + `<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(${g.em(gut)} * ${bracketLine().x / 10});border-top:${HEAVY} solid ${INK.ink}"></span></span>`;
         } else {
             problem = `<span>${D}</span>${op('÷')}<span>${V}</span>${op('=')}${totalSlot}`;
         }

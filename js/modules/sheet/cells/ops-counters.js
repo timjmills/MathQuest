@@ -21,7 +21,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
-import { bracketSvg } from './long-division.js';
+import { bracketSvg, bracketLine } from './long-division.js';
 import { looseArray } from './k2kit.js';
 
 /* ------------------------------------------------------------------ shared drawing */
@@ -367,7 +367,7 @@ function remainderBracket(p, slot) {
         // and one rule runs from the arc's corner across the column gap and the dividend - no step, no break)
         + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`
         + at(3, 2, esc(p.dividend), `border-top:${HEAVY} solid ${INK.ink};padding:0 0.15em;`)
-        + `<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(0.55em * 0.15);border-top:${HEAVY} solid ${INK.ink}"></span>`
+        + `<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(0.55em * ${bracketLine().x / 10});border-top:${HEAVY} solid ${INK.ink}"></span>`
         + `</div>`;
 }
 
