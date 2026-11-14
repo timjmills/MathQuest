@@ -157,3 +157,38 @@ print-lint EB/OVERFLOW findings.
 ## PAGEFILL verdict (two_step_add_then_div, independent, L, p1)
 **Yes: ≥ 8 on all four (C1 8, C2 8, C3 8, C4 8).** The page is full, with working space inside each cell. Item 1 (fact + fact) and
 item 2 (column + fact) now share their caption and sign-row lines. The key follows the pupil page.
+
+# Round 4 (F6, screen) (head b568ac14f, fix 85bfa6313; renders `f6/`). Screen hosts only.
+
+## VERDICT: PASS. C1 8, C2 8, C3 8, C4 8 on every screen host looked at.
+
+| Criterion | worksheet-1280 (3 skills) | card-820 | quiz-1280 |
+|---|---|---|---|
+| C1 Ease of use | 8 | 8 | 8 |
+| C2 Educational value | 8 | 8 | 8 |
+| C3 Spacing and layout | 8 | 8 | 8 |
+| C4 Standard fidelity | 8 | 8 | 8 |
+
+## What is fixed
+- **F6 is fixed.** In `f6/algebra__two_step_mult_div_first/worksheet-1280.png` item 4 (45÷5=9, then 9+3=12), Step 2 now reads
+  "□ ○ □ = □□" on one line, and the two answer boxes sit at the right end of the sentence like every other cell. The same holds for
+  every 2-digit Step 2 answer in `add_then_mult/worksheet-1280.png` (items 1–6, all "= □□" on one line inside the ~330 px cell) and
+  in `add_then_div/worksheet-1280.png`. No fact sentence wraps on any of the three worksheets, the card at 820 or the quiz at 1280.
+- In every cell the "=" and the answer boxes share one baseline with the operands; each step's answer sits at the end of its sentence,
+  and Step 1 / Step 2 rows line up across cells in the same row of the grid.
+- **Narrow one-digit boxes read well.** One-digit operand boxes are one digit box wide, the same height as the others, and a 2-digit
+  operand keeps a wider box (e.g. 45, 12, 24 on worksheet 1280; 54 on quiz 1280), so the box width now hints at the size of the number
+  without giving the number away. The 0.8 mm gaps keep boxes, the sign circle and "=" apart; nothing touches or is clipped.
+- **Paper still matches screen.** `print-p1.png` draws the same sentence: two operand boxes, sign circle, "=", 1 box for a 1-digit and 2
+  boxes for a 2-digit Step 2 answer, columns kept for 47−7 style steps. The only difference is the screen-only narrower one-digit
+  operand box, which the brief allows; the structure and order are identical.
+
+## Notes (not failing)
+- **N1 (F2 territory, not graded):** a 2-digit *Step 1* answer is one wide box (`add_then_div/worksheet-1280` item 5 "5+7=[ 12 ]",
+  `mult_div_first/card-820` "6×8=[ 48 ]"), while a 2-digit Step 2 answer is two digit boxes. Print does the same, so parity holds;
+  it belongs to F2. Check: per-digit slot count equals answer digit count for every step's answer slot.
+- **N2 (F7, minor):** the unit line still moves: left of the bank in `mult_div_first/worksheet-1280` item 1, above the bank in items
+  2–6. Check as in round 3 (unit-slot position relative to the bank is the same in every cell of a page).
+- The focused first-operand box on card/quiz still draws an inner divider and caret (focus style; observation carried from round 3).
+
+Not graded, as the brief says: print, LDIV-JOIN, lesson layout, 390 px, F2, touch targets at 1024.
