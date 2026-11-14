@@ -1020,8 +1020,8 @@ const _opsFactBand = (sub = false) => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
     : 'The largest sum. Single-digit facts never pass 18.' });
 const _opsTableBand = () => _opsBand([100, 144, 225], 144, {
     label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12', 225: '15 × 15' },
-    help: 'Up to the 10s table, the whole 12s table or on to the 15s table: the largest product (or number shared) is 100, 144 '
-        + 'or 225. 15 × 15 adds the 13, 14 and 15 ticks to the fact sets.',
+    help: 'Up to the 10s table, the whole 12s table or on past it: the largest product (or number shared) is 100, 144 '
+        + 'or 225. The biggest choice adds three more ticks to the fact sets.',
 });
 // lane lf-ops t15 (owner, 2026-11-14): "Tables to 15 × 15". The top factor (× ) / divisor and quotient (÷) of each band, read
 // by the generator, the panel, the array support and the sheet bridge alike.
