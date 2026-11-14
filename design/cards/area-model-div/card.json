@@ -1,0 +1,544 @@
+{
+ "id": "area-model-div",
+ "kind": "template",
+ "title": "Area-model division with a 2-digit divisor (`division:area_model_div_4by2` on the `area-model-div` cell)",
+ "template": {
+  "id": "area-model-div",
+  "source": "js/modules/sheet/cells/area-model-div.js",
+  "also": "the kit's long-division bracket (`bracketSvg`, `bracketLine` from `js/modules/sheet/cells/long-division.js`) for the `long` form; generator branches `area_model_div_2by1` / `area_model_div_3by1` in `js/modules/gen-operations.js` (the new `area_model_div_4by2` branch sits beside them and deals `long_div_2digit`'s 4-digit class); options `js/modules/skill-options.js` (`_amEdgesOpt`, `_amFormOpt`); `screen-cell.js` draws the same cell on the practice card, online worksheet and quiz (`_kitTwin`). The siblings 2by1 and 3by1 share the cell but are NOT on this card (open question 1)"
+ },
+ "families": [
+  "division"
+ ],
+ "findingsMatch": {
+  "templates": [
+   "area-model-div",
+   "area-model"
+  ]
+ },
+ "skills": {
+  "include": [
+   "division:area_model_div_4by2"
+  ]
+ },
+ "excerptChars": 140,
+ "sourceChars": 90,
+ "summary": "One boxed cell per problem: a rectangle split into two parts (the tens part and the ones part of the quotient times the 2-digit divisor, e.g. 1360 | 204), the divisor on its left side (printed, or a box on `amEdges: blank`), a box above each part for its side length (the partial quotient: 40, 6), and under it the problem in the form asked (1564 ÷ 34 = [ ], the long-division bracket with the quotient box over the dividend, or 1564 over 34) with the quotient box. Black line art, Andika at the digit size, the cell measured and never squeezed. Paper, key and the three screen hosts are one drawing (the existing cell, unchanged geometry; this card adds a skill, not a template).",
+ "teaches": "5.NBT.B.6 (M.EE.5.NBT.6): find whole-number quotients of 4-digit dividends and 2-digit divisors, illustrated with an area model: split the dividend into the tens part and the ones part of the quotient, find each side length from a 2-digit x multiple-of-ten fact, add them. Deals `long_div_2digit`'s 4-digit class (divisor 11-59 by default, 11-99 on the wider value; quotient 2-digit, exact). WRM Y6.B2.S11 (partial: the area model before the long-division layout). Not this card: remainders, the pupil choosing the split, 3-digit dividends, the siblings 2by1 / 3by1 (open questions).",
+ "research": "design/research/area_model_div_4by2.md (2026-11-14). No premium logins this round: the memory file with the MathWorksheets4Kids / IXL credentials does not exist on this machine; MW4K's area-model pages were not reachable by URL (404) and IXL's \"Divide using area models\" (grade 5) is behind its sign-in. Public K5 Learning grade-5 division hub read (divisor bands 10-25 / 10-99, exact before remainder). Content model from the repo (PROBLEM_TYPES DV-07 / DV-11 / RL-17, ladder DL', the long_div_2digit P8 deal) and from publicly known site grammar; 24 sample items generated and read (L4).",
+ "problemTypes": [
+  "DV-11 area model, parts given: the dividend split by the quotient's place value inside the rectangle; the pupil writes each side length (partial quotient) and the quotient - the core item",
+  "DV-11 with the divisor a box too (`amEdges: blank`), or mixed down the page (`mixed`)",
+  "the problem shown as the division sign, the long-division bracket (the bridge to DV-07 `long_div_2digit`) or a fraction (`amForm`)",
+  "NOT built here (section 9): the pupil chooses the split with friendly multiples (10x, 20x, 5x of the divisor); a remainder; a missing dividend or divisor"
+ ],
+ "progression": [
+  "area_model_div_3by1 (1-digit divisor) is secure (the prerequisite)",
+  "divisor a multiple of ten, 20-90 (each side length a scaled fact: 70 x 30 = 2100) - `amDivisor: tens`",
+  "divisor 11-59 (the default; `long_div_2digit` at its default Max Number) - `amDivisor: 59`",
+  "divisor 11-99 (`long_div_2digit` at Max Number 1000) - `amDivisor: 99`",
+  "the divisor a box too (`amEdges: blank`): the pupil reads the divisor off the problem",
+  "the bracket form (`amForm: long`) beside the model, then `long_div_2digit` itself"
+ ],
+ "drawing": {
+  "sizes": "M and L only (owner 2026-11-13; S falls back to M). Digits 22 / 28 pt (tokens.js SIZES); answer strip SL-12 height; boxes at least 2 x Hw wide and as wide as the widest possible value (2 digits per partial quotient and quotient, never the answer's own length, L3). Part columns sized to 4 digits. Cell footprint (template `footprint()`, no browser): sign 94 x 58 mm at M, 116 x 66 mm at L; long + blank divisor 86 x 68 / 100 x 79 mm; `maxCols: 2`, `measure: true`.",
+  "notes": [
+   "Payload (`q.cell = {template: 'area-model-div', v: 1, payload}`): `dividend`, `divisor`, `parts` [tens part, ones part], `form` ('sign' | 'long' | 'fraction'), `edges` ('given' | 'blank'), `uid`. Slots `q-0`, `q-1` (side lengths), `side` (blank divisor only), `total`. The generator never bakes HTML; `q.visual` is `_kitTwin('area-model-div', payload)`.",
+   "No template change is planned. If the measured cell does not fit two columns at M, the fix is in the template's column width rule (part columns from the widest part, not the widest possible 4-digit value), checked on 2by1 / 3by1 too so their pages do not move; never a smaller font (SCC-T4).",
+   "Key: every slot written (AK-1), reddish orange on keys only (INK-31). States blank / traced / answered / wrong share one geometry (SCC-T10); the screen twin's inputs ARE the slots (SCC-T15, L5)."
+  ],
+  "capacity": []
+ },
+ "ruleGroups": [
+  {
+   "title": "The area model, the response and the key (quoted)",
+   "core": true,
+   "chars": 330,
+   "rules": [
+    "DV-11",
+    "RL-17",
+    "PG-20",
+    "SL-12",
+    "AK-1",
+    "SCC-T4",
+    "P-1"
+   ]
+  },
+  {
+   "title": "Cell, slots, screen and look",
+   "chars": 120,
+   "rules": [
+    "SL-1",
+    "SL-11",
+    "TY-10",
+    "TY-2",
+    "INK-1",
+    "INK-31",
+    "AK-4",
+    "SCC-T10",
+    "SCC-T15",
+    "SCC-01",
+    "SCC-P8",
+    "SP-10",
+    "DN-10",
+    "DV-07",
+    "RD-08",
+    "MU-08",
+    "PT-G-02"
+   ]
+  },
+  {
+   "title": "Pedagogy, options and lessons learned",
+   "chars": 120,
+   "rules": [
+    "P-10",
+    "P-29",
+    "P-35",
+    "O2",
+    "O3",
+    "O6",
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L8",
+    "L10",
+    "L14",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29"
+   ]
+  },
+  {
+   "title": "Cited by critics on this template's and family's findings (ids only)",
+   "chars": 80,
+   "rules": [
+    "AK-2",
+    "AX-4",
+    "BD-10",
+    "BD-11",
+    "CL-8",
+    "CL-40",
+    "DN-1a",
+    "PG-14",
+    "PT-FPR-6",
+    "PT-FRW-5",
+    "PT-FRW-6",
+    "PT-GDP-1",
+    "RP-21",
+    "SP-1",
+    "SP-2",
+    "SP-12",
+    "VA-60",
+    "VA-61",
+    "VA-62",
+    "VA-63",
+    "VA-66"
+   ]
+  },
+  {
+   "title": "Hard caps and criteria (RUBRIC; every page)",
+   "chars": 60,
+   "rules": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "H1@RUBRIC",
+    "H2@RUBRIC",
+    "H3@RUBRIC",
+    "H4@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "H10",
+    "H11",
+    "H12",
+    "H13",
+    "OC3",
+    "OC4",
+    "OC7",
+    "OC8",
+    "OC10",
+    "OC11",
+    "OC14"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-11-14",
+   "ruling": "Add `division:area_model_div_4by2`: area-model division with a 2-digit divisor (4-digit / 2-digit, CCSS 5.NBT.6). It deals the same problem class as `division:long_div_2digit` and uses the existing area-model-div drawing.",
+   "source": "owner request to the lead, 2026-11-14 (lf-ops amdiv brief)"
+  },
+  {
+   "date": "2026-11-13",
+   "ruling": "Two print sizes, M and L; S is dropped (an S setting falls back to M). Screens: print, Chromebook 1280-1366 px, tablet 820-1024 px; no 390 px; answer boxes keep 48 px touch targets.",
+   "source": "CLAUDE.md fastest-implementation plan 7, 9"
+  },
+  {
+   "date": "2026-10-17",
+   "ruling": "A distinct option (a new difficulty or a new skill) is ALSO recorded as a findable preset skill; small tweaks (count, range, a scaffold on / off) stay plain options.",
+   "source": "CLAUDE.md"
+  },
+  {
+   "date": "2026-10-16",
+   "ruling": "Area models: `amEdges` given / blank / mixed and `amForm` sign / long / fraction on the area-model-div skills; the quotient's parts are always the pupil's to find.",
+   "source": "design/audit/runs/wave1-D/OWNER-REQUESTS-2026-10-16.md; skill-options.js _amEdgesOpt / _amFormOpt"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M1",
+   "error": "writes the part, not the side length, above the rectangle",
+   "wrong": "1564 / 34: writes 1360 and 204 above, quotient 1564"
+  },
+  {
+   "id": "M2",
+   "error": "drops the place value of the tens part's side length",
+   "wrong": "1360 / 34 = 4, so 4 + 6 = 10"
+  },
+  {
+   "id": "M3",
+   "error": "multiplies the side lengths instead of adding them",
+   "wrong": "40 x 6 = 240"
+  },
+  {
+   "id": "M4",
+   "error": "divides by one digit of the divisor only",
+   "wrong": "1360 / 34 -> 1360 / 4 = 340"
+  }
+ ],
+ "options": [
+  "amEdges (existing helper `_amEdgesOpt(true)`): given (default) | blank | mixed - the divisor printed on the side or a box. A support control (O3), plain option.",
+  "amForm (existing helper `_amFormOpt()`): set of sign (default) | long | fraction - the problem line. An appearance control (O6), plain option.",
+  "amDivisor (NEW on this skill, group difficulty, O2): tens (20, 30 ... 90) | 59 (11-59, default: long_div_2digit at its default Max Number) | 99 (11-99: long_div_2digit at Max Number 1000). A number-size band, so a plain option, not a preset skill (open question 3). Share codes: an appended option with the default 59, so codes decode unchanged.",
+  "No `constant` (Divide by) set: 89 divisors is not a usable tick list; the band replaces it (open question 4). No `range` (Max Number): the name fixes the dividend at 4 digits.",
+  "Preset skills: none planned (open question 3)."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/area-model-div/area-model-div.md",
+   "note": "build-start gate"
+  },
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --skill division:area_model_div_4by2 --strict",
+   "note": "every machine check of what the lane touched, before any critic (rule 0b)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-content-audit.cjs --skill division:area_model_div_4by2",
+   "note": "4-digit dividend, 2-digit divisor, division only"
+  },
+  {
+   "cmd": "node tests/scripts/ws-options-verify.cjs --category division"
+  },
+  {
+   "cmd": "node tests/scripts/ws-providers-unit.mjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:area_model_div_4by2,division:area_model_div_3by1",
+   "note": "3by1 included: any template change must leave the sibling's pages unchanged"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-slots.cjs --skills division:area_model_div_4by2"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-answer.cjs --skills division:area_model_div_4by2"
+  },
+  {
+   "cmd": "node tests/scripts/ws-chromebook-fit.cjs --skills division:area_model_div_4by2"
+  },
+  {
+   "cmd": "node tests/scripts/ws-grade-render.cjs --skills division:area_model_div_4by2",
+   "note": "the renders the independent critic grades"
+  },
+  {
+   "cmd": "node tests/scripts/ws-standards.cjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-wrm.cjs --report-only"
+  },
+  {
+   "cmd": "node tests/scripts/ws-wrm-page-unit.mjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-search-terms.cjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+   "note": "one appended code, no MOVED / DELETED"
+  },
+  {
+   "cmd": "node tests/scripts/ws-boot-smoke.cjs"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "The siblings `area_model_div_2by1` and `area_model_div_3by1` draw the same cell and have not passed the 8/10 redesign. Does this card (and its critic) cover them too?",
+   "recommended": "No: this card covers the new skill only, so the round stays one skill. Add them to this card later with --resign when their own lane comes (copy-light review on a then-passed template)."
+  },
+  {
+   "q": "Remainders: `long_div_2digit` is exact and the cell has no remainder slot. Offer a remainder value now?",
+   "recommended": "No (hidden). Exact quotients only, as the problem class asked for. A remainder needs an `r` slot in the cell and is its own step (WRM Y6.B2.S12); propose it with long_div_2digit's remainders option later."
+  },
+  {
+   "q": "Is the divisor band `amDivisor` (tens / 11-59 / 11-99) a distinct difficulty that must also be a preset skill (CLAUDE.md 2026-10-17)?",
+   "recommended": "No: it is a number-size band (a small tweak, like range), so a plain option. If the owner wants \"Area model division by a multiple of ten\" findable, it becomes the preset `area_model_div_4by2_tens` {amDivisor: 'tens'} with its own label, tags, terms and code."
+  },
+  {
+   "q": "Offer `constant` (Divide by: tick divisors) as on 2by1 / 3by1?",
+   "recommended": "No: 89 ticks is not usable, and the band covers the need."
+  },
+  {
+   "q": "The pupil choosing the split (partial quotients with friendly multiples 10x, 20x, 5x; parts left blank) - an option here?",
+   "recommended": "Not in this build (hidden). It is a new task with its own response (the parts written, then checked) and, by the distinct-option rule, a preset skill; propose it as a build-list entry after this skill passes."
+  },
+  {
+   "q": "Capacity: the footprint says 94 mm at M (two columns need about 91 mm) and 116 mm at L (one column). Accept M 1 x 4 and L 1 x 3 if the measured cell does not fit two columns?",
+   "recommended": "Fit two columns at M first, by sizing part columns to the widest part dealt (not every possible 4-digit value) inside the template, re-checked on 3by1; accept L 1 x 3 (3 a page, like the other wide models). Never a smaller digit size."
+  },
+  {
+   "q": "MW4K / IXL research ran without logins (no credentials file on this machine). Sign now?",
+   "recommended": "Yes; the content model is the long_div_2digit class plus DV-11, which the repo already decides. Re-sign only if logged-in research changes the problem types or the progression."
+  }
+ ],
+ "decisions": {
+  "options": [
+   {
+    "option": "amEdges",
+    "values": [
+     "given",
+     "blank",
+     "mixed"
+    ],
+    "d": "offered",
+    "why": "NEW on this skill (existing helper `_amEdgesOpt(true)`, as on 2by1 / 3by1): O3 support, the divisor printed or a box; mixed deals both down the page; each value judged on its own page (L29)",
+    "source": "owner 2026-10-16 area-model requests; this card §7"
+   },
+   {
+    "option": "amForm",
+    "values": [
+     "sign",
+     "long",
+     "fraction"
+    ],
+    "d": "offered",
+    "why": "NEW on this skill (existing helper `_amFormOpt()`): O6 the problem line; long is the bridge to long_div_2digit; every value fits the cell (L26)",
+    "source": "owner 2026-10-16 area-model requests; this card §7"
+   },
+   {
+    "option": "amDivisor",
+    "values": [
+     "tens",
+     "59",
+     "99"
+    ],
+    "d": "offered",
+    "why": "NEW (to build): O2 divisor band, 20-90 in tens | 11-59 (default, long_div_2digit at its default) | 11-99 (long_div_2digit at Max Number 1000); a plain option, not a preset (§9 q3)",
+    "source": "owner 2026-11-14 (same class as long_div_2digit); this card §2"
+   },
+   {
+    "option": "constant",
+    "values": [
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "d": "hidden",
+    "why": "the 1-digit Divide-by set of 2by1 / 3by1 must not be copied onto this skill: its divisors are 2-digit, and the band replaces a tick list (§9 q4)",
+    "source": "this card §7, §9 q4"
+   },
+   {
+    "option": "calculator",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "out of scope",
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+    "source": "skill-options.js play controls",
+    "proposed": true
+   },
+   {
+    "option": "skipAfter",
+    "values": [
+     "*"
+    ],
+    "d": "out of scope",
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+    "source": "skill-options.js play controls",
+    "proposed": true
+   }
+  ],
+  "roles": [
+   {
+    "key": "role:independent",
+    "d": "offered",
+    "why": "the pass bar; 2 x 3 at M if the measured cell fits two columns, 1 x 3 at L (§9 q6)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:more-practice",
+    "d": "offered",
+    "why": "the pass bar",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:test",
+    "d": "offered",
+    "why": "the pass bar; no traced item, no Say line",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:lesson",
+    "d": "offered",
+    "why": "the pass bar; lesson data is the FALLBACK today: the build adds a prereqs.js entry whose warm-up is area_model_div_3by1 and mult_multiples_of_ten (H13 on the warm-up cells)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:scripted-model",
+    "d": "offered",
+    "why": "provider workedSteps (REAL, to build): one line per part (34 x 40 = 1360, 34 x 6 = 204, 40 + 6 = 46) and the Say band of research §2 q9; the first item traced",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:guided",
+    "d": "offered",
+    "why": "provider workedSteps (REAL, to build); the first item traced, the next ones with the frame only",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:opener",
+    "d": "offered",
+    "why": "any skill on any page type; the opener uses the skill's own item, no story",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:error-analysis",
+    "d": "offered",
+    "why": "provider wrongAnswer / misconceptions (REAL, to build) from M1-M4, compared slot by slot (L27)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:review",
+    "d": "offered",
+    "why": "earlier skills in data.js order (3by1, long_div_2digit neighbours); never mixes tasks inside one section",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:pre-skill-check",
+    "d": "offered",
+    "why": "earlier skills: area_model_div_3by1 and the multiple-of-ten facts",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:mixed-practice",
+    "d": "offered",
+    "why": "any skill on any page type",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:true-false",
+    "d": "offered",
+    "why": "one completed model or equation, True or False? from wrongAnswer (M2, M3)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:reason-it",
+    "d": "offered",
+    "why": "workedSteps and wrongAnswer real",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:stretch",
+    "d": "offered",
+    "why": "any skill on any page type (amDivisor 99, amEdges blank)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope"
+   },
+   {
+    "key": "role:word-problems",
+    "d": "out of scope",
+    "why": "the skill has no story; division stories are the word-work family's",
+    "source": "provider stories: default 0/1"
+   },
+   {
+    "key": "role:fact-rows",
+    "d": "out of scope",
+    "why": "not a fact-like skill (PT-G-03: the operands are not single facts): the role reports unsupported",
+    "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts"
+   },
+   {
+    "key": "role:fact-probe",
+    "d": "out of scope",
+    "why": "not a fact-like skill (PT-G-03): the role reports unsupported",
+    "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts"
+   }
+  ],
+  "hosts": [
+   {
+    "key": "host:practice-card",
+    "d": "offered",
+    "why": "one drawing with print; the pass bar at 820-1024 and 1280-1366 px (no 390 px, owner 2026-11-13); 48 px touch targets",
+    "source": "RUBRIC (every screen host)"
+   },
+   {
+    "key": "host:online-worksheet",
+    "d": "offered",
+    "why": "one drawing with print; the pass bar",
+    "source": "RUBRIC (every screen host)"
+   },
+   {
+    "key": "host:quiz",
+    "d": "offered",
+    "why": "one drawing with print; the pass bar",
+    "source": "RUBRIC (every screen host)"
+   },
+   {
+    "key": "host:boss",
+    "d": "out of scope",
+    "why": "game hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic",
+    "source": "ws-chromebook-fit",
+    "proposed": true
+   },
+   {
+    "key": "host:race",
+    "d": "out of scope",
+    "why": "game hosts draw the same card; graded by ws-chromebook-fit",
+    "source": "ws-chromebook-fit",
+    "proposed": true
+   },
+   {
+    "key": "host:map",
+    "d": "out of scope",
+    "why": "graded by ws-screen-slots, not by this card's critic",
+    "source": "ws-screen-slots",
+    "proposed": true
+   },
+   {
+    "key": "host:mode-dark",
+    "d": "out of scope",
+    "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
+    "source": "ws-chromebook-fit, ws-screen-slots",
+    "proposed": true
+   },
+   {
+    "key": "host:mode-bigboard",
+    "d": "out of scope",
+    "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
+    "source": "ws-chromebook-fit, ws-screen-slots",
+    "proposed": true
+   }
+  ]
+ }
+}
