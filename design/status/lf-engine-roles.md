@@ -3,8 +3,8 @@ Title: Engine round on the shared role layouts (opener, mixed-practice, sections
 Session: session_01HVwpAE3g6EZH8idgErP6LP
 Branch: claude/sweet-newton-c8wrv1-lf-engine-roles
 Owner of files: sheet/roles/{opener,mixed-practice}.js, sheet/grid.js, sheet/roles/{answer-key,compose}.js (additive style param), tests/scripts/ws-print-lint.cjs (sections DN-2/PG-23), tests/fixtures/precritic/{backtests,sections-density}
-State: building
-Updated: 2026-11-13
+State: critic-ready (r3)
+Updated: 2026-11-14
 Builder profile: mq-opus-medium
 Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
 
@@ -44,26 +44,7 @@ Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
   --all-lessons 1596 hashes identical. Merge with current master (33c7487cd) composes clean (only backtests.json
   appended-both conflict). ws-precritic-plan OK on the two skill backtest rows.
 
-## Resume here (round 3 parked by owner budget stop, 2026-11-14)
-Critic r2 report: design/audit/runs/lf-engine-roles-r2/REPORT.md. Round 3 is WIP, ungated; do not deploy.
-- F1 (side-by-side before split; page 2 fills): PARTLY. opener.js tries Model | first Guided cell side by side at the
-  measured half-cell height (`side`) before splitting; a split page 2 takes the second Guided row (legacy too). Verified layout
-  choice only: coordinate_q1 / shape_name_match_3d / add_wp_10k / multi_step_word M go side-by-side on one page; round_sort_10
-  and multi_step_word L still split. NOT DONE: the side gate must require the half-cell measurement to fit (add_wp_10k's
-  measured[2].fits is false: ink 117 mm > the half cell, so its side row likely overflows - lint run was interrupted);
-  checks first (OPN-SPLIT lint: split Opener page < 50 % used fails unless notes say "side by side ... did not fit"; L-DENSITY
-  DN-2 / LONE / PAGEFILL in the OPENER-OVERFLOW ratchet), backtests FAIL 27b8e540c / OK fix, precritic path, ledger rows.
-- F2 (ratchet keyed on lint, rule, part, page; multi_step_word L page 2 2.1 mm): NOT DONE. opener.js keeps 3 mm in hand on a
-  split page 2 (untested). Ratchet key change + re-trimmed pins (keep `parts`) not started.
-- F3 (page 1 of a kit split): NOT DONE beyond the side row; covered by OPN-SPLIT once built.
-- F7 (ledger rows: roles-mixed-size-order missing from backtests.json, MIX-S retirement row needs an exemption; README claims
-  mixed_placevalue 1/2/0 -> 1/2/0 and fraction_of_set L 1 page; README counts from the sweep file): NOT DONE.
-- Flake row (own row, owner lf-checks, "the harness leaks render state between documents (ws-print-lint long runs)",
-  repro commands from the r2 report's flake section): NOT DONE.
-Next command (after fixing the side gate in js/modules/sheet/roles/opener.js geometry(): require measured[2].fits !== false
-for kit cells, and for legacy cells measured[2].inkMm below the half cell's inner width):
-  S=<scratch>; node tests/scripts/ws-print-lint.cjs --source kit --roles opener --size L --lints L-OVERFLOW,L-SPLIT,L-DENSITY \
-    --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d,number_sense:round_sort_10,addition:add_wp_10k,algebra:multi_step_word --verbose
-then build the OPN-SPLIT lint + ratchet changes (checks first), the every-opener sweep (M, L) with a page-1 / page-2 % used list,
-the overflow ratchet on every changed skill, PNGs (coordinate_q1, shape_name_match_3d, round_sort_10, add_wp_10k,
-multi_step_word; pupil + key; M, L), gates, merge origin/master if moved.
+## Resume here (round 3 critic-ready, 2026-11-14)
+Round 3 is built and gated: design/audit/runs/lf-engine-roles/CRITIC-READY-r3.md (gates, the % used table, PNGs in proof-r3/).
+Merged origin/master 7f2ca5e39 (master's SPILL kept beside the split / side-by-side paths). Next: the independent critic r3 on
+the head named in CRITIC-READY-r3.md. Opener-overflow pins re-taken on master 7f2ca5e39 (L-OVERFLOW, L-SPLIT, L-DENSITY, page-keyed).
