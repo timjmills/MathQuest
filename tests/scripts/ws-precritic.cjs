@@ -84,6 +84,10 @@
 //               scope's skills of that lane>, only when the scope holds them, so no other lane's run changes
 //             ws-grade-render --raster-fit (lf-checks queue 13, F3: the lane skills' scripted-model and guided pages at
 //               S / M / L printed to a real PDF and rasterised: RR-PAGES, RR-EDGE, RR-CLIP; tests/lib/ws-role-raster.cjs)
+//             ws-role-cover --shard i/n (lf-ops critic cbt r2 root cause, 2026-11-14: print-lint, empty-band and raster-fit on
+//               EVERY role the signed card offers - no card: every buildSheet role - at M and L, AND under every option value
+//               that changes the drawing, tests/lib/ws-drawing-variants.mjs; the units the rows above already render are left
+//               out; sharded at ~45 min of slot time a shard, each shard one runner slot; --dry-run prints its size and minutes)
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline, + ws-grade-render --raster-fit on the sample at L. The sample is tests/fixtures/precritic/role-sample.json
 //             + ws-empty-band --roles <role> --hosts none on the lane's --skill skills (the role sample when none is given;
@@ -404,7 +408,15 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const dkLine = String(dk.stdout || '').trim().split('\n').pop();
     if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
+    // ... and the role cover's plan, shard and pin cases (lf-ops critic cbt r2 root cause) in ws-role-cover / ws-drawing-variants
+    const rcLines = [];
+    for (const [nm, f] of [['role-cover', path.join(SCRIPTS, 'ws-role-cover.mjs')], ['drawing-variants', path.join(ROOT, 'tests', 'lib', 'ws-drawing-variants.mjs')]]) {
+        const r = spawnSync(process.execPath, [f, '--self-test'], { cwd: ROOT, encoding: 'utf8' });
+        const line = String(r.stdout || '').trim().split('\n').pop() || '';
+        if (r.status !== 0) { bad.push([nm, line, 'OK']); console.log(String(r.stdout || r.stderr || '').trim()); }
+        rcLines.push(`${nm} ${(/: (OK|FAIL)\b.*$/.exec(line) || ['', 'FAIL'])[0].replace(/^: /, '').slice(0, 40)}`);
+    }
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')}; ${rcLines.join('; ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -826,6 +838,22 @@ function cardPlans(keys) {
     try { return Object.fromEntries(JSON.parse(String(r.stdout || '').trim().split('\n').pop()).map((p) => [p.skill, p])); } catch (e) { return {}; }
 }
 
+/* ============================================================== the role-cover plan (tests/scripts/ws-role-cover.mjs --plan) */
+/** {plan, n} for the --skill keys, n = shards (each <= ~45 min of slot time, at least 2 when the work is over 10 min); null when
+ *  the tool is not in this tree; {error} when it cannot plan. */
+function roleCoverPlan(keys) {
+    const file = scriptPath('ws-role-cover');
+    if (!keys.length || !file) return null;
+    const r = spawnSync(process.execPath, [file, '--skill', keys.join(','), '--plan', '--json'], { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 << 20 });
+    let plan;
+    try { plan = JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { return { error: String(r.stderr || r.stdout || 'no output').trim().split('\n').slice(-2).join(' | ').slice(0, 200) }; }
+    const n = Math.max(plan.estMin > 10 ? 2 : 1, Math.ceil(plan.estMin / 45));
+    if (n === 1) return { plan, n };
+    const r2 = spawnSync(process.execPath, [file, '--skill', keys.join(','), '--plan', '--json', '--shard', `1/${n}`], { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 << 20 });
+    try { plan = JSON.parse(String(r2.stdout || '').trim().split('\n').pop()); } catch (e) { return { error: 'cannot shard the plan' }; }
+    return { plan, n };
+}
+
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N] [--only gate-id,...]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
@@ -955,6 +983,8 @@ function buildPlan(ctx) {
         // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
         // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
+        // (lf-roles 2026-11-14, lf-engine -roles critic r2 F5: no key prints the generator's raw JSON as an answer, any role)
+        add(gate('key-json', 'ws-key-json (L-KEY: no raw JSON answer on any key or page, every role)', scope, 'browser', 'ws-key-json', ['--skills', keys.join(',')], { missingMsg: 'ws-key-json is not in this tree' }));
         // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
         add(gate('tof-stem', 'ws-tof-stem (TOF-STEM: a True or False? "a op b =" stem only over the one number it equals)', scope, 'browser', 'ws-tof-stem', ['--skills', keys.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
@@ -1110,6 +1140,23 @@ function buildPlan(ctx) {
         // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
         add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × M/L`, 'browser', 'ws-grade-render',
             ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // ROLE COVER (lf-ops critic cbt r2 root cause, lead 2026-11-14): print-lint, empty-band and raster-fit on EVERY role the
+        // signed card offers (no card: every buildSheet role) at M and L, AND under every option value that changes the drawing
+        // (tests/lib/ws-drawing-variants.mjs: another drawing vocabulary or size class, or a page option; one value a drawing).
+        // E3 / E5 / E6 sat red in plain print-lint on roles no row rendered. ws-role-cover leaves out the units the rows above
+        // already render (lint independent / lesson, band the card's roles, raster scripted-model / guided, all at defaults),
+        // and is sharded (each shard one browser slot through the runner; the tools inside run in that slot).
+        const rc = roleCoverPlan(keys);
+        ctx.roleCover = rc;
+        if (rc && rc.error) add(synthetic('role-cover', 'ws-role-cover (every offered role x M/L x drawing option values: lint, band, raster)', scope, { result: 'FAIL', findings: `cannot plan: ${rc.error}` }));
+        else if (rc) {
+            const ebArgs = emptyBandDefaults(keys).join(' ');
+            for (let i = 1; i <= rc.n; i++) {
+                const sh = rc.plan.shards[i - 1];
+                add(gate(`role-cover-${i}`, `ws-role-cover shard ${i}/${rc.n} (every offered role x M/L x drawing option values: print-lint ${sh.units.lint}, empty-band ${sh.units.band}, raster-fit ${sh.units.raster} unit(s), est ${sh.estMin} min)`, `${scope} × ${rc.plan.skills.map((x) => `${x.roles} roles + ${x.variants.length} drawing variant(s)`).join('; ')} × M/L`, 'browser', 'ws-role-cover',
+                    ['--skill', keys.join(','), '--shard', `${i}/${rc.n}`, '--out', path.join(ctx.logs, `role-cover-${i}`), ...(ebArgs ? ['--eb-args', ebArgs] : [])], { missingMsg: 'ws-role-cover is not in this tree' }));
+            }
+        }
         // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
         // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
         if (carded.length >= 2) for (const sz of ['M', 'L']) {
@@ -1303,9 +1350,14 @@ function buildPlan(ctx) {
         // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
         // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
         if (ctx.role === 'lesson') {
-            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / M + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, CHART-HEAD on the anchor chart, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / M + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             // (live-pm r2, lead items 6 / 7: the page-use rules over every lesson ws-lesson-baseline --all-lessons proves)
             add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used)', 'every lessons/prereqs.js lesson × L / M', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            // (lf-engine chart-name, owner 2026-11-14: every lesson's ANCHOR CHART, pupil and key, prints frame.js pageHeader's
+            // Name / Date line - no Score unless scored, the key's line at the pupil page's places, no overflow, one page)
+            add(gate('lesson-samples-chart', 'ws-lesson-samples --check --all-lessons --rules CHART-HEAD (every anchor chart, pupil + key: the pageHeader Name / Date line, no Score unless scored, no overflow, fits its page)', 'every lessons/prereqs.js lesson × M / L', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'CHART-HEAD', '--sizes', 'M,L'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            // (lead ruling 2026-11-14: EVERY anchor chart - the detailed lessons' too, each pack's P2 and chunk charts, pupil + key)
+            add(gate('lesson-samples-chart-detailed', 'ws-lesson-samples --check --detailed all --rules CHART-HEAD (every detailed lesson\'s anchor charts, pupil + key: the pageHeader Name / Date line, no Score unless scored, no overflow, fits its page)', 'every detailed lesson (lessons/detailed) × its charts', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--detailed', 'all', '--rules', 'CHART-HEAD'], { parse: PARSE.lessonSamples, needFlags: ['check', 'detailed'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
@@ -1651,6 +1703,12 @@ async function main() {
         for (const g of rows) {
             if (g.synthetic) { say(`  [self] ${g.name} — ${g.synthetic.result}: ${g.synthetic.findings}`); continue; }
             say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : shownCmd(g)}`);
+        }
+        // the role cover's size and minutes, on EVERY dry run (critic roles r1 D3: a --copy-light dry run returned before it)
+        if (ctx.roleCover && ctx.roleCover.plan) {
+            const P = ctx.roleCover.plan;
+            say(`${TOOL} role cover: ${P.skills.map((x) => `${x.skill} ${x.roles} roles (${x.rolesFrom}; roles=${(x.roleList || []).join(',')}) + ${x.variants.length} drawing variant(s) of ${x.candidates} offered value(s)${x.variants.length ? ` [${x.variants.join(', ')}]` : ''}`).join('; ')}`);
+            say(`${TOOL} role cover size: ${P.units.lint} print-lint + ${P.units.band} empty-band + ${P.units.raster} raster-fit unit(s) in ${ctx.roleCover.n} shard(s); est ${P.estMin} min of slot time, ~${P.wallMin} min wall on two slots`);
         }
         if (copyLight) {
             // the copy-light verdict is quick (node, no browser): a dry run gives it, and writes the sample, so a lane knows its
