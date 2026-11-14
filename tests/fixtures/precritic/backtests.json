@@ -11824,6 +11824,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-ldiv-join-bracketsvg",
+   "check": "ws-two-step --ldiv LDIV-JOIN: where a two-step step draws long division, the bracket's top (an arc's end, a one-stroke bracket's corner) meets the bar within 0.3 mm, M / L, print and screen",
+   "kind": "commit-pair",
+   "rule": "LDIV-JOIN (owner 2026-11-14 'the long-division sign is disconnected'; lf-ops' rule and shared bracketSvg)",
+   "fail": {
+    "commit": "091222ebc",
+    "state": "word-work's own open arc (M2 1 Q9 20 2 39) stands 4-5 mm from the dividend's bar"
+   },
+   "pass": {
+    "commit": "0d7f143cc",
+    "state": "the kit's bracketSvg, its corner on the bar's centre line, one bar from the corner"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --ldiv --skill algebra:two_step_add_then_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
