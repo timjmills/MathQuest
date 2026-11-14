@@ -84,6 +84,10 @@
 //               scope's skills of that lane>, only when the scope holds them, so no other lane's run changes
 //             ws-grade-render --raster-fit (lf-checks queue 13, F3: the lane skills' scripted-model and guided pages at
 //               S / M / L printed to a real PDF and rasterised: RR-PAGES, RR-EDGE, RR-CLIP; tests/lib/ws-role-raster.cjs)
+//             ws-role-cover --shard i/n (lf-ops critic cbt r2 root cause, 2026-11-14: print-lint, empty-band and raster-fit on
+//               EVERY role the signed card offers - no card: every buildSheet role - at M and L, AND under every option value
+//               that changes the drawing, tests/lib/ws-drawing-variants.mjs; the units the rows above already render are left
+//               out; sharded at ~45 min of slot time a shard, each shard one runner slot; --dry-run prints its size and minutes)
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline, + ws-grade-render --raster-fit on the sample at L. The sample is tests/fixtures/precritic/role-sample.json
 //             + ws-empty-band --roles <role> --hosts none on the lane's --skill skills (the role sample when none is given;
@@ -404,7 +408,15 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const dkLine = String(dk.stdout || '').trim().split('\n').pop();
     if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
+    // ... and the role cover's plan, shard and pin cases (lf-ops critic cbt r2 root cause) in ws-role-cover / ws-drawing-variants
+    const rcLines = [];
+    for (const [nm, f] of [['role-cover', path.join(SCRIPTS, 'ws-role-cover.mjs')], ['drawing-variants', path.join(ROOT, 'tests', 'lib', 'ws-drawing-variants.mjs')]]) {
+        const r = spawnSync(process.execPath, [f, '--self-test'], { cwd: ROOT, encoding: 'utf8' });
+        const line = String(r.stdout || '').trim().split('\n').pop() || '';
+        if (r.status !== 0) { bad.push([nm, line, 'OK']); console.log(String(r.stdout || r.stderr || '').trim()); }
+        rcLines.push(`${nm} ${(/: (OK|FAIL)\b.*$/.exec(line) || ['', 'FAIL'])[0].replace(/^: /, '').slice(0, 40)}`);
+    }
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')}; ${rcLines.join('; ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -813,6 +825,22 @@ function cardPlans(keys) {
     try { return Object.fromEntries(JSON.parse(String(r.stdout || '').trim().split('\n').pop()).map((p) => [p.skill, p])); } catch (e) { return {}; }
 }
 
+/* ============================================================== the role-cover plan (tests/scripts/ws-role-cover.mjs --plan) */
+/** {plan, n} for the --skill keys, n = shards (each <= ~45 min of slot time, at least 2 when the work is over 10 min); null when
+ *  the tool is not in this tree; {error} when it cannot plan. */
+function roleCoverPlan(keys) {
+    const file = scriptPath('ws-role-cover');
+    if (!keys.length || !file) return null;
+    const r = spawnSync(process.execPath, [file, '--skill', keys.join(','), '--plan', '--json'], { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 << 20 });
+    let plan;
+    try { plan = JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { return { error: String(r.stderr || r.stdout || 'no output').trim().split('\n').slice(-2).join(' | ').slice(0, 200) }; }
+    const n = Math.max(plan.estMin > 10 ? 2 : 1, Math.ceil(plan.estMin / 45));
+    if (n === 1) return { plan, n };
+    const r2 = spawnSync(process.execPath, [file, '--skill', keys.join(','), '--plan', '--json', '--shard', `1/${n}`], { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 << 20 });
+    try { plan = JSON.parse(String(r2.stdout || '').trim().split('\n').pop()); } catch (e) { return { error: 'cannot shard the plan' }; }
+    return { plan, n };
+}
+
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N] [--only gate-id,...]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
@@ -1075,6 +1103,23 @@ function buildPlan(ctx) {
         // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
         add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × M/L`, 'browser', 'ws-grade-render',
             ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // ROLE COVER (lf-ops critic cbt r2 root cause, lead 2026-11-14): print-lint, empty-band and raster-fit on EVERY role the
+        // signed card offers (no card: every buildSheet role) at M and L, AND under every option value that changes the drawing
+        // (tests/lib/ws-drawing-variants.mjs: another drawing vocabulary or size class, or a page option; one value a drawing).
+        // E3 / E5 / E6 sat red in plain print-lint on roles no row rendered. ws-role-cover leaves out the units the rows above
+        // already render (lint independent / lesson, band the card's roles, raster scripted-model / guided, all at defaults),
+        // and is sharded (each shard one browser slot through the runner; the tools inside run in that slot).
+        const rc = roleCoverPlan(keys);
+        ctx.roleCover = rc;
+        if (rc && rc.error) add(synthetic('role-cover', 'ws-role-cover (every offered role x M/L x drawing option values: lint, band, raster)', scope, { result: 'FAIL', findings: `cannot plan: ${rc.error}` }));
+        else if (rc) {
+            const ebArgs = emptyBandDefaults(keys).join(' ');
+            for (let i = 1; i <= rc.n; i++) {
+                const sh = rc.plan.shards[i - 1];
+                add(gate(`role-cover-${i}`, `ws-role-cover shard ${i}/${rc.n} (every offered role x M/L x drawing option values: print-lint ${sh.units.lint}, empty-band ${sh.units.band}, raster-fit ${sh.units.raster} unit(s), est ${sh.estMin} min)`, `${scope} × ${rc.plan.skills.map((x) => `${x.roles} roles + ${x.variants.length} drawing variant(s)`).join('; ')} × M/L`, 'browser', 'ws-role-cover',
+                    ['--skill', keys.join(','), '--shard', `${i}/${rc.n}`, '--out', path.join(ctx.logs, `role-cover-${i}`), ...(ebArgs ? ['--eb-args', ebArgs] : [])], { missingMsg: 'ws-role-cover is not in this tree' }));
+            }
+        }
         // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
         // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
         if (carded.length >= 2) for (const sz of ['M', 'L']) {
@@ -1609,6 +1654,12 @@ async function main() {
         for (const g of rows) {
             if (g.synthetic) { say(`  [self] ${g.name} — ${g.synthetic.result}: ${g.synthetic.findings}`); continue; }
             say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : shownCmd(g)}`);
+        }
+        // the role cover's size and minutes, on EVERY dry run (critic roles r1 D3: a --copy-light dry run returned before it)
+        if (ctx.roleCover && ctx.roleCover.plan) {
+            const P = ctx.roleCover.plan;
+            say(`${TOOL} role cover: ${P.skills.map((x) => `${x.skill} ${x.roles} roles (${x.rolesFrom}; roles=${(x.roleList || []).join(',')}) + ${x.variants.length} drawing variant(s) of ${x.candidates} offered value(s)${x.variants.length ? ` [${x.variants.join(', ')}]` : ''}`).join('; ')}`);
+            say(`${TOOL} role cover size: ${P.units.lint} print-lint + ${P.units.band} empty-band + ${P.units.raster} raster-fit unit(s) in ${ctx.roleCover.n} shard(s); est ${P.estMin} min of slot time, ~${P.wallMin} min wall on two slots`);
         }
         if (copyLight) {
             // the copy-light verdict is quick (node, no browser): a dry run gives it, and writes the sample, so a lane knows its
