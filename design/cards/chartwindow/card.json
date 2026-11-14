@@ -381,8 +381,7 @@
         "d": "offered",
         "proposed": true,
         "skills": [
-          "composing:hundreds_chart_fill",
-          "composing:chart_to_120"
+          "composing:hundreds_chart_fill"
         ],
         "source": "owner request, lead ruling 2026-11-14 (extend tiles, do not add an option)",
         "why": "'Numbers to fill in': how many numbers the pupil writes in each window, 5 by default. A window that cannot hold the number under the rules (never more than half its squares, never a whole row, no two side by side in a row, every gap a printed neighbour: R x min(ceil(C/2), C-2), at most half) holds the most it can, SILENTLY on the pupil page and the key; the cap is said only in the panel's help text (lead 2026-11-14). ws-guided-echo BLANK-COUNT holds every dealt window to it"
@@ -397,11 +396,29 @@
         "d": "hidden",
         "proposed": true,
         "skills": [
-          "composing:hundreds_chart_fill",
-          "composing:chart_to_120"
+          "composing:hundreds_chart_fill"
         ],
         "source": "owner request, lead ruling 2026-11-14 (extend tiles, do not add an option)",
         "why": "kept so old share codes decode (ws-code-snapshot: nothing MOVED), not offered in the panel (a value's hidden: true, offeredOptionsFor). null - the old '1 to 3, dealt' - now deals the default, 5"
+      },
+      {
+        "option": "tiles",
+        "values": [
+          "null",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "skills": [
+          "composing:number_chart_fill"
+        ],
+        "source": "skill-options.js number_chart_fill tiles (unchanged 2026-11-14)",
+        "why": "the bigger chart keeps its 'Empty boxes', 1 to 3 dealt by default (3 rows of 4: at most two in a row); the 2026-11-14 ruling covers hundreds_chart_fill and its preset chart_to_120"
       },
       {
         "option": "grid",

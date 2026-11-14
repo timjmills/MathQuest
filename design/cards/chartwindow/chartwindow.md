@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"chartwindow","kind":"template","template":"chartwindow","families":["composing"],"match":{"templates":["chartwindow"]},"config":"design/cards/chartwindow/card.json","indexSha":"73c6e123d1432e332c8a0bbf42a9d2c7ac458a52","bodySha":"1f60abc2ea5207dc","format":2,"configSha":"d09d0833c073"}
-{"cited":"AX-4 BD-7 BD-14 E31 H1 H2 H3 H4 H5 H6 H8 H10 H11 H12 H13 L1 L2 L6 L10 L11 LR-5 LR-6 OC4 OC8 OC14 OC15 P-1 P-LC-7 PT-GDP-1 PT-MOD-1 PT-REV-1 PT-REV-3 PT-RSN-1 PT-SCR-3 RP-10 RP-11 RP-30 RP-31 RP-40 RP-60 SC-5 SL-1 SL-11 SP-4 SP-10 SP-11a TY-7 TY-10","rules":"RL-11 598123 CC-15 c5bbea 16 5c4ab9 P-10 256ad3 TY-10 4b6b7f H9 fd82d1 13 36f579 AK-1 a0cc12 2 d4709f SC-4 dd45b7 SP-10 6ffb0a 11a 9ce3fb 12a 163cd7 L-11 ea051e P-1 5a3076 DN-33 f57cd1 VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 L1 4f7d0c 2 885b43 3 901e56 6 6e19d8 10 d2ca35 SCC-01 8aa70b CL-4b e7d90e O2 2500c9 3 4b9162 6 f082f2 AX-4 2eb6c1 BD-7 81d3da 14 c8d982 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 e90105 8 44c23b 10 fbd802 11 bef034 12 2de4f7 L11 9ebe19 OC4 00a5e1 8 089b5e 14 719519 15 0d5392 P-LC-7 255439 PT-GDP-1 a0e2cc PT-MOD-1 45072b PT-REV-1 441cc5 3 d5e0d9 PT-RSN-1 a3e2c1 PT-SCR-3 161440 RP-10 67d199 11 0e9c64 30 d1ff22 31 9101f1 40 a30801 60 89c323 SC-5 648376 SL-1 e3b064 11 fc569a SP-4 51a802 TY-7 e3e1e1","entries":"D%3Aband%3D10%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D20%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D30%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D40%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D50%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D100%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D120%40composing%3Ahundreds_chart_fill bcefeb D%3Aband%3D200%40composing%3Anumber_chart_fill 972948 D%3Aband%3D500%40composing%3Anumber_chart_fill 972948 D%3Aband%3D1000%40composing%3Anumber_chart_fill 972948 D%3Aband%3D5000%40composing%3Anumber_chart_fill 972948 D%3Aband%3D10000%40composing%3Anumber_chart_fill 972948 D%3Atiles%3Dnull 972948 D%3Atiles%3D1 972948 D%3Atiles%3D2 972948 D%3Atiles%3D3 972948 D%3Atiles%3D4 972948 D%3Atiles%3D5 972948 D%3Atiles%3D6 972948 D%3Atiles%3D7 972948 D%3Agrid%3Dwindow%40composing%3Ahundreds_chart_fill 972948 D%3Agrid%3Drows%40composing%3Ahundreds_chart_fill 972948 D%3Agrid%3Dwhole%40composing%3Ahundreds_chart_fill 972948 D%3Agrid%3Drows%40composing%3Ahundreds_chart_fill%23guided%2Clesson%2Ctest f9f1d8 D%3Agrid%3Dwhole%40composing%3Ahundreds_chart_fill%23guided%2Clesson%2Ctest f9f1d8 D%3Agrid%3Drows%40composing%3Ahundreds_chart_fill%23independent%2Cmixed-practice%2Cmore-practice%2Creview f9f1d8 D%3Aband%3D10%40composing%3Ahundreds_chart_fill%23independent%2Cmixed-practice%2Cmore-practice%2Creview%2Ctest f9f1d8 D%3Agaps%3Dscatter 972948 D%3Agaps%3Drow 972948 D%3Agaps%3Dcolumn 972948 D%3Agaps%3Dpattern 972948 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 04b8b3 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+{"card":"chartwindow","kind":"template","template":"chartwindow","families":["composing"],"match":{"templates":["chartwindow"]},"config":"design/cards/chartwindow/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"b4b19163379e0b04","format":2,"configSha":"11ed69483ec9"}
+{"cited":"AX-4 BD-7 BD-14 E31 H1 H2 H3 H4 H5 H6 H8 H10 H11 H12 H13 L1 L2 L6 L10 L11 LR-5 LR-6 OC4 OC8 OC14 OC15 P-1 P-LC-7 PT-GDP-1 PT-MOD-1 PT-REV-1 PT-REV-3 PT-RSN-1 PT-SCR-3 RP-10 RP-11 RP-30 RP-31 RP-40 RP-60 SC-5 SL-1 SL-11 SP-4 SP-10 SP-11a TY-7 TY-10","rules":"RL-11 598123 CC-15 c5bbea 16 5c4ab9 P-10 256ad3 TY-10 4b6b7f H9 fd82d1 13 36f579 AK-1 a0cc12 2 d4709f SC-4 dd45b7 SP-10 6ffb0a 11a 9ce3fb 12a 163cd7 L-11 ea051e P-1 5a3076 DN-33 f57cd1 VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 L1 4f7d0c 2 885b43 3 901e56 6 6e19d8 10 d2ca35 SCC-01 8aa70b CL-4b e7d90e O2 2500c9 3 4b9162 6 f082f2 AX-4 2eb6c1 BD-7 81d3da 14 c8d982 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 e90105 8 44c23b 10 fbd802 11 bef034 12 2de4f7 L11 9ebe19 OC4 00a5e1 8 089b5e 14 719519 15 0d5392 P-LC-7 255439 PT-GDP-1 a0e2cc PT-MOD-1 45072b PT-REV-1 441cc5 3 d5e0d9 PT-RSN-1 a3e2c1 PT-SCR-3 161440 RP-10 67d199 11 0e9c64 30 d1ff22 31 9101f1 40 a30801 60 89c323 SC-5 648376 SL-1 e3b064 11 fc569a SP-4 51a802 TY-7 e3e1e1","entries":"D%3Aband%3D10%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D20%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D30%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D40%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D50%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D100%40composing%3Ahundreds_chart_fill 972948 D%3Aband%3D120%40composing%3Ahundreds_chart_fill bcefeb D%3Aband%3D200%40composing%3Anumber_chart_fill 972948 D%3Aband%3D500%40composing%3Anumber_chart_fill 972948 D%3Aband%3D1000%40composing%3Anumber_chart_fill 972948 D%3Aband%3D5000%40composing%3Anumber_chart_fill 972948 D%3Aband%3D10000%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D2%40composing%3Ahundreds_chart_fill 972948 D%3Atiles%3D3%40composing%3Ahundreds_chart_fill 972948 D%3Atiles%3D4%40composing%3Ahundreds_chart_fill 972948 D%3Atiles%3D5%40composing%3Ahundreds_chart_fill 972948 D%3Atiles%3D6%40composing%3Ahundreds_chart_fill 972948 D%3Atiles%3D8%40composing%3Ahundreds_chart_fill 972948 D%3Atiles%3Dnull%40composing%3Ahundreds_chart_fill d55128 D%3Atiles%3D1%40composing%3Ahundreds_chart_fill d55128 D%3Atiles%3D7%40composing%3Ahundreds_chart_fill d55128 D%3Atiles%3Dnull%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D1%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D2%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D3%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D4%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D5%40composing%3Anumber_chart_fill 972948 D%3Atiles%3D6%40composing%3Anumber_chart_fill 972948 D%3Agrid%3Dwindow%40composing%3Ahundreds_chart_fill 972948 D%3Agrid%3Drows%40composing%3Ahundreds_chart_fill 972948 D%3Agrid%3Dwhole%40composing%3Ahundreds_chart_fill 972948 D%3Agrid%3Drows%40composing%3Ahundreds_chart_fill%23guided%2Clesson%2Ctest f9f1d8 D%3Agrid%3Dwhole%40composing%3Ahundreds_chart_fill%23guided%2Clesson%2Ctest f9f1d8 D%3Agrid%3Drows%40composing%3Ahundreds_chart_fill%23independent%2Cmixed-practice%2Cmore-practice%2Creview f9f1d8 D%3Aband%3D10%40composing%3Ahundreds_chart_fill%23independent%2Cmixed-practice%2Cmore-practice%2Creview%2Ctest f9f1d8 D%3Agaps%3Dscatter 972948 D%3Agaps%3Drow 972948 D%3Agaps%3Dcolumn 972948 D%3Agaps%3Dpattern 972948 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 04b8b3 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
 {"v": 1, "card": "chartwindow",
@@ -8,9 +8,10 @@
 "rulings": [
 ],
 "notOffered": [
- {"id":"N-D-grid-roles-1","source":"§7a (decision: lead ruling 2026-11-13 (chart_120 precritic OPEN 1; §5.4))","option":"grid","skills":["composing:hundreds_chart_fill"],"roles":["guided","lesson","test"],"values":["rows","whole"]},
- {"id":"N-D-grid-roles-2","source":"§7a (decision: lead ruling 2026-11-14 (chart_120 r2, ruling (a)))","option":"grid","skills":["composing:hundreds_chart_fill"],"roles":["independent","mixed-practice","more-practice","review"],"values":["rows"]},
- {"id":"N-D-band-roles-3","source":"§7a (decision: lead ruling 2026-11-14 (chart_120 r2, ruling (a)))","option":"band","skills":["composing:hundreds_chart_fill"],"roles":["independent","mixed-practice","more-practice","review","test"],"values":["10"]}
+ {"id":"N-D-tiles-1","source":"§7a (decision, PROPOSED: owner request, lead ruling 2026-11-14 (extend tiles, do not add an option))","option":"tiles","skills":["composing:hundreds_chart_fill"],"values":["null","1","7"]},
+ {"id":"N-D-grid-roles-2","source":"§7a (decision: lead ruling 2026-11-13 (chart_120 precritic OPEN 1; §5.4))","option":"grid","skills":["composing:hundreds_chart_fill"],"roles":["guided","lesson","test"],"values":["rows","whole"]},
+ {"id":"N-D-grid-roles-3","source":"§7a (decision: lead ruling 2026-11-14 (chart_120 r2, ruling (a)))","option":"grid","skills":["composing:hundreds_chart_fill"],"roles":["independent","mixed-practice","more-practice","review"],"values":["rows"]},
+ {"id":"N-D-band-roles-4","source":"§7a (decision: lead ruling 2026-11-14 (chart_120 r2, ruling (a)))","option":"band","skills":["composing:hundreds_chart_fill"],"roles":["independent","mixed-practice","more-practice","review","test"],"values":["10"]}
 ],
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"hundreds_chart_fill \"Numbers to\" 10, 20, 30, 40, 50 and 100; a bigger chart as its own ..."},
@@ -19,6 +20,7 @@
  {"id":"T-5.5","source":"§5.5","text":"'writes-ten-ten' (110 written 1010) is RE-SCOPED, not dropped: it is still taught on th..."},
  {"id":"T-5.6","source":"§5.6","text":"Routed, not this card's: the Guided Model-row band (EB-BAND guided M/L, the shared Guid..."},
  {"id":"T-5.7","source":"§5.7","text":"role:stretch is OUT OF SCOPE on the chartwindow card (hundreds_chart_fill and its prese..."},
+ {"id":"T-5.8","source":"§5.8","text":"'Numbers to fill in' (the tiles option, extended - no second option): 5 numbers to fill..."},
  {"id":"T-9.1","source":"§9.1","text":"Owner rule 2026-10-17: is band 120 a distinct difficulty that must ALSO be a findable p..."},
  {"id":"T-9.2","source":"§9.2","text":"Band 120 window rows: always 91-100 / 101-110 / 111-120 (every window crosses 100), or ..."},
  {"id":"T-9.3","source":"§9.3","text":"The build-list ladder fades 'row starts given -> none' and asks for 'fill the row 111-1..."},
@@ -70,7 +72,6 @@ Count, read and write numerals to 120 starting at any number, across 100 (1.NBT.
 **Build-list entries on this template** (standards, ladder and full spec of each in `design/BUILD_LIST.md`)
 
 - `bonds_100` (new) Bonds to 100 — host `addition:bonds_to_100`
-- `chart_120` (option) Count to 120 on the Chart — host `composing:hundreds_chart_fill`
 - `multiples_2_5_10` (option) Multiples of 2, 5 and 10 — host `number_theory:multiples`
 - `vis_chart_shade` (option) Shade the Hundred Square (whole-chart tasks) — host `composing:hundreds_chart_fill`
 
@@ -92,7 +93,7 @@ Template `chartwindow` — `js/modules/sheet/cells/chartwindow.js`; also Generat
 
 ## 4. Rules that apply
 
-From the rule-id index (`design/cards/rule-index.json`, sha `73c6e123d143`). An id written `ID@SRC` is defined in more than one standard.
+From the rule-id index (`design/cards/rule-index.json`, sha `5eb60f823a61`). An id written `ID@SRC` is defined in more than one standard.
 
 ### 4a. Core rules — apply every one (11 rules; ✱ = quoted in full, the rest cut at a sentence)
 
@@ -155,6 +156,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-11-13** — 'writes-ten-ten' (110 written 1010) is RE-SCOPED, not dropped: it is still taught on the screen practice card and in Reason It's TEXT (a worked-wrong statement in words, a wrong number in a slot wide enough for four digits), but never inside a three-digit chart square. (`lead ruling 2026-11-13 (chart_120 precritic-diff OPEN 5); §3 notes, §6 M-C1; ws-text-misconception`)
 - **2026-11-13** — Routed, not this card's: the Guided Model-row band (EB-BAND guided M/L, the shared Guided layout) and the review / pre-skill-check counters band (EB-SIDE 4, known master debt) go to lane lf-roles; sibling-compare stays SKIPPED (first family on the template: the critic grades the named pages). (`lead ruling 2026-11-13 (chart_120 precritic-diff OPEN 2-4)`)
 - **2026-11-13** — role:stretch is OUT OF SCOPE on the chartwindow card (hundreds_chart_fill and its preset chart_to_120), the same as count_by_tables: the window has no open problem of its own and the app composes no Stretch page for it; Reason It and True or False? are its thinking pages. (`lead ruling 2026-11-13 (via the coordinator; chart_120 precritic r8 EB-ROLE)`)
+- **2026-11-14** — 'Numbers to fill in' (the tiles option, extended - no second option): 5 numbers to fill in per window by default, with 2, 3, 4, 6 and 8 offered; 1 and 7 decode but are hidden; null means 5. A window too small for N holds the legal maximum silently (no note on the page or the key; the panel help says so). On one sheet no missing value is printed in any other window (print and screen): band 120's windows share one pattern repeating every five columns; other bands blank shared squares consistently. (`owner request; lead ruling 2026-11-14 (via the coordinator)`)
 
 ## 6. Misconceptions
 
@@ -165,7 +167,6 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 - **M-C3** after 119 starts a new hundred — e.g. after 119 comes 200
 - **M-C4** moves ten (down a column) where the gap is one along the row (wrong-row) — e.g. the square after 104 written 114
 - **M-C5** writes the number before, not the missing number (one-less) — e.g. the square after 99 written 99
-- From the build list (entries hosted on composing): writes 1010 for 110; 109 → 200
 
 ## 7. Options and presets
 
@@ -185,7 +186,9 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `band=10 | 20 | 30 | 40 | 50 | 100` — **offered** (PROPOSED) on `hundreds_chart_fill` — the chart the window is cut from; 100 the default; each band is its own page judged on its own (L29) (owner 2026-09-25 (skill-options.js _ap1Put))
 - `band=120` — **offered** on `hundreds_chart_fill` — NEW (to build): the window always rows 91-120, crossing 100; three-digit squares 15 / 16 / 18 mm; whole chart 12 rows. Not offered by the repo yet, so --check-signed NOTEs it until the build lands (build-list chart_120; this card §3, §9.1-9.2)
 - `band=200 | 500 | 1000 | 5000 | 10000` — **offered** (PROPOSED) on `number_chart_fill` — the stretch of the bigger chart; never crosses 100 (first band 101-200); squares widen for 3-5 digits (owner 2026-09-25 (SKILL_OPTIONS number_chart_fill))
-- `tiles=null | 1 | 2 | 3 | 4 | 5 | 6 | 7` — **offered** (PROPOSED) — how many squares the pupil writes; capped per window by the gap rules (R x min(ceil(C/2), C-2)) (skill-options.js P11 hundreds_chart_fill tiles)
+- `tiles=2 | 3 | 4 | 5 | 6 | 8` — **offered** (PROPOSED) on `hundreds_chart_fill` — 'Numbers to fill in': how many numbers the pupil writes in each window, 5 by default. A window that cannot hold the number under the rules (never more than half its squares, never a whole row, no two side by side in a row, every gap a printed neighbour: R x min(ceil(C/2), C-2), at most half) holds the most it can, SILENTLY on the pupil page and the key; the cap is said only in the panel's help text (lead 2026-11-14). ws-guided-echo BLANK-COUNT holds every dealt window to it (owner request, lead ruling 2026-11-14 (extend tiles, do not add an option))
+- `tiles=null | 1 | 7` — **hidden** (PROPOSED) on `hundreds_chart_fill` — kept so old share codes decode (ws-code-snapshot: nothing MOVED), not offered in the panel (a value's hidden: true, offeredOptionsFor). null - the old '1 to 3, dealt' - now deals the default, 5 (owner request, lead ruling 2026-11-14 (extend tiles, do not add an option))
+- `tiles=null | 1 | 2 | 3 | 4 | 5 | 6` — **offered** (PROPOSED) on `number_chart_fill` — the bigger chart keeps its 'Empty boxes', 1 to 3 dealt by default (3 rows of 4: at most two in a row); the 2026-11-14 ruling covers hundreds_chart_fill and its preset chart_to_120 (skill-options.js number_chart_fill tiles (unchanged 2026-11-14))
 - `grid=window | rows | whole` — **offered** (PROPOSED) on `hundreds_chart_fill` — O6: a 3 x 5 piece / three rows of ten / the whole chart (12 rows at band 120, one cell to a page); rows / whole are one chart to a page, so they are offered on Independent, More practice and the simple print and hidden on Lesson, Guided and Test (the next decision) (skill-options.js _gridOptions (Wave 1 lane C))
 - `grid=rows | whole` — **hidden** on `hundreds_chart_fill` on the roles `lesson`, `guided`, `test` only — three rows of ten and the whole chart are one chart to a page by design; on a Lesson (beside the Steps and the anchor chart), a Guided page (under the Model) and a Test (many items a page) they overflowed (OVERFLOW lesson 18 / 24, guided 8-12) or printed one item a page (LONE-PAGE test 3). These roles never deal them: the option falls back to the window (skill-options.js hiddenOnRoles, print-sheet optsForRole); ws-role-hidden holds every hidden role's deal to it (lead ruling 2026-11-13 (chart_120 precritic OPEN 1; §5.4))
 - `grid=rows` — **hidden** on `hundreds_chart_fill` on the roles `independent`, `more-practice`, `review`, `mixed-practice` only — one possible window means one item a sheet or a giveaway (lead 2026-11-14): band 120's three rows of ten and the chart to 10 have ONE window, so a second item prints the first one's answers (critic r1 F4 / F9). The multi-item practice pages deal the window / the 1-100 chart instead (skill-options.js hiddenOnRoles, print-sheet optsForRole); the screen card, the quiz and the lesson keep them; ws-role-hidden holds every hidden role's deal to it (lead ruling 2026-11-14 (chart_120 r2, ruling (a)))
@@ -251,7 +254,7 @@ Each runs as `node tests/scripts/<script> …`.
 4. **WRM tag: build-list chart_120 names Y2.B1.S5, which is 'Partition numbers to 100' (1.NBT.B.2), not counting to 120. WRM has no 'to 120' step. Which tag?** Recommended: Fix the build-list entry: tag {step: Y1.B12.S1 'Count from 50 to 100', partial} and keep the lesson link G1-Y2.B1 (Count on to 120) in data/curriculum/links; drop Y2.B1.S5.
 5. **The whole chart at 120 is 12 rows. Shorter squares (16.25 mm tall, same 17.5 mm width and digit size) to keep one page, or two pages (1-60, 61-120)?** Recommended: Shorter squares on one page: the chart's point is the whole pattern in one view, and 16.25 mm stays above the 14 mm writing floor (H9).
 
-Signed: owner, 2026-11-14
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
@@ -267,14 +270,12 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `band=50` Numbers to (hundreds_chart_fill) [offered, PROPOSED]
 - `band=100` Numbers to, default (hundreds_chart_fill) [offered, PROPOSED]
 - `band=120` Numbers to (hundreds_chart_fill) [offered]
-- `tiles=null` Empty boxes [difficulty], default (all 2) [offered, PROPOSED]
-- `tiles=1` Empty boxes [difficulty] (all 2) [offered, PROPOSED]
-- `tiles=2` Empty boxes [difficulty] (all 2) [offered, PROPOSED]
-- `tiles=3` Empty boxes [difficulty] (all 2) [offered, PROPOSED]
-- `tiles=4` Empty boxes [difficulty] (all 2) [offered, PROPOSED]
-- `tiles=5` Empty boxes [difficulty] (all 2) [offered, PROPOSED]
-- `tiles=6` Empty boxes [difficulty] (all 2) [offered, PROPOSED]
-- `tiles=7` Empty boxes [difficulty] (hundreds_chart_fill) [offered, PROPOSED]
+- `tiles=2` Numbers to fill in [difficulty] (all 2) [offered, PROPOSED]
+- `tiles=3` Numbers to fill in [difficulty] (all 2) [offered, PROPOSED]
+- `tiles=4` Numbers to fill in [difficulty] (all 2) [offered, PROPOSED]
+- `tiles=5` Numbers to fill in [difficulty], default on hundreds_chart_fill (all 2) [offered, PROPOSED]
+- `tiles=6` Numbers to fill in [difficulty] (all 2) [offered, PROPOSED]
+- `tiles=8` Numbers to fill in [difficulty] (hundreds_chart_fill) [offered, PROPOSED]
 - `grid=window` Grid size [layout], default (hundreds_chart_fill) [offered, PROPOSED]
 - `grid=rows` Grid size [layout] (hundreds_chart_fill) [offered, PROPOSED]
 - `grid=whole` Grid size [layout] (hundreds_chart_fill) [offered, PROPOSED]
@@ -290,17 +291,19 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `band=1000` Numbers in (number_chart_fill) [offered, PROPOSED]
 - `band=5000` Numbers in (number_chart_fill) [offered, PROPOSED]
 - `band=10000` Numbers in (number_chart_fill) [offered, PROPOSED]
+- `tiles=null` Empty boxes [difficulty], default (number_chart_fill) [offered, PROPOSED]
+- `tiles=1` Empty boxes [difficulty] (number_chart_fill) [offered, PROPOSED]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
 - `role:independent` — the skill's own items (all 2) [offered, PROPOSED]
 - `role:more-practice` — the skill's own items (all 2) [offered, PROPOSED]
-- `role:opener` (also lesson-opener) — the skill's own items (all 2) [offered, PROPOSED]
+- `role:opener` (also lesson-opener) — provider stories: real 0/2 (default on hundreds_chart_fill, number_chart_fill) (all 2) [offered, PROPOSED]
 - `role:scripted-model` (also model) — provider workedSteps: real 2/2 (all 2) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 2/2 (all 2) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 2/2; provider stories: real 0/2 (default on hundreds_chart_fill, number_chart_fill) (all 2) [offered, PROPOSED]
 - `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/2; provider misconceptions: real 2/2 (all 2) [offered, PROPOSED]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered, PROPOSED]
-- `role:test` (also test-a, test-b) — the skill's own items (all 2) [offered, PROPOSED]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 0/2 (default on hundreds_chart_fill, number_chart_fill) (all 2) [offered, PROPOSED]
+- `role:test` (also test-a, test-b) — provider stories: real 0/2 (default on hundreds_chart_fill, number_chart_fill) (all 2) [offered, PROPOSED]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered, PROPOSED]
 - `role:word-problems` — provider stories: real 0/2 (default on hundreds_chart_fill, number_chart_fill) (all 2) [out of scope, PROPOSED]
 - `role:fact-rows` — provider stories: real 0/2 (default on hundreds_chart_fill, number_chart_fill) (all 2) [out of scope, PROPOSED]
@@ -325,10 +328,11 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
 - `gaps` Empty squares: scatter / row / column / pattern (2)
-- `tiles` Empty boxes: (1 to 3, dealt) / 1 / 2 / 3 / 4 / 5 / 6 / 7 (2)
 - `band` Numbers to: 10 / 20 / 30 / 40 / 50 / 100 / 120 (1)
 - `band` Numbers in: 200 / 500 / 1000 / 5000 / 10000 (1)
 - `grid` Grid size: window / rows / whole (1)
+- `tiles` Numbers to fill in: (5 (default)) / 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 (1)
+- `tiles` Empty boxes: (1 to 3, dealt) / 1 / 2 / 3 / 4 / 5 / 6 (1)
 
 **Preset skills on these hosts** (`js/modules/skill-presets.js`): `composing:chart_to_120` → `composing:hundreds_chart_fill` {"band":120}
 <!-- /informational -->
