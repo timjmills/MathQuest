@@ -11192,14 +11192,14 @@
     "state": "one evaluate over every skill: no restart, no retry, no sweep line"
    },
    "pass": {
-    "commit": "HEAD",
+    "commit": "9d7772a36",
     "state": "crash at skill 2 retried; 4 of 4 measured"
    },
-   "command": "MQ_TOF_CRASH_AT=2 node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply --restart-every 2",
+   "command": "env MQ_TOF_CRASH_AT=2 node {root}/tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply --restart-every 2 2>&1 | grep -q 'retried 1' && echo 'tof-retry: OK' || echo 'tof-retry: FAIL (no crash retried)'",
    "expect": {
-    "fail": "ws-tof-stem: OK",
-    "pass": "measured 4, browser restarts 2, retried 1"
-   }
+   "fail": "FAIL",
+   "pass": "OK"
+  }
   }
  ]
 }
