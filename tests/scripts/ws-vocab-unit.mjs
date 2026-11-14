@@ -35,7 +35,7 @@
 //     reads as cycle
 // --browser V-PAGE (r15) no two Match 3 cells of one printed page put the same pictures in the same places
 // --browser r16 (critic r5 nits): V-NAMES no Error analysis page repeats a pupil name while one is unused; V-LETTER the Match 3
-//     letter at one anchor (top-left of its picture) in every slot of a row, print and card; V-BOX390 card-390 boxes in one column
+//     letter at one anchor (top-left of its picture) in every slot of a row, print and card (V-BOX390 retired 2026-11-14: no phone width)
 // V-KEY (r15) every key underlay lies inside the cell, box or ring its mark sits in (+0.5 mm); a whole-drawing focal part on a
 //     structure greys at most 60 % of the picture
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
@@ -968,17 +968,17 @@ async function pageRepeatChecks(page, fail) {
 // V-LETTER  (nit 3) a Match 3 picture letter sits at one anchor, the top-left of its picture, on every picture of a row, whatever
 //           the picture's height: in one line of pictures the letters' tops are within 0.5 mm, and the letter's offset from its
 //           picture's top-left (letter top - picture top, picture left - letter right) is the same within 0.5 mm. Every print
-//           role that deals Match 3 (S / M / L) and the practice card at 1280, 820 and 390 px (A sat at mid-height beside a
+//           role that deals Match 3 (S / M / L) and the practice card at 1280, 1024 and 820 px (390 dropped, owner 2026-11-13) (A sat at mid-height beside a
 //           short picture while B and C sat at the top: Match 3 S independent item 3; card-1280 A at the baseline)
-// V-BOX390  (nit 4) on the practice card at 390 px the three Match 3 letter boxes stand in one column: their left x within 4 px
-//           (they followed the centred words, x 230 / 260 / 225 px); worksheet-1280 already holds this (V19)
+// V-BOX390  RETIRED 2026-11-14 (lf-placevalue, owner rule 2026-11-13: no phone width): it measured the card at 390 px only;
+//           the box column at worksheet-1280 stays held by V19
 // V-CAPTION (nit 6) the captions of one Match 3 picture row print at one size: each picture's largest text, in pt as printed,
 //           within 1 pt across the row's pictures that print text ("2 x 3 = 3 x 2" at 13 pt beside "5 x 1 = 5" at 20 pt)
 // V-GLINE   (nit 2) on a 1 picture, 3 words Guided page the write lines of one row stand at one y (bottom within 0.5 mm), the
 //           Model and the hinted try included (row 1: the hint cell's line 560 px, the Model's 605 px at L)
 // V18 / V18M (r1-r4; V18M r16 for nit 1) the Guided rows are equal at S, M and L within 1 mm, measured on the rendered row
 //           boxes - 1 picture, 3 words (V18) and Match 3 (V18M: rows were model 252 / hint 267 / plain 227 px at S)
-function r16List() { return ['V-NAMES', 'V-LETTER', 'V-BOX390', 'V-CAPTION', 'V-GLINE', 'V18', 'V18M']; }   // (a function: browserChecks runs before this line, top-level await)
+function r16List() { return ['V-NAMES', 'V-LETTER', 'V-CAPTION', 'V-GLINE', 'V18', 'V18M']; }   // (a function: browserChecks runs before this line, top-level await)
 function R16_FNV(x) { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 // the seeds a page is judged at: 7, V23's 143869 and ws-grade-render's seed for the role (the critic's page)
 function r16Seeds(skillId, role) { return [...new Set([7, 143869, R16_FNV(`vocabulary__${skillId}:${role}`) % 1000000])]; }
@@ -1097,23 +1097,11 @@ async function r16Checks(page, fail, sheet, build) {
             });
         }
         if (want('V-CAPTION') && !rows) fail('V-CAPTION: no Match 3 row with two captioned pictures');
-        for (const width of want('V-LETTER') ? [1280, 820, 390] : []) for (let k = 0; k < 6; k++) {
+        for (const width of want('V-LETTER') ? [1280, 1024, 820] : []) for (let k = 0; k < 6; k++) {
             await card('vocab_grade_pictures', width, k);
             lines += judgeLetters(`card-${width} question ${k + 1}`, await page.evaluate(LETTERS), 2);
         }
         if (want('V-LETTER') && !lines) fail('V-LETTER: no Match 3 picture row measured');
-    }
-    if (want('V-BOX390')) {
-        let cells = 0;
-        for (let k = 0; k < 8; k++) {
-            await card('vocab_grade_pictures', 390, k);
-            const xs = await page.evaluate(() => [...document.querySelectorAll('#questionCard .mq-vm')].map((c) => [...c.querySelectorAll('.mq-vm-box')].map((b) => Math.round(b.getBoundingClientRect().left))));
-            for (const x of xs) {
-                cells++;
-                if (x.length && Math.max(...x) - Math.min(...x) > 4) fail(`V-BOX390 card-390 question ${k + 1}: the letter boxes stand at x ${x.join(' / ')} px (want one column, within 4 px)`);
-            }
-        }
-        if (!cells) fail('V-BOX390: no Match 3 cell on the card at 390 px');
     }
 }
 async function r7Checks(page, fail, sheet) {
