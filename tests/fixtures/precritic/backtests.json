@@ -8670,6 +8670,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "gate-agree-batch-ctx",
+   "check": "ws-gate-agree runs on a tree whose ws-precritic plan reads ctx.batch (no TypeError; the precritic row agrees with the tool's verdict)",
+   "kind": "commit-pair",
+   "rule": "ws-gate-agree (precritic two-step r13: the tool crashed after the master 88cc98b00 merge - buildPlan read ctx.batch.length)",
+   "browser": true,
+   "fail": {
+    "commit": "325e26190",
+    "state": "TypeError: Cannot read properties of undefined (reading 'length') at buildPlan"
+   },
+   "pass": {
+    "commit": "fa0185e4a",
+    "state": "buildPlan gets batch: []"
+   },
+   "command": "node tests/scripts/ws-gate-agree.mjs --root {root} --gate screen-support-eq --skills algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
