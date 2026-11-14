@@ -356,7 +356,8 @@ function shownCmd(g) {
 // a non-zero exit (the tool exits 1 because of exactly those findings). judge() turns any other non-zero exit, and any
 // time-out, into FAIL whatever the parser read: a gate that crashed or was killed never shows PASS (critic r1, D1/D8).
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
+// (a tool run with a mode flag prints "ws-no-size-s --browser: OK" - its verdict too; chart_120 r2: the gate read it as unparsed)
+const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}(?: --[\\w-]+)*: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
 const NOISE = /MODULE_TYPELESS_PACKAGE_JSON|Reparsing as ES module|eliminate this warning|--trace-warnings|^\$ /;
 const tailLines = (out, n = 6) => String(out).split('\n').map((l) => l.trimEnd()).filter((l) => l.trim() && !NOISE.test(l)).slice(-n);
 const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output (${what})`, detail: tailLines(out), explainsExit: false });
