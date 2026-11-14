@@ -8706,6 +8706,48 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "precritic-role-cover-plan",
+  "check": "lf-ops critic cbt r2 root cause (E3 / E5 / E6): precritic --skill linted only the Independent (and lesson) page at defaults, so Scripted Model L (L-OVERLAP SECTION), Opener (CL40-INK) and Error analysis (L-TOPSTART CL-4b) never gated though plain print-lint was red on them. The --skill dry run must plan print-lint / empty-band / raster-fit on every offered role (no card: every buildSheet role) at M and L, and print the plan's size",
+  "kind": "commit-pair",
+  "rule": "ws-precritic --skill plans ws-role-cover (every offered role x M/L x drawing option values; --dry-run prints 'role cover size: N print-lint + N empty-band + N raster-fit unit(s) ... est N min'); read by ws-role-cover --plan-check",
+  "browser": false,
+  "fail": {
+   "commit": "22752843c",
+   "state": "master: print-lint rows only on independent (L, M) and lesson (L, M); no row lints opener, error-analysis or scripted-model"
+  },
+  "pass": {
+   "commit": "d17e76aa7",
+   "state": "the role-cover rows: every buildSheet role of count_by_tables (no signed card on this tree) at M and L, 8 drawing variants"
+  },
+  "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "role-cover-cbt-e3-e5-e6",
+  "check": "lf-ops critic cbt r2 E3 / E5 / E6 on the frozen tree 8f76b6401: run with the NEW coverage (ws-role-cover's lint on the card's roles where they live: opener, error-analysis, scripted-model at M and L), print-lint FAILs naming all three - E3 scripted-model@L L-OVERLAP SECTION (the Say band covered), E5 opener CL40-INK (the step tab in the label keep-out), E6 error-analysis L-TOPSTART CL-4b (the gap above 'Sam wrote:'). With the OLD coverage (Independent only, at M and L) the same tree is OK - which is how the three reached the critic",
+  "kind": "commit-pair",
+  "rule": "ws-role-cover lint units (every offered role x M/L; precritic role-cover-1..n)",
+  "browser": true,
+  "fail": {
+   "commit": "8f76b6401",
+   "args": "--roles opener,error-analysis,scripted-model",
+   "state": "the new plan's lint rows on the roles of E3 / E5 / E6: FAIL with all three visible"
+  },
+  "pass": {
+   "commit": "8f76b6401",
+   "args": "--roles independent --with-covered",
+   "state": "the SAME tree under the old plan's lint coverage (Independent at M and L): OK - the coverage, not the tree, is what changed"
+  },
+  "command": "bash tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L {args}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
- ]
+]
 }

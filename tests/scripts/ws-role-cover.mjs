@@ -50,7 +50,7 @@ export const COVERED = {
 };
 export const EB_DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
 // seconds, measured on count_by_tables in this container (2026-11-14, see design/status/lf-checks.md); a planning estimate only
-export const COST = { start: 12, lint: 6, band: 4, raster: 9 };
+export const COST = { start: 12, lint: 5, band: 4, raster: 9 };
 export const TOOLS = ['lint', 'band', 'raster'];
 
 /** The units of one skill's plan. Pure. p = ws-drawing-variants' record; o = {tools, roles?, sizes, defaultsOnly, withCovered}. */
@@ -98,6 +98,19 @@ export function rises(doc, pin) {
     return out;
 }
 
+/** ws-empty-band's failing rules with their detail lines: `RULE FAIL n` then indented lines -> 'RULE: detail'. Pure. */
+export function bandFindings(out) {
+    const res = [];
+    let rule = null;
+    for (const l of String(out).split('\n')) {
+        const m = /^((?:EB|MOD)-[A-Z]+)\s+(PASS|FAIL)\b/.exec(l);
+        if (m) { rule = m[2] === 'FAIL' ? m[1] : null; continue; }
+        if (rule && /^\s{2,}\S/.test(l)) res.push(`${rule} ${l.trim()}`);
+        else if (!/^\s/.test(l)) rule = null;
+    }
+    return res;
+}
+
 function run(cmd, args, cwd, logFile) {
     return new Promise((res) => {
         const ch = spawn(cmd, args, { cwd, env: { ...process.env, MQ_ROOT: cwd }, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -128,13 +141,38 @@ async function selfTest() {
     const F = (lint, rule) => ({ lint, rule, msg: 'm' });
     eq('ratchet: a pinned count holds, a rise fails', rises({ findings: [F('L-INK', 'CL40-INK'), F('L-INK', 'CL40-INK'), F('L-KEY', 'AK-2')] }, { findings: [F('L-INK', 'CL40-INK'), F('L-INK', 'CL40-INK')] }).map((r) => r.k), ['L-KEY AK-2']);
     eq('ratchet: unpinned must be clean', rises({ findings: [F('L-TOPSTART', 'CL-4b')] }, null).length, 1);
-    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length})` : 'OK (11 cases)'}`);
+    const PT = '  [browser] x — tests/scripts/mq-browser-run.sh node tests/scripts/ws-role-cover.mjs --skill a:b --shard 1/1\nws-precritic role cover: a:b 3 roles (card c; roles=independent,opener,lesson) + 0 drawing variant(s)\nws-precritic role cover size: 4 print-lint + 0 empty-band + 4 raster-fit unit(s) in 1 shard(s); est 1.2 min of slot time';
+    eq('plan-check: planned', planCheck(PT, ['a:b'], ['opener']), []);
+    eq('plan-check: a role off the plan, the old plan', [planCheck(PT, ['a:b'], ['scripted-model']).length, planCheck('  [browser] ws-print-lint --roles lesson a:b', ['a:b'], ['opener']).length], [1, 3]);
+    eq('band findings: only FAIL rules, with their detail', bandFindings('EB-BAND  PASS\nEB-VOCAB FAIL 1\n   a:b lesson M p2 vocab cell 1: 38 %\nEB-PAGE  PASS\n(1 skill(s))\nws-empty-band: FAIL (1)'), ['EB-VOCAB a:b lesson M p2 vocab cell 1: 38 %']);
+    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length})` : 'OK (14 cases)'}`);
     for (const b of bad) console.log(`  - ${b}`);
     return bad.length ? 1 : 0;
 }
 
+/** --plan-check: does a ws-precritic --dry-run text (stdin) plan the role cover of `skills` on `roles`? Pure. -> [missing] */
+export function planCheck(text, skills, roles) {
+    const miss = [];
+    for (const k of skills) {
+        if (!String(text).split('\n').some((l) => l.includes('tests/scripts/ws-role-cover.') && l.includes(k))) miss.push(`${k}: no ws-role-cover row`);
+        const m = new RegExp(`role cover: .*?${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\d+ roles \\([^\\n]*?roles=([^;)\\s]+)`).exec(text);
+        const have = m ? m[1].split(',') : [];
+        for (const r of roles) if (!have.includes(r)) miss.push(`${k}: role ${r} not in the role cover`);
+    }
+    if (!/role cover size: [1-9]\d* print-lint \+ \d+ empty-band \+ [1-9]\d* raster-fit unit\(s\) in \d+ shard\(s\); est [\d.]+ min/.test(text)) miss.push('no "role cover size: ... est N min" line');
+    return miss;
+}
+
 async function main() {
     if (has('self-test')) process.exit(await selfTest());
+    if (has('plan-check')) {
+        // (backtest precritic-role-cover-plan) node tests/scripts/ws-precritic.cjs --skill X --dry-run | ws-role-cover --plan-check --skill X --roles r,..
+        let t = ''; for await (const c of process.stdin) t += c;
+        const miss = planCheck(t, list('skill'), list('roles'));
+        console.log(`${TOOL} --plan-check: ${miss.length ? `FAIL (${miss.join('; ')})` : `OK (${list('skill').join(', ')}: ${list('roles').join(', ') || 'the plan'} under print-lint, empty-band and raster-fit at M and L)`}`);
+        process.exitCode = miss.length ? 1 : 0;
+        return;
+    }
     const root = resolve(get('root') || process.env.MQ_ROOT || join(HERE, '..', '..'));
     const skills = list('skill');
     if (!skills.length) { console.log(`usage: ${TOOL} --skill cat:skill[,..] [--plan] [--shard i/n] [--tools lint,band,raster] [--roles r,..] [--sizes M,L] [--defaults-only] [--with-covered] [--out dir] [--root dir] [--eb-args "--vocab-ink --page-fill"] | --self-test`); console.log(`${TOOL}: FAIL (usage)`); process.exit(2); }
@@ -218,7 +256,7 @@ async function main() {
             const v = verdict(r.out, 'ws-empty-band');
             done.band += g.units.band.length;
             if (!v) fails.push(`band ${tag}: no verdict (exit ${r.code})`);
-            else if (v[1] !== 'OK' || r.code) for (const l of String(r.out).split('\n').filter((x) => /^\s*FAIL\b|^\s*EB-[A-Z]+/.test(x)).slice(0, 12)) fails.push(`band ${tag}: ${l.trim().slice(0, 200)}`);
+            else if (v[1] !== 'OK' || r.code) for (const l of bandFindings(r.out).slice(0, 12)) fails.push(`band ${tag}: ${l.slice(0, 200)}`);
             if (v && v[1] !== 'OK' && !fails.some((f) => f.startsWith(`band ${tag}`))) fails.push(`band ${tag}: ${v[0].slice(0, 160)}`);
             console.log(`  band ${tag}: ${roles.length} role(s) x ${szs.join('/')} ${v ? v[1] : 'no verdict'} in ${((Date.now() - t) / 1000).toFixed(0)} s`);
         }

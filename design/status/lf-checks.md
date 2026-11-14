@@ -724,3 +724,37 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
 - Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
   exit uses exitCode when its output can exceed the 64 KB pipe buffer).
+
+## 2026-11-14 — precritic --skill covers every offered role x M/L x drawing option value (lead; lf-ops critic cbt r2 root cause)
+
+- Root cause (critic-cbt-r2.md, lf-ops-props 319b2ae0b): precritic `--skill` ran print-lint on Independent and the lesson page
+  only, raster-fit on Scripted Model / Guided only, and empty-band on the card's roles at defaults (variants: Independent L, 6
+  at most). E3 (Scripted Model L, L-OVERLAP SECTION), E5 (Opener, CL40-INK) and E6 (Error analysis, L-TOPSTART CL-4b) were red
+  in plain print-lint on roles no row rendered.
+- New: `tests/scripts/ws-role-cover.mjs` (rows `role-cover-1..n` on every --skill run) runs print-lint, empty-band and
+  raster-fit on every role the signed card offers (no card: every buildSheet role) at M and L, AND under every option value
+  that changes the drawing. `tests/lib/ws-drawing-variants.mjs` picks those values in node (~1 s): the card's offered values
+  (no card: the skill's own set / enum / bool values), kept when the cells' drawing VOCABULARY (templates + element
+  signatures of the rendered skeleton, any order or count) or SIZE class (median element count, x1.25 steps) differs from the
+  defaults, or when the option is a page option (group layout); one value a distinct drawing. count_by_tables: 8 of 16
+  (times each / given, onePage, jumps 15, shape circle / hex / mixed, spaces line; fill, missing, order dropped as the same
+  drawing). add_facts: 1 of 30 (notation across; its supports keep their own print-lint-supports rows).
+- No repeat renders: units another row already renders are left out (lint independent / lesson, band the card's roles,
+  raster scripted-model / guided, all at defaults). Each tool still renders its own documents (DOM lint, measured cells,
+  printed PDF): one shared render would need the three tools merged, parked. Lint is one `--jobs` browser start a shard.
+- Pins: a defaults lint document is ratcheted against print-lint.json / print-lint.M.json (id cat:skill#role); variant
+  documents and unpinned roles must be clean. A card role buildSheet cannot compose FAILs (no card: a note).
+- Shards: ~45 min of slot time each (at least 2 above 10 min); each shard one runner slot, the tools inside run in it.
+  `--dry-run` prints `role cover size: N print-lint + N empty-band + N raster-fit unit(s) in N shard(s); est N min`.
+- Backtests: `precritic-role-cover-plan` (FAIL master 22752843c, OK d17e76aa7; read by `ws-role-cover --plan-check`) and
+  `role-cover-cbt-e3-e5-e6` (8f76b6401 both states: the new role lint FAILs with E3 / E5 / E6 visible, the old Independent-only
+  lint is OK). Ledger row in CHECKS_FROM_CRITICS.md. ws-precritic-plan: ws-role-cover is an every-role tool.
+- MEASURED (count_by_tables on 8f76b6401, its signed card: 13 roles, 8 drawing variants; 2 slots shared with another lane):
+  shard 1/2 ran 126 lint + 104 band + 126 raster units in 37.7 min (estimate 40.4): print-lint 4.9 s a document (126 in
+  613 s, one browser start), empty-band ~3.8 s a role x size (26 in ~100 s a group), raster-fit ~9.8 s (26 in ~258 s a
+  group). Whole skill ~70 min of slot time, ~36 min wall on two slots (shard 2 not run; estimate 34.7). With no card on this
+  tree (17 roles) the plan is ~94 min of slot time. add_facts (card, 1 variant): ~18 min. The shard found E3 / E5 / E6 on
+  defaults and under every variant, AK-2 on scripted-model / true-false (N4: likely false positive), CL40-INK on
+  reason-it under onePage, EB-BAND on the opener under onePage (E8 class), EB-VOCAB on lesson M, EB-GDPCAP on guided L.
+- Cost note for the lead: raster-fit is half the time. If ~36 min wall a carded skill is too slow, the next cut is raster on
+  variants at L only (about -20 %), or variants on the roles each option line of §7a names (needs the card to say so).
