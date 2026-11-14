@@ -11,4 +11,5 @@ for n in "$root"/*; do b=$(basename "$n"); case "$b" in .git|node_modules|design
 f="$tmp/js/modules/teacher-sheet.js"
 grep -q "case 'size': S.opts.size = v; changed(); return;" "$f" || { echo "nos-drop-first-click: FAIL (anchor not found)"; exit 1; }
 sed -i "s|case 'size': S.opts.size = v; changed(); return;|case 'size': if (!window.__nosDrop) { window.__nosDrop = 1; return; } S.opts.size = v; changed(); return;|" "$f"
-node "$root/tests/scripts/ws-no-size-s.mjs" --browser --root "$tmp" 2>&1 | grep -E '^ws-no-size-s --browser: (OK|FAIL)' | tail -1
+tool="${2:-tests/scripts/ws-no-size-s.mjs}"
+node "$root/$tool" --browser --root "$tmp" 2>&1 | grep -E '^ws-no-size-s --browser: (OK|FAIL)' | tail -1

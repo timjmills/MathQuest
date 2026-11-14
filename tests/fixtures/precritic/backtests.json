@@ -9158,7 +9158,7 @@
    "commit": "db3d4c97d",
    "state": "the de-flaked tool re-clicks once after the build settles: OK"
   },
-  "command": "bash tests/fixtures/precritic/nos-drop-first-click.sh {root}",
+  "command": "bash tests/fixtures/precritic/nos-drop-first-click.sh {root} tests/scripts/ws-no-size-s.mjs",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
