@@ -622,7 +622,7 @@ async function guidedMode() {
                 const pages = [...d.querySelectorAll('.ws-page')];
                 const mm = (el) => (el ? Math.round(el.getBoundingClientRect().height * 25.4 / 96) : 0);
                 const c1 = top(pages[0]), c2 = top(pages[1]);
-                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]) };
+                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')) };
                 d.remove();
                 return r;
             }, { sk, size, seed });
@@ -631,9 +631,11 @@ async function guidedMode() {
             // EXEMPT (lead rulings 2026-11-14, two-step card decision 4 amended): the two-step family at L (the Model and a try do not
             // fit one L page even with the Guided bar off), and multi_step_word (Visual) / multi_step_word_plain at M too ((Visual)
             // keeps its bar - it is the skill's point; _plain's column work is taller). Reported with the measured heights.
-            const exempt = size === 'L' || /^multi_step_word(_plain)?$/.test(sk);
+            // (lead ruling 2026-11-14 (ii), LEAD_DECISIONS: a Model whose step is a NON-fact column / long-division step (STEP-FORM keeps
+            // its frame) is exempt at M too - it cannot share the page; lf-roles' Guided role is to promote a fact-pair Model (post-reset))
+            const exempt = size === 'L' || /^multi_step_word(_plain)?$/.test(sk) || r.colModel;
             if (r.cells < 2) {
-                const msg = `${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (Model ${r.model} mm, first try ${r.firstTry} mm; ${r.pages} pages)`;
+                const msg = `${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (${r.colModel ? 'column-step Model, ' : ''}Model ${r.model} mm, first try ${r.firstTry} mm; ${r.pages} pages)`;
                 if (exempt) exempts.push(msg); else out.push(`GUIDED-MODEL-ALONE ${msg}`);
             }
         }
