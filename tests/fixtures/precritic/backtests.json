@@ -8606,6 +8606,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "touch-floor-fit-top",
+   "check": "ws-phone-card FIT-TOP (critic lf-checks tt-r1 D1): on a computer screen (1280 x 800, 1366 x 768) the practice card fits as it loads - the question text and the cell's first row (the mult chart's x 1-12 factor row) lie inside the viewport below the top bar",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FIT-TOP (critic lf-checks tt-r1 D1)",
+   "browser": true,
+   "fail": {
+    "commit": "c24d069f5",
+    "state": "the touch floor's k2-multgrid rule not width-scoped: 13 rows of 48 px push 'Fill in the missing products.' and the x 1-12 row off the top at 1366 x 768 and 1280 x 800"
+   },
+   "pass": {
+    "commit": "4236381bc",
+    "state": "the k2-multgrid floor scoped to @media (max-width: 1100px), (pointer: coarse): a computer screen keeps the chart's compact rows"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_chart_easy --sizes 1366x768,1280x800 --items 1 --hosts card --only FIT-TOP --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-class-sign",
+   "check": "ws-phone-card TOUCH-TARGET with the shared classifier tests/lib/touch-class.cjs (critic lf-checks tt-r1 D4): the word-work sign circle input.mq-wwork.mq-gl-sign data-mq-kind=\"sign\" is an answer place held to 48 px on a tablet, not a 44 px working box (the c24d069f5 tool passed it at 46 px)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-TARGET / ws-grade-render TARGET: one answer / working classifier (critic lf-checks tt-r1 D4)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/touch-class/sign-46.html",
+    "state": "a 46 px sign circle (data-mq-kind=sign) beside 44 px word-work digit boxes: the c24d069f5 tool said OK"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/touch-class/sign-48.html",
+    "state": "the same frame with a 48 px sign circle; the 44 px digit work boxes stay working boxes"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-TARGET",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
