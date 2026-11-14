@@ -134,6 +134,37 @@ export function compactArc(divisor, dividend, t, g, emMm) {
     return { x0, apex: x0 + bow, a, bow, b: W - s - a - bow, white: W };
 }
 
+/**
+ * LDIV-SHAPE (owner 2026-11-14: "I don't like the big curve ... make it straight or almost straight"): the bracket's
+ * side is a near-straight stroke. From the old arc's `x` (its ends) and `q` (its control point) its apex stays at
+ * the old arc's apex, so the white to the dividend (the hug, ws-ldiv-hug CEIL) is unchanged and the white the bow
+ * gave up goes to the divisor's side; it keeps a slight bow of BRACKET_SAG (in units
+ * of a 10-wide box: <= 0.6 mm on the widest gutter, 0.34 mm on the 13.4 mm screen worked bracket). Every caller that
+ * starts a vinculum rule at the corner reads the corner's x from here.
+ */
+export const BRACKET_SAG = 0.25;
+export function bracketLine(x = 1.5, q = 9, w = 10) {
+    const sag = BRACKET_SAG * w / 10;
+    const m = +(x + (q - x) / 2 - sag).toFixed(3);
+    return { x: m, q: +(m + 2 * sag).toFixed(3) };
+}
+/**
+ * The long-division bracket as ONE stroke (owner 2026-11-14, "it's disconnected"; LDIV-JOIN): the arc is drawn
+ * from its foot up to the vinculum and goes straight on along it in the same path, so the corner is a mitre
+ * join, not a butt cap set under a separate bar. `x` and `q` are the OLD arc's ends and control point; the side
+ * is drawn from them by bracketLine (LDIV-SHAPE), `w` the viewBox width, `h` the viewBox height, `foot` the arc's foot y and
+ * `qy` the control point's y, `bar` where the path's bar ends (default `w`; past `w` it runs on under the next column's
+ * rule, so two pieces never meet at a fractional x - LDIV-JOIN-RASTER)
+ * (all in viewBox units; y 0 is the bar's centre line). Every bracket - the kit's division
+ * cells and the screen's - draws it through this one function; the caller places the svg so y 0 lies on the
+ * vinculum's centre.
+ */
+export function bracketSvg({ x: x0 = 1.5, q: q0 = 9, w = 10, h = 40, bar = w, foot = h, qy = foot / 2, ink = '#000', stroke = HEAVY, cls = '', style = 'display:block;width:100%;height:100%;overflow:visible' } = {}) {
+    const { x, q } = bracketLine(x0, q0, w);   // LDIV-SHAPE: near-straight
+    return `<svg${cls ? ` class="${cls}"` : ''} viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"${style ? ` style="${style}"` : ''}>`
+        + `<path d="M${x} ${foot} Q${q} ${qy} ${x} 0 H${bar}" fill="none" stroke="${ink}" stroke-width="${stroke}" stroke-linejoin="miter" stroke-miterlimit="10" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
 /** Work rows: the payload's count, else two per step of the algorithm (at least two). */
 // A division FACT (`fact: true`, div_facts' long-division form): the bracket and the quotient
 // boxes only - a fact is recalled, not worked, so no work rows.
@@ -293,8 +324,7 @@ register('division', {
             const c = compactArc(V, D, trackMm / g.E, gEm, g.E);
             return { x: +(c.x0 / gEm * 10).toFixed(3), q: +((c.x0 + 2 * c.bow) / gEm * 10).toFixed(3) };
         })() : WIDE_ARC;
-        const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
-            + `<path d="M${A.x} 0 H10 M${A.x} 0 Q${A.q} 20 ${A.x} 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
+        const arc = bracketSvg({ x: A.x, q: A.q, ink: INK.ink });
         // The arc's stroke is centred on y 0 while the vinculum (the dividend's border-top) lies
         // inside its row: the arc drops half a stroke so the two meet in one line.
         html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`;
@@ -304,7 +334,7 @@ register('division', {
         for (let i = 0; i < n; i++) html += cell(esc(D[i]), o + i, 2, `border-top:${HEAVY} solid transparent;`);
         // (it starts over the arc's own top stroke - 15 % into the arc's track, where the path starts -
         // so the arc and the bar meet in one unbroken line, no step at the join)
-        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * ${A.x / 10});border-top:${HEAVY} solid ${INK.ink}"></span>`;
+        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * ${bracketLine(A.x, A.q).x / 10});border-top:${HEAVY} solid ${INK.ink}"></span>`;
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;

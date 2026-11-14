@@ -33,6 +33,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, inked, box, esc, label, HAIR, HEAVY } from './ops-common.js';
 import { INK, stripPos } from '../tokens.js';
+import { bracketSvg } from './long-division.js';
 
 /* ------------------------------------------------------------------------------ the maths */
 
@@ -334,8 +335,7 @@ register('short-division', {
                 dv + 2 + i, 1, `justify-content:flex-end;align-items:flex-end;padding-bottom:0.08em;`);
         }
         for (let i = 0; i < dv; i++) html += at(esc(V[i]), i + 1, 2);
-        const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
-            + `<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
+        const arc = bracketSvg({ ink: INK.ink });   // ONE stroke (owner 2026-11-14, LDIV-JOIN)
         html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block">${arc}</span>`;
         for (let i = 0; i < n; i++) {
             let exBox = '';

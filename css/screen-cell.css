@@ -2220,3 +2220,9 @@ html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell] 
    square landed outside the clip: ws-phone-card TOUCH-HIT at 1280. A window that fits its card does not scroll. Additive.) */
 html body #questionCard .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)),
 html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)) { overflow: visible !important; }
+
+/* LDIV-JOIN (owner 2026-11-14: the bracket was "disconnected"): the arc and the bar over its column are ONE
+   path (bracketSvg); its y 0 sits on the vinculum's centre (1px into the 2px border), and the column's own
+   border is kept for layout but drawn clear. Additive: saved HTML with .mq-ldiv-arc keeps the old rules. */
+.mq-scell .mq-ldiv-brk.mq-ldiv-brkj { border-top-color: transparent; }
+.mq-scell .mq-ldiv-arcj { position: absolute; left: 0; top: -1px; width: 100%; height: calc(100% + 1px); overflow: visible; }

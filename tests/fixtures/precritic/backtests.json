@@ -11020,6 +11020,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ldiv-join",
+   "check": "the long-division bracket is ONE connected stroke: the arc's top end runs into the vinculum with no white at the outer corner (<= 0.3 mm) and no step (<= 0.1 mm), paper M/L pupil + key and screen 1366 / 820 (owner request 2026-11-14: 'disconnected'; master paper gap 0.67 mm, fact rows 0.33 mm, screen step 0.25 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join LDIV-JOIN",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "butt-capped arc under a separate vinculum: white wedge at the corner on every bracket"
+   },
+   "pass": {
+    "commit": "bf0814473",
+    "state": "bracketSvg: arc and bar one path with a mitre join, on paper and screen"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --skills division:long_div_2digit,division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join-raster",
+   "check": "the screen long-division bar has no anti-aliased seam: inside the bar's central 1 px, from the arc's corner to the vinculum's end, no pixel brighter than 80 at DSF 2 or 3, on card / worksheet / quiz at 1366, 1280, 1024 and 820 (ldiv critic r1 F1: div_remainders bracket card at 1366, brightest 103 at DSF 2 / 155 at DSF 3; LDIV-JOIN read gap 0.00)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --raster LDIV-JOIN-RASTER",
+   "browser": true,
+   "fail": {
+    "commit": "654606ae3",
+    "state": "svg bar butt end meets the dividend's border at a fractional x: div_remainders card + quiz 1366 brightest 103 (DSF 2) / 155 (DSF 3)"
+   },
+   "pass": {
+    "commit": "ba835be98",
+    "state": "overlapping bar pieces (rembrk rule span, .mq-ldiv path bar runs under the border): brightest 0"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --raster --skills division:div_remainders",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-shape",
+   "check": "the long-division bracket's side is near-straight: its greatest distance from the chord between its ends is <= 0.6 mm on paper (M/L, pupil + key) and on screen (card / worksheet / quiz 1366 / 820) (owner 2026-11-14: 'I don't like the big curve ... make it straight or almost straight'; 0176d774f bows 1.60-3.30 mm on paper, 5.04 mm on the screen worked bracket)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --shape LDIV-SHAPE",
+   "browser": true,
+   "fail": {
+    "commit": "0176d774f",
+    "state": "quadratic arc x 1.5 / q 9 of a 10-wide box: bow 2.64 mm at M, 3.30 mm at L"
+   },
+   "pass": {
+    "commit": "b7ee41f3a",
+    "state": "bracketLine: near-straight side, apex at the old apex, bow <= 0.34 mm"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --shape --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
