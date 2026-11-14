@@ -44,6 +44,11 @@ export function pickWeDo(items, example, data, n, others = []) {
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
     let order = [...new Set([...liked.filter((it) => !kind || sameKind.includes(it)), ...same.filter((it) => sameKind.includes(it)), ...sameKind,
         ...liked, ...same, ...rest])];
+    // PT 2.3 (round-cap r3, lf-placevalue critic live1 r2 N6): the Guided cells are the example's kind - the items whose Steps
+    // are the example's Steps (compose.js oneKindFirst, the rule the Opener and the Guided page share); every other kind comes
+    // after them, so it is dealt only when the pool has too few of the example's. A one-kind pool keeps its order; a lesson's own
+    // named cases (`guidedWants`, `guided`, the div_facts Mix forms) still lead - they are the lesson's chosen set.
+    order = oneKindFirst(order, example);
     // (`guidedWants` - the detailed lesson maker, lesson 2: the Guided cells' cases, in order, first)
     if (data && Array.isArray(data.guidedWants)) {
         const lead = [];
@@ -84,10 +89,6 @@ export function pickWeDo(items, example, data, n, others = []) {
         for (const it of order) if (f(it) !== f(example) && !lead.some((x) => f(x) === f(it))) lead.push(it);
         order = [...lead, ...order.filter((it) => !lead.includes(it))];
     }
-    // PT 2.3 (round-cap r3, lf-placevalue critic live1 r2 N6): the Guided cells are the example's kind - the items whose Steps
-    // are the example's Steps (compose.js oneKindFirst, the rule the Opener and the Guided page share); every other kind comes
-    // after them, so it is dealt only when the pool has too few of the example's. A one-kind pool keeps its order.
-    order = oneKindFirst(order, example);
     // Lessons r1: a Guided set is varied - no two with the same answer, at most one "make 10"
     // (a fact whose answer is the band's top), and the big number on both sides where the pool
     // has it (the chart models both).
