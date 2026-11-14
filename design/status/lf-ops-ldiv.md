@@ -51,3 +51,18 @@ Report: design/audit/runs/lf-ops/critic-ldiv-r1.md. The corner joins as one stro
   The bow is 0.25 units of a 10-wide box. The white the bow gave up goes to the divisor's side. ARC-INK is clean at M and L.
 - Hash proof (base = 37ca028e6 with the fix reverted): with the bracket svg and its rule offset stripped, 0 of 282
   renders differ. Controls are byte-identical. ws-boot-smoke OK. Merged origin/master e9cb5797c, keeping both sides.
+
+## LDIV-ROOM (owner 2026-11-14: "a lot of white area to work with" on the 4-a-page long-division page)
+
+- Check: `ws-ldiv-hug --room` (gate ldiv-room, backtest ldiv-room: d82acc06f FAIL -> 86950d488 OK). Before: grid 45 % (M) / 56 % (L)
+  of the free height at 1.00x rows, 25.3 / 20.5 mm white above and below. After: M 93 % (rows 1.87x), L 94 % (1.54x),
+  centred (5.4 / 5.4 mm); 6 a page unchanged (rows 9.0 mm, 71 %).
+- Fix: practice.js grids carry roomFill; answer-key.js partRoom hands the division template ctx.room; long-division.js
+  growOf grows the quotient / remainder boxes and the work grid (<= 2x, 6 mm white kept) at 4 a page or fewer. Digits keep
+  their size; divisor tracks and the bracket gutter unchanged. Facts, fact rows, screen and div_remainders (no work grid)
+  are untouched.
+- Pins: none moved (ws-lesson-baseline 1772 identical; print-lint on long_div_2digit + divide, 9 roles, M/L: findings
+  identical to d82acc06f - the ratchet's 7 risen counts are already there on d82acc06f). Hash: only long_div_2digit and
+  divide Independent L / More Practice L / Lesson L (4 a page) changed; screen cards and 4 controls byte-identical.
+- ws-precritic-plan FAILs on 11 other lanes' ledger rows (lf-ops lines 27 and 48, lf-vocab, lf-roles, lead, lf-placevalue);
+  the same 11 FAIL without this change. All four ldiv rows are OK on the path.

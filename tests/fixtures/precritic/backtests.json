@@ -10520,7 +10520,7 @@
     "state": "work grid at its footprint size in a 106 mm cell: 45 % (M) / 56 % (L) of the free height, 25 mm white above and below"
    },
    "pass": {
-    "commit": "c412de98a",
+    "commit": "86950d488",
     "state": "writing boxes grow to the cell (M rows 1.87x, 93 %; L 1.54x, 94 %), centred; 6 a page unchanged"
    },
    "command": "node tests/scripts/ws-ldiv-hug.cjs --room --skills division:long_div_2digit",
