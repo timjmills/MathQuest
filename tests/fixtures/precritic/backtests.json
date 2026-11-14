@@ -10169,6 +10169,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-step-align-all",
+   "check": "ws-two-step --align STEP-ALIGN (widened): every two-step row's step blocks and sign rows top-align within 1 mm (column beside sentence too); a wrapped row's steps share one left edge",
+   "kind": "commit-pair",
+   "rule": "STEP-ALIGN round 2 (STEP-FORM critic r2 F1b / F5; round cap 2 root cause: the round-1 fix and check covered fact pairs only)",
+   "fail": {
+    "commit": "5ce882919",
+    "state": "a column step beside a sentence step bottom-aligns (46-52 px stagger); a wrapped Step 2 starts 14-18 mm left of the centred Step 1"
+   },
+   "pass": {
+    "commit": "517639a61",
+    "state": "every two-step row top-aligns; the wrapped steps share one left edge"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --align --skill algebra:two_step_add_then_div,algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
