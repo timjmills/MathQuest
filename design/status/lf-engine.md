@@ -10,6 +10,15 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-14 09:00 UTC: lf-engine is PARKED (budget stop, about $1,135).**
+  - The chart Name/Date line is LIVE (master 7f2ca5e39).
+  - -roles r3 is HELD by the lead at 1b7280c88; the critic r3 report is at 421a78fed. It scored C3 6 on add_wp_10k M, and its change set covers 263 Openers but the graded sample was only 10 pages.
+  - At the reset, in this order:
+    1. Add the SPILL-P1 render check to ws-print-lint: measured page-1 white against page 2's first band, through spillP1Ok. It must FAIL on 1b7280c88.
+    2. Fix the opener.js p1WhiteMm estimate (lines 153–156). It runs at least 13 mm short of the render.
+    3. One critic on a WIDER sample of the 263 changed Openers.
+  - -pc r6 is parked at 6668f1732. The rest of the queue is below.
+
 - **2026-11-14 02:35 UTC: OWNER BUDGET STOP.** Hard stop at session cost_usd $1,140.
   - -pc r6 is parked at 6668f1732 (WIP, ungated). Resume note in its status file: precritic --role lesson --strict, confirm master's reds, re-pin.
   - -roles r3 is parked at b64203f29 (WIP, ungated; code is ahead of its checks).
