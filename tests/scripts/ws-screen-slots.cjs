@@ -59,7 +59,8 @@
 // and deploy shard reads as before): after the host checks, each skill's practice card, online worksheet (card 1) and
 // quiz question are rendered again at 1280 x 900, 820 x 1180 and 390 x 844, and the item's numeral - the largest-type
 // text run of digits in the cell (tabs, labels, the instruction and screen-only chrome excluded) - must be at least
-// 56 / 48 / 40 px at those widths, in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
+// its host's floor from tests/lib/ws-digit-floors.cjs (card / quiz 56 / 48 / 40 px; the online worksheet 29 px, a passed raise
+// held as a ratchet - div_facts 56 / 48; lead D8 ruling 2026-11-13), in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
 // kind), e.g. "card@1280:digit". --rule-skills a:b,c:d judges it only on those skills (ws-precritic passes the lane's).
 //   node tests/scripts/ws-screen-slots.cjs --digit-fixture file.html --viewport 1280   # the measure on a saved cell
 //                              ([data-mq-digit-root] or the body): OK / FAIL (a backtest fixture)
@@ -152,8 +153,13 @@ const DIGIT_VIEWPORTS = DIGIT_WIDTHS.length ? DIGIT_VIEWPORTS_ALL.filter((v) => 
 // Lead ruling T2 (2026-11-07): the size floor holds for every skill; weight >= 700 only where the paper prints the numeral
 // bold - the place-value numerals (`bold`, true for placevalue:*). add_facts and other non-bold skills are exempt.
 const BOLD_NUMERAL = (key) => /^placevalue:/.test(String(key || ''));
-function digitVerdict(m, width, bold = true) {
-    const vp = DIGIT_VIEWPORTS.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
+// (lead D8 ruling 2026-11-13: the floor comes from the shared table tests/lib/ws-digit-floors.cjs - card / quiz 56 / 48 / 40, the
+// online worksheet 29 px with a passed raise held as a ratchet - never hard-coded here; `host` / `key` select it. Without a host
+// the viewport's card floor applies, as before.)
+const { floorPx } = require('../lib/ws-digit-floors.cjs');
+function digitVerdict(m, width, bold = true, host = '', key = '') {
+    const vp0 = DIGIT_VIEWPORTS_ALL.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
+    const vp = { w: vp0.w, px: host ? floorPx(host, vp0.w, key) : vp0.px };
     if (!m || !(m.px > 0)) return 'no numeral found in the cell';
     const why = [];
     if (m.px < vp.px - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w})`);
@@ -207,9 +213,14 @@ if (has('self-test')) {
         ['SCREEN-DIGIT T2: a regular numeral passes where the paper is not bold', { px: 60, weight: '400', family: 'Andika', text: '7', bold: false }, 1280, null],
         ['SCREEN-DIGIT a fallback face', { px: 60, weight: '700', family: 'Arial, sans-serif', text: '7' }, 1280, /font Arial/],
         ['SCREEN-DIGIT no numeral', null, 1280, /no numeral/],
+        // (lead D8 ruling 2026-11-13: the worksheet floor is 29 px; div_facts' passed raise is held at 56 / 48)
+        ['SCREEN-DIGIT worksheet 40 px at 1280 (floor 29)', { px: 40, weight: '700', family: 'Andika', text: '7', host: 'worksheet', key: 'addition:add_facts' }, 1280, null],
+        ['SCREEN-DIGIT worksheet 28 px at 820 (floor 29)', { px: 28, weight: '700', family: 'Andika', text: '7', host: 'worksheet', key: 'addition:add_facts' }, 820, /28 px.*29 px/],
+        ['SCREEN-DIGIT div_facts worksheet 40 px at 1280 (ratchet 56)', { px: 40, weight: '700', family: 'Andika', text: '7', host: 'worksheet', key: 'division:div_facts' }, 1280, /56 px/],
+        ['SCREEN-DIGIT card 40 px at 1280 (floor 56)', { px: 40, weight: '700', family: 'Andika', text: '7', host: 'card', key: 'addition:add_facts' }, 1280, /56 px/],
     ];
     for (const [name, m, wpx, want] of dcases) {
-        const v = digitVerdict(m, wpx, !(m && m.bold === false));
+        const v = digitVerdict(m, wpx, !(m && m.bold === false), (m && m.host) || "", (m && m.key) || "");
         const ok = want ? !!v && want.test(v) : v === null;
         if (!ok) bad++;
         console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'passes'}`);
@@ -614,7 +625,7 @@ if (arg('digit-fixture', null)) {
                 if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
                 const judge = (host, m) => {
                     checked++;
-                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key));
+                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key), host, key);
                     if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:digit`, line: l }); console.log(l); }
                 };
                 try {
