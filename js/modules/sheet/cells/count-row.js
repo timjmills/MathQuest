@@ -247,7 +247,8 @@ function tightGeom(p, ctx, c) {
     const pt = Math.max(GIVEN_MIN_PT, Math.min(digitPt(ctx) * (compact ? 1 : 0.64), 18));
     const glyph = chars * 0.56 * pt * PT_MM;
     const hard = handMm(chars, hw) + 0.3;
-    const wMin = Math.max(lines ? 7 : compact ? COMPACT_MIN_BOX : MIN_BOX[size], hard, glyph + 2.4);
+    // cbt r3 (SL-1): a Lines write-on line on the Opener's tight row is as wide as the Independent page's (LINE_ROOMY_MM at M / L)
+    const wMin = Math.max(lines ? (size === 'S' ? 7 : LINE_ROOMY_MM) : compact ? COMPACT_MIN_BOX : MIN_BOX[size], hard, glyph + 2.4);
     const want = wMin + HAND_PAD_MM;
     const hOf = (rows) => (lines ? hw + (compact ? 2 : 1) + (rows <= 2 ? 3 : 0) : hw + (compact ? 6.4 : 2.5));   // rows: lines of numbers
     // the Opener's practice cell is the one-page sheet's full-width single column: its 178 mm line (less the letter's inset)
