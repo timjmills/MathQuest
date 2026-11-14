@@ -1837,7 +1837,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             if (ink === 'trace' && v === answer) st = 'traced';
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
-        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, ...(item.guided ? { guided: true } : {}), options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
         // model for its redraw zone, `fix: 'draw'`); the item itself is never changed. S2: the
         // item's supports ride in the payload the same way (`supports`), so the pupil page, the key
@@ -2312,9 +2312,9 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const ctxCache = new Map();
         // (an item's own drawing flags - wrapToCell, tightRows - are part of its context and its key)
         const ctxOf = (state, level, it = null) => {
-            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows);
-            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}`;
-            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}));
+            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows), guided = !!(it && it.guided);
+            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}${guided ? 'g' : ''}`;
+            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}, guided ? { guided: true } : {}));
             return ctxCache.get(k);
         };
         // every drawing, at every column count and state (string work, no layout)
@@ -2331,7 +2331,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1;
         const keyOf = (it) => {
             if (noCache || !faceReady || Array.isArray(it.judgeModes) || it.colsLayout) return null;
-            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (it.measureLevel ?? 1)].join('|');
+            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (it.measureLevel ?? 1), it.guided ? 'g' : ''].join('|');
             const text = `${size}|${look}|${cols.join(',')}|${flags}|${bodies.get(it).map((b) => b.join('\u0001')).join('\u0002')}`;
             return `${hash53(text)}:${text.length}`;
         };
@@ -4564,6 +4564,9 @@ async function buildRoleSheet(n, metaOf) {
             prepared.pool = pool.id;
             // A role that draws Model / Guided cells measures them at their tallest level.
             if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+            // (two-step card decision 4 amended, lead ruling 2026-11-14 GUIDED-MODEL-ALONE: a Guided page's cells know they are on
+            // one - measured and drawn alike - so a template can fade a Guided-only scaffold; word-work drops its two-step bar)
+            if (n.role === 'guided') prepared.guided = true;
             // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
             // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
             if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
