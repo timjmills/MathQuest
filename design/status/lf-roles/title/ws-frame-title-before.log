@@ -1,0 +1,62 @@
+  TITLE-PLACE addition:add_facts/independent/M/above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/independent/M/above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/independent/M/two-line-above: res.titleFit should say 2 lines, not truncated (null)
+  TITLE-PLACE addition:add_facts/independent/M/two-line-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/independent/M/two-line-above/pupil pupil p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-PLACE addition:add_facts/independent/M/two-line-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/independent/M/two-line-above/key key p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-LONG addition:add_facts/independent/M/long: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-LONG addition:add_facts/independent/M/long-above: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-PLACE addition:add_facts/independent/M/long-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/independent/M/long-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/independent/L/above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/independent/L/above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/independent/L/two-line-above: res.titleFit should say 2 lines, not truncated (null)
+  TITLE-PLACE addition:add_facts/independent/L/two-line-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/independent/L/two-line-above/pupil pupil p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-PLACE addition:add_facts/independent/L/two-line-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/independent/L/two-line-above/key key p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-LONG addition:add_facts/independent/L/long: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-LONG addition:add_facts/independent/L/long-above: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-PLACE addition:add_facts/independent/L/long-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/independent/L/long-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/guided/M/above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/guided/M/above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/guided/M/two-line-above: res.titleFit should say 2 lines, not truncated (null)
+  TITLE-PLACE addition:add_facts/guided/M/two-line-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/guided/M/two-line-above/pupil pupil p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-PLACE addition:add_facts/guided/M/two-line-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/guided/M/two-line-above/key key p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-LONG addition:add_facts/guided/M/long: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-LONG addition:add_facts/guided/M/long-above: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-PLACE addition:add_facts/guided/M/long-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/guided/M/long-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/guided/L/above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/guided/L/above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/guided/L/two-line-above: res.titleFit should say 2 lines, not truncated (null)
+  TITLE-PLACE addition:add_facts/guided/L/two-line-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/guided/L/two-line-above/pupil pupil p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-PLACE addition:add_facts/guided/L/two-line-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/guided/L/two-line-above/key key p1: printed "I Can add facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-LONG addition:add_facts/guided/L/long: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-LONG addition:add_facts/guided/L/long-above: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-PLACE addition:add_facts/guided/L/long-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/guided/L/long-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/test/M/above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/test/M/above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/test/M/two-line-above: res.titleFit should say 2 lines, not truncated (null)
+  TITLE-PLACE addition:add_facts/test/M/two-line-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/test/M/two-line-above/pupil pupil p1: printed "Test A: adding facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-PLACE addition:add_facts/test/M/two-line-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/test/M/two-line-above/key key p1: printed "Test A: adding facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  TITLE-LONG addition:add_facts/test/M/long: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-LONG addition:add_facts/test/M/long-above: a title past two lines is not reported truncated in res.titleFit (the dialog warns from it)
+  TITLE-PLACE addition:add_facts/test/M/long-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/test/M/long-above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/test/L/above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-PLACE addition:add_facts/test/L/above/key key p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/test/L/two-line-above: res.titleFit should say 2 lines, not truncated (null)
+  TITLE-PLACE addition:add_facts/test/L/two-line-above/pupil pupil p1: titlePos above, but the title is not before the Name/Date/Score row (ws-rowA > ws-title > ws-headrule)
+  TITLE-LONG addition:add_facts/test/L/two-line-above/pupil pupil p1: printed "Test A: adding facts to 20", asked "I Can add two-digit numbers and check each answer by countin…"
+  ... and 6 more
+ws-frame-title: FAIL (66)
