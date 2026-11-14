@@ -952,7 +952,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // square it prints is never empty here, and a window of a kept window's own squares is not dealt again.
         const kept = (_gaps === 'scatter' && chartSheet()) || [];
         let rows, cols, at, pickIdx = [];
-        for (let w = 0; w < (kept.length ? 40 : 1) && !pickIdx.length; w++) {
+        for (let w = 0; w < (kept.length ? 24 : 1) && !pickIdx.length; w++) {
             const win = pickWin();
             rows = win.rows; cols = win.cols;
             const atW = (i) => rows[Math.floor(i / C)] * 10 + cols[i % C] + 1;
@@ -981,7 +981,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             }
             if ([...forced].some((i) => barred.has(i)) || forced.size > want) continue;
             // spread across the rows: each row holds floor(want / R) or one more, the extra rows dealt
-            for (let t = 0; t < 300 && !pickIdx.length; t++) {
+            for (let t = 0, T = kept.length ? 60 : 300; t < T && !pickIdx.length; t++) {
                 const extra = shuffle(Array.from({ length: R }, (_, r) => r)).slice(0, want % R);
                 const quota = Array.from({ length: R }, (_, r) => Math.floor(want / R) + (extra.includes(r) ? 1 : 0));
                 const set = new Set(forced);
@@ -1003,7 +1003,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (!cand.every((i) => neighbours(i).some((j) => !set.has(j)))) continue;
                 // (band 120: no row blank in both its first and last column - repeated five columns on, they would sit side by side)
                 if (_per5 && Array.from({ length: R }, (_, r) => r).some((r) => set.has(r * C) && set.has(r * C + C - 1))) continue;
-                if (_cross && t < 200 && w < 20 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                if (_cross && t < (kept.length ? 40 : 200) && w < 12 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
                 pickIdx = cand;
             }
         }

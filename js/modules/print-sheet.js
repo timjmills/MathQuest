@@ -963,6 +963,8 @@ export { chartGivesAway };
  * the same order); the first draw is kept if no try gives the kind.
  */
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, want = null } = {}) {
+    const cwRun = `${baseSeed}:${startIndex}`;
+    _cwSheet.set(cwRun, new Set());
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
     // in equal blocks of that count; otherwise two items a level (supports.js fadeRung). The same
@@ -1107,7 +1109,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
-        { const cw = chartOfQ(q); if (cw) { const k = cwKey(cw, _cwShowFirst && !_cwAll(seen).size); seen.add(k); _cwSheet.add(k); } }
+        { const cw = chartOfQ(q); if (cw) { const k = cwKey(cw, _cwShowFirst && !_cwAll(seen).size); seen.add(k); _cwSheet.get(cwRun).add(k); } }
         // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
         if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
@@ -6368,8 +6370,9 @@ let buildQueue = Promise.resolve();
 // first chart window shows its answers traced, so it is recorded as a SHOWN window: a later window leaves none of its squares empty)
 let _cwShowFirst = false;
 // (the sheet's chart windows across ALL its runs - a lesson deals its anchor and each practice section in runs of their own)
-const _cwSheet = new Set();
-const _cwAll = (seen) => { const u = new Set(_cwSheet); for (const k of seen) if (typeof k === 'string' && k.startsWith('cw:')) u.add(k); return u; };
+// (keyed by run - its seed and first place - so a run dealt again, a probe then the final deal, replaces its own windows)
+const _cwSheet = new Map();
+const _cwAll = (seen) => { const u = new Set(); for (const ks of _cwSheet.values()) for (const k of ks) u.add(k); for (const k of seen) if (typeof k === 'string' && k.startsWith('cw:')) u.add(k); return u; };
 export function buildSheet(req = {}) {
     _cwShowFirst = !!(req && ['guided', 'lesson', 'scripted-model'].includes(req.role));
     _cwSheet.clear();
