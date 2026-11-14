@@ -288,13 +288,49 @@ export function judgePage(items, page, { caps = PAGE_CAPS, prob = null } = {}) {
             const m = new Map();
             for (const x of pg) { if (!x) continue; const v = fld === 'item' ? `${x.a} ${x.op || '−'} ${x.b}` : x[fld]; m.set(v, (m.get(v) || 0) + 1); }
             for (const [v, c] of m) {
-                const e = fld !== 'item' && prob ? page * prob(fld, v) : 0;
+                // (an item's own probability only under a DECLARED valid set: a set of 6 pairs deals each pair 3.3 times a
+                // page of 20; a learned set never names one, so an item stays capped at 1 there)
+                const e = prob ? page * prob(fld, v) : 0;
                 const cap = e > 1 ? Math.max(caps[fld], Math.ceil(caps[fld] * e)) : caps[fld];
                 if (c > cap) out.push({ page: p + 1, fld, v, c, cap, e });
             }
         }
     }
     return out;
+}
+/**
+ * A DECLARED valid set (lf-algebra r2, 2026-11-07): an item that is not "a op b" (a growing pattern's (start, step), a
+ * rule and its first term) cannot have its set learned from arithmetic shapes, so the generator declares it on the item
+ * (`q.dealSet = {of, items: [[a, b, ans], ...]}`, not enumerable, every listed pair equally likely). The judges then
+ * read the declared set: UNIFORM over the pair, a, b and the answer (the calibrated min-p bar, as for a learned set),
+ * PAGE with each value's and each item's probability from the set (a set smaller than a page may repeat a pair
+ * ceil(page / size) times, a larger one never), PERIOD unchanged. Items outside the declared set are named.
+ */
+export function declaredJudge(items, set, page, rng) {
+    const sample = (set.items || []).map(([a, b, ans]) => ({ a: +a, b: +b, ans: +ans, pair: `${a},${b}` }));
+    const findings = [], notes = [];
+    if (sample.length < 2) return { findings, notes: ['declared valid set has fewer than 2 pairs: nothing to deal evenly'], sample, prob: () => 0 };
+    const inSet = new Set(sample.map((x) => x.pair));
+    const read = items.filter(Boolean).map((x) => Object.assign({}, x, { pair: `${x.a},${x.b}` }));
+    const out = read.filter((x) => !inSet.has(x.pair));
+    if (out.length) findings.push(`DECLARED: ${out.length} item(s) outside the declared ${set.of || 'valid'} set (${[...new Set(out.map((x) => x.pair))].slice(0, 6).join('; ')})`);
+    const exp = {};
+    for (const fld of ['pair', 'a', 'b', 'ans']) {
+        const m = new Map();
+        for (const x of sample) m.set(x[fld], (m.get(x[fld]) || 0) + 1 / sample.length);
+        if (m.size >= 2) exp[`${fld} value`] = m;
+    }
+    const judged = read.filter((x) => inSet.has(x.pair));
+    if (judged.length >= MIN_STRATUM) {
+        for (const x of judgeUniform(judged, exp, { sample, rng })) {
+            if (x.fail) findings.push(`UNIFORM ${x.name} (declared set): χ² ${x.chi.toFixed(1)} on ${x.df} df (tail ${x.p.toPrecision(2)}, below the 1 % family-wise bar ${x.bar.toPrecision(2)}) over ${judged.length} items; above 2σ: ${x.over.map((c) => `${c.v} ${c.o}× (uniform ${c.e.toFixed(1)})`).join(', ')}`);
+        }
+    } else notes.push(`UNIFORM not judged: ${judged.length} item(s) in the declared set (fewer than ${MIN_STRATUM})`);
+    const probs = new Map();
+    for (const x of sample) {
+        for (const [fld, v] of [['a', x.a], ['ans', x.ans], ['item', `${x.a} − ${x.b}`]]) probs.set(`${fld}|${v}`, (probs.get(`${fld}|${v}`) || 0) + 1 / sample.length);
+    }
+    return { findings, notes, sample, prob: (fld, v) => probs.get(`${fld}|${v}`) || 0, how: `declared by the generator: ${sample.length} ${set.of || ''} pairs, each equally likely` };
 }
 /** The shape stratum of an item: the digit counts of its operands (2d − 1d and 2d − 2d are different item kinds). */
 export const shapeOf = (x) => `${nd(x.a)}d ${x.op || opOf(x) || '?'} ${nd(x.b)}d`;
@@ -377,6 +413,24 @@ function selfTest() {
     let fpp = 0;
     for (let s = 1; s <= 20; s++) { const r = mulberry(100 + s); const free = nz.map((x) => (r() < 0.1 ? zero : x)); if (judgePeriod(free, 20).length) fpp++; }
     t(fpp <= 1, `PERIOD: seeded positions fail on at most 1 of 20 seeds (${fpp})`);
+    // DECLARED (lf-algebra r2): a declared set of 25 (start, step) pairs; a fresh uniform deal passes, a deal that repeats
+    // a pair on a page or crowds one pair fails, an item outside the set is named
+    const decl = { of: 'start, step', items: [] };
+    for (let a = 1; a <= 5; a++) for (let b = 1; b <= 5; b++) decl.items.push([a, b, a + 3 * b]);
+    const asX = ([a, b, ans]) => ({ a, b, ans, set: decl });
+    const fresh = (seed) => { const r = mulberry(seed); const out = []; for (let pg = 0; pg < 6; pg++) { const d = decl.items.slice(); for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; } out.push(...d.slice(0, 20).map(asX)); } return out; };
+    let dfp = 0;
+    for (let s = 1; s <= 10; s++) if (declaredJudge(fresh(s), decl, 20, mulberry(50 + s)).findings.length || judgePage(fresh(s), 20, { prob: declaredJudge(fresh(s), decl, 20, mulberry(1)).prob }).length) dfp++;
+    t(dfp <= 1, `DECLARED: a fresh uniform deal of 25 pairs passes on at least 9 of 10 seeds (${dfp})`);
+    const dj = declaredJudge(fresh(1), decl, 20, mulberry(1));
+    const twice = fresh(1).map((x, i) => (i === 5 ? fresh(1)[2] : x));
+    t(judgePage(twice, 20, { prob: dj.prob }).some((f) => f.fld === 'item'), 'DECLARED: a pair twice on a page of 20 (set of 25) is named');
+    const crowdD = Array.from({ length: 120 }, (_, i) => asX(i % 3 ? decl.items[0] : decl.items[(i * 7) % 25]));
+    t(declaredJudge(crowdD, decl, 20, mulberry(2)).findings.some((f) => /^UNIFORM pair value/.test(f)), 'DECLARED: one pair dealt 2 times in 3 fails UNIFORM');
+    t(declaredJudge([asX([9, 9, 36])].concat(fresh(2).slice(1)), decl, 20, mulberry(3)).findings.some((f) => /^DECLARED/.test(f)), 'DECLARED: an item outside the set is named');
+    const small = { of: 'start, step', items: decl.items.slice(0, 6) };
+    const smallDeal = Array.from({ length: 20 }, (_, i) => asX(small.items[i % 6]));
+    t(!judgePage(smallDeal, 20, { prob: declaredJudge(smallDeal, small, 20, mulberry(4)).prob }).some((f) => f.fld === 'item'), 'DECLARED: a set of 6 may repeat a pair ceil(20 / 6) times a page');
     // D1 (S1 critic r1): a skill that deals no numbers is N/A, never FAIL; a numeric skill that read 0 items is FAIL
     const R = (key, status, findings = []) => ({ key, status, findings });
     t(finalVerdict([R('fractions:identify', 'N/A'), R('measurement:time_hour', 'N/A')]).code === 4 && /^ws-dealer-uniform: N\/A - no operand-dealt items: fractions:identify, measurement:time_hour /.test(finalVerdict([R('fractions:identify', 'N/A'), R('measurement:time_hour', 'N/A')]).line), 'D1: only non-numeric skills -> N/A, exit 4');
@@ -385,7 +439,7 @@ function selfTest() {
     t(finalVerdict([R('fractions:identify', 'N/A'), R('subtraction:x', 'FAIL', ['0 of 120 items read (120 threw, 0 without operands): nothing checked'])]).code === 1, 'D1: a numeric skill whose items all threw still FAILS (A1)');
     t(finalVerdict([]).code === 0 ? false : true, 'D1: an empty scope is never OK');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 19 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 24 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -448,7 +502,9 @@ async function main() {
                 }
                 if (!got) { errors++; out.push(null); continue; }
                 seen.add(sig(got));
-                out.push(readItem(got));
+                const x = readItem(got);
+                if (x && got.dealSet && Array.isArray(got.dealSet.items)) x.set = got.dealSet;
+                out.push(x);
             }
         } finally { un(); }
         return { items: out, errors };
@@ -464,6 +520,25 @@ async function main() {
         if (!read.length && !errors && r.unread === N) { r.status = 'N/A'; r.notes.push(`all ${N} items generated, none deals operands (no "a op b" to read): nothing to deal evenly`); continue; }
         if (!read.length) { r.status = 'FAIL'; r.findings.push(`0 of ${N} items read (${errors} threw, ${r.unread} without operands): nothing checked`); continue; }
         if (read.length < N) { r.status = 'INCOMPLETE'; r.notes.push(`${N - read.length} of ${N} item(s) not read (${errors} threw)`); }
+        // ---- a DECLARED valid set (the generator names it: items that are not "a op b")
+        const decl = read.find((x) => x.set);
+        if (decl) {
+            const dj = declaredJudge(items, decl.set, PAGE, mulberry((base ^ 0x2545f491) >>> 0));
+            r.valid = dj.how || 'declared (empty)';
+            r.findings.push(...dj.findings);
+            r.notes.push(...dj.notes);
+            if (dj.notes.some((n) => /not judged|fewer than 2/.test(n)) && r.status === 'OK') r.status = 'INCOMPLETE';
+            for (const f of judgePage(items, PAGE, { prob: dj.prob })) {
+                r.findings.push(`PAGE ${f.page}: ${f.fld === 'item' ? `item ${f.v}` : `${f.fld} = ${f.v}`} ${f.c} times (at most ${f.cap}${f.e > 1 ? `: the valid set deals it ${f.e.toFixed(1)} times a page` : ''})`);
+            }
+            for (const f of judgePeriod(items, PAGE)) r.findings.push(`PERIOD ${f.case}: ${f.k} of its ${f.n} items at position ${f.r} mod ${f.m} (p ${f.p.toExponential(1)}; positions ${f.positions.join(', ')}…)`);
+            const pinnedD = new Set(((BASE.skills || {})[key] || []).map(String));
+            r.pinned = r.findings.filter((f) => pinnedD.has(findingKey(f)));
+            r.findings = r.findings.filter((f) => !pinnedD.has(findingKey(f)));
+            r.stale = [...pinnedD].filter((k) => !r.pinned.some((f) => findingKey(f) === k));
+            if (r.findings.length) r.status = 'FAIL';
+            continue;
+        }
         // ---- the valid set
         const rul = blocks.flatMap((b) => (b.skills.includes(key) ? (b.rulings || []).filter((x) => (!x.skills || x.skills.includes(key)) && JSON.stringify(x.opts || {}) === JSON.stringify(opts || {})) : []));
         // the deep sample: DEEP pages of the same deal from another base, so the support the valid set learns is not the

@@ -1,0 +1,3818 @@
+{
+  "skill": "patterns:pattern_features",
+  "category": "patterns",
+  "skillId": "pattern_features",
+  "label": "Features of a Number Pattern: Odd, Even and Ones Digits",
+  "grade": "4",
+  "dir": "patterns__pattern_features",
+  "roles": {
+    "lesson-L": {
+      "fits": {
+        "cols": 1,
+        "rows": 2,
+        "pages": 5,
+        "note": "Anchor chart: 1 page · Lesson: 2 pages · Practice: 2 pages. Fits: an anchor chart of 4 steps, 3 warm-up, 2 guided and 1 independent on 2 pages.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 2,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 2 guided and 1 independent on 2 pages."
+          }
+        ]
+      },
+      "pageCount": 5,
+      "keyPageCount": 5,
+      "seed": 573294,
+      "title": "I Can find what a number pattern shows",
+      "notes": [
+        "1 problem is too wide for 2 columns: full width, at the bottom."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 8.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 166.5,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 6, 8, 0, 2, 4, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 4, 6, 8, 0, 2, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 120,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 186.3,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 6.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 69.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 5, 9, 3, 7, 1, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 7, 9, 1, 3, 5, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 173.1,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 7.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 166.5,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 3, 7, 1, 5, 9, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 120,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 186.3,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Find the rule. Write the missing numbers and the rule.",
+          "ans": "23, 28, 33, 38, 43, 5",
+          "measured": {
+            "1": {
+              "hMm": 34,
+              "fits": true,
+              "slackMm": 31.2
+            },
+            "2": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -15.1
+            },
+            "3": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -30.5
+            },
+            "4": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -38.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 8.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 166.5,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 6, 8, 0, 2, 4, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 4, 6, 8, 0, 2, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 120,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 186.3,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 6.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 69.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 5, 9, 3, 7, 1, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 7, 9, 1, 3, 5, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 173.1,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 7.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 166.5,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 3, 7, 1, 5, 9, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 120,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 186.3,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Find the rule. Write the missing numbers and the rule.",
+          "ans": "23, 28, 33, 38, 43, 5",
+          "measured": {
+            "1": {
+              "hMm": 34,
+              "fits": true,
+              "slackMm": 31.2
+            },
+            "2": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -15.1
+            },
+            "3": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -30.5
+            },
+            "4": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -38.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go even, odd, even, odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 6, 1, 6, 1.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 9.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 69.1,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 0, 2, 4, 6, 8, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 81.6,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "L",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-L-p1.png",
+          "words": 228,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p2.png",
+          "words": 94,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p3.png",
+          "words": 167,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p4.png",
+          "words": 205,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p5.png",
+          "words": 74,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-L-key-p1.png",
+          "words": 230,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p2.png",
+          "words": 103,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p3.png",
+          "words": 170,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p4.png",
+          "words": 208,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p5.png",
+          "words": 77,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 5,
+        "cells": [
+          4,
+          4,
+          3,
+          5,
+          1
+        ],
+        "problems": [
+          "page 1 cell 1: content overflows its cell",
+          "page 1 cell 1: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 2: content overflows its cell",
+          "page 1 cell 2: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 3: content overflows its cell",
+          "page 1 cell 3: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 4: content overflows its cell",
+          "page 1 cell 4: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell"
+        ],
+        "fonts": {
+          "Andika": 233
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "bdab3a695c38a1e5",
+          "5a80c6a399384049",
+          "eab45f71626843da",
+          "23f0daa91f0c1789",
+          "4179f6caa9301951"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 7.5,
+              "wPct": 2.2,
+              "cell": 4
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 17.9,
+              "min": 11
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                14,
+                10.5
+              ],
+              "sizes": [
+                "14x13 mm ×6",
+                "49x16 mm ×2",
+                "179x11 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 8.8,
+              "wPct": 23.1,
+              "cell": 2
+            },
+            "footPct": 24.7
+          },
+          {
+            "cells": 3,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 3,
+              "minMm": [
+                169.9,
+                25.8
+              ],
+              "sizes": [
+                "170x26 mm ×2",
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 20.1,
+              "wPct": 5.4,
+              "cell": 3
+            },
+            "footPct": 7.1
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                78.3,
+                25.8
+              ],
+              "sizes": [
+                "78x38 mm ×2",
+                "78x32 mm ×2",
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 30.4,
+              "wPct": 4.3,
+              "cell": 5
+            },
+            "footPct": 1.9
+          },
+          {
+            "cells": 1,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 1,
+              "minMm": [
+                171,
+                25.8
+              ],
+              "sizes": [
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 7.5,
+              "wPct": 2.2,
+              "cell": 1
+            },
+            "footPct": 73.7
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 5,
+        "cells": [
+          4,
+          4,
+          3,
+          5,
+          1
+        ],
+        "problems": [
+          "page 1 cell 1: content overflows its cell",
+          "page 1 cell 1: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 2: content overflows its cell",
+          "page 1 cell 2: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 3: content overflows its cell",
+          "page 1 cell 3: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 4: content overflows its cell",
+          "page 1 cell 4: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell"
+        ],
+        "fonts": {
+          "Andika": 239
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "25eb8b9942f1636d",
+          "b1527ac1f19a00b2",
+          "1b6e01538ff096c8",
+          "8f0118db896c728d",
+          "6632c1145cd88b6e"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 7.5,
+              "wPct": 2.2,
+              "cell": 4
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 17.9,
+              "min": 11
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                14,
+                10.5
+              ],
+              "sizes": [
+                "14x13 mm ×6",
+                "49x16 mm ×2",
+                "179x11 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 8.8,
+              "wPct": 23.1,
+              "cell": 2
+            },
+            "footPct": 24.7
+          },
+          {
+            "cells": 3,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 3,
+              "minMm": [
+                169.9,
+                25.8
+              ],
+              "sizes": [
+                "170x26 mm ×2",
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 20.1,
+              "wPct": 5.4,
+              "cell": 3
+            },
+            "footPct": 7.1
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                78.3,
+                25.8
+              ],
+              "sizes": [
+                "78x38 mm ×2",
+                "78x32 mm ×2",
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 30.4,
+              "wPct": 4.3,
+              "cell": 5
+            },
+            "footPct": 1.9
+          },
+          {
+            "cells": 1,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 1,
+              "minMm": [
+                171,
+                25.8
+              ],
+              "sizes": [
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 7.5,
+              "wPct": 2.2,
+              "cell": 1
+            },
+            "footPct": 73.7
+          }
+        ]
+      }
+    },
+    "lesson-S": {
+      "fits": {
+        "cols": 1,
+        "rows": 2,
+        "pages": 4,
+        "note": "Anchor chart: 1 page · Lesson: 2 pages · Practice: 1 page. Fits: an anchor chart of 4 steps, 3 warm-up, 2 guided and 2 independent on 2 pages.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 2,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 2 guided and 2 independent on 2 pages."
+          }
+        ]
+      },
+      "pageCount": 4,
+      "keyPageCount": 4,
+      "seed": 573294,
+      "title": "I Can find what a number pattern shows",
+      "notes": [
+        "A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 8.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 166.5,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 6, 8, 0, 2, 4, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 4, 6, 8, 0, 2, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 120,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 186.3,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 6.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 69.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 5, 9, 3, 7, 1, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 7, 9, 1, 3, 5, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 173.1,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 7.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 166.5,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 3, 7, 1, 5, 9, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 120,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 186.3,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Find the rule. Write the missing numbers and the rule.",
+          "ans": "23, 28, 33, 38, 43, 5",
+          "measured": {
+            "1": {
+              "hMm": 34,
+              "fits": true,
+              "slackMm": 31.2
+            },
+            "2": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -15.1
+            },
+            "3": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -30.5
+            },
+            "4": {
+              "hMm": 34,
+              "fits": false,
+              "slackMm": -38.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 8.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 130.6,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 6, 8, 0, 2, 4, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 136.3,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 4, 6, 8, 0, 2, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 136.3,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 6.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is even.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 5, 9, 3, 7, 1, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 136.3,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 7, 9, 1, 3, 5, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 136.3,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 136.3,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 7.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 130.6,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 3, 7, 1, 5, 9, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 96,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 136.3,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 90.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 119.1,
+              "fits": false,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Find the rule. Write the missing numbers and the rule.",
+          "ans": "23, 28, 33, 38, 43, 5",
+          "measured": {
+            "1": {
+              "hMm": 30,
+              "fits": true,
+              "slackMm": 31.2
+            },
+            "2": {
+              "hMm": 30,
+              "fits": false,
+              "slackMm": -15.1
+            },
+            "3": {
+              "hMm": 30,
+              "fits": false,
+              "slackMm": -30.5
+            },
+            "4": {
+              "hMm": 30,
+              "fits": false,
+              "slackMm": -38.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 70.2
+            },
+            "2": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 23.9
+            },
+            "3": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "4": {
+              "hMm": 58.6,
+              "fits": false,
+              "slackMm": 1.2
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 70.2
+            },
+            "2": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 23.9
+            },
+            "3": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "4": {
+              "hMm": 58.6,
+              "fits": false,
+              "slackMm": 1.2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go even, odd, even, odd.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 6, 1, 6, 1.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 9.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 0, 2, 4, 6, 8, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.2,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number is odd.",
+          "measured": {
+            "1": {
+              "hMm": 51.2,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 56.7,
+              "fits": true,
+              "slackMm": 3.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "S",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-S-p1.png",
+          "words": 228,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p2.png",
+          "words": 94,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p3.png",
+          "words": 208,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p4.png",
+          "words": 268,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-S-key-p1.png",
+          "words": 230,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p2.png",
+          "words": 103,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p3.png",
+          "words": 211,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p4.png",
+          "words": 271,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          6
+        ],
+        "problems": [
+          "page 1 cell 1: content overflows its cell",
+          "page 1 cell 1: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 2: content overflows its cell",
+          "page 1 cell 2: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 3: content overflows its cell",
+          "page 1 cell 3: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 4: content overflows its cell",
+          "page 1 cell 4: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell"
+        ],
+        "fonts": {
+          "Andika": 247
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "bdab3a695c38a1e5",
+          "16e1e09159db2ec9",
+          "20c68cf295f45df5",
+          "9f67072d64697c41"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 7.5,
+              "wPct": 2.2,
+              "cell": 4
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 22,
+              "median": 14.1,
+              "min": 10
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                14,
+                8.4
+              ],
+              "sizes": [
+                "14x11 mm ×6",
+                "44x14 mm ×2",
+                "179x8 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 11.9,
+              "wPct": 25.8,
+              "cell": 1
+            },
+            "footPct": 33.2
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 15.4,
+              "median": 15.4,
+              "min": 10
+            },
+            "slots": {
+              "n": 4,
+              "minMm": [
+                79.4,
+                22.8
+              ],
+              "sizes": [
+                "171x23 mm ×2",
+                "79x34 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 19.4,
+              "wPct": 4.9,
+              "cell": 4
+            },
+            "footPct": 12.5
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 15.4,
+              "median": 15.4,
+              "min": 10
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                79.4,
+                22.8
+              ],
+              "sizes": [
+                "79x28 mm ×3",
+                "79x34 mm ×2",
+                "79x23 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 32.7,
+              "wPct": 4.3,
+              "cell": 2
+            },
+            "footPct": 0.2
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          6
+        ],
+        "problems": [
+          "page 1 cell 1: content overflows its cell",
+          "page 1 cell 1: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 2: content overflows its cell",
+          "page 1 cell 2: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 3: content overflows its cell",
+          "page 1 cell 3: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell",
+          "page 1 cell 4: content overflows its cell",
+          "page 1 cell 4: <div class=\"mq-cstate mq-cstate-col\"> leaves the cell"
+        ],
+        "fonts": {
+          "Andika": 253
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "25eb8b9942f1636d",
+          "a9acfe9da0ec9520",
+          "df55493fdcf32885",
+          "a49cc4a1062116a7"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 7.5,
+              "wPct": 2.2,
+              "cell": 4
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 22,
+              "median": 14.1,
+              "min": 10
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                14,
+                8.4
+              ],
+              "sizes": [
+                "14x11 mm ×6",
+                "44x14 mm ×2",
+                "179x8 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 11.9,
+              "wPct": 25.8,
+              "cell": 1
+            },
+            "footPct": 33.2
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 15.4,
+              "median": 15.4,
+              "min": 10
+            },
+            "slots": {
+              "n": 4,
+              "minMm": [
+                79.4,
+                22.8
+              ],
+              "sizes": [
+                "171x23 mm ×2",
+                "79x34 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 19.4,
+              "wPct": 4.9,
+              "cell": 4
+            },
+            "footPct": 12.5
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 15.4,
+              "median": 15.4,
+              "min": 10
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                79.4,
+                22.8
+              ],
+              "sizes": [
+                "79x28 mm ×3",
+                "79x34 mm ×2",
+                "79x23 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 32.7,
+              "wPct": 4.3,
+              "cell": 2
+            },
+            "footPct": 0.2
+          }
+        ]
+      }
+    },
+    "independent-L": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "trimmed": 0,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt. 1 problem is too wide for 2 columns: full width, at the bottom.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.333,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 69.1,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 1,
+            "rows": 4,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 57.3,
+            "requested": 1,
+            "clamped": false,
+            "note": "1 problem is too wide for 2 columns: full width, at the bottom.",
+            "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt. 1 full-width problem at the bottom.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 56.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 884064,
+      "title": "I Can find what a number pattern shows",
+      "notes": [
+        "1 problem is too wide for 2 columns: full width, at the bottom."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go even, odd, even, odd.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 68.6,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 106.8,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 153.2,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 2, 7, 2, 7.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 140,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 3.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 69.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 1, 3, 5, 7, 9, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 75.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 113.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 179.7,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 62.3,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 146.6,
+              "fits": false,
+              "slackMm": 2
+            }
+          }
+        }
+      ],
+      "role": "independent",
+      "size": "L",
+      "opts": null,
+      "pages": [
+        {
+          "file": "independent-L-p1.png",
+          "words": 203,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-L-key-p1.png",
+          "words": 206,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 66
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "cb6eb7b4a807687c"
+        ],
+        "measured": [
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                78.3,
+                25.8
+              ],
+              "sizes": [
+                "78x32 mm ×3",
+                "78x38 mm ×1",
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 19.5,
+              "wPct": 4.3,
+              "cell": 2
+            },
+            "footPct": 11.4
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 66
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "129f8255ee94b0d4"
+        ],
+        "measured": [
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 18,
+              "median": 18,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                78.3,
+                25.8
+              ],
+              "sizes": [
+                "78x32 mm ×3",
+                "78x38 mm ×1",
+                "171x26 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 19.5,
+              "wPct": 4.3,
+              "cell": 2
+            },
+            "footPct": 11.4
+          }
+        ]
+      }
+    },
+    "independent-S": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "perPage": 8,
+        "pages": 1,
+        "trimmed": 0,
+        "note": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 16 pt. Dense: 2 x 4, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 57,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 2 x 4, cells sized to the problems.",
+            "line": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 16 pt. Dense: 2 x 4, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 51.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 884064,
+      "title": "I Can find what a number pattern shows",
+      "notes": [
+        "Dense: 2 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go even, odd, even, odd.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 70.9,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 85.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 114.6,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 2, 7, 2, 7.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 70.9,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 80.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 104.9,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "Every number ends in 3.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 70.9,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 80.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 114.6,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 1, 3, 5, 7, 9, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 80.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 90.1,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 134,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 70.9,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 80.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 114.6,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go odd, even, odd, even.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 70.9,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 80.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 114.6,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The ones digits go 9, 3, 7, 1, 5, then start again.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 80.4,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 95,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 134,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Read the pattern. Which sentence is true?",
+          "ans": "The numbers go even, odd, even, odd.",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 70.9,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "4": {
+              "hMm": 85.3,
+              "fits": false,
+              "slackMm": 3.9
+            },
+            "5": {
+              "hMm": 114.6,
+              "fits": false,
+              "slackMm": 1.3
+            }
+          }
+        }
+      ],
+      "role": "independent",
+      "size": "S",
+      "opts": null,
+      "pages": [
+        {
+          "file": "independent-S-p1.png",
+          "words": 307,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-S-key-p1.png",
+          "words": 310,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 99
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "58e7bf9f784bcaf9"
+        ],
+        "measured": [
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 12,
+              "median": 11.2,
+              "min": 8
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                80.4,
+                19.8
+              ],
+              "sizes": [
+                "80x20 mm ×6",
+                "80x25 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 28.5,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 1.5
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 99
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "5ee2ea9e6074850a"
+        ],
+        "measured": [
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 12,
+              "median": 11.2,
+              "min": 8
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                80.4,
+                19.8
+              ],
+              "sizes": [
+                "80x20 mm ×6",
+                "80x25 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 28.5,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 1.5
+          }
+        ]
+      }
+    }
+  },
+  "consoleErrors": []
+}

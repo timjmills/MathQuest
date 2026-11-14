@@ -10753,8 +10753,16 @@
       "forms": [
        0,
        1
-      ],
-      "band": 50
+      ]
+     }
+    },
+    {
+     "key": "algebra:multi_step_word_plain",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
      }
     }
    ],

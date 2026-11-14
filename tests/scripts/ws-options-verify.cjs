@@ -6,6 +6,8 @@
 //   node tests/scripts/ws-options-verify.cjs --report            # also write design/audit/OPTIONS-VERIFY.md
 //   node tests/scripts/ws-options-verify.cjs --json out.json     # raw results
 //   node tests/scripts/ws-options-verify.cjs --n 12              # items per check (default 12)
+//   node tests/scripts/ws-options-verify.cjs --wide 600          # a band value whose sample matches the default is re-dealt on
+//                                                                # 600 seeds: any change is a RARE effect (warn), none is FAIL
 //
 // "Each option panel needs to have an 8/10 or above. And all parts of the option need to be made
 // sure it's working for both print and screen." This is the machine half of that audit
@@ -108,7 +110,7 @@ function seedFor(key) {
 // ---------------------------------------------------------------------------------------------
 // Everything below this function runs IN THE PAGE (it is serialised by page.evaluate).
 // ---------------------------------------------------------------------------------------------
-async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange, dbg }) {
+async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange, dbg, wideN = 600 }) {
     const SO = await import('/js/modules/skill-options.js');
     const DATA = await import('/js/modules/data.js');
     const GQ = await import('/js/modules/generate-question.js');
@@ -755,6 +757,18 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 range = bigRange; items = bigItems; base = baseAt(bigRange); diff = true;
             }
         }
+        // WIDE (lf-algebra, lead ruling B 2026-11-13: band=50 on two_step_add_then_div / _letter_equation bites on ~6 % of items,
+        // 37 / 600 and 38 / 600, so a sample of 12 read it as "the control does nothing"). A number-size value (`band`) whose
+        // sample matches the default is re-dealt on WIDE_N fresh seeds against the same default before the verdict: a value that
+        // changes any of them is a RARE effect (a warning with its share), not a dead control; none of WIDE_N is still FAIL. Each
+        // item is dealt alone (itemIndex 0: no page history), so one changed deal cannot cascade through a page-fresh window.
+        if (!t.renderOnly && items.length && diff === false && def.id === 'band' && wideN > 0) {
+            const wide = (o) => { const out = []; for (let i = 0; i < wideN; i++) { let q = null; try { q = W.generateQuestionFor({ category: categoryId, skill: skillId, range, decimals: DP, opts: o, seed: baseSeed + 100000 + i, itemIndex: 0 }); } catch (e) { q = null; } out.push(q); } return out; };
+            const wv = wide(opts), wb = wide(t.def.appliesBase ? t.base : {});
+            let k = 0;
+            for (let i = 0; i < wideN; i++) if (wv[i] && wb[i] && sigList([wv[i]]) !== sigList([wb[i]])) k++;
+            if (k > 0) { r.rare = { k, m: wideN }; diff = true; warn('gen', `rare effect: changes ${k} / ${wideN} items (${Math.round(1000 * k / wideN) / 10} %), none in the ${n}-item sample`); }
+        }
         if (t.renderOnly) { /* checked above */ }
         else if (!items.length) { fail('gen', 'no items at any Max Number'); r.checks.gen = 'fail'; }
         else {
@@ -790,7 +804,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 if (def.id === 'support' && !marks) fail('print', 'no support drawn on the pupil page ([data-ws-support-on] / touch dots)');
                 if (def.id === 'support' && (ps.keyMarks || 0) !== marks) fail('print', `the key draws ${ps.keyMarks} supports, the pupil page ${marks}`);
             } else if (same && diff !== null) {
-                if (_coincide()) warn('print', 'printed sheet identical to the default, which already satisfies this value');
+                if (r.rare) warn('print', `printed sheet identical to the default (a rare effect, ${r.rare.k} / ${r.rare.m} items in the wide sample)`);
+                else if (_coincide()) warn('print', 'printed sheet identical to the default, which already satisfies this value');
                 else fail('print', 'printed sheet identical to the default sheet');
             }
             const pr = runPred(def, value, ps.items, 'print');
@@ -829,7 +844,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             const dd = differs(list, dl);
             if (dd === false) {
                 const p = runPred(def, value, dl, 'screen');
-                if (p.checked && !p.fails.length && r.checks.gen === 'ok') warn(`screen/${host}`, 'items identical to the default, which already satisfy this value');
+                if (r.rare) warn(`screen/${host}`, `items identical to the default (a rare effect, ${r.rare.k} / ${r.rare.m} items in the wide sample)`);
+                else if (p.checked && !p.fails.length && r.checks.gen === 'ok') warn(`screen/${host}`, 'items identical to the default, which already satisfy this value');
                 else fail(`screen/${host}`, 'items identical to the default (store not honoured)');
             }
             const pr = runPred(def, value, list, 'screen');
@@ -887,7 +903,7 @@ function genFileFor(r) {
         const key = `${s.categoryId}:${s.skillId}`;
         let timer;
         const deadline = new Promise(res => { timer = setTimeout(() => res({ timeout: true }), DEADLINE_MS); });
-        const run = app.page.evaluate(verifyInPage, { categoryId: s.categoryId, skillId: s.skillId, label: s.label, n: N, baseSeed: seedFor(key), bigRange: BIG_RANGE, dbg: has('debug') })
+        const run = app.page.evaluate(verifyInPage, { categoryId: s.categoryId, skillId: s.skillId, label: s.label, n: N, baseSeed: seedFor(key), bigRange: BIG_RANGE, dbg: has('debug'), wideN: parseInt(arg('wide', '600'), 10) })
             .catch(e => ({ crash: String(e && e.message || e) }));
         let r = await Promise.race([run, deadline]);
         clearTimeout(timer);

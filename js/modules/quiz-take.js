@@ -846,6 +846,8 @@ function recordAnswer(flatIdx, studentAnswer, { ladder = true } = {}) {
                 if (first >= 0 && rb.slice(first).some((b) => !filled(b))) partial = true;
             });
         }
+        // (lf-hosts 2026-11-13) a two-step story's graded equation / estimate boxes count as answer boxes too
+        if (!partial && String(studentAnswer).trim() !== '' && [...document.querySelectorAll('.qt-question-card [data-mq-part] input')].some((b) => !filled(b))) partial = true;
     } catch (e) { /* no DOM: not partial */ }
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept

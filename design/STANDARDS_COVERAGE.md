@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 728 live skills; 619 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 732 live skills; 623 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 75 of 177 standards FULL, 91 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 102 FULL, 93 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 278 entries — 133 new skills, 89 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 278 entries — 132 new skills, 90 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -37,10 +37,10 @@ Sources:
 | 1 | 10 / 11 / 0 of 21 (48% full) | 12 / 11 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
 | 2 | 11 / 11 / 4 of 26 (42% full) | 11 / 10 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
 | 3 | 13 / 12 / 0 of 25 (52% full) | 19 / 14 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
-| 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
+| 4 | 15 / 12 / 1 of 28 (54% full) | 20 / 12 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **75 / 91 / 11 of 177 (42% full)** | **102 / 93 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -383,9 +383,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 |---|---|---|---|---|
 | 1 | **Make a Pattern** (`pattern_make`) | new `patterns:make_a_pattern` | - | 6 |
 | 2 | **Equivalent Expressions? (option)** (`equiv_expressions`) | option on `algebra:combine_like_terms` | 6.EE.A.4, M.EE.6.EE.3 | - |
-| 3 | **What Do You Notice?** (`patterns_notice`) | new `patterns:notice_patterns` | 3.OA.D.9, 4.OA.C.5 | - |
-| 4 | **Count in 50s, 100s and 1,000s (option)** (`count_50s`) | option on `patterns:count_by_step_up` | - | 3 |
-| 5 | **Formulae** (`formulae`) | new `algebra:use_formulae` | 6.EE.A.2c | 1 |
+| 3 | **Count in 50s, 100s and 1,000s (option)** (`count_50s`) | option on `patterns:count_by_step_up` | - | 3 |
+| 4 | **Formulae** (`formulae`) | new `algebra:use_formulae` | 6.EE.A.2c | 1 |
+| 5 | **Patterns in the Addition Table** (`addition_table_patterns`) | option on `patterns:notice_patterns` | 3.OA.D.9 | - |
 | 6 | **Write and Graph Inequalities (option)** (`inequality_write_graph`) | option on `algebra:inequalities` | 6.EE.B.8 | - |
 | 7 | **Two-Step Problems With All Four Operations (option)** (`multi_step_four_ops`) | option on `algebra:multi_step_word` | 4.OA.A.3 | - |
 | 8 | **Pairs of Values and Two Unknowns** (`pairs_values`) | new `algebra:pairs_of_values` | - | 2 |
@@ -666,9 +666,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0  
   Build: Multiply Three Numbers (`mult_three`)
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
-  Taught in part by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
-  Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even)  
-  Build: What Do You Notice? (`patterns_notice`)
+  Taught in part by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`); What Do You Notice? Even and Odd Products, Pattern Features (`patterns:notice_patterns`)  
+  Missing: patterns in the addition table  
+  Build: Patterns in the Addition Table (`addition_table_patterns`)
 - **3.NF.A.3a** — PARTIAL. Understand two fractions as equivalent (equal) if they are the same size, or the same point on a number line.  
   Taught in part by: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`)  
   Missing: equivalent fractions as the same point on a number line  
@@ -740,10 +740,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Interpret the Remainder (Word Problems) (`division:remainder_interpret`); Remainder Contexts (Buses, Boxes, Cookies, Money, Cars) (`division:remainder_contexts`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Products (`number_sense:estimate_products`)  
   Missing: multistep problems using × and ÷; an equation with a letter for the unknown  
   Build: Two-Step Problems With All Four Operations (option) (`multi_step_four_ops`)
-- **4.OA.C.5** — PARTIAL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
-  Taught in part by: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`)  
-  Missing: identify features of the pattern not explicit in the rule, and explain them informally  
-  Build: What Do You Notice? (`patterns_notice`)
 - **4.NBT.A.1** — PARTIAL. Recognize that in a multi-digit whole number, a digit in one place represents ten times what it represents in the place to its right. For example, recognize that 700 ÷ 70 = 10 by applying concepts of place value and division.  
   Taught in part by: Value of a Digit (`placevalue:value`); Name the Place (`placevalue:identify`); Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`)  
   Missing: a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10)  
@@ -1374,8 +1370,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Multi-Step Word Problems (No Pictures) (`algebra:multi_step_word_plain`); Two-Step Word Problems: Multiply or Divide First (`algebra:two_step_mult_div_first`); Two-Step Word Problems: Add or Take Away, Then Multiply (`algebra:two_step_add_then_mult`); Two-Step Word Problems: Add or Take Away, Then Divide (`algebra:two_step_add_then_div`); Two-Step Word Problems: One Equation With a Letter (`algebra:two_step_letter_equation`); Two-Step Word Problems: Estimate to Check (`algebra:two_step_estimate_check`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`) — two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)  
   Also tagged: `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
-  In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
-  Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
+  In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`); What Do You Notice? Even and Odd Products, Pattern Features (`patterns:notice_patterns`) — lf-algebra 2026-11-07: explaining a multiplication-table pattern (even products, a times-table sentence true or false) is patterns:notice_patterns  
+  Missing: patterns in the addition table → `addition_table_patterns`  
   Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 #### Number and Operations in Base Ten (3.NBT)
 
@@ -1503,10 +1499,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `number_theory:factor_tchart_medium`, `number_theory:factor_tchart_hard`, `number_theory:factor_links_easy`, `number_theory:factor_links_medium`, `number_theory:factor_links_hard`, `number_theory:sort_prime_composite`, `number_theory:list_multiples`, `number_theory:missing_multiples`, `number_theory:common_factors`, `number_theory:common_multiples`
 *C. Generate and analyze patterns.*
 
-- **4.OA.C.5** — PARTIAL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
-  In part: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`)  
-  Missing: identify features of the pattern not explicit in the rule, and explain them informally → `patterns_notice`  
-  Also tagged: `algebra:function_table_easy`, `algebra:function_table_hard`, `algebra:function_table_find_rule`, `algebra:function_table_find_inputs`
+- **4.OA.C.5** — FULL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
+  Taught by: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`); Features of a Number Pattern: Odd, Even and Ones Digits (`patterns:pattern_features`); Growing Shape Patterns: Draw and Count the Next Term (`patterns:growing_shape_patterns`); Follow a Given Rule: Extend a Number Pattern (`patterns:follow_given_rule`) — lf-algebra 2026-11-07: features not explicit in the rule (pattern_features) and growing shape patterns  
+  Also tagged: `algebra:function_table_easy`, `algebra:function_table_hard`, `algebra:function_table_find_rule`, `algebra:function_table_find_inputs`, `patterns:notice_patterns`
 #### Number and Operations in Base Ten (4.NBT)
 
 *A. Generalize place value understanding for multi-digit whole numbers.*

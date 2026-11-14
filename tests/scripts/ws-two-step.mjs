@@ -1,0 +1,594 @@
+// ws-two-step — node checks of the two-step story family against its signed card (design/cards/two-step/two-step.md;
+// lane lf-algebra, two-step build 2026-11-13; owner rule: each finding is a check before its fix lands). No browser.
+//
+//   node tests/scripts/ws-two-step.mjs [--skill cat:a,...] [--root DIR] [--n 120] [--rules WITHIN-N,...]
+//
+//   WITHIN-N   (card decision 2) every computed number - the Step 1 result AND the answer - is at most the band
+//              (30 / 50 / 100) or, with no band, the Max Number 100; sampled with generateQuestionFor, every band
+//   ANS-STORY  (card §3 guards) the answer is no story number and not the Step 1 answer
+//   BAR-DRAWN  (decisions 4 / 5) with wpBar on - and by default on multi_step_word (Visual) - a two-step story draws BOTH
+//              bars (data-ts-bar 1 and 2) on paper and on the screen twin, and the Step 2 bar carries the Step 1 answer
+//              (on the key, a ts2-* box holds the Step 1 result)
+//   VISUAL     (decision 5) multi_step_word (Visual) differs from multi_step_word_plain: the item streams differ, or the
+//              bar is drawn on the Visual twin and not on the plain one
+//   HINT-L0    (decision 6) the hidden middle question prints on the teaching cells (scaffold level >= 2: Model, Guided)
+//              and never at level 0 or 1 or on the screen twin
+//   BAND-ALIAS (lead ruling R2 2026-11-13) band 100 is no longer offered on the seven skills (the G2 lesson takes "no band",
+//              which at Max Number 100 deals the same), and a share code written with band 100 before the change (pinned
+//              below, encoded on 8438ca59d) still decodes to its skill at "no band" (band null) - a round trip, never lost
+//   PART-FRAMES (lf-algebra R4) the lesson chart's two-step panel drawing (cells/word-work.js twoStepPart, panels 0-3) of a
+//              letter story draws ITS response - the equation (data-ws-slot="equation") on panels 1-3, n = the answer on
+//              panel 3 - and of an estimate story the estimate row ("Estimate:") on 2-3 and the Yes / No ring on 3; the
+//              four panels differ (the chart drew the whole cell four times). lf-engine routes those panels to it.
+//   PAGE-FRESH (precritic two-step r11) dealt as a printed run (seed base + i, itemIndex i, pages of 20): no Step 1 pair twice on a
+//              page, no first number more than twice, no answer more than 3 times (the x / ÷ / add-first presets repeated their
+//              small Step 1 facts; ws-dealer-uniform reads these skills INCOMPLETE, so this keeps the page judged)
+//   CAP-BAND   (--print, browser; lead ruling R1 2026-11-13, card decision 9 re-signed) multi_step_word (Visual) - the bar
+//              ABOVE the column work - holds its ruled capacity on the practice pages (independent / more-practice / test):
+//              at least S 2 / M 1 / L 1 stories a page (CAP), and no cell keeps an empty band of 30 % or more of its height
+//              under its lowest ink (BAND, RUBRIC H13; a one-story page at M / L stretched its cell to the page: 41 % / 32 %).
+//              Also (lf-algebra R4) two_step_letter_equation with wpBar at L, five seeds: at least 1 a page (card: bar model L 1)
+//              and no 30 % band (the options-render "letter + wpBar L PAGEFILL": the one story stretched 1.8x to 172 mm).
+//              `--html F --size M` measures one saved pupil page instead (the backtest's PASS fixture).
+//   BAND-BITES (lead ruling B 2026-11-13) every OFFERED band value changes >= 10 % of the items, each dealt alone (300 seeds),
+//              against the default; a band hidden on a preset (band 50 on add_then_div / letter_equation) reads an old code's value
+//              as the default
+//   EA-COMPOSES (--ea, browser; precritic two-step r12 EB-ROLE / ws-fixit-words, lead ruling D 2026-11-13) the Error analysis
+//              page composes on every two-step skill at M and L (seeds 7, 11): buildSheet does not refuse the skill and the page holds an
+//              item, so a wrong shown value fits the answer box it is written in (the ÷-last step's wrong operation, 27 x 3 = 81, did not fit
+//              the one-digit quotient box, so the role rejected every add_then_div item and the page came out empty)
+//   STEP-ALIGN (--align, browser; lead 2026-11-14 on the STEP-FORM Opener: Step 2 stood ~80 px above Step 1) in a two-step cell whose two
+//              steps are both fact sentences, the two step blocks top-align and their sentences sit on one line (tops within 1 mm), on
+//              the Opener, Guided and Independent pages and the key at M / L
+//   STEP-ALIGN screen (--screen-align, browser; STEP-FORM critic r3 F6: worksheet-1280 mult_div_first item 4, Step 2's fact
+//              sentence broke its 2-digit answer boxes onto a second line) every slot and = of a fact sentence stand on one line
+//              on the online worksheet and the practice card at 820 / 1024 / 1280 / 1366
+//   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
+//              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
+//   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
+//              step, every dealt ÷ step being a fact), the bracket's top end meets the bar within 0.3 mm at M and L, print and screen
+// Skills outside the card print OK (n/a).
+import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const TOOL = 'ws-two-step';
+const args = process.argv.slice(2);
+const arg = (f, d) => { const i = args.indexOf(f); return i >= 0 && i + 1 < args.length ? args[i + 1] : d; };
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(arg('--root', process.env.MQ_ROOT || join(HERE, '..', '..')));
+const N = Math.max(10, Number(arg('--n', 120)) || 120);
+const VERBOSE = args.includes('--verbose');
+const SCOPE = ['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult',
+    'algebra:two_step_add_then_div', 'algebra:two_step_letter_equation', 'algebra:two_step_estimate_check'];
+const only = String(arg('--skill', arg('--skills', ''))).split(',').map((s) => s.trim()).filter(Boolean);
+const mine = only.length ? SCOPE.filter((k) => only.includes(k) || only.includes(k.split(':')[1])) : SCOPE;
+if (!mine.length) { console.log(`${TOOL}: OK (n/a: no two-step skill in scope)`); process.exit(0); }
+
+if (args.includes('--print')) await printMode();
+if (args.includes('--ea')) await eaMode();
+if (args.includes('--ldiv')) await ldivMode();
+if (args.includes('--align')) await alignMode();
+if (args.includes('--screen-align')) await screenAlignMode();
+
+const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
+const app = await loadApp(ROOT);
+const kit = await import(pathToFileURL(join(ROOT, 'js', 'modules', 'sheet', 'index.js')).href);
+const fails = [];
+const fail = (rule, msg) => fails.push(`${rule} ${msg}`);
+const gen = (skill, opts, i, seedKey = skill) => {
+    try { return app.gq.generateQuestionFor({ category: 'algebra', skill, opts, seed: (fnv(`algebra:${seedKey}`) ^ Math.imul(i + 1, 2654435761)) >>> 0, itemIndex: i % 6 }); } catch (e) { return { __error: e.message }; }
+};
+/** The two steps of an item from its word-work payload: {a, b (Step 1 numbers), r1 (Step 1 result), c (Step 2 number), ans}. */
+const stepsOf = (q) => {
+    const st = q && q.cell && q.cell.payload && q.cell.payload.steps;
+    if (!Array.isArray(st) || st.length !== 2) return null;
+    const [s1, s2] = st;
+    const r1 = s1.op === '/' ? s1.q : s1.ans;
+    const c = s2.a === r1 ? s2.b : s2.b === r1 ? s2.a : s2.bottom;
+    return { a: s1.a, b: s1.b, r1, c, ans: Number(String(q.ans).replace(/,/g, '')) };
+};
+const short = (k) => k.split(':')[1];
+
+// WITHIN-N and ANS-STORY: every offered band (the + / − skills: the default and 30 / 50 / 100; the x / ÷ presets: 30 / 50)
+for (const key of mine) {
+    const sk = short(key);
+    const addsub = /^multi_step_word|estimate/.test(sk);
+    const offered = new Set(((app.so.offeredOptionsFor('algebra', sk) || []).find((d) => d.id === 'band') || { values: [] }).values.map((x) => x.v));
+    const bands = (addsub ? [null, 30, 50] : [30, 50]).filter((b) => b === null || offered.has(b));   // a band hidden on a preset is not dealt
+    for (const band of bands) {
+        const cap = band || 100;
+        const bad = [], story = [];
+        let read = 0;
+        for (let i = 0; i < N; i++) {
+            const q = gen(sk, band ? { band } : undefined, i);
+            if (!q || q.__error) { bad.push(`threw ${q && q.__error}`); continue; }
+            const s = stepsOf(q);
+            if (!s) continue;
+            read++;
+            if (s.r1 > cap || s.ans > cap || s.r1 < 0 || s.ans < 1) bad.push(`Step 1 ${s.r1}, answer ${s.ans}`);
+            if ([s.a, s.b, s.c].includes(s.ans) || s.ans === s.r1) story.push(`${s.a}, ${s.b}, ${s.c} -> ${s.r1} -> ${s.ans}`);
+        }
+        const tag = `${sk} ${band ? `band ${band}` : 'no band (Max Number 100)'}`;
+        if (!read) fail('WITHIN-N', `${tag}: no item read as two steps`);
+        if (bad.length) fail('WITHIN-N', `${tag}: ${bad.length} of ${N} items over ${cap} (e.g. ${bad.slice(0, 3).join('; ')})`);
+        if (story.length) fail('ANS-STORY', `${tag}: ${story.length} of ${N} answers are a story number or the Step 1 answer (e.g. ${story.slice(0, 2).join('; ')})`);
+    }
+}
+
+// BAR-DRAWN, VISUAL, HINT-L0: render the kit cell
+const render = (q, extra) => { try { return kit.renderCell({ cell: q.cell }, Object.assign({ mode: 'print', size: 'M', look: 'ican', state: 'blank', scaffoldLevel: 1 }, extra)); } catch (e) { return ''; } };
+const barCases = [];
+if (mine.includes('algebra:multi_step_word')) barCases.push(['multi_step_word', undefined, 'by default (Visual)']);
+for (const key of mine) barCases.push([short(key), { wpBar: true }, 'wpBar on']);
+for (const [sk, opts, why] of barCases) {
+    let checked = 0;
+    for (let i = 0; i < 12; i++) {
+        const q = gen(sk, opts, i);
+        if (!q || !q.cell || q.cell.template !== 'word-work') continue;
+        const s = stepsOf(q);
+        if (!s) continue;
+        const p = q.cell.payload || {};
+        if (p.layout === 'choose') continue;
+        checked++;
+        const paper = render(q, {});
+        const twin = String(q.visual || '');
+        for (const [host, html] of [['paper', paper], ['screen', twin]]) {
+            if (!/data-ts-bar="1"/.test(html) || !/data-ts-bar="2"/.test(html)) { fail('BAR-DRAWN', `${sk} ${why} item ${i} (${host}): the two-step bar model is not drawn (Step 1 bar ${/data-ts-bar="1"/.test(html) ? 'yes' : 'no'}, Step 2 bar ${/data-ts-bar="2"/.test(html) ? 'yes' : 'no'})`); break; }
+        }
+        const key = render(q, { state: 'answered' });
+        const vals = (pre) => [...key.matchAll(new RegExp(`data-ws-slot="${pre}-[a-z0-9]+"[^>]*>([^<]*)<`, 'g'))].map((m) => Number(String(m[1]).replace(/,/g, '')));
+        if (/data-ts-bar="2"/.test(key) && !(vals('ts1').includes(s.r1) && vals('ts2').includes(s.r1))) fail('BAR-DRAWN', `${sk} ${why} item ${i}: the Step 2 bar does not carry the Step 1 answer ${s.r1} (ts1 ${vals('ts1').join(',')}; ts2 ${vals('ts2').join(',')})`);
+        if (fails.length > 40) break;
+    }
+    if (!checked) fail('BAR-DRAWN', `${sk} ${why}: no two-step item to draw`);
+}
+if (mine.includes('algebra:multi_step_word') && mine.includes('algebra:multi_step_word_plain')) {
+    let sameStream = true, barV = 0, barP = 0;
+    for (let i = 0; i < 12; i++) {
+        const v = gen('multi_step_word', undefined, i, 'multi_step_word'), pl = gen('multi_step_word_plain', undefined, i, 'multi_step_word');   // (one seed: the twins' own streams)
+        if (!v || !pl) continue;
+        if (v.text !== pl.text) sameStream = false;
+        if (/data-ts-bar="1"/.test(render(v, {}))) barV++;
+        if (/data-ts-bar="1"/.test(render(pl, {}))) barP++;
+    }
+    if (sameStream && !(barV > 0 && barP === 0)) fail('VISUAL', `multi_step_word (Visual) deals and draws the same as multi_step_word_plain (bar on ${barV} / ${barP} of 12 items)`);
+}
+for (const key of mine) {
+    const sk = short(key);
+    let seen = 0;
+    for (let i = 0; i < 6; i++) {
+        const q = gen(sk, undefined, i);
+        if (!q || !q.cell || !q.cell.payload || (q.cell.payload.steps || []).length !== 2 || q.cell.payload.letter || q.cell.payload.layout === 'choose') continue;
+        for (const lv of [0, 1]) if (/mq-wwmid/.test(render(q, { scaffoldLevel: lv }))) fail('HINT-L0', `${sk} item ${i}: the middle question prints at scaffold level ${lv}`);
+        if (/mq-wwmid/.test(String(q.visual || ''))) fail('HINT-L0', `${sk} item ${i}: the middle question prints on the screen`);
+        if (/mq-wwmid/.test(render(q, { scaffoldLevel: 3, state: 'answered' }))) seen++;
+        else fail('HINT-L0', `${sk} item ${i}: the Model (scaffold level 3) does not print the hidden middle question (decision 6)`);
+        if (fails.length > 60) break;
+    }
+}
+
+// PART-FRAMES: the chart panels of the letter / estimate stories draw their own response
+{
+    const ww = await import(pathToFileURL(join(ROOT, 'js', 'modules', 'sheet', 'cells', 'word-work.js')).href).catch(() => null);
+    const cases = [['two_step_letter_equation', 'letter'], ['two_step_estimate_check', 'check']].filter(([sk]) => mine.includes(`algebra:${sk}`));
+    for (const [sk, kind] of cases) {
+        if (!ww || typeof ww.twoStepPart !== 'function') { fail('PART-FRAMES', `${sk}: no twoStepPart in cells/word-work.js`); continue; }
+        let seen = 0;
+        for (let i = 0; i < 6; i++) {
+            const q = gen(sk, undefined, i);
+            const p = q && q.cell && q.cell.payload;
+            if (!p || (p.steps || []).length !== 2) continue;
+            seen++;
+            const ctx = kit.resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank', scaffoldLevel: 1 });
+            const parts = [0, 1, 2, 3].map((k) => { try { return ww.twoStepPart(p, k, ctx); } catch (e) { return `ERR ${e.message}`; } });
+            const need = kind === 'letter'
+                ? [[1, /data-ws-slot="equation"/, 'the equation'], [2, /data-ws-slot="equation"/, 'the equation'], [3, /data-ws-slot="equation"/, 'the equation'], [3, /data-ws-slot="answer"/, 'n = the answer']]
+                : [[2, /Estimate:/, 'the estimate row'], [3, /Estimate:/, 'the estimate row'], [3, /data-ws-slot="ok-yes"/, 'the Yes / No ring']];
+            for (const [k, re, what] of need) if (!re.test(parts[k])) fail('PART-FRAMES', `${sk} item ${i}: chart panel ${k} does not draw ${what}`);
+            for (let k = 0; k + 1 < parts.length; k++) if (parts[k] === parts[k + 1]) fail('PART-FRAMES', `${sk} item ${i}: chart panels ${k} and ${k + 1} draw the same`);
+            if (fails.length > 60) break;
+        }
+        if (!seen) fail('PART-FRAMES', `${sk}: no two-step item`);
+    }
+}
+
+// BAND-ALIAS: band 100 is not offered; the codes written with it before R2 decode to "no band"
+{
+    const BAND100_CODES = { multi_step_word: 'M7~B100', multi_step_word_plain: 'M8~B100', two_step_mult_div_first: 'ZA~B100', two_step_add_then_mult: 'ZB~B100',
+        two_step_add_then_div: 'ZC~B100', two_step_letter_equation: 'ZD~B100', two_step_estimate_check: 'ZE~B100' };   // generateSkillCode on 8438ca59d
+    let sc = null;
+    try { sc = await import(pathToFileURL(join(ROOT, 'js', 'modules', 'skill-codes.js')).href); } catch (e) { fail('BAND-ALIAS', `skill-codes.js did not load: ${e.message}`); }
+    for (const key of mine) {
+        const sk = short(key);
+        const band = (app.so.offeredOptionsFor('algebra', sk) || []).find((d) => d.id === 'band');
+        if (band && (band.values || []).some((x) => x.v === 100)) fail('BAND-ALIAS', `${sk}: band 100 is still offered (R2: the G2 lesson takes "no band")`);
+        if (!sc || !BAND100_CODES[sk]) continue;
+        const got = sc.parseSkillCodeParts(BAND100_CODES[sk]);
+        const one = got.length === 1 ? got[0] : null;
+        const norm = one ? app.so.normalizeOptions('algebra', one.skillId, one.opts) : null;
+        if (!one || one.skillId !== sk) fail('BAND-ALIAS', `${BAND100_CODES[sk]} decodes to ${one ? one.skillId : 'nothing'}, not ${sk}`);
+        else if (norm.band !== null && norm.band !== undefined) fail('BAND-ALIAS', `${BAND100_CODES[sk]} (${sk}, band 100) decodes to band ${norm.band}, not "no band"`);
+        else if (sc.generateSkillCode([{ categoryId: 'algebra', skillId: sk, opts: one.opts }]) !== BAND100_CODES[sk].split('~')[0]) fail('BAND-ALIAS', `${BAND100_CODES[sk]} re-encodes as ${sc.generateSkillCode([{ categoryId: 'algebra', skillId: sk, opts: one.opts }])}, not the no-band code ${BAND100_CODES[sk].split('~')[0]}`);
+    }
+}
+
+// PAGE-FRESH (precritic two-step r11, ws-dealer-uniform PAGE on the x / ÷ / add-first presets): dealt as print-sheet deals a page
+// (generateQuestionFor, seed base + i, itemIndex i, pages of 20), no Step 1 pair (a, b) twice on a page, no first number more than
+// twice, no answer more than 3 times. ws-dealer-uniform itself reads these skills INCOMPLETE ("no single operation"), so this rule
+// keeps the page judged.
+for (const key of mine) {
+    const sk = short(key);
+    const base = fnv(`algebra:${sk}`);
+    const items = [];
+    for (let i = 0; i < 120; i++) {
+        let q; try { q = app.gq.generateQuestionFor({ category: 'algebra', skill: sk, seed: (base + i) >>> 0, itemIndex: i, itemCount: 120 }); } catch (e) { continue; }
+        const m = q && q.msOps;
+        if (!m) continue;
+        items.push({ page: Math.floor(i / 20), a: m.a, b: m.b, ans: q.ans });
+    }
+    if (!items.length) continue;
+    for (let pg = 0; pg < 6; pg++) {
+        const on = items.filter((x) => x.page === pg);
+        const count = (f) => { const c = new Map(); for (const x of on) c.set(f(x), (c.get(f(x)) || 0) + 1); return c; };
+        for (const [v, n] of count((x) => `${x.a},${x.b}`)) if (n > 1) fail('PAGE-FRESH', `${sk} page ${pg + 1}: Step 1 pair ${v} ${n} times (at most 1)`);
+        for (const [v, n] of count((x) => x.a)) if (n > 2) fail('PAGE-FRESH', `${sk} page ${pg + 1}: first number ${v} ${n} times (at most 2)`);
+        for (const [v, n] of count((x) => x.ans)) if (n > 3) fail('PAGE-FRESH', `${sk} page ${pg + 1}: answer ${v} ${n} times (at most 3)`);
+    }
+}
+
+// BAND-BITES (lead ruling B 2026-11-13, band 50 ruling (a)): every band value a skill OFFERS changes at least 10 % of the items,
+// each dealt alone (itemIndex 0, 300 seeds) against the skill's default - a value that leaves ~94 % of the items as they were
+// prints the default page under another name (band=50 on two_step_add_then_div 37 / 600, two_step_letter_equation 38 / 600),
+// so the card hides it on that preset; an old code carrying the hidden value still decodes (normalizeOptions reads the default).
+for (const key of mine) {
+    const sk = short(key);
+    const band = (app.so.offeredOptionsFor('algebra', sk) || []).find((d) => d.id === 'band');
+    if (!band) continue;
+    const sig = (q) => (q ? `${q.text}|${JSON.stringify(q.ans)}` : 'none');
+    const deal = (opts, i) => { try { return app.gq.generateQuestionFor({ category: 'algebra', skill: sk, opts, seed: (fnv(`bites:${sk}`) + i) >>> 0, itemIndex: 0 }); } catch (e) { return null; } };
+    const M = 300;
+    // Band 50 on mult_div_first / add_then_mult (5.7 % / 9.3 %) was PENDING a lead ruling; ruled hidden 2026-11-13 (step 0, r3b).
+    const base = []; for (let i = 0; i < M; i++) base.push(sig(deal({}, i)));
+    for (const val of band.values || []) {
+        if (val.v === null || val.v === undefined || val.v === band.default) continue;
+        let k = 0; for (let i = 0; i < M; i++) if (sig(deal({ band: val.v }, i)) !== base[i]) k++;
+        if (k < 0.1 * M) fail('BAND-BITES', `${sk}: band ${val.v} is offered but changes ${k} / ${M} items (${Math.round(1000 * k / M) / 10} %, under 10 %)`);
+    }
+    for (const hid of [50]) {
+        if ((band.values || []).some((x) => x.v === hid)) continue;
+        const n = app.so.normalizeOptions('algebra', sk, { band: hid });
+        if (n.band === hid) fail('BAND-BITES', `${sk}: band ${hid} is hidden but an old code's band ${hid} still reads as ${hid}`);
+    }
+}
+
+// STEP-FORM (owner request 2026-11-14, via the lead: a two-step story's basic-fact step is a horizontal number sentence, not a
+// column or a long-division frame - "6 + 4 = [ ]", "10 ÷ 2 = [ ]"; the stray "1" carry box over 6 + 4 on the add_then_div Opener
+// Model). A BASIC FACT: + / − within 20 with no regrouping (or both numbers one digit: 6 + 4, 15 − 7), × / ÷ within the 10 x 10
+// facts. Every other step keeps its frame (columns; long division for a multi-digit dividend that is no fact). Judged on the paper
+// cell (the Model / Guided level 3 and the practice level 0, blank and answered) and on the screen twin (q.visual), 24 items a skill.
+const isFact = (st) => {
+    const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+    if (st.op === '+') return st.ans <= 20 && ((x < 10 && y < 10) || (x % 10) + (y % 10) < 10);
+    if (st.op === '-') return x <= 20 && ((y < 10 && st.ans < 10) || (x % 10) >= (y % 10));
+    if (st.op === '*') return x <= 10 && y <= 10;
+    if (st.op === '/') return y >= 1 && y <= 10 && !st.r && st.q <= 10;
+    return false;
+};
+const stepSegments = (html) => String(html).split('class="mq-wwstep"').slice(1);
+for (const key of mine) {
+    const sk = short(key);
+    let judged = 0;
+    const bad = [];
+    for (let i = 0; i < 24 && bad.length < 6; i++) {
+        const q = gen(sk, undefined, i, `form:${sk}`);
+        const p = q && q.cell && q.cell.payload;
+        if (!p || !Array.isArray(p.steps) || p.steps.length !== 2 || p.layout) continue;    // the column story only (frames / choose have no columns)
+        for (const [host, html] of [['paper L3', render(q, { scaffoldLevel: 3 })], ['paper L0 key', render(q, { scaffoldLevel: 0, state: 'answered' })], ['screen', String(q.visual || '')]]) {
+            const segs = stepSegments(html);
+            if (segs.length !== 2) continue;
+            judged++;
+            p.steps.forEach((st, k) => {
+                const seg = segs[k];
+                const fact = isFact(st);
+                const sentence = /mq-wwfact/.test(seg), frame = /mq-wwcols/.test(seg);
+                const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+                if (fact && (!sentence || frame)) bad.push(`${sk} item ${i} ${host}: Step ${k + 1} ${x} ${st.op} ${y} is a basic fact but draws ${frame ? (st.op === '/' ? 'a long-division frame' : 'columns') : 'no number sentence'}`);
+                if (!fact && (!frame || sentence)) bad.push(`${sk} item ${i} ${host}: Step ${k + 1} ${x} ${st.op} ${y} is no basic fact but draws ${sentence ? 'a fact sentence' : 'no frame'}`);
+            });
+        }
+    }
+    if (!judged && !/letter|estimate/.test(sk)) fail('STEP-FORM', `${sk}: no column two-step cell rendered`);   // (letter / estimate: frames sentences, no columns)
+    for (const b of bad.slice(0, 6)) fail('STEP-FORM', b);
+}
+
+// --rules A,B: only those rules' findings count (a backtest row proves its own rules on commits before later rules existed)
+const ONLY = String(arg('--rules', '')).split(',').map((x) => x.trim()).filter(Boolean);
+if (ONLY.length) for (let i = fails.length - 1; i >= 0; i--) if (!ONLY.includes(fails[i].split(' ')[0])) fails.splice(i, 1);
+const byRule = {};
+for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH', 'BAND-BITES', 'STEP-FORM']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
+if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM)`);
+process.exit(fails.length ? 1 : 0);
+
+/** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
+async function printMode() {
+    if (!arg('--html', null) && !mine.includes('algebra:multi_step_word') && !mine.includes('algebra:two_step_letter_equation')) { console.log(`${TOOL}: OK (--print n/a: neither multi_step_word (Visual) nor two_step_letter_equation in scope)`); process.exit(0); }
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    // card decision 9 (re-signed 2026-11-13, lead ruling R1 (a)): the bar above the column work, S 2 / M 1 / L 1
+    const PIN = { S: 2, M: 1, L: 1 };
+    const ROLES = ['independent', 'more-practice', 'test'];
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const html = arg('--html', null);
+    const out = [];
+    const bad = (rule, msg) => out.push(`${rule} ${msg}`);
+    const measure = (pageHtml) => {
+        const d = document.createElement('div'); d.id = '__ts2'; d.innerHTML = pageHtml; document.body.appendChild(d);
+        const mm = (px) => px / 96 * 25.4;
+        const cells = [...d.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+        const res = cells.map((c) => {
+            const r = c.getBoundingClientRect();
+            const cs = getComputedStyle(c);
+            const inner = r.bottom - parseFloat(cs.paddingBottom || 0) - parseFloat(cs.borderBottomWidth || 0);
+            let low = r.top + parseFloat(cs.paddingTop || 0);
+            for (const e of c.querySelectorAll('*')) {
+                if (e.closest('[data-ws-label]') || e.children.length && !(e instanceof SVGSVGElement) && !e.textContent.trim() && !/border/.test(e.getAttribute('style') || '')) continue;
+                if (e.closest('svg') && !(e instanceof SVGSVGElement)) continue;
+                const b = e.getBoundingClientRect();
+                if (b.width < 0.5 || b.height < 0.5) continue;
+                const st = getComputedStyle(e);
+                if (st.visibility === 'hidden' || st.display === 'none') continue;
+                const inked = (e.children.length === 0 && e.textContent.trim()) || e instanceof SVGSVGElement || parseFloat(st.borderBottomWidth) > 0 || parseFloat(st.borderTopWidth) > 0;
+                if (inked) low = Math.max(low, b.bottom);
+            }
+            return { h: mm(r.height), band: mm(Math.max(0, inner - low)) };
+        });
+        d.remove();
+        return res;
+    };
+    const app = await H.open({});
+    try {
+        if (html) {
+            const size = arg('--size', 'M');
+            const r = await app.page.evaluate(async (h, f) => { await document.fonts.ready; return (0, eval)(`(${f})`)(h); }, readFileSync(resolve(html), 'utf8'), measure.toString());
+            r.forEach((c, i) => { if (c.band / c.h >= 0.3) bad('BAND', `${html} ${size} cell ${i + 1}: ${c.band.toFixed(1)} mm empty under the work in a ${c.h.toFixed(1)} mm cell (${Math.round(100 * c.band / c.h)} %, H13 >= 30 %)`); });
+            if (!r.length) bad('BAND', `${html}: no kit cell`);
+        } else {
+            // the cases: multi_step_word (Visual) on the three practice roles at S / M / L (R1), and - lf-algebra R4, precritic
+            // two-step options-render "letter + wpBar L PAGEFILL" - two_step_letter_equation with wpBar at L on the Independent
+            // page over five seeds (its bar stands one over the other on ~13 % of items, so a page holds 1 at L: the card's
+            // bar-model L 1; the one story must not be stretched to the page either)
+            const cases = [];
+            if (mine.includes('algebra:multi_step_word')) for (const role of ROLES) for (const size of SIZES) cases.push({ sk: 'multi_step_word', tag: 'multi_step_word (Visual)', opts: null, role, size, seed: 7, pin: PIN[size] });
+            if (mine.includes('algebra:two_step_letter_equation') && SIZES.includes('L')) for (const seed of [1, 2, 7, 11, 26]) cases.push({ sk: 'two_step_letter_equation', tag: `two_step_letter_equation wpBar (seed ${seed})`, opts: { wpBar: true }, role: 'independent', size: 'L', seed, pin: 1 });
+            for (const c of cases) {
+                const { role, size } = c;
+                const r = await app.page.evaluate(async (a, f) => {
+                    const s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk, ...(a.opts ? { opts: a.opts } : {}) }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true, anchors: 'off' });
+                    await document.fonts.ready;
+                    const m = s.plan && s.plan.meta;
+                    return { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : (s.items || []).length, cells: (0, eval)(`(${f})`)(s.pupilHtml) };
+                }, c, measure.toString());
+                if (r.items < c.pin) bad('CAP', `${c.tag} ${role} ${size}: ${r.items} stories a page, the card rules ${c.pin} (decision 9)`);
+                r.cells.forEach((x, i) => { if (x.band / x.h >= 0.3) bad('BAND', `${c.tag} ${role} ${size} cell ${i + 1}: ${x.band.toFixed(1)} mm empty under the work in a ${x.h.toFixed(1)} mm cell (${Math.round(100 * x.band / x.h)} %, H13 >= 30 %)`); });
+                if (!r.cells.length) bad('BAND', `${c.tag} ${role} ${size}: no kit cell on the page`);
+            }
+        }
+    } finally { await app.close(); }
+    for (const r of ['CAP', 'BAND']) { const n = out.filter((x) => x.startsWith(r + ' ')).length; console.log(`CAP-BAND ${r.padEnd(5)} ${n ? `FAIL ${n}` : 'PASS'}`); }
+    for (const f of out.slice(0, 30)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--print: ${out.length} finding(s))` : `${TOOL}: OK (--print: CAP-BAND, ${html ? 'fixture' : 'multi_step_word (Visual) / two_step_letter_equation wpBar L'})`);
+    process.exit(out.length ? 1 : 0);
+}
+
+async function eaMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const out = [];
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
+        for (const key of mine) for (const size of SIZES) for (const seed of [7, 11]) {
+            const sk = key.split(':')[1];
+            const r = await app.page.evaluate(async (a) => {
+                let s;
+                try { s = await window.buildSheet({ role: 'error-analysis', sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true, anchors: 'off' }); } catch (e) { return { err: String(e && e.message || e) }; }
+                const d = document.createElement('div'); d.innerHTML = s.pupilHtml || '';
+                const cells = [...d.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                const m = s.plan && s.plan.meta;
+                return { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : cells.length, cells: cells.length, wrong: (s.items || []).filter((x) => x && (x.wrong || x.isWrong || (x.ea && x.ea.wrong))).length, raw: (s.items || []).length };
+            }, { sk, size, seed });
+            if (r.err) { out.push(`EA-COMPOSES ${sk} ${size} seed ${seed}: buildSheet threw ${r.err}`); continue; }
+            if (r.items < 1) out.push(`EA-COMPOSES ${sk} ${size} seed ${seed}: the Error analysis page holds no item: the role rejected the skill's items`);
+            if (VERBOSE) console.log(`  ${sk} ${size} seed ${seed}: ${r.items} items, ${r.cells} cells, wrong ${r.wrong} / ${r.raw}`);
+        }
+    } finally { await app.close(); }
+    console.log(`EA-COMPOSES ${out.length ? `FAIL ${out.length}` : 'PASS'}`);
+    for (const f of out.slice(0, 30)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--ea: ${out.length} finding(s))` : `${TOOL}: OK (--ea: EA-COMPOSES, ${mine.length} skill(s))`);
+    process.exit(out.length ? 1 : 0);
+}
+
+// LDIV-JOIN (--ldiv, browser; owner 2026-11-14 "the long-division sign looks disconnected", lf-ops' rule): wherever a two-step step
+// still draws long division, the bracket's top end meets the bar within 0.3 mm, at M and L, in print and on the screen twin. Every
+// dealt ÷ step of the seven skills is a basic fact (STEP-FORM: a sentence), so the frame is judged on a real add_then_div item whose
+// Step 2 is set to 84 ÷ 4 = 21 (a multi-digit dividend that is no fact).
+async function ldivMode() {
+    if (!mine.includes('algebra:two_step_add_then_div') && !mine.includes('algebra:two_step_mult_div_first')) { console.log(`${TOOL}: OK (--ldiv n/a: no ÷ two-step skill in scope)`); process.exit(0); }
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const out = [];
+    let judged = 0;
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.generateQuestionFor === 'function', { timeout: 60000 });
+        for (const size of ['M', 'L']) for (const twin of [false, true]) {
+            const r = await app.page.evaluate(async (a) => {
+                const kit = await import('/js/modules/sheet/index.js');
+                const q = window.generateQuestionFor({ category: 'algebra', skill: 'two_step_add_then_div', seed: 7, itemIndex: 0 });
+                const p = JSON.parse(JSON.stringify(q.cell.payload));
+                p.steps = [{ a: 50, b: 34, op: '+', ans: 84, top: 50, bottom: 34 }, { a: 84, b: 4, op: '/', ans: 21, q: 21, r: 0, top: 84, bottom: 4 }];
+                p.ans = 21; p.bar2 = false;
+                const ctx = { mode: 'print', size: a.size, look: 'ican', state: 'answered', scaffoldLevel: 0 };
+                if (a.twin) ctx.options = { twin: true };
+                let html = '';
+                try { html = kit.renderCell({ cell: { template: 'word-work', payload: p } }, ctx); } catch (e) { return { err: e.message }; }
+                const host = document.createElement('div');
+                host.style.cssText = 'position:absolute;left:0;top:0;width:186mm;background:#fff;';
+                host.innerHTML = html; document.body.appendChild(host);
+                await document.fonts.ready;
+                const div = host.querySelector('.mq-wwdiv');
+                if (!div) { host.remove(); return { none: true }; }
+                const path = div.querySelector('svg path');
+                const pt = (len) => { const m = path.getScreenCTM(); const q0 = path.getPointAtLength(len); return { x: q0.x * m.a + q0.y * m.c + m.e, y: q0.x * m.b + q0.y * m.d + m.f }; };
+                // the bracket's TOP: the topmost point of its stroke (an arc's top end; or, for the one-stroke bracket that runs on
+                // into the bar - lf-ops' bracketSvg, "M x foot Q ... x 0 H bar" - its corner: the leftmost point on the top line)
+                const T = path.getTotalLength(), pts = Array.from({ length: 201 }, (_, i) => pt(T * i / 200));
+                const yTop = Math.min(...pts.map((u) => u.y));
+                const top = pts.filter((u) => u.y <= yTop + 0.2).sort((u, v) => u.x - v.x)[0];
+                // the bar: a separate element with a solid top border (the vinculum), else the path itself draws it (one stroke)
+                const bar = [...div.querySelectorAll('span')].find((e) => getComputedStyle(e).borderTopStyle === 'solid' && getComputedStyle(e).borderBottomStyle === 'none' && getComputedStyle(e).borderLeftStyle === 'none' && parseFloat(getComputedStyle(e).borderTopWidth) > 0.5 && e.getBoundingClientRect().height < 4);
+                let gap = 0;
+                // the bar meets the top: its left end at or before the corner (a bar that starts left of the corner and runs over it
+                // is one line with it), on the same centre line
+                if (bar) { const b = bar.getBoundingClientRect(); const bw = parseFloat(getComputedStyle(bar).borderTopWidth); const by = b.top + bw / 2; gap = Math.hypot(Math.max(0, b.left - top.x), top.y - by); }
+                host.remove();
+                return { gapMm: gap * 25.4 / 96, sep: !!bar };
+            }, { size, twin });
+            const where = `84 ÷ 4 ${size} ${twin ? 'screen' : 'print'}`;
+            if (r.err) { out.push(`${where}: render threw ${r.err}`); continue; }
+            if (r.none) { out.push(`${where}: no long-division frame drawn for a 2-digit dividend that is no fact`); continue; }
+            judged++;
+            if (r.gapMm > 0.3) out.push(`${where}: the bracket's top end is ${r.gapMm.toFixed(2)} mm from the bar (limit 0.3 mm; one connected stroke)`);
+            if (VERBOSE) console.log(`  ${where}: gap ${r.gapMm.toFixed(2)} mm${r.sep ? ' (separate bar)' : ' (one path)'}`);
+        }
+    } finally { await app.close(); }
+    console.log(`LDIV-JOIN ${out.length ? `FAIL ${out.length}` : 'PASS'}`);
+    for (const f of out) console.log(`  LDIV-JOIN ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--ldiv: ${out.length} finding(s))` : `${TOOL}: OK (--ldiv: LDIV-JOIN, ${judged} frame(s))`);
+    process.exit(out.length ? 1 : 0);
+}
+
+// STEP-ALIGN (--align, browser; lead 2026-11-14: on the STEP-FORM Opener Model Step 2 stood ~80 px higher than Step 1 - the step
+// row aligned the blocks' FEET, and Step 2's block is taller (two-line question, the unit bank)). In a cell whose two steps are both
+// fact sentences, the step blocks' tops and the sentences' tops each agree within 1 mm, pupil page and key, at M / L.
+async function alignMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const ROLES_A = String(arg('--roles', 'opener,guided,independent')).split(',').map((x) => x.trim()).filter(Boolean);
+    const out = [];
+    let judged = 0;
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
+        for (const key of mine) for (const role of ROLES_A) for (const size of SIZES) for (const seed of [7, 784454]) {
+            const sk = key.split(':')[1];
+            const r = await app.page.evaluate(async (a) => {
+                let s;
+                try { s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true }); } catch (e) { return { err: String(e && e.message || e) }; }
+                await document.fonts.ready;
+                const mm = (px) => px / 96 * 25.4;
+                const res = [];
+                for (const [which, html] of [['pupil', s.pupilHtml || ''], ['key', s.keyHtml || '']]) {
+                    const d = document.createElement('div'); d.innerHTML = html; document.body.appendChild(d);
+                    for (const c of d.querySelectorAll('.mq-ww')) {
+                        const steps = [...c.querySelectorAll('.mq-wwstep')];
+                        if (steps.length !== 2 || steps[0].parentElement !== steps[1].parentElement) continue;
+                        // (round 2, critic F1b / F5: EVERY two-step row - a column step beside a sentence step too; a wrapped row's two
+                        // blocks share one left edge)
+                        const facts = steps.map((x) => x.querySelector('.mq-wwfact'));
+                        const t = steps.map((x) => x.getBoundingClientRect());
+                        if (t[1].top >= t[0].bottom - 1) { res.push({ which, wrap: mm(Math.abs(t[0].left - t[1].left)) }); continue; }
+                        const signs = steps.map((x) => [...x.children].find((c) => /×/.test(c.textContent) && /÷/.test(c.textContent) && !c.querySelector('.mq-wwfact,.mq-wwcols')));
+                        const f = facts[0] && facts[1] ? facts.map((x) => x.getBoundingClientRect()) : null;
+                        const g = signs[0] && signs[1] ? signs.map((x) => x.getBoundingClientRect()) : null;
+                        res.push({ which, block: mm(Math.abs(t[0].top - t[1].top)), sent: f ? mm(Math.abs(f[0].top - f[1].top)) : 0, sign: g ? mm(Math.abs(g[0].top - g[1].top)) : 0 });
+                    }
+                    d.remove();
+                }
+                return { res };
+            }, { sk, role, size, seed });
+            if (r.err) { out.push(`STEP-ALIGN ${sk} ${role} ${size}: buildSheet threw ${r.err}`); continue; }
+            for (const x of r.res) {
+                judged++;
+                if (x.wrap !== undefined) { if (x.wrap > 1) out.push(`STEP-ALIGN ${sk} ${role} ${size} ${x.which}: wrapped Step 2 starts ${x.wrap.toFixed(1)} mm off Step 1's left edge (<= 1 mm)`); continue; }
+                if (x.block > 1 || x.sent > 1 || x.sign > 1) out.push(`STEP-ALIGN ${sk} ${role} ${size} ${x.which}: Step 1 / Step 2 stagger - blocks ${x.block.toFixed(1)} mm, sign rows ${x.sign.toFixed(1)} mm, sentences ${x.sent.toFixed(1)} mm apart (<= 1 mm)`);
+            }
+        }
+    } finally { await app.close(); }
+    console.log(`STEP-ALIGN ${out.length ? `FAIL ${out.length}` : 'PASS'} (${judged} fact-pair cell(s) judged)`);
+    for (const f of out.slice(0, 30)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--align: ${out.length} finding(s))` : `${TOOL}: OK (--align: STEP-ALIGN, ${judged} cell(s))`);
+    process.exit(out.length ? 1 : 0);
+}
+
+// STEP-ALIGN on the screen hosts (--screen-align; STEP-FORM critic r3 F6, worksheet-1280 two_step_mult_div_first item 4: in the
+// three-up worksheet cell the Step 2 sentence "45 ÷ 5 = 9 / 9 + 3 = 12" dropped its 2-digit answer boxes to a second line). A fact
+// sentence never wraps: its slots and its = share one line (tops within 1 mm), on the online worksheet and the practice card at
+// 820 / 1024 / 1280 / 1366, over seeded deals.
+async function screenAlignMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const WIDTHS = String(arg('--widths', '820,1024,1280,1366')).split(',').map(Number).filter(Boolean);
+    const SEEDS = Number(arg('--seeds', 6));
+    const out = [];
+    let judged = 0;
+    const app = await H.open({ seed: 1 });
+    try {
+        await app.page.waitForFunction(() => typeof window.initWorksheet === 'function', { timeout: 60000 });
+        await app.page.evaluate(() => document.fonts.ready);   // (the first deal before the webfonts load measures fallback-font boxes)
+        const probe = (VERBOSE_D) => {
+            const mm = (px) => px / 96 * 25.4;
+            const res = [];
+            for (const f of document.querySelectorAll('#worksheetGrid .mq-wwfact, #questionCard .mq-wwfact')) {
+                const kids = [...f.children].map((c) => c.getBoundingClientRect()).filter((r) => r.width > 1 && r.height > 1);
+                if (kids.length < 2) continue;
+                const tops = kids.map((r) => r.top + r.height / 2);
+                res.push({ host: f.closest('#worksheetGrid') ? 'worksheet' : 'card', dump: VERBOSE_D ? [...f.children].map((c) => `${c.tagName}.${c.className}@${Math.round(c.getBoundingClientRect().top)}h${Math.round(c.getBoundingClientRect().height)}w${Math.round(c.getBoundingClientRect().width)}`).join(' ') + ` disp=${getComputedStyle(f).display}/${getComputedStyle(f).flexWrap} fw=${Math.round(f.getBoundingClientRect().width)} last=${f.lastElementChild.outerHTML.slice(0,200)}` : '', spread: mm(Math.max(...tops) - Math.min(...tops)), text: f.textContent.replace(/\s+/g, ' ').trim().slice(0, 40) });
+            }
+            return res;
+        };
+        for (const key of mine) for (const w of WIDTHS) {
+            const sk = key.split(':')[1];
+            await app.page.setViewport({ width: w, height: w === 1366 ? 768 : 900, deviceScaleFactor: 1 });
+            await new Promise((r) => setTimeout(r, 500));   // (the resize from the previous width settles before the first deal is judged)
+            for (let seed = 1; seed <= SEEDS; seed++) {
+                for (const host of ['worksheet', 'card']) {
+                    const err = await app.page.evaluate(({ sk, seed, host }) => {
+                        try {
+                            if (window.__wsReseed) window.__wsReseed(seed * 7919);
+                            const st = window.state; st.category = 'algebra'; st.skill = sk; st.isMixedMode = false;
+                            if (host === 'worksheet') { st.gameMode = 'worksheet'; st.problemCount = 6; window.initWorksheet(); }
+                            else { st.gameMode = 'practice'; window.showView('gameView'); const q = window.generateQuestion(); st.currentQ = q; window.renderQuestion(); }
+                            return '';
+                        } catch (e) { return String(e && e.message || e); }
+                    }, { sk, seed, host });
+                    if (err) { out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w}: ${err}`); continue; }
+                    await app.page.evaluate(() => document.fonts.ready);
+                    await new Promise((r) => setTimeout(r, host === 'worksheet' ? 1000 : 250));
+                    // the worksheet grid's scheduled layout passes (worksheet.js) end with data-mq-laid-out="1": judge the settled layout
+                    if (host === 'worksheet') await app.page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
+                    let got = await app.page.evaluate(probe);
+                    // a wrap seen while the grid is still settling (only ever the run's first deal) is measured once more after 800 ms
+                    if (got.some((x) => x.host === host && x.spread > 1)) { await new Promise((r) => setTimeout(r, 800)); got = await app.page.evaluate(probe, true); }
+                    for (const x of got) {
+                        if (x.host !== host) continue;
+                        judged++;
+                        if (x.spread > 1) out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w} seed ${seed}: the fact sentence "${x.text}" wraps (its slots ${x.spread.toFixed(1)} mm apart; one line)${VERBOSE ? ' ' + x.dump : ''}`);
+                    }
+                }
+            }
+        }
+    } finally { await app.close(); }
+    const uniq = [...new Set(out)];
+    console.log(`STEP-ALIGN-SCREEN ${uniq.length ? `FAIL ${uniq.length}` : 'PASS'} (${judged} sentence(s) judged)`);
+    for (const f of uniq.slice(0, 30)) console.log(`  ${f}`);
+    console.log(uniq.length ? `${TOOL}: FAIL (--screen-align: ${uniq.length} finding(s))` : `${TOOL}: OK (--screen-align: STEP-ALIGN-SCREEN, ${judged} sentence(s))`);
+    process.exit(uniq.length ? 1 : 0);
+}

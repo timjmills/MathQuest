@@ -188,7 +188,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-work-div': 'Write the numbers in the boxes. Divide. Answer the question.',
     // detailed lesson 7 (2026-10-17): the word-work cell's compact frames form (one number sentence a step)
     'story-steps': 'Read the story. Write each step. Solve.',
-    'story-letter': 'Read the story. Write the equation. Find n.',
+    // two-step card 2026-11-13 decision 10: the letter preset (3.OA.D.8 'an equation with a letter') and the estimate preset
+    'story-letter': 'Write one equation with n. Then find n.',
+    'story-estimate': 'Solve. Then estimate. Is your answer close?',
     'story-check': 'Solve. Estimate. Circle Yes or No.',
     // visual-quality lane (2026-10-31): the word-work cell's sentence form for stories within 20
     // (story, `[ ] ◯ [ ] = [ ] unit`), and the family-check cell (fact_family_sort)
@@ -293,6 +295,13 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',
     'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
     tally: 'Use the tally chart. Answer the questions.',
+    // lane lf-algebra (2026-11-07), APPEND ONLY: notice_patterns (the notice cell) and growing_shape_patterns.
+    'product-even-odd': 'Is the product even or odd? Circle one.',
+    'pattern-true-one': 'Read the pattern. Check the sentence that is true.',
+    'row-true-false': 'Read the sentence. Circle True or False.',
+    'grow-next': 'Draw Term 4. Write how many it has.',
+    'grow-rule': 'Draw Term 4. Write how many it has. Write the rule.',
+    'grow-far': 'Find the rule. Write how many Term 10 has.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -351,6 +360,9 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Mark the number with a dot', 'Tap the line to place the number'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
+    // lane lf-algebra (2026-11-07): the growing pattern's Term 4 is made on a tap grid; the notice cell's sentence list
+    ['Draw Term 4', 'Make Term 4 on the grid'],
+    ['Check the sentence that is true', 'Tap the sentence that is true'],
     // round 4 (H7): the paper verbs the screen sweep (ws-screen-slots) still found
     ['Draw the lines of symmetry', 'Tap the lines of symmetry'],
     ['Draw disks to show', 'Tap the mat to show'],

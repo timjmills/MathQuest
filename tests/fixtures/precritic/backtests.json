@@ -5933,7 +5933,7 @@
     "commit": "b0efa7ee8",
     "state": "0"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_facts --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_facts --roles error-analysis --size M,L --rules PUPILTAG",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -5993,7 +5993,7 @@
     "commit": "88032a8a",
     "state": "0"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy,patterns:number_patterns_rule --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy,patterns:number_patterns_rule --roles error-analysis --size M,L --rules PUPILTAG",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -11176,6 +11176,669 @@
     "state": "OK"
    },
    "command": "node tests/scripts/ws-roles-unit.mjs --only GDPCAP-ANSWERS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "dealer-declared-set",
+   "check": "ws-dealer-uniform judges an item that is not 'a op b' against the valid set its generator declares (q.dealSet): page caps, uniform pair, items outside the set",
+   "kind": "commit-pair",
+   "rule": "ws-dealer-uniform DECLARED / PAGE (lf-algebra r2): growing_shape_patterns read as op '?' and judged against no set",
+   "fail": {
+    "commit": "e59e2bf3",
+    "state": "lf-algebra r1: the (start, step) pair dealt from a block of 25 that a page of 20 crosses, a pair twice on a page; no declared set (op '?', UNIFORM not judgeable)"
+   },
+   "pass": {
+    "commit": "6e4efe2b",
+    "state": "r2: the pair drawn uniformly and fresh on the page (freshDeal), the set declared on the item; judged OK against 25 declared pairs"
+   },
+   "command": "node tests/scripts/ws-dealer-uniform.mjs --root {root} --skill patterns:growing_shape_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "patterns-cells-g5-g6-g8",
+   "check": "ws-patterns-cells: the patterns cells against the page - LABEL-REF (Fix-it letters printed in the item), TILE-CARD (feature tiles at the card's 10 / 11.5 / 13 mm), ROW2-S (the growing 4-term row fits a two-across cell at S)",
+   "kind": "commit-pair",
+   "rule": "ws-patterns-cells LABEL-REF / TILE-CARD / ROW2-S (lf-algebra critic r2 G5, G6, G8)",
+   "fail": {
+    "commit": "d20c8a003",
+    "state": "r9: pattern_features EA Fix-it offers A / B / C beside unlettered sentences; working tiles 9 x 8.5 mm at S; growing S one cell a row (2 + 2 wrap behind a fixed 6 mm keep-out)"
+   },
+   "pass": {
+    "commit": "5eb41b2a1",
+    "state": "r10: sentences lettered A / B / C (paper and screen), tiles 10 / 11.5 / 13 mm, keep-out clamped so S prints two across (10 a page)"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --root {root} --skill patterns:pattern_features,patterns:growing_shape_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-clean-list",
+   "check": "ws-precritic-clean: a lane's \"Clean for the critic\" list may name only pages with no open finding of the latest critic round and only print roles a print-lint row of that precritic run linted",
+   "kind": "fixture",
+   "rule": "ws-precritic-clean OPEN / LINT (lf-algebra critic r2 speed reflection, lead rule): precritic r9 listed npr card / worksheet clean while critic r1 F2 was open",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/precritic-clean.fail.md",
+    "state": "a clean list names the card and worksheet while the latest critic's F2 (screen train) is open and no Fixes section closes it"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/precritic-clean.pass.md",
+    "state": "F2 listed \"- F2 fixed\" under Fixes after critic r2, and every claimed print role has a print-lint row"
+   },
+   "command": "node tests/scripts/ws-precritic-clean.mjs --status {fixture} --skill patterns:number_patterns_rule",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-card-d2-d6",
+   "check": "ws-two-step: the two-step stories against their signed card - WITHIN-N (the Step 1 result and the answer within the band or Max Number 100), ANS-STORY (the answer no story number, not the Step 1 answer), BAR-DRAWN (wpBar / multi_step_word (Visual) draws both bars and Step 2 carries the Step 1 answer, paper and screen), VISUAL ((Visual) differs from _plain), HINT-L0 (the middle question on the Model / Guided only, never at level 0 or 1 or on screen)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step WITHIN-N / ANS-STORY / BAR-DRAWN / VISUAL / HINT-L0 (two-step card decisions 2, 4, 5, 6; owner rule 2026-11-13: each finding a check before its fix)",
+   "fail": {
+    "commit": "0e119f312",
+    "state": "card signed, pre-build: answers to 125-150 (Step 1 to 150) against Max Number 100, Step 1 over band 30 / 50, 1-3 % of answers a story number, wpBar draws nothing on a two-step story, multi_step_word (Visual) = _plain, no middle question"
+   },
+   "pass": {
+    "commit": "814109016",
+    "state": "two-step build: every computed number within the cap, answer guards, the two-step bar model drawn with the carried Step 1 answer, Visual draws it by default, middle question on teaching cells only"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 60 --rules WITHIN-N,ANS-STORY,BAR-DRAWN,VISUAL,HINT-L0 --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-visual-cap-band",
+   "check": "ws-two-step --print CAP-BAND: multi_step_word (Visual) - the bar above the column work - holds the card's ruled capacity S 2 / M 1 / L 1 on independent / more-practice / test, and no cell keeps a 30 % empty band under its work (H13)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step CAP-BAND (lead ruling R1 2026-11-13, (a): M holds 1, the one-row practice page must not stretch; card decision 9 re-signed)",
+   "browser": true,
+   "fail": {
+    "commit": "8438ca59d",
+    "state": "precritic two-step: the one-story page at M / L stretches its cell to the page - 41 % (M) / 32 % (L) empty under the work on independent / more-practice, 32 % on test"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/two-step/visual-M-nostretch.pass.html",
+    "command": "node tests/scripts/ws-two-step.mjs --print --html {fixture} --size M --skill algebra:multi_step_word",
+    "state": "A FIXTURE, because the fix is a role change routed to lf-roles (a one-row practice page does not stretch its row): the same independent M page as 8438ca59d with its grid row at its content height. Replace with the lf-roles commit when it lands."
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --print --skill algebra:multi_step_word",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-band100-alias",
+   "check": "ws-two-step BAND-ALIAS: band 100 not offered on the seven two-step skills, and the share codes written with band 100 on 8438ca59d (M7~B100 ... ZE~B100) decode to their skill at no band and re-encode as the no-band code (the round trip)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step BAND-ALIAS (lead ruling R2 2026-11-13: drop band 100; old codes alias to no band)",
+   "fail": {
+    "commit": "8438ca59d",
+    "state": "band 30 / 50 / 100 offered; M7~B100 decodes to band 100"
+   },
+   "pass": {
+    "commit": "910dd9f0b",
+    "state": "band 30 / 50 offered; OPTION_FOLDS rewrites band 100 to null, so every B100 code decodes to no band and re-encodes without a payload"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --rules BAND-ALIAS --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "patterns-hint-on-test-f1",
+   "check": "ws-patterns-cells HINT-ON-TEST: notice_patterns / pattern_features (each patTask) / growing_shape_patterns items with the fading hint (patShow) ON, drawn at the Test's scaffold level 0, print no hint part; every quiz-twin hint part is marked data-ws-hint=fade and css/quiz-mode.css hides it in #quizTakeView",
+   "kind": "commit-pair",
+   "rule": "ws-patterns-cells HINT-ON-TEST (lf-algebra critic r1 F1, PT-TST-2 / P-SC-5)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: the cells read only p.show - the Test printed even / odd under each factor, the track numbers, the times-table row and the growing counts; the quiz twin drew them unmarked"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: no hint at scaffold level 0; hint parts carry data-ws-hint=fade, hidden in the quiz"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --root {root} --rules HINT-ON-TEST --skill patterns:notice_patterns,patterns:pattern_features,patterns:growing_shape_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "patterns-state-progress-f5",
+   "check": "ws-patterns-cells STATE-PROGRESS: the lesson anchor chart's panels (chart.js stateDrawing over the provider's worked steps and stateGroups) - adjacent panels draw different pictures, and a panel whose step says 'Write N' shows N",
+   "kind": "commit-pair",
+   "rule": "ws-patterns-cells STATE-PROGRESS (lf-algebra critic r1 F5; number_patterns_rule / follow_given_rule pinned to lf-ops' count-row stepState)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: function_table_easy chart panels 1-3 the same picture, 'Write 9' under an empty box"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: function-table stepState draws the marks of steps 1..k (the newest traced grey)"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --root {root} --rules STATE-PROGRESS --skill algebra:function_table_easy",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "steps-follow-preset-f6",
+   "check": "ws-node-lint STEPS-FOLLOW-PRESET (opt-in): a preset's Guided / Model Steps band - guided.js stepsOf over the page's dealt items - prints no line of the host's default steps that none of the preset's items gives",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint STEPS-FOLLOW-PRESET (lf-algebra critic r1 F6, LESSONS_LEARNED L28)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: pattern_features items' steps differed (per-item stepsFor), so the band took the item-less strings and printed notice_patterns' parity steps"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: fixed task steps (the lesson's step names), the band takes the items' own"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill patterns:pattern_features --rules STEPS-FOLLOW-PRESET --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "steps-follow-preset-two-step-addfirst",
+   "check": "ws-node-lint STEPS-FOLLOW-PRESET on the two-step add-first presets (found by the F6 check over every preset)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint STEPS-FOLLOW-PRESET (L28 class, found by the check before any critic)",
+   "fail": {
+    "commit": "95473c403",
+    "state": "two_step_add_then_mult / _add_then_div: per-item addfirst stepsFor made the items differ, so the band printed multi_step_word_plain's + / - steps"
+   },
+   "pass": {
+    "commit": "9f963a32f",
+    "state": "one fixed add-first step list ('Step 1: add or take away.') fitting every item"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill algebra:two_step_add_then_mult,algebra:two_step_add_then_div --rules STEPS-FOLLOW-PRESET --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-title-and-f7",
+   "check": "ws-visual-quality VQ-TITLE 'X and Y': the role title compose.js topicOf makes from an 'I Can <verb> and <verb> ...' gives both verbs one form (never 'drawing and count')",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-TITLE X and Y (lf-algebra critic r1 F7, H17)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: growing Test / Review title 'drawing and count the next term'"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: growing I Can one verb ('find the next term'); lf-roles 2a3ecb9c3 also gerundises the second verb"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --skill patterns:growing_shape_patterns --rules VQ-TITLE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-letter-wpbar-L-band",
+   "check": "ws-two-step --print CAP-BAND on two_step_letter_equation with wpBar at L (five seeds): at least the card's bar-model L 1 a page, and the one story is not stretched past a 30 % band (the options-render 'letter + wpBar L PAGEFILL' strip)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step CAP-BAND letter case (lf-algebra R4; same role class as R1: a one-row practice page must not stretch)",
+   "browser": true,
+   "fail": {
+    "commit": "35f427f4c",
+    "state": "letter + wpBar L: ~13 % of x / ÷-first bars do not fit across 171 mm and stand one over the other (132 vs 95 mm), so the page plans 1 a page; the one 95 mm story is stretched to 172-225 mm (41-45 % band), or with no stretch leaves the 60 mm PAGEFILL strip"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/two-step/letter-wpbar-L-nostretch.pass.html",
+    "command": "node tests/scripts/ws-two-step.mjs --print --html {fixture} --size L --skill algebra:two_step_letter_equation",
+    "state": "A FIXTURE, because the fix is the R1 role change routed to lf-roles (a ruled one-row practice page does not stretch its row): the same seed-2 L page with its grid row at its content height. Replace with the lf-roles commit when it lands."
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --print --skill algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-part-frames",
+   "check": "ws-two-step PART-FRAMES: the lesson chart's two-step panel drawing (cells/word-work.js twoStepPart) of a letter story draws the equation on panels 1-3 and n = the answer on 3, of an estimate story the estimate row on 2-3 and the Yes / No ring on 3, and the four panels differ",
+   "kind": "commit-pair",
+   "rule": "ws-two-step PART-FRAMES (lf-algebra R4; precritic two-step lesson chart: letter / estimate panels drew the whole cell)",
+   "fail": {
+    "commit": "d88ab9aee",
+    "state": "twoStepPart drew the Step 1 / Step 2 column blocks for every story: no equation, no estimate"
+   },
+   "pass": {
+    "commit": "b5d9a9cc7",
+    "state": "letter: equation / + the two steps / n; estimate: the steps / + the estimate / the question ringed (frames rows, the newest grey)"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --rules PART-FRAMES --skill algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-phone-focus-twostep",
+   "check": "ws-phone-card FOCUS / INVIEW / CLIP-X at 390 x 844 on the 7 two-step skills: the box the pupil writes first (Step 1 / the letter equation's first box - never the answer at the foot, a regroup box or a must-stay-blank copy box) has the focus when the card opens, in view, nothing cut off",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS (lf-hosts item 4 a; precritic two-step r11)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "lf-algebra head (8438ca59d in its history): question-render _firstWriteBox knew only the one-step sentence layout, so the answer slot at the foot took the focus on all 7 skills; the frames rows ran 18-34 px past 390"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "the two-step twin's first write box takes the focus, centred; the frames work column wraps on screen"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes 390x844 --items 2 --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-screen-grade-twostep",
+   "check": "ws-screen-grade: on the practice card, quiz and online worksheet the screen verdict of a two-step story equals its paper key's verdict (gradeSlots on the key's graded slots and accept forms) for right, equivalent (turn-around, typed signs) and wrong / blank letter equation and estimate",
+   "kind": "commit-pair",
+   "rule": "ws-screen-grade GRADE-AGREE (lf-hosts item 4 b; two-step card decisions 7 / 8)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the twin's equation and estimate boxes were scratch (mq-wwork, data-ws-graded=0): any equation / estimate scored right with the right answer"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "data-mq-part composes them into the host value; every host grades with wordWorkVerdict = the paper key's gradeSlots"
+   },
+   "command": "node tests/scripts/ws-screen-grade.cjs --skills algebra:two_step_letter_equation,algebra:two_step_estimate_check --n 8",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-support-eq-agree",
+   "check": "ws-gate-agree: the precritic screen-support-eq row says what ws-screen-support-eq's own verdict line says (OK PASS, N/A N/A, FAIL FAIL) on two-step skills, which have no supports model",
+   "kind": "commit-pair",
+   "rule": "ws-gate-agree on screen-support-eq (lf-hosts item 4 c)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the tool logged 'algebra:x: no supports' and 'ws-screen-support-eq: OK'; precritic's skill-mention rule did not read 'algebra:x:' as a mention, so the row said FAIL"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "one verdict() line names every skill (N/A here); PARSE.screenSupportEq maps it 1:1"
+   },
+   "command": "node tests/scripts/ws-gate-agree.mjs --root {root} --gate screen-support-eq --skills algebra:two_step_letter_equation,algebra:multi_step_word",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-focus-twostep-desktop",
+   "check": "ws-phone-card FOCUS / INVIEW / CLIP-X at the screen targets 820 x 1180, 1024 x 768 and 1280 x 900 (lead 2026-11-13: no phone width) on the 7 two-step skills: the box the pupil writes first has the focus when the card opens, in view",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS at desktop / tablet widths (lf-hosts item 4 a, scope change)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the answer slot at the foot took the focus at every width (_firstWriteBox knew only the one-step sentence layout)"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "the two-step twin's first write box takes the focus"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes 820x1180,1024x768,1280x900 --items 1 --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-page-fresh",
+   "check": "ws-two-step PAGE-FRESH: a printed run of the two-step skills (seed base + i, itemIndex i, pages of 20) repeats no Step 1 pair on a page, a first number at most twice, an answer at most 3 times",
+   "kind": "commit-pair",
+   "rule": "ws-two-step PAGE-FRESH (lf-algebra precritic two-step r11: ws-dealer-uniform PAGE on the x / ÷ / add-first presets, which dealer-uniform reads INCOMPLETE)",
+   "fail": {
+    "commit": "33810c189",
+    "state": "the msOps deals (x / ÷ first, add-first) drew each item alone: 45 ÷ 5 three times and 6 ÷ 2 twice on a page of 20"
+   },
+   "pass": {
+    "commit": "5921196d7",
+    "state": "freshDeal on both msOps deals: the Step 1 pair is the fresh signature, first number cap 2, answer cap 3"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules PAGE-FRESH --skill algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-band-bites",
+   "check": "ws-two-step BAND-BITES: every band value a two-step skill offers changes >= 10 % of the items dealt alone (300 seeds) against the default; a band hidden on a preset reads an old code's value as the default",
+   "kind": "commit-pair",
+   "rule": "ws-two-step BAND-BITES (lf-algebra precritic two-step r12, ws-options-verify band=50 on add_then_div / letter_equation; lead ruling B (a) 2026-11-13)",
+   "fail": {
+    "commit": "438dc65bc",
+    "state": "band 50 offered on two_step_add_then_div (12 / 300 items changed, 4 %) and two_step_letter_equation (27 / 300, 9 %)"
+   },
+   "pass": {
+    "commit": "bc2001891",
+    "state": "PRESET_HIDE_VALUES hides band 50 on both presets; normalizeOptions reads an old band 50 as the default"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules BAND-BITES --skill algebra:two_step_add_then_div,algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-verify-wide-band",
+   "check": "ws-options-verify WIDE: a band value whose 12-item sample matches the default is re-dealt on 600 independent seeds before the verdict; a ~6 % effect is a RARE warning with its share, not 'the control does nothing'; the row runs each commit's OWN tool ({root}/tests/scripts): the fail commit holds the tool before WIDE, the pass commit the WIDE tool, both on the same options (band 50 still offered)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify (lead ruling B 2026-11-13: band=50 on add_then_div 37 / 600, letter_equation 38 / 600 was reported as identical to the default)",
+   "browser": true,
+   "fail": {
+    "commit": "c0ae1e93e",
+    "state": "the tool before WIDE, band 50 still offered: FAIL band=50 'items identical to the default (the control does nothing)' on both presets"
+   },
+   "pass": {
+    "commit": "f35da17ed",
+    "state": "the WIDE tool on the same options (band 50 still offered): band=50 ok, warn 'rare effect: changes 33 / 600 items (5.5 %)' and 42 / 600 (7 %)"
+   },
+   "command": "node {root}/tests/scripts/ws-options-verify.cjs --root {root} --skill two_step_add_then_div,two_step_letter_equation --category algebra --deadline 600000",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-ea-composes",
+   "check": "ws-two-step --ea EA-COMPOSES: the Error analysis page composes on every two-step skill at M and L (seeds 7, 11): buildSheet does not refuse the skill and the page holds an item",
+   "kind": "commit-pair",
+   "rule": "ws-two-step --ea (lf-algebra precritic two-step r12: EB-ROLE / ws-fixit-words on two_step_add_then_div; lead ruling D 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "698e2da97",
+    "state": "the ÷-last wrong operation (14 ÷ 2 read as 14 × 2 = 28) does not fit the one-digit quotient box: every add_then_div item is rejected and buildSheet refuses the skill"
+   },
+   "pass": {
+    "commit": "962887ce5",
+    "state": "wordWorkWrong gives the ÷-last story a wrong that fits the box (M-TS4 at Step 1 or M-TS3 a story number into Step 2) and the cell draws that work"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --ea --skill algebra:two_step_add_then_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-eb-side-plain",
+   "check": "ws-empty-band EB-SIDE: no full-width two-step cell keeps 30 % or more of its width empty beside its ink (multi_step_word_plain, independent / more-practice / test at M and L)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (lf-algebra precritic two-step r12: practice EB-SIDE 31-38 % on multi_step_word_plain M / L)",
+   "browser": true,
+   "fail": {
+    "commit": "dc4e6a990",
+    "state": "the two step columns (107-126 mm) left-packed in the 185 mm full-width cell: 57-70 mm empty on the right (31-38 %), 9 cells"
+   },
+   "pass": {
+    "commit": "344435351",
+    "state": "the two step columns centred under the story: two margins of 30-39 mm, each under 30 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill algebra:multi_step_word_plain --sizes M,L --roles independent,more-practice,test --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-band-bites-50-mdf-atm",
+   "check": "ws-two-step BAND-BITES on two_step_mult_div_first and two_step_add_then_mult: band 50 is no longer PENDING; offered, it changes under 10 % of items and fails; hidden, an old code reads the default",
+   "kind": "commit-pair",
+   "rule": "ws-two-step BAND-BITES (lead ruling 2026-11-13, step 0 of two-step round 3b: hide band 50 on mult_div_first 5.7 % / add_then_mult 9.3 %)",
+   "fail": {
+    "commit": "6b00bb989",
+    "state": "band 50 offered on two_step_mult_div_first (17 / 300 items changed, 5.7 %) and two_step_add_then_mult (28 / 300, 9.3 %)"
+   },
+   "pass": {
+    "commit": "2828fc427",
+    "state": "PRESET_HIDE_VALUES hides band 50 on both presets; normalizeOptions reads an old band 50 as the default"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules BAND-BITES --skill algebra:two_step_mult_div_first,algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-ri-distinct-frames",
+   "check": "ws-cell-checks RI-DISTINCT (+ KEYFIT) on two_step_letter_equation / two_step_estimate_check Reason It at M / L: the frames cell draws the work it is shown, so A and B differ and the wrong value fits its box",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks RI-DISTINCT (lf-roles r9, two-step round 3b: the frames layout drew the model's work in A and B and ignored the shown wrong value)",
+   "browser": true,
+   "fail": {
+    "commit": "a663b229a",
+    "state": "Reason It panels A and B show the same work on letter_equation / estimate_check (framesLayout ignored ctx.state 'wrong')"
+   },
+   "pass": {
+    "commit": "b1da0079e",
+    "state": "framesLayout draws shownSteps and the shown value; the estimate ring judges it; boxes hold the written number"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:two_step_letter_equation,algebra:two_step_estimate_check --roles reason-it --size M,L --rules RI-DISTINCT,KEYFIT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-div-bar-guided-l",
+   "check": "ws-cell-checks OVERFLOW: the two_step_add_then_div Guided L page holds every cell inside its body (the 6-group ÷ bar no longer stacks the bars into a 188 mm cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (lf-roles r9: guided L p2, a stacked ÷ bar story 188 mm in a 184 mm continuation body - lf-algebra's template)",
+   "browser": true,
+   "fail": {
+    "commit": "3a1b05c58",
+    "state": "the ÷ groups bar (6 x (box + ? room) = 114 mm) did not fit beside Step 1, the bars stacked, the cell drew 188 mm"
+   },
+   "pass": {
+    "commit": "c3aef9acc",
+    "state": "the groups row grows by the ? height (box under the ?), the bars stand across, the cell fits"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:two_step_add_then_div --roles guided --size L --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-frames-eb-side",
+   "check": "ws-empty-band EB-SIDE: a full-width two-step FRAMES cell (letter equation, estimate check) keeps under 30 % of its width empty beside its ink at M / L",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (lf-roles r9 EB-SIDE 120, re-measured round 3b: the 120 are the frames cells, 33-42 %, not the columns)",
+   "browser": true,
+   "fail": {
+    "commit": "c3aef9acc",
+    "state": "the frames sentences (95-130 mm) at the left of a 185 mm cell: 60-78 mm empty on the right"
+   },
+   "pass": {
+    "commit": "126eab3e4",
+    "state": "the sentences centred under the story on a one-column cell not worked wrong"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes M,L --roles independent,test --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-letter-ea-rowx",
+   "check": "ws-cell-checks EA-ROWX: the letter equation's Error analysis judgement starts at one x a page (the unit word stays beside the work in a full-width cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX (regression found in round 3b: b1da0079e put the letter unit in the n = row in every cell)",
+   "browser": true,
+   "fail": {
+    "commit": "b1da0079e",
+    "state": "the judgement starts 125-134 mm (M) / 131-141 mm (L) into the cells"
+   },
+   "pass": {
+    "commit": "126eab3e4",
+    "state": "the unit word in the n = row only in a narrow cell (a Reason It panel)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:two_step_letter_equation --roles error-analysis --size M,L --rules EA-ROWX --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-touch-48",
+   "check": "ws-phone-card TOUCH: every two-step screen box (frames number and sign boxes, the bar's boxes) is a 48 px touch target at 820 / 1024",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH (precritic two-step r13: the screen gates ran for the first time since r11)",
+   "browser": true,
+   "fail": {
+    "commit": "f5ff50856",
+    "state": "frames boxes 77 x 46 px, frames sign and bar boxes 47 x 47 px (floor 48) on multi_step_word, letter, estimate"
+   },
+   "pass": {
+    "commit": "b29beab08",
+    "state": "max(48px, ...) on the twin frames boxes and signs and the bar boxes"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "gate-agree-batch-ctx",
+   "check": "ws-gate-agree runs on a tree whose ws-precritic plan reads ctx.batch (no TypeError; the precritic row agrees with the tool's verdict)",
+   "kind": "commit-pair",
+   "rule": "ws-gate-agree (precritic two-step r13: the tool crashed after the master 88cc98b00 merge - buildPlan read ctx.batch.length)",
+   "browser": true,
+   "fail": {
+    "commit": "325e26190",
+    "state": "TypeError: Cannot read properties of undefined (reading 'length') at buildPlan"
+   },
+   "pass": {
+    "commit": "fa0185e4a",
+    "state": "buildPlan gets batch: []"
+   },
+   "command": "node tests/scripts/ws-gate-agree.mjs --root {root} --gate screen-support-eq --skills algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-step-form",
+   "check": "ws-two-step STEP-FORM: a two-step column story's basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) is a horizontal number sentence (mq-wwfact) on paper (levels 3 and 0, blank and key) and on screen; any other step keeps its frame",
+   "kind": "commit-pair",
+   "rule": "ws-two-step STEP-FORM (owner 2026-11-14 via the lead: \"6 + 4 = [ ]\", \"10 ÷ 2 = [ ]\", the stray carry box over 6 + 4 on the add_then_div Opener Model)",
+   "fail": {
+    "commit": "d92f11216",
+    "state": "fact steps drawn as columns (a carry box over 6 + 4) and as long-division frames (24 ÷ 6, 10 ÷ 2)"
+   },
+   "pass": {
+    "commit": "22f10586f",
+    "state": "fact steps drawn as [a] (sign) [b] = [answer]; columns / long division only for non-fact steps"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules STEP-FORM",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-step-align",
+   "check": "ws-two-step --align STEP-ALIGN: in a two-step cell whose two steps are fact sentences, the step blocks and the sentences top-align within 1 mm (opener / guided / independent, pupil + key, M / L)",
+   "kind": "commit-pair",
+   "rule": "STEP-ALIGN (lead 2026-11-14 on the STEP-FORM Opener; STEP-FORM critic F1: Step 2 ~80 px above Step 1)",
+   "fail": {
+    "commit": "c102ebc73",
+    "state": "the step row aligns the blocks' feet: Step 2 (two-line question, unit bank) stands 16-21 mm higher"
+   },
+   "pass": {
+    "commit": "938fdadbe",
+    "state": "fact-pair blocks top-align, the question lines share a 2-line height, the unit stands at its sentence's top"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --align --skill algebra:two_step_add_then_div,algebra:two_step_mult_div_first",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-step-align-all",
+   "check": "ws-two-step --align STEP-ALIGN (widened): every two-step row's step blocks and sign rows top-align within 1 mm (column beside sentence too); a wrapped row's steps share one left edge",
+   "kind": "commit-pair",
+   "rule": "STEP-ALIGN round 2 (STEP-FORM critic r2 F1b / F5; round cap 2 root cause: the round-1 fix and check covered fact pairs only)",
+   "fail": {
+    "commit": "5ce882919",
+    "state": "a column step beside a sentence step bottom-aligns (46-52 px stagger); a wrapped Step 2 starts 14-18 mm left of the centred Step 1"
+   },
+   "pass": {
+    "commit": "517639a61",
+    "state": "every two-step row top-aligns; the wrapped steps share one left edge"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --align --skill algebra:two_step_add_then_div,algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-screen-sentence",
+   "check": "ws-two-step --screen-align STEP-ALIGN-SCREEN: a two-step fact sentence's slots and = stand on one line on the online worksheet and practice card at 820 / 1024 / 1280 / 1366",
+   "kind": "commit-pair",
+   "rule": "STEP-ALIGN-SCREEN (STEP-FORM critic r3 F6: worksheet-1280 mult_div_first item 4, the Step 2 sentence dropped its 2-digit answer boxes a line)",
+   "fail": {
+    "commit": "af490bbe5",
+    "state": "the twin sentence was flex-wrap: wrap and 1-2 px too wide for the two-up worksheet cell, so the host wrapped it"
+   },
+   "pass": {
+    "commit": "85bfa6313",
+    "state": "nowrap; one-digit boxes one box wide, 0.8 mm gaps on screen: every sentence on one line"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --screen-align --skill algebra:two_step_add_then_div,algebra:two_step_add_then_mult,algebra:two_step_mult_div_first --widths 820,1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-ldiv-join-bracketsvg",
+   "check": "ws-two-step --ldiv LDIV-JOIN: where a two-step step draws long division, the bracket's top (an arc's end, a one-stroke bracket's corner) meets the bar within 0.3 mm, M / L, print and screen",
+   "kind": "commit-pair",
+   "rule": "LDIV-JOIN (owner 2026-11-14 'the long-division sign is disconnected'; lf-ops' rule and shared bracketSvg)",
+   "fail": {
+    "commit": "091222ebc",
+    "state": "word-work's own open arc (M2 1 Q9 20 2 39) stands 4-5 mm from the dividend's bar"
+   },
+   "pass": {
+    "commit": "0d7f143cc",
+    "state": "the kit's bracketSvg, its corner on the bar's centre line, one bar from the corner"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --ldiv --skill algebra:two_step_add_then_div",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

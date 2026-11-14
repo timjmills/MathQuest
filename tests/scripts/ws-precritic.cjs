@@ -449,6 +449,19 @@ function judge(g, run, p) {
 }
 
 const PARSE = {
+    // ws-screen-support-eq (lf-hosts 2026-11-13): its verdict comes from ONE place, the tool's own verdict() line, which
+    // accounts for every skill in scope (checked / no supports / not run). The row maps it 1:1 - OK PASS, N/A N/A, FAIL FAIL -
+    // and applies no rule of its own (the generic skill-mention rule read "algebra:x: no supports" as an absent skill, so the
+    // log said OK and the row FAIL). ws-gate-agree holds the two together.
+    screenSupportEq(g, out, code) {
+        const m = [...out.matchAll(/^ws-screen-support-eq: (OK|N\/A|FAIL)\b(.*)$/gm)];
+        if (!m.length) return unparsed('no "ws-screen-support-eq: OK|N/A|FAIL" line', out);
+        const v = m[m.length - 1];
+        const says = v[2].trim().replace(/^\(|\)$/g, '').trim().slice(0, 200);
+        if (v[1] === 'OK') return { result: 'PASS', findings: says || '-', detail: [], explainsExit: false };
+        if (v[1] === 'N/A') return { result: 'N/A', findings: says || 'no supports model in scope', detail: [], explainsExit: code === 0 };
+        return { result: 'FAIL', findings: v[0].slice(0, 200), detail: out.split('\n').filter((l) => /^\s+SCREEN-|^\s+\S+: /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: true };
+    },
     // ws-detailed-lesson prints `ws-detailed-lesson: OK|FAIL` (--check), `ws-detailed-lesson --repeats|--lp|--sweep: OK|FAIL (n)`;
     // the last such line is the verdict, and the FAIL rows (E.. / LP-.. / seed ..) are the findings
     lessonSamples(g, out, code) {
@@ -985,6 +998,30 @@ function buildPlan(ctx) {
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        // (lf-algebra r10, lead rule after lf-algebra critic r2: precritic r9's "Clean for the critic" list named pages with an open
+        // critic finding (F2, npr / fgr card + worksheet) and roles no page-fill lint ran on (G4 Reason It one item a page). The lane
+        // status file's clean list may name only pages with no open finding of the latest critic and a print-lint row in the run.)
+        add(gate('precritic-clean', 'ws-precritic-clean (the lane status clean list: no open critic finding, every claimed role page-fill linted)', scope, 'node', 'ws-precritic-clean', ['--skill', keys.join(',')], { missingMsg: 'ws-precritic-clean is not in this tree' }));
+        // (lf-algebra r10, critic r2 G5 / G6 / G8: the patterns cells against the page - Fix-it letters printed in the item, the card's
+        // feature tile size, the growing row two across at S; OK (n/a) for a skill outside the patterns card)
+        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
+        // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
+        // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
+        add(gate('two-step', 'ws-two-step (WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM)', scope, 'node', 'ws-two-step', ['--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra, lead ruling R1 2026-11-13: multi_step_word (Visual) practice pages hold the card's ruled capacity S 2 / M 1 / L 1
+        // with no cell stretched past a 30 % band under its work; browser, OK (n/a) without multi_step_word)
+        add(gate('two-step-print', 'ws-two-step --print (CAP-BAND: (Visual) capacity S 2 / M 1 / L 1, no 30 % band on independent / more-practice / test)', scope, 'browser', 'ws-two-step', ['--print', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra r13, precritic two-step r12 EB-ROLE / lead ruling D: the Error analysis page composes on every two-step skill
+        // at M / L - a wrong answer that does not fit the box made the role refuse two_step_add_then_div; browser, OK (n/a) off the card)
+        add(gate('two-step-ea', 'ws-two-step --ea (EA-COMPOSES: Error analysis composes on every two-step skill at M / L)', scope, 'browser', 'ws-two-step', ['--ea', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (owner 2026-11-14, two-step round 3b: a long-division frame left on a two-step step is one connected stroke - the bracket's top
+        // end meets the bar within 0.3 mm at M / L, print and screen; lf-ops' LDIV-JOIN rule on word-work's ÷ frame; browser, OK (n/a) off ÷)
+        add(gate('two-step-ldiv', 'ws-two-step --ldiv (LDIV-JOIN: the ÷ bracket meets its bar within 0.3 mm)', scope, 'browser', 'ws-two-step', ['--ldiv', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lead 2026-11-14 + STEP-FORM critic F1: two fact-sentence steps top-align, blocks and sentences within 1 mm; browser, OK (n/a) off the card)
+        add(gate('two-step-align', 'ws-two-step --align (STEP-ALIGN: fact-pair step blocks and sentences top-align)', scope, 'browser', 'ws-two-step', ['--align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (STEP-FORM critic r3 F6: a two-step fact sentence never wraps on the worksheet / card at 820-1366; browser, OK (n/a) off the card)
+        add(gate('two-step-screen-align', 'ws-two-step --screen-align (STEP-ALIGN-SCREEN: a fact sentence on one line on screen)', scope, 'browser', 'ws-two-step', ['--screen-align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
         // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
         // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
         add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));
@@ -1167,6 +1204,13 @@ function buildPlan(ctx) {
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
         add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE, ARRAY-ORIENT, ARRAY-DOT-MIN, ARRAY-CAPTION, SCREEN-ANSWER-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        // (lf-hosts 2026-11-13) the screen grades a word-work story's letter equation / estimate exactly as its paper key does
+        if (skills.some((sk) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(sk.key))) {
+            const ww = keys.filter((k) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(k));
+            // (and the screen-support-eq row agrees with its tool's own verdict line on them: ws-gate-agree)
+            add(gate('gate-agree', 'ws-gate-agree screen-support-eq (the precritic row = the tool\'s own verdict line)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'node', 'ws-gate-agree', ['--gate', 'screen-support-eq', '--skills', ww.join(',')], { missingMsg: 'no tests/scripts/ws-gate-agree.mjs' }));
+            add(gate('screen-grade', 'ws-screen-grade (screen verdict = paper key verdict: right, wrong, equivalent, every graded part)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'browser', 'ws-screen-grade', ['--skills', ww.join(','), '--n', '20'], { expect: { mention: ww }, missingMsg: 'no tests/scripts/ws-screen-grade.cjs' }));
+        }
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];

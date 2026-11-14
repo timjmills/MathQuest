@@ -910,8 +910,9 @@ export const SKILL_WRM = {
 
     // ---- algebra
     'algebra:tape_diagram': ['Y5.B2.S6'],
-    'algebra:multi_step_word': ['Y5.B2.S6', 'Y5.B5.S6', 'Y6.B2.S8', 'Y6.B2.S14'],
-    'algebra:multi_step_word_plain': ['Y6.B2.S14'],
+    // (two-step card 2026-11-13, decision 12: Y2.B4.S10 partial - two-step + / − stories, without its money context)
+    'algebra:multi_step_word': ['Y5.B2.S6', 'Y5.B5.S6', 'Y6.B2.S8', 'Y6.B2.S14', { step: 'Y2.B4.S10', partial: 'two-step + and − stories within 100; the money context (prices, change) is not dealt' }],
+    'algebra:multi_step_word_plain': ['Y6.B2.S14', { step: 'Y2.B4.S10', partial: 'two-step + and − stories within 100; the money context (prices, change) is not dealt' }],
     'algebra:write_expression': ['Y6.B7.S3'],
     'algebra:evaluate_expression': ['Y6.B7.S4'],
     'algebra:evaluate_expression_hard': ['Y6.B7.S4'],
@@ -1175,6 +1176,10 @@ export const SKILL_WRM = {
     'number_theory:list_multiples': ['Y5.B3.S1'],
     'number_theory:common_factors': [{ step: 'Y5.B3.S4', partial: 'picking every common factor from a set of numbers, not writing the list' }, { step: 'Y6.B2.S2', partial: 'picking every common factor from a set, not writing the list' }],
     'number_theory:common_multiples': [{ step: 'Y5.B3.S2', partial: 'picking every common multiple from a set of numbers, not writing the list' }, { step: 'Y6.B2.S3', partial: 'picking every common multiple from a set, not writing the list' }],
+    'patterns:notice_patterns': [{ step: 'Y4.B4.S6', partial: 'the patterns in the times-tables: even and odd products, the ones digits (not the 3, 6, 9 doubling link)' }],
+    'patterns:growing_shape_patterns': [{ step: 'Y6.B7.S1', partial: 'the one-step rule of a growing pattern of shapes (term 4, term 10), not yet the rule in words for any term' }],
+    'patterns:pattern_features': [{ step: 'Y5.B12.S9', partial: 'features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals' }],
+    'patterns:follow_given_rule': [{ step: 'Y5.B12.S9', partial: 'extend a whole-number sequence from a given rule (add, subtract, double), not decimals' }],
 };
 
 export const WRM_PROPOSALS = {
