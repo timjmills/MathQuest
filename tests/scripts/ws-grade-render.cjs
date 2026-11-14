@@ -136,6 +136,8 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 
 const has = k => process.argv.includes('--' + k);
 const RR = require('../lib/ws-role-raster.cjs');
 const SW = require('../lib/ws-screen-widths.cjs');
+// the ONE answer / working classifier and the tablet floors, shared with ws-phone-card (critic lf-checks tt-r1 D4)
+const TC = require('../lib/touch-class.cjs');
 const RASTER_FIT = has('raster-fit');
 if (has('raster-self-test')) {
     const r = RR.selfTest();
@@ -203,9 +205,9 @@ function touchFindings(m) {
     const out = [];
     for (const [k, v] of Object.entries((m && m.screen) || {})) {
         const tm = /^(card|worksheet|quiz)-(\d+)$/.exec(k);
-        const floor = tm && SW.TABLET_WIDTHS.includes(+tm[2]) ? 48 : tm && +tm[2] < 500 ? 44 : 0;
+        const floor = tm && SW.TABLET_WIDTHS.includes(+tm[2]) ? TC.FLOOR.answer : tm && +tm[2] < 500 ? 44 : 0;
         if (!floor || !v || !v.measure) continue;
-        const fl = (t) => (floor === 48 && t.answer === false ? 44 : floor);   // non-answer controls: SP-10's 44 px
+        const fl = (t) => (floor === TC.FLOOR.answer && t.answer === false ? TC.FLOOR.working : floor);   // non-answer controls: SP-10's 44 px
         for (const t of (v.measure.smallTargets || []).filter((t) => Math.min(t.w, t.h) < fl(t))) out.push(`TARGET ${m.skill} ${k}: <${t.tag} class="${t.cls}"> ${t.w} x ${t.h} px (under ${fl(t)} px${fl(t) === 48 ? ', an answer box' : ''}, H6)`);
     }
     return out;
@@ -361,7 +363,7 @@ function rasterise(pdf, dir) {
 // ---------------------------------------------------------------- measuring a host
 // Colours, fonts and overflow the critic cannot measure from a PNG.
 function measure(page, selector) {
-    return page.evaluate((selector) => {
+    return page.evaluate(TC.INJECT).then(() => page.evaluate((selector) => {
         const root = document.querySelector(selector);
         if (!root) return { missing: true };
         const colours = new Map(); const fonts = new Map();
@@ -386,7 +388,9 @@ function measure(page, selector) {
             if (s.display === 'none' || s.visibility === 'hidden') continue;
             // an ANSWER box (a typed input that is not a regroup / carry scratch box, SP-23) is held to 48 px on a tablet; every
             // other control (buttons, choices, regroup boxes) to SP-10's 44 px (owner 2026-11-13)
-            const answer = /^(input|textarea)$/i.test(el.tagName) && !/^(button|submit|checkbox|radio|hidden|range)$/i.test(el.type || '') && !/carry|regroup/i.test(String(el.className || '') + ' ' + (el.getAttribute('data-ws-slot') || ''));
+            // (the shared classifier, tests/lib/touch-class.cjs: a working box is carry / regroup / .mq-opswork / .mq-wwork ...,
+            // except a data-mq-kind="sign" box, which is an answer place; critic tt-r1 D4)
+            const answer = /^(input|textarea)$/i.test(el.tagName) && !/^(button|submit|checkbox|radio|hidden|range)$/i.test(el.type || '') && window.touchKind(el) === 'answer';
             if (Math.min(r.width, r.height) < 48) targets.push({ tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 40), w: Math.round(r.width), h: Math.round(r.height), answer, text: (el.innerText || el.value || '').trim().slice(0, 24) });
         }
         const de = document.documentElement;
@@ -397,7 +401,7 @@ function measure(page, selector) {
             smallTargets: targets.slice(0, 20),
             smallTargetCount: targets.length,
         };
-    }, selector);
+    }, selector));
 }
 
 async function viewport(page, width, height) {

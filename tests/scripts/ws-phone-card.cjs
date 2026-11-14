@@ -27,6 +27,8 @@
 //             last answer box of its cell in DOM order. A wrong focus is named by its place (ones = place 0) by the
 //             same rule. An item with no typed answer (choices, a drawing) has no FOCUS check (listed as n/a).
 //   INVIEW    that focused input lies inside the viewport (both axes).
+//   FIT-TOP  (computer widths > 1100 px only; critic tt-r1 D1) the question text and the cell's first row lie inside the
+//             viewport below the top bar as the card loads (the 48 px mult-chart rows hid the x 1-12 row at 1366 x 768).
 //   CELL-READ the card's B&W cell (#questionPaper) carries [data-ws-cell], as the worksheet's and the quiz's cells do (lf-checks
 //             queue 20: the mult_facts card drew none, so every card-host check read nothing there and passed); 0 cells is a
 //             finding, never a pass.
@@ -54,6 +56,8 @@
 //             moves the focus. Two runs (HEAD and a base tree via MQ_ROOT) diffed by key list exactly which screens a CSS
 //             change moved: the hash-proof of a screen-only change (lf-checks touch-target floor, 2026-11-13). --shots also
 //             saves the worksheet / quiz host (`<WxH>-<cat>-<skill>-<host>.png`).
+//   --geom-diff BASE.json HEAD.json [--out FILE]  the screen diff of two --geom --json runs (critic tt-r1 D5; 1 px tolerance,
+//             the zoom button and 0-size nodes left out by GEOM): the committed source of changed-screens.txt
 //   --print-widths  print the widths the run would render (`widths: 820,...`) and exit (ws-screen-widths-plan)
 //   --fixture FILE  the card checks (PROBE + the CELL-READ kind match) on a saved card page (backtest rows; lf-hosts r2 F3)
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
@@ -76,6 +80,8 @@
 const fs = require('fs');
 const path = require('path');
 const { open, ROOT } = require('../lib/ws-harness.cjs');
+// the ONE answer / working classifier and floor, shared with ws-grade-render (critic tt-r1 D4)
+const TC = require('../lib/touch-class.cjs');
 
 const TOOL = 'ws-phone-card';
 const argv = process.argv.slice(2);
@@ -214,6 +220,28 @@ function PROBE() {
         const fr = (act && graded.includes(act) ? act : want).getBoundingClientRect();
         if (fr.left < -TOL || fr.right > W + TOL || fr.top < -TOL || fr.bottom > H + TOL) findings.push({ rule: 'INVIEW', msg: `the first answer box is not in view (left ${Math.round(fr.left)}, right ${Math.round(fr.right)}, top ${Math.round(fr.top)}, bottom ${Math.round(fr.bottom)} in ${W} x ${H})` });
     }
+    // FIT-TOP (critic lf-checks tt-r1 D1): on a computer screen (wider than 1100 px: 1280 / 1366) the card fits as it loads -
+    // the question text and the cell's first row (its topmost visible text, input or drawing: the mult chart's x 1-12 factor
+    // row) lie inside the viewport BELOW the top bar (the fixed / sticky bars that start at the top edge and span half the
+    // width) and above the bottom edge. The 48 px mult-chart rows pushed both under the top bar at 1366 x 768.
+    if (W > 1100) {
+        const barB = Math.max(0, ...Array.from(document.querySelectorAll('body *')).filter((el) => { const cs = getComputedStyle(el); if (cs.position !== 'fixed' && cs.position !== 'sticky') return false; if (!vis(el) || el.contains(card)) return false; const r = el.getBoundingClientRect(); return r.top <= 1 && r.width > W / 2 && r.bottom < H / 2; }).map((el) => el.getBoundingClientRect().bottom));
+        const out = (r) => r.top < barB - TOL || r.bottom > H + TOL;
+        const qt = document.getElementById('questionText');
+        if (vis(qt) && String(qt.innerText || '').trim()) { const r = qt.getBoundingClientRect(); if (out(r)) findings.push({ rule: 'FIT-TOP', msg: `the question text "${String(qt.innerText).trim().slice(0, 40)}" is not in view at ${W} x ${H} (top ${Math.round(r.top)}, bottom ${Math.round(r.bottom)}; the top bar ends at ${Math.round(barB)})` }); }
+        const cell0 = paper && ([paper, ...paper.querySelectorAll('[data-ws-cell]')].find((e) => e.hasAttribute('data-ws-cell')));
+        if (cell0) {
+            let first = null, ft = Infinity;
+            for (const el of cell0.querySelectorAll('*')) {
+                if (!vis(el) || (qt && qt.contains(el))) continue;   // the question text is judged above
+                const marks = /^(input|textarea|svg|img|canvas)$/i.test(el.tagName) || Array.from(el.childNodes).some((n) => n.nodeType === 3 && n.textContent.trim());
+                if (!marks) continue;
+                const t = el.getBoundingClientRect().top;
+                if (t < ft) { ft = t; first = el; }
+            }
+            if (first) { const r = first.getBoundingClientRect(); if (out(r)) findings.push({ rule: 'FIT-TOP', msg: `the cell's first row (${name(first)}) is not in view at ${W} x ${H} (top ${Math.round(r.top)}, bottom ${Math.round(r.bottom)}; the top bar ends at ${Math.round(barB)})` }); }
+        }
+    }
     // CELL-READ (lf-checks queue 20): the card's B&W cell carries [data-ws-cell] like the worksheet's and the quiz's, or every
     // card-host check reads nothing there (the r1 mult_facts card)
     const cellN = paper ? [paper, ...paper.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell') && vis(e)).length : 0;
@@ -227,8 +255,9 @@ function PROBE() {
     if (window.UNIQUE) for (const t of window.UNIQUE('#questionCard')) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
     // TOUCH (owner 2026-11-13): answer boxes are 48 px touch targets on a tablet (44 px at an explicit phone width)
     // (a regroup / carry box is scratch, never an answer: SP-10's 44 x 44 floor, SP-23)
-    const FLOOR = W >= 600 ? 48 : 44;
-    const floorOf = (el) => (isOptional(el) ? 44 : FLOOR);
+    // the shared floor (touch-class.cjs): answer 48 / working 44 on a tablet; 44 at a phone or a computer width (tt-r1 D1)
+    const FLOOR = window.floorAt ? window.floorAt('answer', W) : (W >= 600 ? 48 : 44);
+    const floorOf = (el) => (window.touchKind ? window.floorAt(window.touchKind(el), W) : (isOptional(el) ? 44 : FLOOR));
     const small = inputs.filter((el) => { const r = el.getBoundingClientRect(); return Math.min(r.width, r.height) < floorOf(el) - 0.5; });
     if (small.length) findings.push({ rule: 'TOUCH', msg: `${small.length} box(es) under the touch floor at ${W} px (answer boxes ${FLOOR} px, regroup / carry boxes 44 px); e.g. ${small.slice(0, 3).map((el) => { const r = el.getBoundingClientRect(); return `${name(el)} ${Math.round(r.width)} x ${Math.round(r.height)} (floor ${floorOf(el)})`; }).join(', ')}` });
     return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
@@ -270,18 +299,20 @@ function TARGETS(rootSel) {
     const roots = Array.from(document.querySelectorAll(rootSel));
     const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
     const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
-    const OPT = '.mq-carry, .column-carry-input, .mq-opswork, .mq-wwork, [data-mq-work], [data-ws-slot^="regroup"], .mq-regroup';
+    // the shared classifier (tests/lib/touch-class.cjs, injected as window.touchKind / window.floorAt; critic tt-r1 D4): a
+    // .mq-wwork box with data-mq-kind="sign" is an answer place (48), not a working box (44); the floor reads the width
+    const W = window.innerWidth;
     const groups = new Map();
     for (const rt of roots) {
         for (const el of rt.querySelectorAll('input, textarea, [contenteditable="true"]')) {
             if (el.tagName === 'INPUT' && SKIP.has((el.type || '').toLowerCase())) continue;
             if (!vis(el) || el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup')) continue;
             const r = el.getBoundingClientRect();
-            const opt = el.matches(OPT) || /carry|regroup/i.test(String(el.className));
-            const floor = opt ? 44 : 48;
+            const opt = window.touchKind(el) === 'working';
+            const floor = window.floorAt(opt ? 'working' : 'answer', W);
             if (r.width >= floor - 0.5 && r.height >= floor - 0.5) continue;
             const cls = typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '';
-            const k = `${el.tagName.toLowerCase()}${cls} ${Math.round(r.width)} x ${Math.round(r.height)} px (${opt ? 'a working box: want >= 44 x 44, RUBRIC H6' : 'an answer place: want >= 48 x 48, SP-10'})`;
+            const k = `${el.tagName.toLowerCase()}${cls} ${Math.round(r.width)} x ${Math.round(r.height)} px (${opt ? `a working box: want >= ${floor} x ${floor}, RUBRIC H6` : `an answer place: want >= ${floor} x ${floor}, SP-10`})`;
             groups.set(k, (groups.get(k) || 0) + 1);
         }
     }
@@ -297,8 +328,11 @@ function GEOM(rootSel) {
     const o = roots[0].getBoundingClientRect();
     const r2 = (v) => Math.round(v * 2) / 2;
     const lines = [];
+    // critic tt-r1 D5: transient chrome is not geometry - the zoom button (button.zoom-icon-btn and what it holds) and every
+    // 0-size node are left out, so a rerun of the committed tool reproduces the changed-screens list
     for (const rt of roots) for (const el of [rt, ...rt.querySelectorAll('*')]) {
         const r = el.getBoundingClientRect();
+        if (el.closest('.zoom-icon-btn') || r.width === 0 || r.height === 0) continue;
         const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter((c) => c && !/^mq-(active|live-|wd-)/.test(c)).slice(0, 3).join('.') : '';
         lines.push(`${el.tagName.toLowerCase()}${cls ? '.' + cls : ''} ${r2(r.left - o.left)},${r2(r.top - o.top)} ${r2(r.width)}x${r2(r.height)}`);
     }
@@ -465,13 +499,12 @@ async function RINGS(rootSel) {
             && !/mq-live-wrong|mq-wd-empty|mq-wrong-digit|box-wrong/.test(String(el.className)) && !el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup'));
         if (boxes.length < 1) continue;
         const looks = { 'answer place': new Map(), 'working box': new Map() };
-        const OPT = '.mq-carry, .column-carry-input, .mq-opswork, .mq-wwork, [data-mq-work], [data-ws-slot^="regroup"], .mq-regroup';
         for (const el of boxes) {
             el.focus({ preventScroll: true });
             // the page's focusin handlers settle on the next frames (active-box.js marks the next box on rAF)
             await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
             if (document.activeElement !== el) continue;
-            const role = el.matches(OPT) || /carry|regroup/i.test(String(el.className)) ? 'working box' : 'answer place';
+            const role = window.touchKind(el) === 'working' ? 'working box' : 'answer place';
             const g = ring(el);
             const cls = typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '';
             const par = el.parentElement && typeof el.parentElement.className === 'string' && el.parentElement.className.trim() ? ` in .${el.parentElement.className.trim().split(/\s+/)[0]}` : '';
@@ -536,7 +569,7 @@ async function selfTest() {
         // the tablet default (owner 2026-11-13). The fixtures below predate TOUCH; their CLIP-X / FOCUS cases judge every
         // rule but TOUCH (noTouch), and TOUCH has its own cases at the end.
         await page.setViewport({ width: 820, height: 1180 });
-        const run0 = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
+        const run0 = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
         const noTouch = (r) => Object.assign({}, r, { findings: r.findings.filter((x) => x.rule !== 'TOUCH') });
         const run = async (v) => noTouch(await run0(v));
         const good = await run('good');
@@ -569,13 +602,13 @@ async function selfTest() {
         await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" style="width:44px;height:44px"><input style="width:46px;height:48px"><textarea style="width:60px;height:30px"></textarea><div class="mq-wsbar"><input style="width:20px;height:20px"></div></div>');
         const ht = await page.evaluate(TARGETS, '#h');
         if (ht.length !== 2 || !ht.some((t) => /46 x 48/.test(t)) || !ht.some((t) => /textarea 60 x 30/.test(t))) fails.push(`working boxes at 44 pass, a 46 px answer box and a 30 px textarea fail, the chrome bar is skipped: ${JSON.stringify(ht)}`);
-        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
+        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
         const lifted = await runL('lifted');
         if (lifted.focus !== 'ok' || lifted.findings.length) fails.push(`legacy ones box lifted 4 px by .mq-active-box and focused: must be ok (${JSON.stringify(lifted.findings)})`);
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
-        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
         const bl = await runB('bare-left');
         const bf = bl.findings.find((x) => x.rule === 'FOCUS');
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
@@ -601,14 +634,39 @@ async function selfTest() {
         const rb = await page.evaluate(() => window.RINGS('#c'));
         if (rb.length) fails.push(`one blue 4 px ring (inset shadow and outline): no FOCUS-RING finding (${JSON.stringify(rb)})`);
         // TOUCH (owner 2026-11-13): 40 px answer boxes FAIL at 820 and 1024; 48 px boxes pass; at an explicit 390 the floor is 44
-        const touchAt = async (w, px) => { await page.setViewport({ width: w, height: 900 }); await page.setContent(BARE('bare-right').replace('input{width:48px;height:48px}', `input{width:${px}px;height:${px}px;box-sizing:border-box}`)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return (await page.evaluate(PROBE)).findings.filter((x) => x.rule === 'TOUCH'); };
+        const touchAt = async (w, px) => { await page.setViewport({ width: w, height: 900 }); await page.setContent(BARE('bare-right').replace('input{width:48px;height:48px}', `input{width:${px}px;height:${px}px;box-sizing:border-box}`)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return (await page.evaluate(PROBE)).findings.filter((x) => x.rule === 'TOUCH'); };
         if (!(await touchAt(820, 40)).length) fails.push('TOUCH: 40 px answer boxes at 820 must FAIL');
         if (!(await touchAt(1024, 46)).length) fails.push('TOUCH: 46 px answer boxes at 1024 must FAIL');
         if ((await touchAt(1024, 48)).length) fails.push('TOUCH: 48 px answer boxes at 1024 must pass');
         if ((await touchAt(390, 45)).length) fails.push('TOUCH: 45 px answer boxes at an explicit 390 pass (44 px floor)');
+        // TOUCH at a computer width (critic tt-r1 D1): SP-10's 44 px general floor; 48 is the tablets'
+        if ((await touchAt(1280, 45)).length) fails.push('TOUCH: 45 px answer boxes at 1280 pass (44 px computer floor)');
+        if (!(await touchAt(1366, 40)).length) fails.push('TOUCH: 40 px answer boxes at 1366 must FAIL');
+        // GEOM (critic tt-r1 D5): the same tree hashes identically twice; a zoom button or a 0-size node does not change it
+        const g = '<div id="g" style="width:300px"><span style="display:inline-block;width:40px;height:40px">7</span><input style="width:48px;height:48px"></div>';
+        await page.setContent(g); await page.evaluate(`window.GEOM = ${GEOM}`);
+        const ga = await page.evaluate(() => window.GEOM('#g').hash), gb = await page.evaluate(() => window.GEOM('#g').hash);
+        await page.setContent(g.replace('</div>', '<button class="zoom-icon-btn" style="width:30px;height:30px"><i>z</i></button><b style="display:inline-block;width:0;height:0"></b></div>')); await page.evaluate(`window.GEOM = ${GEOM}`);
+        const gc = await page.evaluate(() => window.GEOM('#g').hash);
+        if (ga !== gb || ga !== gc) fails.push(`GEOM: the same tree must hash the same twice and ignore the zoom button / 0-size nodes (${ga} ${gb} ${gc})`);
+        // touch-class (critic tt-r1 D4): a 46 px sign circle (mq-wwork.mq-gl-sign, data-mq-kind="sign") is an answer place
+        // under the 48 px floor at 1024; a 44 px word-work digit box (data-mq-kind="digit") is a working box and passes
+        await page.setViewport({ width: 1024, height: 768 });
+        await page.setContent('<div id="h"><input class="mq-wwork mq-gl-sign" data-mq-kind="sign" style="width:46px;height:46px;box-sizing:border-box"><input class="mq-wwork" data-mq-kind="digit" style="width:44px;height:44px;box-sizing:border-box"></div>');
+        await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS};`);
+        const sg = await page.evaluate(() => window.TARGETS('#h'));
+        if (sg.length !== 1 || !/mq-gl-sign 46 x 46 px \(an answer place: want >= 48/.test(sg[0])) fails.push(`a 46 px sign circle fails as an answer place, a 44 px digit work box passes: ${JSON.stringify(sg)}`);
+        if (TC.selfTest()) fails.push('touch-class self-test');
+        // geom-diff (critic tt-r1 D5): a 1 px move is unchanged, a 2 px move or an element more is changed, P marks a passed skill
+        const gj = (lines) => ({ rows: [{ skill: 'a:b', size: '1024x768', item: 1, geom: { lines } }], hostRows: [{ skill: 'a:b', size: '1024x768', host: 'quiz', geom: { lines } }] });
+        const L0 = ['div.x 0,0 100x50', 'input.y 10,10 48x48'];
+        const d1 = geomDiff(gj(L0), gj(['div.x 0,0 100x50', 'input.y 10.5,10 49x48']), new Set(['a:b']));
+        const d2 = geomDiff(gj(L0), gj(['div.x 0,0 100x50', 'input.y 10,10 50x50']), new Set(['a:b']));
+        const d3 = geomDiff(gj(L0), gj([...L0, 'span 0,0 5x5']));
+        if (d1.changed !== 0 || d2.changed !== 2 || !/^P a:b 1024 card/.test(d2.lines[1]) || d3.changed !== 2) fails.push(`geom-diff: 1 px unchanged, 2 px / an extra element changed, P marks a passed skill (${JSON.stringify([d1.lines, d2.lines, d3.lines])})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 22 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 25 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -644,7 +702,7 @@ async function fixtureRun(file) {
         await page.setViewport({ width: 820, height: 1180 });
         await page.setContent(fs.readFileSync(path.resolve(file), 'utf8'));
         await page.waitForFunction(() => document.readyState === 'complete');
-        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+        await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
         const m = await page.evaluate(PROBE);
         findings = m.findings;
         const ck = await page.evaluate(`(${CELL_KIND})(window.__MQ_KIND_MOD)`);
@@ -658,11 +716,47 @@ async function fixtureRun(file) {
     process.exit(findings.length ? 1 : 0);
 }
 
+/* --geom-diff BASE.json HEAD.json [--out FILE] (critic tt-r1 D5): the committed screen diff of two --geom --json runs (a base
+   tree via MQ_ROOT and HEAD), so a rerun reproduces the changed-screens list. A screen (skill, width, host; the card per item)
+   is CHANGED when its element count differs or any element's x, y, w or h moved by more than 1 px (GEOM already leaves out the
+   zoom button and 0-size nodes). Prints "screens N unchanged U changed C", then one line per changed screen, "P" marking a skill
+   in js/modules/redesign-passed.js, with its first moved element. Pure (no browser); geomDiff() is self-tested. */
+function geomDiff(base, head, passed = new Set()) {
+    const key = (r, host) => `${r.skill} ${String(r.size).split('x')[0]} ${host}${host === 'card' && r.item > 1 ? '#' + r.item : ''}`;
+    const index = (j) => { const m = new Map(); for (const r of j.rows || []) if (r.geom) m.set(key(r, 'card'), r.geom); for (const r of j.hostRows || []) if (r.geom) m.set(key(r, r.host), r.geom); return m; };
+    const A = index(base), B = index(head);
+    const nums = (l) => (l.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+    const tag = (l) => l.split(' ')[0];
+    const out = []; let n = 0, same = 0;
+    for (const k of [...A.keys()].filter((k) => B.has(k)).sort()) {
+        n++;
+        const a = A.get(k).lines || [], b = B.get(k).lines || [];
+        let first = null;
+        if (a.length !== b.length) first = `${a.length} -> ${b.length} elements`;
+        else for (let i = 0; i < a.length && !first; i++) {
+            const x = nums(a[i].slice(a[i].lastIndexOf(' ', a[i].lastIndexOf(' ') - 1))), y = nums(b[i].slice(b[i].lastIndexOf(' ', b[i].lastIndexOf(' ') - 1)));
+            if (tag(a[i]) !== tag(b[i]) || x.length !== y.length || x.some((v, j) => Math.abs(v - y[j]) > 1)) first = `${a[i]} -> ${b[i]}`;
+        }
+        if (!first) { same++; continue; }
+        out.push(`${passed.has(k.split(' ')[0]) ? 'P' : ' '} ${k}  [first: ${first}]`);
+    }
+    return { n, same, changed: out.length, lines: [`screens ${n} unchanged ${same} changed ${out.length}`, ...out] };
+}
+function geomDiffMain(a, b, outFile) {
+    const passed = new Set((fs.readFileSync(path.join(ROOT, 'js/modules/redesign-passed.js'), 'utf8').match(/'[a-z_]+:[a-z0-9_]+'/g) || []).map((x) => x.slice(1, -1)));
+    const d = geomDiff(JSON.parse(fs.readFileSync(a, 'utf8')), JSON.parse(fs.readFileSync(b, 'utf8')), passed);
+    const txt = d.lines.join('\n') + '\n';
+    if (outFile) fs.writeFileSync(outFile, txt);
+    process.stdout.write(txt);
+    say(`${TOOL}: OK (geom-diff: ${d.changed} of ${d.n} screens changed)`);
+}
+
 async function main() {
     if (has('self-test')) return selfTest();
+    if (has('geom-diff')) { const i = argv.indexOf('--geom-diff'); return geomDiffMain(argv[i + 1], argv[i + 2], arg('out', null)); }
     if (has('fixture')) { ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean); return fixtureRun(arg('fixture')); }
     const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
-    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check', 'print-widths', 'no-retap', 'touch-debug', 'geom']);
+    const BOOL = new Set(['report-only', 'self-test', 'geom-diff', 'no-siblings-check', 'print-widths', 'no-retap', 'touch-debug', 'geom']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -722,7 +816,7 @@ async function main() {
                         await cardReady(page);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.GEOM = ${GEOM};`);
+                        await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.GEOM = ${GEOM};`);
                         const geom = has('geom') ? await page.evaluate(() => window.GEOM('#questionCard')) : null;
                         m = await page.evaluate(PROBE);
                         if (geom) m.geom = geom;
@@ -778,7 +872,7 @@ async function main() {
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await hostReady(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper');
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.GEOM = ${GEOM};`);
+                        await page.evaluate(`${TC.INJECT} window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.GEOM = ${GEOM};`);
                         const hsel = host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper';
                         const geom = has('geom') ? await page.evaluate((sel) => window.GEOM(sel), hsel) : null;
                         if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `${label ? 'sibling-' : ''}${size.w}x${size.h}-${c}-${k}-${host}.png`) }); }
