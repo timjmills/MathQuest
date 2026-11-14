@@ -12139,6 +12139,45 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-stretch-rowcap",
+   "check": "ws-empty-band EB-STRETCH: a print row of a template that declares its writing room (layout.js ROW_ROOM_MM) is never taller than the cell's natural height (laid out with no row stretch) + that room, + 1.5 mm. Lead ruling 2026-11-14 (lf-placevalue vocabulary deploy item (d)): spare page height was shared into rows - the Match 3 practice row 57 mm for a 50 mm work, the Opener count row 31.7 -> 39.2 / 43.4 mm, the lesson Vocabulary 39.4 -> 50.7 mm",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH (lead ruling 2026-11-14, ROW-STRETCH CAP)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "EB-STRETCH fires on vocab_grade_pictures (Match 3) independent M / L: 57 mm rows for 50 mm works, 5 mm over the 52 mm cap"
+   },
+   "pass": {
+    "commit": "893d95d16",
+    "state": "0 findings: the rows are held to 52.5 mm (drawn 50 + 2 mm room); the spare height is white at the foot"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --sizes M,L --roles independent --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-fill",
+   "check": "ws-rowcap-fill ROWCAP-FILL: a capped template's section (layout.js ROW_ROOM_MM) counts its rows at the height they are drawn (rowCapMm: drawn + room), so rows x cellH leaves at most one row of the grid free. Critic lf-engine-rowcap r1 F1 / F2 / F3: Review L (master) and Match 3 L (31d41507 + fix) printed 3 rows of 52.5 mm and a ~75 mm white foot where 4 fit - the fill counted on the 48 mm footprint (58 mm asked), the cap drew 50 + 2",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL (critic rowcap r1 F3)",
+   "fail": {
+    "commit": "1b5c3b9c9",
+    "state": "Match 3 footprint 48 mm at M and L: 3 rows of 53 mm leave 68-69 mm of a 227-228 mm grid free"
+   },
+   "pass": {
+    "commit": "f5c025e4c",
+    "state": "4 rows of 53 mm: under one row free at M and L"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

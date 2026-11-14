@@ -223,7 +223,10 @@ export function warmUpBand(env) {
                 return rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
             });
             const maxAdd = Math.max(0, Math.min(...room));
-            groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, Object.assign({ h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }, Number.isFinite(maxAdd) ? { maxAdd } : {})));
+            // (ROW-STRETCH CAP: the band's templates and rows, read by roles/lesson.js with layout.rowCapMm)
+            const tmpls = halves.flatMap((id) => wPools[id].slice(0, shape[id].k * rowsOf(id)).map((it) => it.template || ''));
+            const wRows = Math.max(1, ...halves.map((id) => rowsOf(id)));
+            groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, Object.assign({ h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45, tmpls, rows: wRows }, Number.isFinite(maxAdd) ? { maxAdd } : {})));
         }
     }
     env.letter = letter;

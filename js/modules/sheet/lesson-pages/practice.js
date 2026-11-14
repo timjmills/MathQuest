@@ -13,6 +13,7 @@ import { CASE_TESTS } from '../lesson-arch/index.js';
 import { winShare } from '../lesson-arch/grid.js';
 import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt, phase0On } from './common.js';
 import { shortestRowMm } from '../part-opts.js';
+import { rowCapMm } from '../layout.js';
 
 export const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
@@ -148,7 +149,8 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             // PG-11), never more than half a cell again (H13: no cell mostly empty).
             // (lf-partopts: on a sheet the teacher changed, the rows fill with whole rows, not taller cells - a grown one-number cell
             // passed a 30 % band, div_facts; the standard sheet keeps its fill)
-            const cellH = Math.min(room / r, hTop * (freed ? 1.0 : 1.15));
+            // (ROW-STRETCH CAP, layout.rowCapMm: rows of declared templates stop at their drawn height + writing room)
+            const cellH = Math.min(room / r, hTop * (freed ? 1.0 : 1.15), rowCapMm(hTop, indep));
             const grid = gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter });
             cur.sections.push({
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
