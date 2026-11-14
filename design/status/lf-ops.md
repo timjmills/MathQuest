@@ -11,9 +11,22 @@ Spend at the stop: session cost_usd about $1,165 (baseline $756.09).
 | Mixed facts: ÷ inside the shared grid (MIXED-ALL-OPS), room above fact brackets (LDIV-FACT-ROOM) | -lf-ops-mixfacts @ 638971967 | narrow critic PASS 9/9/8/9; lead deploying |
 
 ## In progress or parked, in resume order
-1. **Tables to 15 × 15 + presets mult_facts_15 / div_facts_15 + "How it is written" above the tick list** (owner, 2026-11-14).
-   Branch -lf-ops-t15, cut from 84f8813a1. Stopped mid-build at the owner stop; see `design/status/lf-ops-t15.md` and the latest commit there for which steps are done.
-   Then: the facts card `--resign` (unsigned) goes to the lead to sign; then the narrow critic.
+1. **Tables to 15 × 15 + presets + "How it is written" first** (owner 2026-11-14): -lf-ops-t15 @ 01e8f5498 (from 84f8813a1), stopped at the owner stop.
+   **Built:**
+   - band 225 on mult_facts and div_facts, through one `factTableTop()` helper;
+   - the 13–15 ticks, shown only under 15 × 15;
+   - presets `mult_facts_15` (ZH, grade 4) and `div_facts_15` (ZJ, grade 5; the commit message of 45f7f8b6f wrongly says ZI), each with tags, search terms and links;
+   - the tick list last in the panel, under "Which facts" (display order only; the codec is unchanged).
+   **Check:** `ws-tables15.mjs` (T15-*, FORM-FIRST): 24 findings on 84f8813a1, OK on the fix. Backtests `tables15` and `tables15-form-first` PASS; on precritic; ledger rows added.
+   **Card:** facts card resigned UNSIGNED, sha256 a8a2fbef321e94145c39e5da3f1f9cebc6f881e58b4534a373c8fceda96c289d (blob 667b5786c7f1). It needs the lead's signature.
+   **Hash proof:** 40 default hashes match master.
+   **Gates:** boot-smoke, code-snapshot (741), content-audit, standards, search-terms, wrm, presets-unit, redesign-passed and codec-registry (except msChoose, which fails on master too) all pass.
+   **Not done:**
+   - precritic `--strict` for mult_facts and div_facts. The killed run showed reds in options-verify, empty-band, cell-checks `--card`, sibling-compare and print-lint `--supports array`, not yet compared with master. Look first at whether options-verify and cell-checks' pins fail to cover band 225 and 13–15;
+   - ws-fact-pages;
+   - the PNGs (scripts ready in scratchpad t15/);
+   - ws-catalogue regeneration.
+   Then the narrow critic.
 2. **count_by_tables r4** (-lf-ops-props @ 4c249ee1d, with lf-checks eblast 2225965ce merged). F1 (Pre-skill check L 10 → 14 items) and m1–m3 are fixed, each check first (backtests 5/5). Precritic reds are routed classes only.
    **Before its narrow critic:**
    - hash-prove that passed skills are unchanged, because the pre-skill-check role and the print-sheet.js retitle are shared code;
