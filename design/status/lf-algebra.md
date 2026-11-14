@@ -9,6 +9,28 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-14 03:05 AT THE OWNER'S BUDGET STOP (session cost_usd $429.31 of the $461 stop). Head 488142df6, merged with master
+  369173bc2 (b0050526d). STEP-FORM narrow critic, 3 rounds (verdict: scratchpad critic-stepform/verdict.md, copied to the evidence
+  branch as design/audit/evidence/lf-algebra/step-form/verdict.md):
+  r1 FAIL F1 (Step 1 / Step 2 staggered; C3 6) -> check ws-two-step --align STEP-ALIGN c102ebc73, fix 938fdadbe, backtest
+  two-step-step-align PASS, precritic gate two-step-align. r2 FAIL F1b (column beside sentence still staggered) + F5 (wrapped Step 2
+  off Step 1's left edge) -> round cap 2 root cause (r1 fix + check covered fact pairs only): STEP-ALIGN widened 5ce882919 (every
+  two-step row, wrapped left edges, two seeds; FAIL 86), fix 517639a61 (300 cells PASS), backtest two-step-step-align-all PASS.
+  r3: EVERY PRINT PAGE 8/8/8/8 (Opener, Guided, Independent, M / L, pupil + key); PAGEFILL add_then_div independent L p1 8 on all
+  four (print-lint ratchet: nothing rose - no re-pin needed). FAIL on one screen host: F6 (C3 7) worksheet-1280 mult_div_first
+  item 4: Step 2's fact sentence wraps inside itself (the 2-digit answer boxes drop a line; factSentence flex-wrap on the twin).
+  NEXT (after the reset; the cap is spent, so check first, then fix, then one critic): STEP-ALIGN on the screen hosts (card
+  820 / 1024 / 1280 / 1366, worksheet 1280, quiz 1280): every slot and = of a .mq-wwfact on one line, seeded for a 2-digit Step 2
+  answer, backtest FAIL at 488142df6 -> fix: the sentence never wraps (wrap the step row / widen the host). F7 minor: the unit line
+  sits in different places beside the bank (a check: same relative place on a page). Unconfirmed: the focused first operand box on
+  card / quiz looks wider (focus style?).
+  Still open: LDIV-JOIN red (lf-ops bracketSvg on claude/sweet-newton-c8wrv1-lf-ops-ldiv bf0814473, not on master: switch
+  word-work.js ÷ frame 'M2 1 Q9 20 2 39' to it and add word-work to ws-ldiv-hug --join once it lands); precritic r13 re-run;
+  pre-existing guided L print-lint findings (EB / OVERFLOW, identical before and after STEP-FORM); lead rulings listed under r3b.
+  Cards signed by the lead 9a2a78084. Evidence branch: c3ca248d6 (before / after / after-merged Opener PNGs).
+  Lead notes carried in from the scratchpad log: signature line "Signed: owner (delegated to lead), 2026-11-13"; S dropped (M, L
+  only); no 390 px; word-problem online-worksheet numerals 25.2 px under the 29 px floor (queued, check first); tape_diagram
+  TAPE-LABEL-INSIDE fix queued (ws-tape-diagram.mjs now M,L); critic r3 on the six pattern skills waits on the routed fixes.
 - 2026-11-14 STEP-FORM (owner via lead; then BUDGET STOP): check ws-two-step STEP-FORM + --ldiv LDIV-JOIN d92f11216 (both FAIL there),
   fix 22f10586f (fact steps = horizontal sentence [a] (sign) [b] = [answer]; one-step stories unchanged), step row wraps when it
   cannot fit (print-lint PG-12 0.3-1.6 mm at L on mult_div_first / add_then_mult -> 0); backtest two-step-step-form PASS
