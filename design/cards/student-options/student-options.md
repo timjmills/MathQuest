@@ -1,7 +1,7 @@
 # Student skill options: design card
 
 Lane `lf-tools-stuopts` · step: DESIGN ONLY (no feature code) · 2026-11-14 · Opus medium (first build of a new screen part).
-Status: **unsigned**. A build starts only after the owner signs (CLAUDE.md, cards README).
+Status: **signed** (owner answers 2026-11-14 recorded; lead signs under delegated approval).
 Mock: `design/status/lf-checks/student-options/mock.html` (`#folded`, `#expanded`, `#off`, `#none`), screenshots
 `folded|expanded|off-1024.png` and `-1366.png` beside it (768 px wide viewport height, full page, deviceScaleFactor 2).
 
@@ -169,3 +169,5 @@ The disclosure always opens folded (owner 2026-11-14); it is not remembered.
 1. **Mode.** Recommended: both Play buttons = practice; boss / race / worksheet stay on the four mode buttons below (which play all selected).
 2. **Per-class lock in the link.** Recommended: later; the device setting is enough for round 1.
 3. **Support choices for pupils.** Recommended: show them ("Help"), since a pupil asking for touch dots is the point.
+
+Signed: owner, 2026-11-14
