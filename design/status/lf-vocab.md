@@ -646,3 +646,17 @@ Owner rule received mid-fix (master 76bc11c6): print size S dropped; S-only find
    78.3 mm row (the pick3 rows' height) for a 50 mm footprint: 26.2 mm under the words (33.4 %), and its pick3 cells draw 58 mm
    against a 50 mm footprint (EB-FOOT 16-17 %). Both are present on 959530e0 and outside every default run; the work cannot grow
    past 55 mm without failing EB-FOOT, so the fix is a Review row sized to its band's own items.
+
+## Deploy-2 head and budget stop (2026-11-14, lead: owner budget stop at session cost $428)
+Head claude/lf-vocab-deploy-2 @ 87db9ae6 (lf-vocab r15 + r16 + r16b, critic PASS; deploy-2 fixes; signed card, Stretch out of scope;
+master 0fbcc341 merged). Green: boot-smoke, code-snapshot (734), redesign-passed, standards, search-terms, spec-card --check-signed,
+ws-vocab-unit and --browser, ws-next-box, both ws-empty-band modes. precritic --strict fails gates that master added since a3eb9d25:
+- EB-BAND at the new 28 % limit: Match 3 independent L bands 28.1-28.2 % (the r16b critic's near-cap minor, now over); 27 findings.
+- FIX-WORDS: the Match 3 Error Analysis "Fix it" line prints the three bank words, which the rule reads as giving the answer.
+- SCREEN-DIGIT (screen-slots): numerals inside the pictures (9-10 px) are read as answer digits on card / worksheet 1280.
+- TARGET: the worksheet-820 vocab letter box is 46 x 46 px (want >= 48).
+- phone-card (820 / 1024 / 1280 worksheet cells), worksheet-reflow (placevalue:expand, not vocab), next-box (TypeError under
+  precritic only; standalone OK), no-phone-width (a 390 px default somewhere in this lane's tools or briefs), sibling-compare.
+Not done (stopped by budget): r17 (5 ledger rows planned: letter anchor on every host, trio (picture, letter) repeat, 3-digit
+padding, Guided top-start, 27 % band guard) and the gate failures above. Resume here: fold into lf-placevalue's
+"number sense + words" lane (lead, 2026-11-13).
