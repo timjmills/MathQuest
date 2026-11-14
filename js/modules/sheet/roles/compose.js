@@ -496,6 +496,22 @@ export function operandsOf(q = {}) {
     return [];
 }
 
+/**
+ * The "a op b = " stem a frame may restate the problem with, ONLY when that equation is true of the answer: one number equal to
+ * the operands combined by the operation (TOF-STEM, lf-ops critic-cbt-r2 E1: count_by_tables printed "3 x 12 = 12, 18, 24, 30,
+ * 36"; a missing-part or 3-addend item printed "49 + 49 = 4"). '' when it is not, and the caller uses its plain stem.
+ */
+export function equationStemOf(q = {}, correct = '') {
+    const ops = operandsOf(q);
+    const op = opOf(q);
+    const g = opGlyphOf(op);
+    const s = String(correct === undefined || correct === null ? '' : correct).trim();
+    if (ops.length < 2 || !g || !/^-?[\d,]+(\.\d+)?$/.test(s)) return '';
+    const f = { add: (a, b) => a + b, subtract: (a, b) => a - b, multiply: (a, b) => a * b, divide: (a, b) => a / b }[op];
+    const val = ops.reduce((a, b) => f(a, b));
+    return Math.abs(val - Number(s.replace(/,/g, ''))) < 1e-9 ? `${ops.join(` ${g} `)} = ` : '';
+}
+
 const isWhole = (v) => /^-?\d+$/.test(String(v).replace(/,/g, '').trim());
 
 /**
