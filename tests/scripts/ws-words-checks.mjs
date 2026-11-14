@@ -80,7 +80,7 @@ for (const band of [20, 100, 1000]) for (const answerSlot of ['line', 'hto']) {
 // the hundreds.'; the page gate read 3 seeds and missed it). Each item is the provider's own reading of a synthetic item:
 // WORDS-KIND-STEPS  the provider's Steps (the shared roles' kind, compose.js stepsKindOf) are equal for two names exactly when
 //                   their kinds are: 0-10 one word, 11 / 12, 13-19, a tens word alone, two words, 100-999, 1,000
-// WORDS-STEPS-TRUE  (every name) each quoted phrase of a worked step is part of the item's own name
+// WORDS-STEPS-TRUE-ALL (every name) each quoted phrase of a worked step is part of the item's own name
 // WORDS-STEPS-GARBLE two place words in a row in a worked step ("thousand hundred"), or a hole
 {
     const { numberWords } = await import(new URL(`file://${ROOT}/js/modules/sheet/cells/words.js`).href);
@@ -100,7 +100,7 @@ for (const band of [20, 100, 1000]) for (const answerSlot of ['line', 'hto']) {
             for (const s of steps || []) {
                 const text = String((s && (s.text || s.label || s.say)) || '');
                 read++;
-                for (const m of text.matchAll(/"([^"]+)"/g)) if (!words.includes(m[1])) bad.push(`WORDS-STEPS-TRUE ${way} ${slot} ${n}: step quotes "${m[1]}", not part of "${words}"`);
+                for (const m of text.matchAll(/"([^"]+)"/g)) if (!words.includes(m[1])) bad.push(`WORDS-STEPS-TRUE-ALL ${way} ${slot} ${n}: step quotes "${m[1]}", not part of "${words}"`);
                 const g = /\b(thousands?|hundreds?)\s+(thousands?|hundreds?|tens|ones)\b|undefined|NaN/.exec(text);
                 if (g) bad.push(`WORDS-STEPS-GARBLE ${way} ${slot} ${n}: "${text}" reads "${g[0]}"`);
             }

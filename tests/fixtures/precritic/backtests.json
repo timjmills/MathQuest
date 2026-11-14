@@ -8988,6 +8988,66 @@
    }
   },
   {
+   "id": "pv-words-thousand-kind",
+   "check": "number_word_form at band 1,000 (both ways, both answer slots), the FIXED seed 913052 on every role: 'one thousand' is never dealt under a non-thousand Model or under Steps that do not cover it (critic live2 N9; the one-kind class)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (fixed seed 913052, band 1,000)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided M / L 'one thousand' under the Model 233 and the hundreds Steps, both ways; opener M / L the same"
+   },
+   "pass": {
+    "commit": "PENDINGFIX",
+    "state": "1,000 is its own kind (pv.js WORDS_TO_NUMBER_1000 / NUMBER_TO_WORDS_1000), so compose.js stepsKindOf / oneKindFirst keep it off a hundreds page"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 0 --seed-list 913052 --deals 'band 1000,band 1000 hto,to_words band 1000' --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-kind-steps-all",
+   "check": "number_word_form, seed-free: over every name 0-1,000, both ways and both answer slots, the provider's Steps are equal exactly when the kinds are (so no seed can deal two kinds under one Model), every quoted step phrase is part of the name, and no step puts two place words in a row (critic live2 N9)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-KIND-STEPS / WORDS-STEPS-TRUE-ALL / WORDS-STEPS-GARBLE",
+   "browser": false,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: one Steps set covers hundreds + thousand (3 ways); '\"one thousand hundred\": 10 in the hundreds.'"
+   },
+   "pass": {
+    "commit": "PENDINGFIX",
+    "state": "1,000 has its own Steps and worked steps ('\"one thousand\": 1 thousand.')"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-KIND-STEPS,WORDS-STEPS-TRUE-ALL,WORDS-STEPS-GARBLE --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble-places",
+   "check": "number_word_form Guided: a grey hint with two place words in a row ('\"one thousand hundred\": ___ in the hundreds.') fails GUIDED-HINT-GARBLE (critic live2 N9: the check read it and passed it)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE (place words)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided L band 1000 seed 913052, the hint '\"one thousand hundred\": in the hundreds.'"
+   },
+   "pass": {
+    "commit": "PENDINGFIX",
+    "state": "1,000's own worked steps; no such hint"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-GARBLE --seeds 0 --seed-list 913052 --pages guided --deals 'band 1000' --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "pv-words-opener-one-kind",
    "check": "number_word_form Opener: the Model and its Guided band are one kind its Steps cover (critic live1 N3: 'twenty' beside a teen Model and the teen Steps at band 20)",
    "kind": "commit-pair",

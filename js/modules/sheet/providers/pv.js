@@ -1321,6 +1321,10 @@ const TO_WORDS_STRINGS = {
     'two-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'Say the ones word.', 'Write them with a dash.'], remember: 'Write the tens word, a dash, then the ones word.' }),
 };
 NUMBER_TO_WORDS.remember = 'Say the hundreds, then the rest.';
+// (critic live2 N9: 1,000 shared the hundreds Steps, so the shared kind rule let a band-1000 Guided page deal "one thousand" under
+// a hundreds Model, its hint '"one thousand hundred": ___ in the hundreds.'. 1,000 is its own kind, with Steps of its own)
+const WORDS_TO_NUMBER_1000 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the thousands word.', 'No hundreds, tens or ones words? Write 0, 0, 0.', 'Write the digits.'], remember: 'One thousand is 10 hundreds.' });
+const NUMBER_TO_WORDS_1000 = Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the thousands word.', 'No hundreds, tens or ones? Write the thousands word alone.'], remember: 'One thousand is 10 hundreds.' });
 // (critic live1 N3: "numbers to 20" numeral to words once printed ONE Steps set over every name 0-20; round-cap r3 deals those
 // names by kind too - the Model's worked steps ("16: 1 ten, 6 ones.") never fit a Guided 3 - so the band takes the kinds' Steps)
 const WORDS_RULED = new Map();   // (one def a kind and slot shape: stringsBy caches its strings by the def)
@@ -1329,7 +1333,8 @@ function wordsStringsOf(q) {
     const p = pvOf(q);
     const n = Number(p.n);
     const hto = !!(q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto');
-    const base = p.way === 'to_words' ? (n < 100 ? TO_WORDS_STRINGS[wordsKind(n)] : NUMBER_TO_WORDS) : n < 100 ? WORDS_STRINGS[wordsKind(n)] : WORDS_TO_NUMBER;
+    const base = p.way === 'to_words' ? (n < 100 ? TO_WORDS_STRINGS[wordsKind(n)] : n >= 1000 ? NUMBER_TO_WORDS_1000 : NUMBER_TO_WORDS)
+        : n < 100 ? WORDS_STRINGS[wordsKind(n)] : n >= 1000 ? WORDS_TO_NUMBER_1000 : WORDS_TO_NUMBER;
     if (!base) return null;
     const boxed = hto && p.way !== 'to_words';
     if (!WORDS_RULED.has(base)) WORDS_RULED.set(base, [Object.assign({}, base, { lessonRule: '' }), Object.assign({}, base, { lessonRule: 'Every box gets a digit.' })]);
@@ -1381,6 +1386,7 @@ registerSkill('composing:number_word_form', {
             // (critic live1 r2 minor: "3: 3 ones." taught nothing over a one-word name; 0-10 are one word each - say it first)
             if (!h) return clampSteps([step(n <= 10 ? `Say ${f(n)} out loud.` : `${f(n)}: ${pl(t, 'ten', 'tens')}, ${pl(o, 'one', 'ones')}.`),
                 step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
+            if (n === 1000) return clampSteps([step(`${f(n)}: 1 thousand, no hundreds, tens or ones.`), step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
             return clampSteps([step(`${f(n)}: ${pl(h, 'hundred', 'hundreds')}, then ${r ? `the rest, ${r}` : 'no tens or ones'}.`),
                 step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
         }
@@ -1405,6 +1411,8 @@ registerSkill('composing:number_word_form', {
         if (!h && r < 10) return clampSteps([step(`"${p.words}": ${r} one${r === 1 ? '' : 's'}.`), step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
         if (!h) return clampSteps([step(`"${p.words}": ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'}, ${r % 10} one${r % 10 === 1 ? '' : 's'}.`),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
+        // (critic live2 N9: "one thousand" was read as a hundreds name - '"one thousand hundred": 10 in the hundreds.')
+        if (n === 1000) return clampSteps([step('"one thousand": 1 thousand.'), step('No hundreds, tens or ones words: 0 hundreds 0 tens 0 ones.'), step('Write 1000.', [{ slot: 'answer', value: '1000' }])]);
         return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'} ${r % 10} one${r % 10 === 1 ? '' : 's'}.` : 'No tens or ones words: 0 tens 0 ones.'),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },
