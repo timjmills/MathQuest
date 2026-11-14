@@ -10467,6 +10467,66 @@
  }
 },
 {
+ "id": "cbt-r3-opener-lines-sl1",
+ "check": "lf-ops cbt r3: the Opener at M with Answer spaces: Lines drew 9.4 mm write-on lines (SL-1 x40); the role cover lints the opener under spaces=line",
+ "kind": "commit-pair",
+ "rule": "ws-role-cover lint (print-lint L-ANSAREA SL-1; precritic role-cover)",
+ "browser": true,
+ "fail": {
+  "commit": "9cf4d4a54",
+  "state": "lf-ops cbt r3 head before the fix"
+ },
+ "pass": {
+  "commit": "1112b857f",
+  "state": "count-row tightGeom: a Lines slot >= LINE_ROOMY_MM (14 mm) at M / L"
+ },
+ "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --variants spaces=line --sizes M,L --roles opener",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
+ "id": "cbt-r3-ea-lines-cl40",
+ "check": "lf-ops cbt r3: error analysis L with Answer spaces: Lines - 'Sam wrote:' at 6.5 mm across, 2.3 mm down in the label keep-out (CL40-INK x4); the role cover lints error-analysis under spaces=line",
+ "kind": "commit-pair",
+ "rule": "ws-role-cover lint (print-lint L-OVERLAP CL40-INK; precritic role-cover)",
+ "browser": true,
+ "fail": {
+  "commit": "9cf4d4a54",
+  "state": "lf-ops cbt r3 head before the fix"
+ },
+ "pass": {
+  "commit": "b8da2b407",
+  "state": "error-analysis.js: a REDO count row's pupil tag starts past --ws-koin + 0.5 mm"
+ },
+ "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --variants spaces=line --sizes M,L --roles error-analysis",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
+ "id": "cbt-r3-ak2-tofblank",
+ "check": "lead ruling 2026-11-14 (cbt r3): L-KEY AK-2 on the count_by_tables True or False? key - a TRUE frame is blank by design (PT-TOF-2); the exemption is the frame's mq-tofblank mark inside .mq-tf only (self-tests: a False frame or any other blank key slot still fires)",
+ "kind": "commit-pair",
+ "rule": "ws-print-lint L-KEY AK-2 (tofBlank: TRUE-frame slots marked by true-false.js)",
+ "browser": true,
+ "fail": {
+  "commit": "9cf4d4a54",
+  "state": "lf-ops cbt r3 head: True frames unmarked, AK-2 critical"
+ },
+ "pass": {
+  "commit": "39bd019f6",
+  "state": "true-false.js marks a TRUE frame mq-tofblank; AK-2 leaves only those blank slots out"
+ },
+ "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --with-covered --sizes M,L --roles true-false",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
  "id": "cbt-r2-e6-ea-topstart",
  "check": "critic cbt r2 E6: error analysis ~16 mm (M) / 9.5 mm (L) empty above 'Sam wrote:' (L-TOPSTART CL-4b x4); the role cover lints error-analysis at M and L",
  "kind": "commit-pair",
