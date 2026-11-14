@@ -705,7 +705,11 @@ export function prepare(it, info = {}) {
         // (a REDO item - a count row, a strip - is written again in a zone under it that starts at the cell's left: its work starts
         // there too, never centred over it - lf-algebra critic r2 G2, the copy train 60 px left of the original)
         const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:${kind === 'redo' ? 'flex-start' : 'center'}` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        // (cbt r3, CL-40: a top-started REDO count row - E6, CL-4b - puts its "<Name> wrote:" in the cell's top-left corner; with
+        // Lines at L its ink entered the label keep-out at 6.5 mm across, 2.3 mm down. The tag is set in past --ws-koin, as the
+        // arrays-turn and Reason It fixes are; the work and the cell height do not move.)
+        const tagLeft = kind === 'redo' && it.template === 'count-row' ? 'max(0mm, calc(var(--ws-koin, 0mm) + 0.5mm))' : '0';
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:${tagLeft}"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
