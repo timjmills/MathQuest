@@ -992,6 +992,52 @@ function _wsFitCard(card) {
     return cellEl.scrollWidth <= cellEl.clientWidth + 1;
 }
 
+/**
+ * A count-row train's natural width in px (critic cbt r2 E9, lead ruling 2026-11-14 - the per-card span): its widest line laid
+ * out unwrapped - the step tab and every number / jump cell (each flex:none, so its width does not depend on the card) with the
+ * gaps between them. 0 for a card with no wrapping count row.
+ */
+export function wsTrainWidth(card) {
+    const root = card && card.querySelector('.k2-countrow-wrap');
+    if (!root) return 0;
+    const shown = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && getComputedStyle(el).display !== 'none'; };
+    const gapOf = (el) => parseFloat(getComputedStyle(el).columnGap) || 0;
+    const natural = (el) => {
+        const kids = Array.from(el.children).filter(shown);
+        if (!kids.length) return el.getBoundingClientRect().width;
+        const cs = getComputedStyle(el);
+        if (el.hasAttribute('data-mq-wrapped') && !el.classList.contains('k2-countrow-line')) return kids.reduce((a, k) => a + k.getBoundingClientRect().width, 0) + gapOf(el) * (kids.length - 1);
+        if (cs.display.includes('flex') && cs.flexDirection.startsWith('row')) return kids.reduce((a, k) => a + natural(k), 0) + gapOf(el) * (kids.length - 1);
+        return Math.max(...kids.map(natural));
+    };
+    const lines = Array.from(root.querySelectorAll('.k2-countrow-line')).filter(shown);
+    const rcs = getComputedStyle(root);
+    return lines.length ? Math.max(...lines.map(natural)) + (parseFloat(rcs.paddingLeft) || 0) + (parseFloat(rcs.paddingRight) || 0) : 0;
+}
+
+/**
+ * Which count-row cards take the whole grid row (critic cbt r2 E9, lead ruling 2026-11-14): only a card whose train is wider than
+ * a column of a 2-column grid - its train could never sit in a column with >= 3 numbers a line (cbt r1 D2). A train that fits
+ * a 2-column column stays in the grid; at a wider column count it does not fit, so the grid drops a column (`_wsFitCard`)
+ * instead of spanning (number_patterns_rule at 1024 / 1280: a 4 + 4 train in the middle third of a 1130 px card).
+ */
+function _wsTrainSpans(grid, cards) {
+    const gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+    const W = grid.clientWidth;
+    const out = new Map();
+    for (const c of cards) {
+        const t = wsTrainWidth(c);
+        if (!t) continue;
+        const cell = c.querySelector('.ws-cell');
+        const cs = cell ? getComputedStyle(cell) : null;
+        const inner = cell ? cell.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) : c.clientWidth;
+        const chrome = Math.max(0, c.getBoundingClientRect().width - inner);
+        const availAt = (k) => (W - gap * (k - 1)) / k - chrome;
+        out.set(c, { train: t, availAt, span: W < 620 || t > availAt(2) + 1 });
+    }
+    return out;
+}
+
 /** Lay the worksheet grid out: the most columns (<= 3) in which every card fits. */
 export function layoutWorksheetGrid(grid) {
     grid = grid || document.getElementById('worksheetGrid');
@@ -1005,10 +1051,18 @@ export function layoutWorksheetGrid(grid) {
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
     _wsOneDigit(cards);
     _wsOneSupportPlace(cards, true);
+    // (critic cbt r2 E9: a count-row card spans the row only when its train is wider than a 2-column column - mq-train-span;
+    // css/screen-cell.css keeps every other count-row card in the grid, where it must fit its column)
+    const trains = _wsTrainSpans(grid, cards);
+    trains.forEach((t, c) => c.classList.toggle('mq-train-span', t.span));
     for (let cols = maxCols; cols >= 1; cols--) {
         grid.style.setProperty('--mq-wscols', String(cols));
         let ok = true;
-        for (const c of cards) { if (!_wsFitCard(c)) { ok = false; if (cols > 1) break; } }
+        for (const c of cards) {
+            const t = trains.get(c);
+            const trainOut = t && !t.span && cols > 1 && t.train > t.availAt(cols) + 1;
+            if (trainOut || !_wsFitCard(c)) { ok = false; if (cols > 1) break; }
+        }
         if (ok) break;
     }
     _wsOneSupportPlace(cards);

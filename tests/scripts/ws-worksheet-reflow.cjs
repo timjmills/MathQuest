@@ -68,7 +68,21 @@ const exemptOf = (m) => (m && Array.isArray(m.templates) ? [...new Set(m.templat
 function judge(m, b) {
     const out = [];
     if (!m || m.error) return [`WS-REFLOW nothing measured (${m ? m.error : 'no render'})`];
-    if (exemptOf(m).length) return [];
+    // (critic cbt r2 E9, lead ruling 2026-11-14: the exemption is PER CARD) a card that spans the row in a grid that could hold
+    // two columns (>= 620 px) must earn it: a count-row card only when its train is wider than a 2-column column (FULLROW-SPAN),
+    // and any full-row card's content uses >= 50 % of its width (FULLROW-USE). The sheet is exempt from the ratchet only when
+    // every spanning card is such a count-row card.
+    const full = [];
+    if (Array.isArray(m.spans) && m.gridW >= 620) m.spans.forEach((sp, i) => {
+        if (!sp) return;
+        const cr = Array.isArray(m.templates) && (m.templates[i] || []).includes('count-row');
+        if (cr && m.trainWs && m.avail2 && m.trainWs[i] > 0 && m.trainWs[i] <= m.avail2[i] + 1) full.push(`FULLROW-SPAN card ${i + 1} spans the row but its train (${m.trainWs[i]} px) fits a column of a 2-column grid (${m.avail2[i]} px): it stays in the grid (lead ruling 2026-11-14, cbt r3 E9)`);
+        // (the card's usable width: its cell's content box when measured, else the card)
+        const W = m.innerWs && m.innerWs[i] > 0 ? m.innerWs[i] : m.cardWs ? m.cardWs[i] : 0;
+        if (m.contentWs && W > 0 && m.contentWs[i] < 0.5 * W) full.push(`FULLROW-USE card ${i + 1} spans the row but its content uses ${m.contentWs[i]} of ${W} px (${Math.round((100 * m.contentWs[i]) / W)} %, want >= 50 %: critic cbt r2 E9)`);
+    });
+    if (full.length) return full;
+    if (exemptOf(m).length && Array.isArray(m.spans) ? m.spans.some(Boolean) : exemptOf(m).length) return [];
     if (!b) return ['WS-REFLOW no baseline for this key (pin it from master with --pin)'];
     if (m.cols < b.cols) out.push(`WS-REFLOW columns ${b.cols} -> ${m.cols} (the grid dropped a column)`);
     if (m.cardH > b.cardH + TOL_H) out.push(`WS-REFLOW tallest card ${b.cardH} -> ${m.cardH} px (+${Math.round(m.cardH - b.cardH)}, want <= +${TOL_H})`);
@@ -138,8 +152,58 @@ function MEASURE() {
     const templates = cards.map((c) => [...new Set([...c.querySelectorAll('[data-mq-template]')].map((e) => e.getAttribute('data-mq-template')).concat(c.querySelector('.k2-cell.k2-countrow') ? ['count-row'] : []))]);
     const ds = perCard.filter((x) => x > 0);
     const r1 = (x) => Math.round(x * 10) / 10;
+    // (critic cbt r2 E9, lead ruling 2026-11-14 - the PER-CARD exemption and FULLROW-USE): the grid's column track, and per card
+    // whether it spans the row, its count-row train's natural width (the widest line laid out unwrapped: its step tab, then every
+    // number / jump cell and the gaps between them - each is flex:none, so its width does not depend on the card) and the width
+    // its content's ink spans (text, boxes, drawings)
+    const tracks = String(getComputedStyle(g).gridTemplateColumns || '').split(/\s+/).map(parseFloat).filter((x) => x > 0);
+    const colW = tracks.length ? Math.min(...tracks) : 0;
+    const gapOf = (el) => parseFloat(getComputedStyle(el).columnGap) || 0;
+    const natural = (el) => {
+        const kids = Array.from(el.children).filter(vis);
+        if (!kids.length) return el.getBoundingClientRect().width;
+        const inner = el.matches('[data-mq-wrapped]') && !el.classList.contains('k2-countrow-line');
+        if (inner) return kids.reduce((a, k) => a + k.getBoundingClientRect().width, 0) + gapOf(el) * (kids.length - 1);
+        if (getComputedStyle(el).display.includes('flex') && getComputedStyle(el).flexDirection.startsWith('row')) return kids.reduce((a, k) => a + natural(k), 0) + gapOf(el) * (kids.length - 1);
+        return Math.max(...kids.map(natural));
+    };
+    const trainWs = cards.map((c) => { const ls = Array.from(c.querySelectorAll('.k2-countrow-line')).filter(vis); return ls.length ? r1(Math.max(...ls.map(natural))) : 0; });
+    const spans = cards.map((c) => (colW > 0 && c.getBoundingClientRect().width > colW * 1.5 ? 1 : 0));
+    const gridGap = parseFloat(getComputedStyle(g).columnGap) || 0;
+    // the width a card's drawing gets in a column of a 2-column grid (the card's chrome - its padding and the cell's - taken off)
+    const avail2 = cards.map((c) => {
+        const cell = c.querySelector('.ws-cell');
+        if (!cell) return 0;
+        const cs = getComputedStyle(cell);
+        const inner = cell.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+        return r1((g.clientWidth - gridGap) / 2 - Math.max(0, c.getBoundingClientRect().width - inner));
+    });
+    // the width a card's drawing can use: its cell's content box (the card's own padding and border are not room)
+    const innerWs = cards.map((c) => {
+        const cell = c.querySelector('.ws-cell');
+        if (!cell) return r1(c.getBoundingClientRect().width);
+        const cs = getComputedStyle(cell);
+        return r1(cell.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0));
+    });
+    const contentWs = cards.map((c) => {
+        // a count row's content is its drawing's ink - the train (numbers, boxes, jumps) and its rule line - not the keys hint
+        const lines = Array.from(c.querySelectorAll('.k2-countrow-line, .k2-rulebox, .k2-rule')).filter(vis);
+        if (lines.length) {
+            let lo = Infinity, hi = -Infinity;
+            for (const l of lines) for (const el of l.querySelectorAll('*')) { if (!vis(el) || el.children.length) continue; const r = el.getBoundingClientRect(); lo = Math.min(lo, r.left); hi = Math.max(hi, r.right); }
+            if (hi > lo) return r1(hi - lo);
+        }
+        const paper = c.querySelector('.mq-wspaper') || c;
+        let lo = Infinity, hi = -Infinity;
+        const add = (r) => { if (r.width > 0 && r.height > 0) { lo = Math.min(lo, r.left); hi = Math.max(hi, r.right); } };
+        const w = document.createTreeWalker(paper, NodeFilter.SHOW_TEXT);
+        for (let t = w.nextNode(); t; t = w.nextNode()) { if (!/\S/.test(t.nodeValue || '') || !t.parentElement || !vis(t.parentElement) || t.parentElement.closest('.mq-sr, .mq-wsbar')) continue; const rg = document.createRange(); rg.selectNodeContents(t); for (const r of rg.getClientRects()) add(r); }
+        for (const el of paper.querySelectorAll('input, textarea, svg, [data-mq-cell], .k2-tile')) if (vis(el) && !el.closest('.mq-wsbar')) add(el.getBoundingClientRect());
+        return hi > lo ? r1(hi - lo) : 0;
+    });
     return { cards: cards.length, cols, cardH: r1(cardH), cardW: r1(cardW), boxW: r1(boxW), boxH: r1(boxH), digit: ds.length ? r1(Math.min(...ds)) : 0,
-        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1), slotXs, templates };
+        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1), slotXs, templates,
+        colW: r1(colW), gridW: r1(g.clientWidth), spans, trainWs, contentWs, avail2, innerWs, cardWs: cards.map((c) => r1(c.getBoundingClientRect().width)) };
 }
 
 function selfTest() {
@@ -166,6 +230,12 @@ function selfTest() {
         // lead ruling 2026-11-13 (cbt r1 D2): a sheet drawing the count-row template is exempt; any other template is judged
         ['D2 a count-row sheet that spans and grows is exempt', { cols: 1, cardH: 396, cardW: 600, boxW: 144, boxH: 192, digit: 29, templates: [['count-row'], ['count-row']] }, []],
         ['D2 a non-count-row card that grows still fails', { cols: 2, cardH: 337, boxW: 144, boxH: 192, digit: 29, templates: [['k2kit'], []] }, [/tallest card/]],
+        // lead ruling 2026-11-14 (cbt r3 E9): the exemption is per card - a spanning count-row card whose train fits a 2-column column,
+        // or whose content uses under half its width, fails; a train wider than that column spans and is exempt
+        ['E9 a spanning count-row card whose train fits a column fails', { cols: 1, cardH: 428, cardW: 1136, boxW: 136, boxH: 72, digit: 56, templates: [['count-row'], ['count-row']], gridW: 1136, spans: [1, 1], trainWs: [444, 444], avail2: [500, 500], contentWs: [444, 444], cardWs: [1136, 1136] }, [/FULLROW-SPAN card 1/, /FULLROW-USE card 1/, /FULLROW-SPAN card 2/, /FULLROW-USE card 2/]],
+        ['E9 a spanning count-row card whose train is wider than a column is exempt', { cols: 1, cardH: 342, cardW: 1136, boxW: 102, boxH: 72, digit: 56, templates: [['count-row'], ['count-row']], gridW: 1136, spans: [1, 1], trainWs: [1652, 1652], avail2: [500, 500], contentWs: [997, 997], cardWs: [1136, 1136] }, []],
+        ['E9 a spanning card using 40 % of its width fails FULLROW-USE', { cols: 1, cardH: 342, cardW: 1136, boxW: 102, boxH: 72, digit: 56, templates: [['count-row'], ['count-row']], gridW: 1136, spans: [1, 0], trainWs: [1652, 300], avail2: [500, 500], contentWs: [454, 300], cardWs: [1136, 560] }, [/FULLROW-USE card 1/]],
+        ['E9 count-row cards in the grid (none spans) are judged against the baseline', { cols: 2, cardH: 337, boxW: 144, boxH: 192, digit: 29, templates: [['count-row'], ['count-row']], gridW: 1136, spans: [0, 0], trainWs: [444, 444], avail2: [500, 500], contentWs: [444, 444], cardWs: [560, 560] }, [/tallest card/]],
     ];
     let bad = 0;
     for (const [name, m, want] of cases) {
@@ -191,7 +261,7 @@ function judgeFixture(file) {
 async function main() {
     if (has('self-test')) return selfTest();
     if (has('judge-fixture')) return judgeFixture(arg('judge-fixture'));
-    const VALUE = new Set(['skills', 'sample-only', 'baseline']), BOOL = new Set(['pin', 'pin-slots', 'self-test', 'print-widths']);
+    const VALUE = new Set(['skills', 'sample-only', 'baseline', 'json']), BOOL = new Set(['pin', 'pin-slots', 'self-test', 'print-widths']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -246,7 +316,7 @@ async function main() {
                 rows[key] = m;
                 const v = pin ? (m.error ? [`WS-REFLOW nothing measured (${m.error})`] : []) : judge(m, base.keys[key]);
                 for (const f of v) fails.push(`${key}: ${f}`);
-                say(`${key.padEnd(40)} ${m.error ? 'ERR ' + m.error : `${exemptOf(m).length ? `EXEMPT (draws ${exemptOf(m).join(', ')}: lead ruling 2026-11-13) ` : ''}${m.cols} col(s), tallest card ${m.cardH} px (w ${m.cardW}), answer place ${m.boxW} x ${m.boxH}, numeral ${m.digit} px, ${m.slotXs.flat().length} slot x`}${v.length ? '\n    ' + v.join('\n    ') : ''}`);
+                say(`${key.padEnd(40)} ${m.error ? 'ERR ' + m.error : `${exemptOf(m).length ? `EXEMPT (draws ${exemptOf(m).join(', ')}: lead ruling 2026-11-13) ` : ''}${m.cols} col(s), tallest card ${m.cardH} px (w ${m.cardW}), answer place ${m.boxW} x ${m.boxH}, numeral ${m.digit} px, ${m.slotXs.flat().length} slot x${m.spans && m.spans.some(Boolean) ? `; col ${m.colW} px, spanning card(s) ${m.spans.map((x, i) => (x ? `${i + 1} (train ${m.trainWs[i]}, content ${m.contentWs[i]} of ${m.innerWs ? m.innerWs[i] : m.cardWs[i]} px, 2-col column ${m.avail2 ? m.avail2[i] : '?'} px)` : '')).filter(Boolean).join(', ')}` : ''}`}${v.length ? '\n    ' + v.join('\n    ') : ''}`);
             }
         }
     } finally { await app.close(); }
@@ -272,6 +342,8 @@ async function main() {
         say(`${TOOL}: OK (pinned ${Object.keys(rows).length} key(s) from ${head} into ${path.relative(process.cwd(), basePath)})`);
         return;
     }
+    // (--json FILE: every measure as judged, keyed skill@width - a fixture's `measured` comes from here, cbt r3 E9)
+    if (arg('json', null)) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, rows }, null, 1) + '\n');
     const n = skills.length * WIDTHS.length;
     if (fails.length) { say(`${TOOL}: FAIL - ${fails.length} finding(s) (${n} worksheet renders): ${fails.slice(0, 4).join(' | ').slice(0, 600)}`); process.exit(1); }
     say(`${TOOL}: OK (${skills.length} skill(s) x ${WIDTHS.length} widths: columns, card heights, answer places and numerals hold against ${base.pinnedFrom})`);

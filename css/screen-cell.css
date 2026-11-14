@@ -2192,3 +2192,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
     padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
 }
+
+/* critic cbt r2 E9 (lead ruling 2026-11-14): the count-row span is PER CARD. Only a card whose train is wider than a column of a
+   2-column grid takes the whole row (worksheet.js _wsTrainSpans sets mq-train-span); every other count-row card stays in the
+   grid - number_patterns_rule's 4 + 4 train stood in the middle third of a full-row card at 1024 / 1280. ADDITIVE: it overrides
+   the D2 rule above by specificity. ws-worksheet-reflow FULLROW-SPAN / FULLROW-USE. */
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-countrow-wrap):not(.mq-train-span):not(.mq-span-row),
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard:has(.k2-countrow-wrap):not(.mq-train-span):not(.mq-span-row) { grid-column: auto; }
