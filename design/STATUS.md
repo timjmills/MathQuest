@@ -901,3 +901,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-14 — Deploy lf-roles round 10 (narrow critic PASS on the changed pages)
 - Guided fit by the drawn frame (count_by_tables M Model + 4), a lone Guided story sized to its work (two_step_add_then_div), the tries ceiling counts answers consistently; vocab_grade_pictures Guided L gains a try (graded >= 8). Open: X1 count-row stretch on continuation pages, X2 Model alone on a Guided page.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy two-step family (lf-algebra; owner request: fact steps as horizontal sentences; critics r3 print + r4 screen 8/8/8/8)
+- A two-step step that is a basic fact prints as a horizontal number sentence (6 + 4 = [ ], 10 ÷ 2 = [ ]); Step 1 / Step 2 top-aligned; sentences never wrap on screen; the ÷ frame uses master's straight joined bracketSvg (LDIV-JOIN green). Band 50 hidden on 4 presets, RI-DISTINCT, EB-SIDE, touch targets.
+- Lesson baseline re-pinned by the lane (eaf317317): g3-oa8 two-step detailed lesson (61 pages, STEP-FORM / STEP-ALIGN / bracket) and g3-oa9 input-output (40 pages, function-table work NOT yet critic-graded: first on patterns critic r3 after the reset); 13 lane lessons newly pinned.
+- Ledger: 1 stale row restored from master; 7 lane rows written before the 13:00 sweep given reasoned exemptions (ids attached at patterns r3).
+- Known: a lone-Model Guided page on two_step_add_then_div is a ruled exception until the Model is shortened (lf-algebra, after the reset).
