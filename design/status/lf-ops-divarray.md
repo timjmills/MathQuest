@@ -354,3 +354,22 @@ Builder Opus medium. Base master fdfddfdd2; -divarray 62f5bec01 merged (b0a8d8e2
   array 10s band, boxsign: one answer place and one cell height on each sheet).
 - **Not done here (parked or other lanes):** critic r2 D1-D5, D8, D9 (mult_facts / add_facts digit floor) are mult_facts or ruling items.
   ws-print-lint DN-1 (the mult_facts Test ceiling) is moot while Test = Independent is parked.
+
+## Merge with master 369173bc2 (2026-11-14, lf-ops builder, merge commit fded88800)
+
+- Merged origin/master 369173bc2 into the divship branch (pre-merge head c3ad651d3); both sides kept. Ten conflicts: screen-cell.css
+  (both sides' rules, additive), review.js (import union; mult_facts keeps master's geometry), ws-capacity-pin (master's per-skill
+  evaluate and M / L sizes plus divship's option-page probes in one last call), ws-empty-band (RULES union, master's neededMm plus
+  supBelowMm; EB-SUPBAND exempt while its mult row is pending), ws-print-lint (isFillRole plus master's oneRowStripOk), ws-precritic
+  (master's M / L, plus divship's --fill-roles, render-gate-div_facts-sm-array and the role empty-band / capacity-pin gates),
+  ws-screen-slots (master's ONE digit table ws-screen-widths.cjs; div_facts' 56 / 48 worksheet raise moved to master's ratchet pin
+  screen-digit-ratchet.json, now per width; tests/lib/ws-digit-floors.cjs removed), backtests.json and CHECKS_FROM_CRITICS.md (union
+  by row id, nothing dropped), screen-ink-size.json (master's pins; the 24 div_facts array keys / 64 findings dropped: 0 findings on
+  the merged tree; a named re-pin).
+- Hash proof against master 369173bc2 (scratchpad/divship/hash.cjs: 17 roles x M / L x 8 option sets, pupil + key; card / worksheet /
+  quiz x 1366 / 1280 / 1024 / 820): mult_facts 368 / 368 identical to master. div_facts and add_facts print 272 / 272 identical to
+  c3ad651d3; screen: 32 card renders differ on each, all from master 46a7c3c45 (the practice card's #questionPaper carries
+  [data-ws-cell]) - with that attribute stripped, 96 / 96 screen renders identical to c3ad651d3 for both skills.
+- Backtest screen-digit-ws-divfacts re-pointed (fail 369173bc2, pass fded88800): 898f800d7 predates master's card [data-ws-cell], so
+  master's CELL-READ failed its pass state. Re-run: ws-backtest --row screen-digit-ws-divfacts PASS; the other 5 rows PASS. ws-lesson-baseline
+  --all-lessons --check: OK (1772 hashes identical).
