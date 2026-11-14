@@ -8586,6 +8586,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "touch-floor-wrappers",
+   "check": "ws-grade-render --gate TOUCH-TARGET on the screen hosts at 820 / 1024: every answer place inside a wrapper (the word-work sign circle mq-wwork.mq-gl-sign, the vocabulary letter box mq-vm-box, the boxed slot mq-cellbox, the multiplication chart, the long-division bracket) has a hit area of at least 48 x 48 px (lf-placevalue sweep: ~146 findings on passed skills, 46 x 46 inputs inside other wrappers)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TOUCH-TARGET (lf-checks touch floor engine rule, lf-placevalue sweep 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "add_wp_10 worksheet-820 / -1024: the sign circle input.mq-wwork.mq-gl-sign 46 x 46 px; vocab_grade_pictures worksheet-820 / -1024: input.mq-cellslot 46 x 46 px in its 2 px letter box"
+   },
+   "pass": {
+    "commit": "52a9f5369",
+    "state": "the touch floor engine rule (css/screen-cell.css): the sign circle 48 x 48, the letter box 52 px so its input is 48 x 48"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --gate --no-print --skills addition:add_wp_10,vocabulary:vocab_grade_pictures --count 6 --out /tmp/mq-backtest-touch-floor",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

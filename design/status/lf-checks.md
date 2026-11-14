@@ -9,6 +9,36 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-14 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-tt from master 7a5bc902c, builder Opus medium): TOUCH FLOOR
+  engine rule (hand-over item 4, the 820 / 1024 touch-target re-check). lf-placevalue live1's floor
+  `html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-height: 50px !important; }` was NOT on master; it is added
+  verbatim (so the branches merge clean) at the head of one screen-only block at the end of css/screen-cell.css that extends it
+  to every other wrapper: the boxed slot's width (50), the vocabulary letter box (52: a 2 px border), the multiplication chart
+  (k2-multgrid: table by content, every square span >= 48; its rule box 52), long division (font floor 62 px: 50 px tracks,
+  48 px digit inputs), the word-work sign circle (48), fact-family / number-family inputs, the ordering row, the box-division
+  scaffold. Additive; saved quiz HTML keeps its markup.
+  Sweep (44 skills: the 30 passed + the re-check list; ws-grade-render --gate --no-print at 820 / 1024 card, worksheet, quiz):
+  7a5bc902c 482 small targets (128 on passed skills: add_wp_10/_plain, add_wp_20/_plain, sub_wp_10/_plain, sub_wp_20/_plain sign
+  circle 46 x 46; vocab_grade_pictures 46 x 46; unit_form 50 x 46; expand quiz 104 x 46) -> head 0. ws-phone-card TOUCH-TARGET +
+  TOUCH-UNIQUE at 820 / 1024 / 1280 / 1366: 142 -> 0 (base had no TOUCH-UNIQUE run). time_hour and money had no finding on
+  either side. add_wp_10 shows only in ws-grade-render: ws-phone-card counts every mq-wwork as a 44 px working box, grade-render
+  counts the graded sign as an answer (48); the floor satisfies both - the two tools' classes still differ (open, for the lead).
+  HASH-PROOF (ws-phone-card --geom, new: a geometry digest per render; base 7a5bc902c via MQ_ROOT vs head; 528 screens, 1 px
+  tolerance, zoom button / 0-size chrome filtered): 118 screens changed, ALL of them screens that held an under-floor box:
+  passed skills - add_wp_10, add_wp_10_plain, add_wp_20, add_wp_20_plain, sub_wp_10, sub_wp_10_plain, sub_wp_20,
+  sub_wp_20_plain, vocab_grade_pictures, unit_form (worksheet at 820 / 1024 / 1280 / 1366), expand (worksheet x4, quiz 820 /
+  1024); the re-check list - box_division_hard and long_div_2digit (card, worksheet, quiz), mult_chart_easy (card, worksheet,
+  quiz), mult_chart / _headers / _pattern, add_sub_fact_family, mult_div_fact_family, order_negatives (worksheet),
+  arrays_groups / mult_arrays (worksheet, quiz 820 / 1024). Every other passed-skill screen is unchanged. The rules are not
+  width-scoped (as lf-placevalue's is not), so the same under-floor screens also move at 1280 / 1366. The list:
+  design/status/lf-checks/touch-target/changed-screens.txt (the critic's packet); before / after at 1024: add_wp_10 worksheet,
+  vocab_grade_pictures worksheet, mult_chart_easy card in the same folder.
+  Print untouched: ws-lesson-baseline --check 334 hashes identical (pinned from 7a5bc902c); ws-print-lint --source kit
+  add_wp_10 + vocab_grade_pictures OK on both trees. ws-worksheet-reflow: placevalue:expand re-pinned at all four widths (THIS
+  change grew its 48 px boxes: card +3 to +6.5 px, box 75.3 -> 78.5 px tall; slotXs unchanged); OK after.
+  Backtest `touch-floor-wrappers` (commit-pair, ws-grade-render --gate on add_wp_10 + vocab_grade_pictures): FAIL 7a5bc902c ->
+  OK 52a9f5369, PASS; ledger row added (checks-from-critics 187 -> 188 pass, none dropped). ws-precritic --self-test,
+  ws-no-phone-width, ws-no-size-s, ws-boot-smoke, ws-phone-card --self-test OK. Not independently critiqued yet.
 - 2026-11-13 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-touch, builder Opus medium; lf-hosts hand-over d23e42fa6 merged in):
   1. TOUCH-HIT de-flake (ws-phone-card). Measured on d23e42fa6, 3 runs of sub_100_no_regroup + placevalue:expand + add_facts
      (--only TOUCH-HIT, 4 widths x card/worksheet/quiz): run 1 sub_100 1280 card item 1 bottom-right; run 2 expand 1280 item 2
