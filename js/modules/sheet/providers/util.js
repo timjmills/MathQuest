@@ -155,6 +155,7 @@ export function chooseWrong(q, candidates, { rotate = true } = {}) {
  *   say / oralFrame the `Say:` frame (both names, one value): blanks `__` only, never `{unit}`
  *   sayFill         (q) -> the frame with THIS item's numbers (and unit word) in its blanks
  *   whatsNew, vocabulary, rule   when the skill has them
+ *   remember, lessonRule   the lesson's Remember line and chant for this item's kind (roles/lesson.js `ruleFromItems`)
  */
 export function strings(def) {
     const key = def.instructionKey;
@@ -183,6 +184,10 @@ export function strings(def) {
         if (def.whatsNew) out.whatsNew = def.whatsNew;
         if (def.vocabulary) out.vocabulary = def.vocabulary;
         if (def.rule) out.rule = def.rule;
+        // (round-cap r3, lf-placevalue critic live1 r2 N6: a lesson's Remember line and chant for THIS item's kind - '' is "none";
+        // roles/lesson.js prints them where the lesson routine asks, `ruleFromItems`)
+        if (typeof def.remember === 'string') out.remember = def.remember;
+        if (typeof def.lessonRule === 'string') out.lessonRule = def.lessonRule;
         if (typeof def.sentence === 'function') out.sentence = def.sentence;
         if (typeof def.instructionPlural === 'function') out.instructionPlural = def.instructionPlural;
         return out;

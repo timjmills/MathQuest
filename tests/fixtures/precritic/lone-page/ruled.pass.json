@@ -1,0 +1,6 @@
+{
+ "note": "ws-cell-checks LONE-PAGE fixture (lf-roles r9): the page ruled to hold 1 - it passes with a note",
+ "ruled": {
+  "algebra:multi_step_word reason-it M": { "items": 1, "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1" }
+ }
+}

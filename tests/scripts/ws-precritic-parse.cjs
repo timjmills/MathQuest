@@ -8,6 +8,12 @@
 //   card-not-offered on a card WITH a rulings block and no notOffered entry -> N/A (every §7a option offered)
 //   card-not-offered on a card with NO rulings block                        -> SKIPPED (no rulings), unchanged
 //   card-rulings (--check rulings) NO-RULINGS                               -> SKIPPED (no rulings), unchanged
+// Cases (lf-partopts, the options-shots row, 2026-11-13):
+//   options-shots: both skills ok at 1280, 1366, 1024 and 820                -> PASS
+//   options-shots: one skill ok, one `skip ...: no options panel`            -> PASS, the skipped skill named
+//   options-shots: every skill skipped (no options panel)                    -> N/A
+//   options-shots: a `FAIL <key> @<w>` line, verdict FAIL, exit 1            -> FAIL, explained by the findings
+//   options-shots: verdict OK but a scope skill checked at one width only    -> FAIL (checked something else)
 // Cases (lf-partopts, 2026-11-13; PARSE.partOpts):
 //   ws-partopts-unit: OK with every expected check line                     -> PASS
 //   ws-partopts-unit: OK but a check the scope asks for never printed       -> FAIL (it judged nothing for it)
@@ -41,6 +47,31 @@ t(r2.result === 'SKIPPED (no rulings)', `offered row, no block: SKIPPED (got ${r
 const r3 = PARSE.cardRulings(rulingsGate, noBlock, 4);
 t(r3.result === 'SKIPPED (no rulings)', `rulings row, no block: SKIPPED (got ${r3.result})`);
 
+let N = 3;
+if (PARSE.optionsShots) {
+    const keys = ['patterns:pattern_features', 'patterns:growing_shape_patterns'];
+    const W4 = [1280, 1366, 1024, 820];   // the panel's widths (owner scope 2026-11-13; 390 dropped)
+    const osGate = { id: 'options-shots', keys, expect: { skills: 2, widths: W4 } };
+    const all = (k) => W4.map((w) => ok(k, w));
+    const ok = (k, w) => `ok   ${k} @${w}: ink 3.27 %, covers 26.7 %`;
+    const both = [...keys.flatMap((k) => all(k)), '  2 skills × 4 widths (1280, 1366, 1024, 820 px), 1 worker(s), 28 s', 'ws-options-shots: OK (2 skills × 4 widths)'].join('\n');
+    const oneSkip = [`skip ${keys[1]}: no options panel (not checked)`, ...all(keys[0]), 'ws-options-shots: OK (1 skills × 4 widths; 1 skipped, no options panel)'].join('\n');
+    const allSkip = [`skip ${keys[0]}: no options panel (not checked)`, `skip ${keys[1]}: no options panel (not checked)`, '  0 skills × 4 widths (1280, 1366, 1024, 820 px), 1 worker(s), 3 s', 'ws-options-shots: OK (0 skills × 4 widths; 2 skipped, no options panel)'].join('\n');
+    const red = [`FAIL ${keys[0]} @1280: stage (-193,-205) 119×126 is neither inside the 398×140 frame nor over 90 % of it (covers 0.0 %)`, ...all(keys[1]), `FAIL ${keys[0]} @820: the frame's visible crop holds 0.00 % dark pixels (needs > 0.5 %)`, 'ws-options-shots: FAIL (2)'].join('\n');
+    const half = [...all(keys[0]), ok(keys[1], 1280), ok(keys[1], 1366), ok(keys[1], 1024), 'ws-options-shots: OK (2 skills × 4 widths)'].join('\n');
+    const o1 = PARSE.optionsShots(osGate, both, 0);
+    t(o1.result === 'PASS', `options-shots, both checked: PASS (got ${o1.result} ${o1.findings})`);
+    const o2 = PARSE.optionsShots(osGate, oneSkip, 0);
+    t(o2.result === 'PASS' && o2.findings.includes(keys[1]), `options-shots, one skipped: PASS naming it (got ${o2.result} ${o2.findings})`);
+    const o3 = PARSE.optionsShots(osGate, allSkip, 0);
+    t(o3.result === 'N/A', `options-shots, all skipped: N/A (got ${o3.result} ${o3.findings})`);
+    const o4 = PARSE.optionsShots(osGate, red, 1);
+    t(o4.result === 'FAIL' && o4.explainsExit && /2 panel sample/.test(o4.findings), `options-shots, FAIL lines: FAIL explained (got ${o4.result} ${o4.findings})`);
+    const o5 = PARSE.optionsShots(osGate, half, 0);
+    t(o5.result === 'FAIL' && o5.findings.includes(keys[1]), `options-shots, one width missing: FAIL naming it (got ${o5.result} ${o5.findings})`);
+    N += 5;
+}
+
 // ---- lane lf-partopts (PARSE.partOpts)
 const poGate = { id: 'partopts-unit', script: 'ws-partopts-unit', args: ['--lessons', 'number_sense:nearest_10'], expect: { must: ['PO-2d', 'PO-CAP', 'PO-2w walk'] } };
 const poOk = [
@@ -66,6 +97,6 @@ t(p3.result === 'FAIL' && /EB-PAGE/.test(p3.findings) && p3.explainsExit, `parto
 const p4 = PARSE.partOpts(poGate, poErr, 2);
 t(p4.result === 'FAIL' && /could not run/.test(p4.findings), `partopts ERROR: FAIL "could not run" (got ${p4.result} ${p4.findings})`);
 
-const N = 7;
+N += 4;   // (the partopts cases above)
 if (fails.length) { for (const f of fails) console.log(`  FAIL ${f}`); console.log(`ws-precritic-parse: FAIL - ${fails.length} of ${N} case(s)`); process.exit(1); }
 console.log(`ws-precritic-parse: OK (${N} cases)`);

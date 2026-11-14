@@ -1814,6 +1814,12 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // (ONE-ROW, lead ruling R1 / R4a 2026-11-13: a practice page of ONE row held to its work - layout.oneRowMm, `mq-onerow` -
+            // leaves the ruled strip under it; PAGEFILL does not read that strip as a page left unfilled)
+            // (critic r9: the class alone is not enough - the strip is accepted only while it is SHORTER than the one row it holds, i.e.
+            // no second row would fit; oneRowH = the row's height, its ink plus pads)
+            const oneRow = grids.length > 0 && grids.every(g => g.classList.contains('mq-onerow'));
+            const oneRowH = oneRow ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[3])) : 0;
             // L-DENSITY HOLE (wave 1 lane D round 5, critic r4 D-B): a bordered empty run of grid
             // tracks after the last problem (the kit's .ws-cell.blankrun, or any empty bordered cell)
             const holes = [...pg.querySelectorAll('.ws-grid > .ws-cell')].filter(e => {
@@ -1900,7 +1906,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop, holes, repeats,
+                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, oneRowH, holes, repeats,
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
                 doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
@@ -2439,7 +2445,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             // ONE problem a page): a mixed pool's Auto page is a review, at least three problems
             if (info.pool && info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.items > 0 && p.items < 3 && !shortOk)
                 F('L-DENSITY', 'POOL-MIN', 'major', { page: p.idx }, `page ${p.idx} of a mixed pool holds ${p.items} problem(s): a review page holds at least three (RUBRIC H5 / C3, LESSONS L2)`, 'pool page under three problems');
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk && !oneRowStripOk(p.oneRow, p.footRect[1] - p.gridBottom, p.oneRowH)) {
                 // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
                 // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
@@ -3541,6 +3547,10 @@ const LEGACY_SELF_TESTS = [
     { name: 'legacy: ten items per printed page', fixture: { items: 12, perPageDense: true }, expect: [['L-DENSITY', 'DN-1']] },
 ];
 
+/** ONE-ROW strip (lead R1 / R4a; tightened after critic r9): a ruled one-row page's strip passes PAGEFILL only while it is shorter than
+ * the row it holds - a strip a whole row tall means another row fits, and the page is under-filled. */
+function oneRowStripOk(oneRow, stripMm, rowMm) { return !!oneRow && Number(rowMm) > 0 && Number(stripMm) < Number(rowMm); }
+
 async function selfTest() {
     await buildPackHtml(['11']);
     const env = await launchBare();
@@ -3688,6 +3698,14 @@ async function selfTest() {
 module.exports = { wsLintPage, wsPageBox, lintDocument, lintHtmlInSheetPage, analysePdf, CEILINGS, PACK_WAIVERS };
 if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
+    // --onerow-probe fixture.json ({"oneRow": true, "stripMm": n, "rowMm": n}): the ONE-ROW PAGEFILL exemption on a planted page
+    // (critic r9: a one-row page whose strip is a whole row tall still fails). OK / FAIL as a gate (backtest onerow-strip-tight).
+    if (arg('onerow-probe', null)) {
+        const f = JSON.parse(require('fs').readFileSync(arg('onerow-probe'), 'utf8'));
+        const ok = oneRowStripOk(f.oneRow, f.stripMm, f.rowMm);
+        console.log(ok ? `${TOOL}: OK (one-row strip ${f.stripMm} mm under a ${f.rowMm} mm row: accepted)` : `${TOOL}: FAIL - L-DENSITY PAGEFILL: a ${f.stripMm} mm strip under ${f.oneRow ? 'a one-row' : 'an unruled'} page (row ${f.rowMm} mm) - another row fits`);
+        process.exit(ok ? 0 : 1);
+    }
     // --support-fixture file.html: L-SUPPORT (supportCheckInPage) on a planted document - a backtest fixture (Lane D R4
     // prep: the RP-1 skip-strip ruling, tests/fixtures/precritic/rp1-skipstrip.{fail,pass}.html). OK / FAIL as a gate.
     if (arg('support-fixture', null)) {
