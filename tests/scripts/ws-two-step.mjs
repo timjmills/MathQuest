@@ -37,6 +37,10 @@
 //              page composes on every two-step skill at M and L (seeds 7, 11): buildSheet does not refuse the skill and the page holds an
 //              item, so a wrong shown value fits the answer box it is written in (the ÷-last step's wrong operation, 27 x 3 = 81, did not fit
 //              the one-digit quotient box, so the role rejected every add_then_div item and the page came out empty)
+//   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
+//              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
+//   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
+//              step, every dealt ÷ step being a fact), the bracket's top end meets the bar within 0.3 mm at M and L, print and screen
 // Skills outside the card print OK (n/a).
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
@@ -58,6 +62,7 @@ if (!mine.length) { console.log(`${TOOL}: OK (n/a: no two-step skill in scope)`)
 
 if (args.includes('--print')) await printMode();
 if (args.includes('--ea')) await eaMode();
+if (args.includes('--ldiv')) await ldivMode();
 
 const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
 const app = await loadApp(ROOT);
@@ -250,15 +255,55 @@ for (const key of mine) {
     }
 }
 
+// STEP-FORM (owner request 2026-11-14, via the lead: a two-step story's basic-fact step is a horizontal number sentence, not a
+// column or a long-division frame - "6 + 4 = [ ]", "10 ÷ 2 = [ ]"; the stray "1" carry box over 6 + 4 on the add_then_div Opener
+// Model). A BASIC FACT: + / − within 20 with no regrouping (or both numbers one digit: 6 + 4, 15 − 7), × / ÷ within the 10 x 10
+// facts. Every other step keeps its frame (columns; long division for a multi-digit dividend that is no fact). Judged on the paper
+// cell (the Model / Guided level 3 and the practice level 0, blank and answered) and on the screen twin (q.visual), 24 items a skill.
+const isFact = (st) => {
+    const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+    if (st.op === '+') return st.ans <= 20 && ((x < 10 && y < 10) || (x % 10) + (y % 10) < 10);
+    if (st.op === '-') return x <= 20 && ((y < 10 && st.ans < 10) || (x % 10) >= (y % 10));
+    if (st.op === '*') return x <= 10 && y <= 10;
+    if (st.op === '/') return y >= 1 && y <= 10 && !st.r && st.q <= 10;
+    return false;
+};
+const stepSegments = (html) => String(html).split('class="mq-wwstep"').slice(1);
+for (const key of mine) {
+    const sk = short(key);
+    let judged = 0;
+    const bad = [];
+    for (let i = 0; i < 24 && bad.length < 6; i++) {
+        const q = gen(sk, undefined, i, `form:${sk}`);
+        const p = q && q.cell && q.cell.payload;
+        if (!p || !Array.isArray(p.steps) || p.steps.length !== 2 || p.layout) continue;    // the column story only (frames / choose have no columns)
+        for (const [host, html] of [['paper L3', render(q, { scaffoldLevel: 3 })], ['paper L0 key', render(q, { scaffoldLevel: 0, state: 'answered' })], ['screen', String(q.visual || '')]]) {
+            const segs = stepSegments(html);
+            if (segs.length !== 2) continue;
+            judged++;
+            p.steps.forEach((st, k) => {
+                const seg = segs[k];
+                const fact = isFact(st);
+                const sentence = /mq-wwfact/.test(seg), frame = /mq-wwcols/.test(seg);
+                const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+                if (fact && (!sentence || frame)) bad.push(`${sk} item ${i} ${host}: Step ${k + 1} ${x} ${st.op} ${y} is a basic fact but draws ${frame ? (st.op === '/' ? 'a long-division frame' : 'columns') : 'no number sentence'}`);
+                if (!fact && (!frame || sentence)) bad.push(`${sk} item ${i} ${host}: Step ${k + 1} ${x} ${st.op} ${y} is no basic fact but draws ${sentence ? 'a fact sentence' : 'no frame'}`);
+            });
+        }
+    }
+    if (!judged && !/letter|estimate/.test(sk)) fail('STEP-FORM', `${sk}: no column two-step cell rendered`);   // (letter / estimate: frames sentences, no columns)
+    for (const b of bad.slice(0, 6)) fail('STEP-FORM', b);
+}
+
 // --rules A,B: only those rules' findings count (a backtest row proves its own rules on commits before later rules existed)
 const ONLY = String(arg('--rules', '')).split(',').map((x) => x.trim()).filter(Boolean);
 if (ONLY.length) for (let i = fails.length - 1; i >= 0; i--) if (!ONLY.includes(fails[i].split(' ')[0])) fails.splice(i, 1);
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
-for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH', 'BAND-BITES']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH', 'BAND-BITES', 'STEP-FORM']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
 for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
-console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES)`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM)`);
 process.exit(fails.length ? 1 : 0);
 
 /** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
@@ -358,5 +403,60 @@ async function eaMode() {
     console.log(`EA-COMPOSES ${out.length ? `FAIL ${out.length}` : 'PASS'}`);
     for (const f of out.slice(0, 30)) console.log(`  ${f}`);
     console.log(out.length ? `${TOOL}: FAIL (--ea: ${out.length} finding(s))` : `${TOOL}: OK (--ea: EA-COMPOSES, ${mine.length} skill(s))`);
+    process.exit(out.length ? 1 : 0);
+}
+
+// LDIV-JOIN (--ldiv, browser; owner 2026-11-14 "the long-division sign looks disconnected", lf-ops' rule): wherever a two-step step
+// still draws long division, the bracket's top end meets the bar within 0.3 mm, at M and L, in print and on the screen twin. Every
+// dealt ÷ step of the seven skills is a basic fact (STEP-FORM: a sentence), so the frame is judged on a real add_then_div item whose
+// Step 2 is set to 84 ÷ 4 = 21 (a multi-digit dividend that is no fact).
+async function ldivMode() {
+    if (!mine.includes('algebra:two_step_add_then_div') && !mine.includes('algebra:two_step_mult_div_first')) { console.log(`${TOOL}: OK (--ldiv n/a: no ÷ two-step skill in scope)`); process.exit(0); }
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const out = [];
+    let judged = 0;
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.generateQuestionFor === 'function', { timeout: 60000 });
+        for (const size of ['M', 'L']) for (const twin of [false, true]) {
+            const r = await app.page.evaluate(async (a) => {
+                const kit = await import('/js/modules/sheet/index.js');
+                const q = window.generateQuestionFor({ category: 'algebra', skill: 'two_step_add_then_div', seed: 7, itemIndex: 0 });
+                const p = JSON.parse(JSON.stringify(q.cell.payload));
+                p.steps = [{ a: 50, b: 34, op: '+', ans: 84, top: 50, bottom: 34 }, { a: 84, b: 4, op: '/', ans: 21, q: 21, r: 0, top: 84, bottom: 4 }];
+                p.ans = 21; p.bar2 = false;
+                const ctx = { mode: 'print', size: a.size, look: 'ican', state: 'answered', scaffoldLevel: 0 };
+                if (a.twin) ctx.options = { twin: true };
+                let html = '';
+                try { html = kit.renderCell({ cell: { template: 'word-work', payload: p } }, ctx); } catch (e) { return { err: e.message }; }
+                const host = document.createElement('div');
+                host.style.cssText = 'position:absolute;left:0;top:0;width:186mm;background:#fff;';
+                host.innerHTML = html; document.body.appendChild(host);
+                await document.fonts.ready;
+                const div = host.querySelector('.mq-wwdiv');
+                if (!div) { host.remove(); return { none: true }; }
+                const path = div.querySelector('svg path');
+                const pt = (len) => { const m = path.getScreenCTM(); const q0 = path.getPointAtLength(len); return { x: q0.x * m.a + q0.y * m.c + m.e, y: q0.x * m.b + q0.y * m.d + m.f }; };
+                const ends = [pt(0), pt(path.getTotalLength())].sort((u, v) => u.y - v.y);
+                const top = ends[0];
+                // the bar: a separate element with a solid top border (the vinculum), else the path itself draws it (one stroke)
+                const bar = [...div.querySelectorAll('span')].find((e) => getComputedStyle(e).borderTopStyle === 'solid' && getComputedStyle(e).borderBottomStyle === 'none' && getComputedStyle(e).borderLeftStyle === 'none' && parseFloat(getComputedStyle(e).borderTopWidth) > 0.5 && e.getBoundingClientRect().height < 4);
+                let gap = 0;
+                if (bar) { const b = bar.getBoundingClientRect(); const bw = parseFloat(getComputedStyle(bar).borderTopWidth); const bx = b.left, by = b.top + bw / 2; gap = Math.hypot(top.x - bx, top.y - by); }
+                host.remove();
+                return { gapMm: gap * 25.4 / 96, sep: !!bar };
+            }, { size, twin });
+            const where = `84 ÷ 4 ${size} ${twin ? 'screen' : 'print'}`;
+            if (r.err) { out.push(`${where}: render threw ${r.err}`); continue; }
+            if (r.none) { out.push(`${where}: no long-division frame drawn for a 2-digit dividend that is no fact`); continue; }
+            judged++;
+            if (r.gapMm > 0.3) out.push(`${where}: the bracket's top end is ${r.gapMm.toFixed(2)} mm from the bar (limit 0.3 mm; one connected stroke)`);
+            if (VERBOSE) console.log(`  ${where}: gap ${r.gapMm.toFixed(2)} mm${r.sep ? ' (separate bar)' : ' (one path)'}`);
+        }
+    } finally { await app.close(); }
+    console.log(`LDIV-JOIN ${out.length ? `FAIL ${out.length}` : 'PASS'}`);
+    for (const f of out) console.log(`  LDIV-JOIN ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--ldiv: ${out.length} finding(s))` : `${TOOL}: OK (--ldiv: LDIV-JOIN, ${judged} frame(s))`);
     process.exit(out.length ? 1 : 0);
 }
