@@ -1127,7 +1127,7 @@ async function r7Checks(page, fail, sheet) {
     // ---- the print pages: pupil hash, key highlight GREY only
     const hashes = {};
     let keyHalos = 0;
-    for (const skillId of SK) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) for (const seed of [7, 143869]) {
+    for (const skillId of SK) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['M', 'L']) for (const seed of [7, 143869]) {   // (S dropped, owner plan item 9: M and L only, as master's empty-band.json)
         const r = await page.evaluate(async (a) => {
             try {
                 const x = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'vocabulary', skillId: a.skillId }] }], size: a.size, paper: 'A4', seed: a.seed, key: true });
