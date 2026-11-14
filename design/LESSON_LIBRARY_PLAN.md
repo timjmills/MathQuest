@@ -155,12 +155,12 @@ different sizes they need to work, or they default to their needed size and prob
 
 - **The lesson packet prints at one size** (the anchor chart and lesson sheet at their designed size; the size control is
   not offered for the Lesson role, with a required tooltip saying why). The S→M notice is retired.
-- **Practice and mixed pages honour the teacher's size S / M / L.** Every item that CAN be drawn at the chosen size is.
+- **Practice and mixed pages honour the teacher's size M / L.** Every item that CAN be drawn at the chosen size is.
 - **An item that cannot be drawn at the chosen size keeps its minimum needed size** (a per-template `minSize`, e.g. the
   regroup stack at M, a clock or graph at its readable floor), and the page packs the other items around it: the
   paginator places mixed-height and mixed-width items together (rows grouped by height, spanning cells where needed) with
   no blank strips — never shrinking content below its floor and never forcing the whole page up a size.
-- Gate: a mixed page at S that contains a `minSize: M` item must still hold more items than the same page at L, keep every
+- Gate: a mixed page at M that contains a `minSize: M` item must still hold more items than the same page at L, keep every
   item at or above its floor, and pass H13; `ws-lesson-check` and `ws-layout-unit` carry this case.
 
 ## 8b. Owner ruling: every lesson opens with a prerequisite check (2026-09-26)
@@ -248,7 +248,7 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
 
 | Paper | Absorbs | Options on the one paper |
 |---|---|---|
-| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix of skills by weight** — every skill in the set carries its own **weight** option (its share of the items, e.g. 3 : 1 : 1), set in that skill's options; no fixed cap (owner, 2026-09-26). **"Mix in prerequisite skills"** (owner, 2026-09-26): an option that lists ALL of the skill's prerequisite skills (from the lesson library's prerequisite graph, `prerequisiteSkillsFor(skill)`; for a skill without a lesson, the skills of the WRM steps before it and its CCSS progression) as choices — none ticked by default; each one the teacher ticks joins the set with its own weight; **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word problems are **skills, not a paper type** (owner): a word-problem skill on a Practice or Quiz paper gets its story-with-work layout automatically. Built on the lesson practice and mixed page designs. |
+| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix of skills by weight** — every skill in the set carries its own **weight** option (its share of the items, e.g. 3 : 1 : 1), set in that skill's options; no fixed cap (owner, 2026-09-26). **"Mix in prerequisite skills"** (owner, 2026-09-26): an option that lists ALL of the skill's prerequisite skills (from the lesson library's prerequisite graph, `prerequisiteSkillsFor(skill)`; for a skill without a lesson, the skills of the WRM steps before it and its CCSS progression) as choices — none ticked by default; each one the teacher ticks joins the set with its own weight; **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word problems are **skills, not a paper type** (owner): a word-problem skill on a Practice or Quiz paper gets its story-with-work layout automatically. Built on the lesson practice and mixed page designs. <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | **Quiz** | Test A / Test B | **the Practice paper engine with scoring and tagging on** (owner): build by CCSS domain, CCSS standard / part, EE, WRM unit / step, lesson, or skills; every question tagged to its standards (tags on the key only); score per question, custom score per question or per question type; a per-standard breakdown on the key; versions A, B…; size. Details: `design/TEACHER_SCREENS.md` → Make quiz. The on-screen Quiz Builder is separate and unchanged. |
 | **Lesson** | Lesson packet, Prerequisite check, Worked example (anchor chart), Guided (We Do), Lesson opener, Pre-skill check | **parts** to print (default all: Prerequisite Check, anchor chart, lesson sheet with We Do, practice, mixed); one size (§8a). The stand-alone Guided / Worked example / Prerequisite pages exist only as parts of a lesson. **Every lesson must HAVE all parts** (a lesson missing a part is incomplete and fails `ws-lesson-coverage`); the teacher **selects which parts to print**, and can **refresh any part with new numbers** — each part (and the chart's worked examples) has its own seed, so refreshing one part re-deals it without changing the others, and the key follows. |
 
@@ -258,7 +258,7 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
   (`independent`/`more-practice`/`mixed-practice`/`review`/`fact-rows`/`fact-probe` → Practice; `word-problems` → Practice with those skills;
   `test`/`test-b` → Quiz versions; `lesson`/`opener`/`pre-skill-check`/`scripted-model`/`guided` → Lesson with the
   matching part). Paused roles still print from old saved sets.
-- **The 8/10 pass bar now covers:** Practice (single skill and mixed, at S and L, with its key), Quiz (with its key),
+- **The 8/10 pass bar now covers:** Practice (single skill and mixed, at M and L, with its key), Quiz (with its key),
   the Lesson where the skill has one, the three screen hosts (practice card, online worksheet, quiz) and the option panel.
   Stand-alone Guided, Worked example, Review, Opener, Pre-skill check and the thinking pages are no longer graded as
   separate pages.

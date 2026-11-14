@@ -198,7 +198,7 @@ const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 
 const fillRoles = (arg('fill-roles', 'independent,more-practice') || '').split(',').map((r) => r.trim()).filter(Boolean);
 const isFillRole = (role) => fillRoles.includes(role);
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'TOPSTART-STRETCH'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -978,6 +978,30 @@ function wsLintPage(cfg) {
            and the key's answer stamp excluded); the band is measured inside the cell's padding. */
         if (!isLegacy) {
             const topRows = [];   // H13-ROW: the top cells of this page, judged against their row after the loop
+            /* CL-4b / CL-4d TWIN ROW (lead ruling (a), 2026-11-13 13:35; lf-placevalue checks pass): H13 exempts the white
+               above and below a CL-4d centred one-line cell (data-ws-stretchmid, the cell's own line, centred) when its row's
+               height is set by a SIBLING's measured ink - another cell of the row (same top and height within 1 mm; a model /
+               worked twin included, which the band loop itself skips) whose ink is taller and fills its own box (inside
+               its pads) to under 30 % white - and each band is at most 40 % of the cell. A row stretched by page fill (no taller sibling) still
+               counts, and so does a band over 40 %. */
+            const inkOf = (c) => {
+                let t = Infinity, b = -Infinity;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!visible(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    const ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') continue;
+                    const ink = [...d.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img|canvas)$/i.test(d.tagName)
+                        || ['Top', 'Bottom', 'Left', 'Right'].some(k => parseFloat(ds[`border${k}Width`]) > 0 && ds[`border${k}Style`] !== 'none');
+                    if (!ink) continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+                }
+                return t === Infinity ? 0 : b - t;
+            };
+            const rowCells = ri.cells.map(c => { const r = c.getBoundingClientRect(); const cs = getComputedStyle(c); return { c, top: r.top, H: r.height, inkH: inkOf(c), innerH: r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) }; });
+            const twinSizes = (c, top, H, inkH) => rowCells.some(b => b.c !== c && Math.abs(b.top - top) <= PX && Math.abs(b.H - H) <= PX
+                && b.inkH > inkH + PX && (b.innerH - b.inkH) < 0.3 * b.innerH);
             for (const c of ri.cells) {
                 if (c.classList.contains('blankrun') || c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
                 const cr = c.getBoundingClientRect();
@@ -1026,7 +1050,28 @@ function wsLintPage(cfg) {
                     inkTop = Math.min(inkTop, r.top); inkBot = Math.max(inkBot, r.bottom);
                 }
                 if (inkTop === Infinity) { inkTop = box.t; inkBot = box.b; }
-                if (judged && fits && wa) {
+                /* CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): the CL-4b stretch exception. A one-line
+                   cell answered in place that opts in (data-ws-stretchmid on its template root) is centred down its box when its
+                   row stretches it by 30 % or more (the room inside the pads at least 1.3 x its content), within 2 mm; a row that
+                   stretches it less keeps the top of the box (the top rule below, 3 mm). OPT-IN rule TOPSTART-STRETCH
+                   (--rules, --rule-skills) judges every ONE-LINE cell of the named skills the same way, marked or not, so a
+                   stretched one-line cell left at the top of its box is found before the attribute exists. */
+                const smMark = c.hasAttribute('data-ws-stretchmid') || !!c.querySelector(':scope > [data-ws-stretchmid]');   // the one line IS the cell (a Guided try's line over its hint is two)
+                let smLine = false;
+                if (!smMark && optOn('TOPSTART-STRETCH') && inkTop < Infinity) {
+                    let fs = 0;
+                    for (const d of c.querySelectorAll('*')) {
+                        if (!visible(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                        if ([...d.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) fs = Math.max(fs, parseFloat(getComputedStyle(d).fontSize) || 0);
+                    }
+                    smLine = fs > 0 && (inkBot - inkTop) <= 1.8 * fs;
+                }
+                const smCell = judged && fits && !wa && (smMark || smLine);
+                const stretch = (inner.b - inner.t) / Math.max(1, box.b - box.t);
+                if (smCell && stretch >= 1.3) {
+                    const off = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);
+                    if (Math.abs(off) > 2 * PX) F('L-TOPSTART', smMark ? 'CL-4d' : 'TOPSTART-STRETCH', 'major', c, `a one-line cell in a row that stretches it ${Math.round((stretch - 1) * 100)} % is ${mm(Math.abs(off))} mm ${off < 0 ? 'above' : 'below'} the cell's centre, ${mm(Math.max(inner.b - box.b, 0))} mm (${Math.round((Math.max(inner.b - box.b, 0) / H) * 100)} %) empty under it: a row that stretches a one-line cell by 30 % or more centres it down the box (CL-4d, lead 2026-11-13)`, 'stretched one-line cell not centred');
+                } else if (judged && fits && wa) {
                     const off = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);   // the laid-out problem, answer zone included
                     if (Math.abs(off) > 2 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `write-above cell is ${mm(Math.abs(off))} mm ${off < 0 ? 'above' : 'below'} the cell's centre: the pupil writes above this problem, so it is centred down the box (CL-4b)`, 'write-above not centred');
                 } else if (judged && fits) {
@@ -1034,7 +1079,14 @@ function wsLintPage(cfg) {
                     const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab, :scope > [data-ws-label]');
                     if (lab) top = Math.max(top, lab.getBoundingClientRect().bottom + 1 * PX);   // CL-40 / CL-41: just below the tab
                     const gap = inkTop - top;
-                    if (gap > 3 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, 'not at top of box');
+                    // (CL-4d: an unstretched one-line cell CENTRED down its box fails even inside the 3 mm - its line sits
+                    // visibly down (over 1.5 mm) with as much white above as below, which the lead ruled is the top's place)
+                    const smOff = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);
+                    if (smCell && gap <= 3 * PX && gap > 1.5 * PX && Math.abs(smOff) <= 1 * PX) F('L-TOPSTART', smMark ? 'CL-4d' : 'TOPSTART-STRETCH', 'major', c,
+                        `a one-line cell its row stretches only ${Math.round((stretch - 1) * 100)} % (under 30 %) is centred down its box, ${mm(gap)} mm below the top pad: an unstretched cell keeps the top of the box (CL-4b, CL-4d)`, 'unstretched one-line cell centred');
+                    if (gap > 3 * PX) F('L-TOPSTART', smCell ? (smMark ? 'CL-4d' : 'TOPSTART-STRETCH') : 'CL-4b', 'major', c, smCell
+                        ? `first printed row starts ${mm(gap)} mm below the top pad of a one-line cell its row stretches only ${Math.round((stretch - 1) * 100)} % (under 30 %): an unstretched cell keeps the top of the box (CL-4b, CL-4d)`
+                        : `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, smCell ? 'unstretched one-line cell centred' : 'not at top of box');
                 }
                 // CL-4b: under a top cell the band below the problem is writing room, not a sizing error.
                 // (a cell answered IN PLACE - data-ws-inplace: the sentence-layout story, the fact-family check - holds no
@@ -1044,7 +1096,13 @@ function wsLintPage(cfg) {
                 const topCell = judged && !wa && getComputedStyle(c).justifyContent === 'flex-start' && !inPlace;
                 // (an in-place cell's band is read to its drawn edge, the bottom pad included: the empty paper the pupil sees -
                 // the critic's pixel scan - not the padding box; a 41 mm story in a 57 mm cell read 28 % inside its pads)
-                const vBand = topCell ? Math.max(box.t - inner.t, 0) : inPlace ? Math.max(box.t - inner.t, cr.bottom - box.b, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
+                const vBand0 = topCell ? Math.max(box.t - inner.t, 0) : inPlace ? Math.max(box.t - inner.t, cr.bottom - box.b, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
+                // CL-4d twin row (ruling above): a centred stretchmid line in a row its taller sibling sizes, each band <= 40 %
+                const twinMid = smMark && judged && fits && !wa && stretch >= 1.3
+                    && Math.abs(((box.t + box.b) / 2) - ((inner.t + inner.b) / 2)) <= 2 * PX
+                    && Math.max(box.t - inner.t, 0) <= 0.4 * H && Math.max(inner.b - box.b, 0) <= 0.4 * H
+                    && twinSizes(c, cr.top, H, inkBot - inkTop);
+                const vBand = twinMid ? 0 : vBand0;
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
@@ -1053,7 +1111,7 @@ function wsLintPage(cfg) {
                    kit cell of a pupil page, judged absolutely - at least 30 % of the cell height less the answer's own
                    writing room Hw is a row sized for more than the item draws (value L 34 % in every cell of every row,
                    which H13-ROW cannot see). */
-                if (optOn('H13-ABS') && !ri.key && c.hasAttribute('data-ws-cell') && inkBot > -Infinity) {
+                if (optOn('H13-ABS') && !ri.key && c.hasAttribute('data-ws-cell') && inkBot > -Infinity && !twinMid) {
                     const hw = hwPx(c);
                     // the answer's own room counts as content: an open slot (a fact's answer row, a stack's write-under
                     // zone) is a box with no ink, so the lowest of the ink and every EMPTY slot box is where the item ends (a slot that holds
@@ -1616,6 +1674,12 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // (ONE-ROW, lead ruling R1 / R4a 2026-11-13: a practice page of ONE row held to its work - layout.oneRowMm, `mq-onerow` -
+            // leaves the ruled strip under it; PAGEFILL does not read that strip as a page left unfilled)
+            // (critic r9: the class alone is not enough - the strip is accepted only while it is SHORTER than the one row it holds, i.e.
+            // no second row would fit; oneRowH = the row's height, its ink plus pads)
+            const oneRow = grids.length > 0 && grids.every(g => g.classList.contains('mq-onerow'));
+            const oneRowH = oneRow ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[3])) : 0;
             // L-DENSITY HOLE (wave 1 lane D round 5, critic r4 D-B): a bordered empty run of grid
             // tracks after the last problem (the kit's .ws-cell.blankrun, or any empty bordered cell)
             const holes = [...pg.querySelectorAll('.ws-grid > .ws-cell')].filter(e => {
@@ -1702,7 +1766,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop, holes, repeats,
+                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, oneRowH, holes, repeats,
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
                 doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
@@ -2246,7 +2310,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             // ONE problem a page): a mixed pool's Auto page is a review, at least three problems
             if (info.pool && info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.items > 0 && p.items < 3 && !shortOk)
                 F('L-DENSITY', 'POOL-MIN', 'major', { page: p.idx }, `page ${p.idx} of a mixed pool holds ${p.items} problem(s): a review page holds at least three (RUBRIC H5 / C3, LESSONS L2)`, 'pool page under three problems');
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && isFillRole(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && isFillRole(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk && !oneRowStripOk(p.oneRow, p.footRect[1] - p.gridBottom, p.oneRowH)) {
                 // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
                 // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
@@ -2989,6 +3053,93 @@ const SELF_TESTS = [
         c.style.justifyContent = 'flex-start';
         c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
     } },
+    // CL-4d (lead 2026-11-13): a one-line cell that opts in (data-ws-stretchmid) is centred when its row stretches it by 30 % or
+    // more, keeps the top of the box when it does not; the opt-in TOPSTART-STRETCH judges an unmarked one-line cell the same way.
+    // CL-4d TWIN ROW (lead ruling (a) 2026-11-13 13:35): the centred stretchmid line beside a taller sibling that sizes the row
+    // (compare's ex-each worked twin) is exempt from H13 while each band is at most 40 % of the cell; a band over 40 %, or a row
+    // stretched by page fill with no taller sibling, still counts. (rowMm: the row; twinMm: the sibling's drawn box, 0 = a second
+    // one-line cell)
+    ...[['twin-sized centred line, bands <= 40 % (CL-4d twin row): exempt', 48, 40, null],
+        ['twin-sized centred line, one band > 40 % (CL-4d twin row): counts', 80, 72, ['L-DENSITY', 'H13']],
+        ['page-fill centred line, no taller sibling (CL-4d twin row): counts', 48, 0, ['L-DENSITY', 'H13']]].map(([name, rowMm, twinMm, want]) => ({
+        name, expect: want || [], absent: want ? undefined : ['L-DENSITY', 'H13'], fn: new Function(`
+        const MM = 96 / 25.4;
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        const g = c.closest('.ws-grid');
+        let d = c.nextElementSibling; while (d && !d.matches('[data-ws-cell]')) d = d.nextElementSibling;
+        if (!d) { d = c.cloneNode(true); c.after(d); }
+        g.style.gridTemplateColumns = '44mm 44mm';
+        const line = '<div data-ws-stretchmid="1" style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>';
+        for (const k of [c, d]) { k.setAttribute('data-ws-cell', 'pv'); [...k.children].forEach(x => x.remove()); k.style.setProperty('justify-content', 'center', 'important'); }
+        c.insertAdjacentHTML('beforeend', line);
+        d.insertAdjacentHTML('beforeend', ${twinMm} ? '<div style="height:${twinMm}mm;width:36mm;margin:0 auto;border:0.75pt solid #000"></div>' : line);
+        [...g.children].forEach(x => { if (x !== c && x !== d) x.remove(); });
+        g.style.gridTemplateRows = (${rowMm} * MM) + 'px';
+    `) })),
+    { name: 'stretched one-line cell centred (CL-4d)', expect: [], absent: ['L-TOPSTART', 'CL-4d'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'center', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'stretched one-line cell at the top of its box (CL-4d)', expect: ['L-TOPSTART', 'CL-4d'], msg: /stretches it/, fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'unstretched cell centred (CL-4d)', expect: ['L-TOPSTART', 'CL-4d'], msg: /only \d+ %/, fn: () => {
+        // 30 mm of content in a row whose room inside the pads is 1.25 x it: centred, it starts 3.75 mm down
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => k.remove());   // no tab: the top rule reads from the top pad
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div style="height:30mm;width:20mm;margin:0 auto;border:0.75pt solid #000"></div></div>');
+        c.style.setProperty('justify-content', 'center', 'important');
+        const cs = getComputedStyle(c), MM = 96 / 25.4;
+        const pads = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        c.closest('.ws-grid').style.gridTemplateRows = `${30 * 1.25 * MM + pads}px repeat(20, auto)`;
+    } },
+    // ... and inside the 3 mm too: 32 mm of content centred in a row 1.17 x it starts 2.7 mm down (the neighbour cells keep the row)
+    { name: 'unstretched one-line cell centred within 3 mm (CL-4d)', expect: ['L-TOPSTART', 'CL-4d'], msg: /is centred down its box/, fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => k.remove());
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div style="height:32mm;width:20mm;margin:0 auto;border:0.75pt solid #000"></div></div>');
+        c.style.setProperty('justify-content', 'center', 'important');
+        const cs = getComputedStyle(c), MM = 96 / 25.4;
+        const pads = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        c.closest('.ws-grid').style.gridTemplateRows = `${32 * 1.17 * MM + pads}px repeat(20, auto)`;
+    } },
+    { name: 'the same unstretched one-line cell at the top (CL-4d control)', expect: [], absent: ['L-TOPSTART', 'CL-4d'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => k.remove());
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div style="height:32mm;width:20mm;margin:0 auto;border:0.75pt solid #000"></div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        const cs = getComputedStyle(c), MM = 96 / 25.4;
+        const pads = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        c.closest('.ws-grid').style.gridTemplateRows = `${32 * 1.17 * MM + pads}px repeat(20, auto)`;
+    } },
+    { name: 'stretched one-line cell at the top, unmarked (TOPSTART-STRETCH opt-in)', rules: ['TOPSTART-STRETCH'], expect: ['L-TOPSTART', 'TOPSTART-STRETCH'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'the same cell with the rule off (TOPSTART-STRETCH opt-in control)', expect: [], absent: ['L-TOPSTART', 'TOPSTART-STRETCH'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
     // CL40-INK (CL-40, critic 2026-10-24 D1): a top-started across fact whose first digit sits on the number tab's
     // bottom-right corner. The plant puts a digit-size glyph where "48 ÷ 12" put its "4": just right of the tab, its
     // ink top level with the tab's bottom edge.
@@ -3276,6 +3427,10 @@ const LEGACY_SELF_TESTS = [
     { name: 'legacy: ten items per printed page', fixture: { items: 12, perPageDense: true }, expect: [['L-DENSITY', 'DN-1']] },
 ];
 
+/** ONE-ROW strip (lead R1 / R4a; tightened after critic r9): a ruled one-row page's strip passes PAGEFILL only while it is shorter than
+ * the row it holds - a strip a whole row tall means another row fits, and the page is under-filled. */
+function oneRowStripOk(oneRow, stripMm, rowMm) { return !!oneRow && Number(rowMm) > 0 && Number(stripMm) < Number(rowMm); }
+
 async function selfTest() {
     await buildPackHtml(['11']);
     const env = await launchBare();
@@ -3423,6 +3578,14 @@ async function selfTest() {
 module.exports = { wsLintPage, wsPageBox, lintDocument, lintHtmlInSheetPage, analysePdf, CEILINGS, PACK_WAIVERS };
 if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
+    // --onerow-probe fixture.json ({"oneRow": true, "stripMm": n, "rowMm": n}): the ONE-ROW PAGEFILL exemption on a planted page
+    // (critic r9: a one-row page whose strip is a whole row tall still fails). OK / FAIL as a gate (backtest onerow-strip-tight).
+    if (arg('onerow-probe', null)) {
+        const f = JSON.parse(require('fs').readFileSync(arg('onerow-probe'), 'utf8'));
+        const ok = oneRowStripOk(f.oneRow, f.stripMm, f.rowMm);
+        console.log(ok ? `${TOOL}: OK (one-row strip ${f.stripMm} mm under a ${f.rowMm} mm row: accepted)` : `${TOOL}: FAIL - L-DENSITY PAGEFILL: a ${f.stripMm} mm strip under ${f.oneRow ? 'a one-row' : 'an unruled'} page (row ${f.rowMm} mm) - another row fits`);
+        process.exit(ok ? 0 : 1);
+    }
     // --support-fixture file.html: L-SUPPORT (supportCheckInPage) on a planted document - a backtest fixture (Lane D R4
     // prep: the RP-1 skip-strip ruling, tests/fixtures/precritic/rp1-skipstrip.{fail,pass}.html). OK / FAIL as a gate.
     if (arg('support-fixture', null)) {

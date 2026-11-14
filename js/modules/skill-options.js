@@ -1491,7 +1491,7 @@ const CB_CHART_LINE_OPTIONS = {
             id: 'onePage', label: 'All rows on one page', type: 'bool', default: false, group: 'layout',
             tip: 'Print every row once, each on one line, on a single sheet.',
             helpShort: 'Independent, More practice and Test pages: your rows (or the tables 1 to 12) once each on one compact sheet, as many as fit.',
-            help: 'Independent, More practice and Test pages (the other page types keep their own layout). Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
+            help: 'Independent, More practice and Test pages (the other page types keep their own layout). Prints the page on ONE sheet (and its key on one page) in the compact layout, Compact (12 tables on one page). With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
                 + 'With rows chosen it is those rows, in order, as many as the paper holds (a row of very wide numbers takes two lines of six, so fewer fit; the panel says how many on Letter and on A4). '
                 + 'Every row is then one line of 12 numbers (the other pages use two lines of six), and the multiplication facts are not shown. The numbers printed to start and "Numbers left blank" still apply.',
         },

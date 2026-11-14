@@ -4,7 +4,7 @@ Session: session_013pHDnPLFmXnUHxE1xyq1rZ
 Branch: claude/sweet-newton-c8wrv1-lf-roles
 Owner of files: js/modules/sheet/roles/{true-false,reason-it,error-analysis,review,pre-skill-check,scripted-model,guided,test,compose}.js, sheet/adapters.js stamp(), tests/scripts/ws-roles-unit.mjs
 State: fix (critic r1 FAIL; r2 fixes in, critic r2 waits on lead rulings)
-Updated: 2026-11-13
+Updated: 2026-11-13 (r9: two-step guided / opener / reason-it / one-row stretch)
 Builder profile: lane session (no sub-agent builder)
 Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4 -> fixed 000f6eb5); 2 earlier: r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
 
@@ -48,6 +48,90 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   compare guided EB-BAND 46 -> 22 (rest: pv's measured height + its one-line hint row); expand / unit_form / combine guided
   EB-BAND 2 -> 0 (9 passed pages change). Backtest guided-tight-rows PASS. compare EA S: 0 now. compare Model EB-SIDE 5 = its
   beside step-text cells, which PT-MOD-5 excuses but ws-empty-band does not yet skip (lf-checks). Opener is not this lane's.
+
+## Round 9b - r9 (2026-11-13; lf-algebra precritic two-step r11 items 1-4, at M / L; mq-opus-medium, rebuild after a failed precritic)
+Test trees: lf-algebra 2d03850fc + this lane (scratch alg), then (lead) lf-algebra 71d4e8ac7 (master a6883082c merged) + this lane
+(scratch alg2; before = 71d4e8ac7 + bc32eecc9). The role files are edited here only. Each item: check first
+(FAIL bc32eecc9 -> OK on the fix), backtest row, CHECKS_FROM_CRITICS row.
+- Item 4 (lead ruling R1 / R4a, single-row stretch). Root cause: practice.js spreadRows grew a lone ONE-row grid to 1.7 x its
+  measure (independent / more-practice 214 mm for a 125 mm story, 41 % at M), test.js kept the layout's fill cellH (184 mm, 32 %).
+  Fix: layout.js capRowsToInk / oneRowCapOf (a row stops at its ink, measure less CELL_PAD_MM, / 0.72), applied in practice.js and
+  test.js to a lone one-row page (any skill) and to every row of a lone page of column stories (two_step_estimate_check L: 2 x 83 mm
+  stories in 114 mm rows, 31 %); top-aligned; a one-row page is marked mq-onerow and ws-print-lint PAGEFILL / ws-empty-band EB-PAGE
+  accept its strip (a multi-row held page is mq-inkrows and still judged). Check ws-roles-unit ONE-ROW-CAP; ws-two-step --print
+  CAP-BAND (lf-algebra) FAIL 10 -> OK. Backtest one-row-cap (FAIL bc32eecc9 -> OK 140e27245). lf-algebra may re-point
+  two-step-visual-cap-band / two-step-letter-wpbar-L-band to a merge holding 140e27245.
+- Item 1 (Guided 1 story a page). Root cause: Guided measures every item at the Model's level 3 (MEASURE_LEVEL 3); a two-step story
+  draws both bars and the worked frames there (126-140 mm at M), a plain try draws 85-98 mm at level 1, so each page fitted one.
+  Fix: print-sheet.js measureLo - a role's MEASURE_LO(item) asks for the item's height at lower levels (measured[c].atLevel;
+  measurement only); guided.js asks it of word-work stories (not the sentence layout), DRAWN-FIT re-fits a one-column sheet whose
+  continuation pages hold one story at the heights its cells draw (Model 3, hinted try 2, plain try 1), and holds each row of such a
+  page to its ink (oneRowCapOf). Result (seed 7): plain / x÷-first / add-first / estimate M 1 + 1 + 2 (was 1 + 1 + 1); letter M 2 + 2,
+  L 1 + 2 + 2. PROOF that the rest needs a page a story: the continuation page body is 211 mm at M, 184 at L; the hinted try
+  draws 135 / 153 mm (level 2 = level 3: the bar and the middle question are its scaffold, card decision 6), so nothing shares its
+  page; two plain tries need 2 x 94 = 188 mm at M (fit) but 2 x 106 = 212 mm at L (do not); multi_step_word (Visual) draws its bar at
+  level 1 too: 2 x 126 = 252 mm at M, 2 x 143 = 286 mm at L - one a page (the R1 probe's capacity 1). Check ws-roles-unit
+  GUIDED-DRAWN-FIT; backtest guided-drawn-fit.
+- Item 2 (Opener OVERFLOW / EB-EDGE 38). Root cause: the two-step Model (107-132 mm wide) sat in the 93 mm Model zone and ran off the
+  page's left edge; the Guided story ran under the footer (Model 135 + Guided 135 mm against a 236 mm budget at M). Fix: opener.js -
+  a word-work Model the host measured over the half cell takes the full width (PT-OPN-4); when the Model and its Guided row cannot
+  share the page (SPILL) page 1 holds What's New, Model, Steps, Say and page 2 the Guided row plus the Independent rows that fit at
+  their level-1 height (plain M: Guided + 1 Independent; Visual L: Guided only). A spilled page takes the SHORTEST stories of its
+  deal (3 spares; a stacked x / ÷ bar draws 181-196 mm at L and ran page 1 over by 27.5 mm) and prints its Steps in two columns.
+  The r12 blank opener cell (EB-READ) was the Guided story pushed off the page: gone with the spill. Check ws-roles-unit OPENER-SPILL; backtest
+  opener-spill. LEAD: the two-page Opener is a PAGE_TYPES amendment (proposed PT-OPN-10: "a Model too tall to share its page with
+  a Guided row spills Guided and Independent to page 2 under the continuation header").
+- Item 3 (Reason It OVERFLOW). Root cause: a two-step column story took the UNDER layout (A | B in half cells, 86 mm) - its step
+  columns are 107-115 mm. Fix: reason-it.js - a two-step column story prints once with the response beside it and stands A over B
+  at the full width; a one-row Reason It page is held to its ink (oneRowMm). Check ws-roles-unit RI-TWOSTEP; backtest ri-twostep.
+  Not changed: two_step_letter_equation RI M holds 1 (its frames panels repeat the story; 114 mm measured, 2 need 229 of 206 mm).
+- Byte identity: 638 passed-skill pages (29 skills x 11 roles incl. opener x M / L, pupil + key) identical before / after (rolehash).
+- Review (lead, r12): multi_step_word (Visual) Review M / L kept 34 % under a one-story band - the same root cause: review.js holds a
+  band of column stories to its ink (capRowsToInk). ONE-ROW-CAP review case; backtest one-row-cap pass commit 9e3059d18.
+- Hash: 638 passed-skill pages (29 x 11 roles incl. opener x M / L, pupil + key): 636 identical; 2 changed ON PURPOSE by the review
+  rule (their Mixed Review band of one-step column stories, same class): division:div_facts_long review M (EB-BAND 34.4 % -> pass) and
+  subtraction:sub_2d_1d review L (stories band 5 mm shorter; its stack band 30.3 % is pre-existing, untouched). PNGs
+  r9/passed-*-before-after.png. Subtraction / placevalue Guided pages: identical. ws-lesson-baseline --all-lessons: 1732 identical.
+- Two-step pages changed (alg2, 58 of 98 pages of 7 skills x 7 roles x M / L): PNGs in r9/ (one per page, rolehash seeds).
+- Gates (M / L): ws-roles-unit OK 98; ws-two-step --print OK (CAP-BAND CAP / BAND PASS); ws-two-step OK; ws-capacity-pin --check OK
+  (36 rises, 0 drops); ws-boot-smoke OK; ws-precritic-plan OK; ws-lesson-baseline OK; ws-backtest 4 rows PASS. ws-empty-band on the
+  7 skills x guided / opener / reason-it / independent / more-practice / test / review: EB-BAND, EB-EDGE, EB-READ, EB-PAGE PASS;
+  EB-SIDE FAIL (two step columns 107 mm in a 185 mm one-column cell: the template's width, lf-algebra). ws-cell-checks: OVERFLOW
+  only two_step_add_then_div guided L p2 (pre-existing on 71d4e8ac7 + bc32eecc9: a stacked ÷ bar story draws 188 mm at level 2,
+  taller than the 184 mm continuation body - lf-algebra); RI-DISTINCT letter / estimate (frames panels draw the same work for A and B:
+  the template ignores the shown wrong value - lf-algebra; pre-existing); LONE-PAGE 16 (Reason It 1 pair a page: a two-step pair
+  A over B is 150-200 mm, two need more than the 206 / 230 mm body; multi_step_word test M / L is the R1-ruled capacity 1) - lead:
+  a ruled capacity (RI two-step 1 a page) or an exemption in LONE-PAGE.
+Times: r9, start 2026-11-13T21:00Z, end 2026-11-13T23:10Z, profile mq-opus-medium (rebuild after a failed precritic)
+
+## Round 9d - critic r9 fixes (design/status/lf-roles/critic-r9.md; opener only, plus the one-row exemption)
+- D2: in since 8d41853f1 (spill page 2 titled "Guided Practice" / "Guided Practice and Your turn"); ws-roles-unit OPENER-SPILL header.
+- D1: the two-column Steps band under a full-width Model is content-sized (no stepLines estimate as its height). OPENER-SPILL fixed-
+  height assertion FAIL on 8b7751c94 -> OK. Rendered: the band ends at its text (r9b/*-opener-L.png).
+- D3: page 2 is fitted from the stories it DEALS (Guided row, then each Independent row at its level-1 height + the row's tab
+  keep-out), never the spares. OPENER-SPILL SPILL-FILL FAIL on 8b7751c94 -> OK. Rendered at M (rolehash seeds): page 2 white under the
+  Guided row 95-101 mm; the next dealt row needs 102-105 mm (level-1 story 86-93 mm + 1 + tab 3 + strip 7.5), so no Independent row
+  fits on plain / Visual / x÷-first / add-first at M - the critic's 224 mm sum left out the band strip, the tab and the titled
+  header (plain M with a row overflowed 6.2 mm, measured). estimate M and letter L do hold one.
+- Exemption: PAGEFILL (ws-print-lint) and EB-PAGE (ws-empty-band) accept an mq-onerow strip only while it is shorter than the row;
+  backtest onerow-strip-tight (fixture, --onerow-probe).
+- Passed pages (30 skills x opener / review / independent / more-practice / test / guided x M / L) vs origin/master 88cc98b00: identical
+  but the 2 accepted Review pages. ws-cell-checks opener (7 skills, M / L, alg2 = lf-algebra 201692a31 + lane): OK. Opener pages of the
+  7 skills change (header, Steps band, row heights): PNGs r9b/.
+- Noted, not changed: page 1 of a spilled M Opener now shows 60-69 mm white under Say (26-30 %) - the Steps band no longer hides it.
+
+## Round 9c - lead rulings on r9 (2026-11-13, all four as recommended; logged in design/decisions/LEAD_DECISIONS.md)
+- PT-OPN-10 (PAGE_TYPES.md, additive): the spill page's continuation header is titled with its part(s) - "Guided Practice" /
+  "Guided Practice and Your turn"; its rows are sized to the stories PLACED (not the deal's tallest spare), top-aligned; it keeps
+  7 mm + the strips' wrap in hand before placing an Independent row (rendered page 2 ran 2.2-6.2 mm over without it). Check:
+  ws-roles-unit OPENER-SPILL header assertion (FAIL on 693d19dbd); backtest opener-spill re-pointed (pass 8d41853f1).
+- Capacity 1 ruled: the 7 two-step Reason It pages and multi_step_word test, M / L (capacity.json `ruled`); ws-cell-checks LONE-PAGE
+  reads `ruled` (a ruled page passes with a note; --lone-page-probe). Backtest lone-page-ruled (fixture: unruled FAIL, ruled OK).
+- The 2 passed Review pages (div_facts_long review M, sub_2d_1d review L): accepted.
+- Visual Opener L page 2: the story at the top under "Guided Practice", its cell its own height.
+- Merged origin/master 88cc98b00 (lf-placevalue w2 636afcd84): guided.js hsOf keeps both (r9 drawn levels, then w2's inkHMm rows);
+  the plan's ko term keeps `!inkRow(r)`, the fit's koFit (r8c) is unchanged - koMm is dropped once. Passed-skill pages (30 skills x
+  11 roles x M / L) vs origin/master: 658 / 660 identical, the 2 accepted Review pages differ.
 
 ## Round 11 (2026-11-13; critic r6c FAIL -> fixes)
 - Critic r6c (design/status/lf-roles/r6c/critic-r6c.md): Guided tightRows PASS; Reason It A over B FAIL - D1 one item a page
@@ -221,3 +305,42 @@ Times: fix 1-5 (checks first, hash proof), start 2026-11-13T01:35Z, end 2026-11-
 
 ## Log
 - 2026-11-13: fixes 1-5, 3 backtest rows, ws-roles-unit (new, node, 40 checks, ~1 s).
+
+- 2026-11-13 deploy-5 hold: duplicate per-role precritic gates removed (747acce99); deploy head 3e3cfff70 merged with master, ws-precritic-plan OK (model-*-facts rows pass), roles-unit 80 OK. Awaiting the Guided SIZE-ORDER ruling.
+
+- 2026-11-13 r8a (lead: Guided SIZE-ORDER ruling (e); guided-tight-rows re-point; capacity-pin timeout). Used (e), not (c):
+  the two-cell Model draws cleanly for column stacks once its working is written beside it (sideLinesOf: "Ones: 8 − 3 = 5."
+  "Tens: 4 − 2 = 2." "Check: 25 + 23 = 48."), so S prints Model + 10 (11 >= M 9) on sub_50 / sub_100 / sub_1k / sub_10k /
+  sub_100k / sub_1m no regroup and sub_2d_1d. General rule (sheetFit): any one-page, one-Model Guided grid the ceiling trims,
+  where a two-cell Model completes the last row at exactly the ceiling; fact pages (ruled option b) and Mix pages excluded.
+  On those pages every cell sits centred in its row (the Model's row band was 35.7 %, now < 30 %). Tight rows: the try rows
+  drop the measure's label keep-out (koMm) and sit centred - expand / unit_form / combine Guided tries 37.4 % -> 26.4 % max.
+  ws-capacity-pin builds one skill an evaluate (full --check 182 s + ProtocolError -> 195 s, complete; output identical).
+  Checks: ws-roles-unit GUIDED-MODEL-SPAN; backtests guided-model-span, guided-size-order-s, guided-tight-rows (re-pointed),
+  all PASS. Debt seen, not changed: these stack Guided pages keep EB-SIDE 32.4 % at S / 31.7 % at M (stack in a 4- / 3-column
+  cell; 5 columns at S would hold 27.7 %) and EB-BAND 34.8 % at L - pre-existing on base, untouched pages.
+Times: r8a, start 2026-11-13T13:45Z, end 2026-11-13T15:10Z, profile mq-opus-medium (rebuild after a failed check)
+
+- 2026-11-13 r8b (lead: the pages r8a changed pass their own band checks; (a) chart_to_120 Guided bands; (b) skipped by the lead's
+  priority order). Stack Guided pages of the 7 no-regroup subtraction skills: ws-empty-band OK at S/M/L (was EB-SIDE 57, EB-BAND 30).
+  How: a measured column stack whose every offered grid leaves >= 30 % beside it (measured slack) takes one column more (S 5, M 4);
+  the Model spans the fewest cells (2 .. the whole row) that complete the grid at the ceiling - on a full row the drawing and its
+  working each in the middle of one half; every stack cell centred in its row. Capacity: S 11, M 9, L 7 (L rose from 6); no drop.
+  (a) GUIDED-MODEL-ROW: the Model's row is held to what the try beside it fills (0.8), never under the Model's need, only where the
+  try would fill under 70 % and holding it passes - chart_to_120 Guided M/L pass (worktree of lf-builds e1389d1f3); the 8 add_wp /
+  sub_wp Guided S pages' first try (40-42 %) now passes; number_word_form row 1 57/50 % -> 47/37 % (its other rows pre-existing).
+  Checks: ws-roles-unit GUIDED-STACK-SIDE, GUIDED-MODEL-ROW; backtests guided-stack-side(-unit), guided-model-row(-wp): PASS.
+  Hash vs r8a: 29 of 87 passed guided pages changed (the 7 subtraction skills' 17 pages; 8 word-problem S, vocab_pick3_words S,
+  number_word_form S/M/L by the model-row rule); ws-lesson-baseline --all-lessons 1732 identical.
+Times: r8b, start 2026-11-13T15:20Z, end 2026-11-13T19:30Z, profile mq-opus-medium (rebuild after a failed check)
+
+- 2026-11-13 r8c (critic r8b D1; round cap: check first). GUIDED-TIGHT-REFILL = ws-empty-band EB-REFILL: a one-page Guided page
+  whose next whole row stays within the §12.1 ceiling fails when a drawn try row is white under its grid (FAIL 5 on e62f1da34:
+  expand M/L, unit_form M/L, combine L; no other passed M/L Guided page). Root cause fixed in the fit (sheetFitWith): a tightRows
+  page's plain try rows are counted at their drawn height (less koMm), as plan() draws them. expand / unit_form M 6 -> 8 tries,
+  L 5 -> 6; combine L 5 -> 6 (ceiling kept, M >= L). Hash: only those 5 M/L pages changed; lesson baseline 1732 identical.
+  Nits not taken (each would move a page the critic passed): n1 (working lines only on a spanning Model: sub_1k / sub_10k M) and
+  n2 (3-line cap drops "Check:" on sub_1k / sub_10k L).
+Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medium
+
+- 2026-11-13 lead: deploy-6 (c4bac87bf) deploying; SIZE-ORDER now M >= L only (S dropped; S stays pinned for CAPACITY-NO-DROP). EB-REFILL minors R1-R4 queued. R2 ruling: a part row is allowed when its cell is one the Model also draws as a part row; otherwise flag it (EB-REFILL-SLOT).

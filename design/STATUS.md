@@ -811,3 +811,63 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Per-part settings for lessons, practice and quiz: how many problems per part and which supports, with the screen only offering settings the page checks pass. Default identity: all 1,732 default lesson pages byte-identical to master.
 - Gates: boot-smoke, code-snapshot, redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, capacity-pin, roles-unit, precritic-plan (none dropped), conflict-markers.
 - 2026-11-13 ~18:45 UTC owner: drop print size S; keep M and L (plan item 9 in CLAUDE.md). S settings / codes fall back to M.
+
+## 2026-11-13 — Deploy-6: shared roles Guided round (lf-roles, critic r8b + r8c PASS)
+- Guided Practice: the 7 subtraction stack skills at M/L; expand M/L, unit_form M/L, combine L (9/8/9/8-9). Tight rows refilled, side band capped, Model-height try rows fixed; each finding has a check + backtest row.
+- Capacity pin now covers every grid role (r17); SIZE-ORDER compares M >= L only (size S dropped).
+- Gates: conflict-markers, stamp, boot-smoke, code-snapshot (734), redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, vocab-unit, roles-unit (87), backtest + empty-band self-tests, capacity-pin (1178 pages, 0 drops), precritic-plan (189 rows), checks-from-critics; 1732 lesson hashes identical.
+
+## 2026-11-13 — Deploy lf-tools (lf-checks): no phone width (critic r3 PASS 8/8/9/8) + review tools with copy-light ADVISORY
+- Screen gates, briefs and RUBRIC hosts run at 1280 / 1366 / 820 / 1024 (owner rule); ws-no-phone-width on precritic. Teacher phone steps stay allow-listed (lead added the teacher lesson-parts panel in ws-partopts-shots).
+- Copy-light sample / batch / --sample render / brief lint / ws-drawing-key; eligibility is ADVISORY (every skill still gets the full critic).
+- Gates: conflict-markers, boot-smoke, code-snapshot (734), backtest self-test, precritic self-test, precritic-plan (193), checks-from-critics, no-phone-width, copy-light self-test. No app code changed.
+
+## 2026-11-13 — Hotfix: option rows with a "?" tip took every click as the tip (critic-panel-r3 P1)
+- One additive CSS line (css/teacher.css): the tip button is its own containing block again, so tick boxes, All / None and selects work by mouse and touch. Its [hit] check and backtest row options-panel-hit land with the lf-partopts panel deploy.
+
+## 2026-11-13 — Deploy no size S (lf-checks; critic r3 C1 9 / C3 9 / C4 9, C2 7 on doc phrasing only -> NOS-DOCS-ADVISORY)
+- Print and screen size pickers offer M and L only; any stored or shared S setting restores as M (codes still decode, 734). Compact simple print shows no dead picker.
+- Gates stop running S; the browser visibility gate (73 checks) and the code guard block; the docs token rule is advisory. CLAUDE.md tokens line now reads "sizes M/L; S is an alias of M".
+- Gates: conflict-markers, stamp, boot-smoke, code-snapshot, redesign-passed, simple-print, screen-answer, pdf-preview (one 0.08 % pixel diff on a set-cover page under 13-way load, then 3 clean runs on this head and master: load flake), roles-unit, teacher-wrm, no-size-s --browser, precritic-plan, backtest self-test; lane: capacity-pin (0 drops), lesson baseline 1732 identical.
+
+## 2026-11-13 — Deploy compare (lf-placevalue w2; placevalue:compare critic r4 PASS) — 30 skills redesign-passed
+- placevalue:compare passes the 8/10 redesign on every page type and screen host; also number_word_form (earlier pass), the pv debt fixes, the CL-2c / CL-4d / PT-ENG-6 rulings with their checks, identify-heads off on the Prerequisite Check, screen text sizes.
+- Lead fixes at the deploy merge: ws-pv-identify-heads defaults to M,L (no size S); ws-screen-ink-size kept as master's copy (w2 had carried an unchecked WIP copy with 390 lines); backtest row pv-screen-text-size set PENDING until lf-hosts lands TEXT-SIZE.
+- Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, roles-unit, empty-band self-test, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan (234) + checks-from-critics, capacity-pin (0 drops), lesson baseline M,L 4242,1 (1772 identical).
+
+## 2026-11-13 — Content hotfix P-WP-19: story pronouns agree with the name (lf-algebra)
+- Six story templates (tape_diagram, tape_diagram_plain, write_equation, write_equation_story, multi_step_word +/- path) now repeat the name instead of a fixed he / she. ws-story-pronouns on precritic (727 skills, 21,810 items OK); backtest story-pronouns-p-wp-19 PASS; lesson baseline 1772 identical.
+- ws-tape-diagram.mjs (unwired, defaulted to size S) left out of this deploy; lf-algebra brings it with M,L.
+
+## 2026-11-13 — Deploy screen fixes (lf-hosts critic r3 PASS 8/8/8/8 on card, worksheet, quiz at 820/1024/1280/1366) + TOUCH-HIT de-flake (lf-checks critic PASS 9/9/8/8)
+- Word-problem answer boxes: a 48 px touch area owned by its own box (drawn boxes unchanged); add_wp_20 bottom-edge taps land; the practice card carries [data-ws-cell].
+- Checks: CELL-READ in 4 tools; TOUCH-TARGET / TOUCH-UNIQUE / TOUCH-HIT (real taps; now re-reads the tap point after 2 rAF and fails only a repeated miss) / FOCUS-RING; ws-worksheet-reflow (WS-REFLOW 1.5 px x tolerance); ws-screen-widths-plan; ink-size TEXT-SIZE; ws-touch-diff.
+- pv-screen-text-size un-pended (TEXT-SIZE present; row PASS).
+- Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, screen-widths-plan, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test + touch / reflow rows, precritic self-test, precritic-plan + checks-from-critics, capacity-pin (0 drops), lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy custom page titles (owner request; lf-roles re-critic r2 PASS: pages 9/9/8/9, both dialogs 9/9/8/9) + precritic verdict-parser fix (lf-checks)
+- Print dialogs: the teacher can write the page title and place it below (default) or above the Name / Date / Score line; long titles wrap to two lines with a cut warning; the choice travels with share codes (old codes unchanged). Default pages are byte-identical (196 hashes). WDS HD-10 amended, HD-14a added; pageHeader(h) exported for the anchor-chart Name / Date line (lf-engine).
+- Owner note T3: on a two-line title the descenders sit 0.7–0.85 mm above the rule (critic accepted; the alternative costs a row of problems).
+- Precritic reads "tool --mode: OK" verdicts; ws-copy-light no longer truncates its verdict through a pipe (process.exitCode). Rows precritic-mode-verdict, copy-light-pipe-verdict.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, frame-title (196), title-code, frame-title-ui, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest self-test, precritic self-test, precritic-plan + checks-from-critics, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy pv live1 (lf-placevalue; expand + unit_form critic r2 PASS)
+- placevalue:expand: worksheet back to one line (boxes 103x76, 2 columns at 1280), card numerals 56 px, quiz / worksheet touch targets >= 48 px. placevalue:unit_form: worksheet boxes 50 px.
+- Global screen rule: a boxed answer slot (.mq-cellbox holding input.mq-cellslot) is at least 50 px tall (border-box: 48 px of input). 30-skill passed sweep: no non-pv screen changed.
+- number_word_form Guided D2-D4 and hint-gap fixes (equal or better on every changed page; not yet passed: one-kind root cause on live2).
+- Gates: code-snapshot, no-size-s, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, capacity-pin, frame-title (196), screen-widths-plan; lane: redesign-passed 30, precritic-plan, no-phone-width, boot-smoke, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy-7: two-step page roles (lf-roles critic r9 + r9b PASS)
+- Two-step word problems: a lone row is held to its ink (ONE-ROW-CAP); Guided fits 2 stories a page by drawn heights (GUIDED-DRAWN-FIT); a Model too tall to share its page spills Guided and Independent to page 2 under a header naming the part (PT-OPN-10, OPENER-SPILL, SPILL-P1); Reason It two-step pairs print A over B at full width (RI-TWOSTEP, capacity 1 ruled); LONE-PAGE reads `ruled`.
+- Passed skills: only div_facts_long review M and sub_2d_1d review L changed (graded 9/9/8/9); 220 other passed pages identical.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit (101), frame-title (196), simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan + checks-from-critics, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Hotfix TOF-STEM: True or False? never states a false equation (lf-roles)
+- The shared True or False? role used an "a op b =" stem whenever a question had two operands, so 55 skills could print a false statement (count_by_tables: "3 x 12 = 12, 18, 24, 30, 36"; missing-part, 3-addend, story and mixed skills). The stem is now used only when it is true of the answer; otherwise "The answer is ...".
+- ws-tof-stem on precritic (--skill and --role true-false): 727 skills, 7,673 frames OK; backtest tof-stem PASS; passed skills' True or False? pages byte-identical; lesson baseline 1772 identical; content-audit OK.
+
+## 2026-11-14 — Deploy options panel (lf-partopts, critic r5 PASS: every criterion >= 8 at 1280/1366/1024/820) + ledger fix + no-size-s browser de-flake (lf-checks)
+- Teacher Options panel: the live sample is drawn whole and scaled (no sliced drawings), a too-wide drawing scrolls with a visible cue; the "?" tip button no longer takes the row's clicks ([hit] check + options-panel-hit row now on master). FU-1 (page count after M->L->M) is held with paused part B: its code (resnapPartOpts) is only on the lane branch.
+- Ledger: lf-checks' checks-from-critics fix (0 fail on master) + the panel's rows; stale duplicate rows from the merge removed. 4 panel rows remain WARNING, routed to lf-checks before 13:00 UTC.
+- ws-no-size-s --browser waits for the built size and re-clicks once on a miss (row nos-browser-settle-reclick).
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, frame-title, simple-print (one load failure, OK when run alone), screen-answer, pdf-preview, teacher-wrm, options-panel rows, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# The ONE deploy-gate list (IMPROVEMENT_PLAN §1.4 S5; closes STATUS §7 "One deploy-gate list"), in three sessions
-# that can run in three cloud sessions at once, or one after another here.
+# The ONE deploy-gate list (IMPROVEMENT_PLAN §1.4 S5; closes STATUS §7 "One deploy-gate list"), in four sessions
+# that can run in four cloud sessions at once, or one after another here.
 #
 #   bash tests/scripts/ws-deploy-gates.sh --list            # print the gate list (session, kind, command, present?),
 #                                                           # then the time budget check (A8; exits with it)
@@ -14,6 +14,8 @@
 #   bash tests/scripts/ws-deploy-gates.sh --session 3       # coverage matrix (budgeted), digests hook, owner go
 #   bash tests/scripts/ws-deploy-gates.sh --session 4       # ws-lesson-baseline --all-lessons --check (every lesson page
 #                                                           # vs the pin; ≈ 13 min on one slot)
+#   bash tests/scripts/ws-deploy-gates.sh --session 5       # ws-options-shots: every Options panel sample, shards 1-2 of 4
+#   bash tests/scripts/ws-deploy-gates.sh --session 6       # ws-options-shots: shards 3-4 of 4
 #   bash tests/scripts/ws-deploy-gates.sh --all             # sessions 1, 2, 3, 4 in sequence
 #   bash tests/scripts/ws-deploy-gates.sh --session 3 --accept-notyet digests
 #                                                           # the lead accepts a named NOT YET gate (logged)
@@ -38,7 +40,7 @@
 # ("acceptedNotYet"). Only NOT YET gates can be accepted; an unknown name is an error. SKIPPED is never acceptable.
 #
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
-#            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
+#            ws-code-snapshot, ws-no-phone-width (no 390 px screen-gate default; owner 2026-11-13), ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-precritic-plan --checks-from-critics (every CHECKS_FROM_CRITICS
 #            finding row names a backtest id on precritic's path, or an exemption), ws-backtest --kind fixture (the S2 checks still
@@ -92,13 +94,27 @@
 # Session 4  ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check
 #            design/audit/baselines/lesson-baseline.json (lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c, which
 #            was a lane rule and is now a deploy gate): every page of every lesson master prints (the three samples, every
-#            key of lessons/prereqs.js LESSONS, every detailed lesson; L and S, seeds 4242 and 1) is byte-identical to the
+#            key of lessons/prereqs.js LESSONS, every detailed lesson; L and M, seeds 4242 and 1) is byte-identical to the
 #            pin, and every lesson the tree prints is pinned (UNPINNED fails). ≈ 13 min on one browser slot: in its own
 #            session because sessions 1-3 each sit at 27-28 min of their 30-min budget (MQ_LESSON_BASELINE_SESSION moves it).
+#            (Owner 2026-11-13, size S dropped: the pin's S keys were renamed M - a lesson asked for at S always printed at
+#            M, and the M render hashes equal the S keys, checked on the samples 30/30 - so the pin stays whole.)
 #            RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the pin in the same deploy commit
 #            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
 #            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
 #            No pin in the tree: the gate is SKIPPED (INCOMPLETE). Backtest row lesson-baseline-deploy-gate.
+#            (merge 2026-11-13: ws-options-shots moved from sessions 4-5 to 5-6; session 4 is the lesson baseline)
+# Session 5  ws-options-shots (lf-partopts, from lf-algebra F8/G11, 2026-11-13): the Options panel's live sample of EVERY
+#            skill whose Sets row offers Options (725 on 2026-11-13), opened the teacher's way at 1280 and 390 px, must lie
+#            inside its frame, hold ink, draw its text at >= 9 px (every part), keep the panel controls in the window and throw no
+#            page error (critic-panel-r1, 2026-11-13: plus 1280x720, a resize and an option change on a spot set). MQ_OPTSHOTS_SHARDS parts (default 2: `--shard i/n --workers 1`, one browser
+#            each, on the two slots). ≈ 2 s a skill a width = ≈ 2,850 slot-s (timed 1,426 + 1,418 s): sessions 1-3 are each predicted at 27-28 of
+#            30 min, so it has a session of its own (MQ_OPTSHOTS_SESSION moves it). A lane's own skills run in its
+#            precritic (`--skill ... --skip-no-panel`).
+# Session 6  ws-options-shots shards 3-4 of 4 (critic-panel-r2 rebuild, 2026-11-13): the owner's panel widths are 1280x1000,
+#            1366x768, 1024x768 and 820x1180 (390 dropped), twice the readings of 1280 + 390, plus the new clip / cover /
+#            choices / svgtext / parts / summary / repeat checks; one session cannot hold the sweep, so shards 1-2 run in
+#            session 4 and 3-4 here (timed: tests/fixtures/precritic/deploy/budget/timings-options-shots.jsonl).
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
 # puppeteer, flock. A missing one fails at once with its fix.
 #
@@ -131,13 +147,14 @@ LESSON_BASE=design/audit/baselines/lesson-baseline.json
 SLOTS_SHARDS=${MQ_SLOTS_SHARDS:-4}
 FIT_SHARDS=${MQ_FIT_SHARDS:-2}
 MATRIX_SHARDS=${MQ_MATRIX_SHARDS:-2}
+OPTSHOTS_SHARDS=${MQ_OPTSHOTS_SHARDS:-4}
 NODE_WORKERS=${MQ_NODE_WORKERS:-2}
 BROWSER_WORKERS=${MQ_BROWSER_WORKERS:-2}
 PRINT_LINT_LIMIT=${MQ_PRINT_LINT_LIMIT:-461/33}
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 [ -n "$(git status --porcelain 2>/dev/null | grep -v '^??' | head -n 1)" ] && COMMIT="$COMMIT+dirty"
 
-usage() { sed -n '2,39p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,41p' "$0" | sed 's/^# \{0,1\}//'; }
 MATRIX_DIR=${MQ_MATRIX_DIR:-design/audit/matrix}
 MATRIX_BUDGET=${MQ_MATRIX_BUDGET:-500}
 ACCEPT_NOTYET=()
@@ -679,10 +696,16 @@ self_test() {
   }
   bcase "the old list (ws-viewport-check in session 2): FAIL" 1 "$bx/timings-2026-10-23.jsonl" 'FAIL - session 2 is predicted at 3[3-4]\.[0-9] min' MQ_VIEWPORT_SESSION=2
   bcase "today's list (viewport in session 3): passes (the options gate is UNTIMED: WARNING)" 4 "$bx/timings-2026-10-23.jsonl" 'session 2: predicted 2[0-9]\.[0-9] min'
-  grep -E '^budget: session [123]: predicted' "$tmp/bu.log" | sed 's/^/       /'
+  grep -E '^budget: session [1234]: predicted' "$tmp/bu.log" | sed 's/^/       /'
   if grep -q 'UNTIMED ws-options-pin --gate' "$tmp/bu.log" && ! grep -q 'budget: FAIL' "$tmp/bu.log"; then echo "  ok   today's list: no session over 30 min; the gate with no measure is listed UNTIMED"; else echo "  FAIL today's list: $(grep -E '^budget: (FAIL|WARNING)' "$tmp/bu.log" | head -n 3)"; bad=1; fi
   cat "$bx/timings-2026-10-23.jsonl" "$bx/timings-pin-check.jsonl" > "$tmp/pin.jsonl"
   bcase "critic r4 D1: ws-options-pin --check added to session 1: FAIL" 1 "$tmp/pin.jsonl" 'FAIL - session 1 is predicted at [0-9]+\.[0-9] min, over the 30-min budget \(the longest: ws-options-pin --check 13440 s' BCASE_ADD=1
+ # sessions 5 and 6 (lf-partopts 2026-11-13; 4 and 5 before the lesson baseline took session 4): ws-options-shots, the whole 725 x 4-width sweep in 4 shards, on its timed run
+  cat "$bx/timings-2026-10-23.jsonl" "$bx/timings-options-shots.jsonl" > "$tmp/os.jsonl"
+  # (critic-panel-r2 rebuild: 4 panel widths, 4 shards, 1-2 in session 4 and 3-4 in session 5, each pair on the two slots)
+  bcase "ws-options-shots shards 1-2 of 4 in session 5: within 30 min" 4 "$tmp/os.jsonl" 'session 5: predicted [0-9]+\.[0-9] min .* budget 30 min: within'
+  bcase "ws-options-shots shards 3-4 of 4 in session 6: within 30 min" 4 "$tmp/os.jsonl" 'session 6: predicted [0-9]+\.[0-9] min .* budget 30 min: within'
+  bcase "ws-options-shots added to session 3 instead (MQ_OPTSHOTS_SESSION=3): FAIL" 1 "$tmp/os.jsonl" 'FAIL - session 3 is predicted at [0-9]+\.[0-9] min, over the 30-min budget' MQ_OPTSHOTS_SESSION=3
   bcase "a gate with no measure (no timings file at all) is UNTIMED, never a FAIL" 4 "$tmp/none.jsonl" 'WARNING - UNTIMED ws-content-audit'
   bcase "the matrix budget is modelled from MQ_MATRIX_BUDGET (900 documents x 5.26 slot-s): session 3 over 30 min" 1 "$bx/timings-2026-10-23.jsonl" 'FAIL - session 3 is predicted' MATRIX_BUDGET=900
   # the budget is the first result row of every session run
@@ -836,6 +859,7 @@ first_of() { local f; for f in "$@"; do [ -f "tests/scripts/$f" ] && { echo "$f"
 build_list() {
   # session 1: browser gates first in rough longest-first order (the two browser workers take them in this order)
   browser_gate 1 ws-content-audit ws-content-audit.cjs
+  browser_gate 1 "ws-no-size-s --browser" ws-no-size-s.mjs --browser   # critic nos r1 F1: S seeded in every restore path reads M (saved set, &set= link, stores)
   if [ -f "$PRINT_BASE" ]; then browser_gate 1 "ws-print-lint --source kit --baseline" ws-print-lint.cjs --source kit --baseline "$PRINT_BASE"
   else add 1 fn "ws-print-lint --source kit (limit $PRINT_LINT_LIMIT)" "print_lint_limit"; fi
   browser_gate 1 ws-teacher-wrm ws-teacher-wrm.cjs
@@ -869,6 +893,7 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
   node_gate 1 ws-codec-registry ws-codec-registry.mjs
   node_gate 1 ws-standards ws-standards.cjs
   node_gate 1 ws-search-terms ws-search-terms.cjs
@@ -880,9 +905,11 @@ build_list() {
   node_gate 1 "ws-plain-words --check" ws-plain-words.mjs --check
   node_gate 1 ws-node-lint "$(first_of ws-node-lint.mjs ws-node-lint.cjs)"
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
+  node_gate 1 "ws-precritic --self-test" ws-precritic.cjs --self-test   # its gate verdict reader (a mode line "tool --mode: OK"), mention matcher, copy-light and drawing-key cases (lf-ops 2026-11-13)
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
   node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
+  node_gate 1 ws-no-size-s ws-no-size-s.mjs --docs-advisory   # (+ live instruction docs, critic nos r1 F4) no size picker offers S, no gate default runs S; S decodes as M (owner 2026-11-13, plan item 9)
   node_gate 1 "ws-precritic-plan --checks-from-critics" ws-precritic-plan.mjs --checks-from-critics   # every ledger finding has a backtest id on the path (owner 2026-11-13)
   node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
@@ -926,6 +953,17 @@ build_list() {
   # commit message names the changed lessons / pages; until then this gate FAILS - no lesson page changes unseen.
   if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
   else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-baseline --all-lessons --check" "$LESSON_BASE (the pin is not in the tree)"; fi
+  # session 5-6 (lf-partopts, sessions 4-5 before the lesson baseline took 4, from lf-algebra F8/G11, 2026-11-13): the Options panel sample of every skill with an options
+  # panel (725 x 1280 / 390 px; ≈ 1.8 s a skill a width, ≈ 2,600 slot-s in all), sharded over the two browser slots, one
+  # browser a shard (--workers 1: the runner's slot is one Chromium). No session 1-3 has room (27-28 of 30 min each).
+  # critic-panel-r2 rebuild (2026-11-13): the owner's four panel widths (1280x1000, 1366x768, 1024x768, 820x1180) double the
+  # sweep, so it is MQ_OPTSHOTS_SHARDS parts (default 4): the first half in session 4, the second half in session 5 (one
+  # session over 30 min otherwise), each pair side by side on the two slots. MQ_OPTSHOTS_SESSION moves both (base, base+1).
+  local os_base=${MQ_OPTSHOTS_SESSION:-5} os_half=$(( (OPTSHOTS_SHARDS + 1) / 2 ))
+  for i in $(seq 1 "$OPTSHOTS_SHARDS"); do
+    local os_s=$os_base; [ "$OPTSHOTS_SHARDS" -ge 3 ] && [ "$i" -gt "$os_half" ] && os_s=$(( os_base + 1 ))
+    browser_gate "$os_s" "ws-options-shots --shard $i/$OPTSHOTS_SHARDS" ws-options-shots.cjs --shard "$i/$OPTSHOTS_SHARDS" --workers 1
+  done
 }
 
 # --accept-notyet: every name must be the key of a NOT YET gate on the list
@@ -1106,7 +1144,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --session) SESSIONS+=("$2"); shift ;;
     --accept-notyet) IFS=', ' read -r -a _acc <<< "$2"; ACCEPT_NOTYET+=("${_acc[@]}"); shift ;;
-    --all) SESSIONS=(1 2 3 4) ;;
+    --all) SESSIONS=(1 2 3 4 5 6) ;;
     --list) MODE=list ;;
     --budget) MODE=budget ;;
     --timings) TIMINGS_READ=$2; shift ;;

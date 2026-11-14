@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -65,7 +65,8 @@ const ordered = (items0, cols) => {
     // one whose worked steps are the MOST (a regroup, a ring, a skip-count adds its own step)
     // is the Model; then the shortest, as above.
     const nSteps = (it) => { try { return providerWorkedSteps(it, 6).length; } catch (e) { return 0; } };
-    const fwd = items0.map((it, i) => i).filter((i) => !(items0[i] && items0[i].q && items0[i].q.missing));
+    // (lf-placevalue compare r2, critic r1 F4: nor an item its generator marks `noModel` - the compare "=", which decides nothing)
+    const fwd = items0.map((it, i) => i).filter((i) => !(items0[i] && items0[i].q && (items0[i].q.missing || items0[i].q.noModel)));
     const most = fwd.length ? Math.max(...fwd.map((i) => nSteps(items0[i]))) : 0;
     const full = fwd.filter((i) => nSteps(items0[i]) === most);
     const first = full.length ? full[0] : items0.findIndex((it) => !(it && it.q && it.q.missing));
@@ -90,9 +91,10 @@ const ordered = (items0, cols) => {
  * of tries under a spanning Model; only the first try when the page's tries are all one row
  * (the fade reaches "none" on the page). Returns the index after the last partial cell.
  */
-export const partialEndOf = (cols, span, n = Infinity) => {
+export const partialEndOf = (cols, span, n = Infinity, span2 = 0) => {
     // The tries in the first try row: the rest of the Model's row, or the row under a spanning Model.
-    const firstRow = span ? cols : Math.max(1, cols - 1);
+    // (a Model over span2 cells, GUIDED-MODEL-SPAN: the rest of its row is cols - span2 cells; over the whole row, the next row)
+    const firstRow = span || span2 >= cols ? cols : Math.max(1, cols - (span2 || 1));
     // Critic guided-r1: when every try sits in that one row, hinting them all leaves no try
     // unhinted and the fade never reaches "none" - then only the FIRST try is hinted.
     const tries = Math.max(0, n - 1);
@@ -100,7 +102,7 @@ export const partialEndOf = (cols, span, n = Infinity) => {
 };
 /** The row the first tries sit in. */
 // (a div_facts Mix page whose Models fill the first row - mixModels - has its first tries in row 2)
-const partialRowOf = (cols, span, nModels = 1) => (span || cols === 1 || nModels >= cols ? 1 : 0);
+const partialRowOf = (cols, span, nModels = 1, span2 = 0) => (span || span2 >= cols || cols === 1 || nModels >= cols ? 1 : 0);
 /**
  * A Mix page's hinted tries: the tries in the row after the last Model (the rest of that row when
  * the Models do not fill it), or the first try alone when the tries end in that row (the fade then
@@ -149,6 +151,25 @@ const cueRowFits = (pool, c) => ordered(pool, c).slice(0, c).every((it) => {
 });
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
+/**
+ * DRAWN-FIT (lf-roles r9, lf-algebra precritic two-step r11: every two-step Guided page held ONE story): every Guided item is
+ * measured at the Model's level 3, but a hinted try draws at level 2 and a plain try at level 1 - a two-step story's Model draws
+ * both bars and the worked frames (126-140 mm at M), its plain try only the story and the two step columns (85-98 mm). A
+ * word-work story (not the sentence layout, whose tries draw at level 2) is also measured at levels 2 and 1
+ * (`measured[c].atLevel`, print-sheet.js measureLo), and a one-column page that would hold one story a page is fitted at the
+ * heights its cells DRAW (drawnMm).
+ */
+export const MEASURE_LO = (it) => {
+    const p = (it && it.q && it.q.cell && it.q.cell.payload) || {};
+    return it && it.template === 'word-work' && p.layout !== 'sentence' ? [2, 1] : null;
+};
+/** An item's row height at `cols` as the page draws it at scaffold `level` (3 the Model, 2 a hinted try, 1 a plain try). */
+const drawnMm = (it, cols, level) => {
+    const m = it && it.measured && it.measured[cols];
+    if (!m || !Number.isFinite(m.hMm)) return 0;
+    const at = m.atLevel && Number(m.atLevel[level]);
+    return (level < 3 && Number.isFinite(at) && at > 0 ? Math.min(m.hMm, at) : m.hMm) + 1;
+};
 /**
  * The probe the page is chosen from: wider than the page, so a mixed pool offers the Model's kind
  * of problem (pageSet) three more times, and one-column items can be left out.
@@ -254,7 +275,8 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0, f
         if (keep.length >= MIN_ITEMS && keep.length * 2 >= items.length) { cols = c; use = keep; break; }
     }
     // The plan keeps the column count counts() chose (its deal is a prefix of the probe).
-    if (fixedCols > 0 && fixedCols <= cols && fitsAt(use, fixedCols, ctx)) return { cols: fixedCols, items: use, kind: cut ? top : '' };
+    // (r8b: or the one column more a measured stack page takes for EB-SIDE, below)
+    if (fixedCols > 0 && (fixedCols <= cols || (fixedCols === wanted + 1 && !facts && !mix)) && fitsAt(use, fixedCols, ctx)) return { cols: fixedCols, items: use, kind: cut ? top : '' };
     // LESSONS_LEARNED L1/L2: the widest grid is not always the fullest page. More columns under a
     // spanning Model cost a whole row to the Model, and the page ceiling then trims the rest (size
     // S: a 4-column compare page held the Model and 4 tries, 45% of it blank, where 2 columns hold
@@ -266,8 +288,16 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0, f
         // that each side band is 30% or more is not a candidate while a narrower grid avoids it.
         const ws = use.map((it) => it.footprint || {}).filter((fp) => !fp.measure && !fp.factLike && Number.isFinite(fp.wMm)).map((fp) => fp.wMm);
         const side = (c) => (ws.length === use.length && ws.length ? (1 - Math.max(...ws) / (186 / c)) / 2 : 0);
-        const fitting = options.filter((x) => x <= cols && (x > 1 || cols === 1) && fitsAt(use, x, ctx));
+        let fitting = options.filter((x) => x <= cols && (x > 1 || cols === 1) && fitsAt(use, x, ctx));
         let calm = fitting.filter((c) => side(c) < 0.28);
+        // (r8b, EB-SIDE on the measured page: a column stack whose MEASURED slack (side() reads its static footprint width, pads included, and passed it)
+        // beside it is 30 % of the cell or more at every grid the size offers (sub_50 S 4 columns 32.4 %, M 3 columns 31.7 %)
+        // takes one column more than AUTO_COLS where the bridge measured it and it fits there; a grid that passes is kept as is)
+        const mSide = (c) => Math.max(0, ...use.slice(0, ceilFor(ctx, use)).map((it) => { const mm = it.measured && it.measured[c]; return mm && Number.isFinite(mm.slackMm) ? mm.slackMm / (186 / c - 0.5) : 0; }));
+        if (!facts && !mix && use.every((it) => it.template === 'stack') && fitting.length && fitting.every((c) => mSide(c) >= 0.30)) {
+            const more = wanted + 1;
+            if (use.every((it) => it.measured && it.measured[more]) && fitsAt(use, more, ctx) && mSide(more) < 0.30) { fitting = [more]; calm = [more]; }
+        }
         // A fact page (factRows): the measured slack beside each fact (its nearest side) at each column count; the grid whose
         // narrowest fact (a 0 or one-digit dividend) leaves the least side band, under 30 % of the cell where one does.
         if (facts) {
@@ -409,7 +439,7 @@ function stepsBodyMm(steps, m) {
 }
 
 /** Rows that fit under the Steps band (PT-GDP-3 teacher strip off). */
-function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLines = false } = {}) {
+function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLines = false, span2 = 0 } = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Lesson 1' });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const steps = stepsOf(items);
@@ -424,10 +454,12 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // RUBRIC H13: a model carrying worked lines on a page of 2+ columns takes the whole first row,
     // its lines BESIDE the drawing - under it, the lines made row 1 far taller than the tries
     // sharing that row (a 40% empty band in each). The row holds the model only.
-    const lines = model && items.length > 1 && !thinkCueOf(model) && !noLines ? workLinesOf(model) : [];
-    const span = !noSpan && cols > 1 && lines.length > 1;
+    // (GUIDED-MODEL-SPAN, lead ruling (e): a two-cell Model writes its working BESIDE the drawing, sideLinesOf)
+    const lines = model && items.length > 1 && !thinkCueOf(model) && !noLines ? (span2 ? sideLinesOf(model) : workLinesOf(model)) : [];
+    const span = !span2 && !noSpan && cols > 1 && lines.length > 1;
     const extra = !model || items.length < 2 ? 0
         : thinkCueOf(model) ? 17
+        : span2 ? (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + Math.max(0, sideLinesMm(lines, cols, m, span2) - h0)
         : span ? TAB_CLEAR_MM + Math.max(0, workLinesMm(lines, 2, m) - h0)
         : (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + workLinesMm(lines, cols, m);
     // BD-7: the first tries carry a grey hint line (hintOf); their row is that much taller.
@@ -437,7 +469,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // own would leave that cell a hint-line's height of empty band (H13).
     const nM = mixModels(items);
     const nTot = Math.min(items.length, ceilFor(ctx, items));
-    const partial = items.slice(nM, nM > 1 ? mixPartialEnd(nM, cols, nTot) : partialEndOf(cols, span, nTot));
+    const partial = items.slice(nM, nM > 1 ? mixPartialEnd(nM, cols, nTot) : partialEndOf(cols, span, nTot, span2));
     const hints = noHint ? [] : partial.map((x) => hintOf(x));
     let hint = hints.some(Boolean) ? Math.max(HINT_MM, ...hints.filter(Boolean).map((t) => workLinesMm([t], cols, m) - 4 + 2)) : 0;
     // A Mix page's first tries carry the times-fact cue under the fact, as the Models do (the
@@ -446,7 +478,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     if (nM > 1 && !noHint && partial.some((x) => thinkCueOf(x))) hint = Math.max(hint, 17);
     const h = h0 + extra;
     const rows = Math.max(1, Math.min(Math.floor(ceilFor(ctx, items) / cols), Math.floor(avail / Math.max(1, h))));
-    return { rows, h, h0, avail, stepsH, steps, frame, m, span, hint, wrap, noLines: !!noLines };
+    return { rows, h, h0, avail, stepsH, steps, frame, m, span, span2: span2 || 0, hint, wrap, noLines: !!noLines };
 }
 
 /**
@@ -456,6 +488,33 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
  * stay in view (PT-GDP-2, PG-22). A continuation page is filled, never above the ceiling.
  */
 function sheetFit(items, cols, ctx, input, limit = Infinity) {
+    const a = sheetFitPlain(items, cols, ctx, input, limit);
+    // DRAWN-FIT (lf-roles r9): a one-column sheet whose continuation pages hold ONE story each is fitted again at the heights its
+    // plain tries draw (level 1, MEASURE_LO); taken when it holds more on fewer or as many pages. Every other page is unchanged.
+    if (cols === 1 && a.pages.length > 1 && a.pages.slice(1).some((p) => p.cap === 1) && items.some((it) => it.measured && it.measured[1] && it.measured[1].atLevel)) {
+        const d = sheetFitWith(items, cols, ctx, input, !a.span, !a.hint, limit, !!a.noLines, 0, true);
+        if (d.total > a.total || (d.total === a.total && d.pages.length < a.pages.length)) return d;
+    }
+    // GUIDED-MODEL-SPAN (lead ruling (e), 2026-11-13; ws-capacity-pin SIZE-ORDER): the ceiling trims a grid whose Model takes one
+    // cell to whole rows (S, 4 columns: Model + 10 tries is 11 cells, so the last part-row went and S printed 8 < M 9). Where
+    // the Model over TWO cells of row 1 completes the last row and keeps the ceiling, the Model spans two cells - its drawing at
+    // its own size, centred, its working written beside it (sideLinesOf) - and the page holds every try the ceiling allows.
+    // Any template, any size; never a Mix page (a Model per form), a full-row Model, a page of several sheets, or a fact page
+    // (factRows: its grid, cue row and row stretch are the lead's ruled option b, and its Model's provider steps - "Make 10" -
+    // are not the count-on Steps the page prints).
+    if (a.span || a.span2 || cols < 3 || items.length < 3 || mixModels(items) > 1 || a.pages.length !== 1 || factRows(input)) return a;
+    const ceil = Math.min(ceilFor(ctx, items), limit);
+    if (a.total >= ceil || sideLinesOf(items[0]).length < 2) return a;
+    // (r8b: the Model spans the FEWEST cells, two or more, that complete the grid at the ceiling - the whole first row when only
+    // that does: S 5 columns, Model + 10; M 4 columns, Model + 8. The rows under it hold whole rows of tries.)
+    const n = [...Array(cols - 1).keys()].map((k) => k + 2).find((k) => (ceil + k - 1) % cols === 0);
+    if (!n) return a;
+    // (the first tries keep their hint, BD-7: a spanning Model never costs them it)
+    const b = sheetFitWith(items, cols, ctx, input, true, false, limit, false, n);
+    return b.pages.length === 1 && b.total === ceil && b.pages[0].cap === ceil ? b : a;
+}
+
+function sheetFitPlain(items, cols, ctx, input, limit = Infinity) {
     let a = sheetFitWith(items, cols, ctx, input, false, false, limit);
     // Critic guided-r1 (mixed_time at L): a spanning Model too tall to leave a row of tries under
     // it stood alone on page 1 (H5). The Model then takes a cell of its own, its lines under it,
@@ -489,37 +548,51 @@ function sheetFit(items, cols, ctx, input, limit = Infinity) {
     return a;
 }
 
-function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = Infinity, noLines = false) {
-    const first = fitRows(items, cols, ctx, input, { noSpan, noHint, noLines });
+function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = Infinity, noLines = false, span2 = 0, drawn = false) {
+    const first = fitRows(items, cols, ctx, input, { noSpan, noHint, noLines, span2 });
+    // (the cells row 1 gives up to the Model: all but one under a full-row Model, one beside a two-cell Model)
+    const lead = first.span ? cols - 1 : first.span2 ? first.span2 - 1 : 0;
     const extra = first.h - first.h0;
     const mc = bandMetrics(ctx, layoutHeader(first.frame.contHeader), { cont: true });
     const availC = mc.budget - first.stepsH - mc.strip - first.wrap;
     const all = hMinAt(items, cols, ctx);
     // A page's rows are sized by the items that page holds (a tall coin set on page 2 does not
     // cost page 1 a row). Past the end of the probe the tallest probe item stands in.
+    // (DRAWN-FIT: the items past the hinted tries are plain tries, sized at the height they draw; the Model and the hinted tries
+    // keep the level-3 measure)
+    const pEndD = drawn ? (mixModels(items) > 1 ? mixPartialEnd(mixModels(items), cols, ceilFor(ctx, items)) : partialEndOf(cols, first.span, Math.min(items.length, ceilFor(ctx, items)), first.span2)) : 0;
     const hOf = (from, n) => {
         const slice = items.slice(from, from + n);
-        const h = slice.length ? hMinAt(slice, cols, ctx) : all;
-        return slice.length < n ? Math.max(h, all) : h;
+        const nMD = mixModels(items);
+        const dh = drawn && slice.length ? slice.map((it, k) => drawnMm(it, cols, from + k < nMD ? 3 : from + k < pEndD ? 2 : 1)) : null;
+        const h = dh && dh.every((x) => x > 0) ? Math.max(...dh) : slice.length ? hMinAt(slice, cols, ctx) : all;
+        return slice.length < n ? Math.max(h, drawn ? 0 : all) : h;
     };
     const pages = [];
     let total = 0;
     const ceil = ceilFor(ctx, items);
     const facts = factRows(input);
     const nM = mixModels(items);
+    const tight = !facts && tightRows(items);
     while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || !minMet(items, total))) {
         const isFirst = pages.length === 0;
         const avail = isFirst ? first.avail : availC;
         const maxR = Math.max(1, Math.ceil((ceil - total) / cols));
         // Each row is as tall as what IT holds (H13), so the rows that fit are counted by the sum
         // of their own heights, page 1's first row taller by the model's trace.
+        // (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1: a `tightRows` page draws its plain try rows - not the Model's row, not the
+        // hinted row - without the measure's label keep-out (koMm, plan); the fit counts them at that drawn height, so the rows the
+        // page has room for are dealt, up to the ceiling)
+        const hintRowFit = isFirst && first.hint ? partialRowOf(cols, first.span, nM, first.span2) : -1;
+        const koFit = tight ? koMm(ctx.size) : 0;
         const rowsH = (k) => {
             let idx = total, sum = 0;
             for (let rr = 0; rr < k; rr++) {
-                const n = isFirst && first.span && rr === 0 ? 1 : cols;
+                const n = isFirst && rr === 0 ? cols - lead : cols;
+                if (koFit && !(isFirst && (rr === 0 || rr === hintRowFit))) sum -= koFit;
                 sum += hOf(idx, n) + (isFirst && nM > 1
                     ? mixRowAdd(rr, cols, nM, mixPartialEnd(nM, cols, ceil), extra, first.hint) - (rr === 0 ? extra : 0)
-                    : (isFirst && rr === partialRowOf(cols, first.span, nM) ? (facts && rr === 0 ? Math.max(0, first.hint - extra) : first.hint) : 0));
+                    : (isFirst && rr === partialRowOf(cols, first.span, nM, isFirst ? first.span2 : 0) ? (facts && rr === 0 ? Math.max(0, first.hint - extra) : first.hint) : 0));
                 idx += n;
             }
             return sum;
@@ -528,7 +601,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
         for (let k = maxR; k >= 1; k--) {
             if (rowsH(k) + (isFirst ? extra : 0) <= avail) { r = k; break; }
         }
-        const cap = r * cols - (isFirst && first.span ? cols - 1 : 0);
+        const cap = r * cols - (isFirst ? lead : 0);
         pages.push({ rows: r, avail, h: hOf(total, r * cols), extra: isFirst ? extra : 0, cap });
         total += cap;
     }
@@ -544,9 +617,10 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     while (over > 0 && pages.length) {
         const pg = pages[pages.length - 1];
         const keepRows = Math.floor((pg.cap - over) / cols);
-        const spanCut = pages.length === 1 && first.span ? cols - 1 : 0;
+        const spanCut = pages.length === 1 ? lead : 0;
         if (keepRows >= 1 || pages.length === 1) {
-            const r = Math.max(1, keepRows + (spanCut ? 1 : 0));
+            // (a two-cell Model's row holds cols - 1 items: its rows are counted with the Model's extra cell)
+            const r = Math.max(1, first.span2 && spanCut ? Math.floor((pg.cap - over + lead) / cols) : keepRows + (spanCut ? 1 : 0));
             const cap = Math.max(1, r * cols - spanCut);
             // Page 1 at its last row: nothing more to trim (the total is clipped on return).
             if (cap >= pg.cap) break;
@@ -562,7 +636,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     // (a cell scoring several tries - Match 3 - in one column: a continuation page holding ONE cell alone gives it up, as the
     // ceiling counted in tries leaves it nothing to share its page with; lf-vocab r9, L-LONE / PG-23)
     if (pointsOf(items) > 1 && cols === 1 && pages.length > 1 && pages[pages.length - 1].cap === 1) { total -= 1; pages.pop(); }
-    return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total) });
+    return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total), drawn: !!drawn });
 }
 
 /* ================================================================== the worked trace */
@@ -576,6 +650,18 @@ const GUIDED_STRETCH = FILL_CAP;
  * of the page stays under the grid.
  */
 const rowLimit = (m) => fillLimit(m);
+
+/**
+ * `tightRows` on the Guided page only (footprint `guidedTight`, lf-placevalue live1, lf-roles critic r8b D2): an in-place cell
+ * whose Guided rows are held to their measured height - the Model row to the taller of its work lines and the tries' hint - and
+ * the spare page height stays under the grid. number_word_form's rows were stretched to 35-50 % empty under the answer line;
+ * its other roles keep their own fill (layout.tightRows is read on every role).
+ */
+const guidedTight = (xs) => tightRows(xs) || (Array.isArray(xs) && xs.length > 0 && xs.every((it) => !!(it && it.footprint && it.footprint.guidedTight)));
+/** An item's planned row height at `cols` (its measure + 1 mm, as the plan draws it). */
+const rowMmOf = (it, cols) => { const mm = it && it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : 0; };
+/** The share of the Model's row the tries beside it fill at least (GUIDED-MODEL-ROW: under it, the band beside the try reaches 30 %). */
+const MODEL_ROW_FILL = 0.8;
 
 /** The least a grey hint under a first try (BD-7) adds to its row, in mm. */
 const HINT_MM = 8;
@@ -612,13 +698,32 @@ export function answerTokens(it) {
     return [...out];
 }
 
-/** Does this hint text hold the problem's answer (any of answerTokens)? */
+/** A place phrase of a hint: "2 tens", "6 ones", "3 hundreds" (its number, then the place). */
+const PLACE_RE = /\b(\d+)(\s+)(thousand|hundred|ten|one)s?\b/gi;
+const PLACE_VAL = { thousand: 1000, hundred: 100, ten: 10, one: 1 };
+/**
+ * The number a hint's place phrases build together ("2 tens, 6 ones" -> 26), or null when it names fewer than two places
+ * (lf-roles critic r8b D3: number_word_form's grey hint '"twenty-six": 2 tens, 6 ones.' holds no "26", yet it is the whole
+ * answer). GUIDED-HINT-LEAK reads the printed hint the same way.
+ */
+export function placeBuilt(text) {
+    let sum = 0, k = 0;
+    for (const m of String(text || '').replace(/,(?=\d{3}\b)/g, '').matchAll(PLACE_RE)) { sum += Number(m[1]) * PLACE_VAL[m[3].toLowerCase()]; k++; }
+    return k >= 2 ? sum : null;
+}
+/** Do the hint's place phrases build an answer number the problem does not print? */
+const placeLeak = (t, it, given) => {
+    const b = placeBuilt(t);
+    return b !== null && !given.has(String(b)) && answerTokens(it).includes(String(b));
+};
+
+/** Does this hint text hold the problem's answer (any of answerTokens, or its place phrases built together)? */
 export function hintGivesAnswer(text, it) {
     const t = String(text || '').replace(/,(?=\d{3}\b)/g, '');
     const nums = new Set((t.match(/\d+(?:\.\d+)?/g) || []).flatMap((n) => [n, String(Number(n))]));
     const words = t.toLowerCase().replace(/[.,:;!?]/g, ' ').split(/\s+/);
     const given = givenNumbers(it);
-    return answerTokens(it).some((a) => (/\d/.test(a) ? nums.has(a) && !given.has(a) : words.includes(a)));
+    return answerTokens(it).some((a) => (/\d/.test(a) ? nums.has(a) && !given.has(a) : words.includes(a))) || placeLeak(t, it, given);
 }
 
 /** The numbers the problem itself prints: naming one gives nothing away ("Circle groups of 4." on 16 ÷ 4 = 4). */
@@ -645,6 +750,15 @@ export function hintOf(it) {
     const own = (t) => /\d/.test(t) || (t.match(/\b[A-Z][a-z]{2,}\b/g) || []).slice(1).some((w) => src.includes(w));
     const all = providerWorkedSteps(it, 6).map((st) => String(st.text || '').trim())
         .filter((t) => t && !/^(Write|Check|Say)\b/i.test(t) && t.length <= 70);
+    // (lf-placevalue critic live1 N1, the CLASS: a number name written as a numeral - the `words` template, words to numeral -
+    // has an answer made only of its place counts, so ANY count in a hint is an answer digit ('"two hundred": 2 in the hundreds.'
+    // under 262). Its hint is always the first step's frame with every count a gap: '"two hundred": ___ in the hundreds.')
+    const wp = (q.cell && q.cell.payload) || {};
+    if (it.template === 'words' && wp.way !== 'to_words') {
+        const first = all.find((t) => /\d/.test(t));
+        if (!first) return '';
+        return first.replace(/,(?=\d{3}\b)/g, '').replace(/\d+/g, '___').replace(/___(\s+)(thousand|hundred|ten|one)\b(?!s)/gi, '___$1$2s');
+    }
     const steps = all.filter((t) => !hintGivesAnswer(t, it));
     if (steps.length) return steps.find(own) || steps[0];
     // Every step names part of the answer (a clock's first step gives its hour): the first step
@@ -653,7 +767,10 @@ export function hintOf(it) {
     if (!all.length) return '';
     const given = givenNumbers(it);
     const toks = new Set(answerTokens(it).filter((a) => /\d/.test(a) && !given.has(a)));
-    const masked = all[0].replace(/,(?=\d{3}\b)/g, '')
+    const first = all[0].replace(/,(?=\d{3}\b)/g, '');
+    // (place phrases that build the answer - "2 tens, 6 ones" for 26 - leave their numbers as gaps: "___ tens, ___ ones",
+    // lf-roles critic r8b D3; the place word always plural, so "1 one" does not show its 1 as "___ one")
+    const masked = (placeLeak(first, it, given) ? first.replace(PLACE_RE, (m, n, sp, pl) => `___${sp}${pl}s`) : first)
         .replace(/\d+(?:\.\d+)?/g, (n) => (toks.has(n) || toks.has(String(Number(n))) ? '___' : n));
     // One sentence of it: the first with a gap ("The short hand has passed ___.").
     const frame = masked.split(/(?<=[.!?])\s+/).find((s) => s.includes('___')) || '';
@@ -677,9 +794,30 @@ export function workLinesOf(it) {
     // A fact traces only its answer, so the skip count its Steps teach ("Count by 3, 7 times:
     // 3, 6, ... 21.") is written under the Model (critic guided-r1, mult_facts: a grey 21 alone
     // over tries hinted "10 × 9 is 10 groups of 9."). Other step templates trace their working.
-    if (stepTemplateOf(it)) return it.template === 'fact' ? steps.filter((t) => /^Count by\b/i.test(t)).slice(0, 1) : [];
+    // (a number name on its answer line - `words`, not in the H T O boxes - draws no step states of its own: its Model writes the
+    // first step under it, '"fifty-three": 5 tens, 3 ones.', as the hinted tries beside it write its frame - lf-roles critic r8b D2)
+    const wordsLine = it.template === 'words' && !((it.q && it.q.cell && it.q.cell.payload) || {}).slot && ((it.q && it.q.cell && it.q.cell.payload) || {}).way !== 'to_words';
+    if (stepTemplateOf(it) && !wordsLine) return it.template === 'fact' ? steps.filter((t) => /^Count by\b/i.test(t)).slice(0, 1) : [];
+    if (wordsLine) return steps.filter((t) => !/^Write\b/i.test(t)).slice(0, 1);
     const work = steps.filter((t) => !/^Write\b/i.test(t));
     return (work.length ? work : steps).slice(0, 3);
+}
+
+/**
+ * The working a two-cell Model writes BESIDE its drawing (GUIDED-MODEL-SPAN, lead ruling (e)): its own work lines when the
+ * template has them; else, for a template that traces its working in the drawing (a column stack, a family, a bond), the
+ * provider's worked steps for THIS problem that carry its numbers, the "Write 5." each repeats left off (the traced digit says
+ * it) and "The answer is 25." (the traced answer): "Ones: 8 − 3 = 5." "Tens: 4 − 2 = 2." "Check: 25 + 23 = 48.". At most 3.
+ * A template that marks its Model in the drawing (DRAWN_MARKS) has none.
+ */
+export function sideLinesOf(it) {
+    if (!it || DRAWN_MARKS[it.template]) return [];
+    const own = workLinesOf(it);
+    if (own.length) return own;
+    // (a step whose numbers are all in its "Write 8." keeps it: "Tens: nothing to take away. Write 8.")
+    const cut = (t) => { const c = t.replace(/\s*\bWrite\b[^.]*\.\s*$/, '').trim(); return /\d/.test(c) ? c : t; };
+    return providerWorkedSteps(it, 6).map((st) => cut(String(st.text || '').trim()))
+        .filter((t) => /\d/.test(t) && t.length <= 60 && !/^(The answer is|Write)\b/i.test(t)).slice(0, 3);
 }
 
 /**
@@ -759,8 +897,26 @@ function workLinesMm(lines, cols, m) {
     return n * lineMm + 4;
 }
 
-const workHtml = (lines) => (lines.length
-    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+/** The height of a two-cell Model's side lines: the column beside the drawing is at most SIDE_SHARE of the two cells. */
+const SIDE_SHARE = 0.6;
+/** A Model over the whole first row: the drawing and its working each centred in one half of the row (EB-SIDE, r8b). */
+const ROW_SHARE = 0.45;
+function sideLinesMm(lines, cols, m, n = 2) {
+    if (!lines.length) return 0;
+    const colW = (n >= cols ? ROW_SHARE : SIDE_SHARE) * (n * 186 / Math.max(1, cols) - 8);
+    const charMm = 0.5 * m.textPt * (25.4 / 72);
+    const lineMm = m.textPt * 1.25 * (25.4 / 72);
+    return lines.reduce((a, t) => a + Math.max(1, Math.ceil((t.length * charMm) / colW)), 0) * lineMm;
+}
+
+/**
+ * A number name's work and hint lines keep each count with its place word on one line (lf-roles critic r8b n3: "3" at a line's
+ * end and "ones." on the next). `html` is escaped text, a gap already a span; only the `words` template's lines are glued.
+ */
+const gluePlaces = (html, it) => (it && it.template === 'words'
+    ? html.replace(/(\d+|<span class="mq-hintgap"[^>]*><\/span>) (thousands?|hundreds?|tens?|ones?)\b/g, '<span style="white-space:nowrap">$1 $2</span>') : html);
+const workHtml = (lines, it = null) => (lines.length
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${gluePlaces(esc(t), it)}</li>`).join('')}</ul>` : '');
 
 const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
@@ -774,6 +930,17 @@ const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-ring{display:inline-block;border:1pt solid #949494;border-radius:999px;padding:0 .2em;line-height:1.1}
 :is(.ws-page,.ws-sheet) .mq-uline{text-decoration:underline;text-decoration-color:#949494;text-decoration-thickness:1pt;text-underline-offset:.15em}
 :is(.ws-page,.ws-sheet) .mq-workeq{position:absolute;left:0;right:0;top:45%;text-align:center;font-size:var(--ws-text);font-weight:700;line-height:1.2}
+</style>`;
+/** A two-cell Model (GUIDED-MODEL-SPAN): its drawing at its own width, its working beside it - printed only on such a page. */
+const SPAN2_CSS = `<style data-mq-guided-span2>
+:is(.ws-page,.ws-sheet) .mq-modelspan2 .mq-workwrap{flex-direction:row;justify-content:center;align-items:center;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-modelspan2 .mq-spandraw{flex:none;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-modelspan2 .mq-worklines{width:auto;max-width:${SIDE_SHARE * 100}%;margin:0;text-align:left}
+</style>`;
+/** A Model over the whole first row (r8b): the drawing in the middle of the left half, its working in the middle of the right. */
+const SPANROW_CSS = `<style data-mq-guided-spanrow>
+:is(.ws-page,.ws-sheet) .mq-modelspanrow .mq-workwrap{justify-content:space-evenly;column-gap:0}
+:is(.ws-page,.ws-sheet) .mq-modelspanrow .mq-worklines{max-width:${ROW_SHARE * 100}%}
 </style>`;
 
 /* ======================================================================= the fade */
@@ -929,10 +1096,12 @@ function withCue(html, it, stage) {
  *              the blanks traced reads as a half-worked item (critic round 2).
  *   'blank'    every later row: structural supports only
  */
-function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
-    const work = stage === 'model' && lines ? workHtml(workLinesOf(it)) : '';
+function fadeRender(it, stage, ans, { hint = true, lines = true, side = false } = {}) {
+    // (`side`: a two-cell Model, its working beside the drawing - sideLinesOf, GUIDED-MODEL-SPAN)
+    const work = stage === 'model' && lines ? workHtml(side ? sideLinesOf(it) : workLinesOf(it), it) : '';
     const cue = (html0) => {
         const html = stage === 'model' ? modelMarks(html0, it) : html0;
+        if (work && side) return `<div class="mq-workwrap"><div class="mq-spandraw">${withCue(html, it, stage)}</div>${work}</div>`;
         return work ? `<div class="mq-workwrap">${withCue(html, it, stage)}${work}</div>` : withCue(html, it, stage);
     };
     // The partial stage's grey hint line prints on the pupil page AND its facsimile key (AK-1):
@@ -940,7 +1109,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
     const hintLine = stage === 'partial' && hint && it.template !== 'stack' ? hintOf(it) : '';
     // A framed hint's gap ("The short hand has passed ___.") is a short grey rule, never
     // underscore characters (SL-6).
-    const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
+    const hintHtml = gluePlaces(esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>'), it);
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
     return (c, o) => {
         if (c.state !== 'blank') {
@@ -999,7 +1168,11 @@ export function plan(input = {}) {
     // The partial stage is the rest of the Model's row (or the first row of tries), partialEndOf.
     // (a Mix page led by a Model per form: its first tries are the whole next row - every cell of
     // a hinted row carries a hint, H13 - or the first try alone when the tries fill only that row)
-    const partialEnd = nModels > 1 ? mixPartialEnd(nModels, cols, use.length) : partialEndOf(cols, fit.span, use.length);
+    const partialEnd = nModels > 1 ? mixPartialEnd(nModels, cols, use.length) : partialEndOf(cols, fit.span, use.length, fit.span2);
+    const tightAll = tightRows(use);
+    // (r8b, EB-BAND at L: a page of column stacks holds each stack in the middle of its row - the row stretch (rowLimit) left a
+    // 34.8 % band under each top-aligned stack at L; centred, the spare height is split above and below)
+    const stackPage = !facts && use.length > 1 && use.every((it) => it.template === 'stack');
     const planItems = use.map((it, i) => {
         const ans = answerOf(it);
         const stage = i < nModels ? 'model' : i < Math.max(partialEnd, nModels + 1) && ans ? 'partial' : 'blank';
@@ -1019,17 +1192,34 @@ export function plan(input = {}) {
         // tile row. Every model cell but a column stack (whose grid already starts below the tab)
         // steps its content down clear of the tab.
         const spanIt = fit.span && i === 0;
-        const cell = stage === 'model' && !OWN_TOP_BAND.has(it.template)
+        // (GUIDED-MODEL-SPAN: the Model over two cells of row 1, lead ruling (e))
+        const span2It = fit.span2 && i === 0;
+        const cell = span2It
+            ? Object.assign({}, it, {
+                cellCls: [it.cellCls || '', OWN_TOP_BAND.has(it.template) ? '' : 'mq-modelcell', 'mq-modelspan2', fit.span2 >= cols ? 'mq-modelspanrow' : ''].filter(Boolean).join(' '),
+                cellStyle: [it.cellStyle || '', `grid-column:span ${fit.span2}`].filter(Boolean).join(';'),
+            })
+            : stage === 'model' && !OWN_TOP_BAND.has(it.template)
             ? Object.assign({}, it, {
                 cellCls: [it.cellCls || '', 'mq-modelcell', spanIt ? 'mq-modelspan' : ''].join(' ').trim(),
                 cellStyle: spanIt ? [it.cellStyle || '', 'grid-column:1 / -1'].filter(Boolean).join(';') : it.cellStyle,
             })
             // A fact page (factRows): the tries beside the Model start where the Model's fact starts, under the tab's keep-out,
             // so the facts of the Model's row line up and each try's hint ends near the Model's (H13 under the try).
-            : facts && stage === 'partial' && !fit.span && i < cols
+            // (and a `guidedTight` number name - lf-roles critic r8b n6: the row-1 names sat a tab's keep-out above the Model's, and
+            // the hinted tries kept that height as a 28-30 % band under their hint)
+            : (facts || guidedTight([it])) && stage === 'partial' && !fit.span && i < cols
                 ? Object.assign({}, it, { cellStyle: [it.cellStyle || '', 'padding-top:calc(var(--ws-tab,6mm) + 1.5mm)'].filter(Boolean).join(';') })
                 : it;
-        return planItem(cell, { cols, level, render: fadeRender(it, stage, ans, { hint: !!fit.hint, lines: !fit.noLines }), model: stage === 'model', nolabel: stage === 'model' });
+        // (guided-tight-rows, lf-roles r8a: a `tightRows` try's row is its MEASURED height, which carries the label spacer and
+        // stamp reserve of the measuring cell (1.7-2.9 mm a row) - drawn top-aligned with no label, that reserve fell under the
+        // ink, a 31-37 % band (EB-BAND on expand / unit_form / combine Guided). The try sits in the middle of its row, so the
+        // reserve is split above and below it; the Model keeps its own top band and tab.)
+        // (GUIDED-MODEL-SPAN: on a page whose Model spans two cells every cell, the Model too, holds its problem in the middle of
+        // its row - the row stretch (rowLimit) left a 35 % band under each top-aligned stack, the Model's included)
+        const mid = (tightAll && stage !== 'model') || fit.span2 || stackPage
+            ? Object.assign({}, cell, { cellStyle: [cell.cellStyle || '', 'justify-content:center'].filter(Boolean).join(';') }) : cell;
+        return planItem(mid, { cols, level, render: fadeRender(it, stage, ans, { hint: !!fit.hint, lines: !fit.noLines, side: span2It }), model: stage === 'model', nolabel: stage === 'model' });
     });
     const stepsBand = () => {
         const cls = `mq-steps-rows${fit.steps.length <= 2 ? ' mq-steps-one' : ''}`;
@@ -1047,17 +1237,37 @@ export function plan(input = {}) {
         const chunk = planItems.slice(from, from + (pg.cap || pg.rows * cols));
         from += chunk.length;
         const spanHere = pi === 0 && fit.span;
-        const rows = Math.max(1, spanHere ? 1 + Math.ceil((chunk.length - 1) / cols) : Math.ceil(chunk.length / cols));
+        const span2Here = pi === 0 && fit.span2;
+        const lead2 = span2Here ? fit.span2 - 1 : 0;
+        const rows = Math.max(1, spanHere ? 1 + Math.ceil((chunk.length - 1) / cols) : Math.ceil((chunk.length + lead2) / cols));
         // RUBRIC H13: each row as tall as what IT holds (the model row with its trace), the rows
         // sharing the page in proportion, never stretched past FILL_CAP x their content (the
         // ceiling can stop more rows; the spare height then stays under the grid).
         const host = use.slice(at, at + chunk.length);
-        const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols)) : host.slice(r * cols, (r + 1) * cols));
-        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
-        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
+        const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols))
+            : span2Here ? (r === 0 ? host.slice(0, cols - lead2) : host.slice(cols - lead2 + (r - 1) * cols, cols - lead2 + r * cols))
+            : host.slice(r * cols, (r + 1) * cols));
+        // (lf-placevalue compare r3, step 4: a one-line cell that names its ink height - footprint `inkHMm`, the compare line - is
+        // measured under a number tab (CL-40's clearance over its line), and a Guided cell carries none (CL-14): its row needs the
+        // pads and the line, never the 3-4 mm of tab clearance the measurement holds; the pads are layout.js CELL_PAD_MM - the cell's
+        // 3 mm + 3 mm padding plus the 1 mm a measurement adds - so a size or look whose pads change moves them in one place)
+        // (lf-roles r9 DRAWN-FIT: an item measured at its drawn levels - MEASURE_LO, a word-work story - takes its row at the level its
+        // stage draws: the Model 3, a hinted try 2, a plain try 1)
+        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; const ink = Number((it.footprint || {}).inkHMm); const h = mm && mm.atLevel && Number.isFinite(mm.hMm) ? drawnMm(it, cols, use.indexOf(it) < nModels ? 3 : use.indexOf(it) < Math.max(partialEnd, nModels + 1) ? 2 : 1) : mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; return ink > 0 && tightRows([it]) ? Math.min(h, ink + CELL_PAD_MM) : h; });
+        // (an ink-sized row - every item named its inkHMm and is tight - already holds no keep-out: lf-roles' koMm is not taken twice)
+        const inkRow = (r) => rowItems(r).length > 0 && rowItems(r).every((it) => Number((it.footprint || {}).inkHMm) > 0 && tightRows([it]));
+        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels, span2Here ? fit.span2 : 0) : -1;
+        // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
+        // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
+        // line, side by side in one row; the sum left compare's Model row 38 mm at M for 10 mm of ink, EB-BAND)
+        const tightAdd = guidedTight(use.slice(at, at + chunk.length));
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
+            : tightAdd && r === 0 && r === hintRow && !spanHere ? Math.max(pg.extra || 0, fit.hint)
             : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
-        const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r));
+        // (guided-tight-rows, lf-roles r8a: a `tightRows` page's plain try rows - no Model, no hint - drop the label keep-out
+        // the measure reserved (layout.koMm: a Guided try has no letter), so the row is its ink and pads, centred below)
+        const ko = tightAll ? koMm(ctx.size) : 0;
+        const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r) - (ko && !inkRow(r) && !(pi === 0 && (r === 0 || r === hintRow)) ? ko : 0));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
         const sumW = w.reduce((x, y) => x + y, 0);
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
@@ -1073,8 +1283,23 @@ export function plan(input = {}) {
         // (`tightRows` - layout.tightRows, lf-placevalue pv debt via the lead: in-place rows held to their ink keep their own
         // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND;
         // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
-        const tight = tightRows(host);
+        const tight = guidedTight(host);
         let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        let modelRow = null;
+        // GUIDED-MODEL-ROW (lf-roles r8b (a), lead via the coordinator; lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %): the
+        // Model's row is as tall as the Model and its worked lines UNDER it, and the row stretch then grew it further, so the try beside
+        // it sat in a row a third or more empty. That row's height is held to what the TRIES beside the Model fill to MODEL_ROW_FILL
+        // (never under the Model's own height); the height it gives up stays under the grid.
+        if (pi === 0 && !spanHere && !span2Here && nModels === 1 && !facts && !tight && cols > 1 && (pg.extra || 0) > 0 && rows > 1) {
+            // (the row needs the taller of the Model with its lines and the try with its hint - not the two added, as w[0] counts them)
+            const tryC = Math.max(0, ...rowItems(0).slice(1).map((it) => rowMmOf(it, cols))) + (hintRow === 0 ? fit.hint || 0 : 0);
+            const modelC = rowMmOf(rowItems(0)[0], cols) + (pg.extra || 0);
+            // (only a row whose try would fill under 70 % of it - a band EB-BAND fails - is held; every other page is unchanged)
+            // (and only when the held row then passes: a Model whose own need leaves the try under 70 % is left as it was)
+            const held = Math.max(modelC, tryC, Math.min(Hr[0], tryC / MODEL_ROW_FILL));
+            if (tryC > 0 && tryC < 0.7 * Hr[0] && tryC >= 0.7 * held) Hr[0] = held;
+            modelRow = { modelRowMm: Math.round(modelC * 10) / 10, tryRowMm: Math.round(tryC * 10) / 10 };
+        }
         // (`evenRows` on a template's footprint - its cell spreads its content over its own height, so the Model's trace and the
         // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
         // tallest row's content. Opt-in, so no other template's page changes - lane lf-vocab r3, critic r2 #4: 405 / 340 px)
@@ -1087,12 +1312,27 @@ export function plan(input = {}) {
             // content needs about 90 mm; lf-vocab r6, critic r4 #2, ws-vocab-unit V18 measures the rendered rows)
             Hr = Hr.map(() => (even * rows <= pg.avail + 0.5 ? even : Math.max(Hr.reduce((a, b) => a + b, 0), pg.avail) / rows));
         }
+        // ONE-ROW (layout.oneRowCapOf, lf-roles r9 item 4 on Guided): a page of ONE row - a two-step story's Model or hinted try
+        // alone, 136 mm in a 197-200 mm row at M (31-32 %) - stops where the band under its work stays under 30 %; the white under
+        // the grid is the Guided page's accepted white (PT-GDP / PAGE_TYPES 12.1). Only a one-column page of word-work stories
+        // measured at their drawn levels (MEASURE_LO), whose row heights are what they draw.
+        // (and every row of such a page: a row of plain tries drawn at level 1 - 52 mm letter stories in 105 mm rows - is held the same way)
+        if (cols === 1 && host.length && host.every((it) => it.template === 'word-work' && it.measured && it.measured[1] && it.measured[1].atLevel)) Hr = Hr.map((x, r) => Math.min(x, oneRowCapOf(w[r])));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: GUIDED_CSS });
+        if (span2Here) sections.push({ kind: 'html', html: SPAN2_CSS });
+        if (span2Here && fit.span2 >= cols) sections.push({ kind: 'html', html: SPANROW_CSS });
         if (fit.steps.length) sections.push(stepsBand());
         // CL-14: Model and Guided cells are unlabelled (the band names them); still scored.
+        // (CL-4d, lead 2026-11-13; lf-placevalue compare r3: a cell its row stretches by 30 % or more - layout.rowStretches -
+        // carries `ws-rowstretch`; css/sheet-kit.css centres it when its template opted in, data-ws-stretchmid)
+        chunk.forEach((p, i) => {
+            const r = spanHere ? (i === 0 ? 0 : 1 + Math.floor((i - 1) / cols)) : Math.floor(i / cols);
+            const it = host[i];
+            if (p && it && it.template === 'pv' && Hr[r] && rowStretches(it, cols, Hr[r])) p.cls = `${p.cls || ''} ws-rowstretch`.trim();
+        });
         const part = gridPart(chunk, { cols, rows, cellH, labels: 'none', start: letter });
         if (spanHere) part.spanFirst = true;
         if (rows > 1 && Math.max(...Hr) - Math.min(...Hr) >= 1) part.rowsTpl = Hr.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ');
@@ -1101,7 +1341,7 @@ export function plan(input = {}) {
         sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: part });
         letter += chunk.filter((p) => !p.nolabel).length;
         pages.push({ sections });
-        fitsOut.push({ cols, rows, cellH });
+        fitsOut.push(Object.assign({ cols, rows, cellH }, modelRow || {}));
     });
     const n = pages.length;
     return assemble(ROLE_ID, input, frame, pages, {

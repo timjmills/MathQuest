@@ -99,7 +99,18 @@ const PLACE_CIRCLE_3 = { ...PLACE_CIRCLE, steps: PLACE_STEPS_3.concat('Circle th
 
 // D5 (lead 2026-11-07): with writeValue on, the instruction names both tasks (the place and the value).
 const withValue = (set, q) => (pvOf(q).writeValue ? { ...set, instructionKey: `${set.instructionKey}-value`, steps: set.steps.concat('Write what the digit is worth.') } : set);
+// Lead ruling (PEDAGOGY 4.1a, lf-placevalue 2026-11-13): identify's answer IS the place name, so its place heads (the H T O
+// letters, or the chart's place names) give it away on the unaided roles - Review, Test (A / B) and the pre-skill check, on
+// paper and in the quiz (the online test). There the support follows the role: none. The lesson's own Practice and Mixed
+// pages (independent / mixed-practice) and every other role keep the support as taught. Check: ws-pv-identify-heads.
+export const IDENTIFY_UNAIDED_ROLES = Object.freeze(['review', 'test', 'test-b', 'pre-skill-check']);
+// (lead ruling 14:24, 2026-11-13: only the DEFAULT changes on those roles - a support the teacher CHOSE for the page is kept. The
+// option store keeps a skill's choices as the values that differ from its defaults (packOptions: a share code, a saved
+// section, a stored quiz), so a chosen support is one that is not the default 'labels': the chart. A set with no support, or
+// the default, takes none. ws-pv-identify-heads PV-HEADS-UNAIDED (the default) and PV-HEADS-CHOSEN (the chart kept))
+const IDENTIFY_DEFAULT_SUPPORT = 'labels';
 registerSkill('placevalue:identify', {
+    roleOpts: (role, o) => (IDENTIFY_UNAIDED_ROLES.includes(role) && (o.support === undefined || o.support === IDENTIFY_DEFAULT_SUPPORT) ? { ...o, support: 'none' } : o),
     strings: stringsBy((q) => withValue(pvOf(q).response === 'bank'
         ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
         : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3,
@@ -659,11 +670,48 @@ registerSkill('placevalue:number_word_names', {
 
 /* =============================================================================== compare / order */
 
+// lf-placevalue compare r2 (critic r1 F2): the steps name and MARK the deciding place. Step 1 counts the digits (the count in
+// words when both are alike, so the Guided page's fading cue - hintOf, the first step that names a number - is step 2, the
+// decision, never "Compare 924 and 998" again); a same-length item names the first different place and boxes its two digits
+// (mark `digits`, the two digits and their sign), then writes the sign, the bigger number underlined (mark `win`). Three steps
+// for every item (SCC-P4), so the lesson anchor is three full-width panels (four left a 32 % band in each 2 x 2 panel:
+// print-lint H13-ABS). The "=" item is never a Model: it carries `noModel` (gen-pv), which the Guided, Opener and Scripted
+// Model pages read (F4: the only Model was "691 = 691"). Marks: `count` (a grey dot under every digit), `digits`
+// (the index, from the left, of the deciding digit - or `all`), `win` ('a' | 'b', the bigger number underlined), `answer`.
+const COUNT_WORD = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+const PLACE_FROM_LEFT = (len, i) => PLACE_WORD[10 ** (len - 1 - i)] || '';
+/** The compare item's decision: kind 'length' | 'place' | 'equal', the deciding index and digits. */
+export function compareDecision(a, b) {
+    const sa = String(Math.trunc(Math.abs(Number(a)))), sb = String(Math.trunc(Math.abs(Number(b))));
+    if (sa.length !== sb.length) return { kind: 'length', la: sa.length, lb: sb.length, sa, sb };
+    const i = [...sa].findIndex((d, k) => d !== sb[k]);
+    if (i < 0) return { kind: 'equal', la: sa.length, lb: sb.length, sa, sb };
+    return { kind: 'place', la: sa.length, lb: sb.length, sa, sb, i, da: Number(sa[i]), db: Number(sb[i]), place: PLACE_FROM_LEFT(sa.length, i) };
+}
+/**
+ * The M6 sign a pupil writes by comparing the last digits (M-C2) or, lengths differing, the digits from the left without
+ * counting them (M-C3): the first digit that differs decides - 89 > 312 (8 > 3), and 345 < 37 (4 < 7: compare r4, critic r2,
+ * the close trap's own first-digit form; the first digits alone, 3 and 3, named no error, so a lengths=mixed page could show
+ * the last-digit form only).
+ */
+export function compareM6(a, b) {
+    const sa = String(a), sb = String(b);
+    const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
+    const k = [...sa.slice(0, Math.min(sa.length, sb.length))].findIndex((d, i) => d !== sb[i]);
+    return {
+        last: cmp(Number(sa.slice(-1)), Number(sb.slice(-1))),
+        first: sa.length !== sb.length ? (k < 0 ? '=' : cmp(Number(sa[k]), Number(sb[k]))) : null,
+    };
+}
+
 registerSkill('placevalue:compare', {
+    // (compare r4, critic r2 N1: an item M6 gets right - "=", a pair the ones place decides - names no error on purpose; a True
+    // or False? False slot skips it, as Error analysis does, instead of printing it True: 12-33 % false, PT-TOF-1 asks 40-60 %)
+    falseNeedsWrong: true,
     strings: strings({
         iCan: 'I Can compare numbers with <, > and =',
         instructionKey: 'compare',
-        steps: ['Count the digits: more digits is bigger.', 'Same length: compare from the left place.', 'The first different digit decides.'],
+        steps: ['Count the digits: more digits is bigger.', 'Same count: find the first different digit from the left.', 'The bigger digit is the bigger number.'],
         say: '__ is __ __.',
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
@@ -671,31 +719,45 @@ registerSkill('placevalue:compare', {
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
-        const la = String(p.a).length, lb = String(p.b).length;
-        let why;
-        if (la !== lb) why = `${f(la > lb ? p.a : p.b)} has more digits.`;
-        else if (p.a === p.b) why = 'Every digit is the same.';
-        else {
-            const sa = String(p.a), sb = String(p.b);
-            const i = [...sa].findIndex((d, k) => d !== sb[k]);
-            why = `The first different digits are ${sa[i]} and ${sb[i]}.`;
+        const d = compareDecision(p.a, p.b);
+        const A = f(p.a), B = f(p.b);
+        // (critic compare r3 N9, the wrap class a second time: EVERY relation a step writes is one unbreakable unit - "Write
+        // 501,765 > / 179,619." broke at band 999,999; ws-pv-compare-pages WRAP-SIGN runs the wide bands too)
+        const rel = (x, s, y) => `${x}\u00a0${s}\u00a0${y}`;
+        const count = { slot: 'count', value: `${d.la},${d.lb}` };
+        const answer = { slot: 'answer', value: String(q.ans) };
+        if (d.kind === 'length') {
+            return [step(`${A} has ${COUNT_WORD[d.la] || d.la} digits. ${B} has ${COUNT_WORD[d.lb] || d.lb}.`, [count]),
+                step(`More digits is bigger: ${d.la > d.lb ? A : B}.`, [{ slot: 'win', value: d.la > d.lb ? 'a' : 'b' }]),
+                step(`Write ${rel(A, q.ans, B)}.`, [answer])];
         }
-        return [step(`Compare ${f(p.a)} and ${f(p.b)}.`), step(why), step(`${f(p.a)} ${q.ans} ${f(p.b)}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        if (d.kind === 'equal') {
+            return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
+                // (critic r2 N7: the step names the digits it judges, so the Guided cue - hintOf, the first step that names a number
+                // - is this step, the one that decides "=", never "Both have three digits.")
+                step(`Every digit is the same: ${A} and ${B}.`, [{ slot: 'digits', value: 'all' }]),
+                step(`Write ${rel(A, '=', B)}.`, [answer])];
+        }
+        return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
+            // (critic r2: "7 >" / "5." broke over two lines - the sign is held to its digits with no-break spaces; ws-pv-compare-pages WRAP-SIGN)
+            step(`The ${d.place} digits differ: ${d.da}\u00a0${d.da > d.db ? '>' : '<'}\u00a0${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
+            step(`Write ${rel(A, q.ans, B)}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }, answer])];
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return null;
-        const flip = q.ans === '>' ? '<' : q.ans === '<' ? '>' : '<';
-        const lastDigits = (String(p.a).slice(-1) > String(p.b).slice(-1)) ? '>' : (String(p.a).slice(-1) < String(p.b).slice(-1) ? '<' : '=');
-        const sa = String(p.a), sb = String(p.b);
-        const firstDigits = sa.length !== sb.length ? (sa[0] > sb[0] ? '>' : sa[0] < sb[0] ? '<' : null) : null;
-        // A named place error first (critic round 3: every shown mistake was the reversed sign);
-        // the reversed sign only when no place error gives a wrong sign.
-        const place = [
-            firstDigits ? { value: firstDigits, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
-            { value: lastDigits, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' },
+        const m6 = compareM6(p.a, p.b);
+        // (critic r1 F3: the thinking pages show the card's M6 - "89 > 312 because 8 > 3" - and nothing else. Different lengths:
+        // the first-digit form whenever it gives a wrong sign, else the last digits; same length: the last digits. An item M6
+        // gets RIGHT - "=", or a pair the last place decides (775 / 778) - has no named error and returns none, so a slot that
+        // must show an error skips it: Error analysis (PT-ERR-1) and a True or False? False slot (falseNeedsWrong above); on a
+        // True slot it prints true. The reversed sign (M-C1) the r1
+        // pages showed instead - 509 < 508, 418 < 418 - was not the card's error.)
+        const named = [
+            m6.first && m6.first !== '=' ? { value: m6.first, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
+            m6.last !== '=' ? { value: m6.last, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' } : null,
         ].filter((c) => c && c.value !== String(q.ans));
-        return choose(q, place.length ? place : [{ value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' }]);
+        return named.length ? choose(q, named.slice(0, 1)) : null;
     },
 });
 
@@ -1222,11 +1284,32 @@ const WORDS_TO_NUMBER = { iCan: 'I Can write a number from its name', instructio
     steps: ['Read the hundreds word.', 'Read the last words as one number.', 'No tens or ones word? Write 0.', 'Write the digits.'],
     say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.words, p.n] : null; } };
 const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey: 'number-words',
-    steps: ['Say the hundreds: three hundred.', 'Say the last two digits as one number.', 'Write the words.'],
+    // (lf-placevalue critic live1 N2: "Say the hundreds: three hundred." - a literal from one example - printed over 53, 26, 99;
+    // each kind of number has its own Steps below, and none names a number)
+    steps: ['Say the hundreds word.', 'Say the last two digits as one number.', 'Write the words.'],
     say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.n, p.words] : null; } };
 // (critic nwf r1 opener / scripted-model C2: "Read the hundreds word." beside "eleven" - a name under 100 has no hundreds word;
 // its steps read the tens word, then the ones word)
 const WORDS_TO_NUMBER_2 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'Read the ones word.', 'Write the digits.'] });
+// (lf-roles critic r8b D4: "eleven" sat on a Guided page whose Steps read "the tens word, the ones word" - a teen, a tens word
+// alone ("forty") and a one-word name under ten are each their own kind of problem, with Steps that fit them. Their own Steps
+// also make them their own kind to the Guided page (guided.js kindOf), which keeps one kind: PT 2.3, GUIDED-ONE-KIND.)
+const WORDS_TO_NUMBER_TEEN = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Eleven to nineteen: 1 ten.', 'Find the ones in the word.', 'Write 1, then the ones.'] });
+const WORDS_TO_NUMBER_TENS = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'No ones word? Write 0 ones.', 'Write the digits.'] });
+const WORDS_TO_NUMBER_1 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the word.', 'Write its digit.'] });
+/** The kind of a words-to-numeral name: one word under ten, a teen, a tens word alone, two words (tens and ones), 100 and up. */
+export const wordsKind = (n) => (n < 10 ? 'one-word' : n < 20 && n !== 10 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
+const WORDS_STRINGS = { 'one-word': WORDS_TO_NUMBER_1, teen: WORDS_TO_NUMBER_TEEN, decade: WORDS_TO_NUMBER_TENS, 'two-word': WORDS_TO_NUMBER_2 };
+// numeral to words, one string set a kind (critic live1 N2: the hundreds Steps over two-digit numbers)
+const TO_WORDS_STRINGS = {
+    'one-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its word.'] }),
+    teen: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Eleven to nineteen: one word.', 'Write the teen word.'] }),
+    decade: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'No ones? Write the tens word alone.'] }),
+    'two-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'Say the ones word.', 'Write them with a dash.'] }),
+};
+// ("numbers to 20" numeral to words: every name from zero to twenty is ONE word, so one Steps set fits every item of the page -
+// its kinds need not be dealt apart; critic live1 N3 on the band-20 Opener)
+const TO_WORDS_UPTO20 = Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its name: one word up to twenty.'] });
 const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
 
 /** Every named wrong answer of a words-to-numeral item (`fits`: in H T O boxes, the claim has the boxes' digit count). */
@@ -1258,7 +1341,7 @@ function wordsWrongs(q) {
 }
 
 registerSkill('composing:number_word_form', {
-    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : Number(pvOf(q).n) < 100 ? WORDS_TO_NUMBER_2 : null), WORDS_TO_NUMBER),
+    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? (q.cell && q.cell.payload && q.cell.payload.pool === 20 ? TO_WORDS_UPTO20 : Number(pvOf(q).n) < 100 ? TO_WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : NUMBER_TO_WORDS) : Number(pvOf(q).n) < 100 ? WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : null), WORDS_TO_NUMBER),
     misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
     workedSteps: (q) => {
         const p = pvOf(q);
@@ -1266,7 +1349,14 @@ registerSkill('composing:number_word_form', {
         if (!Number.isFinite(n)) return [];
         const h = Math.floor(n / 100), r = n % 100;
         if (p.way === 'to_words') {
-            return clampSteps([step(`${f(n)}: the ${h || 'no'} is in the hundreds place.`), step(`The last two digits read ${r}.`), step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
+            // (critic live1 N2: "26: the no is in the hundreds place." - a template filled with 'no'. The first step names the
+            // number's places from its digits only - it holds no word of the answer, so it is the Guided hint as it stands)
+            const t = Math.floor(r / 10), o = r % 10;
+            const pl = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+            if (!h) return clampSteps([step(n < 10 ? `${f(n)}: ${pl(o, 'one', 'ones')}.` : `${f(n)}: ${pl(t, 'ten', 'tens')}, ${pl(o, 'one', 'ones')}.`),
+                step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
+            return clampSteps([step(`${f(n)}: ${pl(h, 'hundred', 'hundreds')}, then ${r ? `the rest, ${r}` : 'no tens or ones'}.`),
+                step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
         }
         // H T O boxes (option answerSlot, the chart's words panels): each step writes its boxes. (No "Read it: 403." step: it
         // wrote nothing, so the lesson's model drew it as a bare full-width row, 64 % beside its text - ws-empty-band EB-SIDE;
@@ -1279,15 +1369,17 @@ registerSkill('composing:number_word_form', {
             if (!h) return clampSteps([step(n >= 10 ? `"${p.words}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.` : `"${p.words}": ${o} one${o === 1 ? '' : 's'}.`, n >= 10 ? [{ slot: 'pv-0', value: String(t) }, { slot: 'pv-1', value: String(o) }] : [{ slot: 'pv-0', value: String(o) }])]);
             const rest = String(p.words).split(' hundred')[1] ? String(p.words).split(' hundred')[1].trim() : '';
             const two = !r ? 'No tens or ones words: write 0 tens, 0 ones.'
-                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} ones.`
-                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} ones.`;
+                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} one${o === 1 ? '' : 's'}.`
+                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.`;
             return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the H box.`, [{ slot: 'pv-0', value: String(h) }]),
                 step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }])]);
         }
         // (critic nwf r1 N3: a name under 100 has no hundreds word - "thirty-five hundred: 0 in the hundreds" was false)
+        // (critic live1 nit: a one-word name under ten is its ones alone - "seven": 7 ones - as its Steps read it)
+        if (!h && r < 10) return clampSteps([step(`"${p.words}": ${r} one${r === 1 ? '' : 's'}.`), step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
         if (!h) return clampSteps([step(`"${p.words}": ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'}, ${r % 10} one${r % 10 === 1 ? '' : 's'}.`),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
-        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} tens ${r % 10} ones.` : 'No tens or ones words: 0 tens 0 ones.'),
+        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'} ${r % 10} one${r % 10 === 1 ? '' : 's'}.` : 'No tens or ones words: 0 tens 0 ones.'),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },
     wrongAnswer: (q) => {

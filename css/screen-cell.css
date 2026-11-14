@@ -752,6 +752,20 @@ html .mq-scell .mq-work-area .mq-work:focus { box-shadow: inset 0 0 0 3px #000 !
     font-size: var(--mq-text); line-height: 1.6; text-align: left; align-self: stretch; margin: 0 0 10px;
 }
 .mq-scell .mq-ibline .mq-cellbox { font-size: calc(var(--mq-digit) * 0.8); height: max(48px, 1.2em); }
+/* lf-placevalue live1: a number sentence (placevalue:expand) at the host's digit size, bold as on paper; an operator keeps its box */
+.mq-scell .mq-ibline.mq-ibnum { font-size: var(--mq-digit); font-weight: 700; line-height: 1.5; text-align: center; }
+.mq-scell .mq-ibline.mq-ibnum .mq-ibkeep { white-space: nowrap; }
+/* (lf-placevalue critic live1 N4: on the online worksheet the sentence stays on ONE line - the grid then takes the columns that
+   hold it, 2 at 1280 as before - and its boxes keep the size the digit fit gave them before, 103 x 76 px at 1280) */
+@media (min-width: 600px) { .mq-grid-cell .mq-ibline.mq-ibnum { white-space: nowrap; } }
+.mq-grid-cell .mq-ibline.mq-ibnum .mq-cellbox { font-size: var(--mq-digit); width: max(103px, calc(var(--mq-w, 2) * 0.62em + 0.9em)); height: max(76px, 1.3em); }
+/* (critic live1 N5, H6; lead 22:19: global, the touch floor is an engine rule) an answer box's INPUT - its hit area - is at least
+   48 px tall on a tablet. The box is border-box with a 1 px border above and below, so a 48 px box held a 46 px input (measured:
+   unit_form worksheet 820, box 52 x 48, input 50 x 46); 50 px is the floor plus the two border pixels, the least that reaches
+   48 px of hit area. Every boxed slot input (the expand sentence, unit_form's place boxes, lf-tools r1 A1) takes it. */
+html body .mq-scell .mq-cellbox:has(> input.mq-cellslot) { min-height: 50px !important; }
+/* (the card's own inputs on that line: room for a 4-digit part at the digit size) */
+.mq-scell .mq-ibline.mq-ibnum input.ib-cell { min-width: max(56px, 2.4em) !important; }
 
 /* cloze twin: the equation, then the two lists in ink */
 .mq-scell .mq-cloze { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
@@ -2110,3 +2124,61 @@ html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wro
 html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 40px; }
 @media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 48px; } }
 @media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 56px; } }
+
+/* (lf-hosts critic r1 F1, lead ruling 2026-11-13: hand-off 1's worksheet digit raise to 40 / 48 / 56 px was removed before it
+   shipped - it reflowed the online worksheet (placevalue:expand 2 -> 1 column at 1280, answer boxes stretched, fact cards
+   28-56 px taller). The worksheet keeps master's grid digit, which holds the contract's 29 px floor (SP table; TY-10b count
+   rows on a phone). ws-worksheet-reflow WS-REFLOW is the ratchet: columns never fall, cards never grow, against master.) */
+
+/* lf-checks queue 10 (lf-builds word-stories critic F3, lead 2026-11-13): a word-work answer digit box (.mq-wwans, the column
+   row of a story's answer) drew a 44 px box whose input was 40 x 44 px at 390 (card, quiz) and 44 x 44 on the worksheet, under
+   the 48 px touch floor (SP-10). The DRAWN box stays the span's 2 px border; the input's touch box grows to >= 48 x 48 as
+   transparent padding around the drawn interior, pulled out of the layout by an equal negative margin (the kit line-slot rule's
+   pattern). Every fill (white, the next-box yellow, green / red) is clipped to the drawn interior, and every ring is an outline
+   set back by the padding onto it. ADDITIVE. ws-phone-card TOUCH-TARGET is the check (every host at 390). */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot {
+    --mq-tp: 4px;
+    box-sizing: border-box !important; flex: none !important;
+    width: calc(100% + 2 * var(--mq-tp)) !important; min-width: 48px !important; max-width: none !important;
+    height: max(48px, calc(100% + 2 * var(--mq-tp))) !important; min-height: 48px !important;
+    margin: calc(0px - var(--mq-tp)) !important; padding: var(--mq-tp) !important;
+    background-clip: content-box !important; background-origin: content-box !important;
+    box-shadow: none !important; outline: none;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot:is(:focus, :focus-visible):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: none !important; background-color: var(--mq-next-fill, #fff) !important;
+    outline: var(--mq-next-w, 4px) solid var(--mq-next-color, #1565d8) !important; outline-offset: calc(0px - var(--mq-next-w, 4px) - var(--mq-tp)) !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot.mq-active-box:not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: none !important; background-color: var(--mq-next-fill, #fff) !important;
+    outline: var(--mq-next-w, 4px) solid var(--mq-next-color, #1565d8) !important; outline-offset: calc(0px - var(--mq-next-w, 4px) - var(--mq-tp)) !important;
+}
+/* lf-hosts critic r1 F3 / F4: (F3) the focused answer box above took a yellow #f2c200 outline (about 1.6:1 on white, under
+   AX-6's 3:1), a look no other answer box has. The focused / next answer box now draws master's O-1 ring for a focused next
+   answer box - the one the column stacks' digits and the other answer boxes draw (the --mq-next-* switch: blue 4 px, or the
+   html.mq-next-yellow set) - as an outline set back by the padding onto the drawn edge. The working boxes keep master's 3 px
+   black focus outline, as a column stack's carry boxes do. (F4) the 44 px boxes sat on a 47 px pitch, so the 48 px touch boxes overlapped 1 px and a tap on a box's right edge
+   focused its neighbour: a column-work grid that holds answer boxes on a screen host opens its column gap to >= 4 px (pitch
+   >= 48). The drawn boxes keep their size. ws-phone-card FOCUS-RING and TOUCH-UNIQUE are the checks. ADDITIVE. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwcols:has(> * > .mq-wwans[data-mq-cell]) {
+    column-gap: max(4px, var(--mq-wwgap, 0px)) !important;
+}
+
+/* lf-hosts critic r2 F1: the answer box's touch padding above (the input grows past the drawn box by --mq-tp on every side) sat
+   UNDER later boxes in paint order - a later grid / flex item (div.mq-wwstep, div.mq-wwcols.mq-wwdiv) painted over the padding
+   ring, so a real tap 1 px inside the touch area's top edge hit that container and the cell's click handler focused the ACTIVE
+   box instead (division box 1 -> box 0; add_wp_20 answer box bottom edge -> the working box). The input is lifted above its
+   neighbours in hit-testing order with position:relative + z-index (no offsets: the drawn box does not move). ADDITIVE.
+   The column work also sits in a sideways scroll wrapper (word-work.js: max-width:100%; overflow-x:auto, which makes
+   overflow-y auto too), whose edge is the drawn boxes' edge - so it CLIPPED the padding ring and its hit area: a tap 1 px
+   inside the touch area's top edge hit div.mq-wwstep and the cell's click handler focused the active box (division box 1 ->
+   box 0 at 820 and 1280). On a screen host that wrapper gets room for the ring as padding cancelled by an equal negative
+   margin (nothing drawn moves), and the input is lifted above later neighbours in hit-testing order (position:relative +
+   z-index, no offsets). ADDITIVE. ws-phone-card TOUCH-HIT (real page.mouse.click 1 px inside the edge midpoints and corners of
+   every typed box's touch area) is the check. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot {
+    position: relative !important; z-index: 2 !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
+    padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
+}

@@ -81,7 +81,7 @@ if (arg('skill', null)) {
 }
 if (has('render')) {
     const keys = (arg('skill', '') || '').split(',').map(s => s.trim()).filter(Boolean);
-    const sizes = (arg('sizes', 'S,L') || 'S,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const sizes = (arg('sizes', 'M,L') || 'M,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const root = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
     const list = (k) => (arg(k, '') || '').split(',').map((x) => x.trim()).filter(Boolean);
     require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m), bands: has('bands'), bandH13: has('band-h13'), ruleSkills: list('rule-skills'), onlyOptions: list('options') })

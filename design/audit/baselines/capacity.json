@@ -1,9 +1,1751 @@
 {
- "note": "ws-capacity-pin: items a page per skill x role x size (CAPACITY-NO-DROP); rewrite only on master or with a ruling",
+ "note": "ws-capacity-pin: items a page per skill x role x size (CAPACITY-NO-DROP); rewrite only on master or with a ruling Owner 2026-11-13 (plan item 9): size S dropped - its S keys removed; M / L keys untouched.",
  "written": "2026-11-13",
  "pages": {
-  "addition:add_facts true-false S": {
+  "addition:add_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "multiplication:mult_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "multiplication:mult_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts_long stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts_long stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_10k_no_regroup stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_100k_no_regroup stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_100k_no_regroup stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_1m_no_regroup stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_1m_no_regroup stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_2d_1d stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:fact_family_sort stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "addition:fact_family_sort stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "addition:add_wp_20_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "vocabulary:vocab_grade_pictures stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "vocabulary:vocab_pick3_words stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "vocabulary:vocab_pick3_words stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:expand stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:expand stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:identify stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:identify stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:unit_form stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:unit_form stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "composing:number_word_form stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "composing:number_word_form stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:value stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:value stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:combine stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:combine stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "division:div_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice L": {
    "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice M": {
+   "items": 9,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice M": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice M": {
+   "items": 4,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice M": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice L": {
+   "items": 8,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:value mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "placevalue:value mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "placevalue:combine mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "addition:add_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "addition:add_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_100_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_1k_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 2
+  },
+  "subtraction:sub_1k_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_10k_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 2
+  },
+  "subtraction:sub_10k_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_100k_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 2
+  },
+  "subtraction:sub_100k_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 4
+  },
+  "subtraction:sub_1m_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_1m_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 4
+  },
+  "subtraction:sub_2d_1d fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "addition:fact_family_sort fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:fact_family_sort fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_grade_pictures fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_grade_pictures fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_pick3_words fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_pick3_words fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:expand fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:expand fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:identify fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:identify fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:unit_form fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:unit_form fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "composing:number_word_form fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "composing:number_word_form fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:value fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:value fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:combine fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:combine fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "division:div_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "addition:add_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "addition:add_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "division:div_facts_long fact-rows M": {
+   "items": 36,
+   "pages": 1
+  },
+  "division:div_facts_long fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup fact-rows M": {
+   "items": 36,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup fact-rows M": {
+   "items": 36,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup fact-rows M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup fact-rows L": {
+   "items": 15,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup fact-rows M": {
+   "items": 15,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup fact-rows L": {
+   "items": 15,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "addition:fact_family_sort fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:fact_family_sort fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_grade_pictures fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_grade_pictures fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_pick3_words fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_pick3_words fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:expand fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:expand fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:identify fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:identify fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:unit_form fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:unit_form fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "composing:number_word_form fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "composing:number_word_form fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:value fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:value fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:combine fact-rows M": {
+   "na": "Fact rows print one fact per cell: two numbers and one sign. This skill adds thr"
+  },
+  "placevalue:combine fact-rows L": {
+   "na": "Fact rows print one fact per cell: two numbers and one sign. This skill adds thr"
+  },
+  "division:div_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "division:div_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "addition:add_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_facts word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_facts word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "multiplication:mult_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "multiplication:mult_facts word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "division:div_facts_long word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "division:div_facts_long word-problems L": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:fact_family_sort word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "addition:fact_family_sort word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "addition:add_wp_20_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "vocabulary:vocab_grade_pictures word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "vocabulary:vocab_pick3_words word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "vocabulary:vocab_pick3_words word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:expand word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:expand word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:identify word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:identify word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:unit_form word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:unit_form word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "composing:number_word_form word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "composing:number_word_form word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:value word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:value word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:combine word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:combine word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "division:div_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "division:div_facts word-problems L": {
+   "items": 2,
+   "pages": 1
+  },
+  "addition:add_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "addition:add_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "multiplication:mult_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "multiplication:mult_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "division:div_facts_long guided M": {
+   "items": 8,
+   "pages": 1
+  },
+  "division:div_facts_long guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup guided M": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:fact_family_sort guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:fact_family_sort guided L": {
+   "items": 7,
+   "pages": 2
+  },
+  "addition:add_wp_20_plain guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "addition:add_wp_20_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "addition:add_wp_10 guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_wp_10 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "addition:add_wp_10_plain guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "addition:add_wp_20 guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "addition:add_wp_20 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "vocabulary:vocab_grade_pictures guided M": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures guided L": {
+   "items": 2,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words guided L": {
+   "items": 4,
+   "pages": 1
+  },
+  "placevalue:expand guided M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:expand guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:identify guided M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:identify guided L": {
+   "items": 5,
+   "pages": 1
+  },
+  "placevalue:unit_form guided M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:unit_form guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "composing:number_word_form guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "composing:number_word_form guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:value guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "placevalue:value guided L": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:combine guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "placevalue:combine guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "division:div_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "division:div_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "addition:add_facts scripted-model L": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_facts scripted-model L": {
+   "items": 2,
+   "pages": 1
+  },
+  "multiplication:mult_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "multiplication:mult_facts scripted-model L": {
+   "items": 2,
+   "pages": 2
+  },
+  "division:div_facts_long scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "division:div_facts_long scripted-model L": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_1m_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_2d_1d scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:fact_family_sort scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:fact_family_sort scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_20_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_20 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_20 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_grade_pictures scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_grade_pictures scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_pick3_words scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_pick3_words scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "placevalue:expand scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:expand scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:identify scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:identify scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "placevalue:unit_form scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:unit_form scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "composing:number_word_form scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "composing:number_word_form scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:value scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:value scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:combine scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:combine scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "division:div_facts scripted-model L": {
+   "items": 2,
+   "pages": 2
+  },
+  "addition:add_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "addition:add_facts opener L": {
+   "items": 11,
+   "pages": 1
+  },
+  "subtraction:sub_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "subtraction:sub_facts opener L": {
+   "items": 11,
+   "pages": 1
+  },
+  "multiplication:mult_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "multiplication:mult_facts opener L": {
+   "items": 8,
+   "pages": 1
+  },
+  "division:div_facts_long opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "division:div_facts_long opener L": {
+   "items": 11,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup opener M": {
+   "items": 5,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:fact_family_sort opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "addition:fact_family_sort opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures opener M": {
+   "items": 2,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "placevalue:expand opener M": {
+   "items": 2,
+   "pages": 1
+  },
+  "placevalue:expand opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "placevalue:identify opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:identify opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "placevalue:unit_form opener M": {
+   "items": 4,
+   "pages": 1
+  },
+  "placevalue:unit_form opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "composing:number_word_form opener M": {
+   "items": 10,
+   "pages": 1
+  },
+  "composing:number_word_form opener L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:value opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "placevalue:value opener L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine opener M": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "division:div_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "division:div_facts opener L": {
+   "items": 10,
    "pages": 1
   },
   "addition:add_facts true-false M": {
@@ -14,10 +1756,6 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_facts reason-it S": {
-   "items": 3,
-   "pages": 1
-  },
   "addition:add_facts reason-it M": {
    "items": 3,
    "pages": 1
@@ -26,19 +1764,11 @@
    "items": 2,
    "pages": 1
   },
-  "addition:add_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "addition:add_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -50,20 +1780,12 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_facts review S": {
-   "items": 16,
-   "pages": 1
-  },
   "addition:add_facts review M": {
    "items": 10,
    "pages": 1
   },
   "addition:add_facts review L": {
    "items": 10,
-   "pages": 1
-  },
-  "addition:add_facts test S": {
-   "items": 20,
    "pages": 1
   },
   "addition:add_facts test M": {
@@ -74,20 +1796,12 @@
    "items": 12,
    "pages": 1
   },
-  "addition:add_facts independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "addition:add_facts independent M": {
    "items": 20,
    "pages": 1
   },
   "addition:add_facts independent L": {
    "items": 12,
-   "pages": 1
-  },
-  "addition:add_facts more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "addition:add_facts more-practice M": {
@@ -98,20 +1812,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_facts true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_facts true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_facts reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "subtraction:sub_facts reason-it M": {
@@ -122,19 +1828,11 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -146,20 +1844,12 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_facts review S": {
-   "items": 15,
-   "pages": 1
-  },
   "subtraction:sub_facts review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_facts review L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_facts test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_facts test M": {
@@ -170,20 +1860,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_facts independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_facts independent M": {
    "items": 20,
    "pages": 1
   },
   "subtraction:sub_facts independent L": {
    "items": 12,
-   "pages": 1
-  },
-  "subtraction:sub_facts more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_facts more-practice M": {
@@ -194,20 +1876,12 @@
    "items": 12,
    "pages": 1
   },
-  "multiplication:mult_facts true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "multiplication:mult_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "multiplication:mult_facts true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "multiplication:mult_facts reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "multiplication:mult_facts reason-it M": {
@@ -218,19 +1892,11 @@
    "items": 2,
    "pages": 1
   },
-  "multiplication:mult_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "multiplication:mult_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "multiplication:mult_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "multiplication:mult_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -242,20 +1908,12 @@
    "items": 4,
    "pages": 1
   },
-  "multiplication:mult_facts review S": {
-   "items": 16,
-   "pages": 1
-  },
   "multiplication:mult_facts review M": {
    "items": 12,
    "pages": 1
   },
   "multiplication:mult_facts review L": {
    "items": 12,
-   "pages": 1
-  },
-  "multiplication:mult_facts test S": {
-   "items": 20,
    "pages": 1
   },
   "multiplication:mult_facts test M": {
@@ -266,20 +1924,12 @@
    "items": 12,
    "pages": 1
   },
-  "multiplication:mult_facts independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "multiplication:mult_facts independent M": {
    "items": 20,
    "pages": 1
   },
   "multiplication:mult_facts independent L": {
    "items": 12,
-   "pages": 1
-  },
-  "multiplication:mult_facts more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "multiplication:mult_facts more-practice M": {
@@ -290,19 +1940,11 @@
    "items": 12,
    "pages": 1
   },
-  "division:div_facts_long true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "division:div_facts_long true-false M": {
    "items": 6,
    "pages": 1
   },
   "division:div_facts_long true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "division:div_facts_long reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -314,10 +1956,6 @@
    "items": 2,
    "pages": 1
   },
-  "division:div_facts_long error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "division:div_facts_long error-analysis M": {
    "items": 4,
    "pages": 1
@@ -325,10 +1963,6 @@
   "division:div_facts_long error-analysis L": {
    "items": 4,
    "pages": 1
-  },
-  "division:div_facts_long pre-skill-check S": {
-   "items": 7,
-   "pages": 2
   },
   "division:div_facts_long pre-skill-check M": {
    "items": 7,
@@ -338,20 +1972,12 @@
    "items": 7,
    "pages": 2
   },
-  "division:div_facts_long review S": {
-   "items": 16,
-   "pages": 1
-  },
   "division:div_facts_long review M": {
    "items": 8,
    "pages": 1
   },
   "division:div_facts_long review L": {
    "items": 8,
-   "pages": 1
-  },
-  "division:div_facts_long test S": {
-   "items": 20,
    "pages": 1
   },
   "division:div_facts_long test M": {
@@ -362,20 +1988,12 @@
    "items": 12,
    "pages": 1
   },
-  "division:div_facts_long independent S": {
-   "items": 30,
-   "pages": 1
-  },
   "division:div_facts_long independent M": {
    "items": 24,
    "pages": 1
   },
   "division:div_facts_long independent L": {
    "items": 15,
-   "pages": 1
-  },
-  "division:div_facts_long more-practice S": {
-   "items": 30,
    "pages": 1
   },
   "division:div_facts_long more-practice M": {
@@ -386,19 +2004,11 @@
    "items": 15,
    "pages": 1
   },
-  "subtraction:sub_50_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -410,20 +2020,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_50_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup pre-skill-check M": {
@@ -434,20 +2036,12 @@
    "items": 16,
    "pages": 2
   },
-  "subtraction:sub_50_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup test M": {
@@ -458,20 +2052,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_50_no_regroup independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup more-practice M": {
@@ -482,19 +2068,11 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_100_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -506,20 +2084,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_100_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup pre-skill-check M": {
@@ -530,20 +2100,12 @@
    "items": 10,
    "pages": 2
   },
-  "subtraction:sub_100_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup test M": {
@@ -554,20 +2116,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_100_no_regroup independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup more-practice M": {
@@ -578,19 +2132,11 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_1k_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -602,20 +2148,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_1k_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup pre-skill-check M": {
@@ -626,20 +2164,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_1k_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup test M": {
@@ -650,20 +2180,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_1k_no_regroup independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup more-practice M": {
@@ -674,19 +2196,11 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_10k_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -698,20 +2212,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_10k_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup pre-skill-check M": {
@@ -722,20 +2228,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_10k_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup test M": {
@@ -746,20 +2244,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_10k_no_regroup independent S": {
-   "items": 20,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup independent M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup more-practice S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup more-practice M": {
@@ -770,20 +2260,12 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup true-false L": {
    "items": 2,
-   "pages": 1
-  },
-  "subtraction:sub_100k_no_regroup reason-it S": {
-   "items": 4,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup reason-it M": {
@@ -794,20 +2276,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup error-analysis L": {
    "items": 3,
-   "pages": 1
-  },
-  "subtraction:sub_100k_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup pre-skill-check M": {
@@ -818,20 +2292,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_100k_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_100k_no_regroup test S": {
-   "items": 15,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup test M": {
@@ -842,10 +2308,6 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup independent S": {
-   "items": 15,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup independent M": {
    "items": 8,
    "pages": 1
@@ -854,19 +2316,11 @@
    "items": 6,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup more-practice S": {
-   "items": 15,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup more-practice M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup more-practice L": {
-   "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_1m_no_regroup true-false S": {
    "items": 6,
    "pages": 1
   },
@@ -878,20 +2332,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup reason-it S": {
-   "items": 4,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup reason-it M": {
    "items": 3,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup reason-it L": {
    "items": 2,
-   "pages": 1
-  },
-  "subtraction:sub_1m_no_regroup error-analysis S": {
-   "items": 6,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup error-analysis M": {
@@ -902,10 +2348,6 @@
    "items": 3,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup pre-skill-check S": {
-   "items": 14,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup pre-skill-check M": {
    "items": 8,
    "pages": 2
@@ -914,20 +2356,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_1m_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup review M": {
    "items": 9,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_1m_no_regroup test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup test M": {
@@ -938,10 +2372,6 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup independent S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup independent M": {
    "items": 8,
    "pages": 1
@@ -950,19 +2380,11 @@
    "items": 6,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup more-practice S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup more-practice M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup more-practice L": {
-   "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d true-false S": {
    "items": 6,
    "pages": 1
   },
@@ -974,20 +2396,12 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_2d_1d reason-it S": {
-   "items": 4,
-   "pages": 1
-  },
   "subtraction:sub_2d_1d reason-it M": {
    "items": 3,
    "pages": 1
   },
   "subtraction:sub_2d_1d reason-it L": {
    "items": 2,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d error-analysis S": {
-   "items": 6,
    "pages": 1
   },
   "subtraction:sub_2d_1d error-analysis M": {
@@ -998,10 +2412,6 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_2d_1d pre-skill-check S": {
-   "items": 6,
-   "pages": 2
-  },
   "subtraction:sub_2d_1d pre-skill-check M": {
    "items": 6,
    "pages": 2
@@ -1010,20 +2420,12 @@
    "items": 6,
    "pages": 2
   },
-  "subtraction:sub_2d_1d review S": {
-   "items": 12,
-   "pages": 1
-  },
   "subtraction:sub_2d_1d review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_2d_1d review L": {
    "items": 5,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_2d_1d test M": {
@@ -1034,20 +2436,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_2d_1d independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_2d_1d independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_2d_1d independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_2d_1d more-practice M": {
@@ -1058,20 +2452,12 @@
    "items": 9,
    "pages": 1
   },
-  "addition:fact_family_sort true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:fact_family_sort true-false M": {
    "items": 4,
    "pages": 1
   },
   "addition:fact_family_sort true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:fact_family_sort reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "addition:fact_family_sort reason-it M": {
@@ -1082,20 +2468,12 @@
    "items": 2,
    "pages": 1
   },
-  "addition:fact_family_sort error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:fact_family_sort error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:fact_family_sort error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:fact_family_sort pre-skill-check S": {
-   "items": 6,
    "pages": 1
   },
   "addition:fact_family_sort pre-skill-check M": {
@@ -1106,20 +2484,12 @@
    "items": 6,
    "pages": 2
   },
-  "addition:fact_family_sort review S": {
-   "items": 9,
-   "pages": 1
-  },
   "addition:fact_family_sort review M": {
    "items": 8,
    "pages": 1
   },
   "addition:fact_family_sort review L": {
    "items": 5,
-   "pages": 1
-  },
-  "addition:fact_family_sort test S": {
-   "items": 12,
    "pages": 1
   },
   "addition:fact_family_sort test M": {
@@ -1130,10 +2500,6 @@
    "items": 6,
    "pages": 1
   },
-  "addition:fact_family_sort independent S": {
-   "items": 12,
-   "pages": 1
-  },
   "addition:fact_family_sort independent M": {
    "items": 9,
    "pages": 1
@@ -1142,19 +2508,11 @@
    "items": 6,
    "pages": 1
   },
-  "addition:fact_family_sort more-practice S": {
-   "items": 12,
-   "pages": 1
-  },
   "addition:fact_family_sort more-practice M": {
    "items": 9,
    "pages": 1
   },
   "addition:fact_family_sort more-practice L": {
-   "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain true-false S": {
    "items": 6,
    "pages": 1
   },
@@ -1166,20 +2524,12 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_wp_20_plain reason-it S": {
-   "items": 2,
-   "pages": 1
-  },
   "addition:add_wp_20_plain reason-it M": {
    "items": 2,
    "pages": 1
   },
   "addition:add_wp_20_plain reason-it L": {
    "items": 2,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain error-analysis S": {
-   "items": 6,
    "pages": 1
   },
   "addition:add_wp_20_plain error-analysis M": {
@@ -1190,10 +2540,6 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_wp_20_plain pre-skill-check S": {
-   "items": 10,
-   "pages": 2
-  },
   "addition:add_wp_20_plain pre-skill-check M": {
    "items": 10,
    "pages": 2
@@ -1202,20 +2548,12 @@
    "items": 10,
    "pages": 2
   },
-  "addition:add_wp_20_plain review S": {
-   "items": 10,
-   "pages": 1
-  },
   "addition:add_wp_20_plain review M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "addition:add_wp_20_plain test M": {
@@ -1226,20 +2564,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_20_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "addition:add_wp_20_plain independent M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "addition:add_wp_20_plain more-practice M": {
@@ -1250,20 +2580,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_10 true-false S": {
-   "items": 4,
-   "pages": 1
-  },
   "addition:add_wp_10 true-false M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_wp_10 true-false L": {
    "items": 2,
-   "pages": 1
-  },
-  "addition:add_wp_10 reason-it S": {
-   "items": 1,
    "pages": 1
   },
   "addition:add_wp_10 reason-it M": {
@@ -1274,20 +2596,12 @@
    "items": 1,
    "pages": 1
   },
-  "addition:add_wp_10 error-analysis S": {
-   "items": 4,
-   "pages": 1
-  },
   "addition:add_wp_10 error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_wp_10 error-analysis L": {
    "items": 3,
-   "pages": 1
-  },
-  "addition:add_wp_10 pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "addition:add_wp_10 pre-skill-check M": {
@@ -1298,19 +2612,11 @@
    "items": 14,
    "pages": 1
   },
-  "addition:add_wp_10 review S": {
-   "items": 7,
-   "pages": 1
-  },
   "addition:add_wp_10 review M": {
    "items": 7,
    "pages": 1
   },
   "addition:add_wp_10 review L": {
-   "items": 7,
-   "pages": 1
-  },
-  "addition:add_wp_10 test S": {
    "items": 7,
    "pages": 1
   },
@@ -1322,20 +2628,12 @@
    "items": 5,
    "pages": 1
   },
-  "addition:add_wp_10 independent S": {
-   "items": 7,
-   "pages": 1
-  },
   "addition:add_wp_10 independent M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_wp_10 independent L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_10 more-practice S": {
-   "items": 7,
    "pages": 1
   },
   "addition:add_wp_10 more-practice M": {
@@ -1346,20 +2644,12 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_wp_20 true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_20 true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_20 reason-it M": {
@@ -1370,20 +2660,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_20 error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_20 error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 pre-skill-check S": {
-   "items": 12,
    "pages": 1
   },
   "subtraction:sub_wp_20 pre-skill-check M": {
@@ -1394,20 +2676,12 @@
    "items": 12,
    "pages": 2
   },
-  "subtraction:sub_wp_20 review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20 review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_20 test M": {
@@ -1418,20 +2692,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_20 independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20 independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_20 more-practice M": {
@@ -1442,20 +2708,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_10_plain true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_10_plain true-false M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_wp_10_plain true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "addition:add_wp_10_plain reason-it M": {
@@ -1466,20 +2724,12 @@
    "items": 2,
    "pages": 1
   },
-  "addition:add_wp_10_plain error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_10_plain error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_wp_10_plain error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "addition:add_wp_10_plain pre-skill-check M": {
@@ -1490,20 +2740,12 @@
    "items": 14,
    "pages": 2
   },
-  "addition:add_wp_10_plain review S": {
-   "items": 8,
-   "pages": 1
-  },
   "addition:add_wp_10_plain review M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_10_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "addition:add_wp_10_plain test M": {
@@ -1514,20 +2756,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_10_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "addition:add_wp_10_plain independent M": {
    "items": 10,
    "pages": 1
   },
   "addition:add_wp_10_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "addition:add_wp_10_plain more-practice M": {
@@ -1538,20 +2772,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_20 true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_20 true-false M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_wp_20 true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_20 reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "addition:add_wp_20 reason-it M": {
@@ -1562,10 +2788,6 @@
    "items": 2,
    "pages": 1
   },
-  "addition:add_wp_20 error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_20 error-analysis M": {
    "items": 4,
    "pages": 1
@@ -1573,10 +2795,6 @@
   "addition:add_wp_20 error-analysis L": {
    "items": 4,
    "pages": 1
-  },
-  "addition:add_wp_20 pre-skill-check S": {
-   "items": 12,
-   "pages": 2
   },
   "addition:add_wp_20 pre-skill-check M": {
    "items": 12,
@@ -1586,20 +2804,12 @@
    "items": 12,
    "pages": 2
   },
-  "addition:add_wp_20 review S": {
-   "items": 10,
-   "pages": 1
-  },
   "addition:add_wp_20 review M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20 review L": {
    "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_20 test S": {
-   "items": 10,
    "pages": 1
   },
   "addition:add_wp_20 test M": {
@@ -1610,20 +2820,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_20 independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "addition:add_wp_20 independent M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20 independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "addition:add_wp_20 more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "addition:add_wp_20 more-practice M": {
@@ -1634,20 +2836,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10 true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_10 true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_10 reason-it M": {
@@ -1658,20 +2852,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_10 error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_10 error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "subtraction:sub_wp_10 pre-skill-check M": {
@@ -1682,20 +2868,12 @@
    "items": 14,
    "pages": 2
   },
-  "subtraction:sub_wp_10 review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 review M": {
    "items": 9,
    "pages": 1
   },
   "subtraction:sub_wp_10 review L": {
    "items": 7,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_10 test M": {
@@ -1706,20 +2884,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10 independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_10 independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_10 more-practice M": {
@@ -1730,20 +2900,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10_plain true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain reason-it M": {
@@ -1754,20 +2916,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_10_plain error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain pre-skill-check M": {
@@ -1778,20 +2932,12 @@
    "items": 14,
    "pages": 2
   },
-  "subtraction:sub_wp_10_plain review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain test M": {
@@ -1802,20 +2948,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain more-practice M": {
@@ -1826,20 +2964,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_20_plain true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain reason-it M": {
@@ -1850,20 +2980,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_20_plain error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain pre-skill-check S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain pre-skill-check M": {
@@ -1874,20 +2996,12 @@
    "items": 10,
    "pages": 2
   },
-  "subtraction:sub_wp_20_plain review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain test M": {
@@ -1898,20 +3012,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_20_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain more-practice M": {
@@ -1922,19 +3028,11 @@
    "items": 8,
    "pages": 1
   },
-  "placevalue:expand true-false S": {
-   "items": 5,
-   "pages": 1
-  },
   "placevalue:expand true-false M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:expand true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:expand reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -1946,20 +3044,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:expand error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:expand error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:expand error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:expand pre-skill-check S": {
-   "items": 13,
    "pages": 1
   },
   "placevalue:expand pre-skill-check M": {
@@ -1970,20 +3060,12 @@
    "items": 9,
    "pages": 2
   },
-  "placevalue:expand review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:expand review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:expand review L": {
    "items": 11,
-   "pages": 1
-  },
-  "placevalue:expand test S": {
-   "items": 12,
    "pages": 1
   },
   "placevalue:expand test M": {
@@ -1994,20 +3076,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:expand independent S": {
-   "items": 15,
-   "pages": 1
-  },
   "placevalue:expand independent M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:expand independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:expand more-practice S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:expand more-practice M": {
@@ -2018,20 +3092,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:identify true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "placevalue:identify true-false M": {
    "items": 6,
    "pages": 1
   },
   "placevalue:identify true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:identify reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "placevalue:identify reason-it M": {
@@ -2042,20 +3108,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:identify error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:identify error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:identify error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:identify pre-skill-check S": {
-   "items": 10,
    "pages": 1
   },
   "placevalue:identify pre-skill-check M": {
@@ -2066,20 +3124,12 @@
    "items": 6,
    "pages": 2
   },
-  "placevalue:identify review S": {
-   "items": 10,
-   "pages": 1
-  },
   "placevalue:identify review M": {
    "items": 5,
    "pages": 1
   },
   "placevalue:identify review L": {
    "items": 5,
-   "pages": 1
-  },
-  "placevalue:identify test S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:identify test M": {
@@ -2090,20 +3140,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:identify independent S": {
-   "items": 20,
-   "pages": 1
-  },
   "placevalue:identify independent M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:identify independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:identify more-practice S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:identify more-practice M": {
@@ -2114,19 +3156,11 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:unit_form true-false S": {
-   "items": 5,
-   "pages": 1
-  },
   "placevalue:unit_form true-false M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:unit_form true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:unit_form reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2138,20 +3172,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:unit_form error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:unit_form error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:unit_form error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:unit_form pre-skill-check S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:unit_form pre-skill-check M": {
@@ -2162,20 +3188,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:unit_form review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:unit_form review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:unit_form review L": {
    "items": 9,
-   "pages": 1
-  },
-  "placevalue:unit_form test S": {
-   "items": 12,
    "pages": 1
   },
   "placevalue:unit_form test M": {
@@ -2186,20 +3204,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:unit_form independent S": {
-   "items": 15,
-   "pages": 1
-  },
   "placevalue:unit_form independent M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:unit_form independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:unit_form more-practice S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:unit_form more-practice M": {
@@ -2210,19 +3220,11 @@
    "items": 10,
    "pages": 1
   },
-  "composing:number_word_form true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "composing:number_word_form true-false M": {
    "items": 6,
    "pages": 1
   },
   "composing:number_word_form true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "composing:number_word_form reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2234,10 +3236,6 @@
    "items": 2,
    "pages": 1
   },
-  "composing:number_word_form error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "composing:number_word_form error-analysis M": {
    "items": 4,
    "pages": 1
@@ -2245,10 +3243,6 @@
   "composing:number_word_form error-analysis L": {
    "items": 4,
    "pages": 1
-  },
-  "composing:number_word_form pre-skill-check S": {
-   "items": 10,
-   "pages": 2
   },
   "composing:number_word_form pre-skill-check M": {
    "items": 6,
@@ -2258,20 +3252,12 @@
    "items": 6,
    "pages": 2
   },
-  "composing:number_word_form review S": {
-   "items": 16,
-   "pages": 1
-  },
   "composing:number_word_form review M": {
    "items": 12,
    "pages": 1
   },
   "composing:number_word_form review L": {
    "items": 10,
-   "pages": 1
-  },
-  "composing:number_word_form test S": {
-   "items": 20,
    "pages": 1
   },
   "composing:number_word_form test M": {
@@ -2282,20 +3268,12 @@
    "items": 12,
    "pages": 1
   },
-  "composing:number_word_form independent S": {
-   "items": 28,
-   "pages": 1
-  },
   "composing:number_word_form independent M": {
    "items": 21,
    "pages": 1
   },
   "composing:number_word_form independent L": {
    "items": 15,
-   "pages": 1
-  },
-  "composing:number_word_form more-practice S": {
-   "items": 28,
    "pages": 1
   },
   "composing:number_word_form more-practice M": {
@@ -2306,19 +3284,11 @@
    "items": 15,
    "pages": 1
   },
-  "placevalue:value true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "placevalue:value true-false M": {
    "items": 6,
    "pages": 1
   },
   "placevalue:value true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:value reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2330,20 +3300,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:value error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:value error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:value error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:value pre-skill-check S": {
-   "items": 10,
    "pages": 1
   },
   "placevalue:value pre-skill-check M": {
@@ -2354,20 +3316,12 @@
    "items": 6,
    "pages": 2
   },
-  "placevalue:value review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:value review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:value review L": {
    "items": 12,
-   "pages": 1
-  },
-  "placevalue:value test S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:value test M": {
@@ -2378,20 +3332,12 @@
    "items": 12,
    "pages": 1
   },
-  "placevalue:value independent S": {
-   "items": 30,
-   "pages": 1
-  },
   "placevalue:value independent M": {
    "items": 24,
    "pages": 1
   },
   "placevalue:value independent L": {
    "items": 18,
-   "pages": 1
-  },
-  "placevalue:value more-practice S": {
-   "items": 30,
    "pages": 1
   },
   "placevalue:value more-practice M": {
@@ -2402,19 +3348,11 @@
    "items": 18,
    "pages": 1
   },
-  "placevalue:combine true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "placevalue:combine true-false M": {
    "items": 6,
    "pages": 1
   },
   "placevalue:combine true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:combine reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2426,20 +3364,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:combine error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:combine error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:combine error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:combine pre-skill-check S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:combine pre-skill-check M": {
@@ -2450,20 +3380,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:combine review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:combine review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:combine review L": {
    "items": 9,
-   "pages": 1
-  },
-  "placevalue:combine test S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:combine test M": {
@@ -2474,20 +3396,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:combine independent S": {
-   "items": 27,
-   "pages": 1
-  },
   "placevalue:combine independent M": {
    "items": 18,
    "pages": 1
   },
   "placevalue:combine independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:combine more-practice S": {
-   "items": 27,
    "pages": 1
   },
   "placevalue:combine more-practice M": {
@@ -2498,19 +3412,11 @@
    "items": 10,
    "pages": 1
   },
-  "division:div_facts true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "division:div_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "division:div_facts true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "division:div_facts reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2522,19 +3428,11 @@
    "items": 2,
    "pages": 1
   },
-  "division:div_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "division:div_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "division:div_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "division:div_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -2546,20 +3444,12 @@
    "items": 4,
    "pages": 1
   },
-  "division:div_facts review S": {
-   "items": 16,
-   "pages": 1
-  },
   "division:div_facts review M": {
    "items": 12,
    "pages": 1
   },
   "division:div_facts review L": {
    "items": 12,
-   "pages": 1
-  },
-  "division:div_facts test S": {
-   "items": 36,
    "pages": 1
   },
   "division:div_facts test M": {
@@ -2570,20 +3460,12 @@
    "items": 18,
    "pages": 1
   },
-  "division:div_facts independent S": {
-   "items": 36,
-   "pages": 1
-  },
   "division:div_facts independent M": {
    "items": 24,
    "pages": 1
   },
   "division:div_facts independent L": {
    "items": 18,
-   "pages": 1
-  },
-  "division:div_facts more-practice S": {
-   "items": 36,
    "pages": 1
   },
   "division:div_facts more-practice M": {
@@ -2604,10 +3486,6 @@
    "items": 2,
    "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"
   },
-  "patterns:growing_shape_patterns review S": {
-   "items": 7,
-   "reason": "items taller than the page allows: Term 1-4 drawings (lead ruling 2026-11-13, critic r2/r3 N4: PT-REV-1's 8 cannot fit)"
-  },
   "patterns:growing_shape_patterns review M": {
    "items": 5,
    "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
@@ -2615,6 +3493,70 @@
   "patterns:growing_shape_patterns review L": {
    "items": 5,
    "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
+  },
+  "algebra:multi_step_word_plain reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word_plain reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_mult_div_first reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_mult_div_first reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_mult reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_mult reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_div reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_add_then_div reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_letter_equation reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_letter_equation reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_estimate_check reason-it M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:two_step_estimate_check reason-it L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word test M": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "algebra:multi_step_word test L": {
+   "items": 1,
+   "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
   }
  },
  "sizeOrderOpts": [

@@ -2981,14 +2981,18 @@ export function cellSlot(w = 2, label = '', fixed = false) {
 }
 
 /** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
-export function inlineBlanksHTML(text, widths, fixed = false) {
+export function inlineBlanksHTML(text, widths, fixed = false, { numeric = false } = {}) {
     let i = 0;
-    const html = esc(plainText(text)).replace(/_{3,}/g, () => {
+    let html = esc(plainText(text)).replace(/_{3,}/g, () => {
         const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
         i++;
         return cellSlot(w, '', fixed && !!(widths && widths[i - 1]));
     });
-    return i ? `<div class="mq-ibline">${html}</div>` : '';
+    // `numeric` (lf-placevalue live1, the lead via lf-hosts: placevalue:expand's "144 = [ ] + [ ] + [ ]" on the online worksheet
+    // was set at the sentence size, 18 px, under the 29 px digit floor): a number sentence is set at the host's digit size, bold
+    // as on paper, and each operator keeps its box on its line (ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP)
+    if (numeric) html = html.replace(/([+=\u2212\u00d7])\s*(<span class="mq-cellbox"[^>]*><\/span>)/g, '<span class="mq-ibkeep">$1 $2</span>');
+    return i ? `<div class="mq-ibline${numeric ? ' mq-ibnum' : ''}">${html}</div>` : '';
 }
 
 /**
@@ -3571,7 +3575,9 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth)) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        // (a place-value expanded form - the paper's pv `expand` cell - is a number sentence: set at the digit size)
+        const numeric = !!(q.cell && q.cell.payload && q.cell.payload.kind === 'expand');
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth), { numeric }) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
@@ -4176,7 +4182,15 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     } catch (e) { return null; }
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
-    tpl.innerHTML = _screenSizes(html, digitPt);
+    // (lf-placevalue, lead 15:35 / ws-screen-ink-size TEXT-SIZE: the cell is drawn at L and scaled to the host's digit, so on the
+    // online worksheet (29 px digits) a 16 pt place word - "hundreds", "worth" - fell to 14 pt. A word never prints smaller on
+    // screen than on the M page: its size is the larger of the scaled one and its print size at M (L less the text step).)
+    let textStep = 2;
+    try { const mM = resolveCtx({ mode: 'print', size: 'M', look: 'ican', state: 'blank' }).metrics; const mL = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' }).metrics; textStep = Math.max(0, mL.textPt - mM.textPt); } catch (e) { /* 2 */ }
+    tpl.innerHTML = _screenSizes(html, digitPt).replace(/font-size:calc\(var\(--mq-digit\) \* ([\d.]+)\)/g, (m, r) => {
+        const v = Number(r) * digitPt;
+        return Number(r) < 0.85 && v - textStep > 0 ? `font-size:max(calc(var(--mq-digit) * ${r}), ${(v - textStep).toFixed(1)}pt)` : m;
+    });
     // A unit-form frame ("6,725 = __ thousands __ hundreds __ tens __ ones") keeps its slots on one
     // nowrap line for paper; on a phone that line ran off both edges of the card. On screen each
     // slot and its place word become one unbreakable pair, and the pairs wrap between them, so a
@@ -4291,7 +4305,10 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     });
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
-    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;
+    // (lf-placevalue compare round, ws-empty-band EB-PARITY: the compare twin is the paper's kit cell on every host - marked
+    // [data-ws-cell="pv"] as the words twin is; an inline block, so the mark is the drawing's own box, centred as before)
+    const inner = p.kind === 'compare' ? `<div data-ws-cell="pv" style="display:inline-block;max-width:100%;padding:0 2mm;box-sizing:border-box;">${wrap.innerHTML}</div>` : wrap.innerHTML;
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
     const instr = printInstructionFor(q, categoryId) || plainText(q.text);
     // a chart's digits make ONE number: the host checks the number, not a list of parts
     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };

@@ -1,0 +1,10 @@
+  TITLE-CODE-RT "My own title" above: decodes as {"text":"","pos":"below"}
+  TITLE-CODE-RT "My own title" above (link): decodes as {"text":"","pos":"below"}
+  TITLE-CODE-REQ: simple-print.js exports no titleHeaderOf(print) (the request header the dialog sends)
+  TITLE-CODE-RT "I Can add 10 to a number (a long one that wraps to two lines on the page, still fine)" below: decodes as {"text":"","pos":"below"}
+  TITLE-CODE-RT "I Can add 10 to a number (a long one that wraps to two lines on the page, still fine)" below (link): decodes as {"text":"","pos":"below"}
+  TITLE-CODE-REQ: simple-print.js exports no titleHeaderOf(print) (the request header the dialog sends)
+  TITLE-CODE-RT "Fractions & “quotes” é" above: decodes as {"text":"","pos":"below"}
+  TITLE-CODE-RT "Fractions & “quotes” é" above (link): decodes as {"text":"","pos":"below"}
+  TITLE-CODE-REQ: simple-print.js exports no titleHeaderOf(print) (the request header the dialog sends)
+ws-title-code: FAIL (9)

@@ -39,6 +39,14 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TOOL = 'ws-precritic-plan';
 const args = process.argv.slice(2);
+// --capacity-pin <file>: ONLY the capacity-roles check on that pin (the backtest's fixtures), then exit
+if (args.includes('--capacity-pin')) {
+    const r = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'ws-capacity-pin.cjs'), '--roles-check', '--pin', args[args.indexOf('--capacity-pin') + 1]], { encoding: 'utf8' });
+    const line = String(r.stdout || '').trim().split('\n').pop() || String(r.stderr || '').slice(0, 200);
+    console.log(`  ${line}`);
+    console.log(r.status === 0 ? 'ws-precritic-plan: OK (capacity roles)' : 'ws-precritic-plan: FAIL (capacity roles)');
+    process.exit(r.status === 0 ? 0 : 1);
+}
 // tools that are drivers or wrappers, never the check under test
 const WRAPPERS = new Set(['ws-backtest', 'ws-precritic', 'ws-precritic-plan']);
 
@@ -73,6 +81,9 @@ export function readLessonCommand(cmd) {
 export const LANE_TOOLS = {
     'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--lessons'] },
     'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
+    // (lane lf-roles, 2026-11-13: the page title in the simple print's share code is a teacher-site check)
+    'ws-title-code': { scope: ['--teacher'], flags: [] },
+    'ws-frame-title-ui': { scope: ['--teacher'], flags: [] },
 };
 /** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
 export function readLaneCommand(cmd) {
@@ -98,20 +109,27 @@ export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
 // the ws-grade-render modes that switch a check on (lf-checks queue 13: --raster-fit is LP-RASTER on role pages; a plain
 // render of the same role is not that check)
 export const GR_FLAGS = ['--raster-fit'];
+// tools whose gate with NO --roles flag renders every offered role of the skill (ws-empty-band: "every offered role x
+// S/M/L + hosts"), so that line plans any one role R when no card roles are given (lf-placevalue checks pass, 2026-11-13)
+const EVERY_ROLE_TOOLS = new Set(['ws-empty-band']);
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
- *  comma list, or - `cardRoles` given - the line has no --roles and so renders every role the signed card offers, R among
- *  them), carrying every flag of `flags`. Pure. */
+ *  comma list, or the line has no --roles and so renders every role - `cardRoles` given: the roles the signed card offers,
+ *  R among them; not given: any role, for an EVERY_ROLE_TOOLS tool), carrying every flag of `flags`. `roles` may itself be a
+ *  comma list `a,b`: every role must be planned by some line. Pure. */
 export function planHas(planText, { tool, skills, roles, flags = [], cardRoles = null }) {
     const esc = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
+    const lines = planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
         .filter((l) => skills.every((k) => l.includes(k) || l.includes(k.split(':')[1])))
-        .filter((l) => {
-            if (!roles) return true;
-            const cmd = l.slice(l.indexOf(`tests/scripts/${tool}.`));
-            if (new RegExp(`--roles?[ =](?:[^\\s,]+,)*${esc(roles)}(?:,|\\s|$)`).test(cmd)) return true;
-            return !!cardRoles && cardRoles.includes(roles) && !/--roles?[ =]/.test(cmd);
-        })
         .filter((l) => flags.every((f) => l.slice(l.indexOf(`tests/scripts/${tool}.`)).includes(f)));
+    if (!roles) return lines;
+    const covers = (l, r) => {
+        const cmd = l.slice(l.indexOf(`tests/scripts/${tool}.`));
+        if (new RegExp(`--roles?[ =](?:[^\\s,]+,)*${esc(r)}(?:,|\\s|$)`).test(cmd)) return true;
+        if (/--roles?[ =]/.test(cmd)) return false;
+        return cardRoles ? cardRoles.includes(r) : EVERY_ROLE_TOOLS.has(tool);
+    };
+    const want = String(roles).split(',').filter(Boolean);
+    return want.every((r) => lines.some((l) => covers(l, r))) ? lines.filter((l) => want.some((r) => covers(l, r))) : [];
 }
 
 function selfTest() {
@@ -120,6 +138,8 @@ function selfTest() {
     eq('print-lint lesson', readCommand("node tests/fixtures/x.cjs -- /tmp/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup --size S"), { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' });
     eq('category + bare skill', readCommand('node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup --category subtraction'), { tool: 'ws-content-audit', skills: ['subtraction:sub_50_no_regroup'], roles: null });
     eq('no skill', readCommand('node tests/scripts/ws-spec-card.mjs --fixture {fixture}'), null);
+    eq('options-shots, repeated --skill', readCommand('node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems --skill coordinates:geo_translate --skip-no-panel --workers 1'), { tool: 'ws-options-shots', skills: ['addition:add_word_problems', 'coordinates:geo_translate'], roles: null });
+    eq('options-shots planned', planHas('  [browser] ws-options-shots (Options panel sample) — tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1', { tool: 'ws-options-shots', skills: ['addition:add_word_problems', 'coordinates:geo_translate'], roles: null }).length, 1);
     eq('bare skill, no category', readCommand('node tests/scripts/ws-x.cjs --skill foo'), null);
     const plan = '  [browser] lint — node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup\n  [node] x — node tests/scripts/ws-dealer-uniform.mjs --skill subtraction:sub_50_no_regroup';
     eq('planned lesson', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' }).length, 1);
@@ -138,6 +158,12 @@ function selfTest() {
     eq('flag missing', planHas(eb.split('\n')[0], { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 0);
     eq('grade-render raster flag carried', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model,guided --raster-fit', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 1);
     eq('grade-render raster flag missing', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model --gate', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 0);
+    const eb2 = '  [browser] eb — node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --grid-foot\n  [browser] gf — node tests/scripts/ws-empty-band.cjs --roles independent,more-practice --sizes S --skills placevalue:compare';
+    eq('every-role empty-band line plans a role', planHas(eb2, { tool: 'ws-empty-band', skills: ['placevalue:combine'], roles: 'test' }).length, 1);
+    eq('role list held by a planned list', planHas(eb2, { tool: 'ws-empty-band', skills: ['placevalue:compare'], roles: 'more-practice' }).length, 1);
+    eq('role list: a role the list lacks', planHas(eb2, { tool: 'ws-empty-band', skills: ['placevalue:compare'], roles: 'test' }).length, 0);
+    eq('no every-role reading for print-lint', planHas('  x — node tests/scripts/ws-print-lint.cjs --source kit --skills a:b', { tool: 'ws-print-lint', skills: ['a:b'], roles: 'test' }).length, 0);
+    eq('role list: every role needed', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson,test' }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
     // lane rows (lf-partopts): no skill, no detailed lesson - the tool and its scope flag
     eq('lane bt row', readLaneCommand('/tmp/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--bt-only' });
@@ -386,6 +412,9 @@ function idOnPath(id) {
     if (v.status === 'OK') return { ok: true, why: '' };
     if (v.status === 'FAIL') return { ok: false, why: v.fail.replace(`${id}: `, '') };
     const tool = commandTool(row.command);
+    // a wrapper's own --self-test (ws-precritic's verdict reader, lf-ops 2026-11-13) is on the path when deploy session 1 runs it
+    const wrapSelf = /tests\/scripts\/(ws-precritic(?:-plan)?|ws-backtest)\.(?:c?js|mjs) --self-test\b/.exec(row.command);
+    if (!tool && wrapSelf && C.deploy.includes(`${wrapSelf[1]}.`) && new RegExp(`${wrapSelf[1]}\\.(?:c?js|mjs) --self-test`).test(C.deploy)) return { ok: true, why: '' };
     if (!tool) return { ok: false, why: 'its command runs no tests/scripts/ws-* check' };
     const inPre = C.precriticSrc.includes(`'${tool}'`) || C.precriticSrc.includes(`tests/scripts/${tool}.`);
     const inDeploy = C.deploy.includes(`${tool}.`);
@@ -507,6 +536,17 @@ else if (args.includes('--checks-from-critics')) {
             console.log(`  ${leak ? 'FAIL' : 'OK  '} opt-in ${lane.lane}: not on another skill's plan (${other})`);
             if (leak) fails.push(`opt-in ${lane.lane}: ws-precritic --skill ${other} --dry-run carries --rule-skills (the lane's rules leak onto another skill)`);
         }
+    }
+    // CAPACITY ROLES (lead 2026-11-13, lf-roles): every role that draws a grid has pinned pages in the capacity pin, so no role sits
+    // outside CAPACITY-NO-DROP / SIZE-ORDER (Guided was, and printed fewer items at S than at M on 12 passed pages);
+    // --capacity-pin <file> checks another pin (the backtest's fixture)
+    {
+        checked++;
+        const pinArg = args.includes('--capacity-pin') ? ['--pin', args[args.indexOf('--capacity-pin') + 1]] : [];
+        const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-capacity-pin.cjs'), '--roles-check', ...pinArg], { cwd: ROOT, encoding: 'utf8' });
+        const line = String(r.stdout || '').trim().split('\n').pop() || String(r.stderr || '').slice(0, 200);
+        console.log(`  ${r.status === 0 ? 'OK  ' : 'FAIL'} capacity-roles                 ${line}`);
+        if (r.status !== 0) fails.push(`capacity-roles: ${line}`);
     }
     if (!checked) { console.log(`${TOOL}: FAIL (no row names a skill: nothing checked)`); process.exit(1); }
     // the ledger sweep rides along on the default run (its rows' path verdicts are the ones just computed); --no-sweep skips it

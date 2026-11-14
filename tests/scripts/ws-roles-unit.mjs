@@ -23,7 +23,34 @@
 //
 //   KEY-TRUE-BLANK a True statement's key leaves the frame empty (PT-TOF-2; critic r1/r2 R5).
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK]
+//   GUIDED-MODEL-SPAN a Guided page of narrow column stacks at S (4 columns, the ceiling 10 tries) whose plain grid the
+//                 ceiling trims to Model + 7 (S 8 < M 9, ws-capacity-pin SIZE-ORDER; subtraction sub_50 / sub_100 no regroup,
+//                 sub_2d_1d) lays the worked Model over TWO cells of row 1, its working written beside it, so Model + 10
+//                 tries fill 3 whole rows (lead ruling (e), 2026-11-13). Control: at M (3 columns, 9 cells fill the grid)
+//                 the Model keeps one cell.
+//   GUIDED-STACK-SIDE a narrow column stack's Guided grid leaves under 30 % beside the stack (EB-SIDE), keeps S 11 / M 9 / L 6,
+//                 fills every row (the Model spanning the cells that complete it) and centres each cell in its row (EB-BAND; r8b).
+//   GUIDED-MODEL-ROW a Model whose worked lines run under it never makes the try beside it sit in a row it fills under 70 %
+//                 (lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %; r8b (a)).
+//
+//   ONE-ROW-CAP  a practice page (independent / test) that holds ONE row of a tall measured story (125 mm at M, the bar model
+//                above the column work: card capacity 1, lead ruling R1 / R4a 2026-11-13) does not stretch that row to its page -
+//                the row is at most its measured height / 0.7 (band under the work < 30 %, H13; ws-two-step --print CAP-BAND found
+//                41 % / 32 % on multi_step_word (Visual)), and its grid carries mq-onerow (PAGEFILL / EB-PAGE accept the strip).
+//                Control: a page of two rows keeps its own layout.
+//
+//   GUIDED-DRAWN-FIT a one-column Guided page of two-step stories (every item measured 135 mm at the Model's level 3, its plain try
+//                93 mm at level 1: lf-roles r9 item 1, lf-algebra precritic two-step r11 "Guided 1 story a page") holds two plain tries
+//                on a page where they fit, sized at the height they draw; no row past its ink / 0.72 (EB-BAND). Control: stories
+//                that draw as tall as they measure (Visual: bar on at level 1, 125 mm) still hold one a page.
+//   OPENER-SPILL a two-step story whose Model runs out of the half-width Model cell (measured fits:false at 2 columns) takes the
+//                full width (PT-OPN-4), and when the Model and its Guided row cannot share the page (135 + 135 mm at M) the Guided
+//                row and the Independent rows go to page 2 - never a page over its budget (lf-roles r9 item 2: Opener OVERFLOW /
+//                EB-EDGE at M / L). PT-OPN-10: page 2's continuation header names its part(s), "Guided Practice" / "Your turn".
+//   RI-TWOSTEP   a two-step column story on Reason It prints its story once and stands A over B at the cell's full width (its
+//                step columns are 107-115 mm, wider than half the cell: side by side they ran out of it; r9 item 3, OVERFLOW).
+//
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -40,10 +67,21 @@ const CO = await mod('roles/compose.js');
 const SM = await mod('roles/scripted-model.js');
 const PSC = await mod('roles/pre-skill-check.js');
 const TS = await mod('roles/test.js');
+const GD = await mod('roles/guided.js');
+const IND = await mod('roles/independent.js');
+const OPN = await mod('roles/opener.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
 const on = (id) => !ONLY || ONLY.includes(id);
+// --spill-p1-fixture f.json ({whiteMm, bodyMm, nextMm}): the SPILL-P1 rule alone on a planted page 1 (backtest spill-p1)
+if (argv.includes('--spill-p1-fixture')) {
+    const f = JSON.parse((await import('fs')).readFileSync(argv[argv.indexOf('--spill-p1-fixture') + 1], 'utf8'));
+    const OP0 = await mod('roles/opener.js');
+    const ok = OP0.spillP1Ok(f.whiteMm, f.bodyMm, f.nextMm);
+    console.log(ok ? `ws-roles-unit: OK (SPILL-P1: ${f.whiteMm} mm white of ${f.bodyMm}, the next part needs ${f.nextMm})` : `  FAIL SPILL-P1: ${f.whiteMm} mm white (${Math.round(100 * f.whiteMm / f.bodyMm)} %) on page 1 could hold the ${f.nextMm} mm Guided band\nws-roles-unit: FAIL - 1 finding(s) in 1 check(s)`);
+    process.exit(ok ? 0 : 1);
+}
 const findings = [];
 let checks = 0;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -312,6 +350,242 @@ if (on('REVIEW-MIXED')) {
         const plS = RV.plan({ ctx: { size: 'S' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t2, z) => ((z || 'S') === 'L' && t2.length > 50 ? 2 : 1) });
         if (/next term of a growing/.test(pageText(plS))) findings.push('REVIEW-MIXED: S printed the long topic title that L cannot hold (one title at every size, PT-FRM-6)');
     } catch (e) { findings.push(`REVIEW-MIXED: ERROR ${String(e && e.message || e).slice(0, 120)}`); }
+}
+
+if (on('GUIDED-MODEL-SPAN')) {
+    // lead ruling (e) 2026-11-13 (ws-capacity-pin SIZE-ORDER on Guided: three subtraction stack pages printed S 8 < M 9): a planted
+    // column stack (24 mm wide, 38 mm tall: 3 columns leave 31 % beside it, 4 columns hold it) with worked steps of its own
+    try {
+        registerSkill('rolesunit:gspan', {
+            workedSteps: () => [{ text: 'Ones: 8 − 3 = 5. Write 5.' }, { text: 'Tens: 4 − 2 = 2. Write 2.' }, { text: 'The answer is 25.' }, { text: 'Check: 25 + 23 = 48.' }],
+            wrongAnswer: () => ({ value: '35', misconception: 'planted', basis: 'rule' }),
+        });
+    } catch (e) { /* re-run */ }
+    const stackItem = (i, size) => {
+        const h = { S: 38, M: 46.9, L: 55.7 }[size];
+        const q = { categoryId: 'rolesunit', skillId: 'gspan', ans: '25', text: `48 − 23 = ?`, answerType: 'number', seed: i, cell: { template: 'stack', payload: {} } };
+        const render = (c, o = {}) => `<div class="ws-cell-work">48<br>− 23<br>${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '25'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4, 5].map((c) => [c, { hMm: h, fits: true, slackMm: (186 / c - 24) / 2 }]));
+        return { q, key: { value: '25', display: '25', slots: {} }, render, template: 'stack', pool: 'main', measured, footprint: { wMm: 24, hMm: h, maxCols: 4 }, fclass: 'standard' };
+    };
+    for (const [size, want, span] of [['S', 11, true], ['M', 9, false]]) {
+        checks++;
+        try {
+            const input = { ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'gspan', iCan: 'I Can subtract in columns', grade: 2 }], items: Array.from({ length: 16 }, (_, i) => stackItem(i, size)) };
+            const pl = GD.plan(input);
+            const n = pl && pl.meta && pl.meta.items;
+            const html = (pl.pages || []).map((pg) => (pg.sections || []).map((s) => (s.content && s.content.items ? s.content.items.map((c) => `<i style="${c.style || ''}">${c.render ? c.render(Object.assign({}, resolveCtx({ size }), { state: 'blank' })) : ''}</i>`).join('') : '')).join('')).join('');
+            const hasSpan = /grid-column:\s*span 2/.test(html);
+            if (n !== want) findings.push(`GUIDED-MODEL-SPAN ${size}: the page holds ${n} cells (want ${want}: ${span ? 'the Model over two cells + 10 tries, 3 whole rows' : 'Model + 8, 3 whole rows'})`);
+            if (hasSpan !== span) findings.push(`GUIDED-MODEL-SPAN ${size}: the Model ${hasSpan ? 'spans' : 'does not span'} two cells (want ${span ? 'two' : 'one'})`);
+            if (span && hasSpan && !/Ones: 8 − 3 = 5\./.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the two-cell Model has no working beside it (an empty band either side of the stack, EB-SIDE)`);
+            if (span && /Write 5/.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the working beside the Model repeats "Write 5." (the traced digit says it)`);
+        } catch (e) { findings.push(`GUIDED-MODEL-SPAN ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-STACK-SIDE')) {
+    // lf-roles r8b (coordinator via the lead: the stack Guided pages of the 7 subtraction skills failed EB-SIDE at S 32.4 % / M 31.7 %
+    // and EB-BAND at L 34.8 %): a planted 16 mm column stack (S/M/L heights of sub_50) is laid in a column count whose side band is
+    // under 30 % of the cell (the measured slack beside it), keeps its capacity (S 11, M 9, L >= 6), every row full, and its cells
+    // centred in their rows
+    try { registerSkill('rolesunit:gside', { workedSteps: () => [{ text: 'Ones: 8 − 3 = 5. Write 5.' }, { text: 'Tens: 4 − 2 = 2. Write 2.' }, { text: 'The answer is 25.' }, { text: 'Check: 25 + 23 = 48.' }], wrongAnswer: () => ({ value: '35', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const W = { S: 16.2, M: 22.5, L: 28.4 };
+    const item = (i, size) => {
+        const h = { S: 38, M: 46.9, L: 55.7 }[size];
+        const q = { categoryId: 'rolesunit', skillId: 'gside', ans: '25', text: '48 − 23 = ?', answerType: 'number', seed: i, cell: { template: 'stack', payload: {} } };
+        const render = (c, o = {}) => `<div class="ws-cell-work">48<br>− 23<br>${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '25'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4, 5].map((c) => [c, { hMm: h, fits: true, slackMm: (186 / c - 0.5 - W[size]) / 2 }]));
+        return { q, key: { value: '25', display: '25', slots: {} }, render, template: 'stack', pool: 'main', measured, footprint: { measure: true, wMm: null, maxCols: 6 }, fclass: 'standard' };
+    };
+    for (const [size, want] of [['S', 11], ['M', 9], ['L', 6]]) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'gside', iCan: 'I Can subtract in columns', grade: 2 }], items: Array.from({ length: 16 }, (_, i) => item(i, size)) });
+            const f = pl.meta.fits[0];
+            const side = (186 / f.cols - 0.5 - W[size]) / 2 / (186 / f.cols - 0.5);
+            const parts = (pl.pages || []).flatMap((pg) => (pg.sections || []).map((s) => s.content).filter((c) => c && c.items));
+            const cells = parts.flatMap((c) => c.items);
+            const span = cells.reduce((a, c) => { const m = /grid-column:\s*span\s+(\d+)/.exec(c.style || ''); return a + (m ? Number(m[1]) - 1 : 0); }, 0);
+            if (side >= 0.30) findings.push(`GUIDED-STACK-SIDE ${size}: ${f.cols} columns leave ${(side * 100).toFixed(1)} % beside the stack (EB-SIDE, want < 30 %)`);
+            if (pl.meta.items < want) findings.push(`GUIDED-STACK-SIDE ${size}: ${pl.meta.items} cells (want at least ${want}: capacity and SIZE-ORDER kept)`);
+            if ((cells.length + span) % f.cols !== 0) findings.push(`GUIDED-STACK-SIDE ${size}: ${cells.length} cells + ${span} spanned in ${f.cols} columns leave a part row`);
+            if (cells.some((c) => !/justify-content:center/.test(c.style || ''))) findings.push(`GUIDED-STACK-SIDE ${size}: a stack cell is not centred in its row (EB-BAND under a stretched row)`);
+        } catch (e) { findings.push(`GUIDED-STACK-SIDE ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-MODEL-ROW')) {
+    // lf-roles r8b (a), via the lead: lf-builds chart_to_120 Guided M / L - the Model (a chart window, its one worked line wrapped
+    // UNDER it: no full-row Model, which would push the third try off the page) shared row 1 with a 60 mm try, and the row stretch
+    // made that row 115 mm: a 42 % / 36 % band beside the try (EB-BAND). The Model's row is held to what the tries beside it fill
+    // (at least 70 %), never under the Model's own height. Planted: 60 mm items, one 88-character worked line.
+    const line = 'Count on from 47 along the row: 48, 49, 50, then down the column.';
+    try { registerSkill('rolesunit:grow', { workedSteps: () => [{ text: line }], wrongAnswer: () => ({ value: '58', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const item = (i) => {
+        const q = { categoryId: 'rolesunit', skillId: 'grow', ans: '57', text: 'Fill in the chart.', answerType: 'number', seed: i };
+        const render = (c, o = {}) => `<div class="ws-cell-work">chart ${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '57'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 60, fits: c <= 2, slackMm: 6 }]));
+        return { q, key: { value: '57', display: '57', slots: {} }, render, template: 'planted', pool: 'main', measured, footprint: { measure: true, wMm: null, maxCols: 2 }, fclass: 'standard' };
+    };
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'grow', iCan: 'I Can count on a chart', grade: 1 }], items: Array.from({ length: 12 }, (_, i) => item(i)) });
+            const part = (pl.pages[0].sections || []).map((s) => s.content).find((c) => c && c.items);
+            const cols = part.cols;
+            const own = part.spanFirst || new RegExp(`grid-column:\\s*(1 / -1|span ${cols})`).test(part.items[0].style || '');
+            const fr = part.rowsTpl ? part.rowsTpl.split(/\s+/).map((t) => parseFloat(t)) : Array(part.rows).fill(1);
+            const gridH = parseFloat(part.height);
+            const row0 = (gridH * fr[0]) / fr.reduce((a, b) => a + b, 0);
+            // (the try beside the Model needs tryRowMm - 61 mm and its hint - and the Model modelRowMm; the row may be as tall as the
+            // Model needs, never stretched so the try fills under 70 % of it; a tree without these fields reads 61 mm and no Model need)
+            const f0 = pl.meta.fits[0];
+            const tryMm = Number(f0.tryRowMm) || 61;
+            const need = Math.max(Number(f0.modelRowMm) || 0, tryMm / 0.7);
+            if (cols > 1 && !own && part.items.length > 1 && tryMm < 0.7 * row0 && row0 > need + 0.5) findings.push(`GUIDED-MODEL-ROW ${size}: a ${tryMm} mm try shares the Model's ${row0.toFixed(1)} mm row, stretched past ${need.toFixed(1)} mm (${((1 - tryMm / row0) * 100).toFixed(0)} % of it empty beside the try: EB-BAND)`);
+            if (pl.meta.items < 4) findings.push(`GUIDED-MODEL-ROW ${size}: ${pl.meta.items} cells (want the Model and 3 tries at least)`);
+        } catch (e) { findings.push(`GUIDED-MODEL-ROW ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('ONE-ROW-CAP')) {
+    // lf-roles r9 item 4 (lead ruling R1 / R4a): one tall story a page (a 125 mm cell at M, one column) on Independent and Test.
+    const item = (i, hMm) => {
+        const q = { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted story', answerType: 'number', seed: i };
+        const render = () => '<div class="ws-cell-work">story 42</div>';
+        const measured = { 1: { hMm, fits: true, slackMm: 3 }, 2: { hMm, fits: false, slackMm: -14 }, 3: { hMm, fits: false }, 4: { hMm, fits: false } };
+        return { q, key: { value: '42', display: '42', slots: {} }, render, template: 'planted', pool: 'main', section: 0, measured, footprint: { measure: true, wMm: 93, hMm: null, maxCols: 2, restacks: true }, fclass: 'standard' };
+    };
+    const gridOf = (pl) => (pl.pages[0].sections || []).map((x) => (x.kind === 'grid' ? x : x.content)).find((x) => x && x.items && x.items.length);
+    for (const [role, R] of [['independent', IND], ['test', TS]]) {
+        for (const size of ['M', 'L']) {
+            checks++;
+            try {
+                const pl = R.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }], items: [item(1, 125)], seed: 1, sections: [{ columns: 'auto' }] });
+                const g = gridOf(pl);
+                const h = g && g.height ? parseFloat(g.height) : Infinity;
+                const lim = 126 / 0.7;
+                if (!g || g.rows !== 1) findings.push(`ONE-ROW-CAP ${role} ${size}: no one-row grid (${g ? g.rows : 'none'} rows)`);
+                else if (!(h <= lim)) findings.push(`ONE-ROW-CAP ${role} ${size}: one 125 mm story stretched to ${g.height || 'the page (flex)'} (cap ${lim.toFixed(1)} mm: ${Math.round((1 - 126 / h) * 100)} % of the cell empty under it, H13 >= 30 %)`);
+                else if (!/mq-onerow/.test(g.cls || '')) findings.push(`ONE-ROW-CAP ${role} ${size}: the one-row grid is not marked mq-onerow (PAGEFILL / EB-PAGE read its strip as unfilled)`);
+            } catch (e) { findings.push(`ONE-ROW-CAP ${role} ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+        }
+    }
+    // every row of a page of column stories (two_step_estimate_check L: two 83 mm stories spread to 114 mm rows, 31 %)
+    checks++;
+    try {
+        const st = (i) => Object.assign(item(i, 83), { template: 'word-work', q: Object.assign(item(i, 83).q, { cell: { template: 'word-work', payload: { steps: [{}, {}] } } }) });
+        const pl = IND.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }], items: [st(1), st(2)], seed: 1, sections: [{ columns: 1 }] });
+        const g = gridOf(pl);
+        const fr = g && g.rowsTpl ? g.rowsTpl.split(/\s+/).map(parseFloat) : Array((g && g.rows) || 1).fill(1);
+        const tot = fr.reduce((a, b) => a + b, 0);
+        const H = g && g.height ? fr.map((f) => (parseFloat(g.height) * f) / tot) : fr.map(() => Infinity);
+        const lim = (84 - 7) / 0.72 + 0.5;
+        if (H.some((h) => h > lim)) findings.push(`ONE-ROW-CAP stories L: rows ${H.map((h) => h.toFixed(1)).join(' / ')} mm for 83 mm stories (cap ${lim.toFixed(1)}: a 30 % band under the work)`);
+    } catch (e) { findings.push(`ONE-ROW-CAP stories: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    // a Review band of ONE column story (multi_step_word (Visual) Review M / L: 185-210 mm cell, 34 % under the work)
+    checks++;
+    try {
+        const st = Object.assign(item(1, 125), { template: 'word-work' });
+        st.q = Object.assign({}, st.q, { cell: { template: 'word-work', payload: { steps: [{}, {}] } } });
+        const pl = RV.plan({ ctx: { size: 'M' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }], items: [st], titleLinesOf: () => 1 });
+        const gs = (pl.pages[0].sections || []).map((x) => x.content || x).filter((x) => x && x.items && x.items.length);
+        const lim = (126 - 7) / 0.72 + 0.5;
+        for (const g of gs) {
+            const h = g.height ? parseFloat(g.height) : (g.rows || 1) * (g.cellH || 999);
+            if (g.rows === 1 && h > lim) findings.push(`ONE-ROW-CAP review M: one 125 mm story in a ${h.toFixed(1)} mm row (cap ${lim.toFixed(1)}: H13)`);
+        }
+    } catch (e) { findings.push(`ONE-ROW-CAP review: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    // control: two 60 mm rows on an Independent page keep their own (multi-row) layout - never marked one-row
+    checks++;
+    try {
+        const pl = IND.plan({ ctx: { size: 'M' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can add', grade: 3 }], items: [item(1, 60), item(2, 60)], seed: 1, sections: [{ columns: 1 }] });
+        const g = gridOf(pl);
+        if (g && /mq-onerow/.test(g.cls || '')) findings.push(`ONE-ROW-CAP control: a ${g.rows}-row page is marked mq-onerow`);
+    } catch (e) { findings.push(`ONE-ROW-CAP control: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+}
+
+// a planted two-step story: word-work, two steps, measured at the Model's level and (atLevel) at the levels it draws
+const twoStep = (i, { h3 = 135, h1 = 93, half = false } = {}) => {
+    const q = { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted two-step story', answerType: 'number', seed: i,
+        cell: { template: 'word-work', payload: { steps: [{ op: '+', top: 16, bottom: 25, ans: 41 }, { op: '+', top: 41, bottom: 1, ans: 42 }], unit: 'apples' } } };
+    const render = (c, o = {}) => `<div class="ws-cell-work">${o.payload && o.payload.storyOnly ? 'story' : `story ${esc(o.shown !== undefined ? o.shown : '')}`}</div>`;
+    const measured = Object.fromEntries([1, 2, 3, 4].map((c) => [c, c === 1 || half ? { hMm: h3, fits: c === 1 || !half ? c === 1 : false, slackMm: 3, atLevel: { 2: h3, 1: h1 } } : { hMm: h3 - 5, fits: false, slackMm: -14, atLevel: { 2: h3, 1: h1 } }]));
+    return { q, key: { value: '42', display: '42', slots: {} }, render, template: 'word-work', pool: 'main', measured, footprint: { measure: true, wMm: 93, hMm: null, maxCols: 2, restacks: true }, fclass: 'standard' };
+};
+const SK1 = [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }];
+
+if (on('GUIDED-DRAWN-FIT')) {
+    for (const [tag, h1, want2] of [['plain', 93, true], ['visual', 125, false]]) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size: 'M' }, skills: SK1, items: Array.from({ length: 8 }, (_, i) => twoStep(i, { h1 })) });
+            const per = pl.pages.map((pg) => ((pg.sections || []).map((x) => x.content).find((c) => c && c.items) || { items: [] }).items.length);
+            if (want2 && !per.some((n) => n >= 2)) findings.push(`GUIDED-DRAWN-FIT ${tag} M: one story a page (${per.join(' + ')}) - two ${h1} mm plain tries fit a continuation page`);
+            if (!want2 && per.some((n) => n >= 2)) findings.push(`GUIDED-DRAWN-FIT ${tag} M: ${per.join(' + ')} - two ${h1} mm tries do not fit a page`);
+            // no row past its ink / 0.72 (EB-BAND): a one-row page of the 135 mm Model
+            const g0 = (pl.pages[0].sections || []).map((x) => x.content).find((c) => c && c.items);
+            const h0 = parseFloat(g0 && g0.height) || ((pl.meta.fits[0] || {}).cellH * ((g0 && g0.rows) || 1));
+            if (g0 && g0.rows === 1 && h0 > (136 - 7) / 0.72 + 30) findings.push(`GUIDED-DRAWN-FIT ${tag} M: the Model's one-row page stretched to ${h0.toFixed(1)} mm (EB-BAND)`);
+            const fits = pl.meta.fits || [];
+            fits.forEach((f, i) => { if (f.rows === 1 && f.cellH > 190) findings.push(`GUIDED-DRAWN-FIT ${tag} M p${i + 1}: a one-row page's row stretched to ${f.cellH.toFixed(1)} mm (a 30 % band under a ${i ? h1 : 135} mm story)`); });
+        } catch (e) { findings.push(`GUIDED-DRAWN-FIT ${tag}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('OPENER-SPILL')) {
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = OPN.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 6 }, (_, i) => twoStep(i, { half: true })) });
+            const notes = (pl.meta.notes || []).join(' ');
+            if (/taller than the page budget/.test(notes)) findings.push(`OPENER-SPILL ${size}: the Model and Guided bands run over the page budget (${pl.pages.length} page(s)) - OVERFLOW`);
+            const mb = (pl.pages[0].sections || []).find((x) => x.kind === 'band' && x.label === 'Model:') || ((pl.pages[0].sections || []).find((x) => x.kind === 'row') || { parts: [] }).parts.find((x) => x.label === 'Model:');
+            if (mb && (pl.pages[0].sections || []).some((x) => x.kind === 'row' && x.cls === 'mq-modelrow')) findings.push(`OPENER-SPILL ${size}: a Model measured over the half-width cell stays in the 93 mm Model zone`);
+            // PT-OPN-10 (lead 2026-11-13, r9): the spill page's continuation header names the part(s) it holds
+            if (pl.pages.length > 1) {
+                const t = String((pl.pages[1].header || {}).title || '');
+                const hasInd = (pl.pages[1].sections || []).some((x) => x.label === 'Independent Practice:');
+                if (!/Guided Practice/.test(t) || (hasInd && !/Your turn/.test(t))) findings.push(`OPENER-SPILL ${size}: page 2's header says "${t}" - it must name its part(s): "Guided Practice"${hasInd ? ' and "Your turn"' : ''} (PT-OPN-10)`);
+            }
+        } catch (e) { findings.push(`OPENER-SPILL ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('OPENER-SPILL')) {
+    // critic r9 D1: a spilled Opener's two-column Steps take their PRINTED height (no estimated fixed height: 50 mm round 27 mm of
+    // text at L); D3 SPILL-FILL: page 2 is fitted from the stories it DEALS - short dealt stories (60 mm at level 1) beside tall
+    // spares (150 mm) still get their Independent row
+    try { registerSkill('rolesunit:spill', { strings: () => ({ steps: ['Read it. What happens first?', 'Step 1: circle the sign. Solve.', 'Step 2: use my Step 1 answer.', 'Write the answer and the unit.'] }), wrongAnswer: () => ({ value: '48', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const sp = (i, h1) => { const it = twoStep(i, { half: true, h1 }); it.q = Object.assign({}, it.q, { skillId: 'spill' }); return it; };
+    const SKS = [{ categoryId: 'rolesunit', skillId: 'spill', iCan: 'I Can solve two-step stories', grade: 3 }];
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const items = [sp(0, 93), sp(1, 60), sp(2, 60), sp(3, 150), sp(4, 150), sp(5, 150)];
+            items.forEach((it, k) => { if (k >= 3) for (const c of [1, 2, 3, 4]) it.measured[c].hMm = 160; });
+            const pl = OPN.plan({ ctx: { size }, skills: SKS, items });
+            const html = JSON.stringify(pl.pages[0].sections || []);
+            if (/mq-stepszone\\" style=\\"height:/.test(html) && /mq-steps-rows/.test(html)) findings.push(`OPENER-SPILL ${size}: the two-column Steps band takes an estimated fixed height (D1: 50 mm round 27 mm of text at L)`);
+            // SPILL-P1 (lead 2026-11-13 r9b): page 1's white over 30 % only when the Guided band could not fit it
+            const f0 = (pl.meta.fits || [])[0] || {};
+            if (pl.pages.length > 1 && Number.isFinite(f0.p1WhiteMm) && !OPN.spillP1Ok(f0.p1WhiteMm, f0.p1BodyMm, f0.p1NextMm)) findings.push(`OPENER-SPILL ${size}: SPILL-P1 - page 1 leaves ${f0.p1WhiteMm} mm white of ${f0.p1BodyMm} that could hold the ${f0.p1NextMm} mm Guided band`);
+            const p2 = pl.pages[1] ? pl.pages[1].sections || [] : [];
+            if (pl.pages.length > 1 && !p2.some((x) => x.label === 'Independent Practice:')) findings.push(`OPENER-SPILL ${size}: SPILL-FILL - page 2 holds no Independent row though the dealt stories (60 mm at level 1) fit; it was sized by the 150 mm spares (D3)`);
+        } catch (e) { findings.push(`OPENER-SPILL ${size} (D1 / D3): ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('RI-TWOSTEP')) {
+    checks++;
+    try {
+        const p = RI.prepare(twoStep(1), { seed: 1, index: 0 });
+        const html = p.render(resolveCtx({ mode: 'print', size: 'M', state: 'blank', scaffoldLevel: 1 }), { cols: 1 });
+        const ab = (/class="mq-ab" style="([^"]*)"/.exec(html) || [])[1] || '';
+        if (!/grid-template-columns:1fr;/.test(ab)) findings.push(`RI-TWOSTEP: A and B of a two-step story stand side by side (${ab.slice(0, 80)}) - its 107-115 mm step columns run out of a half cell`);
+        if ((html.match(/story/g) || []).length !== 1 + 2 && !/>story</.test(html)) findings.push('RI-TWOSTEP: the story is not printed once over A and B');
+    } catch (e) { findings.push(`RI-TWOSTEP: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);

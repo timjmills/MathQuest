@@ -10,7 +10,7 @@
 // Four steps, then Print:
 //   1 Skills      each with a number OR a % of the problems (blank = share evenly)
 //   2 How many    Problems | Pages, and the number
-//   3 Size        Big / Medium / Small (each shows its columns) + Columns "Auto (n)" or 2–10
+//   3 Size        Big / Medium (each shows its columns) + Columns "Auto (n)" or 2–10
 //   4 Answer key  on / off
 //   More options  Arrange: In sections (default) | Mixed up; the full dialog (teacher only)
 //
@@ -32,7 +32,7 @@
 // loads the deferred half on the first press). Styles: css/simple-print.css (.sp-*), self-contained tokens, so it
 // looks the same on the student page and the teacher site.
 
-import { buildSheet as buildSheetRaw, sheetDocument } from './print-sheet.js';
+import { buildSheet as buildSheetRaw, sheetDocument, printsCompactOnePage, fitTitle } from './print-sheet.js';
 import * as printSheetNS from './print-sheet.js';
 // every request this dialog sends, last few kept for the gate (ws-simple-print reads lastSimpleRequests)
 const REQS = [];
@@ -42,15 +42,18 @@ import { printHtml } from './teacher-print.js';
 import { openPdfPreview } from './teacher-pdf-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
+import { offeredSize, COMPACT_LABEL } from './sheet/tokens.js';
 import { SKILLS } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
 import { optionsFor, offeredOptionsFor, describeOptions } from './skill-options.js';
 
 const STORE_KEY = 'mq_simple_print';
-const SIZES = [['L', 'Big'], ['M', 'Medium'], ['S', 'Small']];
+// owner 2026-11-13 (CLAUDE.md plan item 9): two print sizes, M and L; size S is dropped. A stored S (this dialog's own
+// settings, a saved quick print) reads as M through offeredSize - an alias, never a deletion.
+const SIZES = [['L', 'Big'], ['M', 'Medium']];
 const SIZE_NAME = Object.fromEntries(SIZES);
 // (facts-print-fix r3, owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it")
-const FACT_AUTO = { S: 9, M: 6, L: 5 };
+const FACT_AUTO = { M: 6, L: 5 };
 // Owner 2026-11-03 (item 4): "7, 8, 9, 10 should be just for small problems": a fast fact may go up to 10 across, every
 // larger cell at most 6 (and the engine clamps either to what really fits at the size).
 const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
@@ -82,7 +85,7 @@ function loadPrefs() {
             if (Number(s.nProblems) > 0) d.nProblems = Math.min(MAX_PROBLEMS, Math.round(Number(s.nProblems)));
             if (Number(s.nPages) > 0) d.nPages = Math.min(MAX_PAGES, Math.round(Number(s.nPages)));
             if (Number(s.sets) >= 1) d.sets = Math.min(MAX_SETS, Math.round(Number(s.sets)));
-            if (SIZE_NAME[s.size]) d.size = s.size;
+            if (s.size != null) d.size = offeredSize(s.size, d.size);
             if (s.cols === 'auto' || (Number(s.cols) >= 1 && Number(s.cols) <= 10)) d.cols = s.cols === 'auto' ? 'auto' : Number(s.cols);
             if (s.colsMode === 'aim' || s.colsMode === 'exact') d.colsMode = s.colsMode;
             if (typeof s.key === 'boolean') d.key = s.key;
@@ -225,7 +228,7 @@ export function reachOf(s) {
 function baseReq(o) {
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4', seed: o.seed >>> 0,
-        header: Object.assign({ name: true, date: true, score: false, title: o.title || true }, o.footer ? { footerLeft: o.footer } : {}),
+        header: Object.assign({ name: true, date: true, score: false, title: o.title || true }, o.footer ? { footerLeft: o.footer } : {}, titleHeaderOf(o)),
         key: o.key ? { on: true, placement: 'end', style: 'copy' } : { on: false },
         ...(o.arrange === 'mixed' ? { mixLayout: MIX_LAYOUTS[o.mixLayout] ? o.mixLayout : 'rows' } : {}),
     };
@@ -314,6 +317,8 @@ export function footerOf(list, max = 3) {
 }
 
 export async function buildSimple(list, o) {
+    // (owner 2026-11-13: size S is dropped - an S request, e.g. an old saved print, builds at M)
+    if (o && o.size !== offeredSize(o.size, 'M')) o = Object.assign({}, o, { size: offeredSize(o.size, 'M') });
     // (a footer the caller did not give names the skills; a fact print names each page's own skills, D4)
     if (!o.footer) o = Object.assign({}, o, { footer: footerOf(list), __footerAuto: true });
     const amounts = list.map((s) => parseAmount(s.amt));
@@ -1084,13 +1089,28 @@ function cleanPrint(p) {
     if (p.how === 'problems' || p.how === 'pages') o.how = p.how;
     if (Number(p.n) >= 1) o.n = Math.min(o.how === 'pages' ? MAX_PAGES : MAX_PROBLEMS, Math.round(Number(p.n)));
     if (Number(p.sets) >= 1) o.sets = Math.min(MAX_SETS, Math.round(Number(p.sets)));
-    if (SIZE_NAME[p.size]) o.size = p.size;
+    if (p.size != null) o.size = offeredSize(p.size, o.size);
     if (p.cols === 'auto' || (Number(p.cols) >= 1 && Number(p.cols) <= 10)) o.cols = p.cols === 'auto' ? 'auto' : Number(p.cols);
     if (p.colsMode === 'exact' || p.colsMode === 'aim') o.colsMode = p.colsMode;
     if (typeof p.key === 'boolean') o.key = p.key;
     if (p.arrange === 'mixed' || p.arrange === 'sections') o.arrange = p.arrange;
     if (MIX_LAYOUTS[p.mixLayout]) o.mixLayout = p.mixLayout;
+    // the page title (owner request 2026-11-13): appended to the code only when set, so every earlier code is unchanged
+    const pt = typeof p.pageTitle === 'string' ? p.pageTitle.replace(/\s+/g, ' ').trim().slice(0, PAGE_TITLE_MAX) : '';
+    if (pt) o.pageTitle = pt;
+    if (p.titlePos === 'above') o.titlePos = 'above';
     return o;
+}
+/** The page-title option of a print setup (a quick print's `print`, or the dialog's opts) as the buildSheet header fields:
+ *  `titleText` (the teacher's words; buildSheet fits them to two lines) and `titlePos` 'above'. {} at the defaults, so a
+ *  request without them is exactly the request before the option existed. */
+export const PAGE_TITLE_MAX = 160;
+export function titleHeaderOf(p) {
+    const out = {};
+    const pt = p && typeof p.pageTitle === 'string' ? p.pageTitle.replace(/\s+/g, ' ').trim() : '';
+    if (pt) out.titleText = pt.slice(0, PAGE_TITLE_MAX);
+    if (p && p.titlePos === 'above') out.titlePos = 'above';
+    return out;
 }
 function cleanSkills(list) {
     return (Array.isArray(list) ? list : []).filter((x) => x && typeof x.categoryId === 'string' && typeof x.skillId === 'string')
@@ -1142,11 +1162,12 @@ export function openQuickPrint(id, ctx = {}) {
     if (!rec) return;
     const pr = cleanPrint(rec.print);
     Object.assign(P, { how: pr.how, sets: pr.sets, size: pr.size, cols: pr.cols, colsMode: pr.colsMode, key: pr.key, arrange: pr.arrange, mixLayout: pr.mixLayout || 'rows' });
+    const title = { pageTitle: pr.pageTitle || '', titlePos: pr.titlePos === 'above' ? 'above' : 'below' };
     if (pr.how === 'pages') P.nPages = pr.n; else P.nProblems = pr.n;
     savePrefs();
     const keep = S && S.ctx ? S.ctx : {};
     openSimplePrint(rec.skills.map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, opts: x.opts })), Object.assign({ from: 'quick' }, keep, ctx, { quick: rec.id }));
-    if (S) { rec.skills.forEach((x, i) => { if (S.list[i]) S.list[i].amt = x.amt || ''; }); render(); schedule(0); }
+    if (S) { Object.assign(S, title); rec.skills.forEach((x, i) => { if (S.list[i]) S.list[i].amt = x.amt || ''; }); render(); schedule(0); }
 }
 const isTeacher = () => typeof document !== 'undefined' && document.body && document.body.classList.contains('teacher-mode');
 let qpMenu = null, qpRename = null;
@@ -1253,7 +1274,8 @@ const hasFacts = () => !!(S && S.list.some(isFactSkill));
 function opts() {
     // 7–10 across only with fast facts in the set (owner item 4): without them an asked 7+ is read as 6
     const cols = P.cols !== 'auto' && Number(P.cols) > CELL_MAX_COLS && !hasFacts() ? CELL_MAX_COLS : P.cols;
-    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, mixLayout: P.mixLayout || 'rows', seed: S.seed, title: S.ctx.title || true, paper: 'A4' };
+    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, mixLayout: P.mixLayout || 'rows', seed: S.seed, title: S.ctx.title || true, paper: 'A4',
+        ...(S.pageTitle && S.pageTitle.trim() ? { pageTitle: S.pageTitle.trim() } : {}), ...(S.titlePos === 'above' ? { titlePos: 'above' } : {}) };
 }
 
 function mount() {
@@ -1313,6 +1335,10 @@ function render() {
     const dlg = S.root.querySelector('.sp-dialog');
     const ae = document.activeElement && S.root.contains(document.activeElement) ? document.activeElement : null;
     const focusId = ae ? ae.id : '';
+    // (critic title r1 T1: a text box keeps the teacher's cursor and selection across the redraw - the Page title is edited
+    // in the middle, not only at the end; null where the box has no selection, e.g. type="number")
+    let caret = null;
+    try { caret = ae && typeof ae.selectionStart === 'number' ? [ae.selectionStart, ae.selectionEnd, ae.selectionDirection || 'none'] : null; } catch (e) { caret = null; }
     const focusSel = ae && !focusId && ae.dataset && ae.dataset.sp ? `[data-sp="${ae.dataset.sp}"]${ae.dataset.v !== undefined ? `[data-v="${ae.dataset.v}"]` : ''}` : '';
     const many = S.list.length > 1;
     const o = opts();
@@ -1362,7 +1388,9 @@ function render() {
     <div class="sp-row sp-sets"><span class="sp-lbl" id="spSetsLbl">Sets</span><div class="sp-stepper"><button type="button" class="sp-sb" data-sp="sdec" aria-label="Fewer sets">−</button><input id="spSets" class="sp-n" type="number" inputmode="numeric" min="1" max="${MAX_SETS}" value="${P.sets}" aria-labelledby="spSetsLbl"><button type="button" class="sp-sb" data-sp="sinc" aria-label="More sets">+</button></div><span class="sp-hint">${P.sets > 1 ? 'each set has different problems' : ''}</span></div></section>`;
 
     // 3 Size
-    h += `<section class="sp-step">${stepHead(3, 'Size')}<div class="sp-sizes" role="radiogroup" aria-label="Size">`;
+    // lead ruling 2026-11-13 (critic nos r1 F3): "All rows on one page" prints compact whatever is asked: one label, no picker
+    const compact = printsCompactOnePage(S.list);
+    h += `<section class="sp-step">${stepHead(3, 'Size')}${compact ? `<p class="sp-hint" data-size-fixed="compact">${COMPACT_LABEL}. Set by "All rows on one page".</p>` : ''}<div class="sp-sizes sp-sizes-${SIZES.length}" role="radiogroup" aria-label="Size"${compact ? ' hidden' : ''}>`;
     for (const [v, l] of SIZES) {
         const c = S.probes[v];
         h += `<button type="button" role="radio" class="sp-size sp-size-${v}" data-sp="size" data-v="${v}" aria-checked="${P.size === v}"><span class="sp-size-glyph" aria-hidden="true">7</span><span class="sp-size-name">${l}</span><span class="sp-size-cols">${c ? sizeColsText(v) : '…'}</span></button>`;
@@ -1398,6 +1426,12 @@ function render() {
     if (many) h += `<div class="sp-row"><span class="sp-lbl">Arrange</span><div class="sp-seg" role="radiogroup" aria-label="Arrange">${[['sections', 'In sections'], ['mixed', 'Mixed up']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="arrange" data-v="${v}" aria-checked="${P.arrange === v}">${l}</button>`).join('')}</div></div>`;
     const mixIds = engineMixLayouts();
     if (many && P.arrange === 'mixed' && mixIds.length > 1) { const ml = mixIds.includes(P.mixLayout) ? P.mixLayout : mixIds[0]; h += `<div class="sp-row sp-mixl"><span class="sp-lbl">Layout</span><div class="sp-seg" role="radiogroup" aria-label="Mixed up layout">${Object.entries(MIX_LAYOUTS).filter(([v]) => mixIds.includes(v)).map(([v, [l]]) => `<button type="button" role="radio" class="sp-segb" data-sp="mixlayout" data-v="${v}" aria-checked="${ml === v}">${l}</button>`).join('')}</div><span class="sp-hint">${MIX_LAYOUTS[ml][1]}</span></div>`; }
+    // the page title (owner request 2026-11-13): the teacher's own words in place of the skill's title, above or below the
+    // Name / Date line; never smaller (a long title takes two lines; past two it is cut, and this says so)
+    const fitNow = S.pageTitle && S.pageTitle.trim() ? (() => { try { return fitTitle(S.pageTitle, P.size); } catch (e) { return null; } })() : null;
+    h += `<div class="sp-row sp-ptitle"><label class="sp-lbl" for="spPageTitle">Page title</label><input id="spPageTitle" class="sp-ptitle-in" type="text" maxlength="${PAGE_TITLE_MAX}" autocomplete="off" value="${esc(S.pageTitle || '')}" placeholder="The skill's own title" aria-describedby="spPageTitleCap"></div>`;
+    h += `<p class="sp-hint sp-ptitle-cap${fitNow && fitNow.truncated ? ' is-warn' : ''}" id="spPageTitleCap"${fitNow && fitNow.truncated ? ' data-sp-warn="title-cut"' : ''}>${fitNow && fitNow.truncated ? `Too long for two lines: the page prints “${esc(fitNow.text)}”. Shorten it to print all of it.` : fitNow && fitNow.lines > 1 ? 'This title takes two lines on the page: the page is 6 mm shorter and may hold one row of problems fewer.' : 'Prints on every page and key, at full size.'}</p>`;
+    h += `<div class="sp-row"><span class="sp-lbl">Title place</span><div class="sp-seg" role="radiogroup" aria-label="Title place">${[['below', 'Below name'], ['above', 'Above name']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="titlepos" data-v="${v}" aria-checked="${(S.titlePos === 'above' ? 'above' : 'below') === v}">${l}</button>`).join('')}</div></div>`;
     h += `<button type="button" class="sp-link" data-sp="newnums">New numbers</button>`;
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
     h += `</div></details>`;
@@ -1405,7 +1439,7 @@ function render() {
     h += `</div><footer class="sp-foot"><button type="button" class="sp-btn sp-btn-2" data-sp="preview" aria-label="Preview every page"><span class="sp-wide">Preview every page</span><span class="sp-narrow">Preview</span></button><button type="button" class="sp-btn sp-btn-1" data-sp="print"${S.busy && !b ? ' aria-disabled="true"' : ''}>Print</button></footer>`;
     dlg.innerHTML = h;
     showThumb();
-    if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* */ } } }
+    if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') { if (caret) el.setSelectionRange(Math.min(caret[0], el.value.length), Math.min(caret[1], el.value.length), caret[2]); else el.setSelectionRange(el.value.length, el.value.length); } } catch (e) { /* */ } } }
     else if (focusSel && dlg.querySelector(focusSel)) { try { dlg.querySelector(focusSel).focus({ preventScroll: true }); } catch (e) { /* */ } }
     // Focus inside a skill's Options panel (a popover outside the dialog) stays there while the preview redraws.
     else if (document.activeElement && document.activeElement.closest && document.activeElement.closest('#skillOptionsPopover')) { /* keep */ }
@@ -1554,6 +1588,7 @@ function onClick(e) {
     }
     if (quickAct(act, v, render)) return;
     if (act === 'newnums') { S.seed = 100000 + Math.floor(Math.random() * 900000); schedule(0); return; }
+    if (act === 'titlepos') { S.titlePos = v === 'above' ? 'above' : 'below'; render(); schedule(0); return; }
     if (act === 'full') { const more = S.ctx.more; closeSimplePrint(); more(); return; }
     if (act === 'larger') { openLarge(); return; }
     if (act === 'smaller') { closeLarge(); return; }
@@ -1572,6 +1607,7 @@ function onInput(e) {
         schedule(450);
         return;
     }
+    if (t.id === 'spPageTitle') { S.pageTitle = t.value; schedule(450); return; }
     if (t.id === 'spSets') {
         const x = Math.round(Number(t.value));
         if (!(x >= 1)) return;

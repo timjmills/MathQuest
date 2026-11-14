@@ -33,7 +33,7 @@ import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
 import { normalizeOptions } from './skill-options.js';
-import { getProvider } from './sheet/index.js';
+import { getProvider, offeredSize, COMPACT_LABEL } from './sheet/index.js';
 import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
 // The detailed lesson maker (V22, 2026-10-16): its lessons, picked by name (no skill choice).
 import { detailedLessonList, detailedLessonFor } from './lessons/detailed/index.js';
@@ -107,6 +107,8 @@ function initState() {
     const d = printDefaults();
     pr = {
         title: '',
+        // the page title's place (owner request 2026-11-13): 'below' the Name / Date / Score line (today's layout) or 'above'
+        titlePos: 'below',
         sections: [newSection(fromQueue())],
         size: d.size, look: 'auto', paper: d.paper, photocopySafe: d.photocopySafe,
         // S6: step-by-step anchor problems on Independent, More Practice and Mixed practice.
@@ -265,8 +267,9 @@ function shellHTML() {
   <section class="tv-card tv-print-what" aria-labelledby="tvWhatH">
     <h2 class="tv-h2" id="tvWhatH">What to print</h2>
     <div>
-      <label class="tv-label" for="tvSheetTitle">Sheet title</label>
-      <input id="tvSheetTitle" class="tv-input" type="text" placeholder="Taken from the skill when left empty" maxlength="90">
+      <label class="tv-label" for="tvSheetTitle">Page title</label>
+      <input id="tvSheetTitle" class="tv-input" type="text" placeholder="Taken from the skill when left empty" maxlength="160" aria-describedby="tvTitleCap">
+      <p class="tv-cap" id="tvTitleCap" style="margin-top:4px;">${esc(TITLE_CAP)}</p>
     </div>
     <div id="tvSections" style="display:flex;flex-direction:column;gap:12px;"></div>
     <div class="tv-row">
@@ -377,6 +380,7 @@ function onClick(e) {
         case 'remove-section': pr.sections.splice(Number(d.sec), 1); if (!pr.sections.length) pr.sections.push(newSection()); renderWhat(); scheduleBuild(); break;
         case 'size': pr.size = d.v; renderSetup(); scheduleBuild(); break;
         case 'look': pr.look = d.v; renderSetup(); scheduleBuild(); break;
+        case 'title-pos': pr.titlePos = d.v === 'above' ? 'above' : 'below'; renderSetup(); scheduleBuild(); break;
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
@@ -489,7 +493,7 @@ function sectionHTML(s, i) {
     const colsField = onePage ? lockedSelect(`tvCols${i}`, 'Columns', '1') : `<label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select>`;
     const pagesField = onePage && s.role !== 'more-practice' && s.role !== 'lesson' ? `
   <div>${lockedSelect(`tvPages${i}`, 'Pages', '1')}<p class="tv-cap" style="margin-top:4px;">12 rows (× 1 to × 12, in order, 12 jumps each), one page and its key.</p></div>`
-        : onePage ? `${pagesPart}<p class="tv-cap" id="tvOnePageNote${i}">${ONE_PAGE_WHY} Each page: 12 rows (× 1 to × 12, in order, 12 jumps each) on one page, Small, one column.</p>` : pagesPart;
+        : onePage ? `${pagesPart}<p class="tv-cap" id="tvOnePageNote${i}">${ONE_PAGE_WHY} Each page: 12 rows (× 1 to × 12, in order, 12 jumps each) on one page, one column. Size: ${COMPACT_LABEL}.</p>` : pagesPart;
     const skills = s.skills.map((k, idx) => {
         const hit = findSkill(k.categoryId, k.skillId);
         const label = hit ? hit.label : k.skillId;
@@ -932,13 +936,13 @@ function openOptions(si, idx, anchor) {
 }
 
 /** True when the section prints "All 12 tables on one page" (count_by_tables onePage): print-sheet.js
- *  normaliseRequest then forces size S, twelve rows, one page and one column (critic round 4, G). */
+ *  normaliseRequest then forces the compact layout (COMPACT_LABEL), twelve rows, one page and one column (critic round 4, G). */
 function onePageSection(s) {
     return !!(s && s.skills.some((k) => {
         try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
     }));
 }
-const ONE_PAGE_WHY = 'Set by "All 12 tables on one page".';
+const ONE_PAGE_WHY = 'Set by "All rows on one page".';   // the option's own label (skill-options.js onePage)
 function lockedSelect(id, label, text) {
     return `<label class="tv-label" for="${id}">${label}</label><select id="${id}" class="tv-select" disabled aria-describedby="${id}Why"><option selected>${text}</option></select><p class="tv-cap" id="${id}Why" style="margin-top:4px;">${ONE_PAGE_WHY}</p>`;
 }
@@ -965,11 +969,12 @@ function renderSetup() {
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
     <div><span class="tv-label">Size</span>${pr.sections.some(onePageSection)
-        ? `<div class="tv-seg" role="radiogroup" aria-label="Size" aria-describedby="tvSizeOnePage">${[['S', 'Small'], ['M', 'Medium'], ['L', 'Large']].map(([v, l]) => `<button type="button" role="radio" aria-checked="${v === 'S'}" aria-label="${l}" aria-disabled="true" tabindex="-1" disabled>${v}</button>`).join('')}</div><p class="tv-cap" id="tvSizeOnePage" style="margin-top:6px;">S (Small). ${ONE_PAGE_WHY} Twelve rows fit on one page only at Small.</p>`
-        : seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${!pr.sections.some(onePageSection) && pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
-      <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
+        ? `<p class="tv-cap" id="tvSizeOnePage" data-size-fixed="compact" style="margin-top:6px;"><strong>${COMPACT_LABEL}</strong>. ${ONE_PAGE_WHY}</p>`
+        : seg('size', pr.size, [['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}</div>
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
+    <div><span class="tv-label">Title place</span>${seg('title-pos', pr.titlePos === 'above' ? 'above' : 'below', [['below', 'Below name'], ['above', 'Above name']], 'Title place')}
+      <p class="tv-cap" style="margin-top:6px;">${!pr.header.title ? 'Title is off (Header: Title), so the pages print no title.' : pr.titlePos === 'above' ? 'The title prints above the Name, Date and Score line.' : 'The title prints under the Name, Date and Score line.'}</p></div>
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
     </div>
@@ -996,6 +1001,21 @@ function renderSetup() {
   ${classicHTML()}`;
     const det = box.querySelector('.tv-extras');
     if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
+    syncTitleControls();
+}
+
+/** Critic title r1 T4: with the Header "Title" box unticked the page prints no title, so the Page title box and Title place
+ *  are disabled and their caption says why. */
+const TITLE_OFF_CAP = 'Title is off (Header: Title), so the pages print no title. Tick Title to use these.';
+function syncTitleControls() {
+    if (!root) return;
+    const off = !pr.header.title;
+    const inp = root.querySelector('#tvSheetTitle');
+    if (inp) inp.disabled = off;
+    root.querySelectorAll('[data-act="title-pos"]').forEach((b) => { b.disabled = off; b.setAttribute('aria-disabled', String(off)); });
+    const cap = root.querySelector('#tvTitleCap');
+    if (cap && off) { cap.textContent = TITLE_OFF_CAP; cap.classList.remove('tv-fits-warn'); cap.dataset.tvWarn = 'title-off'; }
+    else if (cap && cap.dataset.tvWarn === 'title-off') { cap.dataset.tvWarn = ''; titleFitCaption(last); }
 }
 
 /** Wave 4.4 (critic r1, D7): the key placement and style are the teacher's print defaults. */
@@ -1129,7 +1149,10 @@ function requestFor(s, i) {
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
-        header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
+        // (the teacher's own title words go as titleText: buildSheet fits them to two lines, never smaller - fitTitle; the
+        // fields are sent only when set, so a page with neither prints exactly as before)
+        header: Object.assign({ name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? true : false },
+            h.title && pr.title.trim() ? { titleText: pr.title.trim() } : {}, h.title && pr.titlePos === 'above' ? { titlePos: 'above' } : {}),
         testHints: !!pr.testHints,
         key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy', newSheet: !!pr.keyNewSheet },
         seed: (pr.seed + i * 7919) >>> 0,
@@ -1158,7 +1181,9 @@ function currentReq() {
 async function buildAll(req) {
     const out = { parts: [], pupilHtml: '', keyHtml: '', docHtml: '', pages: [], keyPages: 0 };
     let after = false;
-    for (const [ri, r] of req.parts.entries()) {
+    for (const [ri, r0] of req.parts.entries()) {
+        // owner 2026-11-13: size S is dropped; a stored printout (Recent printouts) that names S prints at M (an alias)
+        const r = r0 && r0.size != null && offeredSize(r0.size, r0.size) !== r0.size ? Object.assign({}, r0, { size: offeredSize(r0.size, 'L') }) : r0;
         let res;
         // B4 (critic r1): in a printout of several sections each short key names its section.
         const rq = req.parts.length > 1 ? Object.assign({}, r, { keySection: `Section ${(req.idx ? req.idx[ri] : ri) + 1}` }) : r;
@@ -1187,6 +1212,20 @@ async function buildAll(req) {
     const seen = {};
     out.pages = out.pages.map((l) => { seen[l] = (seen[l] || 0) + 1; return seen[l] > 1 ? `${l} (${seen[l]})` : l; });
     return out;
+}
+
+/** The caption under the Page title box: what the custom title printed as (two lines, or cut with a warning). */
+const TITLE_CAP = 'Prints at the top of every page and key, at full size, in place of the page type\'s own title (Test A, Review …). A long title takes two lines.';
+function titleFitCaption(built) {
+    const cap = root && root.querySelector('#tvTitleCap');
+    if (!cap) return;
+    if (!pr.header.title) { syncTitleControls(); return; }
+    const fit = built && built.parts.map((p) => p.res && p.res.titleFit).find(Boolean);
+    cap.classList.toggle('tv-fits-warn', !!(fit && fit.truncated));
+    cap.dataset.tvWarn = fit && fit.truncated ? 'title-cut' : '';
+    cap.textContent = !fit ? TITLE_CAP
+        : fit.truncated ? `Too long for two lines: the page prints "${fit.text}". Shorten the title to print all of it.`
+        : fit.lines > 1 ? 'This title takes two lines on the page: the page is 6 mm shorter and may hold one row of problems fewer.' : TITLE_CAP;
 }
 
 function scheduleBuild(delay = 350) {
@@ -1263,6 +1302,7 @@ async function runBuild() {
         const sized = built.parts.some((p) => (p.res.notes || []).includes(LESSON_SIZE_NOTE)) ? [LESSON_SIZE_NOTE] : [];
         const warn = short.concat(sized);
         root.querySelector('#tvFits').innerHTML = `<span class="tv-fits-line">${plain.map(esc).join('<br>')}</span>${details.length ? `<details class="tv-fits-why"><summary>Why?</summary><ul>${details.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}${warn.length ? `<span class="tv-fits-warn" data-tv-warn="${sized.length ? 'lesson-size' : 'short'}">${icon('info', 16)}<span>${esc(warn.join(' '))}</span></span>` : ''}`;
+        titleFitCaption(built);
         renderTabs(); renderSetup(); showPreview();
     } catch (e) {
         if (token !== buildToken) return;
@@ -1319,7 +1359,7 @@ function fitsNotes(res) {
             t = t.replace(/^\d+\s+columns?\s*[x×]\s*\d+\s+rows?,?\s*(\d+\s+per page,?\s*)?(\d+\s+pages?\.?)?\s*/i, '').trim();
             if (!t) continue;
         }
-        t = t.replace(/\bat size ([SML])\b/g, (m, z) => `at size ${z === 'S' ? 'Small' : z === 'M' ? 'Medium' : 'Large'}`)
+        t = t.replace(/\bat size ([SML])\b/g, (m, z) => (z === 'S' ? `in the ${COMPACT_LABEL} layout` : `at size ${z === 'M' ? 'Medium' : 'Large'}`))   // critic nos r2 nit: S is only ever the compact layout
             .replace(/\bmax (\d+) columns?\b/gi, (m, k) => `at most ${k} column${k === '1' ? '' : 's'}`)
             .replace(/\bstep-by-step steps\b/g, 'worked steps');
         if (!out.includes(t)) out.push(t);

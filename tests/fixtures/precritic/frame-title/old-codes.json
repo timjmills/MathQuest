@@ -1,0 +1,57 @@
+{
+ "note": "QP1 codes made by origin/master before the title option (ws-title-code --write-old)",
+ "old": [
+  {
+   "code": "QP1.eyJ2IjoxLCJuIjoiRmFjdHMiLCJzIjpbeyJjIjoiYWRkaXRpb24iLCJrIjoiYWRkX2ZhY3RzIn1dLCJwIjp7ImhvdyI6InBhZ2VzIiwibiI6MSwic2V0cyI6MSwic2l6ZSI6Ik0iLCJjb2xzIjoiYXV0byIsImNvbHNNb2RlIjoiYWltIiwia2V5Ijp0cnVlLCJhcnJhbmdlIjoic2VjdGlvbnMifX0",
+   "decoded": {
+    "name": "Facts",
+    "skills": [
+     {
+      "categoryId": "addition",
+      "skillId": "add_facts"
+     }
+    ],
+    "print": {
+     "how": "pages",
+     "n": 1,
+     "sets": 1,
+     "size": "M",
+     "cols": "auto",
+     "colsMode": "aim",
+     "key": true,
+     "arrange": "sections"
+    }
+   }
+  },
+  {
+   "code": "QP1.eyJ2IjoxLCJuIjoiVHdvIHNraWxscyIsInMiOlt7ImMiOiJzdWJ0cmFjdGlvbiIsImsiOiJzdWJfMTAwX25vX3JlZ3JvdXAiLCJhIjoiNjAlIn0seyJjIjoiYWRkaXRpb24iLCJrIjoiYWRkX2ZhY3RzIiwibyI6eyJiYW5kIjoxMH19XSwicCI6eyJob3ciOiJwcm9ibGVtcyIsIm4iOjEyLCJzZXRzIjoyLCJzaXplIjoiTCIsImNvbHMiOjMsImNvbHNNb2RlIjoiZXhhY3QiLCJrZXkiOmZhbHNlLCJhcnJhbmdlIjoibWl4ZWQifX0",
+   "decoded": {
+    "name": "Two skills",
+    "skills": [
+     {
+      "categoryId": "subtraction",
+      "skillId": "sub_100_no_regroup",
+      "amt": "60%"
+     },
+     {
+      "categoryId": "addition",
+      "skillId": "add_facts",
+      "opts": {
+       "band": 10
+      }
+     }
+    ],
+    "print": {
+     "how": "problems",
+     "n": 12,
+     "sets": 2,
+     "size": "L",
+     "cols": 3,
+     "colsMode": "exact",
+     "key": false,
+     "arrange": "mixed"
+    }
+   }
+  }
+ ]
+}
