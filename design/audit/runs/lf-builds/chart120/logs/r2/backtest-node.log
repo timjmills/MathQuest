@@ -1,0 +1,14 @@
+ws-backtest row c120r2-wrong-multi: PASS  fail state FAIL 2.1s, pass state OK 3.3s
+ws-backtest row c120r2-steps-all-slots: PASS  fail state FAIL 2.8s, pass state OK 3.3s
+ws-backtest row c120r2-say-agree: PASS  fail state FAIL 1.9s, pass state OK 3.9s
+ws-backtest row c120r2-hint-all: PASS  fail state FAIL 2.7s, pass state OK 4.0s
+ws-backtest: 4 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120r2-wrong-multi          commit-pair  FAIL 2.1s           OK 3.3s             PASS
+c120r2-steps-all-slots      commit-pair  FAIL 2.8s           OK 3.3s             PASS
+c120r2-say-agree            commit-pair  FAIL 1.9s           OK 3.9s             PASS
+c120r2-hint-all             commit-pair  FAIL 2.7s           OK 4.0s             PASS
+
+4 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 105.7 s
+ws-backtest: OK

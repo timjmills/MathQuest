@@ -3558,5 +3558,26 @@
    "items": 1,
    "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
   }
- }
+ },
+ "sizeOrderOpts": [
+  {
+   "skill": "division:div_facts",
+   "role": "independent",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  }
+ ],
+ "testEqOpts": [
+  {
+   "skill": "division:div_facts",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  }
+ ]
 }

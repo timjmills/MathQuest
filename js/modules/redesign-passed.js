@@ -70,5 +70,10 @@ const PVC = 'Lane lf-placevalue week 2, placevalue:compare: critic compare r1 FA
 const PVC_IDS = [
     'placevalue:compare',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS, ...PVC_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW]), ...PVC_IDS.map((id) => [id, PVC])]);
+const C120 = 'Lane lf-builds, chart_120 (composing:hundreds_chart_fill band 120 + preset composing:chart_to_120, signed chartwindow card): critic r1 FAIL, r2 FAIL (N1-N3; round-cap root cause, checks MODEL-STATE-MARKS / CROSS-GIVEAWAY screen / SAY-AGREE frames), r3 PASS (independent Opus medium critics; every offered page type at M / L, card 1366 / 820, worksheet and quiz 1366 / 820 >= 8; routed lesson-anchor / guided / pre-skill-check bands to lf-engine / lf-roles); design/audit/runs/lf-builds/chart120/critic-r1.md .. critic-r3.md, 2026-11-14';
+const C120_IDS = [
+    'composing:hundreds_chart_fill',
+    'composing:chart_to_120',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS, ...PVC_IDS, ...C120_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW]), ...PVC_IDS.map((id) => [id, PVC]), ...C120_IDS.map((id) => [id, C120])]);

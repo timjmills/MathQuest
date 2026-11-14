@@ -8,7 +8,7 @@
 // found it on number sequences, which count ON by a step and touch nothing.
 
 import { registerSkill } from '../contract.js';
-import { num, arr, obj, countList, digitsOf, chooseWrong, strings, step, clampSteps } from './util.js';
+import { num, arr, obj, countList, digitsOf, chooseWrong, strings, step, clampSteps, itemHash } from './util.js';
 
 /* ========================================================================= count_objects */
 
@@ -339,63 +339,201 @@ registerSkill('composing:base10_build_hundreds', {
 
 /* ================================================== hundreds_chart_fill, number_chart_fill */
 
+/** Every empty square of a chart window, in reading order (its `keyParts`, else the one answer). */
+export function chartGaps(q) {
+    const raw = Array.isArray(q && q.keyParts) && q.keyParts.length ? q.keyParts : String((q && q.ans) ?? '').split(/\s*,\s*/);
+    return raw.map(num).filter(Number.isFinite);
+}
+/** The chart's last number: 120 for a window past row 9 (band 120), else 100 (number_chart_fill: its own). */
+const chartTop = (q) => {
+    const w = obj(q && q.chartWindow);
+    const rows = w && Array.isArray(w.rows) ? w.rows.map(Number) : [];
+    return rows.some((r) => r >= 10) ? Math.max(120, (Math.max(...rows) + 1) * 10) : 100;
+};
+/** "101", "101 and 104", "101, 104 and 107" (a list read aloud, chart_120 critic r1 F3). */
+export const andList = (xs) => (xs.length <= 1 ? String(xs[0] ?? '') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+/** The Say line of a chart window, agreeing in number with its gaps (critic r1 F3: "The missing number is 101, 104."). */
+export const chartSay = (q) => {
+    const g = chartGaps(q);
+    if (!g.length) return null;
+    return g.length === 1 ? `The missing number is ${g[0]}.` : `The missing numbers are ${andList(g)}.`;
+};
+/** The UNFILLED Say frame of a chart window, one blank a gap (chart_120 critic r2 N3): "The missing numbers are __ and __.". */
+export const chartSayFrame = (q) => {
+    const g = chartGaps(q);
+    return g.length > 1 ? `The missing numbers are ${andList(g.map(() => '__'))}.` : null;
+};
+
 /**
  * The worked steps of a chart window, reading only the numbers the WINDOW prints (2026-09-25:
  * a window of one row, the chart to 10, has no number above or below; a steps line naming one
- * pointed the pupil at a number that is not on the page). `t` is the first gap.
+ * pointed the pupil at a number that is not on the page).
+ * EVERY gap is worked (chart_120 critic r1 F3, lead ruling 2026-11-13: a multi-gap window's steps ended "Write <first gap>."
+ * and the second and third gaps were never named): one gap - the relation in two steps (the guided fade), then "Write t.";
+ * two gaps - each gap's relation, then "Write t." in its own square (slot b<k>); three - each relation, then one Write; four
+ * or more - one step a run of rows naming every gap it writes, then the check.
  */
 function chartSteps(q) {
-    const t = num(Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts[0] : q.ans);
-    if (!Number.isFinite(t)) return [];
+    const parts = chartGaps(q);
+    if (!parts.length) return [];
     const win = obj(q.chartWindow);
-    const gaps = new Set((Array.isArray(q.keyParts) ? q.keyParts : [q.ans]).map(num));
+    const gaps = new Set(parts);
     const shows = (n) => {
         if (gaps.has(n) || n < 1) return false;
         if (!win || !Array.isArray(win.rows) || !Array.isArray(win.cols)) return true;
         return win.rows.includes(Math.floor((n - 1) / 10)) && win.cols.includes((n - 1) % 10);
     };
-    const out = [];
-    if ((t - 1) % 10 !== 0 && shows(t - 1)) out.push(step(`The number before is ${t - 1}. One more is ${t}.`));
-    if (shows(t - 10)) out.push(step(`The number above is ${t - 10}. Ten more is ${t}.`));
-    if (out.length < 2 && shows(t + 10)) out.push(step(`The number below is ${t + 10}. Ten less is ${t}.`));
-    if (out.length < 2 && t % 10 !== 0 && shows(t + 1)) out.push(step(`The number after is ${t + 1}. One less is ${t}.`));
-    // Guided fade (critic guided-r1): the first relation is two steps, the number to read and
-    // then the result, so a first try's grey hint ("The number before is 66.") never holds it.
-    if (out.length) {
-        const m = out[0].text.match(/^(The number \w+ is \d+\.) (.*)$/);
-        if (m) out.splice(0, 1, step(m[1]), step(m[2]));
+    const relation = (t) => {
+        const out = [];
+        if ((t - 1) % 10 !== 0 && shows(t - 1)) out.push(`The number before is ${t - 1}. One more is ${t}.`);
+        if (shows(t - 10)) out.push(`The number above is ${t - 10}. Ten more is ${t}.`);
+        if (out.length < 2 && shows(t + 10)) out.push(`The number below is ${t + 10}. Ten less is ${t}.`);
+        if (out.length < 2 && t % 10 !== 0 && shows(t + 1)) out.push(`The number after is ${t + 1}. One less is ${t}.`);
+        return out;
+    };
+    if (parts.length === 1) {
+        const t = parts[0];
+        const out = relation(t).map((x) => step(x));
+        // Guided fade (critic guided-r1): the first relation is two steps, the number to read and
+        // then the result, so a first try's grey hint ("The number before is 66.") never holds it.
+        if (out.length) {
+            const m = out[0].text.match(/^(The number \w+ is \d+\.) (.*)$/);
+            if (m) out.splice(0, 1, step(m[1]), step(m[2]));
+        }
+        out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
+        return out;
     }
-    out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
+    const out = [];
+    if (parts.length > 3) {
+        // A bigger grid (three whole rows, the whole chart: 4 to 24 gaps). Each step works the gaps of one run of rows, in
+        // reading order, at most 5 steps, and names every gap it writes; the last step checks the two patterns.
+        const rowOf = (t) => Math.floor((t - 1) / 10);
+        const rows = [...new Set(parts.map(rowOf))];
+        const per = Math.ceil(rows.length / 5);
+        for (let i = 0; i < rows.length; i += per) {
+            const rs = rows.slice(i, i + per);
+            const vals = parts.filter((t) => rs.includes(rowOf(t)));
+            const lo = rs[0] * 10 + 1, hi = rs[rs.length - 1] * 10 + 10;
+            out.push(step(`From ${lo} to ${hi}: count on by 1 along ${rs.length === 1 ? 'the row' : 'each row'}. Write ${andList(vals)}.`,
+                vals.map((t) => ({ slot: `b${parts.indexOf(t)}`, value: String(t) }))));
+        }
+        out.push(step('Check: across, each number is 1 more. Down, each number is 10 more.'));
+        return out;
+    }
+    // FOUR short states for two or three gaps, as a one-gap window has (a Scripted Model lays four states out in its rows; three
+    // or six states, or long ones, left its step-text cells 70 % empty, ws-empty-band EB-BAND / EB-SIDE): two gaps - each its
+    // relation, then "Write t." in its own square; three gaps - each its relation, then "Write a, b and c.".
+    // (a gap with no printed neighbour cannot be dealt - gen-counting keeps one beside every gap - but its step still names it)
+    // (short relations, one line in a Guided Model's work column: "One more than 3 is 4." - the long two-sentence form wrapped
+    // there and grew the Model's row, ws-empty-band EB-BAND on the try beside it)
+    const short = (x) => x.replace(/^The number before is (\d+)\. One more is (\d+)\.$/, 'One more than $1 is $2.')
+        .replace(/^The number above is (\d+)\. Ten more is (\d+)\.$/, 'Ten more than $1 is $2.')
+        .replace(/^The number below is (\d+)\. Ten less is (\d+)\.$/, 'Ten less than $1 is $2.')
+        .replace(/^The number after is (\d+)\. One less is (\d+)\.$/, 'One less than $1 is $2.');
+    const rel = (t) => { const r = relation(t); return r.length ? short(r[0]) : `Count on from the numbers beside it to ${t}.`; };
+    parts.forEach((t, k) => {
+        out.push(step(rel(t)));
+        if (parts.length === 2) out.push(step(`Write ${t}.`, [{ slot: `b${k}`, value: String(t) }]));
+    });
+    if (parts.length === 3) out.push(step(`Write ${andList(parts)}.`, parts.map((t, k) => ({ slot: `b${k}`, value: String(t) }))));
     return out;
 }
 
-registerSkill('composing:hundreds_chart_fill', {
-    strings: strings({
+/**
+ * The wrong answers of a chart window, SLOT BY SLOT (L27; chart_120 critic r1 F1 / F2): one gap of the window is written
+ * wrong and every other gap keeps its right number, so a two- or three-gap window has a False to show and Error analysis
+ * a mistake to find (before: `num("91, 101")` was NaN, every multi-gap item had no wrong answer and True or False? dealt
+ * all True). Which gap carries the error is dealt from the item, so it is not always the first.
+ */
+function chartWrong(q, perGap) {
+    const parts = chartGaps(q);
+    if (!parts.length) return null;
+    const one = parts.length === 1;
+    const start = itemHash(q, 'gap') % parts.length;
+    const order = parts.map((_, i) => (start + i) % parts.length);
+    // the gap that carries the error is dealt from the item (every gap equally often), its errors rotated by chooseWrong; a
+    // gap with no usable error passes to the next
+    for (const k of order) {
+        const t = parts[k];
+        const c = [];
+        for (const w of perGap(t, q)) {
+            if (!Number.isFinite(w.value) || w.value < 1 || w.value === t) continue;
+            const vals = parts.map((x, i) => (i === k ? w.value : x));
+            const slots = Object.fromEntries(vals.map((v, i) => [`b${i}`, String(v)]));
+            c.push(Object.assign({}, w, one ? { value: w.value } : { value: vals.join(', '), slot: `b${k}`, slots }));
+        }
+        const got = chooseWrong(q, c);
+        if (got) return got;
+    }
+    return null;
+}
+
+/** The 1-100 chart's strings; band 120 (chart_120) names the chart to 120 (L6, L28). */
+const HC_DEF = {
         iCan: 'I Can find missing numbers on a hundreds chart',
         // A window has one to three empty cells (payload `blanks`), so the page asks for numbers.
         instructionKey: 'missing-many',
+        // (short, so the lesson's Steps zone - which now shows these beside the Guided cells, chart_120 critic r1 F5 - keeps the
+        // height the example's own steps had: the long forms wrapped to 3 lines each and opened 42 % white round the windows)
         steps: [
-            'Look left: the number before. Add 1.',
-            'Look up: the number above. Add 10.',
+            'Look left. Add 1.',
+            'Look up. Add 10.',
             // Round-4 re-grade: a gap in the window's top row has no number above; its worked
             // steps read the number below, so the Steps band names that way too.
-            'Top row? Look down: the number below. Take away 10.',
+            'Top row? Look down. Take away 10.',
             'Write the missing number.',
         ],
         say: 'The missing number is __.',
-    }),
+        // (the Say line agrees with the gaps: "The missing numbers are 101 and 104." - chart_120 critic r1 F3)
+        sayValues: chartSay,
+        sayFrame: chartSayFrame,
+    };
+const HC_DEF_120 = { ...HC_DEF, iCan: 'I Can find missing numbers on a chart to 120' };
+/** Band 120: from the option (an item-less page, L28), the item's window (rows past 9) or its label. */
+function chartTo120(ref = {}) {
+    if (Number(ref && ref.opts && ref.opts.band) === 120) return true;
+    const q = ref && ref.q;
+    const w = q && obj(q.chartWindow);
+    if (w && Array.isArray(w.rows) && w.rows.some((r) => Number(r) >= 10)) return true;
+    return /120/.test(String((ref && ref.label) || ''));
+}
+
+registerSkill('composing:hundreds_chart_fill', {
+    strings: stringsBy((t, ref) => (chartTo120(ref) ? HC_DEF_120 : null), HC_DEF),
     misconceptions: ['wrong-row', 'reversed-digits', 'one-less'],
     workedSteps: chartSteps,
-    wrongAnswer: (q) => {
-        const t = num(q.ans);
-        if (!Number.isFinite(t)) return null;
-        const c = [{ value: t <= 90 ? t + 10 : t - 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
+    wrongAnswer: (q) => chartWrong(q, (t) => {
+        const top = chartTop(q);
+        const c = [{ value: t + 10 <= top ? t + 10 : t - 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
         const rev = num(String(t).split('').reverse().join(''));
         if (t >= 10 && t < 100 && t % 10 && rev !== t) c.push({ value: rev, misconception: 'reversed-digits', explain: `Wrote the digits of ${t} the wrong way round.` });
+        // (chart_120, card M-C1 'writes-ten-ten' - 110 written 1010 - is NEVER dealt in a chart square: four digits at the
+        // working size are 17.7 mm at L, wider than the 17 mm square, and printed '1,011' over the next square on True or
+        // False? L (ws-empty-band EB-EDGE). Lead ruling 2026-11-13: it is taught in TEXT instead - `wrongText` below, Reason
+        // It's worked-wrong statement in words - and on the screen practice card (gen-counting distractorTags).)
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
-        return chooseWrong(q, c);
+        return c;
+    }),
+    // Lead ruling 2026-11-13 (card chartwindow M-C1, re-scoped): the wrong answer a TEXT panel shows (Reason It's statement in
+    // words, its answer slot as wide as four digits), never a chart square: 110 written as it is said, "one hundred, ten" ->
+    // 1010. Band 120 items with a gap at 100 to 120 only.
+    wrongText: (q) => {
+        if (!chartTo120({ q })) return null;
+        const parts = (Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : [q.ans]).map(num);
+        // (lead ruling 2026-11-13, chart_120 critic r1 F8: dealt for 101-110 only, the card's signed form - 110 said "one
+        // hundred ten" and written 1010; 100 and 111-120 have no such as-said form here)
+        const at = parts.findIndex((t) => Number.isFinite(t) && t >= 101 && t <= 110);
+        if (at < 0) return null;
+        const t = parts[at];
+        const w = tenTen(t);
+        const value = parts.map((x, i) => (i === at ? w : x)).join(', ');
+        return { value, misconception: 'writes-ten-ten', explain: `Wrote ${t} as it is said, ${w}: ${t} has three digits.`,
+            statement: parts.length === 1 ? `The missing number is ${w}.` : `The missing numbers are ${value}.`,
+            rightStatement: parts.length === 1 ? `The missing number is ${t}.` : `The missing numbers are ${parts.join(', ')}.` };
     },
 });
+/** 100 to 120 written as it is said (card chartwindow M-C1 'writes-ten-ten'): 100 -> 1000, 101 -> 1001, 110 -> 1010. */
+export function tenTen(t) { return Number(`10${String(t - 100).padStart(2, '0')}`); }
 
 // The same window cut from the chart of the hundreds and the thousands (owner, 2026-09-25).
 // Its real errors: the number from the wrong row (ten off), the number before, and a place-value
@@ -413,18 +551,17 @@ registerSkill('composing:number_chart_fill', {
             'Write the missing number.',
         ],
         say: 'The missing number is __.',
+        sayValues: chartSay,
     }),
     misconceptions: ['wrong-row', 'dropped-zero', 'one-less'],
     workedSteps: chartSteps,
-    wrongAnswer: (q) => {
-        const t = num(q.ans);
-        if (!Number.isFinite(t)) return null;
+    wrongAnswer: (q) => chartWrong(q, (t) => {
         const c = [{ value: t + 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
         const s = String(t);
         if (/\d0\d/.test(s)) c.push({ value: num(s.replace(/0(?=\d)/, '')), misconception: 'dropped-zero', explain: `Left out the zero in ${t}.` });
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
-        return chooseWrong(q, c);
-    },
+        return c;
+    }),
 });
 
 /* ============================ add_5_pictures, tens_foundation_visual, classify_count, teen_compose */

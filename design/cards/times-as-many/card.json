@@ -1,0 +1,624 @@
+{
+  "id": "times-as-many",
+  "kind": "template",
+  "title": "Times as many: the statement and the equation (build-list `comparison_statements`, the scaling bar)",
+  "template": {
+    "id": "times-as-many",
+    "source": "js/modules/sheet/cells/bar-model.js",
+    "also": "the equation frame of `js/modules/sheet/cells/equation.js` and the check boxes of `js/modules/sheet/cells/family-check.js` (reused, not copied); generator branch `mult_comparison` in `js/modules/gen-operations.js` (a `form` switch before the story deal); options `js/modules/skill-options.js` (`SKILL_OPTIONS['multiplication:mult_comparison']`, the `WORD_WORK_OPTIONS` block for `_plain`); provider `js/modules/sheet/providers/word-work.js` (the two `mult_comparison` registrations). The story form stays on the `word-work` cell (`js/modules/word-work.js`) unchanged. `bar-model.js` does not exist yet: this card builds its FIRST kind, `kind: 'scaling'` (V028, 1 box vs n boxes); `vis_bar_family` adds the other kinds to the same file later"
+  },
+  "families": [
+    "multiplication"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "times-as-many",
+      "bar-model",
+      "word-work",
+      "equation"
+    ],
+    "families": [
+      "word-problems"
+    ]
+  },
+  "skills": {
+    "include": [
+      "multiplication:mult_comparison",
+      "multiplication:mult_comparison_plain"
+    ]
+  },
+  "excerptChars": 140,
+  "sourceChars": 90,
+  "summary": "A new FORM on the two times-as-many skills (`form: 'statements'`; the story form stays the default and is graded on the word-work cell): the pupil moves between a multiplication equation and the two comparison sentences it states. One boxed cell: the prompt (an equation at digit size, or a sentence at text size) on top; under it, on mult_comparison, the scaling bar (one unit box over n equal boxes, a bracket over the n boxes with the total, RL-15 multiplicative compare); at the bottom ONE answer area: three check-box sentences (task read), an equation frame [ ] = [ ] x [ ] (task write) or one box in the sentence (task blank). mult_comparison_plain is the same cell without the bar. Paper, key and the three screen hosts are one drawing.",
+  "teaches": "4.OA.A.1 (M.EE.4.OA.1): interpret a multiplication equation as a comparison, 35 = 5 x 7 as \"35 is 5 times as many as 7\" AND \"35 is 7 times as many as 5\", and write the equation for a verbal comparison (\"24 is 3 times as many as 8\" -> 24 = 3 x 8). Closes the 4.OA.A.1 clause of standards-audit.js (`comparison_statements`). Lesson G4-Y5.B3 \"Multiplicative comparison: times as many\" (design/lessons-first/BUILD_QUEUE.md row 22; school record `G4|-|multiplicativecomparisontimesasmany` in data/curriculum/links/Y5.json). Not this card: the unknown multiplier \"how many times as many?\" (`comparison_unknown`, row 23) and the Grade 2 tables cap (`comparison_tables`).",
+  "research": "No premium logins this round. From knowledge of the reference sites: MathWorksheets4Kids \"multiplicative comparison\" pages (write the comparison statement for an equation; write the equation for a statement; a bar model of n equal parts beside one part), K5 Learning grade 4 \"multiplicative comparison\" worksheets (fill the blank in \"__ is 4 times as many as 6\"; match the equation to the sentence), IXL grade 4 \"Multiplicative comparison\" / \"Comparison word problems\" / \"Write multiplication equations for comparison statements\" (pick the sentence that matches 35 = 5 x 7, choose or write the equation for a sentence, the \"times as many\" bar). Repo sources: PROBLEM_TYPES MU-14 (RL-15 one unit bar over an n-unit bar), RL-15 / RP-70 (bars), WRM Y3.B4.S10 \"Scaling\" (the 1 box vs n boxes bar, V028). The sites deal 10-20 items a page, multiple choice on screen; we keep 4-6 boxed cells, the same check boxes on paper and screen (no MC on screen only), and one written response per cell.",
+  "problemTypes": [
+    "Read the equation (task read): 35 = 5 x 7 at digit size; three sentences each with a check box: \"35 is 5 times as many as 7.\", \"35 is 7 times as many as 5.\", and one false sentence from the misconceptions (\"35 is 5 more than 7.\", \"7 is 5 times as many as 35.\"). Either one or two sentences are true (dealt), positions dealt (L10). \"Which sentence matches the equation?\" (the build list's third type) is this task with one true sentence.",
+    "Write the equation (task write): the sentence \"24 is 3 times as many as 8.\" and the frame [ ] = [ ] x [ ] (three number boxes, x and = printed). 24 = 3 x 8 and 24 = 8 x 3 are both right on screen and in the key note.",
+    "Fill the blank (task blank): \"[ ] is 4 times as many as 6.\" one number box in the sentence; the unknown is always the larger amount (the product). The unknown multiplier and the smaller amount are `comparison_unknown`, not here.",
+    "Story form unchanged (form story, the default): the three-unknown times-as-many stories on the word-work cell."
+  ],
+  "progression": [
+    "O2 number size (`facts`): facts to 5 x 5 (both factors 2-5) -> facts to 10 x 10 (2-10). Factor 1 is never dealt (1 times as many is not a comparison), 2 x 2 never (r5 D-A rule kept).",
+    "O3 support (`wpBar`, on the statements form): the scaling bar drawn and labelled -> no bar. On this form O3 and the build list's O6 \"bars / plain\" are the same control: mult_comparison opens with the bar, mult_comparison_plain without; one control, not two (L8 reason).",
+    "Task order inside the lesson (one change a step, P-1 `format`): read (the equation given, judge sentences) -> blank (one number in the sentence) -> write (the whole equation). Each task is its own page; a page never mixes tasks.",
+    "Structural scaffolds on every item and every rung: the x and = printed in the write frame, the check boxes, the boxed cell. Hint scaffolds that fade: the bar and its labels."
+  ],
+  "drawing": {
+    "sizes": "Digits 16 / 22 / 28 pt (S / M / L) in the prompt equation and the answer boxes; sentences at text size 11 / 13 / 15 pt. Scaling bar: bars 10 / 12 / 14 mm tall (RP-70), 1.5 pt outline; the n boxes share the long bar equally, box width = max(target / n, label room) with target 64 / 72 / 80 mm and label room 7 / 9 / 11 mm (a 2-digit unit at 0.8 of the digit size plus 1 mm clear each side), so the long bar is 64-70 / 72-90 / 80-110 mm; the unit bar is ONE box of the same width on the same left edge, 3 / 3.5 / 4 mm above it. Bracket 0.75 pt over the long bar, total at 0.8 digit size above it; the unknown (task blank) a solid box with a zone-size \"?\" (exactly one). Check boxes 5 / 6 / 7 mm (RM-12) at the left of each sentence, 3 mm row gap. Write frame: three boxes B(3) / B(2) / B(2) (the product box B(3) when facts 10 x 10 can deal 100), 14 mm minimum (SL-1), 1 em for x and =. Cell (read, with bar): about 72 / 83 / 95 mm tall; width = long bar + 6 mm = 76 / 96 / 116 mm at facts 10, 70 / 78 / 86 mm at facts 5. Page: S 2 columns x 3 rows = 6; M 2 x 2 = 4 at facts 5, 1 x 2 at facts 10; L 2 x 2 = 4 at facts 5, 1 x 2 at facts 10 (the builder measures; the footprint is the widest n the page's option set can deal, L26). Plain (no bar): about 25 / 28 / 32 mm shorter, one more row.",
+    "notes": [
+      "Payload (new `scaling` kind of bar-model): {kind: 'scaling', unit, times, total, unknown: 'total' | null, labels: true}; the cell payload: {task: 'read' | 'write' | 'blank', a, b, product, statements: [{text, truth}], bar: payload | null}. The template never chooses a size or line weight: it reads ctx.metrics (SCC-T4).",
+      "The bar draws the equation as written: 35 = 5 x 7 is a unit box labelled 7 and a long bar of 5 boxes under a bracket labelled 35. The second reading (7 boxes of 5) is drawn by the Model and Guided worked steps, never in the practice cell, so the drawing never says how many sentences are true.",
+      "Bar lengths are schematic (RL-15): the long bar never grows with the numbers beyond the label room; equal boxes are equal; nothing dashed (RP-70).",
+      "ONE answer area per cell (VQ-2, H16): read = the check boxes only (no write line); write = the frame only; blank = the one box only. The bar's numbers are printed, never pupil slots (no ungraded scratch boxes on this form). No Say frame in the cell; the Say band belongs to the Model (\"35 is 5 times as many as 7, and 7 times as many as 5\").",
+      "Instruction strings (verb library, BD-17): read \"Check each true sentence.\" / write \"Write the equation.\" / blank \"Write the missing number.\"; the I Can follows the task (L6, L28: chosen from the options when the page asks with no item): \"I Can read a times-as-many equation\" / \"I Can write the equation for a times-as-many sentence\".",
+      "Key (AK-1, AK-2): the same cell with the check marks drawn in the true boxes, the frame filled 24 = 3 x 8, the blank filled. Distractors (wrongAnswer): the additive sentence, the reversed sentence, 24 = 3 + 8, the sum in the blank (10 for 4 and 6).",
+      "Screen: each check box is a tap target of at least 44 px graded as a set (all and only the true ones); the frame's three boxes are inputs graded together, accepting either factor order; one Check button. Same drawing at card 390 / 820 / 1280, online worksheet and quiz; a bar wider than the card at 390 keeps its boxes and swipes inside its cell (SP-11a pattern), never shrinks."
+    ]
+  },
+  "ruleGroups": [
+    {
+      "title": "The comparison bar and the response (quoted)",
+      "core": true,
+      "chars": 330,
+      "rules": [
+        "MU-14",
+        "RL-15",
+        "RP-70",
+        "VQ-1",
+        "VQ-2",
+        "P-TH-1",
+        "RM-12",
+        "BD-17"
+      ]
+    },
+    {
+      "title": "Digits, writing room and the key (quoted)",
+      "core": true,
+      "chars": 260,
+      "rules": [
+        "TY-25",
+        "SL-1",
+        "TY-10",
+        "AK-1",
+        "SCC-T4"
+      ]
+    },
+    {
+      "title": "Bars, cells and the page",
+      "chars": 120,
+      "rules": [
+        "RP-80",
+        "CL-7",
+        "RP-4",
+        "VQ-6",
+        "VQ-8",
+        "H9",
+        "H13",
+        "AK-2",
+        "SC-4",
+        "SP-10",
+        "SP-11a",
+        "PT-OPN-4"
+      ]
+    },
+    {
+      "title": "Pedagogy, options and lessons learned",
+      "chars": 120,
+      "rules": [
+        "P-1",
+        "H16",
+        "O2",
+        "O3",
+        "O6",
+        "L1",
+        "L2",
+        "L3",
+        "L5",
+        "L6",
+        "L8",
+        "L10",
+        "L14",
+        "L25",
+        "L26",
+        "L27",
+        "L28",
+        "L29",
+        "SCC-01",
+        "SCC-P8"
+      ]
+    },
+    {
+      "title": "Cited by critics on this template's and family's findings (ids only)",
+      "chars": 80,
+      "rules": [
+        "AX-3",
+        "AX-4",
+        "C1",
+        "C2",
+        "CL-8",
+        "CL-40",
+        "DN-1a",
+        "H1@RUBRIC",
+        "H2@RUBRIC",
+        "H3@RUBRIC",
+        "H4@RUBRIC",
+        "H5@RUBRIC",
+        "H6",
+        "H7",
+        "H8",
+        "H10",
+        "H11",
+        "H12",
+        "PG-12",
+        "PG-14",
+        "PT-FRM-6",
+        "PT-FRW-5",
+        "PT-FRW-6",
+        "PT-REV-3",
+        "RP-1",
+        "RP-72",
+        "SF-50",
+        "SL-3a",
+        "SL-4",
+        "SP-2",
+        "TY-10a"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-17",
+      "ruling": "A distinct option is ALSO a findable skill when it is a distinct new difficulty or skill (a new task kind); small tweaks stay plain options. The statements form is checked against this rule in open question 1.",
+      "source": "owner rule, CLAUDE.md"
+    },
+    {
+      "date": "2026-10-23",
+      "ruling": "Every new skill is linked in the same change: SKILL_WRM tag, the curated year record lists it as direct, prerequisite and related links (open question 2).",
+      "source": "owner rule, CLAUDE.md"
+    },
+    {
+      "date": "2026-09-19",
+      "ruling": "\"Check\" replaces \"Tick\" wherever a pupil reads; the printed square is a check box (BD-17).",
+      "source": "owner ruling, WORKSHEET_DESIGN_STANDARD BD-17"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M-T1",
+      "error": "reads the comparison as addition (additive comparison)",
+      "wrong": "checks \"35 is 5 more than 7\"; writes 24 = 3 + 8; fills \"10 is 4 times as many as 6\""
+    },
+    {
+      "id": "M-T2",
+      "error": "believes only one of the two readings is true",
+      "wrong": "checks \"35 is 5 times as many as 7\" and leaves \"35 is 7 times as many as 5\" empty"
+    },
+    {
+      "id": "M-T3",
+      "error": "makes the smaller number the \"times as many\"",
+      "wrong": "checks \"7 is 5 times as many as 35\"; writes 8 = 3 x 24"
+    },
+    {
+      "id": "M-T4",
+      "error": "writes the numbers in the order they are read, not where they belong",
+      "wrong": "\"24 is 3 times as many as 8\" written 24 x 3 = 8 or 3 = 24 x 8"
+    }
+  ],
+  "options": [
+    "form (mult_comparison, mult_comparison_plain): NEW, values story (default, today's stories, unchanged) | statements (this card). Share codes: an appended option, default story, so old codes decode unchanged (ws-code-snapshot: no MOVED / DELETED).",
+    "task (form statements only; the panel shows it only then): NEW, read (default) | blank | write.",
+    "facts (form statements only): NEW, 5 (facts to 5 x 5, default) | 10 (facts to 10 x 10). Story form keeps `range`.",
+    "wpBar (existing \"Bar model\"): under form statements draws the scaling bar (not the groups bar); the preset on mult_comparison sets it on, mult_comparison_plain leaves it off.",
+    "Under form statements the story-form controls (response, wpCues, wpBank, range) are hidden by the panel (showIf form story): they change nothing on this form (OC options-do-nothing).",
+    "Preset skill: open question 1 (recommended `multiplication:times_as_many_equations`, opens mult_comparison with {form: statements, task: read, facts: 5, wpBar: true})."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill multiplication:mult_comparison --strict",
+      "note": "and mult_comparison_plain and the preset; rule 0b"
+    },
+    {
+      "cmd": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_comparison",
+      "note": "every role and host the card offers, each task at S / M / L (L25)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-cell-checks.cjs --skill multiplication:mult_comparison --card --card-opts",
+      "note": "every §7a value: form x task x facts x wpBar (L26)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-options-verify.cjs --skill multiplication:mult_comparison",
+      "note": "form, task, facts, wpBar each change print AND screen; predicates: facts 5 never deals a factor over 5; read has 1-2 true sentences, positions vary (L10, L29)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill multiplication:mult_comparison",
+      "note": "VQ-REP (the bar on the visual skill), VQ-ONEANSWER, VQ-TITLE"
+    },
+    {
+      "cmd": "node tests/scripts/ws-screen-slots.cjs",
+      "note": "one answer area, no paper verbs on screen"
+    },
+    {
+      "cmd": "node tests/scripts/ws-screen-answer.cjs",
+      "note": "either factor order accepted; check boxes graded as a set"
+    },
+    {
+      "cmd": "node tests/scripts/ws-providers-unit.mjs",
+      "note": "wrong differs from right per slot (L27); steps and instruction follow the task (L6, L28)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-content-audit.cjs --category multiplication",
+      "note": "the statements form deals only x facts"
+    },
+    {
+      "cmd": "node tests/scripts/ws-story-lint.mjs",
+      "note": "the story form unchanged"
+    },
+    {
+      "cmd": "node tests/scripts/ws-detailed-lesson.cjs --check",
+      "note": "every passed lesson that deals mult_comparison"
+    },
+    {
+      "cmd": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --check",
+      "note": "no live packet moves (default form story unchanged)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-presets-unit.mjs",
+      "note": "the preset opens the host with its values"
+    },
+    {
+      "cmd": "node tests/scripts/ws-search-terms.cjs",
+      "note": "the preset is findable (\"times as many\", \"multiplicative comparison\", \"comparison equation\")"
+    },
+    {
+      "cmd": "node tests/scripts/ws-standards.cjs",
+      "note": "4.OA.A.1 / M.EE.4.OA.1 tag; the 4.OA.A.1 verdict flipped to full"
+    },
+    {
+      "cmd": "node tests/scripts/ws-wrm.cjs --report-only",
+      "note": "the WRM tag of open question 2"
+    },
+    {
+      "cmd": "node tests/scripts/ws-wrm-page-unit.mjs",
+      "note": "the preset linked (direct, pre, related)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+      "note": "share codes still decode; the count only rises"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/times-as-many/times-as-many.md",
+      "note": "build-start gate"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-coverage design/cards/times-as-many/times-as-many.md"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "Owner rule 2026-10-17: the build list says preset: false. Is the statements form a distinct new task kind that must ALSO be a findable preset skill?",
+      "recommended": "Yes, one preset `multiplication:times_as_many_equations`, \"Times as Many: Statements and Equations\", grade 4, 4.OA.A.1 / M.EE.4.OA.1, opening mult_comparison with {form: statements, task: read, facts: 5, wpBar: true}: it is a new task kind with its own lesson (row 22) and its own standard clause. The three tasks stay options of that preset (one lesson, two directions), not three presets. Fix the build-list entry to preset: true."
+    },
+    {
+      "q": "WRM tag: the build-list entry has wrmSteps []. Which step?",
+      "recommended": "Y3.B4.S10 \"Scaling\" (3.OA.A.1 / 4.OA.A.1, M.EE.4.OA.1), as {step: 'Y3.B4.S10', partial: 'reading and writing the times-as-many equation'}: it is the WRM 1 box vs n boxes lesson and mult_comparison already holds it. No Y4 / Y5 WRM step teaches times as many (Y5.B5.S11 is problem solving, 4.OA.A.2). List the preset `direct` on the school record G4|-|multiplicativecomparisontimesasmany (links/Y5.json) and on Y3.B4.S10; pre: multiplication:mult_facts, multiplication:mult_comparison; related: mult_comparison_plain, algebra:tape_diagram."
+    },
+    {
+      "q": "Read task: always two true sentences of three, or one or two (dealt)?",
+      "recommended": "One or two, dealt (about two items in three with two true): if both were always true the pupil learns \"check two\", and the build list's \"which sentence matches?\" is the one-true case. The Model always shows both readings."
+    },
+    {
+      "q": "Write task: print the x in the frame, or a sign circle the pupil fills ([ ] = [ ] ( ) [ ])?",
+      "recommended": "Print the x (structure, P-TH-1 three number slots): the lesson is which number goes where. The sign circle (catches M-T1 directly) is a later rung on the story form, not this card."
+    },
+    {
+      "q": "Bar on the read task draws one reading (35 = 5 x 7: 5 boxes of 7). Draw both readings instead?",
+      "recommended": "One reading in the practice cell (two bars would make the cell 110 mm tall and say \"two are true\"); the Model / Guided worked steps draw the turned bar (7 boxes of 5) beside the first, with the Say line naming both."
+    },
+    {
+      "q": "facts default 5 or 10?",
+      "recommended": "5 on the preset (the first rung; ELL / SPED pupils meet the idea on small facts), 10 the second rung."
+    }
+  ],
+  "decisions": {
+    "options": [
+      {
+        "option": "form",
+        "values": [
+          "story"
+        ],
+        "d": "out of scope",
+        "why": "NEW option (to build); the default: today's stories on the word-work cell, graded on the word-work family, unchanged by this card",
+        "source": "this card §7"
+      },
+      {
+        "option": "form",
+        "values": [
+          "statements"
+        ],
+        "d": "offered",
+        "why": "NEW (to build): this card's cell on both skills; not offered by the repo yet, so --check-signed NOTEs it until the build lands",
+        "source": "build-list comparison_statements; this card §2-§3"
+      },
+      {
+        "option": "task",
+        "values": [
+          "read",
+          "blank",
+          "write"
+        ],
+        "d": "offered",
+        "why": "NEW (to build): one task a page; each value its own page judged on its own (L29)",
+        "source": "this card §2"
+      },
+      {
+        "option": "facts",
+        "values": [
+          "5",
+          "10"
+        ],
+        "d": "offered",
+        "why": "NEW (to build): O2 facts to 5 x 5 -> 10 x 10; the cell width follows the widest n (L26)",
+        "source": "build-list ladder O2"
+      },
+      {
+        "option": "wpBar",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "why": "O3 / O6: on the statements form the scaling bar on / off; on the story form the groups bar (graded with the word-work cell)",
+        "source": "skill-options.js WORD_WORK_OPTIONS; build-list ladder O3, O6"
+      },
+      {
+        "option": "response",
+        "values": [
+          "standard",
+          "which-numbers"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "skills": [
+          "multiplication:mult_comparison"
+        ],
+        "why": "story-form control (P4 which-numbers); hidden by the panel under form statements; graded on the word-work cell",
+        "source": "skill-options.js responseOption"
+      },
+      {
+        "option": "wpCues",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "why": "story-form support; hidden under form statements; graded on the word-work cell",
+        "source": "skill-options.js WORD_WORK_OPTIONS"
+      },
+      {
+        "option": "wpBank",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "why": "story-form support; hidden under form statements; graded on the word-work cell",
+        "source": "skill-options.js WORD_WORK_OPTIONS"
+      },
+      {
+        "option": "range",
+        "values": [
+          "null",
+          "10",
+          "20",
+          "50",
+          "100",
+          "1000"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "why": "the story form's number size; the statements form uses `facts` and hides range",
+        "source": "skill-options-derived.js"
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+        "source": "skill-options.js play controls"
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+        "source": "skill-options.js play controls"
+      }
+    ],
+    "roles": [
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "why": "the pass bar",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "why": "the pass bar",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "why": "the pass bar",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:lesson",
+        "d": "offered",
+        "why": "the pass bar; lesson data is the FALLBACK today (prereqs.js 0/2): the times-as-many lesson (G4-Y5.B3) is built by the lessons-first engine, and this role must still pass on the fallback warm-up",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "why": "provider workedSteps must follow the form (both readings drawn, the Say line names both); today's steps are story steps",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "why": "workedSteps per task; the first item's bar and frame traced",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "why": "any skill on any page type",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "why": "wrongAnswer per task from M-T1..M-T4 (the additive sentence, 24 = 3 + 8)",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "why": "any skill on any page type",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "why": "any skill on any page type",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "offered",
+        "why": "any skill on any page type; never mixes tasks inside one section",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "why": "one sentence and its equation: True or False? from the read task",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "why": "workedSteps and wrongAnswer real",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "why": "any skill on any page type (facts 10, task write)",
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "proposed": true
+      },
+      {
+        "key": "role:word-problems",
+        "d": "out of scope",
+        "why": "the statements form has no story; the story form is the word-work family's",
+        "source": "provider stories: default 0/2",
+        "proposed": true
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "why": "not a fact layout skill: the role reports unsupported",
+        "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts",
+        "proposed": true
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "out of scope",
+        "why": "not a fact layout skill: the role reports unsupported",
+        "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts",
+        "proposed": true
+      }
+    ],
+    "hosts": [
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "why": "one drawing with print; the pass bar (card at 390 / 820 / 1280)",
+        "source": "RUBRIC (every screen host)"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "why": "one drawing with print; the pass bar",
+        "source": "RUBRIC (every screen host)"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "why": "one drawing with print; the pass bar",
+        "source": "RUBRIC (every screen host)"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "why": "game hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic",
+        "source": "ws-chromebook-fit",
+        "proposed": true
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "why": "game hosts draw the same card; graded by ws-chromebook-fit",
+        "source": "ws-chromebook-fit",
+        "proposed": true
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "why": "graded by ws-screen-slots, not by this card's critic",
+        "source": "ws-screen-slots",
+        "proposed": true
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "out of scope",
+        "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "proposed": true
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "out of scope",
+        "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "proposed": true
+      }
+    ]
+  }
+}

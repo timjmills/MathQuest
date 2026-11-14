@@ -632,6 +632,13 @@
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun) {
     padding-left: var(--fp, 3mm) !important; padding-top: calc(var(--ws-tab, 6mm) + 1.3mm) !important; --ws-koin: 0mm; --mq-fx: 0mm !important; }
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun)::before { display: none !important; }
+/* chart_120 fix (ws-cell-checks TAGINK, Error analysis L): a lettered chart square keeps its written number under its A / B
+   tag, not behind it. Here, not in the role's inline CSS, so no other page's HTML changes. Additive. */
+:is(.ws-page, .ws-sheet) .k2-chartwindow [data-ws-tagged] { padding-top: calc(var(--ws-zone) + 1.8mm); }
+:is(.ws-page, .ws-sheet) .k2-chartwindow [data-ws-tagged] > .mq-slottag { top: 0; left: .6mm; }
+/* chart_120 fix (ws-cell-checks PUPILTAG, PT-ERR-4): inside an Error-analysis work block the chart window drops its own 4.5 mm
+   item-letter keep-out (the "<Name> wrote:" label already stands over it), so the label sits 2 mm over the chart, not 6.5. Additive. */
+:is(.ws-page, .ws-sheet) .mq-judge-work > .k2-chartwindow > .k2-chart, :is(.ws-page, .ws-sheet) .mq-judge-work .k2-chartwindow > .k2-chart { margin-top: 0 !important; }
 /* CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): a ONE-LINE cell answered in place whose row stretches
    it by 30 % or more is centred down its box, the white split above and below the line, instead of all of it under the line
    (CL-4b's top of the box). Opt-in twice: a template marks its root `data-ws-stretchmid` (placevalue:compare's "a ( ) b" line

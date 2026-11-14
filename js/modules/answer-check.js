@@ -11,7 +11,7 @@ import {
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
 import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
-import { markBoxSubmitted, itemWasHelped, markMissingDigits, clearBoxMark, markVocabFeedback } from './screen-cell.js';
+import { markBoxSubmitted, itemWasHelped, markMissingDigits, clearBoxMark, markVocabFeedback, wordWorkScreenVerdict } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
@@ -1005,9 +1005,14 @@ export function checkAnswer(userAns, btnElement) {
     // Track response time for adaptive difficulty
     const responseTime = state.questionStartTime ? Date.now() - state.questionStartTime : 5000;
 
+    const wwVerdict = wordWorkScreenVerdict(userAns, q);
     if (q && q.ftCheck) {
         // A function table: every slot against the rule (a 'make your own' table has no one answer).
         isCorrect = ftAnswerMatches(userAns, q.ftCheck);
+    } else if (typeof wwVerdict === 'boolean') {
+        // A two-step story's letter equation / estimate is graded as on paper (the key's gradeSlots), with the answer
+        // (lf-hosts 2026-11-13, two-step card decisions 7 / 8)
+        isCorrect = wwVerdict;
     } else if (type === "number") {
         // Strip commas from user input before parsing (allow commas but don't require them)
         const cleanedInput = String(userAns).replace(/,/g, "");
@@ -1334,6 +1339,10 @@ export function autoCheckOnInput() {
     if (!userAns) return;
 
     const type = q.answerType || (typeof q.ans === "number" ? "number" : "text");
+
+    // a two-step story with a graded equation / estimate: auto-submit only once every graded part is right
+    const ww = wordWorkScreenVerdict(userAns, q);
+    if (typeof ww === 'boolean') { if (ww) checkAnswer(userAns); return; }
 
     if (type === "number") {
         // Auto-submit ONLY when the typed value EXACTLY matches the answer.

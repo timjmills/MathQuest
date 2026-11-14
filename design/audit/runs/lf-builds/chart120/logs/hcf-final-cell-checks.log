@@ -1,0 +1,452 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts
+
+mq-browser-run: slot 1 after 249s
+ws-cell-checks: 387 page(s) - composing:hundreds_chart_fill (card plan + option values)
+  ok   composing:hundreds_chart_fill independent S: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill more-practice S: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill more-practice M: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill more-practice L: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test S: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill lesson S: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill scripted-model S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill scripted-model M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill scripted-model L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill opener S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill opener M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill opener L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill error-analysis S: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill error-analysis M: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill error-analysis L: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill review S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill pre-skill-check S: 2p 4x? per undefined
+  ok   composing:hundreds_chart_fill pre-skill-check M: 2p 4x? per undefined
+  ok   composing:hundreds_chart_fill pre-skill-check L: 2p 4x? per undefined
+  ok   composing:hundreds_chart_fill mixed-practice S: 1p 8x? per undefined
+  ok   composing:hundreds_chart_fill mixed-practice M: 1p 6x? per undefined
+  ok   composing:hundreds_chart_fill mixed-practice L: 1p 4x? per undefined
+  ok   composing:hundreds_chart_fill true-false S: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill true-false M: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill true-false L: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill reason-it S: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill reason-it M: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill reason-it L: 1p 1x? per 2
+  n/a  composing:hundreds_chart_fill stretch S: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False?
+  n/a  composing:hundreds_chart_fill stretch M: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False?
+  n/a  composing:hundreds_chart_fill stretch L: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False?
+  ok   composing:hundreds_chart_fill lesson S {"band":10}: 4p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":10}: 4p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":10}: 4p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":10}: 1p 1x? per 7
+  ok   composing:hundreds_chart_fill independent M {"band":10}: 1p 1x? per 7
+  ok   composing:hundreds_chart_fill independent L {"band":10}: 1p 1x? per 7
+  ok   composing:hundreds_chart_fill guided S {"band":10}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":10}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":10}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":10}: 1p 1x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":10}: 1p 1x? per 8
+  ok   composing:hundreds_chart_fill test L {"band":10}: 1p 1x? per 8
+  ok   composing:hundreds_chart_fill review S {"band":10}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":10}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":10}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":20}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":20}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":20}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":20}: 1p 2x? per 10
+  ok   composing:hundreds_chart_fill independent M {"band":20}: 1p 2x? per 10
+  ok   composing:hundreds_chart_fill independent L {"band":20}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill guided S {"band":20}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":20}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":20}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":20}: 1p 2x? per 10
+  ok   composing:hundreds_chart_fill test M {"band":20}: 1p 2x? per 10
+  ok   composing:hundreds_chart_fill test L {"band":20}: 1p 2x? per 10
+  ok   composing:hundreds_chart_fill review S {"band":20}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":20}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":20}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":30}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":30}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":30}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":30}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":30}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":30}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":30}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":30}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":30}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":30}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":30}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":30}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":30}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":30}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":30}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":40}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":40}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":40}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":40}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":40}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":40}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":40}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":40}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":40}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":40}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":40}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":40}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":40}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":40}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":40}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":50}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":50}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":50}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":50}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":50}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":50}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":50}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":50}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":50}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":50}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":50}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":50}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":50}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":50}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":50}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":120}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":120}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":120}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":120}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":120}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":120}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":120}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":120}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":120}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":120}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":120}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":120}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":120}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":120}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":120}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":"200"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":"200"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":"200"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":"200"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":"200"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":"200"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":"200"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":"200"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":"200"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":"200"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":"200"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":"200"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":"200"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":"200"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":"200"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":"500"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":"500"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":"500"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":"500"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":"500"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":"500"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":"500"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":"500"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":"500"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":"500"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":"500"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":"500"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":"500"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":"500"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":"500"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":"1000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":"1000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":"1000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":"1000"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":"1000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":"1000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":"1000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":"1000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":"1000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":"1000"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":"1000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":"1000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":"1000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":"1000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":"1000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":"5000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":"5000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":"5000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":"5000"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":"5000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":"5000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":"5000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":"5000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":"5000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":"5000"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":"5000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":"5000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":"5000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":"5000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":"5000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"band":"10000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"band":"10000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"band":"10000"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"band":"10000"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"band":"10000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"band":"10000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"band":"10000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"band":"10000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"band":"10000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"band":"10000"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"band":"10000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"band":"10000"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"band":"10000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"band":"10000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"band":"10000"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":1}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":1}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":1}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":1}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":1}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":1}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":1}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":1}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":1}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":1}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":1}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":1}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":1}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":1}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":1}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":2}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":2}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":2}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":2}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":2}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":2}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":2}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":2}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":2}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":2}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":2}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":2}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":2}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":2}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":2}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":3}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":3}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":3}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":3}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":3}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":3}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":3}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":3}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":3}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":3}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":3}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":3}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":3}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":3}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":3}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":4}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":4}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":4}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":4}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":4}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":4}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":4}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":4}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":4}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":4}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":4}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":4}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":4}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":4}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":4}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":5}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":5}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":5}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":5}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":5}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":5}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":5}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":5}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":5}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":5}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":5}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":5}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":5}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":5}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":5}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":6}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":6}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":6}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":6}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":6}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":6}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":6}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":6}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":6}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":6}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":6}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":6}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":6}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":6}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":6}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"tiles":7}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"tiles":7}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"tiles":7}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"tiles":7}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"tiles":7}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"tiles":7}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"tiles":7}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"tiles":7}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"tiles":7}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"tiles":7}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"tiles":7}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"tiles":7}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"tiles":7}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"tiles":7}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"tiles":7}: 1p 2x? per undefined
+  FAIL composing:hundreds_chart_fill lesson S {"grid":"rows"}: 5p 1x? per undefined - OVERFLOW (18)
+  FAIL composing:hundreds_chart_fill lesson M {"grid":"rows"}: 5p 1x? per undefined - OVERFLOW (18)
+  FAIL composing:hundreds_chart_fill lesson L {"grid":"rows"}: 5p 1x? per undefined - OVERFLOW (18)
+  ok   composing:hundreds_chart_fill independent S {"grid":"rows"}: 1p 1x? per 4
+  ok   composing:hundreds_chart_fill independent M {"grid":"rows"}: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill independent L {"grid":"rows"}: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill guided S {"grid":"rows"}: 2p 1x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"grid":"rows"}: 2p 1x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"grid":"rows"}: 2p 1x? per undefined
+  ok   composing:hundreds_chart_fill test S {"grid":"rows"}: 1p 1x? per 4
+  ok   composing:hundreds_chart_fill test M {"grid":"rows"}: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill test L {"grid":"rows"}: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill review S {"grid":"rows"}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill review M {"grid":"rows"}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill review L {"grid":"rows"}: 1p 1x? per undefined
+  FAIL composing:hundreds_chart_fill lesson S {"grid":"whole"}: 9p 1x? per undefined - OVERFLOW (24)
+  FAIL composing:hundreds_chart_fill lesson M {"grid":"whole"}: 9p 1x? per undefined - OVERFLOW (24)
+  FAIL composing:hundreds_chart_fill lesson L {"grid":"whole"}: 9p 1x? per undefined - OVERFLOW (24)
+  ok   composing:hundreds_chart_fill independent S {"grid":"whole"}: 1p 1x? per 1
+  ok   composing:hundreds_chart_fill independent M {"grid":"whole"}: 1p 1x? per 1
+  ok   composing:hundreds_chart_fill independent L {"grid":"whole"}: 1p 1x? per 1
+  FAIL composing:hundreds_chart_fill guided S {"grid":"whole"}: 3p 1x? per undefined - OVERFLOW (8)
+  FAIL composing:hundreds_chart_fill guided M {"grid":"whole"}: 3p 1x? per undefined - OVERFLOW (12)
+  FAIL composing:hundreds_chart_fill guided L {"grid":"whole"}: 3p 1x? per undefined - OVERFLOW (12)
+  FAIL composing:hundreds_chart_fill test S {"grid":"whole"}: 1p 1x? per 1 - LONE-PAGE (1)
+  FAIL composing:hundreds_chart_fill test M {"grid":"whole"}: 1p 1x? per 1 - LONE-PAGE (1)
+  FAIL composing:hundreds_chart_fill test L {"grid":"whole"}: 1p 1x? per 1 - LONE-PAGE (1)
+  ok   composing:hundreds_chart_fill review S {"grid":"whole"}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill review M {"grid":"whole"}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill review L {"grid":"whole"}: 1p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"gaps":"row"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"gaps":"row"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"gaps":"row"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"gaps":"row"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"gaps":"row"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"gaps":"row"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"gaps":"row"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"gaps":"row"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"gaps":"row"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"gaps":"row"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"gaps":"row"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"gaps":"row"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"gaps":"row"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"gaps":"row"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"gaps":"row"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"gaps":"column"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"gaps":"column"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"gaps":"column"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"gaps":"column"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"gaps":"column"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"gaps":"column"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"gaps":"column"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"gaps":"column"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"gaps":"column"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"gaps":"column"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"gaps":"column"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"gaps":"column"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"gaps":"column"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"gaps":"column"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"gaps":"column"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill lesson S {"gaps":"pattern"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M {"gaps":"pattern"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L {"gaps":"pattern"}: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill independent S {"gaps":"pattern"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M {"gaps":"pattern"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L {"gaps":"pattern"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill guided S {"gaps":"pattern"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M {"gaps":"pattern"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L {"gaps":"pattern"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill test S {"gaps":"pattern"}: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M {"gaps":"pattern"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L {"gaps":"pattern"}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill review S {"gaps":"pattern"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M {"gaps":"pattern"}: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L {"gaps":"pattern"}: 1p 2x? per undefined
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1: the body overflows by 5.8 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 3: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 3: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 4: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: pupil page 1 cell 4: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1: the body overflows by 5.8 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 3: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 3: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 4: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"rows"}: key page 1 cell 4: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1: the body overflows by 5.8 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 3: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 3: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 4: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: pupil page 1 cell 4: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1: the body overflows by 5.8 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 3: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 3: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 4: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson M {"grid":"rows"}: key page 1 cell 4: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1: the body overflows by 5.8 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 3: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 3: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 4: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: pupil page 1 cell 4: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1: the body overflows by 5.8 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 3: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 3: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 4: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson L {"grid":"rows"}: key page 1 cell 4: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"whole"}: pupil page 1: content overflows the sheet
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"whole"}: pupil page 1: the body overflows by 145 mm
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"whole"}: pupil page 1 cell 1: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"whole"}: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"whole"}: pupil page 1 cell 2: content overflows its cell
+  FAIL OVERFLOW composing:hundreds_chart_fill lesson S {"grid":"whole"}: pupil page 1 cell 2: <div> leaves the cell
+ws-cell-checks: FAIL - 161 finding(s) (OVERFLOW 158, LONE-PAGE 3) on 384 page(s), 269s

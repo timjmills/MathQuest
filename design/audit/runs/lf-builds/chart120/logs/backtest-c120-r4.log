@@ -1,0 +1,60 @@
+ws-backtest: c120-title-band (fail state) has waited 120 s for a browser slot; holders:
+    queue: pid 15201 (up 45 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-slots.cjs --skills composing:chart_to_120 --ba
+    queue: pid 15203 (up 45 s) flock 10
+    queue: pid 15960 (up 7 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-phone-card.
+    queue: pid 15962 (up 7 s) flock 10
+    queue: pid 16179 (up 0 s) sleep 1
+    slot.2: pid 2337 (up 361 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-chromebook-
+    slot.1: pid 5330 (up 269 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --car
+    queue: pid 5680 (up 257 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 7208 (up 239 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-slot-clip.cjs --probe /tmp/mq-slotclip-5QUTo1/probe.json
+    queue: pid 7210 (up 239 s) flock 10
+ws-backtest: c120-title-band (pass state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 15960 (up 339 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-phone-card.
+    slot.2: pid 16929 (up 255 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-options-ver
+    queue: pid 17475 (up 232 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 17476 (up 232 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 17481 (up 232 s) flock 10
+    queue: pid 18489 (up 157 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-answer.cjs --skills composing:chart_to_120
+    queue: pid 18491 (up 157 s) flock 10
+    queue: pid 19327 (up 125 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-support-eq.cjs --skills composing:chart_to_120
+    queue: pid 19329 (up 125 s) flock 10
+    queue: pid 21106 (up 0 s) sleep 1
+ws-backtest row c120-title-band: PASS  fail state FAIL 319.0s, pass state OK 332.0s
+ws-backtest row c120-ri-under: FAIL  fail state FAIL 193.5s, pass state FAIL 167.0s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-cell-checks: FAIL - 2 finding(s) (LONE-PAGE 2) on 73 page(s), 70s; pass: ws-cell-checks: FAIL - 1 finding(s) (LONE-PAGE 1) on 73 page(s), 66s
+    last 20 line(s) of the pass state:
+      |   ok   composing:chart_to_120 guided L {"grid":"whole"}: 3p 1x? per undefined
+      |   FAIL composing:chart_to_120 test L {"grid":"whole"}: 1p 1x? per 1 - LONE-PAGE (1)
+      |   ok   composing:chart_to_120 review L {"grid":"whole"}: 1p 1x? per undefined
+      |   ok   composing:chart_to_120 lesson L {"gaps":"row"}: 3p 1x? per undefined
+      |   ok   composing:chart_to_120 independent L {"gaps":"row"}: 1p 2x? per 6
+      |   ok   composing:chart_to_120 guided L {"gaps":"row"}: 1p 2x? per undefined
+      |   ok   composing:chart_to_120 test L {"gaps":"row"}: 1p 2x? per 6
+      |   ok   composing:chart_to_120 review L {"gaps":"row"}: 1p 2x? per undefined
+      |   ok   composing:chart_to_120 lesson L {"gaps":"column"}: 3p 1x? per undefined
+      |   ok   composing:chart_to_120 independent L {"gaps":"column"}: 1p 2x? per 6
+      |   ok   composing:chart_to_120 guided L {"gaps":"column"}: 1p 2x? per undefined
+      |   ok   composing:chart_to_120 test L {"gaps":"column"}: 1p 2x? per 6
+      |   ok   composing:chart_to_120 review L {"gaps":"column"}: 1p 2x? per undefined
+      |   ok   composing:chart_to_120 lesson L {"gaps":"pattern"}: 3p 1x? per undefined
+      |   ok   composing:chart_to_120 independent L {"gaps":"pattern"}: 1p 2x? per 6
+      |   ok   composing:chart_to_120 guided L {"gaps":"pattern"}: 1p 2x? per undefined
+      |   ok   composing:chart_to_120 test L {"gaps":"pattern"}: 1p 2x? per 6
+      |   ok   composing:chart_to_120 review L {"gaps":"pattern"}: 1p 2x? per undefined
+      |   FAIL LONE-PAGE composing:chart_to_120 test L {"grid":"whole"}: one item a page where the role holds 12 (H5)
+      | ws-cell-checks: FAIL - 1 finding(s) (LONE-PAGE 1) on 73 page(s), 66s
+ws-backtest row c120-pupiltag: PASS  fail state FAIL 121.5s, pass state OK 106.0s
+ws-backtest: 3 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-title-band             commit-pair  FAIL 319.0s         OK 332.0s           PASS
+c120-ri-under               commit-pair  FAIL 193.5s         FAIL 167.0s         FAIL
+c120-pupiltag               commit-pair  FAIL 121.5s         OK 106.0s           PASS
+
+c120-ri-under: expected {"fail":"FAIL","pass":"OK"}
+  fail state (e7d3e8d8c): ws-cell-checks: FAIL - 2 finding(s) (LONE-PAGE 2) on 73 page(s), 70s
+  pass state (72396d8a7): ws-cell-checks: FAIL - 1 finding(s) (LONE-PAGE 1) on 73 page(s), 66s
+
+2 PASS, 1 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 1301.8 s
+ws-backtest: FAIL (1)

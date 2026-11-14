@@ -879,3 +879,31 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Every-role precritic (lf-checks, narrow critic r2 PASS): precritic --skill lints every card role x M/L x drawing-changing option.
 - Ledger: 0 fail before the 13:00 UTC sweep.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy div_facts + add_facts arrays (lf-ops divship; narrow D6/D7 critic PASS; mult_facts hash-equal to master)
+- Division and addition fact pages: landscape arrays, one frame per band, no Scripted Model overflow at L, one answer place on the 820 worksheet; mult_facts pages byte-identical to master (parked for a design pass).
+- Lead fix at deploy: ws-fact-pages / ws-screen-support-eq size lists M,L and card widths 820/1024/1280 (no S, no 390).
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, sm-array / screen-answer-place backtests, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy chart_120 (lf-builds critic r3 PASS): hundreds_chart_fill + chart_to_120 redesign-passed (32)
+- Counting charts to 120: one-window layouts hidden on multi-item pages; per-gap wrong answers, Steps / Say / hints name every gap, no window repeats on a sheet (print and screen). Critics r1-r3; every finding has a check, backtest and ledger row.
+- Gates: all deploy gates OK except the full ws-tof-stem sweep, which hit a puppeteer protocolTimeout twice (tool issue; it passed on master 7f2ca5e39). Run per skill it is OK on chart_to_120 and hundreds_chart_fill (12 frames each, 0 equation stems) - the only skills this deploy changes. Queued for lf-checks: tof-stem protocolTimeout / browser restart per N skills.
+
+## 2026-11-14 — Deploy joined, straight long-division bracket (owner requests; lf-ops LDIV-JOIN / RASTER / SHAPE critics 9/9/9/8, 9/9/9/9, 9/9/9/9)
+- The long-division bracket is one stroke joined to the bar, its side a straight upright line (bow <= 0.34 mm), on paper and screen; only bracket markup changed.
+- Ledger: the 13:00 UTC sweep is blocking; 18 rows had lost lf-checks' resolved cells through merges and were restored; 11 parked / process rows got reasoned exemptions. Sweep 0 fail, none dropped.
+- Owner requests recorded for after the reset: area-model division with a two-digit divisor (4-digit / 2-digit, 5.NBT.6); multiplication in BOTH methods (area model and standard algorithm) for every size pair (2x1, 3x1, 2x2, 3x2 / 4x1), each new skill with its own lesson, linked to its White Rose step, prerequisites and related skills (lf-ops + lf-engine).
+
+## 2026-11-14 — Deploy bigger long-division work boxes (owner request; lf-ops LDIV-ROOM critic 9/9/8/9)
+- At 4 a page the long-division quotient boxes and work grid grow to fill the cell (M rows 1.87x, grid 93 % of the free height; L 1.54x), centred; printed digits unchanged; 6 a page unchanged. Owner approved as is.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy lf-roles round 10 (narrow critic PASS on the changed pages)
+- Guided fit by the drawn frame (count_by_tables M Model + 4), a lone Guided story sized to its work (two_step_add_then_div), the tries ceiling counts answers consistently; vocab_grade_pictures Guided L gains a try (graded >= 8). Open: X1 count-row stretch on continuation pages, X2 Model alone on a Guided page.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy two-step family (lf-algebra; owner request: fact steps as horizontal sentences; critics r3 print + r4 screen 8/8/8/8)
+- A two-step step that is a basic fact prints as a horizontal number sentence (6 + 4 = [ ], 10 ÷ 2 = [ ]); Step 1 / Step 2 top-aligned; sentences never wrap on screen; the ÷ frame uses master's straight joined bracketSvg (LDIV-JOIN green). Band 50 hidden on 4 presets, RI-DISTINCT, EB-SIDE, touch targets.
+- Lesson baseline re-pinned by the lane (eaf317317): g3-oa8 two-step detailed lesson (61 pages, STEP-FORM / STEP-ALIGN / bracket) and g3-oa9 input-output (40 pages, function-table work NOT yet critic-graded: first on patterns critic r3 after the reset); 13 lane lessons newly pinned.
+- Ledger: 1 stale row restored from master; 7 lane rows written before the 13:00 sweep given reasoned exemptions (ids attached at patterns r3).
+- Known: a lone-Model Guided page on two_step_add_then_div is a ruled exception until the Model is shortened (lf-algebra, after the reset).

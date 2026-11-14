@@ -110,6 +110,14 @@ export const scoreDenominator = (counts) => counts.reduce((a, b) => a + (Number(
  * The points a run of items scores: one an item, or the item's template `footprint.points` (owner ruling Q-C, 2026-11-07:
  * a Match 3 cell scores one point a word, 3). Anchors score nothing. Additive: every other template scores 1, as before.
  */
+/**
+ * The Score a page sums when it counts a template's ANSWER SLOTS (chart_120 critic r1 F6, SCORE-SLOTS): an item whose
+ * footprint says `slotPoints` (chartwindow: one point an empty square) scores its `points`; every other item 1; an anchor 0.
+ * The opener, review, mixed-practice, pre-skill-check and lesson pages use it, so their Score /N agrees with the
+ * independent / more-practice / test pages (scorePoints) for the same template - and is unchanged for every other one.
+ */
+export const slotScore = (items) => (items || []).reduce((a, it) => a + (it && it.anchor ? 0
+    : it && it.footprint && it.footprint.slotPoints ? (Number(it.footprint.points) || 1) : 1), 0);
 export const scorePoints = (items) => (items || []).reduce((a, it) => a + (it && it.anchor ? 0 : (Number(it && it.footprint && it.footprint.points) || 1)), 0);
 
 /* ================================================================= placing sections */
@@ -156,4 +164,4 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
     return pages;
 }
 
-export default { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections };
+export default { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, slotScore, placeSections };

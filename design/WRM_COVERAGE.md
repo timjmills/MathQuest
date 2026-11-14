@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 397 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 402 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 58 (49%) | 28 | 33 |
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
-| Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
+| Year 2 | 1 | 11 | 124 | 80 (65%) | 19 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
-| Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
+| Year 5 | 4 | 15 | 136 | 81 (60%) | 23 | 32 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| **All** | | **97** | **872** | **513 (59%)** | **151** | **208** |
 
 ## Source disagreements
 
@@ -1433,6 +1433,7 @@ whatever happens to the WRM gaps.
 
 - **Y1.B12.S1** Count from 50 to 100 — covered. _K.CC.A.1, 1.NBT.A.1, M.EE.K.CC.1, M.EE.1.NBT.1_  
   Skills: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 100}; Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
+  Partial: Count to 120 on the Chart (`composing:chart_to_120`), missing the chart rows 91-120: counting on across 100 to 120 (WRM has no step to 120)  
   Vocabulary: after, before, forwards, backwards  
 - **Y1.B12.S2** Tens to 100 — covered. _K.CC.A.1, 1.NBT.B.2, M.EE.K.CC.1, M.EE.1.NBT.2_  
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`) {tens to 90}; Count by 10s (`patterns:seq_10`)  
@@ -1696,7 +1697,9 @@ whatever happens to the WRM gaps.
 - **Y2.B4.S9** Find change — covered. _1.OA.A.1, 2.MD.C.8, M.EE.1.OA.1, M.EE.2.MD.8_  
   Skills: Find the Change (`measurement:money_change`)  
   Vocabulary: change, pound, cost  
-- **Y2.B4.S10** Two-step problems — GAP. _2.MD.C.8, 2.OA.A.1, M.EE.2.MD.8_  
+- **Y2.B4.S10** Two-step problems — PARTIAL. _2.MD.C.8, 2.OA.A.1, M.EE.2.MD.8_  
+  Partial: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`), missing two-step + and − stories within 100; the money context (prices, change) is not dealt  
+  Partial: Multi-Step Word Problems (No Pictures) (`algebra:multi_step_word_plain`), missing two-step + and − stories within 100; the money context (prices, change) is not dealt  
   Proposal: Two-Step Money Problems  
   Vocabulary: total, difference, change, less than  
 
@@ -1731,7 +1734,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {2}; Count by 2s (`multiplication:count_by_2s`)  
   Vocabulary: times, multiply, array, even  
 - **Y2.B5.S10** Divide by 2 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 2}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 2}  
   Vocabulary: divide / ÷, grouping, sharing  
 - **Y2.B5.S11** Doubling and halving — covered. _2.OA.C.3, 3.OA.A.1, 3.OA.A.2, M.EE.2.OA.3, M.EE.3.OA.1, M.EE.3.OA.2_  
   Skills: Doubling (`patterns:double`); Halving (`patterns:halve`)  
@@ -1743,13 +1746,13 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {10}; Count by 10s (`multiplication:count_by_10s`)  
   Vocabulary: groups of ten, ten times as much, altogether  
 - **Y2.B5.S14** Divide by 10 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 10}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 10}  
   Vocabulary: group, share, ten  
 - **Y2.B5.S15** The 5 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {5}; Count by 5s (`multiplication:count_by_5s`)  
   Vocabulary: lots of, groups of, multiple, times-table  
 - **Y2.B5.S16** Divide by 5 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 5}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 5}  
   Vocabulary: divide, grouping, sharing  
 - **Y2.B5.S17** The 5 and 10 times-tables — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {tables 5 and 10}; Multiplication Chart - Fill the Missing Cells (`multiplication:mult_chart_easy`)  
@@ -2073,7 +2076,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}  
   Vocabulary: lots of, groups of, multiply by 3, altogether  
 - **Y3.B3.S7** Divide by 3 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 3}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 3}  
   Vocabulary: share, group, divide (÷)  
 - **Y3.B3.S8** The 3 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}; Count by 3s (`multiplication:count_by_3s`)  
@@ -2082,7 +2085,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}  
   Vocabulary: equal groups, repeated addition, product  
 - **Y3.B3.S10** Divide by 4 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 4}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 4}  
   Vocabulary: share, group, in each  
 - **Y3.B3.S11** The 4 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {4}; Count by 4s (`multiplication:count_by_4s`)  
@@ -2091,7 +2094,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}  
   Vocabulary: multiple of 8, lots of, groups of, double  
 - **Y3.B3.S13** Divide by 8 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 8}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 8}  
   Vocabulary: share, group, divide  
 - **Y3.B3.S14** The 8 times-table — covered. _3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {8}; Count by 8s (`multiplication:count_by_8s`)  
@@ -2515,13 +2518,13 @@ whatever happens to the WRM gaps.
   Skills: Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}; Multiples of a Number (`number_theory:multiples`) {3}  
   Vocabulary: multiple, multiply, total  
 - **Y4.B4.S2** Multiply and divide by 6 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Division Facts (1-12) (`division:div_facts`) {divide by 6}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 6}  
   Vocabulary: array, group, share, double  
 - **Y4.B4.S3** 6 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
   Vocabulary: fact family, inverse, multiple  
 - **Y4.B4.S4** Multiply and divide by 9 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Division Facts (1-12) (`division:div_facts`) {divide by 9}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 9}  
   Vocabulary: multiply, divide, array  
 - **Y4.B4.S5** 9 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
@@ -2529,19 +2532,20 @@ whatever happens to the WRM gaps.
 - **Y4.B4.S6** The 3, 6 and 9 times-tables — PARTIAL. _3.OA.C.7, 3.OA.D.9, M.EE.3.OA.6, M.EE.3.OA.8_  
   Partial: Multiplication Chart (Visual) (`multiplication:mult_chart`), missing the links between the 3, 6 and 9 tables  
   Partial: Multiplication Chart: Find the Pattern in a Row (`multiplication:mult_chart_pattern`), missing the links between the 3, 6 and 9 tables  
+  Partial: What Do You Notice? Even and Odd Products, Pattern Features (`patterns:notice_patterns`), missing the patterns in the times-tables: even and odd products, the ones digits (not the 3, 6, 9 doubling link)  
   Proposal: Related Times-Tables  
   Vocabulary: multiple, double, treble  
 - **Y4.B4.S7** Multiply and divide by 7 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Division Facts (1-12) (`division:div_facts`) {divide by 7}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 7}  
   Vocabulary: groups of, altogether, partition  
 - **Y4.B4.S8** 7 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
   Vocabulary: fact family, inverse, derive  
 - **Y4.B4.S9** 11 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 11}; Division Facts (1-12) (`division:div_facts`) {divide by 11}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 11}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 11}  
   Vocabulary: partition, multiple, reverse  
 - **Y4.B4.S10** 12 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 12}; Division Facts (1-12) (`division:div_facts`) {divide by 12}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 12}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 12}  
   Vocabulary: partition, double, exchange  
 - **Y4.B4.S11** Multiply by 1 and 0 — covered. _3.OA.B.5_  
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
@@ -3285,7 +3289,9 @@ whatever happens to the WRM gaps.
 - **Y5.B12.S8** Efficient strategies for adding and subtracting decimals — GAP. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Proposal: Decimals from Known Facts  
   Vocabulary: efficient, strategy, adjust, compensate  
-- **Y5.B12.S9** Decimal sequences — GAP. _4.OA.C.5, 5.NBT.B.7, M.EE.4.OA.5, M.EE.5.NBT.7_  
+- **Y5.B12.S9** Decimal sequences — PARTIAL. _4.OA.C.5, 5.NBT.B.7, M.EE.4.OA.5, M.EE.5.NBT.7_  
+  Partial: Features of a Number Pattern: Odd, Even and Ones Digits (`patterns:pattern_features`), missing features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals  
+  Partial: Follow a Given Rule: Extend a Number Pattern (`patterns:follow_given_rule`), missing extend a whole-number sequence from a given rule (add, subtract, double), not decimals  
   Proposal: Decimal Sequences  
   Vocabulary: sequence, term, rule, increasing, decreasing  
 - **Y5.B12.S10** Multiply by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
@@ -3566,6 +3572,7 @@ whatever happens to the WRM gaps.
 
 - **Y6.B7.S1** 1-step function machines — covered. _5.OA.A.2_  
   Skills: Function Tables - Easy (Visual) (`algebra:function_table_easy`)  
+  Partial: Growing Shape Patterns: Draw and Count the Next Term (`patterns:growing_shape_patterns`), missing the one-step rule of a growing pattern of shapes (term 4, term 10), not yet the rule in words for any term  
   Vocabulary: input, output, function  
 - **Y6.B7.S2** 2-step function machines — PARTIAL. _5.OA.A.2_  
   Partial: Function Tables - Hard (Visual) (`algebra:function_table_hard`), missing two operations in sequence and working backwards  

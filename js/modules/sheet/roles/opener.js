@@ -19,6 +19,7 @@ import {
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
     poolItems, answerOf, labelStyleOf, stripExtraMm, oneKindFirst, stepsKindOf,
 } from './compose.js';
+import { slotScore } from '../paginate.js';
 import { koMm } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -256,7 +257,7 @@ export function plan(input = {}) {
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;
     const lesson = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: slotScore(indep) });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);
     const traced = (it) => (c, o) => it.render(c, Object.assign({}, o, c.state === 'blank' && answerOf(it) ? { shown: answerOf(it), ink: 'trace' } : {}));
     // keyList (critic r2, R2-2): the second Model cell is the pupil's to write - the short key lists it
@@ -310,7 +311,7 @@ export function plan(input = {}) {
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size: the Guided and Independent rows continue on page 2.');
     return assemble(ROLE_ID, input, frame, g.spill ? [{ sections }, { sections: page2, header: spillHeader(frame, indep.length > 0) }] : [{ sections }], {
-        meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
+        meta: { items: models.length + guided.length + indep.length, scoreOutOf: slotScore(indep), models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, ...(g.spill ? { spillFreeMm: g.spillFreeMm, p1WhiteMm: g.p1WhiteMm, p1BodyMm: g.p1BodyMm, p1NextMm: g.p1NextMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }

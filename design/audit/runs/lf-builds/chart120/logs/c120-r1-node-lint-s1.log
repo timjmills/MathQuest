@@ -1,0 +1,16 @@
+$ node tests/scripts/ws-node-lint.mjs --skill composing:chart_to_120 --rules LESSON-DATA,OPTION-HELP,WRONG-FITS --baseline tests/fixtures/precritic/node-lint-s1.baseline.json --json /tmp/mq-precritic/20261113-064906-24433/node-lint-s1.json
+
+ws-node-lint: 1 skill(s), 30 items each, page 12, root /home/user/MathQuest
+
+rule        skills   items  findings  skills hit  skipped
+LESSON-DATA       1       1         1           1  -
+OPTION-HELP       1       4         0           0  -
+WRONG-FITS       0       0         0           0  1 no item with a declared box count and a number wrong answer (skills)
+
+baseline: tests/fixtures/precritic/node-lint-s1.baseline.json (7 finding keys pinned at n=30, page=12)
+NEW findings not in the baseline (1; key = rule|kind|#item|signature):
+  composing:chart_to_120 LESSON-DATA|no-lesson-data|#1|composing:chart_to_120
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for composing:chart_to_120 (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+json: /tmp/mq-precritic/20261113-064906-24433/node-lint-s1.json
+time: load 0.2 s, lint 0.1 s, total 0.4 s
+ws-node-lint: FAIL (1)

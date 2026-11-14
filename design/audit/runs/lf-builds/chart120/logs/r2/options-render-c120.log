@@ -1,0 +1,2 @@
+composing:chart_to_120: 12 appearance value(s) to render: tiles=1, tiles=2, tiles=3, tiles=4, tiles=5, tiles=6, tiles=7, grid="rows", grid="whole", gaps="row", gaps="column", gaps="pattern"; not rendered: band (number size), calculator (play control), skipAfter (play control)
+ws-options-verify --render: OK (24 value page(s) (1 skill(s) x M/L) against 2 default page(s) through ws-print-lint --source kit in 75 s; 0 n/a)

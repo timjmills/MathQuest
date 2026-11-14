@@ -33,6 +33,8 @@
 //             PT-MOD-3 (lead ruling 2026-11-12): on a Scripted Model, a state that is not its example's last is excused when its
 //             band is <= 35 % AND a later state of the same example draws ink in that band (the room kept for a later mark).
 //             --self-test checks it (the ink appears later: excused; it never appears: FAIL).
+//   EB-SUPBAND (critic divarray r1 D4) the empty band directly UNDER a support array drawing (÷ frame or × array), to the next ink
+//             below it or the cell's foot: FAIL at >= 30 % of the cell height. A support BESIDE taller ink has no band under it.
 //   EB-SIDE   the empty band BESIDE the ink (left or right of the ink box): FAIL at >= 30 % of the cell width (RUBRIC H13). On a
 //             SCREEN cell only when the content is pinned to one side (>= 30 % one side, <= 10 % the other): a centred fact in a
 //             wide card is not a band.
@@ -160,7 +162,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -180,11 +182,14 @@ function legacyNote(where, c) {
     const pct = c.noInk ? 'no ink' : `largest band ${b[1].toFixed(1)} mm ${b[0]} the ink, ${(b[1] / (c.hRaw || c.hMm) * 100).toFixed(1)} %`;
     return `${where} p${c.page} cell ${c.label || c.cell}: legacy cell not judged by --slot-ink off (${pct})`;
 }
-const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)', 'EB-SIDE (slot width)', 'EB-SIDE (between)'];
+const RULE_CASES = ['EB-BAND (centred)', 'EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)', 'EB-SIDE (slot width)', 'EB-SIDE (between)'];
 // a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
 // compose), which a saved --html page cannot express, and no commit has failed it (lf-checks 2026-11-13; EB-FOOT has eb-foot-div-facts)
 const RULE_EXEMPT = {
     'EB-ROLE': 'needs the signed card and buildSheet (the app), not expressible as --html; every carded role composes today, so no fail commit exists',
+    // (lf-ops divship merge: its row supband-below-support-multfacts-array is PENDING - the mult_facts array work is parked, lead
+    // 2026-11-13; un-exempt when that row goes live)
+    'EB-SUPBAND': 'parked with the mult_facts arrays: its backtest row supband-below-support-multfacts-array is pending (lead 2026-11-13)',
 };
 /** The rules / cases with no backtest row (not pending) whose command runs this script and whose `rule` names it. Pure. */
 function uncovered(rows) {
@@ -261,6 +266,9 @@ function itemParityFinding(tagged, plain, what) {
     let i = 0; while (i < a.length && a[i] === b[i]) i++;
     return `the ${what} with its data-eb-item tags removed differs from the same sheet built with no tags at byte ${i} ("${a.slice(Math.max(0, i - 30), i + 30).replace(/\s+/g, ' ')}" vs "${b.slice(Math.max(0, i - 30), i + 30).replace(/\s+/g, ' ')}"): the tags changed what is drawn`;
 }
+// (the limits are defined before --self-test: its centred EB-BAND cases call judge())
+const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
+const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
         const t = [['all named', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs --html x', rule: `${RULES.join(' ')} ${RULE_CASES.join(' ')}` }]).length, 0],
@@ -392,8 +400,15 @@ if (argv.includes('--self-test')) {
             ['cell without a partial writes none', /data-eb-partial/.test(cell('x', { ebItem: 4 })), false]];
         const kbad = kc.filter(([, got, want]) => got !== want);
         for (const [n, got, want] of kbad) console.log(`self-test FAIL: ebItemOf ${n}: ${got}, want ${want}`);
-        const n = bad.length + kbad.length;
-        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length})`);
+        // centred cells (lf-builds chart_120 fix): white above + under is one band; 23 % passes, 44 % fails, as top-aligned
+        const ccell = (centreMm, belowMm) => ({ page: 1, cell: 1, hMm: 76.5, belowMm, centreMm, sideMm: 0, innerW: 86, edgeMm: 5, tmpl: 'chartwindow' });
+        const crun = (c) => { const got = []; judge([c], 't', (rule) => got.push(rule), 'independent'); return got.includes('EB-BAND'); };
+        const cc = [['centred 8.7 + 8.7 mm of 76.5 (23 %)', crun(ccell(8.7, 8.7)), false], ['centred 17 + 17 mm of 76.5 (44 %)', crun(ccell(17, 17)), true],
+            ['top-aligned 25 mm under of 76.5 (33 %)', crun(ccell(0, 25)), true]];
+        const cbad = cc.filter(([, got, want]) => got !== want);
+        for (const [nm, , want] of cbad) console.log(`self-test FAIL: EB-BAND centred ${nm} should ${want ? 'fail' : 'pass'}`);
+        const n = bad.length + kbad.length + cbad.length;
+        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length})`);
         process.exit(n ? 1 : 0);
     }).catch((e) => { console.log(`self-test FAIL: cannot import the sheet kit (${e.message})`); console.log('ws-empty-band self-test: FAIL'); process.exit(1); });
     return;
@@ -402,7 +417,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const HTML = arg('html', null);
-if (require.main === module && !HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
+if (require.main === module && !HTML && !arg('judge-fixture', null) && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
 const SIZES = (arg('sizes', 'M,L')).split(',').map((s) => s.trim()).filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
@@ -415,8 +430,6 @@ const ONLY = arg('only', null) ? arg('only').split(',') : null;
 const DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
 // (`--margin N`, lf-placevalue critic r4 N-r4-1, owner 2026-11-09 "every finding a check": a fix that clears the 30 % limit by under
 // N points is fragile - G2 passed at 29.9 % - so the band and side limits are judged at 30 - N %; absent, 30 % as before)
-const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
-const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
 // the roles that lay their grid out from the items' measured footprints (buildSheet items[i].measured[cols].hMm)
 const GRID_ROLES = new Set(['independent', 'more-practice', 'test', 'review', 'mixed-practice']);
 
@@ -451,7 +464,10 @@ function measureCells(scope) {
             // the ink, primitive by primitive: text line boxes, each SVG shape that paints (not the whole <svg> box: critic
             // eb-r1 D2), images / canvases / inputs, bordered boxes, and every answer slot (the item's own writing room)
             let box = null; const rects = [];
-            const take = (r) => { if (!r.width || !r.height) return; rects.push({ t: r.top, b: r.bottom }); box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
+            const inks = [];   // each ink box (for EB-SUPBAND: the gap under the support drawing, and what stands beside it)
+            // the support array drawing (÷ frame or × array): its bottom edge, so EB-SUPBAND can read the band below IT (D4)
+            const supSvg = [...c.querySelectorAll('[data-ws-support-on] svg, [data-ws-supports] svg, .ws-support svg')].find((v) => /rows? of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
+            const take = (r) => { if (!r.width || !r.height) return; rects.push({ t: r.top, b: r.bottom }); inks.push({ t: r.top, b: r.bottom, l: r.left, r: r.right, sup: !!supSvg }); box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
             const SHAPES = /^(text|rect|circle|ellipse|line|path|polygon|polyline|image|use)$/i;
             for (const d of c.querySelectorAll('*')) {
                 if (d.closest('[data-ws-label], .ws-letter, .ws-tab') || !visible(d)) continue;
@@ -469,6 +485,23 @@ function measureCells(scope) {
                 const slot = d.hasAttribute('data-ws-slot');
                 if (ownText) { const rg = document.createRange(); rg.selectNodeContents(d); for (const r of rg.getClientRects()) take(r); continue; }
                 if (svgInk || drawn || stroked || slot) take(d.getBoundingClientRect());
+            }
+            // EB-SUPBAND (critic divarray r1 D4): the empty band directly under the support drawing - from its bottom to the
+            // nearest ink below it (the answer slot), or to the cell's inner bottom when nothing is below. An unframed × array
+            // sat in a cell sized for a 10-12-row one, 36-44 % empty below it, under a slot that EB-BAND counted as the floor.
+            // (r2: a support BESIDE ink that runs lower - the fact beside the × band frame - has no empty band under it: the strip
+            // under the frame holds the fact's lower rows, and the band under the cell's LAST ink is EB-BAND's)
+            let supBelow = null;
+            if (supSvg) {
+                const sr = supSvg.getBoundingClientRect();
+                const own = (r) => r.t >= sr.top - 0.5 && r.b <= sr.bottom + 0.5 && r.l >= sr.left - 0.5 && r.r <= sr.right + 0.5;
+                const beside = inks.some((r) => !own(r) && r.t < sr.bottom - 1 && r.b > sr.bottom + 1 && (r.r <= sr.left + 1 || r.l >= sr.right - 1));
+                if (sr.height > 0 && beside) supBelow = 0;
+                else if (sr.height > 0) {
+                    const below = inks.filter((r) => r.t >= sr.bottom - 1);
+                    const nextTop = below.length ? Math.min(...below.map((r) => r.t)) : inner.b;
+                    supBelow = Math.max(Math.min(nextTop, inner.b) - sr.bottom, 0);
+                }
             }
             // the cell is marked for the pixel read (measurePix) under the same page:cell index
             c.setAttribute('data-eb-i', `${pi + 1}:${ci + 1}`);
@@ -493,7 +526,24 @@ function measureCells(scope) {
             const side = !screen || Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
             // EB-EDGE: the ink's nearest approach to the cell's own border, left or right (negative: across it)
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
-            out.push({ page: pi + 1, cell: ci + 1, label, padMm, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            // a cell that CENTRES its flow (justify-content center: chartwindow, clock, number line ...) in a taller row holds equal
+            // white above and below it; EB-BAND counts the two halves as ONE band, as it would under a top-aligned cell (lf-builds
+            // chart_120 fix: a window centred beside the Guided Model, 24.5 + 23.9 mm of 115 mm, read 21 % under-only). Only when
+            // the flow's top and bottom slack match within 1 mm.
+            let centreMm = 0;
+            if (/center/.test(cs.justifyContent) && /column/.test(cs.flexDirection)) {
+                let ft = Infinity, fb = -Infinity;
+                for (const k of c.children) {
+                    if (k.matches('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab') || !visible(k)) continue;
+                    const ks = getComputedStyle(k);
+                    if (ks.position === 'absolute' || ks.position === 'fixed') continue;
+                    const kr = k.getBoundingClientRect();
+                    ft = Math.min(ft, kr.top - (parseFloat(ks.marginTop) || 0)); fb = Math.max(fb, kr.bottom + (parseFloat(ks.marginBottom) || 0));
+                }
+                const top = ft - inner.t, bot = inner.b - fb;
+                if (Number.isFinite(top) && top > 0 && bot > 0 && Math.abs(top - bot) < MM) centreMm = top / MM;
+            }
+            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
@@ -502,6 +552,7 @@ function measureCells(scope) {
                     // stretch, not height it needs: it needs its pads, the tab clearance it draws (::before) and its line's box, as measured)
                     ? (inner.t - cr.top) + (() => { const bs = getComputedStyle(c, '::before'); return bs.content && bs.content !== 'none' ? parseFloat(bs.height) || 0 : 0; })() + c.querySelector(':scope > [data-ws-stretchmid]').getBoundingClientRect().height + (cr.bottom - inner.b)
                     : (box.b - cr.top - (() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })()) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
+                supBelowMm: supBelow === null ? null : +(supBelow / MM).toFixed(1),
                 screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN),
                 // the bridge's item index the kit wrote on the cell (critic eb-r5 m1): EB-FOOT pairs by it; -1 when absent
                 item: c.hasAttribute('data-eb-item') ? Number(c.getAttribute('data-eb-item').split(',')[0]) : -1, items: c.hasAttribute('data-eb-item') ? c.getAttribute('data-eb-item').split(',').map(Number) : [], partial: c.getAttribute('data-eb-partial') || '', inkMm: +((box.b - cr.top) / MM).toFixed(1),
@@ -764,15 +815,24 @@ function judge(cells, where, F, role) {
         // the kit's mandatory top pad is not band (lead ruling 2026-11-13): it comes off the band above the ink; the limit stays
         // 30 % of the whole cell, so the exclusion never makes a band under or between the ink count more than before
         const pad = c.pix ? Math.min(c.padMm || 0, c.aboveMm || 0) : 0,   // (the DOM read's band already starts inside the padding)
-            hJ = c.hRaw, aboveJ = Math.max(0, (c.aboveMm || 0) - pad);
+            hJ = c.hRaw || c.hMm, aboveJ = Math.max(0, (c.aboveMm || 0) - pad);
         const lim = BAND * hJ;
         // (a Scripted Model's interior band - step text to the problem, room kept for a later mark - is EB-GAP's, read on the
         // pixels with PT-MOD-3; here a model state is judged under and above its ink only)
-        const bands = [['under', c.belowMm], ['between the blocks of', role === 'scripted-model' ? 0 : c.betweenMm], ['above', aboveJ]].sort((a, b) => b[1] - a[1]);
+        const bands = [['under', c.belowMm], ['between the blocks of', role === 'scripted-model' ? 0 : c.betweenMm], ['above', aboveJ]];
+        // a CENTRED cell (centreMm > 0): the row's stretch above its flow (centreMm, measured inside the padding, so the top pad
+        // and the letter label's rows are never in it) + the white under its ink is one band (lf-builds chart_120 fix, backtest
+        // eb-centred-band). The pixel band above is NOT used here: it runs over the label's rows, which a critic's scan inks.
+        if (c.centreMm > 0) bands.push(['around (above + under)', (c.belowMm || 0) + c.centreMm]);
+        for (const b of bands) b[1] = Number(b[1]) || 0;   // (a fixture cell may lack a band: undefined broke the sort)
+        bands.sort((a, b) => b[1] - a[1]);
         const [where2, band] = bands[0];
         if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / hJ * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm${pad > 0.05 ? `; the ${pad.toFixed(1)} mm top pad excluded` : ''}) [${c.tmpl}]`);
         if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
         if (c.pix && c.betweenXMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.betweenXMm.toFixed(1)} mm empty BETWEEN two pieces of ink, side to side (no ink above or below it), in a ${c.innerW.toFixed(1)} mm wide cell interior (${(c.betweenXMm / c.innerW * 100).toFixed(1)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
+        // EB-SUPBAND (critic divarray r1 D4): the band directly UNDER the support drawing (not only under the item) - an
+        // unframed × array in a cell sized for a 10-12-row one leaves it empty under a slot EB-BAND counts as the floor.
+        if (c.supBelowMm !== null && c.supBelowMm !== undefined && c.supBelowMm >= BAND * c.hMm) F('EB-SUPBAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${c.supBelowMm} mm under the support drawing of a ${c.hMm} mm cell (${(c.supBelowMm / c.hMm * 100).toFixed(1)} %; limit 30 % = ${(BAND * c.hMm).toFixed(1)} mm) [${c.tmpl}]`);
         if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.tmpl === 'screen-cell' || String(role || '').startsWith('host:') ? 'content pinned to one side: ' : ''}${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.innerW.toFixed(1)} mm wide cell interior (${(c.sideMm / c.innerW * 100).toFixed(1)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
     });
 }
@@ -1039,5 +1099,15 @@ async function main() {
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
 // (lf-partopts: the measure and the judge are shared - ws-partopts-unit.cjs judges every part count by these same rules)
-if (require.main === module) (HTML ? htmlMain() : main()).catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
+// `--judge-fixture file.json` ({role, where, cells: [measured cells]}): judges measured cells as a page would (EB-BAND / EB-SIDE /
+// EB-EDGE), no browser - the backtest of a measure (lf-builds chart_120 fix: a centred cell's white above + under is one band)
+if (require.main === module && arg('judge-fixture', null)) {
+    const fx = JSON.parse(fs.readFileSync(path.resolve(arg('judge-fixture')), 'utf8'));
+    const got = [];
+    judge(fx.cells || [], fx.where || 'fixture', (rule, where, msg) => got.push(`${rule} ${where}: ${msg}`), fx.role || 'independent');
+    for (const g of got) console.log('   ' + g);
+    console.log(`ws-empty-band: ${got.length ? `FAIL (${got.length})` : 'OK (fixture)'}`);
+    process.exit(got.length ? 1 : 0);
+}
+if (require.main === module && !arg('judge-fixture', null)) (HTML ? htmlMain() : main()).catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
 module.exports = { measureCells, judge };
