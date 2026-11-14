@@ -106,7 +106,7 @@ register('area-model-div', {
         } else {
             problem = `<span>${D}</span>${op('÷')}<span>${V}</span>${op('=')}${totalSlot}`;
         }
-        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(3)}`}">`
+        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(1)}`}">`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(G.sideMm)};margin-bottom:0.15em">${top}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span class="${NOWRAP}" style="flex:0 0 ${g.em(G.sideMm)};display:flex;justify-content:center;font-weight:700">${side}</span>`
@@ -127,9 +127,15 @@ register('area-model-div', {
         const probW = formOf(p) === 'long' ? String(p.dividend).length * 0.62 * g.E + g.E * 2 + String(p.divisor).length * 0.62 * g.E
             : String(p.dividend).length * 0.62 * g.E * 2 + g.E * 3 + G.tw;
         const probH = formOf(p) === 'sign' ? g.stripMm : g.stripMm + g.E * 1.3;
+        // inkWMm: the model's true width without the cell slack, so a host laying the cell beside other work (Reason It,
+        // Error Analysis) knows it and stacks instead of squeezing (area_model_div_4by2 precritic r1: Reason It OVERFLOW).
+        // The print top pad is 1 mm (was 3): the "<Name> wrote:" tag sits 2-4 mm over the ink (PT-ERR-4) and the first row
+        // starts at the top (CL-4b) - precritic r1 PUPILTAG 4.8 mm, L-TOPSTART.
+        const inkRaw = Math.max(G.parts.length * G.colMm + G.sideMm, probW);
         return {
-            wMm: Math.ceil(Math.max(G.parts.length * G.colMm + G.sideMm, probW) + 12),
-            hMm: Math.ceil(g.stripMm + 2 + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 3) + 14),
+            wMm: Math.ceil(inkRaw + 12),
+            inkWMm: Math.ceil(inkRaw),
+            hMm: Math.ceil(g.stripMm + 2 + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 1) + 14),
             measure: true, factLike: false, maxCols: 2,
         };
     },
