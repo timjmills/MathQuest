@@ -10102,6 +10102,65 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-no-phone-width",
+   "check": "ws-no-phone-width on the vocab lane: ws-vocab-unit V-LETTER measured the practice card at 1280 / 820 / 390 px (NP-ARRAY) and V-BOX390 at 390 only; the owner rule 2026-11-13 drops 390 - V-LETTER runs at 1280 / 1024 / 820, V-BOX390 is retired",
+   "kind": "commit-pair",
+   "rule": "ws-no-phone-width NP-ARRAY",
+   "fail": {
+    "commit": "3cce171d",
+    "state": "lf-vocab deploy-2 head: [1280, 820, 390] in ws-vocab-unit.mjs"
+   },
+   "pass": {
+    "commit": "6fca59a73",
+    "state": "[1280, 1024, 820]; V-BOX390 retired"
+   },
+   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-match3-target-820",
+   "check": "H6 TARGET: the Match 3 letter box on the online worksheet at 820 / 1024 holds a 48 px input. The box is span.mq-vm-box (2 px border), not .mq-cellbox, so the global 50 px floor missed it: 48 px box, 46 x 46 px input",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-grade-render --gate TARGET",
+   "fail": {
+    "commit": "3cce171d",
+    "state": "worksheet-820 / 1024 letter input 46 x 46 px (18 findings)"
+   },
+   "pass": {
+    "commit": "d3033648e",
+    "state": "box min 52 px on screen (css/screen-cell.css, additive): input 48 x 48"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --gate --skills vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words 2>&1 | tail -1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fixit-words-picture-text",
+   "check": "FIX-WORDS reads only a words frame: a picture's own svg text (\"5 + 3 = 8\" in a growing-pattern picture) and the letters the pupil wrote in a box are not the frame, so a Match 3 error-analysis Fix-it that prints the work's own bank words in order (\"rule array step\") is not a giveaway; the unit_form singular (\"hundred\" under \"hundreds\") still FAILs. At 3cce171d the check FAILed vocab_grade_pictures error-analysis M / L cells 2-3 on exactly this (precritic 2026-11-14)",
+   "kind": "fixture",
+   "browser": true,
+   "rule": "ws-fixit-words FIX-WORDS (--fixture)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/fixit-words-vocab.fail.html",
+    "state": "the real Match 3 cells 2-3 (M, seed 7) plus a unit_form frame whose Fix-it prints the singular \"hundred\""
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/fixit-words-vocab.pass.html",
+    "state": "the same Match 3 cells plus the unit_form frame with its own word \"hundreds\""
+   },
+   "command": "node tests/scripts/ws-fixit-words.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
