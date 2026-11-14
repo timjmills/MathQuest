@@ -357,11 +357,31 @@ function planCheck(input, cut) {
             routedFoot = lay.foot;
             routedFits = lay.fits;
             routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
-        } else for (const q0 of quads) {
+        } else {
+        // (each question's columns, row height and kept count; a quarter-page share each - PT 2.10)
+        const plan0 = quads.map((q0) => {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
             const h = hMinAt(q0, cols, ctx) * grow;
             const share = (m.budget / quads.length - m.strip - TAG) * cut;
-            const q = whole ? q0 : q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
+            return { q0, cols, h, keep: whole ? q0.length : Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))) };
+        });
+        // A ONE-page plain check fills its page (critic cbt r3 F1: count_by_tables at L kept one row of two in each counting
+        // quadrant and left an 84 mm foot, 10 items against 16 at M): while the page has room for another whole row of a
+        // question whose pool holds more, that question (the fewest rows first) takes the row. ws-empty-band EB-LASTPAGE /
+        // CAP-PARITY. (A lesson's check - perQuestion - keeps the counts its caller asked for.)
+        if (!input.perQuestion) {
+            const rowsOf = (e) => Math.ceil(e.keep / e.cols);
+            const used = () => plan0.reduce((a, e) => a + m.strip + TAG + rowsOf(e) * e.h, 0);
+            if (used() <= m.budget) for (;;) {
+                const room = m.budget - used();
+                const can = plan0.filter((e) => e.keep < e.q0.length && e.h <= room);
+                if (!can.length) break;
+                const e = can.reduce((a, b) => (rowsOf(b) < rowsOf(a) ? b : a));
+                e.keep = Math.min(e.q0.length, (rowsOf(e) + 1) * e.cols);
+            }
+        }
+        for (const { q0, cols, h, keep } of plan0) {
+            const q = q0.slice(0, keep);
             kept += slotScore(q);
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + TAG + rows * h;
@@ -371,6 +391,7 @@ function planCheck(input, cut) {
             // band left an empty bordered half - lesson 4 critic r2 D9; the item keeps its measured size, centred)
             cur.sections.push(band(q, input.perQuestion ? Math.max(1, Math.min(cols, q.length)) : cols, rows, h, cols));
             cur.used += bandH;
+        }
         }
         // (gap 0: the bands stand edge to edge, as the one-page sum always counted them)
         if (stacked.length) pages.push(...paginateBands(stacked, m.budget, 0));
