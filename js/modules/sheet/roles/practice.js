@@ -580,6 +580,9 @@ export function sheetHeaders(input, words, score) {
         title: h.title === false ? '' : words.title,
         titleNote: h.titleNote || '',
     };
+    // the teacher's page-title option (lf-roles 2026-11-13): placement and "custom words", only when set (frame.js pageHeader)
+    if (first.title && h.titlePos === 'above') first.titlePos = 'above';
+    if (first.title && h.titleCustom) first.titleCustom = true;
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const cont = { name: on('name'), date: false, score: false, title: '', tab: contTab };
     // Wave 5.2: the reference number line rides under the header of every page (the layout took

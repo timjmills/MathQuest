@@ -7365,6 +7365,86 @@
    }
   },
   {
+   "id": "frame-title-place-long",
+   "check": "The teacher's page title (owner request 2026-11-13): titlePos above draws the title before the Name / Date / Score row, a custom title never shrinks, never passes two lines (cut at a word with an ellipsis and reported in res.titleFit for the dialog), and nothing overlaps the field row, the rule or the first row - every role and key, M and L",
+   "kind": "commit-pair",
+   "rule": "ws-frame-title TITLE-PLACE / TITLE-LONG",
+   "browser": true,
+   "fail": {
+    "commit": "f4294f68b",
+    "state": "origin/master + the checks: no title option (the title stays below and the custom words are ignored)"
+   },
+   "pass": {
+    "commit": "cbfb4e9ca",
+    "state": "the title option built (frame.js pageHeader, print-sheet.js fitTitle / withTitleOption)"
+   },
+   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only geom,long",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "frame-title-ident-planted",
+   "check": "TITLE-IDENT detects a no-option page that is no longer byte-identical to origin/master (planted: one pinned hash of addition:add_facts independent L changed); the live pin of master a6883082c passes",
+   "kind": "fixture",
+   "rule": "ws-frame-title TITLE-IDENT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/frame-title/bt-planted-changed-page.json",
+    "state": "planted: the pinned pupil page differs from the render"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/frame-title/master-hashes.json",
+    "state": "the hashes of origin/master a6883082c (no option)"
+   },
+   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only ident --hashes-against {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "title-code-roundtrip",
+   "check": "The page title travels with the simple print's QP1 share code and link and reaches the request; old codes (pinned from origin/master) decode and re-encode unchanged with the defaults",
+   "kind": "commit-pair",
+   "rule": "ws-title-code TITLE-CODE-RT / -OLD / -REQ",
+   "browser": true,
+   "fail": {
+    "commit": "f4294f68b",
+    "state": "origin/master + the checks: the code drops the title"
+   },
+   "pass": {
+    "commit": "cbfb4e9ca",
+    "state": "cleanPrint appends pageTitle / titlePos only when set; titleHeaderOf"
+   },
+   "command": "node tests/scripts/ws-title-code.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "title-ui-caret",
+   "check": "Critic title r1 T1 (and T4 / T5): in both print dialogs the Page title box keeps the cursor across the redraw that follows a keystroke (cursor at 5, X, a rebuild, Y: 'XY' at 5 - the simple print gave 'FractXions and more wordsY'); with Header Title unticked the title controls are disabled and say why; the simple print box is at least 400 px with a one-line label",
+   "kind": "commit-pair",
+   "rule": "ws-frame-title-ui UI-CARET / UI-TITLE-OFF / UI-WIDTH",
+   "browser": true,
+   "fail": {
+    "commit": "aaafcfb67",
+    "state": "critic r1 state: the simple print's render() put the cursor at the end; Title off left the controls live; the box 270 px"
+   },
+   "pass": {
+    "commit": "a2460c266",
+    "state": "render() keeps selectionStart / selectionEnd; syncTitleControls; .sp-ptitle full width"
+   },
+   "command": "node tests/scripts/ws-frame-title-ui.cjs --only caret,off,width",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "cell-read-ss-mult-facts-card",
    "check": "ws-screen-slots CELL-READ: a host render that reads 0 [data-ws-cell] cells is the finding host:read, never a pass",
    "kind": "commit-pair",
@@ -8587,6 +8667,46 @@
     "pass": "OK"
    }
   },
+ {
+  "id": "precritic-mode-verdict",
+  "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
+  "kind": "commit-pair",
+  "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
+  "browser": false,
+  "fail": {
+   "commit": "7a5bc902c",
+   "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+  },
+  "pass": {
+   "commit": "70d347578",
+   "state": "the mode verdict line reads OK"
+  },
+  "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-pipe-verdict",
+  "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
+  "browser": false,
+  "fail": {
+   "commit": "7a5bc902c",
+   "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+  },
+  "pass": {
+   "commit": "82b8fbf44",
+   "state": "the verdict line is the last line"
+  },
+  "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
   {
    "id": "one-row-cap",
    "check": "a practice page (independent / more-practice / test) holding ONE row of a tall story is held to its work, never stretched to the page (lead ruling R1 / R4a; lf-algebra precritic two-step r11 ws-two-step --print CAP-BAND: multi_step_word (Visual) M 41 % / L 32 %, letter + wpBar L 41-45 %)",
