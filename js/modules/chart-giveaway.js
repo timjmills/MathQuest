@@ -18,7 +18,10 @@ export function chartOfQ(q) {
     return { rows: w.rows.map(Number), cols: w.cols.map(Number), gaps: raw.map((x) => Number(String(x).replace(/,/g, ''))).filter(Number.isFinite) };
 }
 export const cwKey = (c, shows = false) => `cw:${c.rows.join('.')}:${c.cols.join('.')}:${c.gaps.join('.')}${shows ? ':s' : ''}`;
-const cwParse = (k) => { const [, r, c, g, sh] = k.split(':'); const L = (x) => (x ? x.split('.').map(Number) : []); return { rows: L(r), cols: L(c), gaps: L(g), shows: sh === 's' }; };
+// (flags: 's' a SHOWN window - a worked Model or anchor; 'x' a window of ANOTHER run of the sheet - another page or section)
+const cwParse = (k) => { const [, r, c, g, fl = ''] = k.split(':'); const L = (x) => (x ? x.split('.').map(Number) : []); return { rows: L(r), cols: L(c), gaps: L(g), shows: fl.includes('s'), ext: fl.includes('x') }; };
+/** The key of `k` as a window of another run ('x'). */
+export const cwExt = (k) => { const p = k.split(':'); if (p.length < 5) p.push(''); if (!p[4].includes('x')) p[4] += 'x'; return p.join(':'); };
 /** Is `n` one of window `c`'s squares? (a SHOWN window - a worked Model - prints its gaps too, traced) */
 const cwHas = (c, n) => c.rows.includes(Math.floor((n - 1) / 10)) && c.cols.includes((n - 1) % 10);
 /** Does window `c` print `n` as a chart number (in it, and not one of its own empty squares)? */
@@ -36,6 +39,9 @@ export function chartGivesAway(q, seen, { same = false } = {}) {
         if (typeof k !== 'string' || !k.startsWith('cw:')) continue;
         const b = cwParse(k);
         const twin = a.rows.join('.') === b.rows.join('.') && a.cols.join('.') === b.cols.join('.');
+        // (a window of another page that holds the SAME gaps is the same problem again, not a giveaway: a packet of more
+        // pages than band 120 has windows repeats one; a shown window, or a twin on the same run, is never repeated)
+        if (twin && b.ext && !b.shows && a.gaps.join('.') === b.gaps.join('.')) continue;
         if (same) { if (twin) return true; continue; }
         if (a.gaps.some((n) => (b.shows ? cwHas(b, n) : cwPrints(b, n))) || (!b.shows && b.gaps.some((n) => cwPrints(a, n)))) return true;
     }
@@ -81,6 +87,8 @@ export const chartSheet = () => SHEET;
  * never more than half its squares, no whole row empty (and no two side by side in a row, so every gap keeps a printed
  * neighbour along its row). A window that cannot hold the teacher's number holds this many, silently (the panel's help says so).
  */
-export const chartGapCap = (R, C) => Math.max(1, Math.min(Math.floor((R * C) / 2), R * Math.min(Math.ceil(C / 2), Math.max(1, C - 2))));
+export const chartGapCap = (R, C, per5 = false) => Math.max(1, Math.min(Math.floor((R * C) / 2), R * Math.min(Math.ceil(C / 2), Math.max(1, C - 2)), per5 ? R * 2 : Infinity));
+// (per5: band 120's windows share one pattern repeating every five columns, so a row holds at most 2 - three in five would
+// put a gap beside the next window's first one: 6 a 3 x 5 window, not 7; critic blanks B3)
 /** "Numbers to fill in" when none is chosen (null, an old code): 5. */
 export const CHART_TILES_DEFAULT = 5;

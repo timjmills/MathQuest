@@ -24,7 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
-import { chartOfQ, cwKey, chartGivesAway, setChartSheet } from './chart-giveaway.js';
+import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -963,7 +963,7 @@ export { chartGivesAway };
  * the same order); the first draw is kept if no try gives the kind.
  */
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, want = null } = {}) {
-    const cwRun = `${baseSeed}:${startIndex}`;
+    const cwRun = `${_cwPart}|${baseSeed}:${startIndex}`;
     _cwSheet.set(cwRun, new Set());
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
@@ -3128,11 +3128,17 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols, level }) {
             // (CROSS-GIVEAWAY, lead 2026-11-14: an anchor shows its answers, so a chart anchor holds none of the squares a pupil
             // window on the sheet leaves empty - the anchors join the sheet's chart deal (chart-giveaway.js) at their pick)
             const pupilCw = pupil.map((it) => it && it.q && chartOfQ(it.q)).filter(Boolean);
+            // (the whole packet is one sheet - critic blanks B2: the pupil windows of its other pages count too)
+            for (const k of _cwAll(new Set())) { const [, r, c, g, fl = ''] = k.split(':'); if (!fl.includes('s')) pupilCw.push({ rows: r.split('.').map(Number), cols: c.split('.').map(Number), gaps: g ? g.split('.').map(Number) : [] }); }
             const cwOk = (a) => { const c = a && a.source && chartOfQ(a.source.q); return !c || !pupilCw.some((p) => p.gaps.some((g) => c.rows.includes(Math.floor((g - 1) / 10)) && c.cols.includes((g - 1) % 10))); };
             const free = () => cands.filter((a) => !sigs.has(sigOf(a)) && cwOk(a)).length;
             if (free() < count) grow(cands.length + count - free() + 2);
             const pool = pupilCw.length && free() >= count ? cands.filter(cwOk) : cands;
-            return pickDistinct(pool, sigs, count, sigOf, (a) => String((a.source.q && a.source.q.text) || '').replace(/[^0-9]/g, ''));
+            const picked = pickDistinct(pool, sigs, count, sigOf, (a) => String((a.source.q && a.source.q.text) || '').replace(/[^0-9]/g, ''));
+            // (the chosen chart examples join the sheet as SHOWN windows: every later window of the packet keeps its gaps off them)
+            const shownKeys = new Set(picked.map((a) => a && a.source && chartOfQ(a.source.q)).filter(Boolean).map((c) => cwKey(c, true)));
+            if (shownKeys.size) _cwSheet.set(`anchors:${si}:${(n.lessonInput && n.lessonInput.part) || ''}:${variant}`, shownKeys);
+            return picked;
         },
     };
 }
@@ -4398,6 +4404,7 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
  *   plan(input)                 -> PagePlan
  */
 async function buildRoleSheet(n, metaOf) {
+    _cwPart = (n && n.lessonInput && n.lessonInput.part) || (n && n.role) || '';
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
@@ -5108,6 +5115,10 @@ async function buildLesson(n, metaOf) {
     let chart = await buildRoleSheet(Object.assign({}, nz, {
         size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
     }), metaOf);
+    // (critic blanks B2: the packet is one sheet - the chart page prints only its worked examples, so they, not the run's
+    // other dealt items, are its windows, and they are SHOWN: every later window keeps its gaps off their squares)
+    for (const k of [..._cwSheet.keys()]) if (String(k).startsWith('chart|')) _cwSheet.delete(k);
+    { const ex = ((chart.plan && chart.plan.meta && chart.plan.meta.exampleQs) || []).map(chartOfQ).filter(Boolean); if (ex.length) _cwSheet.set('lesson-examples', new Set(ex.map((c) => cwKey(c, true)))); }
     let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
@@ -6374,6 +6385,8 @@ let buildQueue = Promise.resolve();
 // (CROSS-GIVEAWAY, lead 2026-11-14: on a role that opens with a worked Model - Guided, the Scripted Model - the
 // first chart window shows its answers traced, so it is recorded as a SHOWN window: a later window leaves none of its squares empty)
 let _cwShowFirst = false;
+// (the lesson part being built - its chart page, teaching sheet and practice pages deal under the same seed: runs keyed apart)
+let _cwPart = '';
 // (lead ruling (a) 2026-11-14: a Guided page's chart windows hold 3 blanks - a scaffold step below Independent's 5; the role
 // overrides the skill's "Numbers to fill in")
 let _cwRoleTiles = null;
@@ -6381,7 +6394,7 @@ const CW_SKILLS = new Set(['composing:hundreds_chart_fill', 'composing:chart_to_
 // (the sheet's chart windows across ALL its runs - a lesson deals its anchor and each practice section in runs of their own)
 // (keyed by run - its seed and first place - so a run dealt again, a probe then the final deal, replaces its own windows)
 const _cwSheet = new Map();
-const _cwAll = (seen) => { const u = new Set(); for (const ks of _cwSheet.values()) for (const k of ks) u.add(k); for (const k of seen) if (typeof k === 'string' && k.startsWith('cw:')) u.add(k); return u; };
+const _cwAll = (seen) => { const u = new Set(); for (const ks of _cwSheet.values()) for (const k of ks) u.add(seen.has(k) ? k : cwExt(k)); for (const k of seen) if (typeof k === 'string' && k.startsWith('cw:')) u.add(k); return u; };
 export function buildSheet(req = {}) {
     // (not a lesson: its first window is a pupil's; its worked examples are anchor items, kept off the pupil gaps in anchorSet.take)
     _cwShowFirst = !!(req && ['guided', 'scripted-model'].includes(req.role));

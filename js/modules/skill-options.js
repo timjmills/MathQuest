@@ -1260,7 +1260,7 @@ function _gridOptions() {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
             values: [{ v: 'scatter', l: 'Scattered anywhere (default)' }, { v: 'row', l: 'A run along one row (count on by 1)' },
                 { v: 'column', l: 'A run down one column (count on by 10)' }, { v: 'pattern', l: 'Every other square in a row' }],
-            help: '"Empty boxes" says how many (in each row, on three rows or the whole chart). A run stays one square in from the edge, so a printed number stands at each end to count from: a run along a row is two or more boxes, a run down a column needs three rows. The whole chart with every other square varies from page to page. Every other square needs a row of at least four.',
+            help: '"Numbers to fill in" says how many (in each row, on three rows or the whole chart). A run stays one square in from the edge, so a printed number stands at each end to count from: a run along a row is two or more boxes, a run down a column needs three rows. The whole chart with every other square varies from page to page. Every other square needs a row of at least four.',
         },
     ];
 }
@@ -1368,6 +1368,8 @@ const P11_K2_OPTIONS = {
             id: 'tiles', label: 'Numbers to fill in', type: 'enum', default: 5, group: 'difficulty',
             values: [{ v: null, l: '5 (default)', hidden: true }, { v: 1, l: '1 number', hidden: true },
                 ...[2, 3, 4, 5, 6, 7, 8].map(n => ({ v: n, l: n === 5 ? '5 numbers (default)' : `${n} numbers`, ...(n === 7 ? { hidden: true } : {}) }))],
+            // (critic blanks n2: the cap sentence on the visible line too - a tablet has no hover)
+            helpShort: 'How many numbers the pupil writes in each window. A small window holds fewer: never more than half its squares.',
             help: 'How many numbers the pupil writes in each window. A window too small to hold them all (the row 1 to 10, '
                 + 'or more than half its squares) holds as many as it can: never more than half the squares, never a whole row, '
                 + 'and every empty box keeps a printed number beside it.',

@@ -939,7 +939,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // no two side by side in a row, every gap a printed neighbour) holds the most it can, silently.
         const _hcRaw = Number(_kOpt('tiles'));
         const _hcWant = [1, 2, 3, 4, 5, 6, 7, 8].includes(_hcRaw) ? _hcRaw : big ? [1, 2, 2, 3][_kDeal(4)] : CHART_TILES_DEFAULT;   // (number_chart_fill keeps its own "1 to 3, dealt")
-        const want = Math.min(chartGapCap(R, C), _hcWant);
+        const want = Math.min(chartGapCap(R, C, _to120 && R === 3 && C === 5 && _grid === 'window' && _gaps === 'scatter'), _hcWant);
         const neighbours = (i) => {
             const r = Math.floor(i / C), c = i % C, out = [];
             if (c > 0) out.push(i - 1);
@@ -960,7 +960,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             if (_gaps !== 'scatter') { pickIdx = _chartGaps({ R, C, grid: _grid, gaps: _gaps, per: [1, 2, 2, 3][_kDeal(4)], tiles: _hcWant, neighbours, rng }); break; }
             const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
             const idxOf = (n) => rows.indexOf(Math.floor((n - 1) / 10)) * C + cols.indexOf((n - 1) % 10);
-            if (kept.some((k) => k.rows.join() === rows.join() && k.cols.join() === cols.join())) continue;
+            // (a window of the same squares: never on the same run or a shown one; on another page it repeats with the same gaps)
+            if (kept.some((k) => k.rows.join() === rows.join() && k.cols.join() === cols.join() && (!k.ext || k.shows))) continue;
             const forced = new Set(), barred = new Set();
             for (const k of kept) {
                 // (a SHOWN window - the worked Model - prints every square, its traced answers too: none is left empty here)
@@ -973,7 +974,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             // holds the same count, spread the same way, and no window prints another's gap.
             const _per5 = _to120 && R === 3 && C === 5;
             const resKey = (n) => `${Math.floor((n - 1) / 10)}:${((n - 1) % 10) % 5}`;
-            if (_per5 && kept.some((k) => !k.shows)) {
+            // (not beside a SHOWN window: it prints every square of its five columns, so the gaps keep to the other columns)
+            if (_per5 && kept.some((k) => !k.shows) && !kept.some((k) => k.shows)) {
                 const k0 = kept.find((k) => !k.shows);
                 const P = new Set(k0 ? k0.gaps.map(resKey) : []);
                 forced.clear();
@@ -1003,6 +1005,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (!cand.every((i) => neighbours(i).some((j) => !set.has(j)))) continue;
                 // (band 120: no row blank in both its first and last column - repeated five columns on, they would sit side by side)
                 if (_per5 && Array.from({ length: R }, (_, r) => r).some((r) => set.has(r * C) && set.has(r * C + C - 1))) continue;
+                // (the first try beside a shown Model keeps its gaps within three columns of the Model, so a second try that
+                // overlaps the Model's columns can still hold them - critic blanks B4: band 120 Guided dealt one try)
+                const shown = kept.filter((k) => k.shows);
+                if (shown.length && shown.length === kept.length && t < 40 && w < 16 && !cand.every((i) => shown.some((k) => Math.min(...k.cols.map((c) => Math.abs(c - cols[i % C]))) <= 3))) continue;
                 if (_cross && t < (kept.length ? 40 : 200) && w < 12 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
                 pickIdx = cand;
             }

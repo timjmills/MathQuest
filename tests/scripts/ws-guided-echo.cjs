@@ -34,6 +34,12 @@
 //                      legal maximum min(half, R x min(ceil(C/2), C-2)); row counts differ by at most 1; no whole row blank; never
 //                      more than half the squares; every blank a printed neighbour; the key holds one answer a blank (Score /N =
 //                      SCORE-SLOTS); a Guided page holds 3 (lead ruling (a)). Every role drawn, the online worksheet, the quiz and the practice card. --seed-list a,b picks seeds.
+//   (critic blanks, 2026-11-14:)
+//   LESSON-EMPTY-PAGE  no lesson packet page past the first is empty, and pupil and key (when built) print the same page count (B1).
+//   CROSS-GIVEAWAY     on a lesson, the whole PACKET is one sheet and its worked examples (plan.meta.exampleQs) count as printed (B2).
+//   OPTION-ITEMS       (--variants) every offered tiles value 2/3/4/6/8 deals Independent / Test windows >= 2/3 of the default's,
+//                      each holding min(N, cap) - band 120's 3 x 5 cap is 6 (B3).
+//   GUIDED-TRY-COUNT   a Guided chart page deals 2+ tries after its Model (B4).
 //   (chart_120 critic r2, 2026-11-14:)
 //   MODEL-STATE-MARKS  every Scripted Model state and lesson-anchor panel whose step says "Write N" (or "Write a, b and c") draws N
 //                      in that state's drawing, and each state adds one mark group: what it draws newly is trace grey, what an
@@ -79,7 +85,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -175,7 +181,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             // BLANK-COUNT (lead ruling 2026-11-14, "Numbers to fill in"): every dealt window holds exactly the chosen number of
             // blanks - capped, silently, at the most its R x C squares can legally hold - spread across its rows (row counts differ
             // by at most 1), no whole row blank, never more than half its squares, every blank a printed neighbour in the window.
-            const capOf = (R, C) => Math.max(1, Math.min(Math.floor(R * C / 2), R * Math.min(Math.ceil(C / 2), Math.max(1, C - 2))));
+            // (band 120's 3 x 5 window - rows 91-120 - shares one pattern every five columns: at most 2 a row, 6 a window; critic blanks B3)
+            const capOf = (R, C, rows) => Math.max(1, Math.min(Math.floor(R * C / 2), R * Math.min(Math.ceil(C / 2), Math.max(1, C - 2)), rows && rows.join() === '9,10,11' && C === 5 ? 6 : Infinity));
             const judgeBlanks = (label, items, want) => {
                 if (/number_chart_fill/.test(label)) return;
                 items.forEach((it, k) => {
@@ -183,7 +190,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     const cp = q.cell && q.cell.template === 'chartwindow' && q.cell.payload;
                     const blanks = cp && Array.isArray(cp.blanks) ? cp.blanks.map(Number) : w.gaps;
                     const R = w.rows.length, C = w.cols.length;
-                    const exp = Math.min(capOf(R, C), want);
+                    const exp = Math.min(capOf(R, C, w.rows), want);
                     const f = [];
                     if (blanks.length !== exp) f.push(`${blanks.length} blank(s), want ${exp}${exp < want ? ` (${want} capped)` : ''}`);
                     if (w.gaps.length !== blanks.length) f.push(`key holds ${w.gaps.length} answer(s) for ${blanks.length} blank(s)`);
@@ -254,6 +261,20 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         if (on('BLANK-COUNT')) judgeBlanks(`${key} ${JSON.stringify(opts)} ${role} L seed ${s}`, planPages(r.plan).flatMap((pg) => pg.items), tilesWant);
                     }
                 }
+                // OPTION-ITEMS (critic blanks B3): every offered "Numbers to fill in" keeps the page dense - Independent and Test deal at
+                // least two thirds of the default's windows - and each window holds min(N, the legal cap) (BLANK-COUNT)
+                if (variantsOnly && vBand === 'tiles' && on('OPTION-ITEMS') && /^(hundreds_chart_fill|chart_to_120)$/.test(skillId)) {
+                    for (const role of ['independent', 'test']) for (const size of sizes) for (let s = 1; s <= Math.min(N, 2); s++) {
+                        const count = async (tiles) => { const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId, ...(tiles ? { opts: { tiles } } : {}) }] }], size, paper: 'A4', seed: s, key: false }); pages++; return planPages(r.plan).flatMap((pg) => pg.items); };
+                        const base = (await count(null)).filter((it) => winOf(it.q)).length;
+                        for (const t of [2, 3, 4, 6, 8]) {
+                            const its = await count(t);
+                            const n = its.filter((it) => winOf(it.q)).length;
+                            if (n * 3 < base * 2) out.push(`OPTION-ITEMS ${key} tiles ${t} ${role} ${size} seed ${s}: ${n} window(s) where the default deals ${base}`);
+                            if (on('BLANK-COUNT')) judgeBlanks(`${key} tiles ${t} ${role} ${size} seed ${s}`, its, t);
+                        }
+                    }
+                }
                 if (!variantsOnly && !finalize) for (const size of sizes) for (let s = seedFrom; s <= seedTo; s++) {
                     for (const role of pageRule ? scoreRoles : ['guided']) {
                         if (role !== 'guided' && !pageRule) continue;
@@ -286,6 +307,23 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             }
                         }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
+                        // (critic blanks B2: a lesson PACKET is one sheet - every page's windows together, its worked examples printed)
+                        const packet = role === 'lesson' ? (r.keyPlans || [r.plan]).flatMap((pl) => planPages(pl)) : null;
+                        if (packet && on('CROSS-GIVEAWAY') && /chart/.test(skillId)) {
+                            const ex = ((r.plan && r.plan.meta && r.plan.meta.exampleQs) || []).map((q) => ({ q, anchor: true }));
+                            judgeGiveaway(`${key} lesson packet ${size} seed ${s}`, ex.concat(packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model)));
+                        }
+                        // LESSON-EMPTY-PAGE (critic blanks B1): no page of a lesson packet past its first is printed empty, and the key
+                        // prints as many pages as the pupil copy
+                        if (packet && on('LESSON-EMPTY-PAGE')) {
+                            packet.forEach((pg, pi) => { if (pi > 0 && !pg.items.some((it) => it && (it.q || it.source || it.anchor))) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: page ${pi + 1} of ${packet.length} holds no item`); });
+                            if (Number(r.keyPageCount) > 0 && Number(r.pageCount) !== Number(r.keyPageCount)) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: ${r.pageCount} pupil page(s), ${r.keyPageCount} key page(s)`);
+                        }
+                        // GUIDED-TRY-COUNT (critic blanks B4): a Guided chart page deals at least two tries after its Model
+                        if (role === 'guided' && on('GUIDED-TRY-COUNT') && /chart/.test(skillId)) {
+                            const tries = scoredItems.filter((it) => winOf(it.q)).length;
+                            if (tries < 2) out.push(`GUIDED-TRY-COUNT ${key} guided ${size} seed ${s}: ${tries} try window(s) after the Model (want 2 or more)`);
+                        }
                         // (BLANK-COUNT: the whole sheet's windows; Score /N equals their blanks is SCORE-SLOTS, judged above)
                         if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, pp.flatMap((pg) => pg.items), role === 'guided' ? 3 : tilesWant);   // (lead ruling (a) 2026-11-14: Guided 3)
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
@@ -352,6 +390,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const sk = key.split(':')[1];
             if (variants && (!only || only.includes('CROSS-GIVEAWAY')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(sk)) {
                 const bands = sk === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : ['all'];
+                if (sk !== 'number_chart_fill') add(await call({ keys: [key], vBand: 'tiles', seedFrom: 1, seedTo: 0 }).then((r) => r, (e) => ({ out: [`${key} tiles: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
                 for (const b of bands) add(await call({ keys: [key], vBand: b, seedFrom: 1, seedTo: 0, tilesOpt }).then((r) => r, (e) => ({ out: [`${key} band ${b}: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
             }
         }
@@ -363,7 +402,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
