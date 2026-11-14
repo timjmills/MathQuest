@@ -344,3 +344,5 @@ Times: r8b, start 2026-11-13T15:20Z, end 2026-11-13T19:30Z, profile mq-opus-medi
 Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medium
 
 - 2026-11-13 lead: deploy-6 (c4bac87bf) deploying; SIZE-ORDER now M >= L only (S dropped; S stays pinned for CAPACITY-NO-DROP). EB-REFILL minors R1-R4 queued. R2 ruling: a part row is allowed when its cell is one the Model also draws as a part row; otherwise flag it (EB-REFILL-SLOT).
+
+- 2026-11-14 QUEUED (next budget): chart_120 items (EB-GDPCAP answer count, guided try 32-33 %, PSC p1 42-55 %); EB-REFILL minors R1/R3/R4; counters EB-SIDE; Review Mixed fixes; Guided fit over-reserves the frame (stripExtraMm +5.7 mm on a one-line instruction, Steps band estimated 39.7 vs drawn 37.3 -> count_by_tables Guided M 4 rows where 5 fit, EB-REFILL; fix in guided.js fitRows / compose.js from drawn heights; lf-ops ledger 3157e01f4).
