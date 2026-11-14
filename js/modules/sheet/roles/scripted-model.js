@@ -351,6 +351,7 @@ export function plan(input = {}) {
         // The chosen plan has no lone state when any candidate has none, then the fewest pages, then the unmerged steps, then the
         // two-line text (the base layout). So the D5 / D8 one-page models are unchanged, and a model that cannot be one page
         // pairs its states (2 + 2) instead of leaving one alone (D12: 1 + 2 + 1 on A4, 1 + 1 + 1 + 1 on Letter).
+        const STATE_SLACK_MM = 2.5;
         const parallel = (t) => /^[\d,]+ [+\u2212-] [\d,]+ = [\d,]+\. Write [\d,]+\.$/.test(String(t).trim());
         const variants = [{ steps, marks, merged: 0 }];
         if (steps.length >= 4 && parallel(steps[1]) && parallel(steps[2])) {
@@ -372,7 +373,9 @@ export function plan(input = {}) {
         const better = (a, b) => { for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return a[k] < b[k]; return false; };
         let best = null;
         for (const v of variants) for (const t of texts) {
-            const Hs = h1 + t.tH;
+            // (critic cbt r2 E3: a drawn count-row state stands ~2 mm taller than h1 + its text - at L the fourth state ran into the
+            // Say band, L-OVERLAP SECTION - so each state is planned with STATE_SLACK_MM more)
+            const Hs = h1 + t.tH + STATE_SLACK_MM;
             for (const d of [dealOf(v.steps.length, Math.max(1, Math.floor(room1 / Hs)), Math.max(1, Math.floor(roomC / Hs))), exactDeal(v.steps.length, Hs)]) {
                 if (!d) continue;
                 // the merged text is long: two lines (textH2) even when the unmerged steps are one line each
