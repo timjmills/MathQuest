@@ -440,6 +440,26 @@ function stepsBodyMm(steps, m) {
     return h;
 }
 
+/**
+ * GUIDED-FRAME-FIT (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL): the frame over a Guided grid as it is DRAWN,
+ * in mm. The fit's own reserve (bandMetrics + stepsBodyMm + stripExtraMm) over-reserves it: on count_by_tables Guided M the
+ * instruction "Count by the number in the arrow. Write the missing numbers." was held to two lines (5.7 mm) where it prints on
+ * one, the Steps band was estimated 39.7 mm where it prints 37.3, the strip 7.5 where it prints 6.8, and the body 236 where it
+ * prints 239: 179 mm left for rows where 196 are drawn, so the fifth try row (192.7 mm) never came. Calibrated on the printed
+ * page (Andika at 13 / 15 pt, M / L): a strip is stripMm + 0.8 and 1.1 em a further line, a character 0.45 em, the Steps band
+ * stripMm + 1.3 + 1.07 x its estimated body, the body 3 mm taller than bodyHeightMm on page 1 (a continuation page as estimated), a 1 mm keep (each row is counted 1 mm over its cell already, hMinAt). `room` is what a page holds.
+ */
+export function drawnFrameMm(ctx, m, steps, instr, { cont = false } = {}) {
+    const em = m.textPt * (25.4 / 72);
+    const stripMm = m.strip - 1.5;
+    const label = 'Guided Practice:';
+    const room = Math.max(40, 186 - 10 - (label.length * 0.55 * em + 4));
+    const lines = Math.max(1, Math.ceil((String(instr || '').length * 0.45 * em) / room));
+    const strip = stripMm + 0.8 + (lines - 1) * em * 1.1;
+    const stepsMm = steps.length ? stripMm + 1.3 + 1.07 * stepsBodyMm(steps, m) : 0;
+    return { strip, steps: stepsMm, lines, room: m.body + (cont ? 0 : 3) - 1 - stepsMm - strip, cont };
+}
+
 /** Rows that fit under the Steps band (PT-GDP-3 teacher strip off). */
 function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLines = false, span2 = 0 } = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Lesson 1' });
@@ -449,6 +469,9 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // A "Guided Practice:" strip whose instruction wraps takes its second line off the page.
     const wrap = stripExtraMm(ctx, 'Guided Practice:', instructionText(instructionKeyOf(items, input.skills), items));
     const avail = m.budget - stepsH - m.strip - wrap;
+    // (GUIDED-FRAME-FIT: the room the page draws, never less than the reserve's; a row past `avail` is taken only within it)
+    const instrT = instructionText(instructionKeyOf(items, input.skills), items);
+    const availD = Math.max(avail, drawnFrameMm(ctx, m, steps, instrT).room);
     // The think line under a division fact (row 1), the Model tab clearance and the model's work
     // lines are drawn by the role, so their height is added here (the rows share one height).
     const model = items[0];
@@ -480,7 +503,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     if (nM > 1 && !noHint && partial.some((x) => thinkCueOf(x))) hint = Math.max(hint, 17);
     const h = h0 + extra;
     const rows = Math.max(1, Math.min(Math.floor(ceilFor(ctx, items) / cols), Math.floor(avail / Math.max(1, h))));
-    return { rows, h, h0, avail, stepsH, steps, frame, m, span, span2: span2 || 0, hint, wrap, noLines: !!noLines };
+    return { rows, h, h0, avail, availD, instrT, stepsH, steps, frame, m, span, span2: span2 || 0, hint, wrap, noLines: !!noLines };
 }
 
 /**
@@ -557,6 +580,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const extra = first.h - first.h0;
     const mc = bandMetrics(ctx, layoutHeader(first.frame.contHeader), { cont: true });
     const availC = mc.budget - first.stepsH - mc.strip - first.wrap;
+    const availCD = Math.max(availC, drawnFrameMm(ctx, mc, first.steps, first.instrT, { cont: true }).room);
     const all = hMinAt(items, cols, ctx);
     // A page's rows are sized by the items that page holds (a tall coin set on page 2 does not
     // cost page 1 a row). Past the end of the probe the tallest probe item stands in.
@@ -603,8 +627,15 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
         for (let k = maxR; k >= 1; k--) {
             if (rowsH(k) + (isFirst ? extra : 0) <= avail) { r = k; break; }
         }
+        // GUIDED-FRAME-FIT: one more row when the page as DRAWN holds it (the reserve over-reserves the frame); the page's rows then
+        // share the drawn room. A page whose row count the reserve already gives is unchanged. One-column pages only (a count row,
+        // a story): on a grid the extra room changed pageSet's column choice - two-step stories went from 1 x 6 tries on two pages
+        // to 2 x 2 on one, fewer tries (r10 hash diff).
+        let availP = avail;
+        const availPD = isFirst ? first.availD : availCD;
+        if (cols === 1 && r < maxR && availPD > avail && rowsH(r + 1) + (isFirst ? extra : 0) <= availPD) { r += 1; availP = availPD; }
         const cap = r * cols - (isFirst ? lead : 0);
-        pages.push({ rows: r, avail, h: hOf(total, r * cols), extra: isFirst ? extra : 0, cap });
+        pages.push({ rows: r, avail: availP, h: hOf(total, r * cols), extra: isFirst ? extra : 0, cap, rowsR: availP === avail ? r : r - 1, availR: avail });
         total += cap;
     }
     // The ceiling trims the LAST page to whole rows (round-4: a 2 x 2 continuation page with its
@@ -638,6 +669,8 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     // (a cell scoring several tries - Match 3 - in one column: a continuation page holding ONE cell alone gives it up, as the
     // ceiling counted in tries leaves it nothing to share its page with; lf-vocab r9, L-LONE / PG-23)
     if (pointsOf(items) > 1 && cols === 1 && pages.length > 1 && pages[pages.length - 1].cap === 1) { total -= 1; pages.pop(); }
+    // (GUIDED-FRAME-FIT: a page the ceiling trimmed back to the rows the reserve gave keeps the reserve's room - unchanged)
+    for (const pg of pages) { if (pg.rows <= pg.rowsR) pg.avail = pg.availR; delete pg.rowsR; delete pg.availR; }
     return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total), drawn: !!drawn });
 }
 

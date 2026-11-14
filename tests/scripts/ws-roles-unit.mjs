@@ -50,6 +50,10 @@
 //   RI-TWOSTEP   a two-step column story on Reason It prints its story once and stands A over B at the cell's full width (its
 //                step columns are 107-115 mm, wider than half the cell: side by side they ran out of it; r9 item 3, OVERFLOW).
 //
+//   GUIDED-FRAME-FIT a one-column Guided page of count rows (31 mm measured, as count_by_tables' rows) takes the rows the page
+//                DRAWS room for, not the rows its frame reserve leaves (lf-roles r10 item 1: the reserve held the one-line instruction
+//                to two lines, the Steps band 2.4 mm and the body 3 mm over what prints; count_by_tables Guided M dealt 4 rows where
+//                5 fit, EB-REFILL on lf-ops-props). M and L: the Model and 6 tries, never past the drawn room or the L ceiling.
 //   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
@@ -531,6 +535,24 @@ if (on('GUIDED-DRAWN-FIT')) {
             const fits = pl.meta.fits || [];
             fits.forEach((f, i) => { if (f.rows === 1 && f.cellH > 190) findings.push(`GUIDED-DRAWN-FIT ${tag} M p${i + 1}: a one-row page's row stretched to ${f.cellH.toFixed(1)} mm (a 30 % band under a ${i ? h1 : 135} mm story)`); });
         } catch (e) { findings.push(`GUIDED-DRAWN-FIT ${tag}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-FRAME-FIT')) {
+    const cRow = (i, h) => ({ q: { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted count row', answerType: 'number', seed: i, cell: { template: 'count-row', payload: {} } },
+        key: { value: '42', display: '42', slots: {} }, render: () => '<div class="ws-cell-work">row</div>', template: 'count-row', pool: 'main',
+        measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: h, fits: c === 1, slackMm: 3 }])), footprint: { measure: true, wMm: 170, hMm: null, maxCols: 1 }, fclass: 'standard' });
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 12 }, (_, i) => cRow(i, 31)) });
+            const f = (pl.meta.fits || [])[0] || {};
+            if (pl.meta.items < 7) findings.push(`GUIDED-FRAME-FIT ${size}: ${pl.meta.items} cells of 31 mm count rows on page 1 (want the Model and 6 tries: the page draws room for them; the frame reserve over-reserved the instruction / Steps / body)`);
+            if (size === 'L' && pl.meta.items > 7) findings.push(`GUIDED-FRAME-FIT L: ${pl.meta.items} cells (over the L ceiling of 6 tries)`);
+            const gridMm = (f.cellH || 0) * (f.rows || 0);
+            if (typeof GD.drawnFrameMm !== 'function') findings.push(`GUIDED-FRAME-FIT ${size}: no drawnFrameMm (the fit has no drawn frame to count rows against)`);
+            else if (gridMm > 239 - 6.8 - 1 + 0.5) findings.push(`GUIDED-FRAME-FIT ${size}: grid ${gridMm.toFixed(1)} mm runs past the drawn room`);
+        } catch (e) { findings.push(`GUIDED-FRAME-FIT ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 
