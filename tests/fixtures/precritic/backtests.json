@@ -9039,6 +9039,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120r2-touch-hit",
+   "check": "a chart window's empty square takes a real tap 1 px inside every edge and corner on the practice card / quiz at 820-1366 (master's TOUCH-HIT on the lane's digit-sized chart window: a neighbour's number span lay 1 px over the input, and the card's .visual-aid scrolled the window 1 px)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-HIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "eb28a8960",
+    "state": "TOUCH-HIT 9 on hundreds_chart_fill (bottom edge 820-1366, top corners 1280)"
+   },
+   "pass": {
+    "commit": "00bafd629",
+    "state": "the empty square's slot z-index 1; .visual-aid overflow visible for a fitting window"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill --sizes 820x1180,1280x900",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
