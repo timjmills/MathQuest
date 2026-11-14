@@ -856,3 +856,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Global screen rule: a boxed answer slot (.mq-cellbox holding input.mq-cellslot) is at least 50 px tall (border-box: 48 px of input). 30-skill passed sweep: no non-pv screen changed.
 - number_word_form Guided D2-D4 and hint-gap fixes (equal or better on every changed page; not yet passed: one-kind root cause on live2).
 - Gates: code-snapshot, no-size-s, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, capacity-pin, frame-title (196), screen-widths-plan; lane: redesign-passed 30, precritic-plan, no-phone-width, boot-smoke, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy-7: two-step page roles (lf-roles critic r9 + r9b PASS)
+- Two-step word problems: a lone row is held to its ink (ONE-ROW-CAP); Guided fits 2 stories a page by drawn heights (GUIDED-DRAWN-FIT); a Model too tall to share its page spills Guided and Independent to page 2 under a header naming the part (PT-OPN-10, OPENER-SPILL, SPILL-P1); Reason It two-step pairs print A over B at full width (RI-TWOSTEP, capacity 1 ruled); LONE-PAGE reads `ruled`.
+- Passed skills: only div_facts_long review M and sub_2d_1d review L changed (graded 9/9/8/9); 220 other passed pages identical.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit (101), frame-title (196), simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan + checks-from-critics, capacity-pin, lesson baseline 1772 identical.
