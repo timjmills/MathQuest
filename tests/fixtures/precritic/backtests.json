@@ -11933,9 +11933,9 @@
     "state": "critic cbt r3 tree: Pre-skill check L p1 34 % empty (81.0 mm, its next 25.5 mm row fits)"
    },
    "pass": {
-    "commit": "3038af154",
-    "args": "--roles test,true-false,reason-it,error-analysis",
-    "state": "the same commit, its other fixed-capacity roles: every last page full (no fix of F1 has landed: count_by_tables is parked; re-point the pass side to the fixing commit when cbt resumes)"
+    "commit": "95f64c8a3",
+    "args": "--roles pre-skill-check",
+    "state": "lf-ops cbt r4 F1 fix: a one-page plain check fills its page with whole rows - Pre-skill check L 14 items a page (M 16, needs >= 12), 12 % empty (29.0 mm, under its 25.6 mm row + the planned row height)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only EB-LASTPAGE {args}",
    "expect": {
@@ -11955,11 +11955,71 @@
     "state": "critic cbt r3 tree: Pre-skill check M 16 / L 10 items a page (needs >= 12), L page not full"
    },
    "pass": {
-    "commit": "3038af154",
-    "args": "--roles test,true-false,reason-it,error-analysis",
-    "state": "the same commit, its other fixed-capacity roles: L below 0.7 x M only where the L page is full (no fix of F1 has landed: re-point the pass side when cbt resumes)"
+    "commit": "95f64c8a3",
+    "args": "--roles pre-skill-check",
+    "state": "lf-ops cbt r4 F1 fix: a one-page plain check fills its page with whole rows - Pre-skill check L 14 items a page (M 16, needs >= 12), 12 % empty (29.0 mm, under its 25.6 mm row + the planned row height)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only CAP-PARITY {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-m1-title-range",
+   "check": "an 'I Can count ... by As to Bs' / 'by As, Bs and Cs' title names exactly the steps the page prints (its count rows' step tabs); the key's title too (lf-ops critic cbt r3 m1: the count_by_tables Opener was titled 'I Can count by 2s to 7s' but dealt 2-5 at M and 2-4 at L, and the key copied it)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE-RANGE (default rule; precritic cell-checks)",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "state": "critic cbt r3 tree: Opener M prints 2, 3, 4, 5 and L 2, 3, 4 under 'I Can count by 2s to 7s'"
+   },
+   "pass": {
+    "commit": "7a4bc8d98",
+    "state": "lf-ops cbt r4: a role that places fewer count rows than dealt is retitled by those it placed (Opener M 'by 2s to 5s', L 'by 2s to 4s')"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --roles opener --rules TITLE-RANGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-m2-sentence-frame",
+   "check": "an instruction that says 'Finish the sentence' needs a sentence frame on the page (a .mq-frame that is not a list of write lines) (lf-ops critic cbt r3 m2: the count_by_tables True or False? page said 'Finish the sentence.' over 'Answer: __, __' lines only)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks SENTENCE-FRAME (default rule; precritic cell-checks)",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "state": "critic cbt r3 tree: True or False? M 4 / L 3 list frames, no sentence frame, 'Finish the sentence.'"
+   },
+   "pass": {
+    "commit": "446cf2306",
+    "state": "lf-ops cbt r4: library key true-false-list 'Check one box: True or False. If False, write the right numbers.'"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --roles true-false --rules SENTENCE-FRAME",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-m3-sm-state-parity",
+   "check": "a Scripted Model draws as many states at L as at M for the same skill, options and seed (P-1) (lf-ops critic cbt r3 m3: count_by_tables at L merged steps 2 and 3 into one state, 3 at L against 4 at M)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks SM-STATE-PARITY (default rule; precritic cell-checks)",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "state": "critic cbt r3 tree: Scripted Model 4 states at M, 3 at L"
+   },
+   "pass": {
+    "commit": "4b4a23dec",
+    "state": "lf-ops cbt r4: a one-line step band (one text line + 4 mm) is planned before a merge: 4 states at M and L, one page each"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --roles scripted-model --rules SM-STATE-PARITY",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
