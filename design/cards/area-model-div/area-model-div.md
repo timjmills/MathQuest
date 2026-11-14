@@ -231,7 +231,7 @@ Each runs as `node tests/scripts/<script> …`.
 6. **Capacity: the footprint says 94 mm at M (two columns need about 91 mm) and 116 mm at L (one column). Accept M 1 x 4 and L 1 x 3 if the measured cell does not fit two columns?** Recommended: Fit two columns at M first, by sizing part columns to the widest part dealt (not every possible 4-digit value) inside the template, re-checked on 3by1; accept L 1 x 3 (3 a page, like the other wide models). Never a smaller digit size.
 7. **MW4K / IXL research ran without logins (no credentials file on this machine). Sign now?** Recommended: Yes; the content model is the long_div_2digit class plus DV-11, which the repo already decides. Re-sign only if logged-in research changes the problem types or the progression.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-14
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
