@@ -1,0 +1,24 @@
+note: slot ink on: an empty PRINT answer slot is ink over its whole box (the writing room)
+note: composing:hundreds_chart_fill: slot ink on; card design/cards/chartwindow/chartwindow.md; 13 roles x M/L + 6 option variant(s) of 18 + hosts card, worksheet, quiz
+EB-BAND  FAIL 1
+   composing:hundreds_chart_fill lesson L p2 cell 2: empty band 23.3 mm under the ink of a 81.1 mm cell (28.7 %; limit 28 % = 22.7 mm; the 3.0 mm top pad excluded) [counters]
+EB-SIDE  PASS
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-ROLE  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  FAIL 2
+   composing:hundreds_chart_fill pre-skill-check M p1: 50 % of the page body is empty under its last block (not the last page; limit 30 %)
+   composing:hundreds_chart_fill pre-skill-check L p1: 42 % of the page body is empty under its last block (not the last page; limit 30 %)
+EB-GDPCAP PASS
+EB-REFILL PASS
+EB-PARITY PASS
+EB-ITEMKEY PASS
+EB-ITEMPARITY PASS
+(1 skill(s), 74 renders, 265 cells, 119 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (3)

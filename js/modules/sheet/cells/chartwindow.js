@@ -41,6 +41,9 @@ const CELL = { S: { w: 15, h: 15 }, M: { w: 16, h: 16 }, L: { w: 17, h: 17 } };
  * (the digits never shrink, TY-10), and its squares are taller than wide to use the page's height.
  */
 const WHOLE = { w: 17.5, h: 19.5 };   // 19.5: the tallest that still fits one US Letter page
+/** The whole chart's square height: 19.5 mm to 10 rows, shorter past that so 12 rows (1-120) keep the
+ * same 195 mm of page (16.25 mm, card chartwindow §3 / §9.5), never under the 14 mm writing floor (H9). */
+const wholeH = (p) => Math.max(14, Math.min(WHOLE.h, 195 / Math.max(1, (p.rows || []).length)));
 const isWhole = (p) => (p.rows || []).length >= 8 && (p.cols || []).length === 10;
 /** The widest number in the window. */
 const topOf = (p) => Math.max(0, ...(p.rows || []).map((r) => r * 10 + Math.max(0, ...(p.cols || [0])) + 1));
@@ -56,6 +59,10 @@ function cellW(p, size, pt) {
     const digits = String(top).length;
     // The 1-100 chart (its one three-digit number is 100) keeps the size's width.
     if (top <= 100) return base;
+    // Three digits (the chart to 120, band 120): the size's own width (15 / 16 / 17 mm). 120 at 22.4 pt is 13.3 mm, so
+    // 17 mm keeps 1.8 mm clear either side, and the 3 x 5 window (85 mm at L, as the 1-100 window) shares a row at L
+    // (measured: 87.5 and 90 mm windows printed one to a row on the independent page).
+    if (digits === 3) return Math.max(base, Math.min(17, Math.ceil(3 * 0.56 * pt * (25.4 / 72) + 3)));
     return Math.max(base, Math.ceil((digits * 0.56 + (digits >= 4 ? 0.28 : 0)) * pt * (25.4 / 72) + (digits >= 4 ? 5.5 : 4)));
 }
 /** A chart number as the page writes it: the thousands comma from 1,000 up (SC-4). */
@@ -69,10 +76,23 @@ register('chartwindow', {
     render(p, ctx) {
         const whole = isWhole(p);
         const pt = (whole ? SIZES.L.digitPt : digitPt(ctx)) * 0.8;
-        const c = whole ? { w: WHOLE.w, h: WHOLE.h }
+        const c = whole ? { w: WHOLE.w, h: wholeH(p) }
             : { w: cellW(p, sizeOf(ctx), pt), h: (CELL[sizeOf(ctx)] || CELL.L).h };
         const blanks = (p.blanks || []).map(Number);
         const shown = shownParts(ctx, blanks);
+        // A model STATE (chart_120 critic r2 N1, PT-MOD-1): the squares steps 1..k wrote, the newest grey and the earlier ones
+        // black - `traceSlots` / `traceNew`, as a count row's (the Scripted Model's states, the lesson anchor's panels). A
+        // one-gap step writes the slot 'answer', which is the first square.
+        const ts = ctx.state === 'blank' && p.traceSlots && typeof p.traceSlots === 'object' ? p.traceSlots : null;
+        const tsNew = ts && Array.isArray(p.traceNew) ? new Set(p.traceNew.map(String)) : null;
+        const markOf = (k) => {
+            if (ts) {
+                const id = ts[`b${k}`] !== undefined ? `b${k}` : k === 0 && ts.answer !== undefined ? 'answer' : null;
+                const v = id ? String(ts[id] ?? '') : '';
+                return v ? { v, ink: tsNew && !tsNew.has(id) ? 'solid' : 'trace' } : { v: '', ink: null };
+            }
+            return null;
+        };
         // A row of ten stays one row of ten in the screen twin (SP-10: 34.5 x 44 px cells on a phone).
         const ten = isTwin(ctx) && (p.cols || []).length === 10;
         const halves = [p.cols || []];
@@ -94,8 +114,9 @@ register('chartwindow', {
                         // baselines jumped about 1 mm beside a heavy-bordered empty cell).
                         tds += `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};"><span style="${FILL}">${fmt(n)}</span></td>`;
                     } else {
-                        const v = shown[k];
-                        const ink = v !== '' ? inkOf(ctx) : null;
+                        const mk = markOf(k);
+                        const v = mk ? mk.v : shown[k];
+                        const ink = mk ? mk.ink : v !== '' ? inkOf(ctx) : null;
                         const hook = isTwin(ctx) ? ' data-mq-cell="1"' : '';
                         // The writing place is the square's own heavier border (no overlay layer to spill
                         // into a neighbour); its text is filled like every number, so rows keep one baseline.
@@ -112,7 +133,9 @@ register('chartwindow', {
             // two rows, four- and five-digit cells) states its width, so a narrow cell overflows (and
             // the page measures it into fewer columns) instead of the table squeezing its boxes below
             // the size a pupil writes in. The 3 x 5 keeps its markup (old pages are unchanged).
-            const wide = !((p.rows || []).length === 3 && (p.cols || []).length === 5 && c.w === (CELL[sizeOf(ctx)] || CELL.L).w);
+            // (a window of three-digit numbers - the chart to 120 - states its width too: squeezed beside a lesson's Steps its
+            // 101 102 103 ran together and the key's 101 left its square; lf-builds chart_120 fix, ws-cell-checks KEYFIT)
+            const wide = !((p.rows || []).length === 3 && (p.cols || []).length === 5 && c.w === (CELL[sizeOf(ctx)] || CELL.L).w && topOf(p) <= 100);
             const width = ten ? `width:min(100%,${L(ctx, part.length * c.w)});` : wide ? `width:${L(ctx, part.length * c.w)};` : '';
             // a ten-column twin names its widest number's digits: a phone sizes its squares from it (css/screen-cell.css)
             const tenCls = ten ? ' k2-chart-ten' : '';
@@ -133,12 +156,19 @@ register('chartwindow', {
     footprint(p) {
         // The window's width at L: a 1-100 window (85 mm) shares a row; a row of ten or a window
         // of four- and five-digit numbers takes the whole row (the host's measurement decides at S).
-        if (p && isWhole(p)) return { wMm: 10 * WHOLE.w + 4, hMm: null, measure: true, factLike: false, maxCols: 1 };
+        // `points` (SCORE-SLOTS, lf-roles critic r8b n5): the page's Score counts every empty square the pupil writes, not
+        // one a window (Score /3 over three windows holding 5 squares); paginate.js scorePoints reads it
+        const points = Math.max(1, (p && p.blanks ? p.blanks.length : 1));
+        if (p && isWhole(p)) return { wMm: 10 * WHOLE.w + 4, hMm: null, measure: true, factLike: false, maxCols: 1, points, slotPoints: true };
+        // (`inkWMm`: a window past 100 never squeezes - its true width, so a host laying cells beside other work knows it)
         const w = (p && p.cols ? p.cols.length : 5) * cellW(p || {}, 'L', 28 * 0.8);
         // `hardCap`: the chart's tracks have a 12 mm floor its measurement cannot see (the table
         // squeezes rather than overflowing), so its 2 columns hold at every size (critic guided-r1).
-        return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true }
-            : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1 };
+        if (w <= 90 && topOf(p || {}) > 100) return { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true };
+        // (a 1-100 window states its true width too - chart_120 critic r1 F10: Reason It at L laid band 100's A | B windows in
+        // half the room beside the response and squeezed the squares to 10.4 mm; with its width known it takes the wide form)
+        return w <= 90 ? { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true }
+            : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1, points, slotPoints: true };
     },
     inputs(p) {
         return (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, scopes: ['full', 'answer-only'] }));

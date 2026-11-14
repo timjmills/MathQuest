@@ -42,6 +42,7 @@ import { interleave, dealCounts } from '../interleave.js';
 import { groupByHeight, measuredH, NO_STRETCH_ROOM } from '../layout.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
+import { slotScore } from '../paginate.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -544,6 +545,7 @@ function planMixed(input, pools) {
         shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
     }
     const n = queue.length;
+    const nScore = slotScore(queue);   // (answer slots: critic r1 F6)
     // CL-13: quiet letters never double (aa.). An I Can mixed page of more than 26 problems numbers
     // every problem with the standard black tab instead (CL-21 "every fact numbered"; critic M1 r2).
     const labels = labels0 === 'letter' && n > 26 ? 'tab' : labels0;
@@ -552,7 +554,7 @@ function planMixed(input, pools) {
     const pick = cls.pick || null;
     const tabStep = pick ? factTab(FACT_LADDER[k]) : 0;
     const tabCls = tabStep && tabStep !== factTab(SIZES[ctx.size].digitPt) ? `ws-tab${tabStep}` : '';
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: n });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: nScore });
     const instr = instructionText('default-solve');
     const pages = [];
     let cur = null;
@@ -590,7 +592,7 @@ function planMixed(input, pools) {
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
         meta: {
-            items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'mixed', notes,
+            items: n, scoreOutOf: nScore, units: p.N, achieved, arrangement: 'mixed', notes,
             // (the across pick of an all-fact page: digits, fill, tracks - the mixed-page check reads it)
             factPick: pick ? { k, digitPt: FACT_LADDER[k], fill: Math.round(pick.fill * 1000) / 1000, tracks: pick.tracks, tabStep, ladder: pick.ladder } : null,
             interleave: { keys: mix.order.map((e) => e.key), counts: mix.counts, cap: mix.cap, maxRun: mix.maxRun, longest: mix.longest, firstThird: mix.firstThird, relaxed: mix.relaxed, notes: mix.notes, deal: p.deal.counts },
@@ -644,7 +646,8 @@ export function plan(input = {}) {
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: n });
+    const nScore = shelves.reduce((a, s) => a + slotScore(s.items), 0);   // (answer slots: critic r1 F6)
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: nScore });
     const pages = [];
     let cur = null;
     let start = 1;
@@ -750,7 +753,7 @@ export function plan(input = {}) {
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
-        meta: { items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'sections',
+        meta: { items: n, scoreOutOf: nScore, units: p.N, achieved, arrangement: 'sections',
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }

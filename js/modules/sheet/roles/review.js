@@ -19,6 +19,7 @@ import {
 } from './compose.js';
 import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, cellWidthMm, LIVE_W_MM, capRowsToInk, isStoryWork } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
+import { slotScore } from '../paginate.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
 const rowLimit = (m) => fillLimit(m);
@@ -332,8 +333,10 @@ export function plan(input = {}) {
         useE = eRowsN ? groupByHeight(earlier.slice(0, eRowsN * eCols), eCols) : [];
     }
     const n = useM.length + useE.length + useEW.length;
+    // (the Score counts answer slots: a chart window scores its empty squares - critic r1 F6, paginate.js slotScore)
+    const nScore = slotScore(useM) + slotScore(useE) + slotScore(useEW);
     const n0 = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: reviewTitle(input, topic), score: n });
+    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: reviewTitle(input, topic), score: nScore });
     const rowsOf = groups.map((gr) => Math.ceil(gr.length / g.cols));
     const rowsM = rowsOf.reduce((a, b) => a + b, 0);
     const rowsE = Math.ceil(useE.length / eCols);
@@ -411,7 +414,7 @@ export function plan(input = {}) {
             ...(parts.length === 1 ? { content: parts[0] } : { contents: parts }) });
     }
     return assemble(ROLE_ID, input, frame, [{ sections }], {
-        meta: { items: n, scoreOutOf: n, earlierShare: n ? (useE.length + useEW.length) / n : 0,
+        meta: { items: n, scoreOutOf: nScore, earlierShare: n ? (useE.length + useEW.length) / n : 0,
             fits: [{ cols: g.cols, rows: rowsM + rowsE + useEW.length, cellH: cellM, line: `Fits: ${g.cols} columns x ${rowsM} rows${rowsE ? ` + ${eCols} x ${rowsE} mixed` : ''}${useEW.length ? ` + 1 x ${useEW.length} mixed (full width)` : ''}, ${n} per page.` }] },
     });
 }

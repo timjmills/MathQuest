@@ -24,11 +24,12 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
+import { chartOfQ, cwKey, chartGivesAway } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -281,6 +282,15 @@ function normaliseRequest(req = {}) {
             ...(s && Number(s.blockShare) > 0 ? { blockShare: Number(s.blockShare) } : {}),
         }))
         .filter((s) => s.skills.length);
+    // Lead ruling 2026-11-13 (chartwindow card §7a, role-scoped hidden): an option value the ROLE hides (`hiddenOnRoles`,
+    // grid whole / rows on Lesson, Guided, Test) falls back to the option's default, so the role never deals or draws it.
+    for (const sec of sections) {
+        sec.skills = sec.skills.map((k) => {
+            let o;
+            try { o = optsForRole(k.categoryId, k.skillId, k.opts || {}, role); } catch (e) { o = k.opts; }
+            return o === k.opts || (o && k.opts === undefined && !Object.keys(o).length) ? k : { ...k, opts: o };
+        });
+    }
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
     // problems' size: its rows share the whole grid instead of leaving a strip under capped rows.
     // The ceiling is the section's own dense ceiling too, so the grid is laid for that count.
@@ -959,6 +969,10 @@ const POOL_LEGACY_TRIES = 16;
 /** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
 const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
 
+/* CROSS-GIVEAWAY (chart_120 critic r1 F4 / F9; r2 N2): the window rule lives in chart-giveaway.js, shared with the screen deal
+ * (the online worksheet and the quiz), so paper and screen never repeat a window's squares. */
+export { chartGivesAway };
+
 /**
  * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
  * column work, to fill that group's last row (buildSheetOnce, whole rows). A draw of another kind
@@ -1022,7 +1036,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // deals as before); absent on every other ref: skH is sk)
         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
         const pass = (rotate, relaxLast, soft, words = true) => {
-            let got = null;
+            let got = null, altCw = null;
             for (let k = 0; k <= tries; k++) {
                 const seed = (runSeed + i + 7919 * k) >>> 0;
                 let cand = null;
@@ -1068,9 +1082,17 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (want && k < tries && !want(cand, sk)) { if (!got) got = cand; continue; }
                 // (a case the last row WANTS is kept for it: no other place of the page deals it)
                 if (strict && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
+                // (CROSS-GIVEAWAY: a window that would print another window's answer is passed over while tries remain)
+                if (k < tries && chartGivesAway(cand, seen)) {
+                    // (a NEW window that only overlaps a kept one is the fallback: never a repeat of a kept window)
+                    if (!altCw && !seen.has(signature(cand)) && !chartGivesAway(cand, seen, { same: true })) altCw = cand;
+                    if (!got) got = cand;
+                    continue;
+                }
                 got = cand;
                 if (!seen.has(signature(cand))) break;
             }
+            if (altCw && got && got !== altCw && (seen.has(signature(got)) || chartGivesAway(got, seen))) got = altCw;
             return got;
         };
         // (a detailed lesson's ref - `avoidKeys` - rotates the generator's case before it relaxes: a
@@ -1082,6 +1104,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
+        // (CROSS-GIVEAWAY: every try drew a window of squares already on the sheet - a one-window chart, or more items than the
+        // chart has windows - so this item is not dealt)
+        if (chartGivesAway(q, seen, { same: true })) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
@@ -1100,6 +1125,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
+        { const cw = chartOfQ(q); if (cw) seen.add(cwKey(cw)); }
         // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
         if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
@@ -2868,6 +2894,8 @@ function skillMeta(sk, q) {
             titleOpts = { opts: no };
         } catch (e) { titleOpts = {}; }
     }
+    // chart_120 (card chartwindow §3, L28): the chart's I Can follows its band (band 120: "a chart to 120"), read from the options
+    if (sk.skillId === 'hundreds_chart_fill' && sk.opts && Number(sk.opts.band) === 120) titleOpts = { opts: { band: 120 } };
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;

@@ -9126,26 +9126,26 @@
     "pass": "OK"
    }
   },
-{
- "id": "cbt-r2-e9-fullrow",
- "check": "critic cbt r2 E9 (lead ruling 2026-11-14): the template-wide WS-REFLOW count-row exemption let number_patterns_rule's worksheet at 1024 / 1280 span every card, its 4 + 4 train in the middle third (~40 %) of a 1130 px card; the span is per card - only a train wider than a 2-column column spans (FULLROW-SPAN) - and a full-row card's content uses >= 50 % of its width (FULLROW-USE)",
- "kind": "fixture",
- "rule": "ws-worksheet-reflow FULLROW-SPAN / FULLROW-USE (precritic worksheet-reflow)",
- "browser": false,
- "fail": {
-  "fixture": "tests/fixtures/precritic/worksheet-reflow/npr-fullrow-1280.fail.json",
-  "state": "number_patterns_rule@1280 measured on 8f76b6401 (critic cbt r2 frozen tree) with the new measure: six spanning cards, trains 304-384 px in 910 px"
- },
- "pass": {
-  "fixture": "tests/fixtures/precritic/worksheet-reflow/npr-fullrow-1280.pass.json",
-  "state": "the same sheet with the per-card span: two columns, holding the re-pinned baseline"
- },
- "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
+  {
+   "id": "cbt-r2-e9-fullrow",
+   "check": "critic cbt r2 E9 (lead ruling 2026-11-14): the template-wide WS-REFLOW count-row exemption let number_patterns_rule's worksheet at 1024 / 1280 span every card, its 4 + 4 train in the middle third (~40 %) of a 1130 px card; the span is per card - only a train wider than a 2-column column spans (FULLROW-SPAN) - and a full-row card's content uses >= 50 % of its width (FULLROW-USE)",
+   "kind": "fixture",
+   "rule": "ws-worksheet-reflow FULLROW-SPAN / FULLROW-USE (precritic worksheet-reflow)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/npr-fullrow-1280.fail.json",
+    "state": "number_patterns_rule@1280 measured on 8f76b6401 (critic cbt r2 frozen tree) with the new measure: six spanning cards, trains 304-384 px in 910 px"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/npr-fullrow-1280.pass.json",
+    "state": "the same sheet with the per-card span: two columns, holding the re-pinned baseline"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
   {
    "id": "precritic-mode-verdict",
    "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
@@ -10969,225 +10969,1001 @@
     "pass": "OK"
    }
   },
-{
- "id": "cbt-r2-e7-chart-panels",
- "check": "critic cbt r2 E7 (P-1): times each / given and 15 jumps merged chart steps 1 and 2 (Read the jump, Add the jump) into one panel; lead ruling 2026-11-14: the look step is a numbered HEAD line above the two panels (headFirst), so head line + panels + tail line number every worked step",
- "kind": "commit-pair",
- "rule": "ws-node-lint CHART-PANELS (opt-in; precritic node-lint-s1)",
- "browser": false,
- "fail": {
-  "commit": "8f76b6401",
-  "state": "critic cbt r2 frozen tree: chartMaxStates 2, the look step merged into panel 1"
- },
- "pass": {
-  "commit": "0479ee673",
-  "state": "lf-ops cbt r3: headFirst - step 1 a head line, steps 2 and 3 a panel each, step 4 the tail line"
- },
- "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill multiplication:count_by_tables --rules CHART-PANELS --no-baseline",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r3-ak2-smstate",
- "check": "critic cbt r2 N4 / lead ruling 2026-11-14: L-KEY AK-2 on the count_by_tables Scripted Model key was a reasoned false positive (its state cells are blank by design); the exemption is the state cell's mq-smstate mark only, so a key slot in any other cell left blank still FAILs",
- "kind": "fixture",
- "rule": "ws-print-lint L-KEY AK-2 (smState: cells marked mq-smstate by scripted-model.js stateItem are not counted)",
- "browser": true,
- "fail": {
-  "fixture": "tests/fixtures/precritic/ak2-smstate/fail.html",
-  "state": "the count_by_tables Scripted Model L document with the mq-smstate mark stripped: its 8 blank slots are ordinary key slots - AK-2 critical"
- },
- "pass": {
-  "fixture": "tests/fixtures/precritic/ak2-smstate/pass.html",
-  "state": "the same document as built (state cells marked): AK-2 not fired"
- },
- "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-KEY",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r2-e3-scripted-say",
- "check": "critic cbt r2 E3 (H2): Scripted Model L - the fourth count-row state covered the Say band (L-OVERLAP SECTION); the role cover lints scripted-model at M and L",
- "kind": "commit-pair",
- "rule": "ws-role-cover lint (print-lint L-OVERLAP SECTION; precritic role-cover)",
- "browser": true,
- "fail": {
-  "commit": "8f76b6401",
-  "state": "critic cbt r2 frozen tree"
- },
- "pass": {
-  "commit": "59f9eaf2e",
-  "state": "lf-ops cbt r3: count-row states planned with 2.5 mm slack"
- },
- "command": "bash -c 'node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles scripted-model 2>&1 | grep -q \"L-OVERLAP SECTION\" && echo \"ws-role-cover: FAIL (L-OVERLAP SECTION)\" || echo \"ws-role-cover: OK\"'",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r2-e5-opener-cl40",
- "check": "critic cbt r2 E5: the Opener's step tab painted in the label keep-out (CL40-INK x4 M, x2 L); the role cover lints the opener at M and L",
- "kind": "commit-pair",
- "rule": "ws-role-cover lint (print-lint L-OVERLAP CL40-INK; precritic role-cover)",
- "browser": true,
- "fail": {
-  "commit": "8f76b6401",
-  "state": "critic cbt r2 frozen tree"
- },
- "pass": {
-  "commit": "422d0a75a",
-  "state": "lf-ops cbt r3: the Opener row starts past the keep-out (4.5 / 5.5 mm)"
- },
- "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles opener",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r3-opener-lines-sl1",
- "check": "lf-ops cbt r3: the Opener at M with Answer spaces: Lines drew 9.4 mm write-on lines (SL-1 x40); the role cover lints the opener under spaces=line",
- "kind": "commit-pair",
- "rule": "ws-role-cover lint (print-lint L-ANSAREA SL-1; precritic role-cover)",
- "browser": true,
- "fail": {
-  "commit": "9cf4d4a54",
-  "state": "lf-ops cbt r3 head before the fix"
- },
- "pass": {
-  "commit": "1112b857f",
-  "state": "count-row tightGeom: a Lines slot >= LINE_ROOMY_MM (14 mm) at M / L"
- },
- "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --variants spaces=line --sizes M,L --roles opener",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r3-ea-lines-cl40",
- "check": "lf-ops cbt r3: error analysis L with Answer spaces: Lines - 'Sam wrote:' at 6.5 mm across, 2.3 mm down in the label keep-out (CL40-INK x4); the role cover lints error-analysis under spaces=line",
- "kind": "commit-pair",
- "rule": "ws-role-cover lint (print-lint L-OVERLAP CL40-INK; precritic role-cover)",
- "browser": true,
- "fail": {
-  "commit": "9cf4d4a54",
-  "state": "lf-ops cbt r3 head before the fix"
- },
- "pass": {
-  "commit": "b8da2b407",
-  "state": "error-analysis.js: a REDO count row's pupil tag starts past --ws-koin + 0.5 mm"
- },
- "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --variants spaces=line --sizes M,L --roles error-analysis",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r3-ak2-tofblank",
- "check": "lead ruling 2026-11-14 (cbt r3): L-KEY AK-2 on the count_by_tables True or False? key - a TRUE frame is blank by design (PT-TOF-2); the exemption is the frame's mq-tofblank mark inside .mq-tf only (self-tests: a False frame or any other blank key slot still fires)",
- "kind": "commit-pair",
- "rule": "ws-print-lint L-KEY AK-2 (tofBlank: TRUE-frame slots marked by true-false.js)",
- "browser": true,
- "fail": {
-  "commit": "9cf4d4a54",
-  "state": "lf-ops cbt r3 head: True frames unmarked, AK-2 critical"
- },
- "pass": {
-  "commit": "39bd019f6",
-  "state": "true-false.js marks a TRUE frame mq-tofblank; AK-2 leaves only those blank slots out"
- },
- "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --with-covered --sizes M,L --roles true-false",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r2-e6-ea-topstart",
- "check": "critic cbt r2 E6: error analysis ~16 mm (M) / 9.5 mm (L) empty above 'Sam wrote:' (L-TOPSTART CL-4b x4); the role cover lints error-analysis at M and L",
- "kind": "commit-pair",
- "rule": "ws-role-cover lint (print-lint L-TOPSTART CL-4b; precritic role-cover)",
- "browser": true,
- "fail": {
-  "commit": "8f76b6401",
-  "state": "critic cbt r2 frozen tree"
- },
- "pass": {
-  "commit": "8277ea52a",
-  "state": "lf-ops cbt r3: a REDO item starts at the top of its box"
- },
- "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles error-analysis",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r3-ea-band",
- "check": "cbt r3 (E6 side effect): with a REDO item top-started (CL-4b), the count_by_tables error-analysis M cells (114.8 mm, two to a page) left a 34 mm band UNDER the row (EB-BAND 29.6 %, limit 28 % with margin 2); a page of REDO items holds each row to its ink (layout capRowsToInk), the spare to the page foot",
- "kind": "commit-pair",
- "rule": "ws-empty-band EB-BAND (precritic empty-band, role-cover band)",
- "browser": true,
- "fail": {
-  "commit": "e6d1b2c19",
-  "state": "lf-ops cbt r3 E6 head: rows stretched to the page's grid, the work at the top"
- },
- "pass": {
-  "commit": "e464b4906",
-  "state": "lf-ops cbt r3: error-analysis REDO rows held to their ink / 0.72"
- },
- "command": "node tests/scripts/ws-empty-band.cjs --root {root} --skill multiplication:count_by_tables --roles error-analysis --sizes M,L --hosts none --margin 2",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r2-e4-chart-lines",
- "check": "critic cbt r2 E4 (TY-10a): the jumps=15 lesson chart drew the row 9 + 6 (boxes 9-11 mm, arrows touching); a count row prints at most 6 numbers a line (15 = 5 + 5 + 5) and spans >= 80 % of its panel",
- "kind": "commit-pair",
- "rule": "ws-print-lint CHART-WIDTH (opt-in; lines a row)",
- "browser": true,
- "fail": {
-  "commit": "8f76b6401",
-  "state": "critic cbt r2 frozen tree"
- },
- "pass": {
-  "commit": "422d0a75a",
-  "state": "lf-ops cbt r3: twoLines no longer splits a 15-jump row; 5 + 5 + 5 in two panels"
- },
- "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --opts '{\"jumps\":15}' --rules CHART-WIDTH --lints CHART-WIDTH --skills multiplication:count_by_tables",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-},
-{
- "id": "cbt-r2-m2-shape-page",
- "check": "critic cbt r2 m2: circles and hexagons mixed as writing places on the Review and the Pre-skill check (number_seq_fill default) beside the count rows' boxes; a page writes in one outline shape",
- "kind": "commit-pair",
- "rule": "ws-print-lint SHAPE-ONE (opt-in; page-wide since r3)",
- "browser": true,
- "fail": {
-  "commit": "8f76b6401",
-  "state": "critic cbt r2 frozen tree"
- },
- "pass": {
-  "commit": "f1d360bd6",
-  "state": "lf-ops cbt r3: Review earlier step and Pre-skill check skills draw boxes"
- },
- "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles review,pre-skill-check --size M --rules SHAPE-ONE --lints SHAPE-ONE --skills multiplication:count_by_tables",
- "expect": {
-  "fail": "FAIL",
-  "pass": "OK"
- }
-}
-]
+  {
+   "id": "cbt-r2-e7-chart-panels",
+   "check": "critic cbt r2 E7 (P-1): times each / given and 15 jumps merged chart steps 1 and 2 (Read the jump, Add the jump) into one panel; lead ruling 2026-11-14: the look step is a numbered HEAD line above the two panels (headFirst), so head line + panels + tail line number every worked step",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint CHART-PANELS (opt-in; precritic node-lint-s1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree: chartMaxStates 2, the look step merged into panel 1"
+   },
+   "pass": {
+    "commit": "0479ee673",
+    "state": "lf-ops cbt r3: headFirst - step 1 a head line, steps 2 and 3 a panel each, step 4 the tail line"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill multiplication:count_by_tables --rules CHART-PANELS --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-ak2-smstate",
+   "check": "critic cbt r2 N4 / lead ruling 2026-11-14: L-KEY AK-2 on the count_by_tables Scripted Model key was a reasoned false positive (its state cells are blank by design); the exemption is the state cell's mq-smstate mark only, so a key slot in any other cell left blank still FAILs",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-KEY AK-2 (smState: cells marked mq-smstate by scripted-model.js stateItem are not counted)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ak2-smstate/fail.html",
+    "state": "the count_by_tables Scripted Model L document with the mq-smstate mark stripped: its 8 blank slots are ordinary key slots - AK-2 critical"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ak2-smstate/pass.html",
+    "state": "the same document as built (state cells marked): AK-2 not fired"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-KEY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r2-e3-scripted-say",
+   "check": "critic cbt r2 E3 (H2): Scripted Model L - the fourth count-row state covered the Say band (L-OVERLAP SECTION); the role cover lints scripted-model at M and L",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint (print-lint L-OVERLAP SECTION; precritic role-cover)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree"
+   },
+   "pass": {
+    "commit": "59f9eaf2e",
+    "state": "lf-ops cbt r3: count-row states planned with 2.5 mm slack"
+   },
+   "command": "bash -c 'node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles scripted-model 2>&1 | grep -q \"L-OVERLAP SECTION\" && echo \"ws-role-cover: FAIL (L-OVERLAP SECTION)\" || echo \"ws-role-cover: OK\"'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r2-e5-opener-cl40",
+   "check": "critic cbt r2 E5: the Opener's step tab painted in the label keep-out (CL40-INK x4 M, x2 L); the role cover lints the opener at M and L",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint (print-lint L-OVERLAP CL40-INK; precritic role-cover)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree"
+   },
+   "pass": {
+    "commit": "422d0a75a",
+    "state": "lf-ops cbt r3: the Opener row starts past the keep-out (4.5 / 5.5 mm)"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles opener",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-opener-lines-sl1",
+   "check": "lf-ops cbt r3: the Opener at M with Answer spaces: Lines drew 9.4 mm write-on lines (SL-1 x40); the role cover lints the opener under spaces=line",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint (print-lint L-ANSAREA SL-1; precritic role-cover)",
+   "browser": true,
+   "fail": {
+    "commit": "9cf4d4a54",
+    "state": "lf-ops cbt r3 head before the fix"
+   },
+   "pass": {
+    "commit": "1112b857f",
+    "state": "count-row tightGeom: a Lines slot >= LINE_ROOMY_MM (14 mm) at M / L"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --variants spaces=line --sizes M,L --roles opener",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-ea-lines-cl40",
+   "check": "lf-ops cbt r3: error analysis L with Answer spaces: Lines - 'Sam wrote:' at 6.5 mm across, 2.3 mm down in the label keep-out (CL40-INK x4); the role cover lints error-analysis under spaces=line",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint (print-lint L-OVERLAP CL40-INK; precritic role-cover)",
+   "browser": true,
+   "fail": {
+    "commit": "9cf4d4a54",
+    "state": "lf-ops cbt r3 head before the fix"
+   },
+   "pass": {
+    "commit": "b8da2b407",
+    "state": "error-analysis.js: a REDO count row's pupil tag starts past --ws-koin + 0.5 mm"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --variants spaces=line --sizes M,L --roles error-analysis",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-ak2-tofblank",
+   "check": "lead ruling 2026-11-14 (cbt r3): L-KEY AK-2 on the count_by_tables True or False? key - a TRUE frame is blank by design (PT-TOF-2); the exemption is the frame's mq-tofblank mark inside .mq-tf only (self-tests: a False frame or any other blank key slot still fires)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-KEY AK-2 (tofBlank: TRUE-frame slots marked by true-false.js)",
+   "browser": true,
+   "fail": {
+    "commit": "9cf4d4a54",
+    "state": "lf-ops cbt r3 head: True frames unmarked, AK-2 critical"
+   },
+   "pass": {
+    "commit": "39bd019f6",
+    "state": "true-false.js marks a TRUE frame mq-tofblank; AK-2 leaves only those blank slots out"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --with-covered --sizes M,L --roles true-false",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r2-e6-ea-topstart",
+   "check": "critic cbt r2 E6: error analysis ~16 mm (M) / 9.5 mm (L) empty above 'Sam wrote:' (L-TOPSTART CL-4b x4); the role cover lints error-analysis at M and L",
+   "kind": "commit-pair",
+   "rule": "ws-role-cover lint (print-lint L-TOPSTART CL-4b; precritic role-cover)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree"
+   },
+   "pass": {
+    "commit": "8277ea52a",
+    "state": "lf-ops cbt r3: a REDO item starts at the top of its box"
+   },
+   "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles error-analysis",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r3-ea-band",
+   "check": "cbt r3 (E6 side effect): with a REDO item top-started (CL-4b), the count_by_tables error-analysis M cells (114.8 mm, two to a page) left a 34 mm band UNDER the row (EB-BAND 29.6 %, limit 28 % with margin 2); a page of REDO items holds each row to its ink (layout capRowsToInk), the spare to the page foot",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (precritic empty-band, role-cover band)",
+   "browser": true,
+   "fail": {
+    "commit": "e6d1b2c19",
+    "state": "lf-ops cbt r3 E6 head: rows stretched to the page's grid, the work at the top"
+   },
+   "pass": {
+    "commit": "e464b4906",
+    "state": "lf-ops cbt r3: error-analysis REDO rows held to their ink / 0.72"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --root {root} --skill multiplication:count_by_tables --roles error-analysis --sizes M,L --hosts none --margin 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r2-e4-chart-lines",
+   "check": "critic cbt r2 E4 (TY-10a): the jumps=15 lesson chart drew the row 9 + 6 (boxes 9-11 mm, arrows touching); a count row prints at most 6 numbers a line (15 = 5 + 5 + 5) and spans >= 80 % of its panel",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint CHART-WIDTH (opt-in; lines a row)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree"
+   },
+   "pass": {
+    "commit": "422d0a75a",
+    "state": "lf-ops cbt r3: twoLines no longer splits a 15-jump row; 5 + 5 + 5 in two panels"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --opts '{\"jumps\":15}' --rules CHART-WIDTH --lints CHART-WIDTH --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r2-m2-shape-page",
+   "check": "critic cbt r2 m2: circles and hexagons mixed as writing places on the Review and the Pre-skill check (number_seq_fill default) beside the count rows' boxes; a page writes in one outline shape",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint SHAPE-ONE (opt-in; page-wide since r3)",
+   "browser": true,
+   "fail": {
+    "commit": "8f76b6401",
+    "state": "critic cbt r2 frozen tree"
+   },
+   "pass": {
+    "commit": "f1d360bd6",
+    "state": "lf-ops cbt r3: Review earlier step and Pre-skill check skills draw boxes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles review,pre-skill-check --size M --rules SHAPE-ONE --lints SHAPE-ONE --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-wrong-fits",
+   "check": "a chart window's wrong answer fits its square: one value per square, no more digits than the window's widest number (chart_120 'writes-ten-ten' 1011 printed '1,011' over the next square, True or False? L)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint WRONG-FITS (chartwindow payload)",
+   "fail": {
+    "commit": "e3733905c",
+    "state": "WRONG-FITS too-long #12, #20 (4>3) on composing:chart_to_120"
+   },
+   "pass": {
+    "commit": "ac88be08e",
+    "state": "the chart square no longer deals writes-ten-ten"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules WRONG-FITS --no-baseline --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-tagink",
+   "check": "a lettered chart square on Error analysis keeps its written number clear of the A / B tag (gate seed, L)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TAGINK",
+   "browser": true,
+   "fail": {
+    "commit": "e3733905c",
+    "state": "TAGINK 8 on chart_to_120 error-analysis L"
+   },
+   "pass": {
+    "commit": "ac88be08e",
+    "state": "k2-chartwindow [data-ws-tagged] padding under the tag"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --rules TAGINK --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-lesson-wide",
+   "check": "the fallback lesson draws a row of ten (hundreds_chart_fill band 10) in full-width chart rows, never a 92 mm anchor-chart panel or beside the Steps (OVERFLOW 54, lesson S/M/L)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (card option value on the lesson role)",
+   "browser": true,
+   "fail": {
+    "commit": "e3733905c",
+    "state": "OVERFLOW 18 on hundreds_chart_fill lesson M {band: 10}"
+   },
+   "pass": {
+    "commit": "032e07ec6",
+    "state": "lesson.js chartDataOf: a fallback lesson takes chartWide for an example wider than half the page"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=10 --opt-roles lesson --size M --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-centred-band",
+   "check": "a CENTRED cell (chartwindow) is judged by its white above + under as one band, and its centring is not drawn height (EB-FOOT read a 59 mm window in a 76.5 mm row as 'drawn 67.5 mm', 60 false reds; EB-BAND passed a 42 % band around a window beside the Guided Model)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (centred) / EB-FOOT (centred cells)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/eb-centred/fail.json",
+    "state": "guided M p1 cell 2: 24.5 + 23.9 mm of 115.1 (42 %), passed by the under-only measure"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/eb-centred/pass.json",
+    "state": "independent M p1 cell 1: 8.7 + 8.8 mm of 76.5 (23 %), the row stretch EB-FOOT failed"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-title-band",
+   "check": "a band-120 chart names 'a chart to 120' on every role, not 'a hundreds chart' (L6 / L28; print-sheet reads the band for the I Can)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE (the lesson title follows the option)",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "lesson {band:120} key printed 'on a hundreds chart' and the key 101 left its square (KEYFIT)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "'a chart to 120'; the window states its width so it never squeezes"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=120 --opt-roles lesson --size L --rules KEYFIT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-ri-under",
+   "check": "Reason It holds more than one chart-window item a page: a window past 100 states its true width (inkWMm) and takes the A|B-under layout, not the stacked one-a-page form (H5)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks LONE-PAGE",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "reason-it L one item a page where the role holds 2 (LONE-PAGE)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "chartwindow footprint inkWMm -> reason-it UNDER layout, 2 a page"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles reason-it --size L --rules LONE-PAGE --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-pupiltag",
+   "check": "the 'Sam wrote:' label sits 2 mm over a chart-window error-analysis item, not 6.5 mm (PT-ERR-4): the window drops its own letter keep-out inside the work block",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "e7d3e8d8c",
+    "state": "error-analysis M label 6.5 mm from its work (PUPILTAG 8)"
+   },
+   "pass": {
+    "commit": "72396d8a7",
+    "state": "css/sheet-kit.css .mq-judge-work .k2-chart margin-top 0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --card-opts --size M --rules PUPILTAG --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-role-hidden",
+   "check": "an option value a signed card hides on a role (chartwindow §7a: grid rows / whole on lesson, guided, test) is never dealt there: the role's page with the value is byte-identical to its page with the default (lead ruling 2026-11-13; the whole chart overflowed lesson 18/24, guided 8-12, and printed one a page on the test)",
+   "kind": "commit-pair",
+   "rule": "ws-role-hidden ROLE-HIDDEN (card role-scoped hidden decisions)",
+   "browser": true,
+   "fail": {
+    "commit": "e1389d1f3",
+    "state": "grid=rows / whole drawn on lesson, guided, test of hundreds_chart_fill and chart_to_120"
+   },
+   "pass": {
+    "commit": "25e62c6d6",
+    "state": "skill-options hiddenOnRoles + print-sheet optsForRole: the roles fall back to the window"
+   },
+   "command": "node tests/scripts/ws-role-hidden.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-text-misc",
+   "check": "a misconception a card re-scopes to TEXT (chartwindow M-C1 'writes-ten-ten', textOnly) reaches the screen practice card and Reason It's statements in words within 16 seeds, and no chart square ever holds more digits than its window's widest number (lead ruling 2026-11-13: re-scoped, not dropped)",
+   "kind": "commit-pair",
+   "rule": "ws-text-misconception REACH-SCREEN / REACH-TEXT / SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "e1389d1f3",
+    "state": "writes-ten-ten taught nowhere (dropped from the square with no text form)"
+   },
+   "pass": {
+    "commit": "25e62c6d6",
+    "state": "provider wrongText + Reason It text pairs + screen distractorTags; squares unchanged"
+   },
+   "command": "node tests/scripts/ws-text-misconception.cjs --skills composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-guided-echo",
+   "check": "no try on a Guided page shows the Model's own picture: the chart_to_120 Model's 96-120 window with 100 traced came back as a try with 100 blank (lf-roles critic r8b D5)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo GUIDED-MODEL-ECHO",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "guided L seeds 3 and 7: a try draws the Model's window (3x5@96, 3x5@91)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "the window is the generator's dupKey: no window twice on a page while another is left"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 8 --only GUIDED-MODEL-ECHO",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-score-slots",
+   "check": "a page's Score equals the answer places of its scored chart windows: Guided printed Score /3 over three windows holding 5 empty squares (lf-roles critic r8b n5); Error analysis stays one judgement a cell",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "every scored chart page counted one point a window (guided /3 vs 5-7 squares, independent /6 vs 11-13)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "chartwindow footprint points = its blanks (slotPoints); error-analysis.js keeps 1 a cell"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 4 --only SCORE-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-card-plan-preset",
+   "check": "a PRESET skill is planned from its host's signed card (every role it offers, the host's other option values): composing:chart_to_120 fell back to the 9 default roles and no option values, so opener / scripted-model / pre-skill-check / mixed-practice / stretch were never rendered before a critic (L25)",
+   "kind": "commit-pair",
+   "rule": "ws-card-plan preset plan",
+   "fail": {
+    "commit": "f80dfd9d6",
+    "state": "cardPlanFor(composing:chart_to_120): no card, 0 card roles (the 9 default roles)"
+   },
+   "pass": {
+    "commit": "a810a6cbc",
+    "state": "preset planned from the chartwindow card: 14 roles"
+   },
+   "command": "node -e \"const o=JSON.parse(require('child_process').execFileSync('node',['{root}/tests/lib/ws-card-plan.mjs','--skill','composing:chart_to_120','--root','{root}'],{stdio:['ignore','pipe','ignore']}).toString())[0];const ok=!!(o.preset&&o.roles.length>9);console.log('ws-card-plan --preset: '+(ok?'OK':'FAIL'));process.exit(ok?0:1)\"",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-screen-digit",
+   "check": "a chart window's screen numerals reach their host's floor: practice card and quiz 48 px at 820 / 1024, 56 px at 1280 / 1366; online worksheet 29 px (LEAD_DECISIONS 2026-11-13). They were 29-34 px on the card and quiz and 24.7 px on the worksheet at 1024",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "34419f4d1",
+    "state": "card@1280 34 px, quiz@820 28.9 px, worksheet@1024 24.7 px"
+   },
+   "pass": {
+    "commit": "4b464e322",
+    "state": "squares sized from the digits on the card / quiz (48 / 56 px) and the worksheet (30 px), scoped to the window"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-wrong-multi",
+   "check": "every chart window, every gap count the skill deals, has a wrong answer that is a number in every slot and differs from the key in exactly one slot (chart_120 critic r1 F1: num('91, 101') was NaN, no multi-gap window had a wrong answer, True or False? dealt all True; L27)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit WRONG-MULTI",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "wrongAnswer null on every 2- and 3-gap window"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartWrong: one gap written wrong per candidate, the others kept"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules WRONG-MULTI",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-steps-all-slots",
+   "check": "a chart window's worked steps name EVERY gap's value in grammatical sentences (critic r1 F3: steps ended 'Write <first gap>.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit STEPS-ALL-SLOTS",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the second and third gaps never named"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartSteps works every gap (relation + Write per gap; row runs for 4+ gaps)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules STEPS-ALL-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-say-agree",
+   "check": "the Say line names every gap and agrees in number ('The missing numbers are 101 and 104.'; critic r1 F3: 'The missing number is 101, 104.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "'The missing number is 101, 104.'"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayValues: chartSay (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-hint-all",
+   "check": "the Guided Model's grey work lines name every traced gap (critic r1 F3b: hints explained only 100 of 100, 107, 117)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit HINT-ALL",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "work lines name the first gap only"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "one relation line per gap"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules HINT-ALL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-tf-false",
+   "check": "True or False? deals True and False statements on every chart page (2+ statements) and 35-65 % False over the seeds (critic r1 F1, PT-TOF-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo TF-FALSE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "4 of 4 True on chart_to_120 pages"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "per-slot wrong answers deal False on multi-gap windows"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only TF-FALSE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-pattern",
+   "check": "Error analysis cannot be answered by counting gaps: windows of 2+ gaps are judged both Correct and Fix it over the seeds (critic r1 F2)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo EA-PATTERN",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "every multi-gap window Correct"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "per-slot wrong answers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only EA-PATTERN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-score-roles",
+   "check": "Score /N counts answer slots on opener, review, mixed-practice, pre-skill-check and lesson as on independent / test (critic r1 F6: opener /2 over 4 squares, mixed /6 over 13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS (every scored role)",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "opener / review / mixed / pre-skill-check / lesson count windows"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "paginate.js slotScore on those roles"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only SCORE-SLOTS --score-roles opener,review,mixed-practice,pre-skill-check,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-cross-giveaway",
+   "check": "no chart window prints, as a chart number, an empty square of another window of the same squares on the sheet - every band x grid value (critic r1 F4: band 120 grid=rows, one window, items copying each other's answers; F9: band 10)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY --variants",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "band 120 rows and band 10 pages give answers away item to item"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "the dealer never deals a window of squares already on the sheet (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-strip-numbers",
+   "check": "a lesson sheet's Steps zone and strip name no number (11+) that is not printed in, or a key of, a cell of its page (critic r1 F5: 'The number before is 109 ... Write 110.' beside windows with no 109 / 110)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo STRIP-NUMBERS",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the strip walks the example, not on the page"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "stripStepsFor: the skill's general steps when the example's steps name its own numbers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 2 --only STRIP-NUMBERS --score-roles lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-chart-square",
+   "check": "a chart window on Reason It / True or False? / Error analysis is never squeezed under the 14 mm writing floor (critic r1 F10: band 100 Reason It L at 10.4 mm squares)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CHART-SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "hundreds_chart_fill reason-it L 10.4 mm"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "chartwindow footprint states inkWMm for a 1-100 window, so Reason It takes its wide form"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes M,L --only CHART-SQUARE --score-roles reason-it,true-false,error-analysis",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-touch-hit",
+   "check": "a chart window's empty square takes a real tap 1 px inside every edge and corner on the practice card / quiz at 820-1366 (master's TOUCH-HIT on the lane's digit-sized chart window: a neighbour's number span lay 1 px over the input, and the card's .visual-aid scrolled the window 1 px)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-HIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "eb28a8960",
+    "state": "TOUCH-HIT 9 on hundreds_chart_fill (bottom edge 820-1366, top corners 1280)"
+   },
+   "pass": {
+    "commit": "00bafd629",
+    "state": "the empty square's slot z-index 1; .visual-aid overflow visible for a fitting window"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill --sizes 820x1180,1280x900",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-rowx",
+   "check": "Error analysis of chart windows with 1, 2 and 3 gaps on one page: the Correct / Fix it judgement starts at one x a column (the 3-box fix widened its centred cell: 100.7-113.2 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "00bafd629",
+    "state": "EA-ROWX 4 on chart_to_120 error-analysis M/L"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "error-analysis.js: one fix width a one-column page (fixWBy / o.fixW)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles error-analysis --rules EA-ROWX,EA-PAD --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-one-window-hidden",
+   "check": "lead ruling (a) 2026-11-14: a chart with ONE window (band 120 grid=rows, band 10) is not dealt on the multi-item practice pages - one item a sheet left the page 68 % empty (options-verify --render L-DENSITY PAGEFILL on grid=rows)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render PAGEFILL (+ ws-role-hidden on the card decision)",
+   "browser": true,
+   "fail": {
+    "commit": "427e28563",
+    "state": "chart_to_120 grid=rows @M/@L PAGEFILL (one window a sheet)"
+   },
+   "pass": {
+    "commit": "af76fc570",
+    "state": "grid=rows@band=120 and band 10 hidden on independent / more-practice / review / mixed-practice (+ test for band 10)"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill composing:chart_to_120",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-model-state-marks",
+   "check": "every Scripted Model state and lesson-anchor panel whose step says 'Write N' draws N in that state, the newest marks trace grey and the earlier ones solid; judged for the templates in scripted-model.js TRACE_TEMPLATES (chart_120 critic r2 N1: a two-gap window's 'Write 101.' state drew no 101; PT-MOD-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo MODEL-STATE-MARKS",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "chartwindow not in TRACE_TEMPLATES: states 2-3 blank, state 4 traces both gaps"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chartwindow draws traceSlots / traceNew on the Scripted Model and the lesson anchor"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only MODEL-STATE-MARKS --screen-seeds 0 --score-roles scripted-model,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-screen-giveaway",
+   "check": "the online worksheet's cards and the quiz builder's questions never repeat a chart window's squares, so no card prints another's answers (chart_120 critic r2 N2: the screen deal repeated band-120 windows; CROSS-GIVEAWAY on the screen hosts, L13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY (screen)",
+   "browser": true,
+   "fail": {
+    "commit": "03c811eed",
+    "state": "worksheet.js / quiz-builder deal without the window rule"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "chart-giveaway.js shared by print-sheet, the worksheet and the quiz builder"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 0 --only CROSS-GIVEAWAY --screen-seeds 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r3-say-frame",
+   "check": "the UNFILLED Say frame of a chart window agrees with its gaps: one blank a gap, plural for 2+ ('The missing numbers are __ and __.'; chart_120 critic r2 N3: the opener printed 'The missing number is __.' under a two-gap Model)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE (unfilled frame)",
+   "fail": {
+    "commit": "03c811eed",
+    "state": "fixed strings.say 'The missing number is __.' (k2.js:481)"
+   },
+   "pass": {
+    "commit": "de7225b14",
+    "state": "sayFrame(q): chartSayFrame"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join",
+   "check": "the long-division bracket is ONE connected stroke: the arc's top end runs into the vinculum with no white at the outer corner (<= 0.3 mm) and no step (<= 0.1 mm), paper M/L pupil + key and screen 1366 / 820 (owner request 2026-11-14: 'disconnected'; master paper gap 0.67 mm, fact rows 0.33 mm, screen step 0.25 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join LDIV-JOIN",
+   "browser": true,
+   "fail": {
+    "commit": "3623be10c",
+    "state": "butt-capped arc under a separate vinculum: white wedge at the corner on every bracket"
+   },
+   "pass": {
+    "commit": "bf0814473",
+    "state": "bracketSvg: arc and bar one path with a mitre join, on paper and screen"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --skills division:long_div_2digit,division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-join-raster",
+   "check": "the screen long-division bar has no anti-aliased seam: inside the bar's central 1 px, from the arc's corner to the vinculum's end, no pixel brighter than 80 at DSF 2 or 3, on card / worksheet / quiz at 1366, 1280, 1024 and 820 (ldiv critic r1 F1: div_remainders bracket card at 1366, brightest 103 at DSF 2 / 155 at DSF 3; LDIV-JOIN read gap 0.00)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --raster LDIV-JOIN-RASTER",
+   "browser": true,
+   "fail": {
+    "commit": "654606ae3",
+    "state": "svg bar butt end meets the dividend's border at a fractional x: div_remainders card + quiz 1366 brightest 103 (DSF 2) / 155 (DSF 3)"
+   },
+   "pass": {
+    "commit": "ba835be98",
+    "state": "overlapping bar pieces (rembrk rule span, .mq-ldiv path bar runs under the border): brightest 0"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --raster --skills division:div_remainders",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-shape",
+   "check": "the long-division bracket's side is near-straight: its greatest distance from the chord between its ends is <= 0.6 mm on paper (M/L, pupil + key) and on screen (card / worksheet / quiz 1366 / 820) (owner 2026-11-14: 'I don't like the big curve ... make it straight or almost straight'; 0176d774f bows 1.60-3.30 mm on paper, 5.04 mm on the screen worked bracket)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --shape LDIV-SHAPE",
+   "browser": true,
+   "fail": {
+    "commit": "0176d774f",
+    "state": "quadratic arc x 1.5 / q 9 of a 10-wide box: bow 2.64 mm at M, 3.30 mm at L"
+   },
+   "pass": {
+    "commit": "b7ee41f3a",
+    "state": "bracketLine: near-straight side, apex at the old apex, bow <= 0.34 mm"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --shape --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-room",
+   "check": "the long-division work grid uses the room a 4-a-page cell gives: grid >= 80 % of the cell's free height or rows at the 2x cap, block centred; 6 / 8 a page keep the floor row with no overflow (owner 2026-11-14: 'a lot of white area to work with'; d82acc06f grid 45 % M / 56 % L at 1x)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --room LDIV-ROOM",
+   "browser": true,
+   "fail": {
+    "commit": "d82acc06f",
+    "state": "work grid at its footprint size in a 106 mm cell: 45 % (M) / 56 % (L) of the free height, 25 mm white above and below"
+   },
+   "pass": {
+    "commit": "86950d488",
+    "state": "writing boxes grow to the cell (M rows 1.87x, 93 %; L 1.54x, 94 %), centred; 6 a page unchanged"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --room --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-stem",
+   "check": "an Error Analysis story sentence on an item the key judges correct is true of its numbers: the operands combined give the shown result (lead 2026-11-14, the class of TOF-STEM; no live skill prints a story sentence today, so this is a planted guard)",
+   "kind": "fixture",
+   "rule": "ws-ea-stem EA-STEM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ea-stem.fail.html",
+    "state": "a correct unknown-start item whose work reads '44 - 8 = 44'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ea-stem.pass.html",
+    "state": "'44 - 8 = 36' on the correct item; the Fix-it item keeps the pupil's wrong result"
+   },
+   "command": "node tests/scripts/ws-ea-stem.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-frame-fit",
+   "check": "a one-column Guided page of 31 mm count rows takes the rows the page DRAWS room for (Model + 6 tries at M and L), never past the drawn room or the L ceiling (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL: the frame reserve over-reserved instruction / Steps / body by 11 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-FRAME-FIT (browser twin: ws-empty-band EB-REFILL guided)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "M no drawnFrameMm; L 6 cells"
+   },
+   "pass": {
+    "commit": "a64d0e285",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-FRAME-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-lone-story",
+   "check": "a one-column Guided page holding ONE two-step story sizes the cell to the story it draws, never stretched to content / 0.7 (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: the lone story 25-31 % empty in its frame)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-LONE-STORY (browser twin: ws-empty-band EB-BAND guided, >= 30 % only)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "lone 135 mm story in a 186.1 mm cell at M and L"
+   },
+   "pass": {
+    "commit": "f8e338139",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-LONE-STORY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "gdpcap-answers",
+   "check": "a Guided page whose cells score 1 to 3 answers each keeps its scored answers within the §12.1 ceiling (lf-builds chart_120 Guided L: 7 answers > 6; ceilFor counted answers only when every cell scored > 1)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GDPCAP-ANSWERS (browser twin: ws-empty-band EB-GDPCAP)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "mixed L: 11 scored answers"
+   },
+   "pass": {
+    "commit": "72d4949bc",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GDPCAP-ANSWERS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-lastpage-cbt-pre-skill-check",
+   "check": "the last (or only) page of a fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test) is measured: FAIL at >= 30 % of its body empty when its next row fits (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check L, one page, 84 mm empty foot; EB-PAGE skipped a role's last page, so a one-page role was never measured)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check L p1 34 % empty (81.0 mm, its next 25.5 mm row fits)"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "the same commit, its other fixed-capacity roles: every last page full (no fix of F1 has landed: count_by_tables is parked; re-point the pass side to the fixing commit when cbt resumes)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only EB-LASTPAGE {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cap-parity-cbt-pre-skill-check",
+   "check": "for the same skill, role and seed, items a page at L >= ceil(0.7 x items a page at M) unless the L page is full (no room for another row) (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check 10 items at L against 16 at M, the L page not full)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band CAP-PARITY",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check M 16 / L 10 items a page (needs >= 12), L page not full"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "the same commit, its other fixed-capacity roles: L below 0.7 x M only where the L page is full (no fix of F1 has landed: re-point the pass side when cbt resumes)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only CAP-PARITY {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
+ ]
 }

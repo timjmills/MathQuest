@@ -46,7 +46,8 @@ function stepsFor(it) {
  * provider's mark `blankN` is the row's slot `bN`. null: the default (blank states, the last one answered).
  */
 // (the templates that draw a state's marks from `traceSlots`: a count row's blanks, a function table's cells - PT-MOD-1, lf-roles)
-const TRACE_TEMPLATES = new Set(['count-row', 'function-table']);
+// (a chart window's squares: chart_120 critic r2 N1 - a two-gap window's "Write 101." state drew no 101; MODEL-STATE-MARKS)
+export const TRACE_TEMPLATES = new Set(['count-row', 'function-table', 'chartwindow']);
 export function marksFor(it, steps) {
     const q = it.q || {};
     if (!q.cell || !TRACE_TEMPLATES.has(q.cell.template)) return null;

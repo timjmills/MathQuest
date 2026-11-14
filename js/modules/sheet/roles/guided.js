@@ -120,7 +120,21 @@ const mixRowAdd = (r, cols, nM, pEnd, extra, hint) => Math.max(r * cols < nM ? e
 // (a cell that scores several tries - Match 3, footprint `points` 3, owner ruling Q-C - counts them against the ceiling:
 // 10 / 8 / 6 scored tries hold 3 / 2 / 2 such cells plus the Model; lf-vocab r9, ws-empty-band EB-GDPCAP)
 const pointsOf = (items) => { const its = (items || []).filter(Boolean); const p = its.length && its.every((it) => it.footprint && Number(it.footprint.points) > 1) ? Math.max(...its.map((it) => Number(it.footprint.points))) : 1; return p; };
-const ceilFor = (ctx, items) => { const p = pointsOf(items); return (p > 1 ? Math.floor(CEILING[ctx.size] / p) + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1); };
+const ceilFor = (ctx, items) => {
+    const p = pointsOf(items);
+    const its = (items || []).filter(Boolean);
+    const ptsOf = (it) => (it.anchor ? 0 : Number(it.footprint && it.footprint.points) || 1);
+    // GDPCAP-ANSWERS (lf-roles r10 item 3a; lf-builds chart_120 Guided L: 7 answers > 6): a page whose cells score 1 to 3 answers
+    // each (a chart's squares) counts its ceiling in ANSWERS too - the tries after the Model(s) are dealt while their answers stay
+    // within it (paginate.scorePoints, the page's Score). Pages of 1-point cells, or of cells all scoring the same, are unchanged.
+    if (p === 1 && its.some((it) => ptsOf(it) > 1)) {
+        const nM = Math.max(1, mixModels(its));
+        let sum = 0, k = nM;
+        for (; k < its.length; k++) { const q = ptsOf(its[k]); if (sum + q > CEILING[ctx.size]) break; sum += q; }
+        return k < its.length ? k : k + (CEILING[ctx.size] - sum);
+    }
+    return (p > 1 ? Math.floor(CEILING[ctx.size] / p) + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1);
+};
 /**
  * The fact pages (lf-ops facts-roles task, RUBRIC H13): add / sub / mult facts, div_facts_long and div_facts. Their cells are
  * short, so the shared ceiling (10 / 8 / 6 tries) and the row stretch (up to FILL_CAP) left 31-58 % empty bands under every
@@ -440,6 +454,26 @@ function stepsBodyMm(steps, m) {
     return h;
 }
 
+/**
+ * GUIDED-FRAME-FIT (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL): the frame over a Guided grid as it is DRAWN,
+ * in mm. The fit's own reserve (bandMetrics + stepsBodyMm + stripExtraMm) over-reserves it: on count_by_tables Guided M the
+ * instruction "Count by the number in the arrow. Write the missing numbers." was held to two lines (5.7 mm) where it prints on
+ * one, the Steps band was estimated 39.7 mm where it prints 37.3, the strip 7.5 where it prints 6.8, and the body 236 where it
+ * prints 239: 179 mm left for rows where 196 are drawn, so the fifth try row (192.7 mm) never came. Calibrated on the printed
+ * page (Andika at 13 / 15 pt, M / L): a strip is stripMm + 0.8 and 1.1 em a further line, a character 0.45 em, the Steps band
+ * stripMm + 1.3 + 1.07 x its estimated body, the body 3 mm taller than bodyHeightMm on page 1 (a continuation page as estimated), a 1 mm keep (each row is counted 1 mm over its cell already, hMinAt). `room` is what a page holds.
+ */
+export function drawnFrameMm(ctx, m, steps, instr, { cont = false } = {}) {
+    const em = m.textPt * (25.4 / 72);
+    const stripMm = m.strip - 1.5;
+    const label = 'Guided Practice:';
+    const room = Math.max(40, 186 - 10 - (label.length * 0.55 * em + 4));
+    const lines = Math.max(1, Math.ceil((String(instr || '').length * 0.45 * em) / room));
+    const strip = stripMm + 0.8 + (lines - 1) * em * 1.1;
+    const stepsMm = steps.length ? stripMm + 1.3 + 1.07 * stepsBodyMm(steps, m) : 0;
+    return { strip, steps: stepsMm, lines, room: m.body + (cont ? 0 : 3) - 1 - stepsMm - strip, cont };
+}
+
 /** Rows that fit under the Steps band (PT-GDP-3 teacher strip off). */
 function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLines = false, span2 = 0 } = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Lesson 1' });
@@ -449,6 +483,9 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // A "Guided Practice:" strip whose instruction wraps takes its second line off the page.
     const wrap = stripExtraMm(ctx, 'Guided Practice:', instructionText(instructionKeyOf(items, input.skills), items));
     const avail = m.budget - stepsH - m.strip - wrap;
+    // (GUIDED-FRAME-FIT: the room the page draws, never less than the reserve's; a row past `avail` is taken only within it)
+    const instrT = instructionText(instructionKeyOf(items, input.skills), items);
+    const availD = Math.max(avail, drawnFrameMm(ctx, m, steps, instrT).room);
     // The think line under a division fact (row 1), the Model tab clearance and the model's work
     // lines are drawn by the role, so their height is added here (the rows share one height).
     const model = items[0];
@@ -480,7 +517,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     if (nM > 1 && !noHint && partial.some((x) => thinkCueOf(x))) hint = Math.max(hint, 17);
     const h = h0 + extra;
     const rows = Math.max(1, Math.min(Math.floor(ceilFor(ctx, items) / cols), Math.floor(avail / Math.max(1, h))));
-    return { rows, h, h0, avail, stepsH, steps, frame, m, span, span2: span2 || 0, hint, wrap, noLines: !!noLines };
+    return { rows, h, h0, avail, availD, instrT, stepsH, steps, frame, m, span, span2: span2 || 0, hint, wrap, noLines: !!noLines };
 }
 
 /**
@@ -557,6 +594,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const extra = first.h - first.h0;
     const mc = bandMetrics(ctx, layoutHeader(first.frame.contHeader), { cont: true });
     const availC = mc.budget - first.stepsH - mc.strip - first.wrap;
+    const availCD = Math.max(availC, drawnFrameMm(ctx, mc, first.steps, first.instrT, { cont: true }).room);
     const all = hMinAt(items, cols, ctx);
     // A page's rows are sized by the items that page holds (a tall coin set on page 2 does not
     // cost page 1 a row). Past the end of the probe the tallest probe item stands in.
@@ -603,8 +641,15 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
         for (let k = maxR; k >= 1; k--) {
             if (rowsH(k) + (isFirst ? extra : 0) <= avail) { r = k; break; }
         }
+        // GUIDED-FRAME-FIT: one more row when the page as DRAWN holds it (the reserve over-reserves the frame); the page's rows then
+        // share the drawn room. A page whose row count the reserve already gives is unchanged. One-column pages only (a count row,
+        // a story): on a grid the extra room changed pageSet's column choice - two-step stories went from 1 x 6 tries on two pages
+        // to 2 x 2 on one, fewer tries (r10 hash diff).
+        let availP = avail;
+        const availPD = isFirst ? first.availD : availCD;
+        if (cols === 1 && r < maxR && availPD > avail && rowsH(r + 1) + (isFirst ? extra : 0) <= availPD) { r += 1; availP = availPD; }
         const cap = r * cols - (isFirst ? lead : 0);
-        pages.push({ rows: r, avail, h: hOf(total, r * cols), extra: isFirst ? extra : 0, cap });
+        pages.push({ rows: r, avail: availP, h: hOf(total, r * cols), extra: isFirst ? extra : 0, cap, rowsR: availP === avail ? r : r - 1, availR: avail });
         total += cap;
     }
     // The ceiling trims the LAST page to whole rows (round-4: a 2 x 2 continuation page with its
@@ -638,6 +683,8 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     // (a cell scoring several tries - Match 3 - in one column: a continuation page holding ONE cell alone gives it up, as the
     // ceiling counted in tries leaves it nothing to share its page with; lf-vocab r9, L-LONE / PG-23)
     if (pointsOf(items) > 1 && cols === 1 && pages.length > 1 && pages[pages.length - 1].cap === 1) { total -= 1; pages.pop(); }
+    // (GUIDED-FRAME-FIT: a page the ceiling trimmed back to the rows the reserve gave keeps the reserve's room - unchanged)
+    for (const pg of pages) { if (pg.rows <= pg.rowsR) pg.avail = pg.availR; delete pg.rowsR; delete pg.availR; }
     return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total), drawn: !!drawn });
 }
 
@@ -1326,7 +1373,15 @@ export function plan(input = {}) {
         // the grid is the Guided page's accepted white (PT-GDP / PAGE_TYPES 12.1). Only a one-column page of word-work stories
         // measured at their drawn levels (MEASURE_LO), whose row heights are what they draw.
         // (and every row of such a page: a row of plain tries drawn at level 1 - 52 mm letter stories in 105 mm rows - is held the same way)
+        // GUIDED-LONE-STORY (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: a lone story cell ~25-31 %
+        // empty inside its frame): a one-column page holding ONE word-work story is held the same way, whatever its measure - the
+        // cell is its drawn content plus its writing room, the spare under the grid.
         if (cols === 1 && host.length && host.every((it) => it.template === 'word-work' && it.measured && it.measured[1] && it.measured[1].atLevel)) Hr = Hr.map((x, r) => Math.min(x, oneRowCapOf(w[r])));
+        // GUIDED-LONE-STORY (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: a lone story cell ~25-31 %
+        // empty inside its frame, the page ~30 % white under it): ONE-ROW's cap still lets a lone row stretch to its content / 0.7.
+        // A one-column page holding ONE word-work story takes the row the story draws - its measured work and writing room, the
+        // Model's tab clearance and worked lines, the hint line (w) - and the spare height stays under the grid (PAGE_TYPES 12.1).
+        if (cols === 1 && rows === 1 && host.length === 1 && host[0].template === 'word-work') Hr = [Math.min(Hr[0], w[0])];
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

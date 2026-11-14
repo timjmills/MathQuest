@@ -1,0 +1,204 @@
+#0 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[92, 111] wrong="29, 111"(reversed-digits)
+   steps: One more than 91 is 92. | Write 92. | Ten more than 101 is 111. | Write 111.
+   say: The missing numbers are 92 and 111.
+   lines: One more than 91 is 92. / Ten more than 101 is 111.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#1 skill=hundreds_chart_fill win={r:[9,10,11],c:[2,3,4,5,6]} ans=[104, 107] wrong="104, 117"(wrong-row)
+   steps: One more than 103 is 104. | Write 104. | One more than 106 is 107. | Write 107.
+   say: The missing numbers are 104 and 107.
+   lines: One more than 103 is 104. / One more than 106 is 107.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#2 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[96, 104, 116] wrong="96, 104, 115"(one-less)
+   steps: One more than 95 is 96. | Ten more than 94 is 104. | One more than 115 is 116. | Write 96, 104 and 116.
+   say: The missing numbers are 96, 104 and 116.
+   lines: One more than 95 is 96. / Ten more than 94 is 104. / One more than 115 is 116.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#3 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[100] wrong=99(one-less)
+   steps: The number before is 99. | One more is 100. | The number below is 110. Ten less is 100. | Write 100.
+   say: The missing number is 100.
+   lines: The number before is 99. / One more is 100. / The number below is 110. Ten less is 100.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#4 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[108, 117] wrong="107, 117"(one-less)
+   steps: One more than 107 is 108. | Write 108. | One more than 116 is 117. | Write 117.
+   say: The missing numbers are 108 and 117.
+   lines: One more than 107 is 108. / One more than 116 is 117.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#5 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[105, 116] wrong="104, 116"(one-less)
+   steps: One more than 104 is 105. | Write 105. | One more than 115 is 116. | Write 116.
+   say: The missing numbers are 105 and 116.
+   lines: One more than 104 is 105. / One more than 115 is 116.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#6 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[95, 101, 115] wrong="59, 101, 115"(reversed-digits)
+   steps: One more than 94 is 95. | Ten more than 91 is 101. | One more than 114 is 115. | Write 95, 101 and 115.
+   say: The missing numbers are 95, 101 and 115.
+   lines: One more than 94 is 95. / Ten more than 91 is 101. / One more than 114 is 115.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#7 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[92] wrong=29(reversed-digits)
+   steps: The number before is 91. | One more is 92. | The number below is 102. Ten less is 92. | Write 92.
+   say: The missing number is 92.
+   lines: The number before is 91. / One more is 92. / The number below is 102. Ten less is 92.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#8 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[104, 118] wrong="114, 118"(wrong-row)
+   steps: Ten more than 94 is 104. | Write 104. | One more than 117 is 118. | Write 118.
+   say: The missing numbers are 104 and 118.
+   lines: Ten more than 94 is 104. / One more than 117 is 118.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#9 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[106, 110] wrong="106, 109"(one-less)
+   steps: Ten more than 96 is 106. | Write 106. | One more than 109 is 110. | Write 110.
+   say: The missing numbers are 106 and 110.
+   lines: Ten more than 96 is 106. / One more than 109 is 110.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#10 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[96, 99, 109] wrong="106, 99, 109"(wrong-row)
+   steps: Ten less than 106 is 96. | One more than 98 is 99. | One more than 108 is 109. | Write 96, 99 and 109.
+   say: The missing numbers are 96, 99 and 109.
+   lines: Ten less than 106 is 96. / One more than 98 is 99. / One more than 108 is 109.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#11 skill=hundreds_chart_fill win={r:[9,10,11],c:[1,2,3,4,5]} ans=[114] wrong=104(wrong-row)
+   steps: The number before is 113. | One more is 114. | The number above is 104. Ten more is 114. | Write 114.
+   say: The missing number is 114.
+   lines: The number before is 113. / One more is 114. / The number above is 104. Ten more is 114.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#12 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[101, 114] wrong="101, 113"(one-less)
+   steps: Ten more than 91 is 101. | Write 101. | One more than 113 is 114. | Write 114.
+   say: The missing numbers are 101 and 114.
+   lines: Ten more than 91 is 101. / One more than 113 is 114.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#13 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[98, 105] wrong="89, 105"(reversed-digits)
+   steps: One more than 97 is 98. | Write 98. | One more than 104 is 105. | Write 105.
+   say: The missing numbers are 98 and 105.
+   lines: One more than 97 is 98. / One more than 104 is 105.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#14 skill=hundreds_chart_fill win={r:[9,10,11],c:[1,2,3,4,5]} ans=[94, 104, 115] wrong="94, 103, 115"(one-less)
+   steps: One more than 93 is 94. | One more than 103 is 104. | One more than 114 is 115. | Write 94, 104 and 115.
+   say: The missing numbers are 94, 104 and 115.
+   lines: One more than 93 is 94. / One more than 103 is 104. / One more than 114 is 115.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#15 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[111] wrong=101(wrong-row)
+   steps: The number above is 101. | Ten more is 111. | The number after is 112. One less is 111. | Write 111.
+   say: The missing number is 111.
+   lines: The number above is 101. / Ten more is 111. / The number after is 112. One less is 111.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#16 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[106, 119] wrong="105, 119"(one-less)
+   steps: Ten more than 96 is 106. | Write 106. | One more than 118 is 119. | Write 119.
+   say: The missing numbers are 106 and 119.
+   lines: Ten more than 96 is 106. / One more than 118 is 119.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#17 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[104, 106] wrong="114, 106"(wrong-row)
+   steps: Ten more than 94 is 104. | Write 104. | One more than 105 is 106. | Write 106.
+   say: The missing numbers are 104 and 106.
+   lines: Ten more than 94 is 104. / One more than 105 is 106.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#18 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[100, 107, 119] wrong="100, 107, 118"(one-less)
+   steps: One more than 99 is 100. | One more than 106 is 107. | One more than 118 is 119. | Write 100, 107 and 119.
+   say: The missing numbers are 100, 107 and 119.
+   lines: One more than 99 is 100. / One more than 106 is 107. / One more than 118 is 119.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#19 skill=hundreds_chart_fill win={r:[9,10,11],c:[2,3,4,5,6]} ans=[106] wrong=105(one-less)
+   steps: The number before is 105. | One more is 106. | The number above is 96. Ten more is 106. | Write 106.
+   say: The missing number is 106.
+   lines: The number before is 105. / One more is 106. / The number above is 96. Ten more is 106.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#20 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[105, 115] wrong="105, 105"(wrong-row)
+   steps: One more than 104 is 105. | Write 105. | One more than 114 is 115. | Write 115.
+   say: The missing numbers are 105 and 115.
+   lines: One more than 104 is 105. / One more than 114 is 115.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#21 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[98, 110] wrong="97, 110"(one-less)
+   steps: One more than 97 is 98. | Write 98. | One more than 109 is 110. | Write 110.
+   say: The missing numbers are 98 and 110.
+   lines: One more than 97 is 98. / One more than 109 is 110.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#22 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[96, 118, 120] wrong="106, 118, 120"(wrong-row)
+   steps: Ten less than 106 is 96. | One more than 117 is 118. | One more than 119 is 120. | Write 96, 118 and 120.
+   say: The missing numbers are 96, 118 and 120.
+   lines: Ten less than 106 is 96. / One more than 117 is 118. / One more than 119 is 120.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#23 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[118] wrong=117(one-less)
+   steps: The number before is 117. | One more is 118. | The number above is 108. Ten more is 118. | Write 118.
+   say: The missing number is 118.
+   lines: The number before is 117. / One more is 118. / The number above is 108. Ten more is 118.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#24 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[110, 116] wrong="110, 115"(one-less)
+   steps: One more than 109 is 110. | Write 110. | Ten more than 106 is 116. | Write 116.
+   say: The missing numbers are 110 and 116.
+   lines: One more than 109 is 110. / Ten more than 106 is 116.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#25 skill=hundreds_chart_fill win={r:[9,10,11],c:[2,3,4,5,6]} ans=[107, 117] wrong="107, 116"(one-less)
+   steps: One more than 106 is 107. | Write 107. | One more than 116 is 117. | Write 117.
+   say: The missing numbers are 107 and 117.
+   lines: One more than 106 is 107. / One more than 116 is 117.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#26 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[93, 95, 112] wrong="39, 95, 112"(reversed-digits)
+   steps: One more than 92 is 93. | One more than 94 is 95. | One more than 111 is 112. | Write 93, 95 and 112.
+   say: The missing numbers are 93, 95 and 112.
+   lines: One more than 92 is 93. / One more than 94 is 95. / One more than 111 is 112.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#27 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[100] wrong=110(wrong-row)
+   steps: The number before is 99. | One more is 100. | The number below is 110. Ten less is 100. | Write 100.
+   say: The missing number is 100.
+   lines: The number before is 99. / One more is 100. / The number below is 110. Ten less is 100.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#28 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[97, 117] wrong="97, 107"(wrong-row)
+   steps: One more than 96 is 97. | Write 97. | One more than 116 is 117. | Write 117.
+   say: The missing numbers are 97 and 117.
+   lines: One more than 96 is 97. / One more than 116 is 117.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#29 skill=hundreds_chart_fill win={r:[9,10,11],c:[2,3,4,5,6]} ans=[105, 114] wrong="115, 114"(wrong-row)
+   steps: One more than 104 is 105. | Write 105. | One more than 113 is 114. | Write 114.
+   say: The missing numbers are 105 and 114.
+   lines: One more than 104 is 105. / One more than 113 is 114.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#30 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[92, 94, 101] wrong="92, 93, 101"(one-less)
+   steps: One more than 91 is 92. | One more than 93 is 94. | Ten more than 91 is 101. | Write 92, 94 and 101.
+   say: The missing numbers are 92, 94 and 101.
+   lines: One more than 91 is 92. / One more than 93 is 94. / Ten more than 91 is 101.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#31 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[108] wrong=107(one-less)
+   steps: The number before is 107. | One more is 108. | The number above is 98. Ten more is 108. | Write 108.
+   say: The missing number is 108.
+   lines: The number before is 107. / One more is 108. / The number above is 98. Ten more is 108.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#32 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[102, 104] wrong="102, 114"(wrong-row)
+   steps: One more than 101 is 102. | Write 102. | One more than 103 is 104. | Write 104.
+   say: The missing numbers are 102 and 104.
+   lines: One more than 101 is 102. / One more than 103 is 104.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#33 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[110, 116] wrong="109, 116"(one-less)
+   steps: One more than 109 is 110. | Write 110. | Ten more than 106 is 116. | Write 116.
+   say: The missing numbers are 110 and 116.
+   lines: One more than 109 is 110. / Ten more than 106 is 116.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#34 skill=hundreds_chart_fill win={r:[9,10,11],c:[1,2,3,4,5]} ans=[94, 96, 102] wrong="94, 96, 101"(one-less)
+   steps: One more than 93 is 94. | One more than 95 is 96. | Ten more than 92 is 102. | Write 94, 96 and 102.
+   say: The missing numbers are 94, 96 and 102.
+   lines: One more than 93 is 94. / One more than 95 is 96. / Ten more than 92 is 102.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#35 skill=hundreds_chart_fill win={r:[9,10,11],c:[3,4,5,6,7]} ans=[95] wrong=94(one-less)
+   steps: The number before is 94. | One more is 95. | The number below is 105. Ten less is 95. | Write 95.
+   say: The missing number is 95.
+   lines: The number before is 94. / One more is 95. / The number below is 105. Ten less is 95.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#36 skill=hundreds_chart_fill win={r:[9,10,11],c:[5,6,7,8,9]} ans=[106, 110] wrong="106, 120"(wrong-row)
+   steps: Ten more than 96 is 106. | Write 106. | One more than 109 is 110. | Write 110.
+   say: The missing numbers are 106 and 110.
+   lines: Ten more than 96 is 106. / One more than 109 is 110.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#37 skill=hundreds_chart_fill win={r:[9,10,11],c:[2,3,4,5,6]} ans=[96, 105] wrong="95, 105"(one-less)
+   steps: One more than 95 is 96. | Write 96. | One more than 104 is 105. | Write 105.
+   say: The missing numbers are 96 and 105.
+   lines: One more than 95 is 96. / One more than 104 is 105.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#38 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[102, 105, 115] wrong="112, 105, 115"(wrong-row)
+   steps: One more than 101 is 102. | One more than 104 is 105. | One more than 114 is 115. | Write 102, 105 and 115.
+   say: The missing numbers are 102, 105 and 115.
+   lines: One more than 101 is 102. / One more than 104 is 105. / One more than 114 is 115.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+#39 skill=hundreds_chart_fill win={r:[9,10,11],c:[0,1,2,3,4]} ans=[101] wrong=111(wrong-row)
+   steps: The number above is 91. | Ten more is 101. | The number below is 111. Ten less is 101. | Write 101.
+   say: The missing number is 101.
+   lines: The number above is 91. / Ten more is 101. / The number below is 111. Ten less is 101.
+   hint: Across a row the number goes up by 1. Down a column it goes up by 10.
+(node:24478) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/js/modules/generate-question.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

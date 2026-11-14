@@ -1,0 +1,26 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill composing:chart_to_120
+
+mq-browser-run: slot 1 after 474s
+note: composing:chart_to_120: card design/cards/chartwindow/chartwindow.md; 14 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: composing:chart_to_120 stretch S: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:chart_to_120 stretch M: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:chart_to_120 stretch L: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:chart_to_120 card 390: no kit cell on the host (legacy screen item?)
+note: composing:chart_to_120 card 820: no kit cell on the host (legacy screen item?)
+note: composing:chart_to_120 card 1280: no kit cell on the host (legacy screen item?)
+EB-BAND  FAIL 2
+   composing:chart_to_120 guided M p1 cell 2: empty band 48.2 mm around (24.4 mm above, 23.8 mm under) the ink of a 115 mm cell (41.9 %; limit 30 % = 34.5 mm) [chartwindow]
+   composing:chart_to_120 guided L p1 cell 2: empty band 40.2 mm around (20.5 mm above, 19.7 mm under) the ink of a 111 mm cell (36.2 %; limit 30 % = 33.3 mm) [chartwindow]
+EB-SIDE  PASS
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(1 skill(s), 50 renders, 265 cells, 115 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (2)

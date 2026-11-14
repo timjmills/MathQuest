@@ -1,0 +1,745 @@
+{
+  "id": "word-stories",
+  "kind": "template",
+  "title": "Word-work story cells on add_word_problems / sub_word_problems: change unknown and compare with the smaller unknown (build-list `map_change_unknown_story`, `map_compare_smaller_unknown`)",
+  "template": {
+    "id": "word-work",
+    "source": "js/modules/sheet/cells/word-work.js",
+    "also": "Wiring `js/modules/word-work.js` (applyWordWork, sentenceBand), generator `js/modules/gen-operations.js` (add_word_problems Types 1-5, sub_word_problems Types 1-5), options `js/modules/skill-options.js` (`_wpAdd` / `_wpSub` forms over pickVariant), graphics `js/modules/sheet/graphics/part-whole-bar.js` and `sentence-frame.js`. `screen-cell.js` draws the same cell on the practice card, online worksheet and quiz. The ranged story skills (add_wp_* / sub_wp_*) and the sentence layout's signed rules stay on design/cards/family-check"
+  },
+  "families": [
+    "addition",
+    "subtraction"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "word-work"
+    ]
+  },
+  "skills": {
+    "include": [
+      "addition:add_word_problems",
+      "addition:add_word_problems_plain",
+      "subtraction:sub_word_problems",
+      "subtraction:sub_word_problems_plain"
+    ]
+  },
+  "excerptChars": 140,
+  "sourceChars": 90,
+  "summary": "One-step + / − stories on the general word-problem skills, answered in the word-work cell (story, optional bar, the solving number sentence, the answer with its unit). This card signs the hosts as they stand plus two build-list entries: `map_change_unknown_story` (a selectable 'change' value: past-tense join 'had 8, got some, now 13' and separate 'had 15, some went, 9 left') and `map_compare_smaller_unknown` (compare with the smaller amount unknown: 'fewer than', then 'more than' about the bigger, known amount, the language trap). The bar is the part-whole bar for change and two bars for compare, schematic, the unknown marked ?. Paper, key and the three screen hosts are one drawing.",
+  "teaches": "1.OA.A.1 / 2.OA.A.1 (M.EE.1.OA.1): add and subtract to solve one-step stories of adding to, taking from and comparing with the unknown in every position, within 20 (G1) and within 100 (G2), using drawings and equations with a symbol for the unknown. Lessons G1-Y2.B2 and G2-Y3.B2 'Solve one-step word problems ... using bar models' (design/lessons-first/BUILD_QUEUE.md rows 2 and 16). What is NEW: the change-unknown story as a value a teacher can choose (today it is dealt only under the value labelled 'A part', and the retell turns it into 'wants / needs'); separate change-unknown and compare-fewer, whose generator branches exist but are never reached; and the compare story 'Maya has 6 more than Tom' with Tom unknown, which no generator, retell or drawing has.",
+  "research": "No premium logins this round. From knowledge of MathWorksheets4Kids 'change unknown' and 'compare' word-problem pages (one story a box, a number sentence with a box for the unknown), K5 Learning grade 1-2 'missing addend / compare word problems' worksheets, IXL grade 1 'Addition and subtraction word problems: change unknown' and grade 2 'Comparison word problems' (type the number; some items ask for the equation), and the CGI problem types (Carpenter et al.: join and separate result / change / start unknown; compare difference / bigger / smaller unknown, consistent and inconsistent language). Repo sources: PEDAGOGY_STANDARD P-21 and P-WP-1..4 (one schema a set; unknown positions one per step; consistent language first, inconsistent flagged), design/PROBLEM_TYPES.md WP-02 / WP-04, WORKSHEET_DESIGN_STANDARD RP-70..72, design/audit/runs/wrm-tagging/MAP-report.md. The sites deal 10-20 stories a page with keyword hints; we keep one story a boxed cell, no keyword cues (P-21), the bar as the structure.",
+  "problemTypes": [
+    "change / join (forms 'change' on add_word_problems): 'Leo had 8 cars. Leo got some more. Now Leo has 13 cars. How many cars did Leo get?' -> 13 − 8 = 5, answer 5 cars. Told in the past tense, kept as told (never retold as 'wants / needs').",
+    "change / separate (forms 'change' on sub_word_problems): 'Ana had 15 shells. Ana gave some away. Now Ana has 9 shells. How many shells did Ana give away?' -> 15 − 9 = 6.",
+    "compare, fewer (forms 'fewer'): 'Maya has 14 shells. Tom has 6 fewer shells than Maya. How many shells does Tom have?' -> 14 − 6 = 8 (consistent language).",
+    "compare, more than, bigger known (forms 'more-bigger-known', the trap): 'Maya has 14 shells. Maya has 6 more shells than Tom. How many shells does Tom have?' -> 14 − 6 = 8 (inconsistent language, P-WP-3).",
+    "Each with the bar on (teaching pages always; practice by option) and off; _plain twins the same stories with no picture row."
+  ],
+  "progression": [
+    "P-WP-2: one new unknown position a step: join result (exists) -> join change (new) -> separate change (new) -> compare fewer (new) -> compare more-than with the bigger known (new, the trap, P-WP-3 Level 2 up).",
+    "O2 number size: band 10 -> 20 (G1 lesson) -> 100 (G2 lesson); the band bounds the ANSWER and every number in the story (the start / the bigger amount).",
+    "O3 support: bar with the known numbers traced (guided) -> bar with blank boxes (independent, option on) -> no bar (option off). The bar frame and its printed labels are structural (RP-71); the traced numbers are the hint that fades.",
+    "One change a step (P-1): a new value changes the unknown position only; the cell, the sentence and the answer place stay."
+  ],
+  "drawing": {
+    "sizes": "Story at cell text + 2 pt, one sentence a line (P-WP-17), at most 4 lines. Bars from the library: segment height 11 / 12.5 / 14 mm (S / M / L, BAR_SEG_H; RP-70 10 / 12 / 14 within 1 mm), outline 1 pt bars, 1.5 pt the unknown box; writing boxes B(2) at band 20, B(3) at band 100, digits at the working size 16 / 22 / 28 pt (TY-10). Change bar: whole 64 mm (52 mm in a two-across column), parts drawn EQUAL 32 / 32 mm (26 / 26) whatever the numbers (RP-72; a part is the unknown). Compare: the longer bar 64 mm (52), the shorter 38.4 mm (31.2, 60 %) plus a solid difference box 25.6 mm (20.8, 40 %) beside it, the two bars 1.5 mm apart, left edges aligned; same lengths on every item. Zone labels (First / Then / Now; the two names; ?) at zone-label size in each box's top-left corner, keep-out CL-40. Sentence frame as the signed sentence layout (answer-area boxes, sign circle 9 / 11 / 13 mm).",
+    "notes": [
+      "Generator: add_word_problems gains `change` (forms value 3): the existing Type 5 numbers (a known start, total <= band) told in the past tense; sub_word_problems gains `change` (value 3, the existing Type 3 branch made reachable), `fewer` (value 4, the existing Type 4 branch made reachable) and `more-bigger-known` (value 5, new: 'X has d more than Y', X known, Y asked). Values are positions (pickVariant): appended, never renumbered, never in the default set, so old pages and share codes deal what they dealt.",
+      "Word-work retell (schemaOf / tellStory): a new schema `add-some` (had a, got some more, now has b, how many did … get?) that wins over `change` (wants / needs) when the generator told a past-tense join; `take-some` already tells separate change-unknown; `compare-fewer` exists; a new schema `compare-more-smaller` (X has d more than Y, X known) - today schemaOf reads it as 'compare' and would retell it as 'how many more', a different story. The generator tags `q.schema` so the retell never guesses.",
+      "Answer: ONE answer place (VQ-2): the solving sentence's result box with the unit (13 − 8 = [5] cars, 14 − 6 = [8] shells). The bar boxes are working space (data-ws-graded=0 on paper, typed but never graded on screen); the bar's ? is a printed zone label, never a box to fill. Key: the sentence filled, the bar's numbers written in.",
+      "Within 20 the cell uses the signed sentence layout (`[ ] ◯ [ ] = [ ] unit`); within 100 the column work. The general hosts have no band today (sentenceBand reads only the ranged ids), so the build adds an answer-bounded `band` 10 / 20 / 100 on the four hosts and sentenceBand reads it (open question 2).",
+      "Change bar labels: join - whole 'Now', parts 'First' and 'Then ?'; separate - whole 'First', parts 'Then ?' (went) and 'Now' (left). Compare bars: each bar labelled with its person's name on the left (printed, RP-71); the unknown bar carries ?; the difference box carries its number box. Nothing dashed (RP-70); the current compare bar (dashed, proportional) is replaced on these values.",
+      "One schema a page (P-WP-1): a page that ticks several forms deals one form a page section, mixed only on Review / Mixed Practice. The trap value is never mixed into a first page of compare (P-WP-3) and carries `language: 'inconsistent'`.",
+      "Screen: the cell is the twin (SP-1): the sentence boxes and the answer box are the inputs (data-mq-cell), the bar boxes typed scratch; the two bars and the sentence wrap under the story on a phone (390), beside it at 820 / 1280; nothing below 44 px.",
+      "Title and instruction follow the value (L6, L28): 'I Can find how many were added or taken away' (change), 'I Can find the smaller amount in a compare story' (compare); chosen from the options when the page asks with no item."
+    ]
+  },
+  "ruleGroups": [
+    {
+      "title": "Story schemas and unknown positions (quoted)",
+      "core": true,
+      "chars": 360,
+      "rules": [
+        "P-21",
+        "P-WP-1",
+        "P-WP-2",
+        "P-WP-3",
+        "WP-02",
+        "WP-04"
+      ]
+    },
+    {
+      "title": "The bar diagram, one answer place, key (quoted)",
+      "core": true,
+      "chars": 300,
+      "rules": [
+        "RP-70",
+        "RP-71",
+        "RP-72",
+        "VQ-2",
+        "VQ-3",
+        "AK-1"
+      ]
+    },
+    {
+      "title": "Story text",
+      "chars": 120,
+      "rules": [
+        "P-WP-4",
+        "P-WP-17",
+        "P-WP-18",
+        "P-WP-19",
+        "P-WP-20",
+        "P-WP-21",
+        "P-WP-22",
+        "P-WP-23",
+        "P-WP-24",
+        "PT-WPR-1",
+        "PT-WPR-3"
+      ]
+    },
+    {
+      "title": "Cell, slots, density and screen",
+      "chars": 120,
+      "rules": [
+        "VQ-1",
+        "AK-2",
+        "H9",
+        "H13",
+        "TY-10",
+        "CL-40",
+        "SL-11",
+        "SP-1",
+        "SCC-01",
+        "P-1",
+        "P-10"
+      ]
+    },
+    {
+      "title": "Lessons learned",
+      "chars": 100,
+      "rules": [
+        "L1",
+        "L3",
+        "L4",
+        "L6",
+        "L10",
+        "L13",
+        "L14",
+        "L25",
+        "L26",
+        "L28",
+        "L29"
+      ]
+    },
+    {
+      "title": "Cited by critics on these families and the word-work template (ids only)",
+      "chars": 80,
+      "rules": [
+        "C1",
+        "C2",
+        "H1@RUBRIC",
+        "H2@RUBRIC",
+        "H3@RUBRIC",
+        "H4@RUBRIC",
+        "H5@RUBRIC",
+        "H6",
+        "H7",
+        "H8",
+        "H10",
+        "H11",
+        "AX-4",
+        "BD-4",
+        "BD-7",
+        "BD-11",
+        "DN-1a",
+        "PT-FRM-6",
+        "PT-GDP-1",
+        "PT-GDP-2",
+        "PT-SCR-1",
+        "RP-1",
+        "SF-50",
+        "SL-2",
+        "SL-3",
+        "SL-4",
+        "SP-2",
+        "VA-10@WDS"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-17",
+      "ruling": "A distinct option is ALSO a findable skill when it is a distinct new difficulty or skill (a new task kind); small tweaks stay plain options. Both entries are checked against it in open question 3.",
+      "source": "owner rule, CLAUDE.md"
+    },
+    {
+      "date": "2026-10-17",
+      "ruling": "Every 'ask owner' row of the preset list is a preset; sub_word_problems already has the presets sub_wp_compare (forms [1]) and sub_wp_start_unknown (forms [2]).",
+      "source": "owner, data.js APPENDED 2026-10-17 batch 2; js/modules/skill-presets.js"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "The part-whole bar is drawn on teaching pages (model, guided, lesson) and is an option, default off, on practice pages; bold key words and the keyword bank are hidden on the sentence-layout story skills (P-21).",
+      "source": "owner direct 2026-10-31, design/cards/family-check §5"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M-W1",
+      "error": "adds the two numbers in a change-unknown join story",
+      "wrong": "had 8, got some, now 13: 8 + 13 = 21"
+    },
+    {
+      "id": "M-W2",
+      "error": "writes the end number as the answer",
+      "wrong": "now 13: answer 13"
+    },
+    {
+      "id": "M-W3",
+      "error": "'more' means add: solves the inconsistent compare by adding",
+      "wrong": "Maya 14, Maya has 6 more than Tom: Tom 20"
+    },
+    {
+      "id": "M-W4",
+      "error": "writes the difference instead of the smaller amount",
+      "wrong": "Tom has 6 fewer than Maya (14): Tom 6"
+    },
+    {
+      "id": "M-W5",
+      "error": "separate change-unknown: writes what is left, not what went",
+      "wrong": "had 15, some went, 9 left: answer 9"
+    }
+  ],
+  "options": [
+    "forms on addition:add_word_problems (+ _plain): append value 3 'How many were added? (had 8, got some, now 13)'; default stays [0, 1, 2].",
+    "forms on subtraction:sub_word_problems (+ _plain): append value 3 'How many went? (had 15, some went, 9 left)', value 4 'The smaller amount: fewer than (Tom has 6 fewer than Maya)', value 5 'The smaller amount: more than (Maya has 6 more than Tom)'; default stays [0, 1, 2].",
+    "band (new on the four hosts, answer-bounded): 10 / 20 / 100, default none (the Max Number decides, as today); within 20 draws the sentence layout. A plain option (number size), not a preset (open question 2).",
+    "Preset skills (open question 3, recommended yes): addition:add_wp_change_unknown 'Addition Word Problems: How Many Were Added?' (add_word_problems forms [3]); subtraction:sub_wp_change_unknown 'Subtraction Word Problems: How Many Went?' (sub_word_problems forms [3]); subtraction:sub_wp_compare_smaller 'Compare Stories: Find the Smaller Amount' (sub_word_problems forms [4, 5]). Each gets grade 1, 1.OA.A.1 / 2.OA.A.1 / M.EE.1.OA.1, SKILL_WRM (partial), links, search terms, an appended share code.",
+    "Repair found while specifying (open question 4): forms value 1 on add_word_problems is labelled 'The start' but deals compare-more stories, value 2 'A part' deals change-unknown; Types 3-4 of both generators are unreachable."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill addition:add_word_problems --strict",
+      "note": "and subtraction:sub_word_problems, the _plain twins and each preset; rule 0b"
+    },
+    {
+      "cmd": "node tests/scripts/ws-empty-band.cjs --skill subtraction:sub_word_problems",
+      "note": "every role and host the card offers, each new forms value and band 20 / 100 at S / M / L (L25, L29)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-cell-checks.cjs --skill subtraction:sub_word_problems --card --card-opts",
+      "note": "every §7a option value (L26); and addition:add_word_problems"
+    },
+    {
+      "cmd": "node tests/scripts/ws-options-verify.cjs --skill subtraction:sub_word_problems",
+      "note": "each new forms value changes print AND screen and round-trips a share code; predicates: change items ask the change, compare items ask the smaller amount, the trap says 'more than' with the bigger known (L4)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill subtraction:sub_word_problems",
+      "note": "VQ-REP / VQ-ONEANSWER / VQ-LIVE (the bar drawn, one answer place, no dead parts)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-content-audit.cjs --category addition",
+      "note": "and --category subtraction: the stories still match their skills' names"
+    },
+    {
+      "cmd": "node tests/scripts/ws-providers-unit.mjs",
+      "note": "wrongAnswer differs from the answer on every new value; the misconceptions of section 6 dealt"
+    },
+    {
+      "cmd": "node tests/scripts/ws-detailed-lesson.cjs --check",
+      "note": "g1-oa1-bar-model-wp-20 and every passed lesson that deals these hosts"
+    },
+    {
+      "cmd": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --check",
+      "note": "no live packet moves"
+    },
+    {
+      "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+      "note": "appended values and presets only: no MOVED / DELETED line"
+    },
+    {
+      "cmd": "node tests/scripts/ws-search-terms.cjs",
+      "note": "each preset findable ('change unknown', 'how many were added', 'fewer than', 'compare word problems')"
+    },
+    {
+      "cmd": "node tests/scripts/ws-standards.cjs",
+      "note": "the two entries deleted when built; 1.OA.A.1 / 2.OA.A.1 verdicts"
+    },
+    {
+      "cmd": "node tests/scripts/ws-wrm.cjs --report-only",
+      "note": "SKILL_WRM partial tags of the presets"
+    },
+    {
+      "cmd": "node tests/scripts/ws-wrm-page-unit.mjs",
+      "note": "links: direct / pre / related for the presets"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/word-stories/word-stories.md",
+      "note": "build-start gate"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-coverage design/cards/word-stories/word-stories.md"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "Which skills host the new values? The build-list entries name add_word_problems / sub_word_problems; the two lessons use add_wp_20 / sub_wp_20 (G1) and add_wp_100 / sub_wp_100 (G2), which deal only result-unknown stories from a separate generator branch, and add_wp_20 / sub_wp_20 sit on the SIGNED family-check card (touching their options needs `--template family-check --resign` and a new owner signature).",
+      "recommended": "Host on add_word_problems / sub_word_problems (+ _plain) only, as the build list says: their generators already hold the change and compare-fewer branches, they are on no signed card, and the ranged skills keep their name ('Addition Word Problems (within 20)' = result unknown). The lessons add the preset skills (open question 3) to their skill lists at band 20 / 100 beside add_wp_20 / sub_wp_20 / add_wp_100 / sub_wp_100; family-check stays signed as it is."
+    },
+    {
+      "q": "The general hosts have no band (they read the Max Number), and the sentence layout reads the band only of the ranged ids, so a 'within 20' change story would draw column work. Add an answer-bounded band 10 / 20 / 100 to the four hosts?",
+      "recommended": "Yes, as a plain option (number size, default none = the Max Number as today): sentenceBand reads it on these hosts, so within 20 draws the signed sentence layout and within 100 the column work; the presets and the lessons set it."
+    },
+    {
+      "q": "Owner rule 2026-10-17: are the new values distinct new skills that must ALSO be findable presets? The build list marks both entries preset: true.",
+      "recommended": "Yes, three presets: addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller (forms [4, 5]: fewer and the trap on one preset, the trap the later section). A new unknown position is a new task kind (CGI type) with its own lesson step, and sub_word_problems' other unknowns are already presets (sub_wp_compare, sub_wp_start_unknown)."
+    },
+    {
+      "q": "Repair: add_word_problems forms value 1 'The start (Sam had some, got 3, now has 8)' deals compare-more stories and value 2 'A part (8 in all, 5 are red)' deals change-unknown stories; sub_word_problems Types 3-4 and add Types 3-4 are never reached (a string variant compared with 0.72 / 0.86). Fix in this build?",
+      "recommended": "Yes, in this build (the name is the declaration): value 1 deals start-unknown, value 2 part-part-whole (missing part) as their labels say, compare-more stays reachable as today under value 1's old stories only if the owner wants a compare value (else it is dealt by addition:comparison_word); the dead numeric branches become the named values 3-5. ws-code-snapshot must show no MOVED line (the ids stay); old share codes now deal what their label promised."
+    },
+    {
+      "q": "Change stories: draw the part-whole bar (whole = Now or First, captions First / Then / Now, ? on the change) or the WP-02 change strip (three boxes in a row with arrows)?",
+      "recommended": "The part-whole bar: the two lessons are 'using bar models', the bar is the library graphic the signed sentence layout already draws, and one picture serves all four story kinds of the lesson. The WP-02 strip stays the within-10 picture strip of vis_story_strip (k2 lane)."
+    },
+    {
+      "q": "Compare bars: the MAP spec shades the difference grey at Level 1 as a hint. Shade it?",
+      "recommended": "No: the single grey is for structure and traced numbers only, and the solid difference box already stands apart. The hint that fades is the traced known numbers in the bars on the guided page."
+    }
+  ],
+  "decisions": {
+    "options": [
+      {
+        "option": "forms",
+        "values": [
+          "0",
+          "1",
+          "2"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js _wpAdd / _wpSub (P11 What is missing)",
+        "why": "the existing kinds, default all three; on add_word_problems values 1 and 2 deal what their labels say once the repair of open question 4 lands"
+      },
+      {
+        "option": "forms",
+        "values": [
+          "3"
+        ],
+        "d": "offered",
+        "skills": [
+          "addition:add_word_problems",
+          "addition:add_word_problems_plain"
+        ],
+        "source": "build-list map_change_unknown_story; this card §2-3",
+        "why": "NEW (to build): join with the change unknown, past tense, the part-whole bar with ? on Then; never in the default set. Not offered by the repo yet, so --check-signed NOTEs it until the build lands"
+      },
+      {
+        "option": "forms",
+        "values": [
+          "3",
+          "4",
+          "5"
+        ],
+        "d": "offered",
+        "skills": [
+          "subtraction:sub_word_problems",
+          "subtraction:sub_word_problems_plain"
+        ],
+        "source": "build-list map_change_unknown_story, map_compare_smaller_unknown; this card §2-3",
+        "why": "NEW (to build): 3 separate change unknown; 4 compare, fewer than; 5 compare, more than with the bigger known (inconsistent language, P-WP-3); never in the default set; NOTE until built"
+      },
+      {
+        "option": "band",
+        "values": [
+          "10",
+          "20",
+          "100"
+        ],
+        "d": "offered",
+        "source": "this card open question 2",
+        "why": "NEW (to build): answer-bounded number size on the general hosts; 20 draws the signed sentence layout, 100 the column work; default none (the Max Number, as today); NOTE until built"
+      },
+      {
+        "option": "range",
+        "values": [
+          "null",
+          "10",
+          "20",
+          "50",
+          "100"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options-derived.js (measured Max Number)",
+        "why": "the Max Number bounds every story number and the answer (maxNum = max(10, range)); the band, once built, wins over it"
+      },
+      {
+        "option": "pictures",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js _opsPictures",
+        "why": "off gives the same stories with no picture row (the _plain skills are the preset of off)"
+      },
+      {
+        "option": "response",
+        "values": [
+          "standard"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js responseOption",
+        "why": "solve in the word-work cell: the response this card grades"
+      },
+      {
+        "option": "response",
+        "values": [
+          "which-numbers"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js responseOption (P4)",
+        "why": "a different cell (click the numbers you need, its own story generator); graded by ws-options-verify and its own critic, not by this card"
+      },
+      {
+        "option": "wpBar",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "owner 2026-10-31 (family-check §9.4)",
+        "why": "the bar: drawn on teaching pages, an option default off on practice; on the new values it is the change bar or the two compare bars"
+      },
+      {
+        "option": "wpCues",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "hidden",
+        "proposed": true,
+        "source": "P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check)",
+        "why": "bold key words teach the keyword strategy P-21 forbids, and on the trap value ('Maya has 6 more than Tom') the cue points to the wrong sign. Hidden on these hosts (kept in the model so share codes decode). OWNER TO CONFIRM: it is offered today"
+      },
+      {
+        "option": "wpBank",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "hidden",
+        "proposed": true,
+        "source": "P-21; owner 2026-10-31 (family-check)",
+        "why": "the keyword bank files 'more' under + and 'fewer' under −: wrong on the trap and on change-unknown stories. Hidden on these hosts (kept in the model so share codes decode). OWNER TO CONFIRM: it is offered today"
+      },
+      {
+        "option": "nlOn",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js numberLineOptions",
+        "why": "lead to rule; proposed out of scope here: the page number line is a page-level aid graded on its own (ws-options-verify nline group), not on this card's critic"
+      },
+      {
+        "option": "nlFrom",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlTo",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlStep",
+        "values": [
+          "1",
+          "2",
+          "5",
+          "10",
+          "20",
+          "25",
+          "50",
+          "100",
+          "1000",
+          "auto",
+          "1/2",
+          "1/3",
+          "1/4",
+          "1/5",
+          "1/6",
+          "1/8",
+          "1/10",
+          "1/12",
+          "0.1",
+          "0.01"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlLabels",
+        "values": [
+          "auto",
+          "all",
+          "2",
+          "5",
+          "10",
+          "ends",
+          "none"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlMinor",
+        "values": [
+          "auto",
+          "0",
+          "2",
+          "4",
+          "5",
+          "10"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlHops",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card"
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR"
+      }
+    ],
+    "roles": [
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:lesson",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "teaching page: the bar (change) or the two bars (compare) drawn, part labels printed (RP-71); provider workedSteps real"
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "teaching page: the bar (change) or the two bars (compare) drawn, part labels printed (RP-71); provider workedSteps real"
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "teaching page: the bar (change) or the two bars (compare) drawn, part labels printed (RP-71); provider workedSteps real"
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider wrongAnswer: the new values add the misconceptions of section 6 (add the two numbers, write the now number, add on \"more than\")"
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider wrongAnswer: the new values add the misconceptions of section 6 (add the two numbers, write the now number, add on \"more than\")"
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "provider wrongAnswer: the new values add the misconceptions of section 6 (add the two numbers, write the now number, add on \"more than\")"
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "any skill on any page type; the new values judged as pages of their own (L29)"
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "not fact skills: the role reports unsupported"
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+        "why": "not fact skills: the role reports unsupported"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "offered",
+        "proposed": true,
+        "source": "provider stories",
+        "why": "the story skills' own page (provider stories default: the role deals the skill's own items); one schema a page (P-WP-1), each new value a schema"
+      }
+    ],
+    "hosts": [
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      }
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+ws-grade-render: 1 skills -> ../../../tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/c120/rg-r9b
+  [1/1] composing:chart_to_120  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  test-S 1p+1k 2x4  test-M 1p+1k 2x3  test-L 1p+1k 2x3  independent-S 1p+1k 2x4  independent-M 1p+1k 2x3  independent-L 1p+1k 2x3  66s
+ws-grade-render: done, 1 units, 40 pages, 66s
+ws-grade-render: OK (1 unit(s): no overflow on any role page, no answer box under 48 px or other target under 44 px on the card, worksheet or quiz at 820 / 1024)

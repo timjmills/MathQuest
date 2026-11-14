@@ -992,6 +992,105 @@ if (pvR2On('N4', 'placevalue:identify')) {
     ok(!bad.length, `N4 PLACE-WORD-LIVE placevalue:identify: ${bad.length} of ${n4} cells offer a place word the number does not have, e.g. ${bad.slice(0, 4).join('; ')}`);
 }
 
+/* ============================================ chart windows: chart_120 critic r1 F1 / F3 / F3b (2026-11-13) */
+// Lead ruling 2026-11-13 (the class, not the instance): every chart window the skill deals - every gap count 1 to the most an
+// option set gives (band x grid x tiles x gaps, the real generator) - has, for EVERY gap:
+//   WRONG-MULTI      a wrong answer: a number in every slot, differing from the key in exactly one slot (L27, slot by slot)
+//                    - `num("91, 101")` was NaN, so every multi-gap window had none and True or False? dealt all True (F1, F2)
+//   STEPS-ALL-SLOTS  worked steps that name the gap's value, each step one grammatical sentence or two (F3: "Write <first gap>.")
+//   SAY-AGREE        a Say line naming every gap and agreeing in number ("The missing numbers are 101 and 104.", F3), and the
+//                    UNFILLED frame too, one blank a gap ("The missing numbers are __ and __.", r2 N3: the opener's frame)
+//   HINT-ALL         on the option sets Guided deals (grid=window), the Model's grey work lines name every gap (F3b)
+// Runs whenever composing:hundreds_chart_fill / chart_to_120 / number_chart_fill is in scope (or no --skill is given).
+const CHART_KEYS = ['composing:hundreds_chart_fill', 'composing:chart_to_120', 'composing:number_chart_fill'];
+const chartInScope = CHART_KEYS.filter((k) => !ONLY_SKILLS.length || onlyHit(k));
+if (chartInScope.length) {
+    const G = globalThis;
+    if (!G.window) G.window = G;
+    if (!G.localStorage) { const st = {}; G.localStorage = { getItem: (k) => (k in st ? st[k] : null), setItem: (k, v) => { st[k] = String(v); }, removeItem: (k) => { delete st[k]; } }; }
+    if (!G.document) G.document = { cookie: '', getElementById: () => null, querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, createElement: () => ({ style: {} }) };
+    // (MQ_ROOT: judge another checkout's generator and providers - ws-backtest commit-pair rows; default this tree)
+    const { pathToFileURL } = await import('node:url');
+    const at = (rel) => (process.env.MQ_ROOT ? pathToFileURL(`${process.env.MQ_ROOT.replace(/\/$/, '')}/${rel}`).href : `../../${rel}`);
+    const _log = console.log; console.log = () => {};
+    let gq = null, kit = null, guidedM = null, optsM = null;
+    try {
+        gq = await import(at('js/modules/generate-question.js'));
+        kit = await import(at('js/modules/sheet/index.js'));
+        guidedM = await import(at('js/modules/sheet/roles/guided.js'));
+        optsM = await import(at('js/modules/skill-options.js'));
+    } catch (e) { gq = null; } finally { console.log = _log; }
+    const getProviderC = kit ? kit.getProvider : getProvider;
+    const workLinesOf = guidedM && guidedM.workLinesOf ? guidedM.workLinesOf : () => [];
+    const offeredFor = optsM && optsM.offeredOptionsFor ? optsM.offeredOptionsFor : offeredOptionsFor;
+    ok(!!gq, 'CHART: generate-question.js does not load in node');
+    const sentence = /^[A-Z][^.!?]*[.!?](?: [A-Z][^.!?]*[.!?])*$/;
+    for (const key of chartInScope) {
+        const [cat, skill] = key.split(':');
+        CHECKED_ONLY.add(key); CHECKED_ONLY.add(skill);
+        if (!gq) continue;
+        const host = skill === 'chart_to_120' ? 'hundreds_chart_fill' : skill;
+        const offered = (id) => { const o = (offeredFor(cat, skill) || []).find((x) => x.id === id); return o && Array.isArray(o.values) ? o.values.map((v) => v.v) : [undefined]; };
+        const bands = skill === 'chart_to_120' ? [120] : offered('band');
+        const sets = [];
+        for (const band of bands) for (const grid of (skill === 'number_chart_fill' ? [undefined] : offered('grid'))) for (const tiles of offered('tiles')) for (const gaps of offered('gaps')) {
+            const o = {}; if (band !== undefined) o.band = band; if (grid !== undefined) o.grid = grid; if (tiles !== undefined && tiles !== null) o.tiles = tiles; if (gaps !== undefined) o.gaps = gaps;
+            sets.push(o);
+        }
+        const bad = { W: [], S: [], Y: [], H: [] }; let n = 0; const counts = new Set();
+        for (const o of sets) for (let i = 0; i < 4; i++) {
+            let q;
+            try { q = gq.generateQuestionFor({ category: cat, skill: host, opts: o, seed: 9001 + i * 31 + sets.indexOf(o) * 7, itemIndex: i }); } catch (e) { continue; }
+            if (!q || !q.chartWindow) continue;
+            q.categoryId = q.categoryId || cat; q.skillId = q.skillId || host;
+            const p = getProviderC(cat, host);
+            const gaps = (Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : [q.ans]).map((x) => Number(String(x).replace(/,/g, '')));
+            n++; counts.add(gaps.length);
+            const tag = `${JSON.stringify(o)} [${gaps.join(', ')}]`;
+            // WRONG-MULTI
+            const w = p.wrongAnswer(q);
+            if (!w) bad.W.push(`${tag}: no wrong answer`);
+            else {
+                const ws = String(w.value).split(/\s*,\s*/).map((x) => Number(String(x).replace(/,/g, '')));
+                const diff = ws.filter((v, k) => v !== gaps[k]).length;
+                if (ws.length !== gaps.length || ws.some((v) => !Number.isFinite(v)) || diff !== 1) bad.W.push(`${tag}: wrong "${w.value}" (${diff} slot(s) differ)`);
+                else if (gaps.length > 1 && (!w.slots || gaps.some((g, k) => String(w.slots[`b${k}`]) !== String(ws[k])))) bad.W.push(`${tag}: wrong "${w.value}" slots ${JSON.stringify(w.slots)} do not match its parts`);
+            }
+            // STEPS-ALL-SLOTS
+            const steps = (p.workedSteps(q) || []).map((x) => String(x.text || ''));
+            const said = (t, g) => new RegExp(`(^|\\D)${g}(\\D|$)`).test(String(t).replace(/(\d),(?=\d{3})/g, '$1'));
+            const missing = gaps.filter((g) => !steps.some((t) => said(t, g)));
+            const ugly = steps.filter((t) => !sentence.test(t) || /\d, \./.test(t) || /, \d+\.$/.test(t) && !/ and \d+\.$/.test(t) && /Write \d+, \d+/.test(t));
+            if (missing.length || ugly.length || steps.length > 6 || steps.length < 2) bad.S.push(`${tag}: ${missing.length ? `steps never name ${missing.join(', ')}` : ''}${ugly.length ? ` ungrammatical "${ugly[0]}"` : ''}${steps.length > 6 || steps.length < 2 ? ` ${steps.length} steps` : ''}`);
+            // SAY-AGREE
+            const say = String(p.strings({ q }).sayFill(q) || '');
+            const sayOk = gaps.length === 1 ? new RegExp(`^The missing number is ${gaps[0]}\\.$`).test(say)
+                : /^The missing numbers are (\d+, )*\d+ and \d+\.$/.test(say) && gaps.every((g) => said(say, g));
+            if (!sayOk) bad.Y.push(`${tag}: Say "${say}"`);
+            // SAY-AGREE on the UNFILLED frame (chart_120 critic r2 N3: the opener prints the frame with its blanks, and it was the
+            // fixed "The missing number is __." under a two-gap Model): singular for one gap, else plural with one blank a gap
+            const frame = String(p.strings({ q }).say || '');
+            const nBl = (frame.match(/__/g) || []).length;
+            const frameOk = gaps.length === 1 ? frame === 'The missing number is __.' : /^The missing numbers are (__, )*__ and __\.$/.test(frame) && nBl === gaps.length;
+            if (!frameOk) bad.Y.push(`${tag}: unfilled Say frame "${frame}" (${nBl} blank${nBl === 1 ? '' : 's'}) for ${gaps.length} gap${gaps.length === 1 ? '' : 's'}`);
+            // HINT-ALL (the option sets Guided deals: the window)
+            if (!o.grid || o.grid === 'window') {
+                const lines = workLinesOf({ q, template: 'chartwindow' });
+                const un = gaps.filter((g) => !lines.some((t) => said(t, g)));
+                if (un.length) bad.H.push(`${tag}: the Model's work lines (${lines.join(' / ')}) never name ${un.join(', ')}`);
+            }
+        }
+        ok(n > 0, `CHART ${key}: no chart window dealt`);
+        ok(!bad.W.length, `WRONG-MULTI ${key}: ${bad.W.length} of ${n} windows have no per-slot wrong answer (gap counts ${[...counts].sort((a, b) => a - b).join('/')}), e.g. ${bad.W.slice(0, 3).join('; ')}`);
+        ok(!bad.S.length, `STEPS-ALL-SLOTS ${key}: ${bad.S.length} of ${n} windows' steps miss a gap or a sentence, e.g. ${bad.S.slice(0, 3).join('; ')}`);
+        ok(!bad.Y.length, `SAY-AGREE ${key}: ${bad.Y.length} of ${n} Say lines do not name every gap in agreement, e.g. ${bad.Y.slice(0, 3).join('; ')}`);
+        ok(!bad.H.length, `HINT-ALL ${key}: ${bad.H.length} Guided Model work lines miss a gap, e.g. ${bad.H.slice(0, 3).join('; ')}`);
+    }
+}
+
+// --only-rules WRONG-MULTI,SAY-AGREE (backtests, chart_120 r2): judge only failures of these rule ids.
+const ONLY_RULES = ARGV.flatMap((a, i) => (a === '--only-rules' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean);
+if (ONLY_RULES.length) { const keep = failures.filter((f) => ONLY_RULES.some((id) => f.startsWith(`${id} `))); failures.length = 0; failures.push(...keep); }
 // --pv-r1 F3,F11 (backtests, lf-placevalue r1): judge only these critic-finding rules (the other checks still run).
 const PV_R1_ONLY = ARGV.flatMap((a, i) => (a === '--pv-r1' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean);
 if (PV_R1_ONLY.length) { const keep = failures.filter((f) => PV_R1_ONLY.some((id) => f.startsWith(`${id} `))); failures.length = 0; failures.push(...keep); }

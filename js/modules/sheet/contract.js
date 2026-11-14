@@ -50,6 +50,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `preSkillsWhy: '...'`: why a hand-named preSkills list checks fewer than three skills (ws-node-lint PRE-QUADRANTS, critic
     // cbt r2 E2: a list of one drew one quadrant on a 75 % empty page). Absent: the list names three or more.
     'preSkillsWhy',
+    // `wrongText(q) -> WrongAnswer & {statement}`: a misconception's wrong answer that is shown only as TEXT (Reason It's
+    // worked-wrong statement in words), because it does not fit the cell's own writing place (chart_120 'writes-ten-ten':
+    // 1010 in a three-digit chart square; lead ruling 2026-11-13). Absent: none.
+    'wrongText',
     // `roleOpts(role, opts) -> opts`: the skill's option values on one page role, when a support must follow the role (lead
     // ruling, PEDAGOGY 4.1a, lf-placevalue 2026-11-13: identify's place heads give the answer - the place name - so the
     // unaided roles Review / Test / pre-skill check, on paper and in the quiz, drop them). Absent: the opts as chosen.

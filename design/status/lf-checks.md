@@ -794,3 +794,13 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   precritic-copy-light-role-cover-size: all PASS; role-cover-cbt-e3-e5-e6 and precritic-role-cover-plan re-run PASS.
 - N1 (numbers masked whole) not addressed.
 - checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).
+
+## 2026-11-14 — EB-LASTPAGE + CAP-PARITY (lf-ops critic cbt r3 F1 root cause)
+- ws-empty-band (under --page-fill, which precritic passes by default): **EB-LASTPAGE** judges the last / only page of a
+  fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test): FAIL at >= 30 % empty when its next row
+  fits; other roles' last pages are measured and noted. **CAP-PARITY**: items a page at L >= ceil(0.7 x M) unless the L page is
+  full (white < one row); counts noted per role. Self-test: 6 + 5 pure cases.
+- Backtests eb-lastpage-cbt-pre-skill-check, cap-parity-cbt-pre-skill-check: FAIL 3038af154 pre-skill-check (L 34 % / 81 mm
+  empty; L 10 vs M 16 items) -> OK 3038af154 test / true-false / reason-it / error-analysis (re-point the pass side to the F1 fix).
+- master 448bc5e74: count_by_tables has no pre-skill-check role on its card; both rules PASS on every role. **add_facts FAILS
+  EB-LASTPAGE**: pre-skill-check M and L 78 % empty (4 items, 42.6 mm rows) - a real defect for the role's owner, not exempted.

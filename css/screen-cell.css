@@ -2142,6 +2142,32 @@ html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit
 @media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 48px; } }
 @media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 56px; } }
 
+/* lf-builds chart_120 (SCREEN-DIGIT, LEAD_DECISIONS 2026-11-13: the practice card and the quiz floor 48 px at 820 / 1024, 56 px
+   at 1280 / 1366; the online worksheet's 29 px floor already holds): a chart WINDOW (the 3 x 5 of the 1-100 and 1-120 charts;
+   not the ten-column chart above) drew its numbers at the shared min(--mq-k2 x 6.4, 4vw) = 29-34 px in squares of the paper's
+   size. On the card and the quiz its squares are sized from the digits instead - a three-digit number (100 ... 120) at 0.58 em
+   a digit plus 10 px wide, 1.4 em (>= 56 px) tall - so 5 squares of 56 px numerals are 535 px, of 48 px 459 px. Scoped to the
+   chart window on those two hosts; the shared min(..., 4vw) rule is unchanged. Additive (saved quizzes keep their HTML). */
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten), html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) {
+    --mq-cwfs: 56px; --mq-cww: calc(3 * 0.58 * var(--mq-cwfs) + 10px);
+    width: auto !important; max-width: none !important; table-layout: fixed;
+}
+@media (max-width: 1100px) { html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten), html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) { --mq-cwfs: 48px; } }
+@media (max-width: 480px) { html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten), html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) { --mq-cwfs: 40px; } }
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td, html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td {
+    width: var(--mq-cww) !important; min-width: var(--mq-cww) !important; height: max(56px, calc(var(--mq-cwfs) * 1.4)) !important; font-size: var(--mq-cwfs) !important;
+}
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot, html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot { font-size: var(--mq-cwfs) !important; }
+/* ... and on the online worksheet (floor 29 px, LEAD_DECISIONS 2026-11-13): the worksheet's fit pass shrank a chart window's
+   numerals to 24.7 px at 1024 (critic gate SCREEN-DIGIT, lf-tools hosts). Its numerals are held at 30 px in squares sized
+   from the digits (5 x 62 px, 56 px tall: its answer boxes keep the 48 px target), and a worksheet card holding a chart window takes the grid's whole row, as the ten-column
+   chart's card does, so the window never runs past its card. Additive. */
+html body .online-edition .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten), html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) {
+    --mq-cwfs: 30px; --mq-cww: calc(3 * 0.58 * var(--mq-cwfs) + 10px); width: auto !important; max-width: none !important; table-layout: fixed;
+}
+html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td { width: var(--mq-cww) !important; min-width: var(--mq-cww) !important; height: max(56px, calc(var(--mq-cwfs) * 1.5)) !important; font-size: var(--mq-cwfs) !important; }
+html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot { font-size: var(--mq-cwfs) !important; }
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-chart:not(.k2-chart-ten)) { grid-column: 1 / -1; }
 /* (lf-hosts critic r1 F1, lead ruling 2026-11-13: hand-off 1's worksheet digit raise to 40 / 48 / 56 px was removed before it
    shipped - it reflowed the online worksheet (placevalue:expand 2 -> 1 column at 1280, answer boxes stretched, fact cards
    28-56 px taller). The worksheet keeps master's grid digit, which holds the contract's 29 px floor (SP table; TY-10b count
@@ -2206,3 +2232,21 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
    the D2 rule above by specificity. ws-worksheet-reflow FULLROW-SPAN / FULLROW-USE. */
 .online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-countrow-wrap):not(.mq-train-span):not(.mq-span-row),
 .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard:has(.k2-countrow-wrap):not(.mq-train-span):not(.mq-span-row) { grid-column: auto; }
+/* lf-builds chart_120 r2 (ws-phone-card TOUCH-HIT, lf-checks 2026-11-13): in a chart window sized from its digits the collapsed
+   borders let a NEIGHBOUR square's number (an absolute span over its own square) lie 1 px over an empty square's input, so a
+   tap on the input's edge or corner landed on "62" and focused nothing. The empty square's writing place stands above its
+   neighbours. Scoped to the chart window on the card, the quiz and the online worksheet. Additive. */
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell],
+html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell],
+html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell] { z-index: 1; }
+/* (and its scroll box: the card's .visual-aid scrolls sideways for a wide chart, so a chart window that fits - every 3 x 5
+   window at 820 to 1366 - scrolled 1 px down inside it once a square took focus, and a tap on the top corners of a first-row
+   square landed outside the clip: ws-phone-card TOUCH-HIT at 1280. A window that fits its card does not scroll. Additive.) */
+html body #questionCard .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)),
+html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-chart:not(.k2-chart-ten)) { overflow: visible !important; }
+
+/* LDIV-JOIN (owner 2026-11-14: the bracket was "disconnected"): the arc and the bar over its column are ONE
+   path (bracketSvg); its y 0 sits on the vinculum's centre (1px into the 2px border), and the column's own
+   border is kept for layout but drawn clear. Additive: saved HTML with .mq-ldiv-arc keeps the old rules. */
+.mq-scell .mq-ldiv-brk.mq-ldiv-brkj { border-top-color: transparent; }
+.mq-scell .mq-ldiv-arcj { position: absolute; left: 0; top: -1px; width: 100%; height: calc(100% + 1px); overflow: visible; }
