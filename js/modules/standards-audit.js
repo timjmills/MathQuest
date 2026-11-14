@@ -65,7 +65,7 @@ export const CCSS_AUDIT = {
     '1.OA.C.6': P(['addition:add_facts', 'subtraction:sub_facts', 'number_sense:make_a_ten', 'number_sense:doubles_near_doubles', 'addition:number_families_add'], ['decomposing a number leading to a ten in subtraction (13 − 4 = 13 − 3 − 1)'], ['make_ten_subtract']),
     '1.OA.D.7': P(['algebra:balance_addsub'], ['decide whether equations are true or false: addition:equal_sign is tagged but deals plain column addition (it routes to the operations generator)', 'the forms 6 = 6 and 7 = 8 − 1'], ['equal_sign_repair', 'compare_sentences']),
     '1.OA.D.8': F(['subtraction:missing_add_sub', 'addition:cloze_addition', 'algebra:balance_addsub']),
-    '1.NBT.A.1': P(['counting:number_seq_fill', 'composing:hundreds_chart_fill'], ['counting across 100 to 120 on a chart', 'writing the numeral for a counted set above 20'], ['chart_120', 'tens_ones_group']),
+    '1.NBT.A.1': P(['counting:number_seq_fill', 'composing:hundreds_chart_fill', 'composing:chart_to_120'], ['writing the numeral for a counted set above 20'], ['tens_ones_group']),
     '1.NBT.B.2': F(['composing:base10_build'], 'own clause: the two digits are tens and ones'),
     '1.NBT.B.2a': F(['composing:tens_foundation_visual', 'composing:base10_regroup']),
     '1.NBT.B.2b': F(['composing:teen_compose', 'composing:ten_frame_build_teen'], 'teen numbers as a ten and some ones'),

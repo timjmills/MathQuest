@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 725 live skills; 616 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 728 live skills; 619 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 75 of 177 standards FULL, 91 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 102 FULL, 93 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 279 entries — 133 new skills, 90 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 63 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 278 entries — 133 new skills, 89 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -277,28 +277,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 40 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
 | 41 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
-### Counting and early number (17)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
-| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
-| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
-| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
-| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
-| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
-| 7 | **Zero Means None** (`zero`) | new `counting:zero_none` | K.CC.A.3 | 1 |
-| 8 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
-| 9 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
-| 10 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
-| 11 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
-| 12 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
-| 13 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
-| 14 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 15 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
-| 16 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
-| 17 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
-
 ### Fractions (22)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -325,6 +303,27 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 20 | **Understand the Whole** (`frac_whole`) | new `fractions:understand_the_whole` | - | 1 |
 | 21 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
 | 22 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
+
+### Counting and early number (16)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
+| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
+| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
+| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
+| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
+| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
+| 7 | **Zero Means None** (`zero`) | new `counting:zero_none` | K.CC.A.3 | 1 |
+| 8 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
+| 9 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
+| 10 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
+| 11 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
+| 12 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
+| 13 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
+| 14 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
+| 15 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
+| 16 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Place value (12)
 
@@ -518,9 +517,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: decide whether equations are true or false: addition:equal_sign is tagged but deals plain column addition (it routes to the operations generator); the forms 6 = 6 and 7 = 8 − 1  
   Build: True or False Equations (repair) (`equal_sign_repair`); Compare Number Sentences (`compare_sentences`)
 - **1.NBT.A.1** — PARTIAL. Count to 120, starting at any number less than 120. In this range, read and write numerals and represent a number of objects with a written numeral.  
-  Taught in part by: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
-  Missing: counting across 100 to 120 on a chart; writing the numeral for a counted set above 20  
-  Build: Count to 120 on the Chart (option) (`chart_120`); Count by Making Tens (`tens_ones_group`)
+  Taught in part by: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`); Count to 120 on the Chart (`composing:chart_to_120`)  
+  Missing: writing the numeral for a counted set above 20  
+  Build: Count by Making Tens (`tens_ones_group`)
 - **1.NBT.C.4** — PARTIAL. Add within 100, including adding a two-digit number and a one-digit number, and adding a two-digit number and a multiple of 10, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used. Understand that in adding two-digit numbers, one adds tens and tens, ones and ones; and sometimes it is necessary to compose a ten.  
   Taught in part by: Add within 50 (`addition:add_50_mixed`); Add within 100 (`addition:add_100_mixed`); Add & Subtract by 10s (`addition:add_sub_10s`)  
   Missing: concrete models or drawings for 2-digit addition, related to the written method; a 2-digit number plus a multiple of 10 as its own step  
@@ -1167,8 +1166,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 *A. Extend the counting sequence.*
 
 - **1.NBT.A.1** — PARTIAL. Count to 120, starting at any number less than 120. In this range, read and write numerals and represent a number of objects with a written numeral.  
-  In part: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
-  Missing: counting across 100 to 120 on a chart; writing the numeral for a counted set above 20 → `chart_120`, `tens_ones_group`  
+  In part: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`); Count to 120 on the Chart (`composing:chart_to_120`)  
+  Missing: writing the numeral for a counted set above 20 → `tens_ones_group`  
 *B. Understand place value.*
 
 - **1.NBT.B.2** — FULL. Understand that the two digits of a two-digit number represent amounts of tens and ones. Understand the following as special cases:  
@@ -1360,7 +1359,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.OA.B.5** — PARTIAL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
   In part: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
   Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0 → `mult_three`  
-  Also tagged: `multiplication:mult_break_apart`
+  Also tagged: `multiplication:mult_break_apart`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 - **3.OA.B.6** — FULL. Understand division as an unknown-factor problem. For example, find 32 ÷ 8 by finding the number that makes 32 when multiplied by 8.  
   Taught by: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
   Also tagged: `multiplication:number_families_mult`, `division:div_check_by_multiplying`, `number_ops_mixed:number_families_mixed`
@@ -1373,11 +1372,11 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.OA.D.8** — FULL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
   Taught by: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Multi-Step Word Problems (No Pictures) (`algebra:multi_step_word_plain`); Two-Step Word Problems: Multiply or Divide First (`algebra:two_step_mult_div_first`); Two-Step Word Problems: Add or Take Away, Then Multiply (`algebra:two_step_add_then_mult`); Two-Step Word Problems: Add or Take Away, Then Divide (`algebra:two_step_add_then_div`); Two-Step Word Problems: One Equation With a Letter (`algebra:two_step_letter_equation`); Two-Step Word Problems: Estimate to Check (`algebra:two_step_estimate_check`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`) — two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)  
-  Also tagged: `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`
+  Also tagged: `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
-  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
+  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 #### Number and Operations in Base Ten (3.NBT)
 
 *A. Use place value understanding and properties of operations to perform multi-digit arithmetic.*
