@@ -608,7 +608,10 @@ async function guidedMode() {
     const app = await H.open({});
     try {
         await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
-        for (const key of mine) for (const size of SIZES) for (const seed of [7, 11, 26]) {
+        // (narrow critic 2026-11-14 F1: seeds 7 / 11 / 26 never dealt a column-form Model; the render seed 591220 did - so 20 seeds a
+        // skill plus the render seeds)
+        const SEEDS = [...Array.from({ length: Number(arg('--seeds', 20)) }, (_, i) => i + 1), 591220, 694812];
+        for (const key of mine) for (const size of SIZES) for (const seed of SEEDS) {
             const sk = key.split(':')[1];
             const r = await app.page.evaluate(async (a) => {
                 let s;
