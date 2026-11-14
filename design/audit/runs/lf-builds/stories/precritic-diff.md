@@ -101,3 +101,14 @@ phone-card, screen-slots @390) and every S-only finding.
   instead of laying its two rows together. Needs an engine change in roles/practice.js placeSections (lf-engine).
 - **empty-band rises on the hosts at M** (independent / test 2 → 3) and the Model EB-PAGE: the in-place / across changes of r3;
   not yet fixed this round.
+
+### After pc-final2 (targeted runs on the head; `chk2`-`chk4`, `lb-check4`, `backtest`, `bt2`)
+- FIXED and verified: FIX-WORDS (0), compare lesson forms 3/4/5 OVERFLOW (0), kit M / L on the presets (0), EA-PAD (0).
+- Lesson baseline vs a fresh master 76bc11c61 (1732 hashes): 24 differ, page 3 of add_wp_20 / add_wp_20_plain / sub_wp_10 /
+  sub_wp_10_plain / sub_wp_20 / sub_wp_20_plain at M, seed 4242 (pupil, key and the two whole-sheet hashes). The only change on
+  those pages is the hung unit word pinned to its box's right edge (a word that would run more than 5 mm past it, "stickers"):
+  intended (EA-PAD), diffed line by line on add_wp_20 M 4242 (`scratchpad/r3/lp3-*.html`).
+- Still OPEN (new, ours): empty-band - add preset Guided L cell 2 32.6 % and compare preset lesson M vocabulary 31.1 % under
+  master's new measure (top pad excluded); the presets' Prerequisite Check M / L (EB-SIDE 30.3 %, EB-PAGE 51-62 %); the hosts'
+  independent / test M 2 -> 3 and Model EB-PAGE; sections L PAGEFILL p6 / p7; options-render forms capacity. Backtest
+  eb-guided-word-stories fails its pass state for the same Guided L cell (the measure changed under it).

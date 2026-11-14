@@ -1,0 +1,10 @@
+$ node tests/scripts/ws-backtest.mjs --row wp-bar-word-stories  [a4a76e1e2]
+ws-backtest row wp-bar-word-stories: PASS  fail state FAIL 28.6s, pass state OK 73.6s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+wp-bar-word-stories         commit-pair  FAIL 28.6s          OK 73.6s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 121.9 s
+ws-backtest: OK
+exit 0
