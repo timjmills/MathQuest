@@ -8592,7 +8592,7 @@
    }
   },
   {
-   "id": "two-step-div-bar-guided-L",
+   "id": "two-step-div-bar-guided-l",
    "check": "ws-cell-checks OVERFLOW: the two_step_add_then_div Guided L page holds every cell inside its body (the 6-group ÷ bar no longer stacks the bars into a 188 mm cell)",
    "kind": "commit-pair",
    "rule": "ws-cell-checks OVERFLOW (lf-roles r9: guided L p2, a stacked ÷ bar story 188 mm in a 184 mm continuation body - lf-algebra's template)",
