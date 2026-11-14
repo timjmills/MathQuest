@@ -41,7 +41,12 @@
 //                fields and rule at the pupil page's places (+/- 0.5 mm); the header's type, row (height and overflow) and rule
 //                those of an ordinary page() of the same size; no overflow (page, body, cell, ink past the sheet); the chart fits
 //                its page (one pupil page and one key page, the page inside A4, sizing.ok). A detailed lesson's chart is not
-//                read (those lessons are paused). `--rules CHART-HEAD` alone builds the chart part only (fast).
+//                read too with --detailed (lead ruling 2026-11-14: Name / Date on EVERY anchor chart). `--rules CHART-HEAD`
+//                alone builds the chart part only (fast).
+//   --detailed all|id,id  (CHART-HEAD) the DETAILED lessons' anchor charts too (js/modules/lessons/detailed, role
+//                detailed-lesson, seed 4242; a detailed pack prints at L only, so --sizes does not apply): every chart of the
+//                pack (P2, and each chunk's P2b ...) and its key. Alone (no --only / --all-lessons) it reads only the detailed
+//                lessons. Each pack is built in the page with no protocol timeout (a pack can take minutes).
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
@@ -235,6 +240,7 @@ function chartHeadMeasure(refs) {
         const foot = pg.querySelector(':scope > .ws-foot');
         return {
             sheet: pg.getAttribute('data-ws-sheet') || '',
+            dl: pg.getAttribute('data-dl-page') || '', dlKind: pg.getAttribute('data-dl-kind') || '',
             head: head ? head.outerHTML.replace(/<div class="ws-title"[^>]*>[\s\S]*?<\/div>/, '<TITLE>') : '',
             above: !!(head && head.classList.contains('ws-head--title-above')),
             fields: row ? [...row.children].map((f) => ({ cls: f.className, text: (f.textContent || '').trim(), at: at(f) })) : [],
@@ -405,6 +411,9 @@ async function checkMain() {
             if (!ONLY || ONLY.split(',').includes(k)) LESSONS.push({ id: k, dir: skillId, spot: true, skill: { categoryId, skillId } }); }
     }
     const F = (rule, where, msg) => findings.push({ rule, where, msg });
+    // --detailed alone: the detailed lessons only
+    const DETAILED = arg('detailed', '');
+    if (DETAILED && !ONLY && !has('all-lessons')) LESSONS.length = 0;
     // CHART-HEAD: the header frame.js pageHeader draws for an unscored page (pupil, and the key's with "Answer Key" on the
     // Name rule, answer-key.js markKeyName), title masked; and an ordinary page() of each size, whose header type the chart's must match
     const WANT = await page.evaluate(async () => {
@@ -497,6 +506,39 @@ async function checkMain() {
                 });
             }
         }
+        // --detailed (lead ruling 2026-11-14): every anchor chart of every detailed lesson pack, pupil and key
+        if (DETAILED) {
+            // (a pack can keep the page busy past puppeteer's 180 s protocol timeout: the same page, reconnected without one)
+            const conn = await require('puppeteer').connect({ browserWSEndpoint: app.browser.wsEndpoint(), protocolTimeout: 0, defaultViewport: null });
+            try {
+                const pg0 = (await conn.pages()).find((p) => p.url() === page.url());
+                const all = await pg0.evaluate(async () => (await import('./js/modules/lessons/detailed/index.js')).detailedLessonList().map((d) => d.id));
+                const ids = DETAILED === 'all' ? all : DETAILED.split(',').map((x) => x.trim()).filter(Boolean);
+                for (const id of ids) {
+                    if (!all.includes(id)) { F('CHART-HEAD', `detailed/${id}`, 'no such detailed lesson'); continue; }
+                    await pg0.evaluate(`window.__wsCH = undefined; window.buildSheet({ role: 'detailed-lesson', lessonId: ${JSON.stringify(id)}, seed: 4242, paper: 'A4', year: 2026 }).then((r) => { window.__wsCH = { html: r.html, sizing: r.chartSizing || [] }; }, (e) => { window.__wsCH = { error: String((e && e.message) || e) }; }); 0`);
+                    await pg0.waitForFunction(() => window.__wsCH !== undefined, { timeout: 0, polling: 500 });
+                    const b = await pg0.evaluate(() => window.__wsCH);
+                    if (b.error) { F('PC-BUILD', `detailed/${id}`, b.error.slice(0, 160)); continue; }
+                    const sh = await page.browser().newPage();
+                    let ch;
+                    try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
+                        await sh.setContent(b.html, { waitUntil: 'networkidle0', timeout: 120000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+                        await sh.emulateMediaType('print'); ch = await sh.evaluate(chartHeadMeasure, WANT.refs); } finally { await sh.close(); }
+                    // the pack's charts: P2, then each chunk's (P2b ...); pupil pages carry the id, key pages `<id>-key` (a teacher
+                    // page's small copy of the chart - a .ws-page nested in it, no data-dl-page - is not a printed chart page)
+                    const charts = [...new Set(ch.filter((x) => x.sheet === 'lesson-chart' && x.dl).map((x) => x.dl.replace(/-key$/, '')))];
+                    if (!charts.length) { F('CHART-HEAD', `detailed/${id}`, 'no anchor chart page in the pack'); continue; }
+                    for (const cid of charts) {
+                        const P = ch.filter((x) => x.sheet === 'lesson-chart' && x.dlKind === 'pupil' && x.dl === cid);
+                        const K = ch.filter((x) => x.sheet === 'lesson-chart' && x.dlKind === 'key' && x.dl === `${cid}-key`);
+                        const sz = (b.sizing.find((z) => z.id === cid) || {}).sizing || null;
+                        for (const x of chartHeadVerdict({ id: `detailed/${id}`, size: cid, P, K, want: WANT, sizing: sz, parts: [{ part: 'chart', pages: P.length, keyPages: K.length }] })) F('CHART-HEAD', x.where, x.msg);
+                    }
+                    console.log(`  detailed/${id}: charts ${charts.join(', ')}`);
+                }
+            } finally { conn.disconnect(); }
+        }
     } finally { await app.close(); }
     // one line per (rule, lesson, question, message) across seeds: "seeds 4242, 1037, ..."
     const merged = new Map();
@@ -514,8 +556,8 @@ async function checkMain() {
     { const keep = findings.filter((x) => !known.includes(x)); findings.length = 0; findings.push(...keep); }
     for (const x of known) { const k = KNOWN.find((y) => y.rule === x.rule && x.where.startsWith(`${y.lesson} ${y.size} `)); console.log(`${x.rule.padEnd(12)} KNOWN ${x.where}: ${x.msg} [${k.note}]`); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); const kn = known.filter((x) => x.rule === r).length; console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}${kn ? ` (+ KNOWN ${kn})` : ''}` : kn ? `KNOWN ${kn}` : na === CORE_N && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); const SHOWN = has("all") ? 1e9 : 8; for (const x of fs2.slice(0, SHOWN)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > SHOWN) console.log(`   ... ${fs2.length - SHOWN} more`); }
-    if (!CHART_ONLY && na < CORE_N && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
-    console.log(`(${LESSONS.length} lessons, ${NSEEDS} seeds, sizes ${SIZES.join(',')}; ${read} prerequisite items read)`);
+    if (!CHART_ONLY && CORE_N && LESSONS.length && na < CORE_N && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
+    console.log(`(${LESSONS.length} lessons${arg('detailed', '') ? ` + detailed ${arg('detailed', '')}` : ''}, ${NSEEDS} seeds, sizes ${SIZES.join(',')}; ${read} prerequisite items read)`);
     console.log(`ws-lesson-samples --check: ${findings.length ? `FAIL (${findings.length})` : 'OK'}`);
     process.exit(findings.length ? 1 : 0);
 }
