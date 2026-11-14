@@ -22,10 +22,9 @@ Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
   at this size's metrics, and the shelf budget compare takes an epsilon (value / combine S 8 + 1 spill). Pin OK, 0 drops.
 - OPENER-OVERFLOW (lead ruling): coordinate_q1 L fixed - the practice moves to page 2 when both pages close; every Opener
   is ratcheted against a master pin of L-OVERFLOW / L-SPLIT at M and L (all 727 live skills). Size S dropped (owner).
-- Capacity pin scope (lead 2026-11-13, item 2): lf-roles' pin script checks EVERY grid role by default, but this branch keeps
-  only the mixed-practice pins from lf-roles (plus the eight pre-widening roles master already pinned). ws-precritic's
-  capacity-pin steps run on those pinned roles only (CAPACITY_PIN_ROLES in ws-precritic.cjs), so no unpinned role (opener,
-  guided, scripted-model, ...) adds a red here until lf-roles' pins merge and widen the list.
+- Capacity pin scope: the interim scoping (pinned roles only) is dropped on the merge - master now pins every grid role at M / L
+  (lf-roles merged); ws-capacity-pin --check --roles opener,mixed-practice OK on the merged branch.
+- Merged origin/master 7a5bc902c (w2, size S dropped) at 4f448fa7e; sweeps and checks re-run at M / L.
 - Findings 1-3 (r0), B1/N2/GUARD and MIX-S each a check FAIL-on-bad / PASS-on-fix; backtests all PASS.
 
 ## Owner go

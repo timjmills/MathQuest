@@ -1,5 +1,24 @@
 # lf-engine-roles — before/after proof for the critic (round 2)
 
+## Re-run on the MERGED master (7a5bc902c: w2, size S dropped) — sizes M and L only (owner, 2026-11-13)
+
+- **Opener, every live skill (727 x M, L = 1454 builds)**: 263 changed; 103 now print the practice on page 2 (the Model + Say +
+  one Guided row exceed the page and both pages close: OPENER-OVERFLOW), 75 print more items, 85 same counts (rows held / Model
+  sized); **no item, Guided or Independent count fell** against master. The full list, skill by skill:
+  `opener-sweep-all-skills.txt`. Overflow ratchet (L-OVERFLOW / L-SPLIT vs the master pin `design/audit/baselines/opener-overflow.{M,L}.json`)
+  on all 161 changed skills: nothing rose except `fractions:fraction_of_set_hard`, an order-dependent flake master shows in the
+  same run (both trees pass it alone).
+- **Passed skills, Opener (M, L)**: 10 of 60 changed - expand M/L, unit_form M/L, combine M/L (Guided 2 + Independent 2 or rows
+  held), compare M/L (w2's cells, rows held), vocab_grade_pictures M/L (same counts). None worse.
+- **Passed skills, 4-skill Mixed (M, L x anchors off/side/sections)**: 60 of 180 changed - every lead at M/off and L/off
+  (finding 2, PG-23 fill); anchors side / sections unchanged; none worse.
+- **Passed skills, one-skill Mixed (M, L)**: 5 of 60 changed - sub_50 / sub_100 / sub_1k / sub_2d_1d M 12 -> 16, value M 21 -> 28.
+- **Lessons**: byte-identical to merged master (`ws-lesson-baseline --all-lessons --sizes L,M --seeds 4242,1 --per-lesson`,
+  1772 hashes).
+- PNGs (merged master before / branch after): `opener-coordinates.coordinate_q1-{M,L}-{before,after}-{pupil,key}-p*.png`,
+  `opener-placevalue.compare-M-*`, `opener-vocabulary.vocab_grade_pictures-M-*`.
+
+
 Engine round on three shared role layouts (findings 1-3 from lf-placevalue on `placevalue:compare`), then the critic r1
 rebuild (B1 second Guided row, N2 Model column rule, the sections DN-2 fill guard). Branch
 `claude/sweet-newton-c8wrv1-lf-engine-roles` from master `8df014ab7`.
