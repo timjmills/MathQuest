@@ -349,3 +349,23 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - 2026-11-14 HOTFIX TOF-STEM: branch claude/sweet-newton-c8wrv1-lf-roles-tofstem (2703445a5, from master 1531d0728): true-false.js equation stem only when true of the answer (compose.js equationStemOf); ws-tof-stem on precritic --skill / --role true-false; master sweep 55 skills hit, 0 after; passed true-false pages 90/90 identical; backtest tof-stem PASS.
 - 2026-11-14 QUEUED (lead, live deploy-7): algebra:two_step_add_then_div Guided p2 M seed 694812 - the lone story cell is ~25 % empty inside its frame (ink ends ~670 of 800 px) and the page ~30 % white below; size a one-story Guided cell to its drawn content + writing room; check EB-BAND / ONE-ROW-CAP cover a lone Guided cell (next budget, after TOF-STEM / EA-STEM).
 - 2026-11-14 EA-STEM: ws-ea-stem swept master (727 skills): 0 live story sentences (storyWork never prints today); kept as a guard (fixture backtest ea-stem, precritic --role error-analysis); storyWork now uses equationStemOf; passed EA pages 90/90 identical.
+
+## Round 10 (2026-11-14) - Guided fit to the drawn frame, lone story, mixed-score ceiling
+
+- Item 1 GUIDED-FRAME-FIT (a64d0e285): `roles/guided.js` `drawnFrameMm` + one more one-column row when the page as drawn holds it
+  (the reserve held count_by_tables' one-line instruction to two lines, Steps +2.4 mm, page-1 body +3 mm: 179 mm for rows where 196
+  print). count_by_tables Guided M seed 7: Model + 3 -> Model + 4 (grid 193.7 mm, ends 2 mm above the body). One-column pages only:
+  on a grid the extra room changed pageSet's column choice (two-step stories 1 x 6 on two pages -> 2 x 2 on one). Check
+  ws-roles-unit GUIDED-FRAME-FIT, backtest `guided-frame-fit` PASS.
+- Item 2 GUIDED-LONE-STORY (f8e338139): a one-column page of ONE word-work story takes the row it draws (no content / 0.7 stretch).
+  two_step_add_then_div Guided M seed 694812 p1: 155.8 -> 119.6 mm cell (EB-BAND 30.8 % gone); on lf-algebra merged with this lane
+  196.1 -> 155.6 mm at M, L lone pages 176 / 151 / 117 mm. EB-BAND sees only >= 30 % and ONE-ROW-CAP only independent / test, so
+  ws-roles-unit GUIDED-LONE-STORY is the new check; backtest `guided-lone-story` PASS.
+- Item 3 (a) GDPCAP-ANSWERS (72d4949bc): ceilFor walks the tries' answers on a page mixing 1-3 point cells. Backtest
+  `gdpcap-answers` PASS. chart_to_120 on lf-builds merged with this lane: EB-GDPCAP PASS at M / L seed 7 (the 7 > 6 case did not
+  reproduce at seed 7 on that tree; the unit check plants it). (b) and (c) NOT done.
+- Byte identity (ROLES=guided, 30 passed skills x S/M/L = 90 pages): ONE page changed - vocabulary:vocab_grade_pictures guided L
+  (item 1: a one-column page 2 cells -> 3, grid 161 -> 193.1 mm in 201.8 mm of drawn room).
+- Open, not this round: count_by_tables Guided L p2 EB-BAND 33 % (4 count rows stretched to 45.8 mm at the L ceiling; same on
+  66dcb77a0); two_step_add_then_div EB-SIDE on the master tree (passes on lf-algebra's branch).
+- PNGs: design/status/lf-roles/r10/.
