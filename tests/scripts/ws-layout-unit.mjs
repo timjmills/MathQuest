@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight, rowCapMm,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -1439,6 +1439,21 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(!/relaid|blankrun|span/.test(d), 'D5-5: whole rows are untouched');
     const e = g6(['a', 'b', 'c'], { cols: 2, rows: 3 });
     ok(/blankrun/.test(e) && !/class="ws-cell blankrun cut"/.test(e), 'PG-15: an explicit taller grid keeps one blank run inside the closed frame (no `cut`)');
+}
+
+/* ===================================================== ROW-STRETCH CAP: the fill counts at the cap (critic rowcap r1 F3) */
+{
+    // a capped template (layout ROW_ROOM_MM) whose footprint asks more than it draws (Match 3: footprint 46 / 48 mm, measured 50):
+    // its rows are drawn at drawn + room, so the page must COUNT them at that height - rows x cap leaves at most one row free
+    // (r1 F1 / F2: 3 rows of 52.5 mm and a 75 mm white foot at L, where 4 fit)
+    for (const [size, hMm] of [['M', 46], ['L', 46], ['L', 48]]) {
+        const its = Array.from({ length: 6 }, () => ({ template: 'vocab-match3', footprint: { wMm: 186, hMm, measure: false, factLike: false, maxCols: 1, points: 3, evenRows: true, wholeRows: true },
+            measured: { 1: { hMm: 50, fits: true } } }));
+        const Lc = resolveSectionLayout({ role: 'independent', columns: 'auto' }, its, 'A4', 186, { size, look: 'ican', header: FULL_HEADER });
+        const cap = rowCapMm(51, its);
+        const free = Lc.gridH - Lc.rows * Lc.cellH;
+        ok(Lc.cellH <= cap + 0.01 && free < cap, `ROWCAP-FILL ${size} footprint ${hMm}: ${Lc.rows} rows of ${Lc.cellH} mm (cap ${cap}) leave ${free.toFixed(1)} mm of a ${Lc.gridH} mm grid free - at most one row`);
+    }
 }
 
 /* ======================================================================= report */

@@ -651,7 +651,13 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         const res = infos.map((i) => fitAt(i, c, { size, look, availableWidthMm: W, auto }));
         const f = floor && floor[c];
         const fH = f && Number.isFinite(f.hMm) ? f.hMm : 0;
-        const hMin = Math.max(0, fH, ...res.map((r) => r.hMin));
+        const hMin0 = Math.max(0, fH, ...res.map((r) => r.hMin));
+        // ROW-STRETCH CAP (critic rowcap r1 F3): a row of capped templates is DRAWN at most drawn + room (rowCapMm), so it is
+        // COUNTED at that height too - never at a footprint guess taller than it (Match 3: a 48 mm footprint asked 58 mm, the
+        // work draws 50, so 3 rows printed with a 75 mm white foot where 4 fit). The floor (a wider sample's tallest measure)
+        // still holds: the cap is reckoned on the taller of it and these items' measure.
+        const dr = drawnRowMm(infos, c);
+        const hMin = dr > 0 ? Math.min(hMin0, rowCapMm(Math.max(dr, fH > 0 ? fH + 1 : 0), infos.map((i) => i.template))) : hMin0;
         // r12c: the tallest cell is a host MEASUREMENT (it carries the label keep-out, see koMm)
         const meas = hMin > 0 && (fH === hMin || infos.some((i, k) => res[k].hMin === hMin && i.measured && i.measured[c] && i.measured[c].hMm === hMin));
         return {
