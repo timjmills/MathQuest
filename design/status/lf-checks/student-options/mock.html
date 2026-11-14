@@ -7,7 +7,7 @@
 <!-- DESIGN MOCK (lf-tools-stuopts, 2026-11-14). Static: it links the app's real stylesheets for the student home
      (brand, variables, base, role-toggle, ui-components, Andika, screen-cell) and adds the proposed .stu-sko rules
      inline below, scoped and additive. The skill is the real addition:add_facts and its real option values
-     (skill-options.js L1065). States: #open (default), #collapsed, #off, #none.  Card: design/cards/student-options/student-options.md -->
+     (skill-options.js L1065). States: #folded (default), #expanded, #off, #none. Three skills are selected (owner rulings 2026-11-14).  Card: design/cards/student-options/student-options.md -->
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../../../css/brand.css">
 <link rel="stylesheet" href="../../../../css/variables.css">
@@ -42,6 +42,23 @@ body { padding: 20px; }
   border-radius: 18px; box-shadow: 0 6px 0 0 var(--mq-orange-d); cursor: pointer; }
 .stu-sko-start svg { width: 30px; height: 30px; }
 .stu-sko-start:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
+.stu-sko-plays { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.stu-sko-start { flex-direction: row; }
+.stu-sko-start .sub { display: block; font-size: 1rem; font-weight: 800; opacity: .95; margin-top: 4px; }
+.stu-sko-start .txt { display: flex; flex-direction: column; align-items: flex-start; }
+.stu-sko-sel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.stu-sko-sel-h { font-weight: 900; font-size: 1.05rem; margin-right: 4px; }
+.stu-sko-pill { display: inline-flex; align-items: center; gap: 4px; min-height: 48px; padding: 0 0 0 14px; border-radius: 14px;
+  border: 2px solid var(--mq-purple-l); background: var(--mq-purple-soft); font: 800 1rem Nunito, sans-serif; color: var(--mq-ink); }
+.stu-sko-pill button, .qs-x { width: 48px; height: 48px; border: 0; background: transparent; font: 900 1.4rem/1 Nunito, sans-serif; color: var(--mq-ink); cursor: pointer; border-radius: 12px; }
+.qs-x { position: absolute; top: 2px; right: 2px; background: #fff; border: 2px solid var(--mq-ink); z-index: 7; }
+.qs-tick { position: absolute; top: 6px; left: 6px; width: 30px; height: 30px; border-radius: 50%; background: var(--mq-ink); color: #fff;
+  font: 900 1rem/30px Nunito, sans-serif; text-align: center; z-index: 7; }
+.mock-qs .quick-skill-card.selected::after { display: none; }
+.mock-qs .quick-skill-card { min-height: 112px; }
+.mock-modes { display: flex; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+.mock-modes .student-start-btn { flex: 1 1 200px; max-width: none; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.mock-modes .student-start-btn small { font-size: .95rem; font-weight: 800; }
 .stu-sko-more { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin-top: 16px; padding: 8px 16px;
   background: var(--mq-purple-soft); border: 2px solid var(--mq-purple-l); border-radius: 14px; cursor: pointer;
   font: 800 1.1rem/1.2 Nunito, sans-serif; color: var(--mq-ink); text-align: left; }
@@ -76,17 +93,26 @@ body { padding: 20px; }
     <div class="mock-qs">
       <p class="mock-qs-h">&#9889; Quick Start</p>
       <div id="quickSkillsGrid" class="quick-skills-grid">
-        <div class="quick-skill-card pastel-coral selected" aria-expanded="true" aria-controls="stuSko" id="card0" role="button" tabindex="0"><span class="skill-icon">&#10133;</span><span class="skill-name"><span class="qs-name-text">Addition Facts (within 20)</span></span></div>
+        <div class="quick-skill-card pastel-coral selected" aria-expanded="true" aria-controls="stuSko" id="card0" role="button" tabindex="0"><span class="qs-tick" aria-hidden="true">&#10003;</span><button type="button" class="qs-x" aria-label="Remove Addition Facts">&times;</button><span class="skill-icon">&#10133;</span><span class="skill-name"><span class="qs-name-text">Addition Facts (within 20)</span></span></div>
         <div class="quick-skill-card pastel-peach" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#10134;</span><span class="skill-name"><span class="qs-name-text">Subtraction Facts (within 20)</span></span></div>
-        <div class="quick-skill-card pastel-lemon" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#10006;&#65039;</span><span class="skill-name"><span class="qs-name-text">Mult Facts</span></span></div>
-        <div class="quick-skill-card pastel-mint" role="button" tabindex="0" aria-expanded="false" id="card3"><span class="skill-icon">&#10135;</span><span class="skill-name"><span class="qs-name-text">Division Facts (&divide;1 to &divide;12)</span></span></div>
+        <div class="quick-skill-card pastel-lemon selected" role="button" tabindex="0" aria-expanded="false"><span class="qs-tick" aria-hidden="true">&#10003;</span><button type="button" class="qs-x" aria-label="Remove Mult Facts">&times;</button><span class="skill-icon">&#10006;&#65039;</span><span class="skill-name"><span class="qs-name-text">Mult Facts</span></span></div>
+        <div class="quick-skill-card pastel-mint selected" role="button" tabindex="0" aria-expanded="false" id="card3"><span class="qs-tick" aria-hidden="true">&#10003;</span><button type="button" class="qs-x" aria-label="Remove Division Facts">&times;</button><span class="skill-icon">&#10135;</span><span class="skill-name"><span class="qs-name-text">Division Facts (&divide;1 to &divide;12)</span></span></div>
 
         <section class="stu-sko" id="stuSko" role="region" aria-labelledby="stuSkoTitle">
           <div class="stu-sko-head">
             <h3 class="stu-sko-title" id="stuSkoTitle">Addition Facts (within 20)</h3>
             <button type="button" class="stu-sko-x" aria-label="Close">&times;</button>
           </div>
-          <button type="button" class="stu-sko-start"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Start</button>
+          <div class="stu-sko-plays">
+            <button type="button" class="stu-sko-start" id="playOne"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span class="txt">Play this skill</span></button>
+            <button type="button" class="stu-sko-start" id="playAll"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span class="txt">Play all selected<span class="sub">3 skills</span></span></button>
+          </div>
+          <div class="stu-sko-sel" role="group" aria-label="Selected skills">
+            <span class="stu-sko-sel-h">Selected (3)</span>
+            <span class="stu-sko-pill">Addition Facts (within 20)<button type="button" aria-label="Remove Addition Facts">&times;</button></span>
+            <span class="stu-sko-pill">Mult Facts<button type="button" aria-label="Remove Mult Facts">&times;</button></span>
+            <span class="stu-sko-pill">Division Facts<button type="button" aria-label="Remove Division Facts">&times;</button></span>
+          </div>
 
           <div id="stuSkoOpts">
             <button type="button" class="stu-sko-more" id="stuSkoMore" aria-expanded="true" aria-controls="stuSkoBody">
@@ -132,25 +158,26 @@ body { padding: 20px; }
         <div class="quick-skill-card pastel-aqua" role="button" tabindex="0" aria-expanded="false"><span class="skill-icon">&#128290;</span><span class="skill-name"><span class="qs-name-text">Count to 100</span></span></div>
       </div>
     </div>
+    <div class="mock-modes" role="group" aria-label="Start">
+      <button type="button" class="student-start-btn">&#127891; Start practice<small>3 skills</small></button>
+      <button type="button" class="student-start-btn">&#128009; Start boss battle<small>3 skills</small></button>
+      <button type="button" class="student-start-btn">&#127950;&#65039; Start car race<small>3 skills</small></button>
+      <button type="button" class="student-start-btn">&#128221; Start worksheet<small>3 skills</small></button>
+    </div>
     <p class="mock-note" id="mockNote"></p>
   </div>
 </div>
 <script>
 // Mock state switcher only. #open | #collapsed | #off | #none
 (function () {
-  var s = (location.hash || '#open').slice(1);
+  var st = (location.hash || '#folded').slice(1);
   var more = document.getElementById('stuSkoMore'), body = document.getElementById('stuSkoBody');
   var note = document.getElementById('mockNote');
-  if (s === 'collapsed') { more.setAttribute('aria-expanded', 'false'); body.hidden = true; note.textContent = 'MOCK state: collapsed (the default each time the panel opens). Start is first; the summary line says what is set.'; }
-  else if (s === 'off') { document.getElementById('stuSkoOpts').hidden = true; note.textContent = 'MOCK state: teacher setting "Let students change options" is OFF. The panel shows only Start; the teacher\'s choices still apply.'; }
-  else if (s === 'none') {
-    document.getElementById('stuSkoOpts').hidden = true;
-    document.getElementById('stuSkoTitle').textContent = 'Division Facts (÷1 to ÷12)';
-    document.getElementById('stuSko').style.setProperty('--caret', '86%');
-    document.getElementById('card0').classList.remove('selected'); document.getElementById('card3').classList.add('selected');
-    note.textContent = 'MOCK state: a skill with no pupil options (layout shown on the Division card for illustration only; division facts does have options). Same panel, Start only.';
-  }
-  else note.textContent = 'MOCK state: open, options expanded. Pupil chose Add 7 and 8. Every target is 48 px or more.';
+  function fold() { more.setAttribute('aria-expanded', 'false'); body.hidden = true; }
+  if (st === 'expanded') note.textContent = 'MOCK: options expanded after "Change it". This skill: Add 7 and 8. Each selected skill keeps its own options.';
+  else if (st === 'off') { document.getElementById('stuSkoOpts').hidden = true; note.textContent = 'MOCK: teacher setting "Let students change options" is OFF. Play buttons and the selected list only; the teacher\'s options apply.'; }
+  else if (st === 'none') { document.getElementById('stuSkoOpts').hidden = true; note.textContent = 'MOCK: a skill with no pupil options (illustrated on Addition Facts, which does have options). Play buttons only.'; }
+  else { fold(); note.textContent = 'MOCK: folded (the default each time the panel opens). Three skills selected; tap \u2715 on a card or in the list to remove one. Every target is 48 px or more.'; }
 })();
 </script>
 </body>
