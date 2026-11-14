@@ -478,11 +478,11 @@ async function alignMode() {
     const app = await H.open({});
     try {
         await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
-        for (const key of mine) for (const role of ROLES_A) for (const size of SIZES) {
+        for (const key of mine) for (const role of ROLES_A) for (const size of SIZES) for (const seed of [7, 784454]) {
             const sk = key.split(':')[1];
             const r = await app.page.evaluate(async (a) => {
                 let s;
-                try { s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: 7, form: 'A', key: true }); } catch (e) { return { err: String(e && e.message || e) }; }
+                try { s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true }); } catch (e) { return { err: String(e && e.message || e) }; }
                 await document.fonts.ready;
                 const mm = (px) => px / 96 * 25.4;
                 const res = [];
@@ -491,21 +491,25 @@ async function alignMode() {
                     for (const c of d.querySelectorAll('.mq-ww')) {
                         const steps = [...c.querySelectorAll('.mq-wwstep')];
                         if (steps.length !== 2 || steps[0].parentElement !== steps[1].parentElement) continue;
+                        // (round 2, critic F1b / F5: EVERY two-step row - a column step beside a sentence step too; a wrapped row's two
+                        // blocks share one left edge)
                         const facts = steps.map((x) => x.querySelector('.mq-wwfact'));
-                        if (!facts[0] || !facts[1]) continue;
                         const t = steps.map((x) => x.getBoundingClientRect());
-                        if (Math.abs(t[0].top - t[1].top) > 0 && t[1].left < t[0].right - 1) continue;   // wrapped onto two rows: not side by side
-                        const f = facts.map((x) => x.getBoundingClientRect());
-                        res.push({ which, block: mm(Math.abs(t[0].top - t[1].top)), sent: mm(Math.abs(f[0].top - f[1].top)) });
+                        if (t[1].top >= t[0].bottom - 1) { res.push({ which, wrap: mm(Math.abs(t[0].left - t[1].left)) }); continue; }
+                        const signs = steps.map((x) => [...x.children].find((c) => /×/.test(c.textContent) && /÷/.test(c.textContent) && !c.querySelector('.mq-wwfact,.mq-wwcols')));
+                        const f = facts[0] && facts[1] ? facts.map((x) => x.getBoundingClientRect()) : null;
+                        const g = signs[0] && signs[1] ? signs.map((x) => x.getBoundingClientRect()) : null;
+                        res.push({ which, block: mm(Math.abs(t[0].top - t[1].top)), sent: f ? mm(Math.abs(f[0].top - f[1].top)) : 0, sign: g ? mm(Math.abs(g[0].top - g[1].top)) : 0 });
                     }
                     d.remove();
                 }
                 return { res };
-            }, { sk, role, size });
+            }, { sk, role, size, seed });
             if (r.err) { out.push(`STEP-ALIGN ${sk} ${role} ${size}: buildSheet threw ${r.err}`); continue; }
             for (const x of r.res) {
                 judged++;
-                if (x.block > 1 || x.sent > 1) out.push(`STEP-ALIGN ${sk} ${role} ${size} ${x.which}: Step 1 / Step 2 stagger - blocks ${x.block.toFixed(1)} mm, sentences ${x.sent.toFixed(1)} mm apart (<= 1 mm)`);
+                if (x.wrap !== undefined) { if (x.wrap > 1) out.push(`STEP-ALIGN ${sk} ${role} ${size} ${x.which}: wrapped Step 2 starts ${x.wrap.toFixed(1)} mm off Step 1's left edge (<= 1 mm)`); continue; }
+                if (x.block > 1 || x.sent > 1 || x.sign > 1) out.push(`STEP-ALIGN ${sk} ${role} ${size} ${x.which}: Step 1 / Step 2 stagger - blocks ${x.block.toFixed(1)} mm, sign rows ${x.sign.toFixed(1)} mm, sentences ${x.sent.toFixed(1)} mm apart (<= 1 mm)`);
             }
         }
     } finally { await app.close(); }
