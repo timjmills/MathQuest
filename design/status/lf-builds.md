@@ -9,12 +9,10 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: 1, word-stories r1 FAIL
 
 ## Now
-- PAUSED at budget (cost_usd ≈ $125 of $140). word-stories critic r1 FAIL (design/audit/runs/lf-builds/stories/critic-r1.md, e82499a5e on claude/sweet-newton-c8wrv1-lf-builds-stories). Lowest: True or False? on add C2 3 (F1, NEW on branch: q.op '+' on every missing-part kind, 632748196); hosts' Reason It 4-3-6-6 (F2, master too); card 390 C1 5 (F3); guided / band-10 / column cell C3 6 (F4, F5); Reason It C4 6 (F8, engine).
-- Content passed the critic's read (432 items): forms 1–5 deal their labels, the trap is worded right, bands bound the answer, drawings follow RP-70/72.
-- Next round (medium fixer, rule 7 re-brief): F1 first (with the TF-EVAL check), F9 (No-limit bound), F6 (preset page mix), F4/F5; F2/F3 are master defects on offered roles/hosts: the lead decides whether this lane fixes them or the card hides those roles/hosts. F7/F8 belong to lf-roles.
-- g3-oa8 6-page baseline diff: CAUSED BY THIS BRANCH (lf-engine diagnosis 2026-11-13: sentenceState step-wise bar slots + columnPanel in lesson-arch/story.js; master baselines 0 of 1,598 differ). My probe only ruled out the band option. Fix r2 decides: intended change with named before/after pages and r2 critic scope, or gate it off for detailed lessons.
-- chart_120 precritic red, paused; times-as-many and partition not started.
-## Owner go
+- 2026-11-14 00:40Z: cost_usd $539.25, against the week's allocation stop of $569.70. No new agents.
+- chart_120 (this branch): critic r1 FAIL (critic-r1.md, 28096aaa7). The F1 class covers wrongAnswer / Steps / Say / hints on multi-gap items; there are also F2, F4, F5, F6, F9 and F10. The r2 fixer is running. F8 was decided by the lead: 101–110 only.
+- word-stories (-lf-builds-stories at 16b5d8ccd): r3 STOPPED, not critic-ready. 16 FAIL at ff819443c. The new ones need rulings or routing: sections PAGEFILL goes to lf-engine (placeSections); SCREEN-DIGIT on story-text numerals needs a scope ruling; forms 4/5 capacity at L is 5 vs 6; empty bands on the presets / Prerequisite Check / hosts. Details in design/audit/runs/lf-builds/stories/precritic-diff.md ("Fix round 3").
+- Out of scope by the owner's plan: S and 390.
 
 ## Budget
 - Week from 2026-11-13: allocation $200 above the session cost_usd baseline $369.70 (stop new agents at $569.70; lead, design/status/usage-week-2026-11-13.md).
