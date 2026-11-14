@@ -32,6 +32,9 @@
 //         wedge of white there (master 3623be10c); a joined path closes it (miter: K is the corner itself). <= 0.3 mm.
 //         A break in the vinculum (white between its pieces, from the arc rightwards) counts as gap too.
 //   step  the arc's top end against the vinculum's centre line, and the vinculum's pieces against each other (mm). <= 0.1 mm.
+// --raster (LDIV-JOIN-RASTER, ldiv critic r1 F1): also screenshots every screen host (card, worksheet, quiz at 1366, 1280,
+// 1024, 820) at DSF 2 and 3 and fails a bar whose central 1 px, from the arc's corner to the vinculum's end, holds a pixel
+// brighter than 80 (0 = black): an anti-aliased seam where two bar pieces meet at a fractional x.
 // A skill x host that draws no bracket FAILS (it would pass unseen). word-work.js's own divide frame (M2 1 Q...) is
 // lf-algebra's and is not measured here.
 const fs = require('fs');
@@ -162,6 +165,8 @@ function JOIN(rootSel, frameSel) {
     const root = doc.querySelector(rootSel);
     if (!root) return { error: 'no root ' + rootSel };
     const win = doc.defaultView, MM = 25.4 / 96;
+    // an entrance animation still running would move the bar between this measure and a --raster capture
+    try { (doc.getAnimations ? doc.getAnimations() : []).forEach((a) => { try { a.finish(); } catch (e) { /* infinite */ } }); } catch (e) { /* none */ }
     const parse = (d) => {
         const t = String(d).match(/[A-Za-z]|-?\d*\.?\d+(?:e-?\d+)?/g) || [];
         const segs = []; let i = 0, cur = null, sub = -1, cmd = null;
@@ -255,12 +260,16 @@ function JOIN(rootSel, frameSel) {
             if (lj === 'round') gap = Math.min(gap, Math.max(0, len(sub(K, T)) - hw));
             else if (/miter/.test(lj) && 1 / Math.sin(phi / 2) <= (parseFloat(cs.strokeMiterlimit) || 4)) gap = 0;
         }
-        out.push({ gap: Math.max(gap, brk) * MM, step: step * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40) });
+        // the bar's inside, for --raster: from just past the arc's corner to the vinculum's end, its central 1 px
+        const yc = (first.t + first.b) / 2;
+        out.push({ gap: Math.max(gap, brk) * MM, step: step * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40),
+            bar: { x0: T.x + 2 * hw + win.scrollX, x1: reach - 1 + win.scrollX, y0: yc - 0.5 + win.scrollY, y1: yc + 0.5 + win.scrollY } });
     });
     return { arcs: out };
 }
 
-async function viewport(page, w, h) { await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 }); await sleep(150); }
+let DSF = 1;   // --join --raster sets the device scale factor of the screen hosts
+async function viewport(page, w, h) { await page.setViewport({ width: w, height: h, deviceScaleFactor: DSF }); await sleep(150); }
 
 async function card(page, s, w, seed, fn = MEASURE) {
     await viewport(page, w, 900);
@@ -402,11 +411,51 @@ async function shotJoin(page, frameSel, file) {
     if (box) await page.screenshot({ path: path.join(SHOTS, file), clip: box });
     if (frameSel) await page.evaluate((frameSel) => { const fr = document.querySelector(frameSel); fr.style.visibility = 'hidden'; fr.style.zIndex = '-1'; }, frameSel);
 }
+// LDIV-JOIN-RASTER (ldiv critic r1 F1, 2026-11-14): the svg bar's butt end and the dividend's border can meet at a
+// fractional x and anti-alias to a light seam the geometry reads as gap 0. Screenshot each bar's central 1 px at the
+// current DSF and return the brightest device pixel inside it (0 = black; > RASTER_MAX is a break).
+const RASTER_MAX = 80;
+async function rasterBars(page, res) {
+    if (!res || res.error) return res;
+    for (const a of res.arcs) {
+        if (!a.bar || a.bar.x1 - a.bar.x0 < 1) continue;
+        const b = a.bar;
+        // a fixed or sticky layer (a footer bar, a toast) must not cover the bar in the capture
+        await page.evaluate(() => document.querySelectorAll('body *').forEach((el) => {
+            const p = getComputedStyle(el).position;
+            if ((p === 'fixed' || p === 'sticky') && !el.querySelector('svg path[d*="Q"]')) el.style.setProperty('visibility', 'hidden', 'important');
+        }));
+        const clip = { x: Math.floor(b.x0), y: Math.floor(b.y0) - 1, width: Math.ceil(b.x1) - Math.floor(b.x0), height: Math.ceil(b.y1) - Math.floor(b.y0) + 2 };
+        const png = await page.screenshot({ clip, encoding: 'base64', captureBeyondViewport: true });
+        if (process.env.LDIV_RASTER_DUMP) fs.writeFileSync(path.join(process.env.LDIV_RASTER_DUMP, `bar-${DSF}-${Math.round(clip.x)}-${Math.round(clip.y)}.png`), Buffer.from(png, 'base64'));
+        a.bright = await page.evaluate(async ({ png, clip, b, dsf }) => {
+            const img = new Image();
+            await new Promise((r, j) => { img.onload = r; img.onerror = j; img.src = 'data:image/png;base64,' + png; });
+            const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+            const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+            const px = g.getImageData(0, 0, c.width, c.height).data;
+            let max = 0;
+            for (let y = 0; y < c.height; y++) {
+                const cy = clip.y + (y + 0.5) / dsf;
+                if (cy < b.y0 || cy > b.y1) continue;
+                for (let x = 0; x < c.width; x++) {
+                    const cx = clip.x + (x + 0.5) / dsf;
+                    if (cx < b.x0 || cx > b.x1) continue;
+                    const i = (y * c.width + x) * 4;
+                    max = Math.max(max, Math.round((px[i] + px[i + 1] + px[i + 2]) / 3));
+                }
+            }
+            return max;
+        }, { png, clip, b, dsf: DSF });
+    }
+    return res;
+}
 async function joinMain() {
     const want = String(arg('skills', Object.keys(JOIN_SKILLS).join(','))).split(',').map((x) => x.trim()).filter(Boolean);
     const app = await open({ seed: 1, viewport: { width: 1366, height: 900, deviceScaleFactor: SHOTS ? 4 : 1 } });
     const { page } = app;
-    let fails = 0, n = 0, worstGap = 0, worstStep = 0;
+    let fails = 0, n = 0, worstGap = 0, worstStep = 0, worstBright = 0;
+    const RASTER = process.argv.includes('--raster');
     const judge = (where, res, needOne) => {
         if (!res || res.error) { fails++; console.log(`FAIL ${where}: ${res ? res.error : 'no result'}`); return; }
         if (!res.arcs.length) { if (needOne) { fails++; console.log(`FAIL ${where}: no bracket measured`); } return; }
@@ -444,11 +493,29 @@ async function joinMain() {
                     judge(`worksheet-${w} ${c.tag}`, await worksheet(page, s, w, JOIN), true);
                     judge(`quiz-${w} ${c.tag}`, await quiz(page, s, JOIN, w), true);
                 }
+                if (RASTER) {
+                    for (const dsf of [2, 3]) {
+                        DSF = dsf;
+                        for (const w of (process.env.LDIV_RASTER_W ? process.env.LDIV_RASTER_W.split(',').map(Number) : [1366, 1280, 1024, 820])) {
+                            const hosts = [['card', () => card(page, s, w, 11, JOIN)], ['worksheet', () => worksheet(page, s, w, JOIN)], ['quiz', () => quiz(page, s, JOIN, w)]];
+                            for (const [host, run] of hosts) {
+                                const res = await rasterBars(page, await run());
+                                const where = `${host}-${w} DSF ${dsf} ${c.tag}`;
+                                if (!res || res.error || !res.arcs.length) { fails++; console.log(`FAIL LDIV-JOIN-RASTER ${where}: ${res && res.error ? res.error : 'no bracket'}`); continue; }
+                                const br = Math.max(...res.arcs.map((a) => a.bright || 0));
+                                worstBright = Math.max(worstBright, br);
+                                if (br > RASTER_MAX) fails++;
+                                console.log(`${br > RASTER_MAX ? 'FAIL' : 'PASS'} LDIV-JOIN-RASTER ${where}: ${res.arcs.length} bar(s), brightest pixel in the bar ${br}${br > RASTER_MAX ? ` > ${RASTER_MAX} (a break)` : ''}`);
+                            }
+                        }
+                    }
+                    DSF = 1;
+                }
             }
         }
         const errs = app.problems.filter((p) => p.type !== 'requestfailed');
         if (errs.length) { fails++; errs.slice(0, 5).forEach((e) => console.log(`FAIL console: ${e.text}`)); }
-        console.log(`LDIV-JOIN: ${n} arcs measured; worst gap ${worstGap.toFixed(2)} mm, worst step ${worstStep.toFixed(2)} mm`);
+        console.log(`LDIV-JOIN: ${n} arcs measured; worst gap ${worstGap.toFixed(2)} mm, worst step ${worstStep.toFixed(2)} mm${RASTER ? `; LDIV-JOIN-RASTER brightest bar pixel ${worstBright} (max ${RASTER_MAX})` : ''}`);
     } catch (e) {
         console.log('FAIL ' + (e.stack || e.message));
         fails++;
