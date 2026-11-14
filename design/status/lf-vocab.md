@@ -619,3 +619,30 @@ pick3 answer-choice ring / picture marks). empty-band and next-box PASS inside p
    (V-GLINE / V18 / V18M OK, pick3 guided hashes unchanged by the fix). Backtest vocab-r16b-ebband-model-l (FAIL 9fa898ed, PASS
    15b4a933).
 Owner rule received mid-fix (master 76bc11c6): print size S dropped; S-only findings are noted, not fixed or counted.
+
+## Deploy-2 fixes (2026-11-14, on claude/lf-vocab-deploy-2 = r15 + r16 merged onto master 7a5bc902)
+
+1. **V23 at size S dropped.** ws-vocab-unit --browser V23 failed on 2 pupil pins (vocab_pick3_words guided S, seeds 7 and
+   143869), moved by master changes. Size S is dropped (owner plan item 9, master 76bc11c6), so V23 no longer composes or pins S:
+   the pinned pages loop over M and L only (tests/scripts/ws-vocab-unit.mjs) and the 20 S keys are removed from
+   tests/fixtures/precritic/vocab-pupil-hashes.json (60 -> 40), as master's design/audit/baselines/empty-band.json removed its S
+   keys. The 40 M and L pins are unchanged and pass.
+2. **EB-BAND, Match 3 flat pictures in a short row.** ws-empty-band (both modes, the full two-skill run) failed pick3's Review M p1
+   cell 5 [vocab-match3]: 19.6 mm between the pictures and the words of a 61.7 mm cell (31.7 %). Cause: master's Review composer
+   deals a Match 3 item of the earlier step (vocab_grade_pictures) into the pick3 Review's mixed band, in a 56-62 mm row; the r16b
+   Match 3 work (min 44, max 50 mm, words at its bottom) put ALL its free height between the pictures and the words, and a row of
+   FLAT pictures (the growing-patterns set, vocabSet 8: pictures 15-19 mm tall in a 26.7 mm box) leaves 19.6 mm free. It appeared
+   in the gate only because the last host variant's set options (grade_pictures {vocabSet: 8}) stay set into pick3's print jobs
+   (the harness never clears them after its host loop; reported to lf-checks). The same layout failed grade_pictures' own Review,
+   independent, more-practice, test and mixed-practice at M with vocabSet 8 (34-35 %), which no default run renders (the option
+   variants run at L only). Fix (vocab-match3.js only): a flat row's work is as tall as the middle of its natural height and the
+   cell's - height:min(50mm, max(44mm, (100% + natural) / 2)) - so the free height splits between the gap and the room under the
+   words; a full-height row keeps the old markup. Result: 24.4 % / 18 % at Review M. Backtest vocab-match3-flat-review-band.
+   V23: 2 of the 40 M / L pins move with this fix, both deliberate: vocab_grade_pictures more-practice M 143869 (a flat row dealt
+   by default: p1 cells 1-2 from 29.1 % / 25.4 % between the blocks to 19.4 % / 18.7 %) and more-practice L 143869 (the same row,
+   markup only: at a 72.5 mm cell the new height resolves to the old 50 mm, bands identical, 28.1-28.2 %). Re-pinned those 2;
+   the other 38 are unchanged.
+   Not fixed (outside the lane, the Review composer's row height): pick3 Review L with vocabSet 8 gives its Match 3 mixed cell a
+   78.3 mm row (the pick3 rows' height) for a 50 mm footprint: 26.2 mm under the words (33.4 %), and its pick3 cells draw 58 mm
+   against a 50 mm footprint (EB-FOOT 16-17 %). Both are present on 959530e0 and outside every default run; the work cannot grow
+   past 55 mm without failing EB-FOOT, so the fix is a Review row sized to its band's own items.

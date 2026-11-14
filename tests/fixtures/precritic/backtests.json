@@ -8823,6 +8823,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-match3-flat-review-band",
+   "check": "EB-BAND (--slot-ink off): a Match 3 row of FLAT pictures (vocabSet 8, the growing-patterns set) in a Review row at M leaves no band over 30 % (the r16b work put all its free height between the pictures and the words: 19.6 mm of a 56-62 mm cell, 31.7-35 %; pick3 Review M p1 cell 5, the Review's mixed band dealing grade_pictures' Match 3 item)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-empty-band EB-BAND --slot-ink off (lf-vocab deploy-2 fix 2)",
+   "fail": {
+    "commit": "959530e0",
+    "state": "lf-vocab r15 + r16 merged onto master 7a5bc902: the flat-row Match 3 work 44-50 mm with the words at its bottom"
+   },
+   "pass": {
+    "commit": "29984919",
+    "state": "a flat row's work is min(50, max(44, (cell + natural) / 2)) mm: the gap and the room under the words share the free height"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words --opts '{\"vocabSet\":8}' --roles review --sizes M --hosts none --no-baseline --slot-ink off --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
