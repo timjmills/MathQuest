@@ -893,3 +893,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - The long-division bracket is one stroke joined to the bar, its side a straight upright line (bow <= 0.34 mm), on paper and screen; only bracket markup changed.
 - Ledger: the 13:00 UTC sweep is blocking; 18 rows had lost lf-checks' resolved cells through merges and were restored; 11 parked / process rows got reasoned exemptions. Sweep 0 fail, none dropped.
 - Owner requests recorded for after the reset: area-model division with a two-digit divisor (4-digit / 2-digit, 5.NBT.6); multiplication in BOTH methods (area model and standard algorithm) for every size pair (2x1, 3x1, 2x2, 3x2 / 4x1), each new skill with its own lesson, linked to its White Rose step, prerequisites and related skills (lf-ops + lf-engine).
+
+## 2026-11-14 — Deploy bigger long-division work boxes (owner request; lf-ops LDIV-ROOM critic 9/9/8/9)
+- At 4 a page the long-division quotient boxes and work grid grow to fill the cell (M rows 1.87x, grid 93 % of the free height; L 1.54x), centred; printed digits unchanged; 6 a page unchanged. Owner approved as is.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
