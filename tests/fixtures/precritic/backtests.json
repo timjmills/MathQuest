@@ -8650,6 +8650,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-touch-48",
+   "check": "ws-phone-card TOUCH: every two-step screen box (frames number and sign boxes, the bar's boxes) is a 48 px touch target at 820 / 1024",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH (precritic two-step r13: the screen gates ran for the first time since r11)",
+   "browser": true,
+   "fail": {
+    "commit": "f5ff50856",
+    "state": "frames boxes 77 x 46 px, frames sign and bar boxes 47 x 47 px (floor 48) on multi_step_word, letter, estimate"
+   },
+   "pass": {
+    "commit": "b29beab08",
+    "state": "max(48px, ...) on the twin frames boxes and signs and the bar boxes"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
