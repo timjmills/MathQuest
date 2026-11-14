@@ -356,7 +356,9 @@ function shownCmd(g) {
 // a non-zero exit (the tool exits 1 because of exactly those findings). judge() turns any other non-zero exit, and any
 // time-out, into FAIL whatever the parser read: a gate that crashed or was killed never shows PASS (critic r1, D1/D8).
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
+// a gate's verdict line: "<tool>: OK|FAIL ..." or, for a tool run in one of its modes, "<tool> --mode[ --mode2]: OK|FAIL ..."
+// (lf-ops 2026-11-13: `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output" and turned every --strict run red)
+const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}(?: --[\\w-]+)*: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
 const NOISE = /MODULE_TYPELESS_PACKAGE_JSON|Reparsing as ES module|eliminate this warning|--trace-warnings|^\$ /;
 const tailLines = (out, n = 6) => String(out).split('\n').map((l) => l.trimEnd()).filter((l) => l.trim() && !NOISE.test(l)).slice(-n);
 const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output (${what})`, detail: tailLines(out), explainsExit: false });
@@ -368,6 +370,14 @@ const fmtMin = (m) => String(+(+m).toFixed(3));
 const mentioned = (out, k) => new RegExp(`(^|[\\s,;()\\[\\]{}"'])${reEsc(k)}($|[\\s,;:()\\[\\]{}"'.])`, 'm').test(out);
 
 if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more cases go here
+    // the verdict line of a tool run in a mode (lf-ops 2026-11-13: ws-no-size-s --browser read as unparsed)
+    const vl = (out, name) => { const v = lastVerdict(out, name); return v ? v[1] : null; };
+    const tv = [['plain verdict', vl('x\nws-no-size-s: OK (205 app files)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict', vl('  ok   no page errors\nws-no-size-s --browser: OK (73 checks)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict FAIL', vl('ws-no-size-s --browser: FAIL - 2 finding(s)\n', 'ws-no-size-s'), 'FAIL'],
+        ['two modes', vl('ws-x --a --b-c: OK\n', 'ws-x'), 'OK'],
+        ['another tool is not this one', vl('ws-no-size-s-extra: OK\n', 'ws-no-size-s'), null],
+        ['a non-flag word is not a mode', vl('ws-no-size-s browser: OK\n', 'ws-no-size-s'), null]];
     const t = [['one per line', mentioned('vocabulary:vocab_grade_pictures OK\n', 'vocabulary:vocab_grade_pictures'), true],
         ['comma list on one line', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_words'), true],
         ['last in the list', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_pictures'), true],
@@ -376,6 +386,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
         ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
     const bad = t.filter(([, got, want]) => got !== want);
     for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
+    for (const [n, got, want] of tv) if (got !== want) { bad.push([`verdict ${n}`, got, want]); console.log(`self-test FAIL: verdict ${n}: ${got}, want ${want}`); }
     // the copy-light eligibility, batch and sample cases (owner rule 2026-11-13) live in ws-copy-light --self-test
     const cl = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-copy-light.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const clLine = String(cl.stdout || '').trim().split('\n').pop();
@@ -384,7 +395,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const dkLine = String(dk.stdout || '').trim().split('\n').pop();
     if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
