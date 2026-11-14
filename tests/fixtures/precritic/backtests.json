@@ -9127,6 +9127,26 @@
     "pass": "OK"
    }
   },
+{
+ "id": "cbt-r2-e9-fullrow",
+ "check": "critic cbt r2 E9 (lead ruling 2026-11-14): the template-wide WS-REFLOW count-row exemption let number_patterns_rule's worksheet at 1024 / 1280 span every card, its 4 + 4 train in the middle third (~40 %) of a 1130 px card; the span is per card - only a train wider than a 2-column column spans (FULLROW-SPAN) - and a full-row card's content uses >= 50 % of its width (FULLROW-USE)",
+ "kind": "fixture",
+ "rule": "ws-worksheet-reflow FULLROW-SPAN / FULLROW-USE (precritic worksheet-reflow)",
+ "browser": false,
+ "fail": {
+  "fixture": "tests/fixtures/precritic/worksheet-reflow/npr-fullrow-1280.fail.json",
+  "state": "number_patterns_rule@1280 measured on 8f76b6401 (critic cbt r2 frozen tree) with the new measure: six spanning cards, trains 304-384 px in 910 px"
+ },
+ "pass": {
+  "fixture": "tests/fixtures/precritic/worksheet-reflow/npr-fullrow-1280.pass.json",
+  "state": "the same sheet with the per-card span: two columns, holding the re-pinned baseline"
+ },
+ "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
   {
    "id": "precritic-mode-verdict",
    "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
