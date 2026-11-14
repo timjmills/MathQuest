@@ -758,3 +758,20 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   reason-it under onePage, EB-BAND on the opener under onePage (E8 class), EB-VOCAB on lesson M, EB-GDPCAP on guided L.
 - Cost note for the lead: raster-fit is half the time. If ~36 min wall a carded skill is too slow, the next cut is raster on
   variants at L only (about -20 %), or variants on the roles each option line of §7a names (needs the card to say so).
+
+## 2026-11-14 — role cover after critic roles r1 (FAIL C1 6 / C2 7): rebuild at medium
+
+- **D1** `tests/lib/ws-drawing-variants.mjs` also signs the BUILT page: buildSheet pupil HTML (role independent, size M, seed
+  7000, no key; node, DOM stub removed so its measuring is skipped), skeleton vocabulary (`pg:` tokens), one buildSheet a value.
+  add_facts 1 -> 8 of 30 variants (notation=across + 7 support values); count_by_tables unchanged (8 of 16). Planning cost
+  ~1.2 s for both skills. `ws-role-cover` lints a support variant with `--supports` (print-lint runs L-SUPPORT only then);
+  new `--variants opt=v` focus and `--plan-check --variant`. Proven: `--skill addition:add_facts --roles guided --variants
+  support=frame` names L-SUPPORT SCC-T10 at M and L.
+- **Runtime**: add_facts role cover 2 shards / 18.2 min -> 3 shards, 302 + 272 + 302 units, est 92.6 min slot, ~46.3 min wall;
+  count_by_tables unchanged (93.9 / ~46.9).
+- **D2** expect-e3-e5-e6.sh re-states only with `--expect-e3e5e6` (fail args); the pass side can fail.
+- **D3** every precritic dry run (copy-light too) prints the role cover and its size.
+- Rows: role-cover-buildsheet-variants, role-cover-add-facts-guided-frame (browser), role-cover-e3e5e6-pass-can-fail (ws-role-cover --check-wrapper),
+  precritic-copy-light-role-cover-size: all PASS; role-cover-cbt-e3-e5-e6 and precritic-role-cover-plan re-run PASS.
+- N1 (numbers masked whole) not addressed.
+- checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).

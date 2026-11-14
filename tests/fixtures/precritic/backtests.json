@@ -8783,7 +8783,7 @@
    "commit": "b153ae21e",
    "state": "the planted FAIL passes through as FAIL"
   },
-  "command": "bash {root}/tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh bash -c \"echo 'ws-role-cover: FAIL (planted unrelated)'\" | tail -1 | grep -q 'FAIL (planted unrelated)' && echo 'expect-e3-e5-e6 --pass-side: OK (a planted unrelated red stays red)' || echo 'expect-e3-e5-e6 --pass-side: FAIL (a planted unrelated red read as green)'",
+  "command": "node tests/scripts/ws-role-cover.mjs --check-wrapper {root}/tests/fixtures/precritic/role-cover/expect-e3-e5-e6.sh",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -8804,6 +8804,26 @@
    "state": "copy-light dry run prints count_by_tables' role cover (17 roles, 8 variants) and its size and minutes"
   },
   "command": "node {root}/tests/scripts/ws-precritic.cjs --skill multiplication:count_by_tables --copy-light --dry-run 2>/dev/null | node tests/scripts/ws-role-cover.mjs --plan-check --skill multiplication:count_by_tables --roles opener,error-analysis,scripted-model",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "role-cover-add-facts-guided-frame",
+  "check": "critic roles r1 D1 proven escape: add_facts guided + support=frame fails L-SUPPORT SCC-T10 (the answer zone moves between cells, supports drawn) at M and L, yet no precritic --skill row ran it. The role cover on that variant must name L-SUPPORT SCC-T10: on ac526b6b2 the variant is not planned (and print-lint got --opts only, so L-SUPPORT never ran)",
+  "kind": "commit-pair",
+  "rule": "ws-role-cover lint units of support variants run print-lint with --supports (precritic role-cover-1..n)",
+  "browser": true,
+  "fail": {
+   "commit": "ac526b6b2",
+   "state": "the role cover of add_facts guided@L holds no support=frame unit: clean, the escape"
+  },
+  "pass": {
+   "commit": "225d8f049",
+   "state": "the support=frame unit lints with --supports frame and names L-SUPPORT SCC-T10"
+  },
+  "command": "node {root}/tests/scripts/ws-role-cover.mjs --root {root} --skill addition:add_facts --tools lint --roles guided --sizes L --variants support=frame 2>&1 | grep -q 'guided@L~support=frame: L-SUPPORT SCC-T10' && echo 'role-cover --guided-frame: OK (L-SUPPORT SCC-T10 named on guided@L support=frame)' || echo 'role-cover --guided-frame: FAIL (guided + support=frame not linted for L-SUPPORT)'",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

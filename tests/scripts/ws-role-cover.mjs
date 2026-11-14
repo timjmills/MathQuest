@@ -192,6 +192,18 @@ export function planCheck(text, skills, roles, variants = []) {
 
 async function main() {
     if (has('self-test')) process.exit(await selfTest());
+    if (has('check-wrapper')) {
+        // (critic roles r1 D2; backtest role-cover-e3e5e6-pass-can-fail) the E3/E5/E6 wrapper's PASS side can fail: a planted
+        // unrelated FAIL given without --expect-e3e5e6 must stay FAIL, a planted OK stay OK
+        const { spawnSync } = await import('node:child_process');
+        const w = (line, ...x) => (spawnSync('bash', [get('check-wrapper'), 'bash', '-c', `echo '${line}'`, ...x], { encoding: 'utf8' }).stdout || '').trim().split('\n').pop();
+        const bad = [];
+        if (!/: FAIL/.test(w('ws-role-cover: FAIL (planted unrelated)'))) bad.push('a planted unrelated FAIL reads OK on the pass side');
+        if (!/: OK/.test(w('ws-role-cover: OK (planted)'))) bad.push('a planted OK does not read OK');
+        console.log(`${TOOL} --check-wrapper: ${bad.length ? `FAIL (${bad.join('; ')})` : 'OK (pass side: an unrelated FAIL stays FAIL, an OK stays OK)'}`);
+        process.exitCode = bad.length ? 1 : 0;
+        return;
+    }
     if (has('plan-check')) {
         // (backtest precritic-role-cover-plan) node tests/scripts/ws-precritic.cjs --skill X --dry-run | ws-role-cover --plan-check --skill X --roles r,..
         let t = ''; for await (const c of process.stdin) t += c;
