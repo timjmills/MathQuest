@@ -871,3 +871,11 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Ledger: lf-checks' checks-from-critics fix (0 fail on master) + the panel's rows; stale duplicate rows from the merge removed. 4 panel rows remain WARNING, routed to lf-checks before 13:00 UTC.
 - ws-no-size-s --browser waits for the built size and re-clicks once on a miss (row nos-browser-settle-reclick).
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, frame-title, simple-print (one load failure, OK when run alone), screen-answer, pdf-preview, teacher-wrm, options-panel rows, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Final deploy before the owner's budget stop
+- number_word_form live2 (final round PASS; N3 / N6 / N7 / N9 fixed; PVW evidence updated).
+- L-KEY hotfix (lf-roles): answer keys and pupil pages never print raw JSON or generator ids (89 skills hit on master, 1,041 findings); ws-key-json on precritic.
+- Anchor charts carry the Name / Date line on every lesson, detailed lessons included (owner request; critics 9/9/9/9 and 9/9/9/8; re-pinned 512 + 86 chart hashes).
+- Every-role precritic (lf-checks, narrow critic r2 PASS): precritic --skill lints every card role x M/L x drawing-changing option.
+- Ledger: 0 fail before the 13:00 UTC sweep.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
