@@ -397,7 +397,7 @@ function rowFormHeightMm(forms, geo, size, labels, cols, look) {
     const padTop = Math.max(factPadTop(labels, cols), sz.tabMm + 1);
     // A grid MIXING forms (facts-print-fix r4): every form is drawn in the stacked fact's three lines (mixFrameMm), centred
     // down the cell under the tab's keep-out (the page's tab + 1 mm) with the 2 mm pad under it
-    if (forms.size > 1) return Math.ceil((mixKeepOutMm(size, look, cols, labels) + mixFrameMm(geo.pt) + 2) * 10) / 10;
+    if (forms.size > 1) return Math.ceil((mixKeepOutMm(size, look, cols, labels) + mixQuotientLiftMm(forms, geo.pt, size) + mixFrameMm(geo.pt) + 2) * 10) / 10;
     let h = 0;
     // the stacked ÷: the + - x fact's own need (factRowsLayout)
     if (forms.has('standard') || forms.has('vertical')) h = Math.max(h, padTop + 2.3 * em + 2.1 + Math.max(1.15 * em, sz.writeMm) + 2);
@@ -405,9 +405,12 @@ function rowFormHeightMm(forms, geo, size, labels, cols, look) {
     if (forms.has('fraction')) h = Math.max(h, padTop + 2.42 * em + 0.6 + sz.writeMm + 3);
     // the bracket (write-above, centred down the cell, CL-4b): the quotient zone and the bracket row
     if (forms.has('long')) {
-        h = Math.max(h, 2 + ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 1.33 * em + 2 + 2);
+        // (LDIV-FACT-ROOM, owner 2026-11-14: the quotient row over the bar is at least the writing height, cells/long-division.js)
+        const strip = Math.max((SLOT.digitStripMm || {})[size] || sz.writeMm, sz.writeMm);
+        h = Math.max(h, 2 + strip + 1.33 * em + 2 + 2);
         // QROOM (facts-print-fix r5, critic D-R5-5): the bracket is centred down its cell, so the cell is tall enough that the
         // room over the vinculum, under the tab, holds a written line of figures (1.15 em) - the stacked fact's answer row
+        // (the QROOM need is kept as it was laid - the old strip - so a long page keeps its rows; the taller strip only adds room)
         const qRow = ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 0.08 * em;
         let tab = sz.tabMm;
         try { tab = Math.max(tab, metricsFor(size, look || DEFAULT_LOOK, { factColumns: cols }).tabMm || 0); } catch (e) { /* the size's tab */ }
@@ -420,6 +423,17 @@ function rowFormHeightMm(forms, geo, size, labels, cols, look) {
 /** Height (mm) of one form in a mixed grid: two digit lines (1.15 em each), the rule's room (2 mm + 1.5 pt), the answer line. */
 export const mixFrameMm = (pt) => 3.45 * (EM_MM[pt] || (pt / 72) * 25.4) + 2 + 1.5 * 25.4 / 72;
 /** The keep-out over a mixed grid's cell: the number tab (the page's own tab size) + 1 mm, at least the fact pad. */
+/**
+ * LDIV-FACT-ROOM (owner 2026-11-14: "10 ⟌ 70", "2 ⟌ 6" squished beside a fraction; lead ruling): in a grid mixing forms the
+ * bracket's quotient is written on the frame's top line (1.07 em), under the tab's keep-out. When a bracket is in the grid
+ * that line is shorter than the size's writing height, the row grows by this and the BRACKET frames start this much lower
+ * (lead ruling 2026-11-14: Mix rows holding a bracket drop the one-baseline rule), so the room over the bar is at least Hw.
+ */
+function mixQuotientLiftMm(forms, pt, size) {
+    if (!forms || !forms.has('long')) return 0;
+    const em = EM_MM[pt] || (pt / 72) * 25.4;
+    return Math.max(0, Math.ceil(((SIZES[size] || SIZES.L).writeMm - 1.07 * em) * 10) / 10);
+}
 function mixKeepOutMm(size, look, cols, labels) {
     const sz = SIZES[size] || SIZES.L;
     let tab = sz.tabMm;
@@ -479,7 +493,7 @@ function formRows(items, input, ctx, G, labels, forms) {
     };
     return { across: false, forms, row, cols, rows, perPage, cellH: Math.min(G / rows, h * 1.3), hMin: h, digitPt: pt, tracks: geo.tracks || tracksOf(items), gridH: G, labels, mixed,
         // (a grid mixing forms: every cell drawn in the stacked fact's three lines, under the tab's keep-out - factCell)
-        mixGrid: forms.size > 1, keepOut: forms.size > 1 ? mixKeepOutMm(ctx.size, ctx.look, cols, labels) : 0, note: notes.join(' ') };
+        mixGrid: forms.size > 1, keepOut: forms.size > 1 ? mixKeepOutMm(ctx.size, ctx.look, cols, labels) : 0, lift: forms.size > 1 ? mixQuotientLiftMm(forms, pt, ctx.size) : 0, note: notes.join(' ') };
 }
 
 /** The rung every form of a Mix page is drawn at: the Standard fact rows' across rung (20 pt). */
@@ -562,11 +576,23 @@ export function factRowsLayout(items, input) {
     const n = Math.max(tracksOf(items), reachT, input.__clamp8 && items.some((it) => opOf(it.q || {}) !== 'divide') ? 3 : 0);
     const labels = labelStyleOf(ctx.look, input.labels);
     const forms = divForms(items) || mixedForms(items);
-    if (forms) return formRows(items, input, ctx, G, labels, forms);
+    // MIXED-ALL-OPS (owner 2026-11-14: "Mixed facts" put ÷ in its own section; he wants ÷ mixed in the rows like the other
+    // signs): + − × with ÷ facts in the ÷ sign's own form only (div_facts Standard / Vertical, no bracket or fraction) is a
+    // page of stacked facts - every fact on the page's one set of tracks, the ÷ fact drawn as the ÷ page draws it - so the
+    // ones digits keep one line down every column and each sign keeps its slot. A bracket or a fraction in the mix keeps
+    // the form rows below.
+    // (the section's SKILLS mix ÷ with + − × too: a page of the print that happened to deal ÷ facts only - the last page of
+    // In sections - is laid as the mixed page, its columns and digits the print's own)
+    const sk = Array.isArray(input.skills) ? input.skills : [];
+    const skillsMix = !!input.factSignMix || (sk.some((k) => k && k.categoryId === 'division') && sk.some((k) => k && k.categoryId && k.categoryId !== 'division'));
+    const signOnly = items.filter((it) => opOf(it.q || {}) === 'divide').every((it) => /^(standard|vertical)$/.test(formOf(it)));
+    const signMix = signOnly && !divForms(items) && ((!!forms && forms.size === 1 && forms.has('standard'))
+        || (!forms && skillsMix && items.length > 0 && items.every((it) => OP_SIGN[opOf(it.q || {})] && operandsOf(it.q || {}).length === 2)));
+    if (forms && !signMix) return formRows(items, input, ctx, G, labels, forms);
     // div_facts Standard ("12 ÷ 3 = __") and Vertical: on a fact-rows page both are the STACKED ÷
     // fact (owner ruling 2026-10-30: the ÷ sign reaches 10 columns; the across sentence of a 3-digit
     // dividend is 28 mm at 16 pt and cannot fit a 5-column cell at its rung, let alone 10).
-    const divStacked = items.length > 0 && items.every((it) => opOf(it.q || {}) === 'divide' && /^(standard|vertical)$/.test(formOf(it)));
+    const divStacked = (items.length > 0 && items.every((it) => opOf(it.q || {}) === 'divide' && /^(standard|vertical)$/.test(formOf(it)))) || signMix;
     if (isAcross(items) && !divStacked) {
         let cols = 3;
         let pt = 24;
@@ -591,7 +617,7 @@ export function factRowsLayout(items, input) {
     const fac = mults.map((it) => (operandsOf(it.q || {}) || []).slice(0, 2).map((v) => Math.abs(Number(v) || 0)));
     const reachMul = mults.length > 1 && Math.max(0, ...fac.map((f) => Math.max(...f, 0))) * Math.max(0, ...fac.map((f) => Math.min(...(f.length ? f : [0])))) > 99;
     // (input.factAnsTracks: the digits the + − × answers can reach, from the same probe - PT-FRW-5's clamp off the reach)
-    const big = (reachT ? (Number(input.factAnsTracks) || 0) >= 3 && items.some((it) => opOf(it.q || {}) !== 'divide') : reachMul) || items.some((it) => Number(answerOf(it)) > 99);
+    const big = (reachT ? (Number(input.factAnsTracks) || 0) >= 3 && (signMix || items.some((it) => opOf(it.q || {}) !== 'divide')) : reachMul) || items.some((it) => Number(answerOf(it)) > 99);
     let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
     // (input.__clamp8: the page was dealt for the 8-column clamp, see plan / R2-2)
@@ -638,7 +664,10 @@ export function factRowsLayout(items, input) {
     // number takes the tight 0.72 em track (x 1-12: "x _12" over "144"), so its facts are 2.88 em, not 3.36 em, wide
     // (facts-print-fix r4 D-R4-6: mult_facts alone at L dropped to 24 pt on the 1.2 em estimate; 28 pt fits with 4 mm a side)
     // hoisted above its first use (bigFact branch) - 2026-11-07 hotfix: TDZ ReferenceError on 5-6-digit facts
-    const opEm = items.length ? Math.max(...items.map((it) => { const o = operandsOf(it.q || {}); return o.length >= 2 ? factOpTrackEm(n, o[1], OP_SIGN[opOf(it.q || {})]) : FACT_OP_TRACK_EM; })) : FACT_OP_TRACK_EM;
+    const opEm0 = items.length ? Math.max(...items.map((it) => { const o = operandsOf(it.q || {}); return o.length >= 2 ? factOpTrackEm(n, o[1], OP_SIGN[opOf(it.q || {})]) : FACT_OP_TRACK_EM; })) : FACT_OP_TRACK_EM;
+    // (MIXED-ALL-OPS: a page mixing ÷ into the + − × rows draws every sign on the + − × operator track, whatever this page
+    // dealt, so every page of the print takes one track, one digit size and one column count)
+    const opEm = signMix ? Math.max(opEm0, factOpTrackEm(n, '9', '+')) : opEm0;
     const bigFact = !divide && n >= 5;
     if (bigFact) {
         const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
@@ -653,13 +682,15 @@ export function factRowsLayout(items, input) {
     // budget used as a column gate cost add_facts / sub_facts their Auto 10 at S, and overrode an
     // explicit teacher choice, though the facts fit with 1.7-4.4 mm to spare).
     const lastRung = LADDER_PTS[LADDER_PTS.length - 1];
-    if (!divide && !bigFact) {
+    if ((!divide || signMix) && !bigFact) {
         const before = cols;
         while (cols > 2 && verticalFitPt(cols, n, ctx.look, lastRung, ctx.size, FIT_CLEAR_MM, opEm) === 0) cols--;
         if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so every fact fits its cell.`].filter(Boolean).join(' ');
     }
-    const pt0 = tightDiv && fitsAt(cols) ? factDigitPt(cols)
+    const pt0a = tightDiv && fitsAt(cols) ? factDigitPt(cols)
         : (bigFact && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size, 5, opEm)) || verticalPt(cols, n, ctx.look, opEm);
+    // (MIXED-ALL-OPS: the + − × facts of a mixed page keep the digit size they take on their own page)
+    const pt0 = signMix ? Math.min(pt0a, verticalPt(cols, n, ctx.look, opEm)) : pt0a;
     // (input.factPt, facts-print-fix r4 ONEDIGIT: sections sharing a page take the smallest of their digit sizes)
     const pt1 = input.factSizeCap ? Math.min(pt0, SIZE_FACT_PT[ctx.size] || pt0) : pt0;
     const pt = Number(input.factPt) > 0 ? Math.min(pt1, Math.max(Number(input.factPt), LADDER_PTS[LADDER_PTS.length - 1])) : pt1;
@@ -679,7 +710,9 @@ export function factRowsLayout(items, input) {
     const need = padTop + 2.3 * dMm + 2.1 + Math.max(1.15 * dMm, sz.writeMm) + 2;
     const hMin = Math.max(cap.cellH, Math.ceil(need * 10) / 10);
     const rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / hMin));
-    return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, hMin * 1.3), hMin, digitPt: pt, tracks: n, gridH: G, labels, note };
+    return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, hMin * 1.3), hMin, digitPt: pt, tracks: n, gridH: G, labels, note,
+        // (MIXED-ALL-OPS: ÷ in the + − × rows - every fact on the page's widest operator track, so the ones digits keep one line)
+        ...(signMix ? { opEm } : {}) };
 }
 
 
@@ -770,7 +803,13 @@ function divUnderTab(L, n = L.tracks) {
  * border"): every form drawn in one frame of the stacked fact's three lines (mixFrameMm), the frame below the tab's
  * keep-out and centred down the cell (css/sheet-kit.css, .ws-mixform), each drawing centred across it.
  */
-const mixWrap = (L, kind, html) => `<div class="ws-mixform" data-ws-mixform="${kind}" style="font-size:${L.digitPt}pt;height:${mixFrameMm(L.digitPt).toFixed(2)}mm;margin-top:${Math.max(0, (L.keepOut || 2) - 2).toFixed(2)}mm">${html}</div>`;
+// (LDIV-FACT-ROOM, lead ruling 2026-11-14: only a BRACKET frame is lowered by the lift - Mix rows holding a bracket drop the
+// one-baseline rule; the other frames keep the top of the box, CL-4b)
+const mixWrap = (L, kind, html) => {
+    const lift = Number(L.lift) || 0;
+    const top = Math.max(0, (L.keepOut || 2) - 2) + (kind === 'bracket' ? lift : 0);
+    return `<div class="ws-mixform" data-ws-mixform="${kind}" style="font-size:${L.digitPt}pt;height:${mixFrameMm(L.digitPt).toFixed(2)}mm;margin-top:${top.toFixed(2)}mm${lift > 0 && kind !== 'bracket' ? ';margin-bottom:auto' : ''}">${html}</div>`;
+};
 
 function factCell(it, L) {
     const q = it.q || {};
@@ -816,6 +855,7 @@ function factCell(it, L) {
         // CL-40: a stacked ÷ fact's narrow operator track (0.62 em) puts a 3-digit dividend's first
         // digit 5.7 mm in from the cell's edge, under the M / L number tab's keep-out (6 / 7 mm) at
         // 10 columns: it starts below the keep-out instead (the row height already holds it).
+        ...(L.opEm ? { opEm: L.opEm } : {}),
         padTop: op === '/' && L.labels === 'tab' && divUnderTab(L, tracks) ? Math.max(factPadTop(L.labels, L.cols), ((SIZES[L.size] || SIZES.L).tabMm || 4) + 1)
             : factPadTop(L.labels, L.cols),
         // a fact-rows page is a fact drill: a 3+-track sum stays a fact in 4 columns or fewer too
@@ -895,7 +935,7 @@ function planSections(input, ctx, ids) {
     const secs = ids.map((id, i) => {
         const its = poolItems(input, id);
         const own = secIn[i] || {};
-        const inp = Object.assign({}, input, { factTracks: own.tracks || 0, factAnsTracks: own.ansTracks || 0, columns: own.columns || 'auto', count: own.count || undefined, factStretch: own.stretch || 0, factPt: own.maxPt || 0, factSizeCap: !!own.sizeCap });
+        const inp = Object.assign({}, input, { factTracks: own.tracks || 0, factAnsTracks: own.ansTracks || 0, columns: own.columns || 'auto', count: own.count || undefined, factStretch: own.stretch || 0, factPt: own.maxPt || 0, factSizeCap: !!own.sizeCap, factSignMix: !!own.signMix });
         return { id, its, inp, L: its.length ? factRowsLayout(its, inp) : null };
     }).filter((x) => x.its.length);
     const allItems = secs.flatMap((x) => x.its);

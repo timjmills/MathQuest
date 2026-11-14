@@ -1134,6 +1134,9 @@ function buildPlan(ctx) {
         // owner 2026-11-13 (size S dropped, fact sheets keep everything): 9- and 10-column fact sheets print at M with the
         // picked columns at the 16 pt rung, on the teacher print and the simple print (ws-fact-cols-m: FCM-COLS, FCM-PT, FCM-FIT)
         if (factKeys.length) add(gate('fact-cols-m', 'ws-fact-cols-m (9 / 10 picked columns at M: FCM-COLS, FCM-PT, FCM-FIT)', 'the four fact skills × 9 / 10 columns × M × teacher + simple print', 'browser', 'ws-fact-cols-m', [], { missingMsg: 'ws-fact-cols-m is not in this tree' }));
+        // owner 2026-11-14 (lf-ops mixfacts): the Mixed facts print keeps ÷ in the shared rows (MIXED-ALL-OPS), and a bracket fact on
+        // fact rows keeps a writing row over its bar (LDIV-FACT-ROOM)
+        if (factKeys.length) add(gate('fact-mix', 'ws-fact-mix (MIXED-ALL-OPS: ÷ in the + − × rows; LDIV-FACT-ROOM: Hw over the bracket bar)', 'Mixed facts simple print × M/L × Columns 6/8/Auto; div_facts Long / Mix / Long + − × fact rows × M/L', 'browser', 'ws-fact-mix', [], { missingMsg: 'ws-fact-mix is not in this tree' }));
         // Visual-quality critic r1 (root cause of F3 / F4): ws-grade-render MEASURED a lesson cell overflowing its pad and a
         // 41 x 44 px phone-card input, but no --skill gate failed on either (print-lint's L-OVERFLOW reads rectangles past the
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a
