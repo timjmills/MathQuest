@@ -884,3 +884,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Division and addition fact pages: landscape arrays, one frame per band, no Scripted Model overflow at L, one answer place on the 820 worksheet; mult_facts pages byte-identical to master (parked for a design pass).
 - Lead fix at deploy: ws-fact-pages / ws-screen-support-eq size lists M,L and card widths 820/1024/1280 (no S, no 390).
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, sm-array / screen-answer-place backtests, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy chart_120 (lf-builds critic r3 PASS): hundreds_chart_fill + chart_to_120 redesign-passed (32)
+- Counting charts to 120: one-window layouts hidden on multi-item pages; per-gap wrong answers, Steps / Say / hints name every gap, no window repeats on a sheet (print and screen). Critics r1-r3; every finding has a check, backtest and ledger row.
+- Gates: all deploy gates OK except the full ws-tof-stem sweep, which hit a puppeteer protocolTimeout twice (tool issue; it passed on master 7f2ca5e39). Run per skill it is OK on chart_to_120 and hundreds_chart_fill (12 frames each, 0 equation stems) - the only skills this deploy changes. Queued for lf-checks: tof-stem protocolTimeout / browser restart per N skills.
