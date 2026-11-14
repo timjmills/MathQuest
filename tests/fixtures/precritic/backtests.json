@@ -11100,6 +11100,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ea-stem",
+   "check": "an Error Analysis story sentence on an item the key judges correct is true of its numbers: the operands combined give the shown result (lead 2026-11-14, the class of TOF-STEM; no live skill prints a story sentence today, so this is a planted guard)",
+   "kind": "fixture",
+   "rule": "ws-ea-stem EA-STEM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ea-stem.fail.html",
+    "state": "a correct unknown-start item whose work reads '44 - 8 = 44'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ea-stem.pass.html",
+    "state": "'44 - 8 = 36' on the correct item; the Fix-it item keeps the pupil's wrong result"
+   },
+   "command": "node tests/scripts/ws-ea-stem.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-frame-fit",
+   "check": "a one-column Guided page of 31 mm count rows takes the rows the page DRAWS room for (Model + 6 tries at M and L), never past the drawn room or the L ceiling (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL: the frame reserve over-reserved instruction / Steps / body by 11 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-FRAME-FIT (browser twin: ws-empty-band EB-REFILL guided)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "M no drawnFrameMm; L 6 cells"
+   },
+   "pass": {
+    "commit": "a64d0e285",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-FRAME-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-lone-story",
+   "check": "a one-column Guided page holding ONE two-step story sizes the cell to the story it draws, never stretched to content / 0.7 (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: the lone story 25-31 % empty in its frame)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-LONE-STORY (browser twin: ws-empty-band EB-BAND guided, >= 30 % only)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "lone 135 mm story in a 186.1 mm cell at M and L"
+   },
+   "pass": {
+    "commit": "f8e338139",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-LONE-STORY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "gdpcap-answers",
+   "check": "a Guided page whose cells score 1 to 3 answers each keeps its scored answers within the §12.1 ceiling (lf-builds chart_120 Guided L: 7 answers > 6; ceilFor counted answers only when every cell scored > 1)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GDPCAP-ANSWERS (browser twin: ws-empty-band EB-GDPCAP)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "mixed L: 11 scored answers"
+   },
+   "pass": {
+    "commit": "72d4949bc",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GDPCAP-ANSWERS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
