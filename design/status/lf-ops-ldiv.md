@@ -38,3 +38,16 @@ Report: design/audit/runs/lf-ops/critic-ldiv-r1.md. The corner joins as one stro
 - Re-hash of the screen cards against 654606ae3 (5 bracket skills + add_facts and mult_facts, 1366 / 820, 3 seeds): only
   bracket markup changed. div_facts and div_facts_long: H12 → H13. div_remainders: the added rule span. Everything else,
   controls included, is byte-identical. ws-boot-smoke OK.
+
+## LDIV-SHAPE (owner 2026-11-14: "make it straight or almost straight")
+
+- Check: `ws-ldiv-hug --shape` measures the bracket side's bow: its greatest distance from the chord, in mm, limit 0.6. It runs on
+  precritic's ldiv-join gate (--join --raster --shape). Backtest `ldiv-shape`: 0176d774f FAIL → b7ee41f3a OK. ws-precritic-plan OK.
+- Bows before (0176d774f): paper M 2.64, L 3.30 (long_div_2digit, div_facts long); remainder bracket M 1.60, L 2.04;
+  screen card div_facts 2.59, remainder 3.06, worked bracket 5.04. After: worst 0.34 mm everywhere (610 arcs).
+  LDIV-JOIN gap and step 0.00, LDIV-JOIN-RASTER brightest pixel 0.
+- Fix (b7ee41f3a): `bracketLine()` in long-division.js. The side's apex stays at the old apex, so the hug is unchanged:
+  ws-ldiv-hug's paper reference gap is still 0.53 em, and its default run has the same one pre-existing FAIL as before.
+  The bow is 0.25 units of a 10-wide box. The white the bow gave up goes to the divisor's side. ARC-INK is clean at M and L.
+- Hash proof (base = 37ca028e6 with the fix reverted): with the bracket svg and its rule offset stripped, 0 of 282
+  renders differ. Controls are byte-identical. ws-boot-smoke OK. Merged origin/master e9cb5797c, keeping both sides.
