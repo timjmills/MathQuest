@@ -1140,7 +1140,8 @@ function framesLayout(p, ctx) {
     const sh = put ? shownSteps(p, ctx) : null;
     const S = sh ? sh.steps : p.steps;
     const shownAns = sh ? sh.ans : String(p.ans);
-    const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
+    // (screen: every frames box is a 48 px touch target at the tablet widths - ws-phone-card TOUCH, round 3b: 46 px at 820 / 1024)
+    const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${twin ? `max(48px, ${L(ctx, bx)})` : tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
     // one number box; on screen an input as wide as its number (the answer: the host's own cell, `data-mq-cell`)
     const box = (id, v, digits, graded = false, heavy = false) => {
         const w = Math.max(bx * 1.25, blankWidth(Math.max(2, digits), sizeOf(ctx)));
@@ -1151,7 +1152,7 @@ function framesLayout(p, ctx) {
         return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face(w, heavy)}">${put ? esc(v) : ''}</span>`;
     };
     const sign = (id, op) => (twin
-        ? `<input type="text" class="mq-wwork" data-mq-kind="sign" data-mq-expect="${GLYPH[op]}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign" style="box-sizing:border-box;width:${tw(ctx, bx * 0.9)};height:${tw(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;text-align:center;padding:0;margin:0;">`
+        ? `<input type="text" class="mq-wwork" data-mq-kind="sign" data-mq-expect="${GLYPH[op]}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign" style="box-sizing:border-box;width:max(48px, ${L(ctx, bx * 0.9)});height:max(48px, ${L(ctx, bx * 0.9)});border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;text-align:center;padding:0;margin:0;">`
         : `<span data-ws-slot="${esc(id)}" data-ws-shape="circle" data-ws-graded="0"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, bx * 0.9)};height:${L(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;line-height:1;color:${col};">${put ? GLYPH[op] : ''}</span>`);
     const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
     const cap = (t) => `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">${t}</span>`;
