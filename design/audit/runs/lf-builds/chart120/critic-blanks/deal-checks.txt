@@ -1,0 +1,191 @@
+c120-independent-M pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [98,100,110,117,120] | w2:3x5 blanks=5 [93,95,105,112,115] | w3:3x5 blanks=5 [95,98,105,115,117] | w4:3x5 blanks=5 [95,98,105,115,117] | w5:3x5 blanks=5 [93,95,105,115,117] | w6:3x5 blanks=5 [93,95,105,112,115]
+   Score /30
+c120-independent-L pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [98,100,110,117,120] | w2:3x5 blanks=5 [93,95,105,112,115] | w3:3x5 blanks=5 [95,98,105,115,117] | w4:3x5 blanks=5 [95,98,105,115,117] | w5:3x5 blanks=5 [93,95,105,115,117] | w6:3x5 blanks=5 [93,95,105,112,115]
+   Score /30
+c120-test-M pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [98,100,110,117,120] | w2:3x5 blanks=5 [93,95,105,112,115] | w3:3x5 blanks=5 [95,98,105,115,117] | w4:3x5 blanks=5 [95,98,105,115,117] | w5:3x5 blanks=5 [93,95,105,115,117] | w6:3x5 blanks=5 [93,95,105,112,115]
+   Score /30
+c120-test-L pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [98,100,110,117,120] | w2:3x5 blanks=5 [93,95,105,112,115] | w3:3x5 blanks=5 [95,98,105,115,117] | w4:3x5 blanks=5 [95,98,105,115,117] | w5:3x5 blanks=5 [93,95,105,115,117] | w6:3x5 blanks=5 [93,95,105,112,115]
+   Score /30
+c120-guided-M pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,103,114]
+   Score /3
+c120-guided-L pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,103,114]
+   Score /3
+c120-error-analysis-M pages=1/1 fits=[object Object] pupilBlanks=0 keySlots=[5,5]
+ p1: w1:3x5 blanks=0 traced=5 [] | w2:3x5 blanks=0 traced=5 []
+   Score /2
+c120-error-analysis-L pages=1/1 fits=[object Object] pupilBlanks=0 keySlots=[5,5]
+ p1: w1:3x5 blanks=0 traced=5 [] | w2:3x5 blanks=0 traced=5 []
+   Score /2
+c120-lesson-M pages=3/3 fits=[object Object] pupilBlanks=15 keySlots=[0,0,0 / 5,5,5 / ]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [98,100,110,117,120] | w2:3x5 blanks=5 [93,95,105,112,115] | w3:3x5 blanks=5 [95,98,105,115,117]
+   Score /12
+ p3: 
+c120-lesson-L pages=3/3 fits=[object Object] pupilBlanks=5 keySlots=[0,0,0 / 5 / ]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [98,100,110,117,120]
+   Score /2
+ p3: 
+c120t8-independent-M pages=1/1 fits=[object Object] pupilBlanks=12 keySlots=[6,6]
+ p1: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-independent-L pages=1/1 fits=[object Object] pupilBlanks=12 keySlots=[6,6]
+ p1: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-test-M pages=1/1 fits=[object Object] pupilBlanks=12 keySlots=[6,6]
+ p1: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-test-L pages=1/1 fits=[object Object] pupilBlanks=12 keySlots=[6,6]
+ p1: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-guided-M pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,103,114]
+   Score /3
+c120t8-guided-L pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,103,114]
+   Score /3
+c120t8-error-analysis-M pages=1/1 fits=[object Object] pupilBlanks=0 keySlots=[6,6]
+ p1: w1:3x5 blanks=0 traced=6 [] | w2:3x5 blanks=0 traced=6 []
+   Score /2
+c120t8-error-analysis-L pages=1/1 fits=[object Object] pupilBlanks=0 keySlots=[6,6]
+ p1: w1:3x5 blanks=0 traced=6 [] | w2:3x5 blanks=0 traced=6 []
+   Score /2
+c120t8-lesson-M pages=3/3 fits=[object Object] pupilBlanks=18 keySlots=[0,0,0 / 6 / 6,6]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /2
+ p3: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-lesson-L pages=3/3 fits=[object Object] pupilBlanks=18 keySlots=[0,0,0 / 6 / 6,6]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /2
+ p3: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+hcf100-independent-M pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [44,46,52,56,62] | w2:3x5 blanks=5 [2,13,16,23,26] | w3:3x5 blanks=5 [70,76,78,87,90] | w4:3x5 blanks=5 [46,48,56,58,70] | w5:3x5 blanks=5 [33,35,44,46,56] | w6:3x5 blanks=5 [40,46,48,56,58]
+   Score /30
+hcf100-independent-L pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [44,46,52,56,62] | w2:3x5 blanks=5 [2,13,16,23,26] | w3:3x5 blanks=5 [70,76,78,87,90] | w4:3x5 blanks=5 [46,48,56,58,70] | w5:3x5 blanks=5 [33,35,44,46,56] | w6:3x5 blanks=5 [40,46,48,56,58]
+   Score /30
+hcf100-test-M pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [44,46,52,56,62] | w2:3x5 blanks=5 [2,13,16,23,26] | w3:3x5 blanks=5 [70,76,78,87,90] | w4:3x5 blanks=5 [46,48,56,58,70] | w5:3x5 blanks=5 [33,35,44,46,56] | w6:3x5 blanks=5 [40,46,48,56,58]
+   Score /30
+hcf100-test-L pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [44,46,52,56,62] | w2:3x5 blanks=5 [2,13,16,23,26] | w3:3x5 blanks=5 [70,76,78,87,90] | w4:3x5 blanks=5 [46,48,56,58,70] | w5:3x5 blanks=5 [33,35,44,46,56] | w6:3x5 blanks=5 [40,46,48,56,58]
+   Score /30
+hcf100-guided-M pages=1/1 fits=[object Object] pupilBlanks=6 keySlots=[3,3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [2,16,23] | w3:3x5 blanks=3 [70,78,90]
+   Score /6
+hcf100-guided-L pages=1/1 fits=[object Object] pupilBlanks=6 keySlots=[3,3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [2,16,23] | w3:3x5 blanks=3 [70,78,90]
+   Score /6
+hcf100-error-analysis-M pages=1/1 fits=[object Object] pupilBlanks=0 keySlots=[5,5]
+ p1: w1:3x5 blanks=0 traced=5 [] | w2:3x5 blanks=0 traced=5 []
+   Score /2
+hcf100-error-analysis-L pages=1/1 fits=[object Object] pupilBlanks=0 keySlots=[5,5]
+ p1: w1:3x5 blanks=0 traced=5 [] | w2:3x5 blanks=0 traced=5 []
+   Score /2
+hcf100-lesson-M pages=3/3 fits=[object Object] pupilBlanks=50 keySlots=[0,0,0 / 5,5,5,5 / 5,5,5,5,5,5]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [2,13,16,23,26] | w2:3x5 blanks=5 [70,76,78,87,90] | w3:3x5 blanks=5 [44,46,52,56,62] | w4:3x5 blanks=5 [46,48,56,58,70]
+   Score /12
+ p3: w1:3x5 blanks=5 [7,16,19,26,29] | w2:3x5 blanks=5 [7,13,16,23,26] | w3:3x5 blanks=5 [26,29,40,46,48] | w4:3x5 blanks=5 [7,16,19,26,29] | w5:3x5 blanks=5 [52,56,62,74,76] | w6:3x5 blanks=5 [33,35,41,44,52]
+   Score /30
+hcf100-lesson-L pages=3/3 fits=[object Object] pupilBlanks=40 keySlots=[0,0,0 / 5,5 / 5,5,5,5,5,5]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [2,13,16,23,26] | w2:3x5 blanks=5 [70,76,78,87,90]
+   Score /2
+ p3: w1:3x5 blanks=5 [7,16,19,26,29] | w2:3x5 blanks=5 [7,13,16,23,26] | w3:3x5 blanks=5 [26,29,40,46,48] | w4:3x5 blanks=5 [7,16,19,26,29] | w5:3x5 blanks=5 [52,56,62,74,76] | w6:3x5 blanks=5 [33,35,41,44,52]
+   Score /30
+
+c120-lesson-M pages=3/3 fits=[object Object] pupilBlanks=15 keySlots=[0,0,0 / 5,5,5 / ]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [97,100,108,110,117] | w2:3x5 blanks=5 [92,95,103,105,112] | w3:3x5 blanks=5 [95,97,105,108,117]
+   Score /12
+ p3: 
+c120-lesson-L pages=3/3 fits=[object Object] pupilBlanks=5 keySlots=[0,0,0 / 5 / ]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [97,100,108,110,117]
+   Score /2
+ p3: 
+c120-independent-M pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [97,100,108,110,117] | w2:3x5 blanks=5 [92,95,103,105,112] | w3:3x5 blanks=5 [95,97,103,105,117] | w4:3x5 blanks=5 [95,97,105,108,117] | w5:3x5 blanks=5 [92,95,103,105,112] | w6:3x5 blanks=5 [95,97,105,108,117]
+   Score /30
+c120-independent-L pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [97,100,108,110,117] | w2:3x5 blanks=5 [92,95,103,105,112] | w3:3x5 blanks=5 [95,97,103,105,117] | w4:3x5 blanks=5 [95,97,105,108,117] | w5:3x5 blanks=5 [92,95,103,105,112] | w6:3x5 blanks=5 [95,97,105,108,117]
+   Score /30
+c120-guided-M pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,105,114]
+   Score /3
+c120-guided-L pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,105,114]
+   Score /3
+c120t8-lesson-M pages=3/3 fits=[object Object] pupilBlanks=18 keySlots=[0,0,0 / 6 / 6,6]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /2
+ p3: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-lesson-L pages=3/3 fits=[object Object] pupilBlanks=18 keySlots=[0,0,0 / 6 / 6,6]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /2
+ p3: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-independent-M pages=1/1 fits=[object Object] pupilBlanks=12 keySlots=[6,6]
+ p1: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-independent-L pages=1/1 fits=[object Object] pupilBlanks=12 keySlots=[6,6]
+ p1: w1:3x5 blanks=6 [96,98,106,108,116,118] | w2:3x5 blanks=6 [91,93,101,103,111,113]
+   Score /12
+c120t8-guided-M pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,105,114]
+   Score /3
+c120t8-guided-L pages=1/1 fits=[object Object] pupilBlanks=3 keySlots=[3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [91,105,114]
+   Score /3
+hcf100-lesson-M pages=3/3 fits=[object Object] pupilBlanks=50 keySlots=[0,0,0 / 5,5,5,5 / 5,5,5,5,5,5]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [4,6,14,16,28] | w2:3x5 blanks=5 [34,36,42,46,53] | w3:3x5 blanks=5 [53,61,63,72,75] | w4:3x5 blanks=5 [34,36,46,53,57]
+   Score /12
+ p3: w1:3x5 blanks=5 [28,30,36,46,48] | w2:3x5 blanks=5 [34,36,46,48,57] | w3:3x5 blanks=5 [4,11,14,21,23] | w4:3x5 blanks=5 [4,6,14,16,23] | w5:3x5 blanks=5 [36,46,48,57,60] | w6:3x5 blanks=5 [4,6,14,16,23]
+   Score /30
+hcf100-lesson-L pages=3/3 fits=[object Object] pupilBlanks=40 keySlots=[0,0,0 / 5,5 / 5,5,5,5,5,5]
+ p1: w1:3x5 blanks=0 [] | w2:3x5 blanks=0 [] | w3:3x5 blanks=0 []
+ p2: w1:3x5 blanks=5 [4,6,14,16,28] | w2:3x5 blanks=5 [34,36,42,46,53]
+   Score /2
+ p3: w1:3x5 blanks=5 [28,30,36,46,48] | w2:3x5 blanks=5 [34,36,46,48,57] | w3:3x5 blanks=5 [4,11,14,21,23] | w4:3x5 blanks=5 [4,6,14,16,23] | w5:3x5 blanks=5 [36,46,48,57,60] | w6:3x5 blanks=5 [4,6,14,16,23]
+   Score /30
+hcf100-independent-M pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [53,61,63,72,75] | w2:3x5 blanks=5 [4,6,14,16,28] | w3:3x5 blanks=5 [34,36,46,53,57] | w4:3x5 blanks=5 [57,60,70,78,80] | w5:3x5 blanks=5 [6,16,19,28,30] | w6:3x5 blanks=5 [16,19,28,30,36]
+   Score /30
+hcf100-independent-L pages=1/1 fits=[object Object] pupilBlanks=30 keySlots=[5,5,5,5,5,5]
+ p1: w1:3x5 blanks=5 [53,61,63,72,75] | w2:3x5 blanks=5 [4,6,14,16,28] | w3:3x5 blanks=5 [34,36,46,53,57] | w4:3x5 blanks=5 [57,60,70,78,80] | w5:3x5 blanks=5 [6,16,19,28,30] | w6:3x5 blanks=5 [16,19,28,30,36]
+   Score /30
+hcf100-guided-M pages=1/1 fits=[object Object] pupilBlanks=6 keySlots=[3,3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [4,16,28] | w3:3x5 blanks=3 [36,46,57]
+   Score /6
+hcf100-guided-L pages=1/1 fits=[object Object] pupilBlanks=6 keySlots=[3,3,3]
+ p1: w1:3x5 blanks=0 traced=3 [] | w2:3x5 blanks=3 [4,16,28] | w3:3x5 blanks=3 [36,46,57]
+   Score /6
+
+worksheet chart_to_120 1366 score: null inputs: [[60,54],[60,54],[60,54]] text: 1
+worksheet chart_to_120 820 score: null inputs: [[60,54],[60,54],[60,54]] text: 1
+worksheet hundreds_chart_fill 1366 score: null inputs: [[60,54],[60,54],[60,54]] text: 1
+worksheet hundreds_chart_fill 820 score: null inputs: [[60,54],[60,54],[60,54]] text: 1
+worksheet chart_to_120 1366 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":60},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+quiz chart_to_120 1366 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":30},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+worksheet chart_to_120 820 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":60},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+quiz chart_to_120 820 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":30},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+worksheet hundreds_chart_fill 1366 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":60},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+quiz hundreds_chart_fill 1366 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":30},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+worksheet hundreds_chart_fill 820 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":60},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+quiz hundreds_chart_fill 820 {"sets":10,"giveSets":0,"gives":0,"counts":{"3x5:5":30},"rowAll":0,"half":0,"noNb":0,"adj":0,"noWin":0,"sameSquares":0}
+
