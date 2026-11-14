@@ -11863,6 +11863,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "correct-sound-powerup-once",
+   "check": "ws-correct-sound SOUND-PLAN / SOUND-ONCE: the power-up (square C5 E5 G5 70 ms, C6 400 ms decaying) plays exactly once on a correct answer with Sound on, never on a wrong one or with Sound off, on the card, the worksheet and the quiz at 1280 / 1024",
+   "kind": "commit-pair",
+   "rule": "SOUND-ONCE (owner request 2026-11-14, correct-answer sound \"B, power-up\")",
+   "fail": {
+    "commit": "84f8813a1",
+    "state": "no power-up module: the card played the old triangle arpeggio, the worksheet and the quiz played nothing"
+   },
+   "pass": {
+    "commit": "eed07b7c1",
+    "state": "correct-sound.js, called from answer-check.js, worksheet.js wsRecordAnswer (once per item) and quiz-take.js recordAnswer (instant feedback), gated by the Sound toggle"
+   },
+   "command": "node tests/scripts/ws-correct-sound.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
