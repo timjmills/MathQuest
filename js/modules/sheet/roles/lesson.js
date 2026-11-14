@@ -452,8 +452,10 @@ function planOnce(input = {}) {
             carry = data && data.growAll ? 0 : add0 - add;
             // (ROW-STRETCH CAP, layout.rowCapMm: a band of declared templates - `tmpls`, its `rows` - grows at most their writing
             // room past its drawn height; what the cap refuses is not carried to the bands after it: it stays white at the foot)
+            // (on a `growAll` sheet too: the refused part leaves `left`, so the bands after it do not take it)
+            const addPre = add;
             if (g.tmpls) add = Math.min(add, Math.max(0, rowCapMm(g.h, g.tmpls, g.rows || 1) - g.h));
-            left -= add;
+            left -= data && data.growAll ? addPre : add;
             pg.grown = (pg.grown || 0) + add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
