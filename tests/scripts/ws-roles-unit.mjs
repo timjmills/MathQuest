@@ -54,6 +54,10 @@
 //                DRAWS room for, not the rows its frame reserve leaves (lf-roles r10 item 1: the reserve held the one-line instruction
 //                to two lines, the Steps band 2.4 mm and the body 3 mm over what prints; count_by_tables Guided M dealt 4 rows where
 //                5 fit, EB-REFILL on lf-ops-props). M and L: the Model and 6 tries, never past the drawn room or the L ceiling.
+//   GUIDED-LONE-STORY a one-column Guided page holding ONE two-step story (the Model, 135 mm measured) sizes the cell to the story
+//                it draws (its work, writing room, tab clearance), never stretched to content / 0.7: a lone cell <= its measure / 0.9
+//                (lf-roles r10 item 2, live deploy-7 algebra:two_step_add_then_div Guided M seed 694812: the lone story ~25-31 %
+//                empty in its frame; EB-BAND sees only >= 30 %). Control: a page of two stories keeps its rows.
 //   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
@@ -553,6 +557,20 @@ if (on('GUIDED-FRAME-FIT')) {
             if (typeof GD.drawnFrameMm !== 'function') findings.push(`GUIDED-FRAME-FIT ${size}: no drawnFrameMm (the fit has no drawn frame to count rows against)`);
             else if (gridMm > 239 - 6.8 - 1 + 0.5) findings.push(`GUIDED-FRAME-FIT ${size}: grid ${gridMm.toFixed(1)} mm runs past the drawn room`);
         } catch (e) { findings.push(`GUIDED-FRAME-FIT ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-LONE-STORY')) {
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 8 }, (_, i) => twoStep(i, { h3: 135, h1: 93 })) });
+            const fits = pl.meta.fits || [];
+            const lone = fits.filter((f) => f.rows === 1 && f.cols === 1);
+            if (!lone.length) findings.push(`GUIDED-LONE-STORY ${size}: no lone-story page planted (${fits.map((f) => f.rows).join(' + ')}) - the check's fixture moved`);
+            for (const f of lone) if (f.cellH > (135 + 1) / 0.9) findings.push(`GUIDED-LONE-STORY ${size}: a lone 135 mm story in a ${f.cellH.toFixed(1)} mm cell (${Math.round((1 - 136 / f.cellH) * 100)} % of it empty under the work; want <= ${((135 + 1) / 0.9).toFixed(1)} mm)`);
+            if (!fits.some((f) => f.rows === 2)) findings.push(`GUIDED-LONE-STORY ${size} control: no page of two plain tries (${fits.map((f) => f.rows).join(' + ')})`);
+        } catch (e) { findings.push(`GUIDED-LONE-STORY ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 

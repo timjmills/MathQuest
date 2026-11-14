@@ -1352,7 +1352,15 @@ export function plan(input = {}) {
         // the grid is the Guided page's accepted white (PT-GDP / PAGE_TYPES 12.1). Only a one-column page of word-work stories
         // measured at their drawn levels (MEASURE_LO), whose row heights are what they draw.
         // (and every row of such a page: a row of plain tries drawn at level 1 - 52 mm letter stories in 105 mm rows - is held the same way)
+        // GUIDED-LONE-STORY (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: a lone story cell ~25-31 %
+        // empty inside its frame): a one-column page holding ONE word-work story is held the same way, whatever its measure - the
+        // cell is its drawn content plus its writing room, the spare under the grid.
         if (cols === 1 && host.length && host.every((it) => it.template === 'word-work' && it.measured && it.measured[1] && it.measured[1].atLevel)) Hr = Hr.map((x, r) => Math.min(x, oneRowCapOf(w[r])));
+        // GUIDED-LONE-STORY (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: a lone story cell ~25-31 %
+        // empty inside its frame, the page ~30 % white under it): ONE-ROW's cap still lets a lone row stretch to its content / 0.7.
+        // A one-column page holding ONE word-work story takes the row the story draws - its measured work and writing room, the
+        // Model's tab clearance and worked lines, the hint line (w) - and the spare height stays under the grid (PAGE_TYPES 12.1).
+        if (cols === 1 && rows === 1 && host.length === 1 && host[0].template === 'word-work') Hr = [Math.min(Hr[0], w[0])];
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
