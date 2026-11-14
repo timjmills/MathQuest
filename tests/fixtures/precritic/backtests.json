@@ -9183,6 +9183,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ldiv-shape",
+   "check": "the long-division bracket's side is near-straight: its greatest distance from the chord between its ends is <= 0.6 mm on paper (M/L, pupil + key) and on screen (card / worksheet / quiz 1366 / 820) (owner 2026-11-14: 'I don't like the big curve ... make it straight or almost straight'; 0176d774f bows 1.60-3.30 mm on paper, 5.04 mm on the screen worked bracket)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --join --shape LDIV-SHAPE",
+   "browser": true,
+   "fail": {
+    "commit": "0176d774f",
+    "state": "quadratic arc x 1.5 / q 9 of a 10-wide box: bow 2.64 mm at M, 3.30 mm at L"
+   },
+   "pass": {
+    "commit": "b7ee41f3a",
+    "state": "bracketLine: near-straight side, apex at the old apex, bow <= 0.34 mm"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --join --shape --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
