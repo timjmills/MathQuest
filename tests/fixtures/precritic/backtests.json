@@ -10460,7 +10460,7 @@
   "commit": "f1d360bd6",
   "state": "lf-ops cbt r3: Review earlier step and Pre-skill check skills draw boxes"
  },
- "command": "bash -c 'for r in review pre-skill-check; do node tests/scripts/ws-print-lint.cjs --source kit --roles $r --size M --rules SHAPE-ONE --lints SHAPE-ONE --skills multiplication:count_by_tables 2>&1 | grep -q \"ws-print-lint: FAIL\" && { echo \"ws-print-lint: FAIL (SHAPE-ONE)\"; exit 0; }; done; echo \"ws-print-lint: OK\"'",
+ "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles review,pre-skill-check --size M --rules SHAPE-ONE --lints SHAPE-ONE --skills multiplication:count_by_tables",
  "expect": {
   "fail": "FAIL",
   "pass": "OK"
