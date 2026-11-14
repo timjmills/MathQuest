@@ -451,6 +451,7 @@ Each finding: check first (FAILs on 8f76b6401), then the fix; backtest row; ledg
 - E4 jumps=15 chart: 5 + 5 + 5 in the chart panel (count-row ignores `twoLines` for 15 jumps). Check print-lint CHART-WIDTH now also caps 6 numbers a line; backtest `cbt-r2-e4-chart-lines`.
 - E5 Opener CL40-INK: the tight row starts 4.5 / 5.5 mm in (past the 6 / 7 mm keep-out). Role-cover lint; backtest `cbt-r2-e5-opener-cl40`.
 - E6 Error analysis top start: a REDO item's judge block starts at the top (CL-4b). Role-cover lint; backtest `cbt-r2-e6-ea-topstart`.
+- E6 side effect (final precritic): with the row at the top, the error-analysis M cells (114.8 mm, two to a page) now leave a 34 mm band UNDER the row (EB-BAND 29.6 %, limit 28 %); centred, that white was split. Next fix: cap a REDO row's height to its ink (layout capRowsToInk) and give the spare to the page foot. Not done (budget cap).
 - E7 NOT FIXED. Check ws-node-lint CHART-PANELS is on precritic's path and is RED (times each / given, jumps 15: chartMaxStates 2). Three full-width panels zoom the row to 65-73 % of the panel (CHART-WIDTH, the r1 D8 class), so E7 and D8 conflict at one page. Proposal for the lead: the look step as a numbered HEAD line over the panels (as `tailLast` does for the check step).
 - E8 onePage: provider `roleOpts` turns it off outside Independent / More practice / Test. Check ws-node-lint ROLE-SCOPE; backtest `cbt-r2-e8-role-scope`.
 - E9 NOT STARTED (budget): WS-REFLOW per-card exemption + FULLROW-USE stay parked.
