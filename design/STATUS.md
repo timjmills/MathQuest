@@ -888,3 +888,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-14 — Deploy chart_120 (lf-builds critic r3 PASS): hundreds_chart_fill + chart_to_120 redesign-passed (32)
 - Counting charts to 120: one-window layouts hidden on multi-item pages; per-gap wrong answers, Steps / Say / hints name every gap, no window repeats on a sheet (print and screen). Critics r1-r3; every finding has a check, backtest and ledger row.
 - Gates: all deploy gates OK except the full ws-tof-stem sweep, which hit a puppeteer protocolTimeout twice (tool issue; it passed on master 7f2ca5e39). Run per skill it is OK on chart_to_120 and hundreds_chart_fill (12 frames each, 0 equation stems) - the only skills this deploy changes. Queued for lf-checks: tof-stem protocolTimeout / browser restart per N skills.
+
+## 2026-11-14 — Deploy joined, straight long-division bracket (owner requests; lf-ops LDIV-JOIN / RASTER / SHAPE critics 9/9/9/8, 9/9/9/9, 9/9/9/9)
+- The long-division bracket is one stroke joined to the bar, its side a straight upright line (bow <= 0.34 mm), on paper and screen; only bracket markup changed.
+- Ledger: the 13:00 UTC sweep is blocking; 18 rows had lost lf-checks' resolved cells through merges and were restored; 11 parked / process rows got reasoned exemptions. Sweep 0 fail, none dropped.
+- Owner requests recorded for after the reset: area-model division with a two-digit divisor (4-digit / 2-digit, 5.NBT.6); multiplication in BOTH methods (area model and standard algorithm) for every size pair (2x1, 3x1, 2x2, 3x2 / 4x1), each new skill with its own lesson, linked to its White Rose step, prerequisites and related skills (lf-ops + lf-engine).
