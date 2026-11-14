@@ -10017,7 +10017,7 @@
     "state": "coordinate_q1 / shape_name_match_3d L split into two pages under half used, the note silent on side by side"
    },
    "pass": {
-    "commit": "39c65c65f",
+    "commit": "a594e08d4",
     "state": "coordinate_q1 and shape_name_match_3d L one page (Model | Guided side by side); round_sort_10 L 57 / 54 % used"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d,number_sense:round_sort_10 --roles opener --size L --lints L-DENSITY",
@@ -10037,10 +10037,10 @@
     "state": "rises on the split Openers against the master pin (page 2 findings, OPN-SPLIT)"
    },
    "pass": {
-    "commit": "39c65c65f",
+    "commit": "a594e08d4",
     "state": "nothing rose"
    },
-   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d,number_sense:round_sort_10,algebra:multi_step_word --roles opener --size L --lints L-OVERFLOW,L-SPLIT,L-DENSITY --ratchet-pages --baseline design/audit/baselines/opener-overflow.L.json",
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d,number_sense:round_sort_10,algebra:multi_step_word --roles opener --size L --lints L-OVERFLOW,L-SPLIT,L-DENSITY --ratchet-pages --ratchet-density DN-2,LONE,PAGEFILL,OPN-SPLIT --baseline design/audit/baselines/opener-overflow.L.json",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

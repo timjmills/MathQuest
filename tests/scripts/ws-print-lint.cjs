@@ -59,6 +59,7 @@
 //   --json out.json           machine-readable findings for the critic loop
 //   --baseline base.json      RATCHET: fail only where a (document, lint, rule) count rose above the
 //   --ratchet-pages           ... per (document, lint, rule, page) instead (the OPENER-OVERFLOW gate)
+//   --ratchet-density R,..    ... and only these L-DENSITY rules (OPENER-OVERFLOW: DN-2,LONE,PAGEFILL,OPN-SPLIT)
 //                             baseline written by an earlier --json run (P7.5 "as a ratchet")
 //   --report-only             print everything, exit 0 (never prints OK when something failed)
 //   --verbose                 print every finding group, not just the first 12 per document
@@ -3009,7 +3010,10 @@ function ratchet(results, file) {
     // (lf-engine roles OPENER-OVERFLOW: with --lints the ratchet compares those lints only, so a pin of one lint family -
     // design/audit/baselines/opener-overflow.<size>.json holds L-OVERFLOW / L-SPLIT - is judged on that family)
     const only = (arg('lints', '') || '').split(',').map(s => s.trim()).filter(Boolean);
-    const kept = (f) => !only.length || only.includes(f.lint);
+    // (lf-engine roles r3: --ratchet-density R1,R2 compares only those L-DENSITY rules - OPENER-OVERFLOW takes DN-2, LONE, PAGEFILL and
+    // OPN-SPLIT (critic r2 F1 / F2); another density rule, such as H13 on a cell that moved to page 2 of a split, is not ratcheted there)
+    const dens = (arg('ratchet-density', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+    const kept = (f) => (!only.length || only.includes(f.lint)) && !(dens.length && f.lint === 'L-DENSITY' && !dens.includes(f.rule));
     // (lf-engine roles r3, critic r2 F2: with --ratchet-pages - the OPENER-OVERFLOW gate - a count is kept per (lint, rule, PAGE):
     // multi_step_word L's page 2 overflow hid behind master's PG-12 x2 on page 1 of the same document when only counts were compared)
     const byPage = has('ratchet-pages');

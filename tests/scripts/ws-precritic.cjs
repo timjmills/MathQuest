@@ -181,6 +181,8 @@ const { spawn, spawnSync, execFileSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '..', '..');
 /** OPENER-OVERFLOW (lf-engine roles): the lint families its ratchet compares with the master pin opener-overflow.<size>.json. */
 const OPENER_RATCHET_LINTS = 'L-OVERFLOW,L-SPLIT,L-DENSITY';
+/** ... and the L-DENSITY rules it ratchets (critic r2 F1 / F2): a split Opener's half-blank or lone pages, never another density rule. */
+const OPENER_RATCHET_DENSITY = 'DN-2,LONE,PAGEFILL,OPN-SPLIT';
 const TOOL = 'ws-precritic';
 const ARGV = process.argv.slice(2);
 const has = (f) => ARGV.includes(`--${f}`);
@@ -1279,7 +1281,7 @@ function buildPlan(ctx) {
             const pin = path.join(ROOT, 'design', 'audit', 'baselines', `opener-overflow.${sz}.json`);
             // (lf-engine roles r3, critic r2 F1 / F2: L-DENSITY joins the ratchet - DN-2, LONE, PAGEFILL, OPN-SPLIT - and it is kept per
             // (lint, rule, page), so a split page's overflow is never hidden by master's findings on another page)
-            if (fs.existsSync(pin)) add(gate(`opener-overflow-${sz}`, `ws-print-lint --source kit --roles opener --size ${sz} --lints ${OPENER_RATCHET_LINTS} --ratchet-pages against the master pin (OPENER-OVERFLOW)`, sc, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'opener', '--size', sz, '--lints', OPENER_RATCHET_LINTS, '--ratchet-pages', '--baseline', rel(pin), '--skills', sample.join(',')], { parse: PARSE.printLint, expect: { ids: sample.map(docId) } }));
+            if (fs.existsSync(pin)) add(gate(`opener-overflow-${sz}`, `ws-print-lint --source kit --roles opener --size ${sz} --lints ${OPENER_RATCHET_LINTS} --ratchet-pages --ratchet-density ${OPENER_RATCHET_DENSITY} against the master pin (OPENER-OVERFLOW)`, sc, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'opener', '--size', sz, '--lints', OPENER_RATCHET_LINTS, '--ratchet-pages', '--ratchet-density', OPENER_RATCHET_DENSITY, '--baseline', rel(pin), '--skills', sample.join(',')], { parse: PARSE.printLint, expect: { ids: sample.map(docId) } }));
         }
         // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at the small size
         // too - M since the owner dropped S (2026-11-13) - against the M pin (print-lint.M.json); a role page that pin does
