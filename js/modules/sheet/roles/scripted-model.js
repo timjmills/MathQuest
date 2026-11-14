@@ -347,6 +347,7 @@ export function plan(input = {}) {
     // Every skill: the pages as they always were (a page holds what fits with the Say band's room kept), the states dealt so no
     // page holds a lone state where the same pages allow it ([3, 1] -> [2, 2], [3, 3, 1] -> [3, 2, 2]; critic r2 D8, r4 D12).
     let deal = dealOf(steps.length, Math.max(1, Math.floor(room1 / H)), Math.max(1, Math.floor(roomC / H)));
+    let tightTop = false;
     if (marks && cols === 1) {
         // A COUNT ROW (marks non-null: the count-row template with the provider's traced steps) re-plans. Its candidates:
         //  - the step text on one line (critic r1 D5: every step <= 48 characters is one line across the full-width state);
@@ -364,6 +365,12 @@ export function plan(input = {}) {
         }
         const texts = [{ tH: textH2, one: 0 }];
         if (steps.every((t) => t.length <= 48)) texts.push({ tH: textH1, one: 1 });
+        // (critic cbt r3 m3, P-1: at L the 4 one-line states missed one page by 3 mm, so the plan MERGED steps 2 and 3 - 3 states at L
+        // against 4 at M. The step band is drawn two lines tall (.mq-steptop) even for one-line text; drawn ONE line tall - its
+        // text's line plus the 4 mm the band keeps - the four states fit. Ranked after the one-line plan, so a size whose states
+        // already fit keeps its page; chosen before a merge. ws-cell-checks SM-STATE-PARITY.)
+        const oneTopMm = m.textPt * 1.3 * (25.4 / 72) + 4;
+        if (steps.every((t) => t.length <= 48)) texts.push({ tH: oneTopMm, one: 2, tight: true });
         const exactDeal = (n, Hs) => {
             // the fewest pages P whose pages hold n states with the Say band on page P only, each page >= 2 when that can be
             const capAt = (k, P) => Math.floor(((k ? mCont.budget : m.budget) - m.strip - (k === P - 1 ? m.say : 0)) / Hs);
@@ -389,7 +396,7 @@ export function plan(input = {}) {
                 if (!best || better(score, best.score)) best = { score, v, t, d, Hs };
             }
         }
-        if (best) { steps = best.v.steps; marks = best.v.marks; H = best.Hs; deal = best.d; }
+        if (best) { steps = best.v.steps; marks = best.v.marks; H = best.Hs; deal = best.d; tightTop = !!best.t.tight; }
     }
     // A FACT page (factRows; lf-ops facts-roles task, RUBRIC H13): the short fact beside its step text left 35 % of the state
     // cell and 48-72 % of the text cell empty. Its states stand side by side instead, one column a state, each with its
@@ -444,7 +451,7 @@ export function plan(input = {}) {
     // key lint's AK-2 skips its slots and judges every other key slot)
     const stateItem = (i) => smState(planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
-        render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
+        render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop"${tightTop ? ' style="height:calc(1.3em + 4mm)"' : ''}>${stepText(i)}</div>` : '')
             + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : stAt(i) ? Object.assign({ payload: Object.assign({}, o && o.payload, stAt(i).payload) }, stAt(i).answer && ans ? { shown: ans, ink: 'trace' } : {})

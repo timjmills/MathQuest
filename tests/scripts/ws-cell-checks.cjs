@@ -32,7 +32,9 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG,TITLE-RANGE,SENTENCE-FRAME'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG,TITLE-RANGE,SENTENCE-FRAME,SM-STATE-PARITY'));
+// SM-STATE-PARITY (lf-ops critic cbt r3 m3, P-1): a Scripted Model draws as many states (.mq-smstate) at L as at M, for the same
+// skill, options and seed - count_by_tables at L merged steps 2 and 3 into one state (3 at L, 4 at M) to save a page.
 // SENTENCE-FRAME (lf-ops critic cbt r3 m2): an instruction that says "Finish the sentence" needs a sentence frame on the page - a
 // frame (.mq-frame) that is not a list of write lines (.mq-framelist, "Answer: __, __, __"). The count_by_tables True or False?
 // page said "Finish the sentence." over "Answer:" lines only.
@@ -82,6 +84,15 @@ const TITLE_RANGE_SKIP = new Set(['lesson', 'detailed-lesson']);
 function sentenceFrameFindings(info) {
     if (!info || !info.finish || info.frames > 0) return [];
     return [{ rule: 'SENTENCE-FRAME', msg: `the instruction says "Finish the sentence" but the page has no sentence frame (${info.lists} list frame(s) "Answer: __, __") (critic cbt r3 m2)` }];
+}
+/** SM-STATE-PARITY over the runs: a scripted-model page's state count at L equals the count at M (same skill and options). */
+function smStateParity(runs) {
+    const out = [];
+    for (const l of runs.filter((r) => r.role === 'scripted-model' && r.size === 'L' && Number.isFinite(r.smStates))) {
+        const mm = runs.find((r) => r.role === 'scripted-model' && r.size === 'M' && r.skill === l.skill && r.optsKey === l.optsKey && Number.isFinite(r.smStates));
+        if (mm && mm.smStates > 0 && l.smStates !== mm.smStates) out.push({ rule: 'SM-STATE-PARITY', msg: `${l.skill} scripted-model${l.optsKey ? ' ' + l.optsKey : ''}: ${l.smStates} state(s) at L against ${mm.smStates} at M - a step merged or dropped at one size (P-1; critic cbt r3 m3)` });
+    }
+    return out;
 }
 function titleSteps(title) {
     const t = String(title || '').replace(/\u2013/g, '-');
@@ -189,6 +200,11 @@ function selfTest() {
         const sfBad = sfCases.filter(([c, n]) => sentenceFrameFindings(c).length !== n);
         if (sfBad.length) bad++;
         console.log(`  ${sfBad.length ? 'FAIL' : 'ok  '} SENTENCE-FRAME: ${sfCases.length} cases`);
+        const spBad = [[[{ role: 'scripted-model', size: 'M', skill: 'k', optsKey: '', smStates: 4 }, { role: 'scripted-model', size: 'L', skill: 'k', optsKey: '', smStates: 3 }], 1],
+            [[{ role: 'scripted-model', size: 'M', skill: 'k', optsKey: '', smStates: 4 }, { role: 'scripted-model', size: 'L', skill: 'k', optsKey: '', smStates: 4 }], 0],
+            [[{ role: 'scripted-model', size: 'L', skill: 'k', optsKey: '', smStates: 3 }], 0]].filter(([r, n]) => smStateParity(r).length !== n);
+        if (spBad.length) bad++;
+        console.log(`  ${spBad.length ? 'FAIL' : 'ok  '} SM-STATE-PARITY: 3 cases`);
         const trBad = trCases.filter(([t, tabs, n]) => titleRangeFindings(t, tabs).length !== n);
         if (trBad.length) bad++;
         console.log(`  ${trBad.length ? 'FAIL' : 'ok  '} TITLE-RANGE: ${trCases.length} titles against printed step tabs${trBad.length ? ` (wrong: ${trBad.map((c) => c[0]).join('; ')})` : ''}`);
@@ -245,7 +261,8 @@ function selfTest() {
                 const tabs = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return [...d.querySelectorAll('[data-ws-steptab]')].map((e) => e.getAttribute('data-ws-steptab')); })();
                 const keyTitle = (() => { const d = document.createElement('div'); d.innerHTML = r.keyHtml || ''; const el = d.querySelector('.mq-ican, [data-ws-title], h1'); return el ? el.textContent.trim() : ''; })();
                 const sent = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return { finish: /Finish the sentence/i.test(d.textContent || ''), frames: d.querySelectorAll('.mq-frame:not(.mq-framelist)').length, lists: d.querySelectorAll('.mq-framelist').length }; })();
-                return { sent, tabs, keyTitle, want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
+                const smStates = role === 'scripted-model' ? (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return d.querySelectorAll('.mq-smstate').length; })() : null;
+                return { smStates, sent, tabs, keyTitle, want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
@@ -275,10 +292,11 @@ function selfTest() {
             ...(!TITLE_RANGE_SKIP.has(j.role) && built.keyTitle && built.keyTitle !== built.title && /^I Can /.test(built.keyTitle) ? titleRangeFindings(built.keyTitle, built.tabs).map((f) => Object.assign({}, f, { msg: `key ${f.msg}` })) : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
-        runs.push({ skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });
+        runs.push({ smStates: built.smStates, skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });
         console.log(`  ${here.length ? 'FAIL' : 'ok  '} ${tag}: ${built.pages}p ${built.cols}x? per ${built.perPage}${here.length ? ` - ${[...new Set(here.map((f) => f.rule))].join(', ')} (${here.length})` : ''}`);
     }
     if (RULES.includes('SIZE-S')) findings.push(...sizeSFindings(runs));
+    if (RULES.includes('SM-STATE-PARITY')) findings.push(...smStateParity(runs));
     // LESSON-OPT (check 7 + speed-up 5): a lesson printed for an option value whose title differs from the default's
     // (another property, another kind) carries its own Rule - never the default lesson's (D-MP-7 / D-MP-8)
     if (RULES.includes('LESSON-OPT')) {
