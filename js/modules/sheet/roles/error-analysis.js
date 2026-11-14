@@ -38,7 +38,7 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
 } from './compose.js';
-import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
+import { gridHeightMm, SAFETY_H_MM, capRowsToInk } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
@@ -1077,6 +1077,14 @@ export function plan(input = {}) {
             grid.rowsTpl = rowH.map((h) => `${h}fr`).join(' ');
             grid.height = `${Math.round(sum * 100) / 100}mm`;
         }
+    }
+    // ONE-ROW (layout.capRowsToInk, as Test / Review / Practice; lf-ops cbt r3): a page of REDO items - a count row and its
+    // fix line, top-started since critic cbt r2 E6 (CL-4b) - holds each row to its ink / 0.72; the spare goes to the page foot.
+    // Top-started, the white of a stretched row fell under the work (count_by_tables M: 34 mm, 29.6 % of a 114.8 mm cell, EB-BAND).
+    if (items.length && items.every((it) => it.thinking && it.thinking.kind === 'redo')) {
+        const drawn = grid.height ? parseFloat(grid.height) : L.gridH;
+        const held = capRowsToInk(items, L.cols, rows, drawn, grid.rowsTpl || '');
+        if (held) Object.assign(grid, { height: `${held.heightMm}mm`, rowsTpl: held.rowsTpl, cls: `${grid.cls || 'fixed'} mq-inkrows` });
     }
     const wrongShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
     const fit = Object.assign({}, L, { items: undefined });
