@@ -369,3 +369,4 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - Open, not this round: count_by_tables Guided L p2 EB-BAND 33 % (4 count rows stretched to 45.8 mm at the L ceiling; same on
   66dcb77a0); two_step_add_then_div EB-SIDE on the master tree (passes on lf-algebra's branch).
 - PNGs: design/status/lf-roles/r10/.
+- 2026-11-14 r10 narrow critic: count_by_tables M + vocab_grade_pictures L PASS; QUEUED: X1 count_by_tables Guided L p2 EB-BAND 33% (pre-existing; hold count rows to ink on continuation pages); X2 two_step_add_then_div Guided M p1 Model alone (PAGE_TYPES 2.3; check GUIDED-MODEL-ALONE first); chart_120 (b)/(c). Stopped at budget ($319 of $345).
