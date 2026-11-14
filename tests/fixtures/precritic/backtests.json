@@ -9885,6 +9885,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-frame-fit",
+   "check": "a one-column Guided page of 31 mm count rows takes the rows the page DRAWS room for (Model + 6 tries at M and L), never past the drawn room or the L ceiling (lf-roles r10 item 1; lf-ops-props count_by_tables r2 EB-REFILL: the frame reserve over-reserved instruction / Steps / body by 11 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-FRAME-FIT (browser twin: ws-empty-band EB-REFILL guided)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "M no drawnFrameMm; L 6 cells"
+   },
+   "pass": {
+    "commit": "a64d0e285",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-FRAME-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
