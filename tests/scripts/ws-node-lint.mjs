@@ -59,7 +59,8 @@
 //                   not judged (skipped, counted). Kinds: too-few, dead-ref.
 //   CHART-PANELS    (critic cbt r2 E7, P-1; opt-in) the lesson's anchor chart draws ONE panel per worked step under every
 //                   option value its lesson data names (byOption): a `chartMaxStates` below the step count less the tail
-//                   line (`tailLast`) folds two steps into one panel. Kind: merged.
+//                   line (`tailLast`) and the head line (`headFirst`, lead ruling 2026-11-14 cbt r3 E7) folds two steps into
+//                   one panel: head line + panels + tail line must number every worked step. Kind: merged.
 //   ROLE-SCOPE      (critic cbt r2 E8; opt-in) an option whose help opens with the page types it is for ("Independent, More
 //                   practice and Test pages ...") is OFF on every other role: the provider's roleOpts (sheet contract
 //                   roleOptions, which buildSheet applies to every role's skills) returns the option at its default there.
@@ -1108,10 +1109,16 @@ function ruleChartPanels(key, cat, skill) {
         try { d = opts ? prereqs.lessonFor(cat, skill, opts) : base; } catch (e) { d = null; }
         if (!d) continue;
         tick('CHART-PANELS', 1);
+        // (lead ruling 2026-11-14, cbt r3 E7: the NUMBERED steps are counted - the head line (`headFirst`, the opening look
+        // step above the panels), each panel, the tail line (`tailLast`) - against the worked steps; a step is lost only when
+        // two of them share one panel)
         const n = Array.isArray(d.steps) ? d.steps.length : 0;
-        const need = Math.min(4, n - (d.tailLast ? 1 : 0));
+        const head = d.headFirst && n > 1 ? 1 : 0;
+        const tail = d.tailLast && n > 1 ? 1 : 0;
+        const need = Math.min(4, n - head - tail);
         const max = Number(d.chartMaxStates) > 0 ? Number(d.chartMaxStates) : 4;
-        if (n && max < need) find(key, 'CHART-PANELS', 0, 'merged', `under ${label} the anchor chart draws ${max} panel(s) for ${need} worked step(s) (chartMaxStates ${max}): two steps share a panel (P-1, critic cbt r2 E7)`, label);
+        const lines = head + Math.min(max, need) + tail;
+        if (n && lines < Math.min(n, 4 + head + tail)) find(key, 'CHART-PANELS', 0, 'merged', `under ${label} the anchor chart draws ${lines} numbered step line(s) (head ${head}, panels ${Math.min(max, need)}, tail ${tail}) for ${n} worked step(s) (chartMaxStates ${max}): two steps share a panel (P-1, critic cbt r2 E7)`, label);
     }
 }
 

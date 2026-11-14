@@ -448,7 +448,7 @@ function planOnce(input = {}) {
     let chartSizing = null;
     let chartDesigned = 0, chartMin = 0;
     if (states.length && part !== 'sheet') {
-        const chartOf = (sec, fin) => chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, sec, extrasList.find((x) => x.lessonTail), fin, extrasList.find((x) => x.lessonTailPanel));
+        const chartOf = (sec, fin) => chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, sec, extrasList.find((x) => x.lessonTail), fin, extrasList.find((x) => x.lessonTailPanel), extrasList.find((x) => x.lessonHead));
         // (lf-partopts: `lesson.partN.chart` - n worked examples, 1 .. the chart's own design; the design is the chart laid
         // out uncapped, so the Parts table's range never moves with the teacher's choice)
         const cN = lesson.partN && Number.isFinite(lesson.partN.chart) ? Math.max(1, lesson.partN.chart) : null;

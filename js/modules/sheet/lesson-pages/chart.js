@@ -176,9 +176,14 @@ export function stateItems(example, data) {
     // writes nothing new - it is the line under the panels, not a panel of its own.
     const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
+    // `headFirst` (lesson data - lead ruling 2026-11-14, cbt r3 E7): an opening step that writes nothing ("Read the jump") is a
+    // NUMBERED HEAD LINE above the panels, the way `tailLast` draws the closing step under them: every step keeps its own
+    // numbered line (P-1) and the panels stay as many as the row's working size allows (CHART-WIDTH).
+    const head = data && data.headFirst && steps.length > 1 && !((steps[0] && steps[0].marks) || []).length ? [0] : [];
     // (`chartMaxStates`, lesson data - critic cbt r1 D8: a count row with its times labels or 15 jumps draws in TWO panels, the
     // look step joining the step it prepares, so the row keeps the chart's working size)
-    const groups = stateGroups(steps, data && Number(data.chartMaxStates) > 0 ? Number(data.chartMaxStates) : 4);
+    const groups0 = stateGroups(head.length ? steps.slice(1) : steps, data && Number(data.chartMaxStates) > 0 ? Number(data.chartMaxStates) : 4);
+    const groups = head.length ? groups0.map((g) => Object.assign({}, g, { steps: g.steps.map((i) => i + 1) })) : groups0;
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
@@ -230,6 +235,12 @@ export function stateItems(example, data) {
         lessonDraw: k, cellCls: 'mq-cdrawcell',
         render: (c) => `<div class="mq-cdraw">${drawing(k, c)}</div>`,
     }));
+    const lineOf = (idx, c) => `<div class="mq-ctail">${idx.map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: { S: 7, M: 8.5, L: 10 }[c.size] || 10 })}<b>${esc(named[i].name)}</b>`
+        + `${named[i].words ? `<span class="mq-ctailw">${esc(named[i].words)}</span>` : ''}</div>`).join('')}</div>`;
+    const heads0 = head.length ? [Object.assign({}, base, {
+        lessonHead: true, cellCls: 'mq-ctailcell mq-cheadcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
+        render: (c) => lineOf(head, c),
+    })] : [];
     const tails = tail.length ? [Object.assign({}, base, {
         lessonTail: true, cellCls: 'mq-ctailcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
         // (`tailRead`, lesson data - the detailed lesson maker, lesson 7: the closing line is read, not worked: a reading cell)
@@ -255,7 +266,7 @@ export function stateItems(example, data) {
                 + `${words.length ? `<div class="mq-cwords">${words.map((w) => `<div>${esc(w)}</div>`).join('')}</div>` : ''}</div>`;
         },
     })] : [];
-    return panels.concat(draws, tails, tailPanels);
+    return panels.concat(draws, tails, tailPanels, heads0);
 }
 
 /**
@@ -358,7 +369,7 @@ export function sameFactForms(ex) {
  * panels fill the body left over, never above 2 x (rows) / 1.6 x (2 x 2) or the panel's width,
  * and a panel grows past its content by a quarter at most, the content centred in it (H13).
  */
-export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null) {
+export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null, headItem = null) {
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
     const f = frameOf({ skills: target, input, tabId: 'Anchor chart', score: 0, footerLeft: lesson.tagLine });
@@ -375,7 +386,8 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
-    const tailH = tailItem ? Math.max(12, hOf(tailItem, 1)) : 0;
+    // (`headFirst`: the head line above the panels takes its height as the tail line does)
+    const tailH = (tailItem ? Math.max(12, hOf(tailItem, 1)) : 0) + (headItem ? Math.max(12, hOf(headItem, 1)) : 0);
     const availAll = m.body - m.say - chantH - 2;
     const avail = availAll - tailH;
     // The second example's row: one cell per state, sized to its tallest drawing.
@@ -471,6 +483,7 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         // the page) whenever they already use all of it, or when they are rows (the side column
         // spreads).
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
+        if (headItem) sections.push(gridPart([Object.assign(planItem(headItem, { cols: 1, nolabel: true }), { cls: headItem.cellCls })], { cols: 1, rows: 1, cellH: Math.max(12, hOf(headItem, 1)), labels: 'none', cls: 'mq-ctailgrid mq-cheadgrid' }));
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
         // (`chartMaxStates` - critic cbt r1 D8: a merged panel holds two step heads, the next one; equal rows left a 38 % band
         // under the shorter. Each one-column panel is as tall as ITS content, a quarter more at most, the rest under the grid)
@@ -483,7 +496,7 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
             sections.push(grid);
         } else
         sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
-        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
+        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: Math.max(12, hOf(tailItem, 1)), labels: 'none', cls: 'mq-ctailgrid' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
         if (mode === 'row') {

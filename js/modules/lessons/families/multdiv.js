@@ -274,10 +274,12 @@ export const ROUTINES = Object.freeze({
         // (critic cbt r1 D8: a row with its times labels, or of 15 jumps, is taller - the chart draws two panels, not three,
         // so its row keeps the working size instead of a zoom to 13 pt; prereqs.js optionLesson reads `byOption`)
         byOption: {
-            times: { each: { chartMaxStates: 2 }, given: { chartMaxStates: 2 } },
+            // (lead ruling 2026-11-14, cbt r3 E7: the look step "Read the jump" is a numbered HEAD line above the two panels -
+            // `headFirst` - not merged into panel 1, so every step keeps its own numbered line, P-1)
+            times: { each: { chartMaxStates: 2, headFirst: true }, given: { chartMaxStates: 2, headFirst: true } },
             // (critic cbt r1 D9: three-line Guided rows - two of them did not fit under the Warm-up, so the sheet's page 1 stood half
             // empty and its page 2 held the Guided and ONE Independent row; one Guided row keeps the sheet on one page)
-            jumps: { 15: { chartMaxStates: 2, guidedRows: 1 } },
+            jumps: { 15: { chartMaxStates: 2, headFirst: true, guidedRows: 1 } },
         },
     },
 });

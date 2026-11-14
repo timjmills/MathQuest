@@ -50,6 +50,7 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid:has(+ .ws-grid.mq-ctailgrid){border-bottom-width:var(--ws-cell)}
 :is(.ws-page,.ws-sheet) .ws-grid.mq-ctailgrid{border-top-width:0}
 :is(.ws-page,.ws-sheet) .mq-ctail{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-ctailgrid.mq-cheadgrid{border-top-width:var(--ws-cell);border-bottom-width:0}
 :is(.ws-page,.ws-sheet) .mq-ctailw{margin-left:6mm;font-size:var(--ws-text);font-weight:400}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-c2cell{justify-content:center;align-items:center;padding:2mm 2mm}
 :is(.ws-page,.ws-sheet) .mq-c2{display:flex;flex-direction:column;align-items:center;gap:2mm}
