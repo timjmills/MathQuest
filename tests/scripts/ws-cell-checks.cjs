@@ -32,7 +32,12 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG,TITLE-RANGE'));
+// TITLE-RANGE (lf-ops critic cbt r3 m1): an "I Can count ... by As to Bs" / "by As, Bs and Cs" title names exactly the steps the
+// page PRINTS (its count rows' step tabs, data-ws-steptab): a range's ends are the min / max step printed, a list is the set
+// printed. The Opener dealt 2s to 5s at M (2s to 4s at L) under "I Can count by 2s to 7s", and the key copied it. Pages with
+// no step tab, or a title naming no "by Ns", are not judged; nor is the lesson, whose I Can is the lesson's goal over its
+// several parts (the anchor chart names every table; the practice rows are a sample). The key's title is held to the pupil page's tabs too.
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -68,6 +73,27 @@ function lonePage(key, perPage, ceiling) {
     return [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${ceiling} (H5)` }];
 }
 
+/** TITLE-RANGE: the steps an I Can title names ({kind: 'range', lo, hi} | {kind: 'list', set}) or null. */
+const TITLE_RANGE_SKIP = new Set(['lesson', 'detailed-lesson']);
+function titleSteps(title) {
+    const t = String(title || '').replace(/\u2013/g, '-');
+    if (!/^I Can\b/i.test(t)) return null;
+    const m = t.match(/\bby ((?:\d[\d,]*s(?:, | and | to )?)+)/i);
+    if (!m) return null;
+    const nums = (m[1].match(/\d[\d,]*(?=s)/g) || []).map((x) => Number(x.replace(/,/g, '')));
+    if (!nums.length) return null;
+    return / to \d/.test(m[1]) && nums.length === 2 ? { kind: 'range', lo: nums[0], hi: nums[1] } : { kind: 'list', set: nums };
+}
+/** TITLE-RANGE findings for a page titled `title` whose count rows print the step tabs `tabs` (strings: "7", "+7", "-7"). */
+function titleRangeFindings(title, tabs) {
+    const want = titleSteps(title);
+    const got = [...new Set((tabs || []).map((x) => Number(String(x).replace(/[^\d]/g, ''))).filter((v) => v > 0))].sort((a, b) => a - b);
+    if (!want || !got.length) return [];
+    const lo = got[0], hi = got[got.length - 1];
+    if (want.kind === 'range' ? (want.lo !== lo || want.hi !== hi) : (want.set.slice().sort((a, b) => a - b).join() !== got.join()))
+        return [{ rule: 'TITLE-RANGE', msg: `the title "${title}" names ${want.kind === 'range' ? `${want.lo}s to ${want.hi}s` : want.set.map((v) => v + 's').join(', ')}, but the page prints the steps ${got.join(', ')} (critic cbt r3 m1)` }];
+    return [];
+}
 async function checkDoc(sheet, html, ctx) {
     await sheet.setContent(html, { waitUntil: 'load', timeout: 60000 });
     await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
@@ -148,6 +174,12 @@ function selfTest() {
         }
         const sz = sizeSFindings([{ skill: 'k', role: 'independent', size: 'S', perPage: 6, cols: 2, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 30 }] }, { skill: 'k', role: 'independent', size: 'M', perPage: 6, cols: 2, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 40 }] }]);
         const sz0 = sizeSFindings([{ skill: 'k', role: 'independent', size: 'S', perPage: 9, cols: 3, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 30 }] }, { skill: 'k', role: 'independent', size: 'M', perPage: 6, cols: 2, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 40 }] }]);
+        const trCases = [['I Can count by 2s to 7s', ['2', '3', '4', '5'], 1], ['I Can count by 2s to 5s', ['2', '3', '4', '5'], 0],
+            ['I Can count by 3s, 4s and 6s', ['3', '4', '6'], 0], ['I Can count by 3s, 4s and 6s', ['3', '4'], 1], ['I Can count back by 7s', ['−7'], 0],
+            ['I Can count by 5s', ['10'], 1], ['I Can count by 2s to 12s', [], 0], ['Pre-skill check: counting', ['2', '9'], 0]];
+        const trBad = trCases.filter(([t, tabs, n]) => titleRangeFindings(t, tabs).length !== n);
+        if (trBad.length) bad++;
+        console.log(`  ${trBad.length ? 'FAIL' : 'ok  '} TITLE-RANGE: ${trCases.length} titles against printed step tabs${trBad.length ? ` (wrong: ${trBad.map((c) => c[0]).join('; ')})` : ''}`);
         const szOk = sz.length === 1 && sz0.length === 0;
         if (!szOk) bad++;
         console.log(`  ${szOk ? 'ok  ' : 'FAIL'} S = M with smaller drawings (SIZE-S) and its control`);
@@ -198,7 +230,9 @@ function selfTest() {
                 let want = '';
                 try { const pr = await import('./js/modules/sheet/roles/practice.js'); want = pr.skillWords({ categoryId: cat, skillId: id, opts: opts || undefined }).iCan; } catch (e) { want = ''; }
                 const rule = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; const el = d.querySelector('.mq-cchant span, .mq-lstripchant span, .mq-lchant'); return el ? el.textContent.trim() : ''; })();
-                return { want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
+                const tabs = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return [...d.querySelectorAll('[data-ws-steptab]')].map((e) => e.getAttribute('data-ws-steptab')); })();
+                const keyTitle = (() => { const d = document.createElement('div'); d.innerHTML = r.keyHtml || ''; const el = d.querySelector('.mq-ican, [data-ws-title], h1'); return el ? el.textContent.trim() : ''; })();
+                return { tabs, keyTitle, want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
@@ -223,6 +257,8 @@ function selfTest() {
             // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
             // only the passed skills)
             ...lonePage(j.opts ? '' : `${j.k} ${j.role} ${j.size}`, built.perPage, built.ceiling),
+            ...(TITLE_RANGE_SKIP.has(j.role) ? [] : titleRangeFindings(built.title, built.tabs)),
+            ...(!TITLE_RANGE_SKIP.has(j.role) && built.keyTitle && built.keyTitle !== built.title && /^I Can /.test(built.keyTitle) ? titleRangeFindings(built.keyTitle, built.tabs).map((f) => Object.assign({}, f, { msg: `key ${f.msg}` })) : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
         runs.push({ skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });

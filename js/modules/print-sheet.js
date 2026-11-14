@@ -3402,6 +3402,20 @@ function retitleByDealt(skills, hostItems, n) {
     }
 }
 
+/** The dealt items a plan places (each item whose question object the plan's pages hold), in dealt order. */
+function placedItems(plan, items) {
+    const qs = new Set();
+    const seen = new Set();
+    const walk = (o, d) => {
+        if (!o || typeof o !== 'object' || seen.has(o) || d > 40) return;
+        seen.add(o);
+        if (o.q && typeof o.q === 'object') qs.add(o.q);
+        for (const v of Array.isArray(o) ? o : Object.values(o)) if (v && typeof v === 'object' && !(v.countBy && v === o.q)) walk(v, d + 1);
+    };
+    for (const sh of (plan && plan.sheets && plan.sheets.length ? plan.sheets : [plan || {}])) walk(sh.pages || sh.sections || [], 0);
+    return (items || []).filter((it) => it && it.q && qs.has(it.q));
+}
+
 function tagItemIndex(plan, items) {
     const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
     const walk = (s) => {
@@ -5066,6 +5080,20 @@ async function buildRoleSheet(n, metaOf) {
         if (t && t.iCan) input.targetSkill = Object.assign({}, input.targetSkill, { iCan: t.iCan });
     }
     let plan = mod.plan(input);
+    // (critic cbt r3 m1: a role that PLACES fewer count rows than it was dealt - the Opener drew 2s to 5s at M, 2s to 4s at L, of
+    // the 2s to 7s handed to it - is titled by the rows it placed; the key renders from the same plan. ws-cell-checks TITLE-RANGE)
+    if (Array.isArray(input.skills) && n.role !== 'lesson') {
+        const placed = placedItems(plan, items);
+        if (placed.length && placed.length < items.length) {
+            const before = input.skills.map((x) => x && x.iCan);
+            retitleByDealt(input.skills, placed, n);
+            if (input.skills.some((x, i) => (x && x.iCan) !== before[i])) {
+                const t = input.targetSkill && input.skills.find((x) => x && x.categoryId === input.targetSkill.categoryId && x.skillId === input.targetSkill.skillId);
+                if (t && t.iCan) input.targetSkill = Object.assign({}, input.targetSkill, { iCan: t.iCan });
+                plan = mod.plan(input);
+            }
+        }
+    }
     // (lf-ops-props r5, lead ruling (b'): a mixed-class noStretch row has its boundary item(s) dealt again - evenMixedRows)
     const evenRows = evenMixedRows(plan, items, (its) => { input.items = its; return mod.plan(input); }, n);
     plan = evenRows.plan;
