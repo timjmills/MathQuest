@@ -1,19 +1,30 @@
-ws-backtest row c120r2-wrong-multi: PASS  fail state FAIL 1.8s, pass state OK 1.8s
-ws-backtest row c120r2-steps-all-slots: PASS  fail state FAIL 1.3s, pass state OK 1.6s
-ws-backtest row c120r2-say-agree: PASS  fail state FAIL 1.4s, pass state OK 1.6s
-ws-backtest row c120r2-hint-all: PASS  fail state FAIL 1.4s, pass state OK 1.5s
-ws-backtest: c120r2-tf-false (fail state) has waited 120 s for a browser slot; holders:
-    slot.2: pid 19254 (up 275 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-lesson-baseline.cjs --all-lessons --check /tmp/claude-0/-home-user-MathQuest/a287
-    slot.1: pid 21802 (up 138 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fil
-    queue: pid 22039 (up 129 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-ink-size.cjs --skill composing:hundreds_chart_
-    queue: pid 22428 (up 110 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-HjsJrV/jobs-0.jso
-    queue: pid 22429 (up 110 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-HjsJrV/jobs-1.jso
-    queue: pid 22432 (up 110 s) flock 10
-    queue: pid 22434 (up 110 s) flock 10
-    queue: pid 23128 (up 0 s) sleep 1
-ws-backtest row c120r2-tf-false: PASS  fail state FAIL 214.7s, pass state OK 158.0s
-ws-backtest row c120r2-ea-pattern: PASS  fail state FAIL 107.4s, pass state OK 151.9s
-ws-backtest row c120r2-score-roles: PASS  fail state FAIL 63.7s, pass state OK 39.2s
-ws-backtest row c120r2-cross-giveaway: PASS  fail state FAIL 71.9s, pass state OK 143.9s
-ws-backtest row c120r2-strip-numbers: PASS  fail state FAIL 20.2s, pass state OK 95.2s
-ws-backtest: killed by SIGTERM
+ws-backtest row c120r2-wrong-multi: PASS  fail state FAIL 1.1s, pass state OK 1.2s
+ws-backtest row c120r2-steps-all-slots: PASS  fail state FAIL 1.0s, pass state OK 1.2s
+ws-backtest row c120r2-say-agree: PASS  fail state FAIL 1.0s, pass state OK 1.2s
+ws-backtest row c120r2-hint-all: PASS  fail state FAIL 1.0s, pass state OK 1.2s
+ws-backtest row c120r2-tf-false: PASS  fail state FAIL 35.5s, pass state OK 50.6s
+ws-backtest row c120r2-ea-pattern: PASS  fail state FAIL 39.7s, pass state OK 51.4s
+ws-backtest row c120r2-score-roles: PASS  fail state FAIL 12.1s, pass state OK 17.0s
+ws-backtest row c120r2-cross-giveaway: PASS  fail state FAIL 47.6s, pass state OK 40.1s
+ws-backtest row c120r2-strip-numbers: PASS  fail state FAIL 11.1s, pass state OK 13.8s
+ws-backtest row c120r2-chart-square: PASS  fail state FAIL 8.8s, pass state OK 9.2s
+ws-backtest row c120r2-touch-hit: PASS  fail state FAIL 156.5s, pass state OK 162.0s
+ws-backtest row c120r2-ea-rowx: PASS  fail state FAIL 23.8s, pass state OK 23.9s
+ws-backtest: 12 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120r2-wrong-multi          commit-pair  FAIL 1.1s           OK 1.2s             PASS
+c120r2-steps-all-slots      commit-pair  FAIL 1.0s           OK 1.2s             PASS
+c120r2-say-agree            commit-pair  FAIL 1.0s           OK 1.2s             PASS
+c120r2-hint-all             commit-pair  FAIL 1.0s           OK 1.2s             PASS
+c120r2-tf-false             commit-pair  FAIL 35.5s          OK 50.6s            PASS
+c120r2-ea-pattern           commit-pair  FAIL 39.7s          OK 51.4s            PASS
+c120r2-score-roles          commit-pair  FAIL 12.1s          OK 17.0s            PASS
+c120r2-cross-giveaway       commit-pair  FAIL 47.6s          OK 40.1s            PASS
+c120r2-strip-numbers        commit-pair  FAIL 11.1s          OK 13.8s            PASS
+c120r2-chart-square         commit-pair  FAIL 8.8s           OK 9.2s             PASS
+c120r2-touch-hit            commit-pair  FAIL 156.5s         OK 162.0s           PASS
+c120r2-ea-rowx              commit-pair  FAIL 23.8s          OK 23.9s            PASS
+
+12 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 892.6 s
+ws-backtest: OK
