@@ -9,6 +9,32 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+
+- **2026-11-14 02:35 UTC: OWNER BUDGET STOP.** Hard stop at session cost_usd $1,140.
+  - -pc r6 is parked at 6668f1732 (WIP, ungated). Resume note in its status file: precritic --role lesson --strict, confirm master's reds, re-pin.
+  - -roles r3 is parked at b64203f29 (WIP, ungated; code is ahead of its checks).
+    - On resume, write OPN-SPLIT and L-DENSITY and key the overflow ratchet by (lint, rule, page) first, and show they FAIL on 27b8e540c.
+    - Then fix the side-by-side gate in opener.js geometry(): add_wp_10k goes side by side but does not fit.
+  - The chart Name/Date line is the one lane still running.
+- **Queue after the reset, in this order:**
+  1. -roles r3: checks first; no round 4.
+  2. -pc r6: finish, critic r6.
+  3. Slot stretch:
+     - Opener EB-BAND: grow's 8 mm cap.
+     - Lesson-vocab EB-BAND / EB-VOCAB: capIfEmpty's spare-height share.
+  4. placeSections 4-item sub-sections: PAGEFILL on Sections L p6 and p7.
+  5. Lesson-pack key stamp row (lf-roles L-KEY, lead 2026-11-14).
+     - In the LESSON PACK only, the key's "Answer:" line overlaps a 2-row word bank by 7–19 px (shape_name_match_3d).
+     - The pack does not reserve the stamp row that print-sheet readCell stampH reads. Independent and Test are fine.
+     - Planned check: ws-lesson-samples KEY-STAMP. On every lesson-pack key page at M and L, the stamp/Answer line's box must not intersect any cell content box, measured with the same rule as L-OVERLAP.
+     - The backtest must FAIL on master. A CHECKS_FROM_CRITICS row is added with the check (the ledger lives on master, not on this branch).
+  6. div_facts chart and CHART-FILL (chart critic r1 F1).
+  7. Then the earlier items: (e) twoState, G7, (d) live round, (c) vocab Mixed.
+- **Lead rulings 2026-11-14:**
+  - Chart Name/Date type follows the chart's own size (L).
+  - mixed_placevalue Guided 2 + Independent 0 is correct (PT-OPN-6).
+  - F5 (raw JSON on keys) goes to lf-roles.
+  - The fraction_of_set_hard harness leak is its own ledger row for lf-checks.
 - QUEUED (OWNER request via lead 19:49), HIGH, after -pc / -roles deploy and BEFORE G7: anchor charts print the Name / Date header line like other pupil pages, via the shared frame (sheet/frame.js), honouring lf-roles' new title option (custom title text above or below the Name / Date line). Checks first: anchor chart has a Name / Date line at M / L, no overflow, chart still fits its page. Lesson pages change -> re-pin the baseline (M,L) naming the pages. Queue order now: -pc r6 -> -roles -> anchor Name/Date -> (e) two-step twoState -> G7 (+div_facts, mult_facts) -> live lesson round -> vocab Mixed continuation.
 - OWNER FASTEST PLAN (lead 17:59): round cap 2 (escalate, no r7), no 390 px, deploy train 11:00 / 19:00 UTC, round-1 units only, long lessons paused. Lead ruling on the queue - all KEEP (round 1 or live): ORDER after -pc and -roles deploy: (e) two-step chart twoState routing (high) -> (a)+(b) G7 resume (growing, div_facts chart, mult_facts M sheet) -> (d) live lesson round -> (c) vocab_grade_pictures Mixed continuation. Then round-1 short lessons as their skills pass.
 - QUEUED with G7 (lead 17:17): vocab_grade_pictures L lesson Mixed continuation 72 % blank is ours (lesson Mixed engine: lead-half rule + full-page mult-grid shelf; if the fix belongs in the shelf's footprint, ask lf-vocab). Checks first: PM-CONT over all lessons (Mixed continuation >= 50 % blank = FAIL). fact_family_sort L Mixed: lead confirms on lf-partopts' deploy tree (it merges master).
