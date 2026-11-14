@@ -15,7 +15,12 @@ const RAW = /^\s*(\[\s*[{"\[]|\{\s*")/;
 function scanText(text, label) {
     const out = [];
     const t = String(text).replace(/<style[\s\S]*?<\/style>/g, '').replace(/<script[\s\S]*?<\/script>/g, '');
-    for (const m of t.matchAll(/>([^<]+)</g)) { const s = m[1].replace(/&quot;/g, '"').replace(/&#34;/g, '"'); if (RAW.test(s)) out.push(`${label}: raw JSON "${s.trim().slice(0, 60)}"`); }
+    for (const m of t.matchAll(/>([^<]+)</g)) {
+        const s = m[1].replace(/&quot;/g, '"').replace(/&#34;/g, '"');
+        if (RAW.test(s)) out.push(`${label}: raw JSON "${s.trim().slice(0, 60)}"`);
+        // (L-KEY ids: a generator's own keys - "t3, t0, t1", "opt1, opt3", "binEq" - printed in place of the answer)
+        else if (/^\s*((t|opt)\d+|bin[A-Z0-9]\w*)(\s*,\s*((t|opt)\d+|bin[A-Z0-9]\w*))+\s*$/.test(s)) out.push(`${label}: internal ids "${s.trim().slice(0, 60)}"`);
+    }
     for (const m of t.matchAll(/\b(?:value|data-ans|data-value)="([^"]*)"/g)) { const s = m[1].replace(/&quot;/g, '"').replace(/&#34;/g, '"'); if (RAW.test(s)) out.push(`${label}: raw JSON in an attribute "${s.slice(0, 60)}"`); }
     return out;
 }

@@ -178,8 +178,22 @@ export function readableAnswer(p = {}, value) {
     const prim = (v) => v === null || ['string', 'number', 'boolean'].includes(typeof v);
     const pt = (o) => o && typeof o === 'object' && Number.isFinite(Number(o.x)) && Number.isFinite(Number(o.y));
     const fmt = (o) => `${o.label ? `${o.label} ` : ''}(${o.x}, ${o.y})`;
+    // ids a generator keys its tiles / bins / options by ("t3", "opt1", "binEq") are never shown: each reads as its own label
+    const labelOf = (id) => {
+        for (const arr of [p.tiles, p.bins, p.options, p.items, p.choices]) {
+            if (!Array.isArray(arr)) continue;
+            const hit = arr.find((x) => x && typeof x === 'object' && String(x.id) === String(id));
+            if (hit) return String(hit.label ?? hit.text ?? hit.canonicalName ?? hit.ariaLabel ?? hit.name ?? '');
+        }
+        return null;
+    };
+    const idLike = (v) => /^(t|opt|bin|d|b)[A-Za-z0-9]*$/.test(String(v)) && /\d|bin/.test(String(v));
     if (Array.isArray(value)) {
         if (value.length && value.every(pt)) return value.map(fmt).join(', ');
+        if (value.length && value.every(prim) && value.some(idLike)) {
+            const labs = value.map(labelOf);
+            return labs.every((x) => x) ? labs.join(', ') : '';
+        }
         if (value.every(prim)) return value.map(String).join(', ');
         return '';
     }
@@ -189,13 +203,16 @@ export function readableAnswer(p = {}, value) {
     const entries = Object.entries(value || {});
     if (tiles && bins && entries.length && entries.every(([, v]) => prim(v))) {
         const tileLabel = (id) => { const tl = tiles.find((x) => x && x.id === id); return tl ? String(tl.label || tl.text || id) : ''; };
+        // (a sort into named bins - "Equal" / "Not equal" - groups each bin's tiles under its label; a match to pictures numbers them)
+        const named = bins.every((b) => b && (b.label || b.text) && !b.htmlLabel);
+        if (named) return bins.map((b) => { const ts = entries.filter(([, bin]) => String(bin) === String(b.id)).map(([tile]) => tileLabel(tile)).filter(Boolean); return ts.length ? `${b.label || b.text}: ${ts.join(', ')}` : ''; }).filter(Boolean).join('; ');
         const out = bins.map((b, i) => {
             const hit = entries.filter(([, bin]) => String(bin) === String(b && b.id)).map(([tile]) => tileLabel(tile)).filter(Boolean);
             return hit.length ? `${i + 1}. ${hit.join(', ')}` : '';
         }).filter(Boolean);
         return out.join('  ');
     }
-    if (entries.length && entries.every(([, v]) => prim(v))) return entries.map(([k, v]) => `${k}: ${v}`).join(', ');
+    if (entries.length && entries.every(([, v]) => prim(v)) && !entries.some(([k, v]) => idLike(k) || idLike(v))) return entries.map(([k, v]) => `${k}: ${v}`).join(', ');
     return '';
 }
 
