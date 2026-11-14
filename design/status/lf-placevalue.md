@@ -77,6 +77,20 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-14 **Vocab + rowcap head, NOT deploy-clean, stopped at budget ($632 of $645).** `claude/lf-placevalue-vocab-deploy` @ f5ae12001
+  = 31d41507 + master 84f8813a1 + lf-engine rowcap 3b0fdbcbb. EB-FOOT / EB-BAND on Match 3 L: PASS (rows 52.5 mm, 4 at L).
+  vocab_grade_pictures L lesson rebalanced 10 -> 8 pages: practiceShapes [[4,1]] (lessons/families/multdiv.js) and
+  mixed-practice.js `pagesOf` counts a page-opening shelf's strip (an ENGINE change: it also moves add_wp_10 L Mixed and
+  two_step_letter_equation M Mixed; check V-PACK + ws-layout-unit MIX-PAGES, backtest vocab-pack-lesson PASS).
+  NEEDS before deploy:
+  (1) lf-engine review of the pagesOf change, plus a critic on the passed Mixed pages it moves.
+  (2) The lesson baseline was RE-PINNED, including a rowcap-caused group on master's newer algebra / patterns lessons and g3-oa9
+      that was re-pinned on cause alone, NOT rendered. The rowcap critic or the lead must look before this deploys.
+  (3) ws-vocab-unit --browser V23: 14 pupil pins moved by the rowcap rows, not re-pinned.
+  (4) EB-PAGE: grade_pictures scripted-model L 32 %.
+  (5) Narrow critic not run.
+  Pre-existing (master / 31d as well): V-AMBIG 2 (master lesson bands), EB-PARITY on vocab screen hosts, and ws-layout-unit
+  "Guided, 110 mm cells".
 - 2026-11-14 **HAND-OVER (budget stop, lead option C; session cost $601 of the $640 hard stop).**
   Live on master: compare (w2), live1 (expand / unit_form screens, the global 50 px touch rule, number_word_form Guided
   D2-D4), live2 (number_word_form one-kind root cause, N3 / N6 / N7 / N9 closed; critic-live2 + critic-n9 PASS).
