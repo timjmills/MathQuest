@@ -446,6 +446,36 @@ export function stringsOf(it) {
     } catch (e) { return {}; }
 }
 
+/**
+ * PT 2.3, "the Steps on a page fit EVERY item on that page" (lf-placevalue round-cap r3, critic live1 r2 N3 / N6): the kind of
+ * problem an item is, for a Model and Steps set over it - the Steps its provider writes for THIS item. Two items are one kind
+ * when their Steps are the same. A skill whose Steps never change with the item is one kind throughout.
+ */
+export function stepsKindOf(it) {
+    try { return JSON.stringify((stringsOf(it || {}) || {}).steps || null); } catch (e) { return ''; }
+}
+
+/**
+ * The ONE place a role takes its Model's kind for its worked and guided items (opener, lesson We Do, guided): the pool
+ * reordered, stably, so the items of one kind come first - `lead`'s kind when a lead (the Model) is given, else the kind the
+ * pool deals most (ties: the kind dealt first). A pool of one kind is returned as it was.
+ */
+export function oneKindFirst(pool, lead = null) {
+    if (!Array.isArray(pool) || pool.length < 2) return pool;
+    const keys = pool.map(stepsKindOf);
+    if (new Set(keys).size < 2) return pool;
+    let top = lead ? stepsKindOf(lead) : keys[0];
+    if (!lead) {
+        const n = new Map();
+        keys.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
+        for (const [k, c] of n) if (c > n.get(top)) top = k;
+    }
+    return [...pool.filter((_, i) => keys[i] === top), ...pool.filter((_, i) => keys[i] !== top)];
+}
+
+/** True when two items are the same kind of problem (stepsKindOf). */
+export const sameKind = (a, b) => stepsKindOf(a) === stepsKindOf(b);
+
 /** A deterministic 40-60% "wrong" pattern over n items (PT-ERR-1, PT-TOF-1). */
 export function wrongPattern(n, seed, tag) {
     const r = rng(deriveSeed(seed === undefined ? 0 : seed, tag || 'wrong', n));

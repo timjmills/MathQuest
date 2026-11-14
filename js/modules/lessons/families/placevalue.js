@@ -202,6 +202,9 @@ export const ROUTINES = Object.freeze({
         // (critic nwf r1 N6: "Three boxes, three digits." was printed over 2-digit items with no boxes and over "one thousand" in
         // four boxes; the chant names no count - every item the lesson deals is boxed, one digit a box, the empty place a 0)
         chant: 'Every box gets a digit.',
+        // (round-cap r3, critic live1 r2 N6: the skill also deals numeral to words, names under 100 and words on a line - the
+        // Rule and the Remember line follow the worked example's kind and slot, roles/lesson.js fitLessonData)
+        ruleFromItems: true,
         format: { kind: 'numbered steps with icons + a chant', why: 'The one step pupils skip is the empty place; the chant cues its 0.' },
         example: { match: 'hundred' },
         // (three across where the name and its boxes fit: two across left 31 % beside the boxes at S - ws-print-lint H13)

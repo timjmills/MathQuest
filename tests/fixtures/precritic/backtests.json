@@ -8855,10 +8855,10 @@
     "state": "Guided M / L, default and every band: '\"twenty-six\": 2 tens, 6 ones.' under twenty-six, 26 more hints"
    },
    "pass": {
-    "commit": "ae83dfbc",
-    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.'"
+    "commit": "b372b573",
+    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.' (re-pointed in round-cap r3: the check was tightened to ANY answer digit outside a gap and to the H T O deals in live1 r1 - critic live1 N1, row pv-words-hint-any-digit - so ae83dfbc, which still printed '\"two hundred\": 2 in the hundreds.', fails it; the row already failed at the r2 head)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -8875,10 +8875,10 @@
     "state": "Guided M default: 'eleven' under 'Read the tens word. Read the ones word.'; band 20 pages mixing one-word, teen and decade names"
    },
    "pass": {
-    "commit": "ae83dfbc",
-    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind"
+    "commit": "b372b573",
+    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9018,7 +9018,7 @@
     "commit": "feadad0b",
     "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9038,7 +9038,7 @@
     "commit": "feadad0b",
     "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9055,10 +9055,130 @@
     "state": "to_words default / band 20 / band 1000 M / L: the hundreds Steps with a literal 'three hundred' over two-digit numbers"
    },
    "pass": {
-    "commit": "feadad0b",
-    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20)"
+    "commit": "b372b573",
+    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20) (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-one-kind-roles",
+   "check": "number_word_form: every item a Model and Steps are set over is the Model's kind, on the lesson, guided, opener and scripted-model pages, every wordform x band x answer slot; 11 and 12 are their own kind (no ones word), 0-10 one kind (round-cap r3, critic live1 r2 N3 / N6; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (every role, Model kind)",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'twelve' / 'eleven' under the teen Model and Steps 'Find the ones in the word.' (guided / opener band 20); the lesson's Model 39 over Guided 11, Model 'six' over 'sixteen', Model 'fifty' over two-word names; the opener's to_words Model 95 over 50"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "compose.js stepsKindOf / oneKindFirst shared by the opener, the guided page, the lesson's We Do and its example; 11 / 12 their own kind"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-lesson-rule-fits",
+   "check": "number_word_form lesson: no Rule / Remember / Steps line names a box, a place, a teen word or a dash that no number-name item on its sheet has (round-cap r3, critic live1 r2 N6)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages LESSON-RULE-FITS",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'Rule: Every box gets a digit.' over words written on a line (to_words, band 20, band 100); 'Remember: A number name says the hundreds, then the rest.' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "lesson routine pv-number-words ruleFromItems: the Rule and Remember line from the worked example's kind and slot (roles/lesson.js fitLessonData)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --only LESSON-RULE-FITS --pages lesson --seeds 1 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-to-words-overflow",
+   "check": "number_word_form Opener L, numeral to words: the Model's answer line stays inside its half-width cell (critic live1 r2 N7, OVERFLOW; ws-grade-render --gate on the to_words deal)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate --roles opener (to_words)",
+   "browser": true,
+   "fail": {
+    "commit": "7dea0448",
+    "state": "the r2 head: 'page 1 cell 1: content overflows its cell' - the 100 mm L line across the Model cell's edge into the Steps column"
+   },
+   "pass": {
+    "commit": "b372b573",
+    "state": "words.js: the to_words line max-width 100 % of its cell, a long name wraps on it at its own size"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills composing:number_word_form --roles opener --size L --opts '{\"wordform\":[\"to_words\"]}' --gate --no-screen --out /tmp/mq-bt-pv-opener-tw",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-thousand-kind",
+   "check": "number_word_form at band 1,000 (both ways, both answer slots), the FIXED seed 913052 on every role: 'one thousand' is never dealt under a non-thousand Model or under Steps that do not cover it (critic live2 N9; the one-kind class)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (fixed seed 913052, band 1,000)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided M / L 'one thousand' under the Model 233 and the hundreds Steps, both ways; opener M / L the same"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000 is its own kind (pv.js WORDS_TO_NUMBER_1000 / NUMBER_TO_WORDS_1000), so compose.js stepsKindOf / oneKindFirst keep it off a hundreds page"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 0 --seed-list 913052 --deals 'band 1000,band 1000 hto,to_words band 1000' --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-kind-steps-all",
+   "check": "number_word_form, seed-free: over every name 0-1,000, both ways and both answer slots, the provider's Steps are equal exactly when the kinds are (so no seed can deal two kinds under one Model), every quoted step phrase is part of the name, and no step puts two place words in a row (critic live2 N9)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-KIND-STEPS / WORDS-STEPS-TRUE-ALL / WORDS-STEPS-GARBLE",
+   "browser": false,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: one Steps set covers hundreds + thousand (3 ways); '\"one thousand hundred\": 10 in the hundreds.'"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000 has its own Steps and worked steps ('\"one thousand\": 1 thousand.')"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-KIND-STEPS,WORDS-STEPS-TRUE-ALL,WORDS-STEPS-GARBLE --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble-places",
+   "check": "number_word_form Guided: a grey hint with two place words in a row ('\"one thousand hundred\": ___ in the hundreds.') fails GUIDED-HINT-GARBLE (critic live2 N9: the check read it and passed it)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE (place words)",
+   "browser": true,
+   "fail": {
+    "commit": "839abe6a",
+    "state": "the critic head: guided L band 1000 seed 913052, the hint '\"one thousand hundred\": in the hundreds.'"
+   },
+   "pass": {
+    "commit": "76cafeb2",
+    "state": "1,000's own worked steps; no such hint"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-GARBLE --seeds 0 --seed-list 913052 --pages guided --deals 'band 1000' --skills composing:number_word_form",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -9075,10 +9195,10 @@
     "state": "band 20 M: Model 'five' with Guided 'fifteen', 'seventeen', 'ten'; to_words band 20 '15' beside '20'"
    },
    "pass": {
-    "commit": "feadad0b",
-    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band"
+    "commit": "b372b573",
+    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band (round-cap r3: today's GUIDED-ONE-KIND also holds 11 / 12 as their own kind and every item to the Model's kind, so the class fix b372b573 is this row's pass state; its first fix still put 'twelve' under the teen Steps)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seed-list '' --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

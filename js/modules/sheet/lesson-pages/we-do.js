@@ -6,7 +6,7 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
-import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc } from '../roles/compose.js';
+import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc, oneKindFirst } from '../roles/compose.js';
 import { resolveCtx } from '../index.js';
 import { workedStepsOf, stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueOf, countCueRow } from '../roles/guided.js';
@@ -44,6 +44,11 @@ export function pickWeDo(items, example, data, n, others = []) {
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
     let order = [...new Set([...liked.filter((it) => !kind || sameKind.includes(it)), ...same.filter((it) => sameKind.includes(it)), ...sameKind,
         ...liked, ...same, ...rest])];
+    // PT 2.3 (round-cap r3, lf-placevalue critic live1 r2 N6): the Guided cells are the example's kind - the items whose Steps
+    // are the example's Steps (compose.js oneKindFirst, the rule the Opener and the Guided page share); every other kind comes
+    // after them, so it is dealt only when the pool has too few of the example's. A one-kind pool keeps its order; a lesson's own
+    // named cases (`guidedWants`, `guided`, the div_facts Mix forms) still lead - they are the lesson's chosen set.
+    order = oneKindFirst(order, example);
     // (`guidedWants` - the detailed lesson maker, lesson 2: the Guided cells' cases, in order, first)
     if (data && Array.isArray(data.guidedWants)) {
         const lead = [];
