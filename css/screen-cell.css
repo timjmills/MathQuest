@@ -2175,3 +2175,9 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
     padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
 }
+
+/* LDIV-JOIN (owner 2026-11-14: the bracket was "disconnected"): the arc and the bar over its column are ONE
+   path (bracketSvg); its y 0 sits on the vinculum's centre (1px into the 2px border), and the column's own
+   border is kept for layout but drawn clear. Additive: saved HTML with .mq-ldiv-arc keeps the old rules. */
+.mq-scell .mq-ldiv-brk.mq-ldiv-brkj { border-top-color: transparent; }
+.mq-scell .mq-ldiv-arcj { position: absolute; left: 0; top: -1px; width: 100%; height: calc(100% + 1px); overflow: visible; }

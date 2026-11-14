@@ -30,6 +30,7 @@
 //         top-end tangent, meets the vinculum's top edge, to the nearest ink of the arc stroke (its butt cap, or its join
 //         when the arc and the bar are one path) or the vinculum. A butt-capped arc set under a separate bar leaves a
 //         wedge of white there (master 3623be10c); a joined path closes it (miter: K is the corner itself). <= 0.3 mm.
+//         A break in the vinculum (white between its pieces, from the arc rightwards) counts as gap too.
 //   step  the arc's top end against the vinculum's centre line, and the vinculum's pieces against each other (mm). <= 0.1 mm.
 // A skill x host that draws no bracket FAILS (it would pass unseen). word-work.js's own divide frame (M2 1 Q...) is
 // lf-algebra's and is not measured here.
@@ -90,7 +91,7 @@ function MEASURE(rootSel, frameSel) {
     root.querySelectorAll('.mq-ldiv').forEach((g) => {
         if (!vis(g)) return;
         const em = parseFloat(getComputedStyle(g).fontSize);
-        const arc = g.querySelector('.mq-ldiv-arc'), dvd = g.querySelector('.mq-ldiv-dvd');
+        const arc = g.querySelector('.mq-ldiv-arc, .mq-ldiv-arcj'), dvd = g.querySelector('.mq-ldiv-dvd');
         const t = textRect(dvd);
         if (!arc || !t) return;
         const a = arc.getBoundingClientRect(), d = dvd.getBoundingClientRect();
@@ -230,6 +231,9 @@ function JOIN(rootSel, frameSel) {
         const yTop = Math.min(...near.map((b) => b.t));
         const cents = near.map((b) => (b.t + b.b) / 2);
         const step = Math.max(Math.abs(T.y - (first.t + first.b) / 2), Math.max(...cents) - Math.min(...cents));
+        // a break along the vinculum: white between its pieces, from the arc's corner rightwards
+        let reach = first.l, brk = 0;
+        near.slice().sort((p, q2) => p.l - q2.l).forEach((b) => { brk = Math.max(brk, b.l - reach); reach = Math.max(reach, b.r); });
         // K: the arc's outer (left) edge, continued up along its top tangent, meets the vinculum's top edge
         const nOut = { x: -u.y, y: u.x };
         const E0 = { x: T.x + hw * nOut.x, y: T.y + hw * nOut.y };
@@ -251,7 +255,7 @@ function JOIN(rootSel, frameSel) {
             if (lj === 'round') gap = Math.min(gap, Math.max(0, len(sub(K, T)) - hw));
             else if (/miter/.test(lj) && 1 / Math.sin(phi / 2) <= (parseFloat(cs.strokeMiterlimit) || 4)) gap = 0;
         }
-        out.push({ gap: gap * MM, step: step * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40) });
+        out.push({ gap: Math.max(gap, brk) * MM, step: step * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40) });
     });
     return { arcs: out };
 }

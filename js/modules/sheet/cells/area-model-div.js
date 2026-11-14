@@ -22,6 +22,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
+import { bracketSvg } from './long-division.js';
 import { stepMarks, slotInks, WHOLE_SLOTS } from '../steps.js';
 
 const NOWRAP = 'area-model-total-row';   // the online worksheet's no-wrap opt-out (see area-model.js)
@@ -95,8 +96,7 @@ register('area-model-div', {
             // The kit's long-division bracket (long-division.js): the arc and the vinculum in one
             // 1.5 pt line, the divisor before it, the quotient box over the dividend.
             const gut = g.E * 0.9;
-            const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible">`
-                + `<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
+            const arc = bracketSvg({ ink: INK.ink, style: 'position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible' });
             problem = `<span role="group" aria-label="${D} divided by ${V}" style="display:inline-grid;grid-template-columns:auto ${g.em(gut)} auto;grid-template-rows:auto ${g.em(g.E * 1.25)};align-items:center">`
                 + `<span style="grid-column:3;grid-row:1;align-self:end;display:flex;justify-content:center;padding-bottom:0.1em">${totalSlot}</span>`
                 + `<span style="grid-column:1;grid-row:2;padding-right:0.05em">${V}</span>`

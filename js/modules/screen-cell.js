@@ -27,7 +27,7 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { bracketSvg, opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
 import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
@@ -432,11 +432,13 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
  * quotient slot in the row above, right-aligned over the dividend.
  */
 export function divisionHTML(k, slotHtml) {
-    const arc = '<svg class="mq-ldiv-arc" viewBox="0 0 12 48" preserveAspectRatio="none" aria-hidden="true">'
-        + '<path d="M1 1 Q11 24 1 47" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+    // ONE stroke (owner 2026-11-14, LDIV-JOIN): the kit's bracketSvg, its y 0 on the vinculum's centre
+    // (`.mq-ldiv-arcj`); the bracket column's own border stays for layout but is clear (`.mq-ldiv-brkj`), so the
+    // bar over the arc is the path's and it starts at the arc's corner.
+    const arc = bracketSvg({ x: 1, q: 11, w: 12, h: 48, foot: 47, qy: 23.5, ink: '#000', stroke: 2, cls: 'mq-ldiv-arcj', style: '' });
     return `<div class="ws-sheet mq-kit"><div class="mq-ldiv" role="group" aria-label="${attr(`${k.a} divided by ${k.b}`)}">`
         + `<span class="mq-ldiv-q">${slotHtml || ''}</span>`
-        + `<span class="mq-ldiv-dsr">${k.b}</span><span class="mq-ldiv-brk">${arc}</span>`
+        + `<span class="mq-ldiv-dsr">${k.b}</span><span class="mq-ldiv-brk mq-ldiv-brkj">${arc}</span>`
         + `<span class="mq-ldiv-dvd">${k.a}</span></div></div>`;
 }
 
@@ -3186,8 +3188,7 @@ export function ringCellHTML(p) {
             // (`contain: inline-size`), so the arc and the bar hug the digits. The boxes are sized
             // from the dividend and the divisor, never the answer (SL-2).
             const qw = Math.max(String(p.a).length, 2), rw = Math.max(String(p.b).length, 2);
-            const arc = '<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">'
-                + '<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+            const arc = bracketSvg({ ink: '#000', stroke: 2 });   // ONE stroke (owner 2026-11-14, LDIV-JOIN)
             const at = (c, r, inner, extra = '') => `<span style="grid-column:${c};grid-row:${r};display:flex;align-items:flex-end;justify-content:center;${extra}">${inner}</span>`;
             return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
                 + `<div style="text-align:center"><div class="ws-eq mq-eq mq-remeq mq-rembrk" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}" `

@@ -21,6 +21,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
+import { bracketSvg } from './long-division.js';
 import { looseArray } from './k2kit.js';
 
 /* ------------------------------------------------------------------ shared drawing */
@@ -354,8 +355,7 @@ register('add-three', {
  * screen inputs (q then r, joined " R ") and the checker are unchanged.
  */
 function remainderBracket(p, slot) {
-    const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
-        + `<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
+    const arc = bracketSvg({ ink: INK.ink });
     const at = (c, r, inner, extra = '') => `<span style="grid-column:${c};grid-row:${r};display:flex;align-items:center;justify-content:center;${extra}">${inner}</span>`;
     return `<div data-mq-join=" R " role="group" aria-label="${esc(p.dividend)} divided by ${esc(p.divisor)}" `
         + `style="display:inline-grid;grid-template-columns:auto 0.55em auto auto auto;grid-template-rows:auto 1.3em;column-gap:0.15em;row-gap:0.15em;white-space:nowrap;margin-top:0.4em">`
@@ -363,8 +363,11 @@ function remainderBracket(p, slot) {
         + at(4, 1, '<span style="font-weight:700">R</span>', 'align-items:flex-end;')
         + at(5, 1, slot('r'), 'align-items:flex-end;')
         + at(1, 2, esc(p.divisor), 'padding-right:0.1em;')
-        + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block">${arc}</span>`
+        // (LDIV-JOIN, owner 2026-11-14: the arc drops half a stroke so its corner sits on the vinculum's centre line,
+        // and one rule runs from the arc's corner across the column gap and the dividend - no step, no break)
+        + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`
         + at(3, 2, esc(p.dividend), `border-top:${HEAVY} solid ${INK.ink};padding:0 0.15em;`)
+        + `<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(0.55em * 0.15);border-top:${HEAVY} solid ${INK.ink}"></span>`
         + `</div>`;
 }
 

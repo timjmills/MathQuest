@@ -134,6 +134,20 @@ export function compactArc(divisor, dividend, t, g, emMm) {
     return { x0, apex: x0 + bow, a, bow, b: W - s - a - bow, white: W };
 }
 
+/**
+ * The long-division bracket as ONE stroke (owner 2026-11-14, "it's disconnected"; LDIV-JOIN): the arc is drawn
+ * from its foot up to the vinculum and goes straight on along it in the same path, so the corner is a mitre
+ * join, not a butt cap set under a separate bar. `x` is where the arc's centre line meets the bar and its foot,
+ * `q` the control point's x (its bow), `w` the bar's end, `h` the viewBox height, `foot` the arc's foot y and
+ * `qy` the control point's y (viewBox units; y 0 is the bar's centre line). Every bracket - the kit's division
+ * cells and the screen's - draws it through this one function; the caller places the svg so y 0 lies on the
+ * vinculum's centre.
+ */
+export function bracketSvg({ x = 1.5, q = 9, w = 10, h = 40, foot = h, qy = foot / 2, ink = '#000', stroke = HEAVY, cls = '', style = 'display:block;width:100%;height:100%;overflow:visible' } = {}) {
+    return `<svg${cls ? ` class="${cls}"` : ''} viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"${style ? ` style="${style}"` : ''}>`
+        + `<path d="M${x} ${foot} Q${q} ${qy} ${x} 0 H${w}" fill="none" stroke="${ink}" stroke-width="${stroke}" stroke-linejoin="miter" stroke-miterlimit="10" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
 /** Work rows: the payload's count, else two per step of the algorithm (at least two). */
 // A division FACT (`fact: true`, div_facts' long-division form): the bracket and the quotient
 // boxes only - a fact is recalled, not worked, so no work rows.
@@ -293,8 +307,7 @@ register('division', {
             const c = compactArc(V, D, trackMm / g.E, gEm, g.E);
             return { x: +(c.x0 / gEm * 10).toFixed(3), q: +((c.x0 + 2 * c.bow) / gEm * 10).toFixed(3) };
         })() : WIDE_ARC;
-        const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
-            + `<path d="M${A.x} 0 H10 M${A.x} 0 Q${A.q} 20 ${A.x} 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
+        const arc = bracketSvg({ x: A.x, q: A.q, ink: INK.ink });
         // The arc's stroke is centred on y 0 while the vinculum (the dividend's border-top) lies
         // inside its row: the arc drops half a stroke so the two meet in one line.
         html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`;
