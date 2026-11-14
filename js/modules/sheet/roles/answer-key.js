@@ -350,8 +350,8 @@ function itemHtml(item, ctx, report) {
 
 /**
  * LDIV-ROOM (owner 2026-11-14: "a lot of white area to work with"): the room (mm) a grid part gives its i-th cell, from the
- * part's drawn height, rows, row shares and columns, plus how many cells the part holds. Handed ONLY to the long-division
- * template (`ctx.room`), which grows its writing boxes into it; every other template's ctx is untouched.
+ * part's drawn height, rows, row shares and columns, plus how many cells the part holds. Handed ONLY by a practice grid
+ * (practice.js `roomFill`: Independent, More Practice, Test ...) and ONLY to the long-division template (`ctx.room`), which grows its writing boxes into it; every other template's ctx is untouched.
  */
 function partRoom(part, i, n) {
     const H = parseFloat(part.height);
@@ -370,7 +370,7 @@ function gridPart(part, ctx, report) {
     const cells = items.map((item, i) => {
         report.index = report.cellNo++;
         const gi = item.q ? cellGridItem(item.q, ctx) : { cls: '', style: '' };
-        const room = isLongDivision(item) ? partRoom(part, i, items.length) : null;
+        const room = part.roomFill && isLongDivision(item) ? partRoom(part, i, items.length) : null;
         // critic r3 (N-1, lead ruling on Q1): the key marks a Model cell, so its traced worked answer
         // stays a black given there while a Guided Practice trace takes the key ink (key only).
         let html = itemHtml(item, room ? Object.assign({}, ctx, { room }) : ctx, report);
