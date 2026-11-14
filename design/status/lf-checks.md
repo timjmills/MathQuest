@@ -711,3 +711,36 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
   `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
 - CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
+
+## 2026-11-13 — precritic "unparsed" verdict fix (lead, urgent; reported by lf-ops)
+
+- `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output": precritic's verdict reader accepted only
+  `<tool>: OK|FAIL`. It now accepts `<tool>[ --mode]*: OK|FAIL` (self-test: 6 verdict cases). Row `precritic-mode-verdict`.
+- copy-light "unparsed": NOT reproduced on master 7a5bc902c (precritic's parser reads `ws-copy-light --skill
+  multiplication:count_by_tables` as PASS); asked the lead for lf-ops' log line and branch.
+- copy-light "unparsed" (lf-ops log, 594642d49): reproduced. ws-copy-light ended with process.exit(), which drops stdout
+  still queued for a pipe; precritic's reader got no verdict line. Fix: process.exitCode, plus the drawings / reasons lists
+  capped at 12. Row `copy-light-pipe-verdict` (30 skills through a slow pipe). The count-row key granularity lf-ops noted
+  (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
+- Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
+  exit uses exitCode when its output can exceed the 64 KB pipe buffer).
+
+## 2026-11-14 ledger sweep before the 13:00 UTC flip (branch claude/sweet-newton-c8wrv1-lf-tools-ledger)
+
+- `ws-precritic-plan --checks-from-critics`: 15 failing rows -> 0 (222 pass, 58 exempt). Only backtest cells edited.
+- (a) named existing on-path ids: 6 rows (49, 51, 60, 137, 302 by id; 178 as a process rule).
+- (b) brought from lf-partopts: 0 (the partopts step-A / panel rows were already green on master; options-panel-sample's
+  fix d7847568 and ws-options-shots gate are not on master, so it could not run here).
+- (c) reasoned exemptions: 9 rows - div_facts 27/45/46/47/48 (ws-fact-pages.cjs + 8 rows parked on lf-ops-divarray
+  6e5fe3415), 43 (nits under the bar), 131 (overflowOf runs in every precritic run and its --self-test), 140 (open, needs a
+  PDF-raster check), 141 (parked with the partopts panel). When lf-ops-divarray or the partopts panel deploys, swap these
+  exemptions for their ids.
+- PARKED (budget stop from the lead): lf-engine F2, the plan's row listing printing skill-less rows (chart-name-line,
+  lesson-pm-cont, lesson-tab-clear) N/A; fix = judge them with idOnPath's tool rule (precritic or deploy gate) and print why.
+## 2026-11-14 — ws-no-size-s --browser de-flake (lead; seen on lf-builds chart_to_120)
+
+- Cause: a size click landed while the previous build still redrew the controls, so the click was lost. Fix: wait until the
+  built size reads the same 3 times, re-scan just before each click (a rebuild drops the old tags), and on a miss re-click
+  once; a re-click is printed as a note, and only a repeat miss fails. 2 of 2 plain runs OK; the 30-mutation browser
+  self-test still catches every planted S / dead control. Row `nos-browser-settle-reclick` (a planted lost first click:
+  master's tool FAIL, this tool OK).

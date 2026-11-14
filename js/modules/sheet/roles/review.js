@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, capRowsToInk, isStoryWork } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 import { slotScore } from '../paginate.js';
 
@@ -338,6 +338,12 @@ export function plan(input = {}) {
         // Each row as tall as what IT holds (layout.rowShape).
         const shape = rows > 1 ? rowShape(items, cols, rows, cellH) : null;
         if (shape) { part.rowsTpl = shape.rowsTpl; part.height = `${shape.heightMm}mm`; }
+        // ONE-ROW (layout.capRowsToInk, lf-roles r9): a band of column stories (two-step) keeps each row at its ink / 0.72, top-aligned
+        // (multi_step_word (Visual) Review M / L: one story in a 185-210 mm cell, 34 % under it)
+        if (items.length && items.every(isStoryWork)) {
+            const held = capRowsToInk(items, cols, rows, part.height ? parseFloat(part.height) : rows * cellH, part.rowsTpl || '');
+            if (held) Object.assign(part, { height: `${held.heightMm}mm`, rowsTpl: held.rowsTpl, cls: `${part.cls || 'fixed'} ${rows === 1 ? 'mq-onerow' : 'mq-inkrows'}` });
+        }
         return part;
     };
     const sections = [];
