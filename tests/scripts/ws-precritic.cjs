@@ -978,6 +978,10 @@ function buildPlan(ctx) {
         // stroke - no white at the outer corner, no step - on paper (M/L, pupil + key, the card roles) and on screen (1366, 820)
         const ldivKeys = keys.filter((k) => /^division:(long_div_2digit|div_facts|div_facts_long|divide|div_remainders)$/.test(k));
         if (ldivKeys.length) add(gate('ldiv-join', 'ws-ldiv-hug --join --raster (LDIV-JOIN: the bracket arc runs into the vinculum, gap <= 0.3 mm, no step; LDIV-JOIN-RASTER: no pixel > 80 in the bar at DSF 2 / 3; LDIV-SHAPE: the side bows <= 0.6 mm)', `${ldivKeys.length} bracket skill(s)`, 'browser', 'ws-ldiv-hug', ['--join', '--raster', '--shape', '--skills', ldivKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
+        // LDIV-ROOM (owner 2026-11-14: "a lot of white area to work with"): the long-division work grid fills a 4-a-page cell
+        // (>= 80 % of its free height or the 2x cap, centred); 6 / 8 a page keep the floor row and stay inside the cell
+        const roomKeys = keys.filter((k) => /^division:(long_div_2digit|divide)$/.test(k));
+        if (roomKeys.length) add(gate('ldiv-room', 'ws-ldiv-hug --room (LDIV-ROOM: the work grid uses a 4-a-page cell, M/L)', `${roomKeys.length} work-grid skill(s)`, 'browser', 'ws-ldiv-hug', ['--room', '--skills', roomKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
