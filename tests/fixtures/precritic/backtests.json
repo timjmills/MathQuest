@@ -11843,6 +11843,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-guided-model-alone",
+   "check": "ws-two-step --guided GUIDED-MODEL-ALONE: Guided page 1 of a two-step skill holds the Model and a try (exempt by ruling: the family at L; multi_step_word (Visual) / _plain at M), M / L, three seeds",
+   "kind": "commit-pair",
+   "rule": "GUIDED-MODEL-ALONE (lf-roles critic r8b X2; lead rulings 2026-11-14 a + d; two-step card decision 4 amended)",
+   "fail": {
+    "commit": "220419440",
+    "state": "the Guided Model drew the two-step bar (~143 mm at M), so page 1 held the Model alone on the five presets at M"
+   },
+   "pass": {
+    "commit": "364743ae1",
+    "state": "buildSheet marks Guided items (ctx.guided); word-work drops the bar there; the Model and a try share page 1 at M"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --skill algebra:two_step_add_then_div,algebra:two_step_mult_div_first",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
