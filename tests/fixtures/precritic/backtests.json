@@ -8854,7 +8854,7 @@
     "state": "wrongAnswer null on every 2- and 3-gap window"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "chartWrong: one gap written wrong per candidate, the others kept"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules WRONG-MULTI",
@@ -8873,7 +8873,7 @@
     "state": "the second and third gaps never named"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "chartSteps works every gap (relation + Write per gap; row runs for 4+ gaps)"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules STEPS-ALL-SLOTS",
@@ -8892,7 +8892,7 @@
     "state": "'The missing number is 101, 104.'"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "sayValues: chartSay"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
@@ -8911,7 +8911,7 @@
     "state": "work lines name the first gap only"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "one relation line per gap"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules HINT-ALL",
@@ -8931,7 +8931,7 @@
     "state": "4 of 4 True on chart_to_120 pages"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "per-slot wrong answers deal False on multi-gap windows"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only TF-FALSE",
@@ -8951,7 +8951,7 @@
     "state": "every multi-gap window Correct"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "per-slot wrong answers"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only EA-PATTERN",
@@ -8971,7 +8971,7 @@
     "state": "opener / review / mixed / pre-skill-check / lesson count windows"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "paginate.js slotScore on those roles"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only SCORE-SLOTS --score-roles opener,review,mixed-practice,pre-skill-check,lesson",
@@ -8991,7 +8991,7 @@
     "state": "band 120 rows and band 10 pages give answers away item to item"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "the dealer never deals a window of squares already on the sheet"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
@@ -9011,7 +9011,7 @@
     "state": "the strip walks the example, not on the page"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "stripStepsFor: the skill's general steps when the example's steps name its own numbers"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 2 --only STRIP-NUMBERS --score-roles lesson",
@@ -9031,7 +9031,7 @@
     "state": "hundreds_chart_fill reason-it L 10.4 mm"
    },
    "pass": {
-    "commit": "433454037",
+    "commit": "ee8c6c287",
     "state": "chartwindow footprint states inkWMm for a 1-100 window, so Reason It takes its wide form"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes M,L --only CHART-SQUARE --score-roles reason-it,true-false,error-analysis",
@@ -9055,6 +9055,26 @@
     "state": "the empty square's slot z-index 1; .visual-aid overflow visible for a fitting window"
    },
    "command": "node tests/scripts/ws-phone-card.cjs --skills composing:hundreds_chart_fill --sizes 820x1180,1280x900",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-rowx",
+   "check": "Error analysis of chart windows with 1, 2 and 3 gaps on one page: the Correct / Fix it judgement starts at one x a column (the 3-box fix widened its centred cell: 100.7-113.2 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "00bafd629",
+    "state": "EA-ROWX 4 on chart_to_120 error-analysis M/L"
+   },
+   "pass": {
+    "commit": "ee8c6c287",
+    "state": "error-analysis.js: one fix width a one-column page (fixWBy / o.fixW)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles error-analysis --rules EA-ROWX,EA-PAD --show 20",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
