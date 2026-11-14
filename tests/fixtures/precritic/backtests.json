@@ -8706,6 +8706,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "chart-name-line",
+  "check": "lf-engine chart-name (owner request 2026-11-14): every lesson's ANCHOR CHART, pupil and key, prints frame.js pageHeader's Name / Date line (the same type and rule as an ordinary page), no Score unless the chart is scored, the key's line at the pupil page's places, no overflow, one page inside A4 (master printed the chart's header with no Name / Date)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples CHART-HEAD",
+  "browser": true,
+  "fail": {
+   "commit": "22752843c",
+   "state": "CHART-HEAD FAIL: add / round / div M, L pupil + key - no Name / Date field, the header is not pageHeader's markup"
+  },
+  "pass": {
+   "commit": "cb5e5bd94",
+   "state": "CHART-HEAD PASS: chartPage takes the frame header (Name / Date, Score off); detailed lessons keep their bare header"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only add,round,div --rules CHART-HEAD --sizes M,L",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
