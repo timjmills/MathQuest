@@ -216,8 +216,26 @@ export function counts(pools, input) {
     return { main: needOf(g) };
 }
 
+/**
+ * PT 2.3 on the Opener (lf-placevalue critic live1 N3): the Model and its Guided band are one kind of problem - the items whose
+ * Steps are the same. The pool is reordered, stably, so the kind it deals most comes first (ties: the kind dealt first): the
+ * Model, the Steps band (read off the first item) and the Guided band take it, and the other kinds go to the Independent band.
+ * A pool of one kind - every skill but a mixed-kind one such as number_word_form at "numbers to 20" - is returned as it was.
+ */
+function oneKindFirst(pool) {
+    if (!Array.isArray(pool) || pool.length < 3) return pool;
+    const key = (it) => { try { return JSON.stringify((stringsOf(it) || {}).steps || null); } catch (e) { return ''; } };
+    const keys = pool.map(key);
+    if (new Set(keys).size < 2) return pool;
+    const n = new Map();
+    keys.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
+    let top = keys[0];
+    for (const [k, c] of n) if (c > n.get(top)) top = k;
+    return [...pool.filter((_, i) => keys[i] === top), ...pool.filter((_, i) => keys[i] !== top)];
+}
+
 export function plan(input = {}) {
-    const fit = bestGeometry(poolItems(input, 'main'), input);
+    const fit = bestGeometry(oneKindFirst(poolItems(input, 'main')), input);
     const { g, items } = fit;
     const { ctx, m } = g;
     const nModel = g.twoModels ? 2 : 1;

@@ -8667,46 +8667,46 @@
     "pass": "OK"
    }
   },
- {
-  "id": "precritic-mode-verdict",
-  "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
-  "kind": "commit-pair",
-  "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
-  "browser": false,
-  "fail": {
-   "commit": "7a5bc902c",
-   "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+  {
+   "id": "precritic-mode-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
+   "kind": "commit-pair",
+   "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+   },
+   "pass": {
+    "commit": "70d347578",
+    "state": "the mode verdict line reads OK"
+   },
+   "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "70d347578",
-   "state": "the mode verdict line reads OK"
+  {
+   "id": "copy-light-pipe-verdict",
+   "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
+   "browser": false,
+   "fail": {
+    "commit": "7a5bc902c",
+    "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+   },
+   "pass": {
+    "commit": "82b8fbf44",
+    "state": "the verdict line is the last line"
+   },
+   "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "copy-light-pipe-verdict",
-  "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
-  "kind": "commit-pair",
-  "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
-  "browser": false,
-  "fail": {
-   "commit": "7a5bc902c",
-   "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
-  },
-  "pass": {
-   "commit": "82b8fbf44",
-   "state": "the verdict line is the last line"
-  },
-  "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
   {
    "id": "one-row-cap",
    "check": "a practice page (independent / more-practice / test) holding ONE row of a tall story is held to its work, never stretched to the page (lead ruling R1 / R4a; lf-algebra precritic two-step r11 ws-two-step --print CAP-BAND: multi_step_word (Visual) M 41 % / L 32 %, letter + wpBar L 41-45 %)",
@@ -8839,6 +8839,286 @@
     "state": "letter_equation opener L: 93.7 mm white, the Guided band needs 105 mm - an honest leftover"
    },
    "command": "node tests/scripts/ws-roles-unit.mjs --spill-p1-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-hint-leak",
+   "check": "number_word_form Guided: no grey hint gives the answer away - its place phrases built together ('2 tens, 6 ones' -> 26), or every digit of the answer named; the allowed form is the first step's gapped frame (lf-roles critic r8b D3, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M / L, default and every band: '\"twenty-six\": 2 tens, 6 ones.' under twenty-six, 26 more hints"
+   },
+   "pass": {
+    "commit": "ae83dfbc",
+    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-one-kind",
+   "check": "number_word_form Guided: one kind of problem per page - no item (teen, tens word alone, one word, two words, hundreds) whose kind the page's Steps do not cover (lf-roles critic r8b D4, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M default: 'eleven' under 'Read the tens word. Read the ones word.'; band 20 pages mixing one-word, teen and decade names"
+   },
+   "pass": {
+    "commit": "ae83dfbc",
+    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-eb-band",
+   "check": "number_word_form Guided M / L: no cell 30 % or more empty under its ink (lf-roles critic r8b D2: 35-50 % in all 15 cells)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (--roles guided)",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "EB-BAND 15: M 35-50 %, L 35-59 % (rows stretched to the page)"
+   },
+   "pass": {
+    "commit": "878f5325",
+    "state": "words footprint guidedTight: rows at their measured height, the Model row the larger of its work line and the hint: EB-BAND 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --roles guided --sizes M,L --hosts none --no-baseline --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-numeral",
+   "check": "placevalue:expand on the online worksheet: the number sentence's numerals set and drawn at >= 29 px (the worksheet digit floor), Andika 700, no operator left at a line's end (lf-hosts critic via the lead 2026-11-13: 18 px)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "worksheet 1280 / 820 / 390: '144 =' set at 18 px weight 400 (drawn 22 px at 390), '+' alone at a line's end at 390"
+   },
+   "pass": {
+    "commit": "77b6ce24",
+    "state": "inlineBlanksHTML numeric: the sentence at --mq-digit (29 px), bold, each operator kept with its box"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-floor",
+   "check": "SCREEN-DIGIT holds the online worksheet to the shared table's 29 px floor (tests/lib/ws-screen-widths.cjs), not the card's 56 / 48: a 29 px worksheet numeral passes, 28 px still fails (lead ruling 2026-11-13 21:21 a; the ratchet pin design/audit/baselines/screen-digit-ratchet.json is proved by the --self-test case 'worksheet ratchet')",
+   "kind": "fixture",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (worksheet floor)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-28.html",
+    "state": "expand's worksheet sentence at 28 px, Andika 700: under the 29 px floor"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-29.html",
+    "state": "the same at 29 px: the worksheet floor, passes"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280 --host worksheet",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-no-numeral-skip",
+   "check": "SCREEN-DIGIT SKIPS a screen cell with no numeral (a number-name skill's card or quiz) instead of failing it 'no numeral found' (lead ruling 2026-11-13 21:21 b). Each state runs its OWN ws-screen-slots on the same fixture: the ruling changes the check",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (no numeral: SKIP)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form's card (the name 'twenty-six', no numeral): 'no numeral found in the cell' FAIL"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "SKIP no numeral, OK"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --digit-fixture tests/fixtures/precritic/screen-digit/no-numeral.html --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-chrome",
+   "check": "SCREEN-DIGIT never reads the worksheet card's chrome (the number badge .mq-wsbar, Nunito 16 px; the hint popup) as the item's numeral (lead ruling 2026-11-13 21:21 d: number_word_form's worksheet 'the numeral \"1\" is 16 px, font Nunito' was the badge). Each state runs its OWN ws-screen-slots on the live app",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (chrome excluded)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form worksheet@1280 / 1366 / 820 / 1024: the badge '1' 16 px Nunito; card / quiz 'no numeral found'"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": ".mq-wsbar / .hint-popup excluded, a cell with no numeral SKIPPED: 0 misses"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --skills composing:number_word_form --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-card-numeral",
+   "check": "placevalue:expand's practice card sets its number sentence at the card's digit floor (56 / 48 px at 1280-1366 / 820-1024), bold, every operator with its box (lead ruling 2026-11-13 21:21 c: 24 px regular)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (card)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "expand card@1280 '552 =' 24 px weight 400 (and 22 / 20 px at the narrower widths)"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "question-render.js .mq-ibnum: 56 px Andika 700 at 1280, 48 at 820; worksheet 29, quiz 56: 0 misses"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills placevalue:expand --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-any-digit",
+   "check": "number_word_form Guided: no hint names ANY digit of the answer outside a ruled gap, on every band and answer slot (lf-placevalue critic live1 N1, the class; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK (any digit)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 1000 M / L: '\"two hundred\": 2 in the hundreds.' under 262, '\"nine hundred\": 9 in the hundreds.' under 986"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble",
+   "check": "number_word_form Guided: every hint reads as English - no template filled with 'no' ('the no is'), no doubled word, no hole (critic live1 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words M / L: '26: the no is in the hundreds place.'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-to-words-steps",
+   "check": "number_word_form numeral-to-words Guided: the Steps fit every item's kind and name no place no item has (critic live1 N2: 'Say the hundreds: three hundred.' over 53, 26, 99)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (to_words, places)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words default / band 20 / band 1000 M / L: the hundreds Steps with a literal 'three hundred' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-one-kind",
+   "check": "number_word_form Opener: the Model and its Guided band are one kind its Steps cover (critic live1 N3: 'twenty' beside a teen Model and the teen Steps at band 20)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND --roles opener",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 20 M: Model 'five' with Guided 'fifteen', 'seventeen', 'ten'; to_words band 20 '15' beside '20'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-one-line",
+   "check": "placevalue:expand online worksheet at 820 px and wider: the sentence on one line, every answer box at least 100 x 76 px - the size before the twin (critic live1 N4, a ratchet)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-ONE-LINE / WS-SLOT-SIZE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "3 columns at 1280: '+ [ ]' on a second line in every card, boxes 62 x 46"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "nowrap line, 2 columns at 1280 / 1 at 820, boxes 103 x 76"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-touch-target",
+   "check": "placevalue:expand and placevalue:unit_form answer boxes >= 48 px on the worksheet and the builder-made quiz at 820 / 1024 (critic live1 N5, H6; lf-tools r1 A1 - one shared fix)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TOUCH-TARGET (--quiz-builder)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "expand quiz-820 / -1024 and worksheet 46 px inputs; unit_form worksheet-820 / -1024 46 px (30 findings)"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "a boxed slot's box >= 50 px, its input 48 px: 0 findings"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills placevalue:expand,placevalue:unit_form --roles independent --size M --gate --quiz-builder --out /tmp/mq-bt-touch",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
