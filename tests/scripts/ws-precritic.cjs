@@ -1608,6 +1608,12 @@ async function main() {
             if (g.synthetic) { say(`  [self] ${g.name} — ${g.synthetic.result}: ${g.synthetic.findings}`); continue; }
             say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : shownCmd(g)}`);
         }
+        // the role cover's size and minutes, on EVERY dry run (critic roles r1 D3: a --copy-light dry run returned before it)
+        if (ctx.roleCover && ctx.roleCover.plan) {
+            const P = ctx.roleCover.plan;
+            say(`${TOOL} role cover: ${P.skills.map((x) => `${x.skill} ${x.roles} roles (${x.rolesFrom}; roles=${(x.roleList || []).join(',')}) + ${x.variants.length} drawing variant(s) of ${x.candidates} offered value(s)${x.variants.length ? ` [${x.variants.join(', ')}]` : ''}`).join('; ')}`);
+            say(`${TOOL} role cover size: ${P.units.lint} print-lint + ${P.units.band} empty-band + ${P.units.raster} raster-fit unit(s) in ${ctx.roleCover.n} shard(s); est ${P.estMin} min of slot time, ~${P.wallMin} min wall on two slots`);
+        }
         if (copyLight) {
             // the copy-light verdict is quick (node, no browser): a dry run gives it, and writes the sample, so a lane knows its
             // route before it spends a run
@@ -1620,11 +1626,6 @@ async function main() {
             if (r.status !== 0) { say(`${TOOL}: FAIL (dry run, nothing ran; copy-light: ${(out.filter((l) => /why not/.test(l))[0] || out.slice(-1)[0] || 'error').replace(/^\s*why not: /, '')})`); process.exit(1); }
             say(`${TOOL}: OK (dry run, nothing ran; copy-light: ${batchKeys.length ? `batch on one passed template` : 'every skill eligible'}, sample ${ctx.samplePath})`);
             return;
-        }
-        if (ctx.roleCover && ctx.roleCover.plan) {
-            const P = ctx.roleCover.plan;
-            say(`${TOOL} role cover: ${P.skills.map((x) => `${x.skill} ${x.roles} roles (${x.rolesFrom}; roles=${(x.roleList || []).join(',')}) + ${x.variants.length} drawing variant(s) of ${x.candidates} offered value(s)${x.variants.length ? ` [${x.variants.join(', ')}]` : ''}`).join('; ')}`);
-            say(`${TOOL} role cover size: ${P.units.lint} print-lint + ${P.units.band} empty-band + ${P.units.raster} raster-fit unit(s) in ${ctx.roleCover.n} shard(s); est ${P.estMin} min of slot time, ~${P.wallMin} min wall on two slots`);
         }
         say(`${TOOL}: OK (dry run, nothing ran)`);
         return;

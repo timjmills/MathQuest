@@ -18,6 +18,7 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+export const PAGE_ROLE = 'independent';
 const NO_CARD_SKIP = /^(nl[A-Z]|calculator$|skipAfter$)/;
 
 export async function loadApp(root) {
@@ -36,7 +37,8 @@ export async function loadApp(root) {
         const kit = await import(M('sheet/index.js'));
         const sk = await import(pathToFileURL(join(HERE, 'ws-drawing-skeleton.mjs')).href);
         const cp = await import(pathToFileURL(join(HERE, 'ws-card-plan.mjs')).href);
-        return { gq, pg, so, kit, sk, cp, allRoles: ['independent', 'more-practice', ...Object.keys(roles.ROLE_MODULES)], quiet };
+        const ps = await import(M('print-sheet.js'));
+        return { gq, pg, so, kit, sk, cp, ps, allRoles: ['independent', 'more-practice', ...Object.keys(roles.ROLE_MODULES)], quiet };
     } finally { Object.assign(console, quiet); }
 }
 
@@ -104,10 +106,34 @@ export async function drawingVariantsFor(app, root, key, items = 6) {
         // or fewer blanks, another table, a shuffled order is the same drawing; a times label, a circle, a third line is not)
         return [...new Set(out), ...[...vocab].sort()];
     };
+    // ... and the BUILT PAGE (critic roles r1 D1): options buildSheet draws round the problem (supports: frame, touch, tile,
+    // line, boxsign; cover; mix ...) never reach the generator's cell, so the cell alone read them "same as defaults" and
+    // add_facts' 30 values were "1 of 30" while guided + support=frame failed L-SUPPORT SCC-T10. The pupil HTML of ONE
+    // buildSheet page (role PAGE_ROLE, size M, seed 7000, no key; node, no DOM: tens of ms) is skeletoned the same way, so
+    // ANY option that changes the page is a variant.
+    const pageSig = async (opts) => {
+        const D = globalThis.document;
+        delete globalThis.document;   // buildSheet's DOM measuring is guarded on `typeof document`; the stub would loop
+        try {
+            const r = await app.ps.buildSheet({ role: PAGE_ROLE, sections: [{ skills: [{ categoryId: cat, skillId: id, opts }], count: items }], size: 'M', seed: 7000, key: false });
+            if (!r || !r.pupilHtml) return ['page:none'];
+            // its VOCABULARY, as for the cell (a frame, a touch dot, a tile, a sign box is a new kind; one more row or blank is not)
+            return [...new Set(app.sk.skeletonOfHtml(r.pupilHtml).split(/[(),*|]+/).filter(Boolean))].sort().map((t) => `pg:${t}`);
+        } catch (e) { return ['page:error']; } finally { globalThis.document = D; }
+    };
     const q = { ...console };
     console.log = console.warn = console.error = console.info = console.debug = () => {};
     let r;
-    try { r = pickDrawingVariants(candidates, sig, (o) => group[o] === 'layout'); } finally { Object.assign(console, q); }
+    try {
+        const memo = new Map();
+        for (const o of [undefined, ...candidates.map((c) => c.opts)]) {
+            const k = JSON.stringify(o ?? null);
+            if (memo.has(k)) continue;
+            const s = sig(o);
+            memo.set(k, s === null ? null : [...s, ...(await pageSig(o))]);
+        }
+        r = pickDrawingVariants(candidates, (o) => memo.get(JSON.stringify(o ?? null)), (o) => group[o] === 'layout');
+    } finally { Object.assign(console, q); }
     return {
         skill: key, hasCard, cards: plan.cards,
         roles: hasCard ? plan.roles : app.allRoles.slice(),

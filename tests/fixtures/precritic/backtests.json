@@ -8735,7 +8735,7 @@
   "browser": true,
   "fail": {
    "commit": "8f76b6401",
-   "args": "--roles opener,error-analysis,scripted-model",
+   "args": "--roles opener,error-analysis,scripted-model --expect-e3e5e6",
    "state": "the new plan's lint rows on the roles of E3 / E5 / E6: FAIL with all three visible"
   },
   "pass": {

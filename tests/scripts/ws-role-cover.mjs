@@ -58,7 +58,9 @@ export function unitsOf(p, o) {
     const ctx = { hasCard: p.hasCard, cardRoles: p.roles };
     const roles = o.roles && o.roles.length ? p.roles.filter((r) => o.roles.includes(r)).concat(o.roles.filter((r) => !p.roles.includes(r))) : p.roles;
     const groups = [];
-    const vs = [null, ...(o.defaultsOnly ? [] : p.variants)];
+    // --variants opt=value,..: only those variants (and no defaults group), for a cheap focused run of one escape
+    const pick = o.variants && o.variants.length ? p.variants.filter((v) => o.variants.includes(`${v.option}=${v.value}`)) : null;
+    const vs = pick ? pick : [null, ...(o.defaultsOnly ? [] : p.variants)];
     for (const v of vs) {
         const g = { skill: p.skill, variant: v ? `${v.option}=${v.value}` : null, opts: v ? v.opts : null, units: {} };
         for (const t of o.tools) {
@@ -145,14 +147,31 @@ async function selfTest() {
     eq('plan-check: planned', planCheck(PT, ['a:b'], ['opener']), []);
     eq('plan-check: a role off the plan, the old plan', [planCheck(PT, ['a:b'], ['scripted-model']).length, planCheck('  [browser] ws-print-lint --roles lesson a:b', ['a:b'], ['opener']).length], [1, 3]);
     eq('band findings: only FAIL rules, with their detail', bandFindings('EB-BAND  PASS\nEB-VOCAB FAIL 1\n   a:b lesson M p2 vocab cell 1: 38 %\nEB-PAGE  PASS\n(1 skill(s))\nws-empty-band: FAIL (1)'), ['EB-VOCAB a:b lesson M p2 vocab cell 1: 38 %']);
-    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length})` : 'OK (14 cases)'}`);
+    // (critic roles r1 D1) the plan holds a named variant; --variants focuses a run on it
+    const PV = 'ws-precritic role cover: a:b 3 roles (card c; roles=independent,guided) + 2 drawing variant(s) of 9 offered value(s) [notation=across, support=frame]';
+    eq('plan-check: variant planned / missing', [planCheck(PV, ['a:b'], [], ['support=frame']).length, planCheck(PV, ['a:b'], [], ['support=tile']).length, planCheck(PV.replace(', support=frame', ''), ['a:b'], [], ['support=frame']).length], [2, 3, 3]);   // 2 = this snippet has no row and no size line
+    eq('--variants focuses', unitsOf({ ...p, variants: [{ option: 'x', value: '1' }, { option: 's', value: 'frame' }] }, { tools: ['lint'], sizes: ['L'], roles: ['opener'], variants: ['s=frame'] }).map((x) => `${x.variant}:${x.units.lint.length}`), ['s=frame:1']);
+    // (critic roles r1 D1, live) add_facts support=frame is drawn by buildSheet, not the generator: it must be a variant
+    try {
+        const DV = await import(pathToFileURL(join(HERE, '..', 'lib', 'ws-drawing-variants.mjs')).href);
+        const root = resolve(join(HERE, '..', '..'));
+        const r = await DV.drawingVariantsFor(await DV.loadApp(root), root, 'addition:add_facts');
+        eq('live: add_facts support=frame is a drawing variant', r.variants.some((v) => v.option === 'support' && v.value === 'frame'), true);
+    } catch (e) { bad.push(`live add_facts: ${e.message}`); }
+    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length})` : 'OK (17 cases)'}`);
     for (const b of bad) console.log(`  - ${b}`);
     return bad.length ? 1 : 0;
 }
 
 /** --plan-check: does a ws-precritic --dry-run text (stdin) plan the role cover of `skills` on `roles`? Pure. -> [missing] */
-export function planCheck(text, skills, roles) {
+export function planCheck(text, skills, roles, variants = []) {
     const miss = [];
+    // (critic roles r1 D1) a variant the plan must hold, e.g. support=frame: a buildSheet-drawn option is a drawing variant
+    for (const k of skills) for (const v of variants) {
+        const line = String(text).split('\n').find((l) => / role cover: /.test(l) && l.includes(k)) || '';
+        const seg = line.slice(line.indexOf(k)).split(/; [a-z_]+:[a-z_0-9]+ \d+ roles/)[0];
+        if (!new RegExp(`[\\[ ,]${v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[,\\]]`).test(seg)) miss.push(`${k}: variant ${v} not in the role cover`);
+    }
     for (const k of skills) {
         if (!String(text).split('\n').some((l) => l.includes('tests/scripts/ws-role-cover.') && l.includes(k))) miss.push(`${k}: no ws-role-cover row`);
         const m = new RegExp(`role cover: .*?${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\d+ roles \\([^\\n]*?roles=([^;)\\s]+)`).exec(text);
@@ -168,7 +187,7 @@ async function main() {
     if (has('plan-check')) {
         // (backtest precritic-role-cover-plan) node tests/scripts/ws-precritic.cjs --skill X --dry-run | ws-role-cover --plan-check --skill X --roles r,..
         let t = ''; for await (const c of process.stdin) t += c;
-        const miss = planCheck(t, list('skill'), list('roles'));
+        const miss = planCheck(t, list('skill'), list('roles'), list('variant'));
         console.log(`${TOOL} --plan-check: ${miss.length ? `FAIL (${miss.join('; ')})` : `OK (${list('skill').join(', ')}: ${list('roles').join(', ') || 'the plan'} under print-lint, empty-band and raster-fit at M and L)`}`);
         process.exitCode = miss.length ? 1 : 0;
         return;
@@ -184,7 +203,7 @@ async function main() {
     const app = await loadApp(root);
     const plans = [];
     for (const k of skills) plans.push(await DV.drawingVariantsFor(app, root, k));
-    const o = { tools, sizes, roles: list('roles'), defaultsOnly: has('defaults-only'), withCovered: has('with-covered') };
+    const o = { tools, sizes, roles: list('roles'), variants: list('variants'), defaultsOnly: has('defaults-only'), withCovered: has('with-covered') };
     const groups = plans.flatMap((p) => unitsOf(p, o));
     const [si, sn] = (get('shard') || '1/1').split('/').map(Number);
     if (!(sn >= 1 && si >= 1 && si <= sn)) { console.log(`${TOOL}: FAIL (usage: --shard i/n)`); process.exit(2); }
