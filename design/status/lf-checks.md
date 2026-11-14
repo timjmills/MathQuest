@@ -724,3 +724,16 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
 - Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
   exit uses exitCode when its output can exceed the 64 KB pipe buffer).
+
+## 2026-11-14 ledger sweep before the 13:00 UTC flip (branch claude/sweet-newton-c8wrv1-lf-tools-ledger)
+
+- `ws-precritic-plan --checks-from-critics`: 15 failing rows -> 0 (222 pass, 58 exempt). Only backtest cells edited.
+- (a) named existing on-path ids: 6 rows (49, 51, 60, 137, 302 by id; 178 as a process rule).
+- (b) brought from lf-partopts: 0 (the partopts step-A / panel rows were already green on master; options-panel-sample's
+  fix d7847568 and ws-options-shots gate are not on master, so it could not run here).
+- (c) reasoned exemptions: 9 rows - div_facts 27/45/46/47/48 (ws-fact-pages.cjs + 8 rows parked on lf-ops-divarray
+  6e5fe3415), 43 (nits under the bar), 131 (overflowOf runs in every precritic run and its --self-test), 140 (open, needs a
+  PDF-raster check), 141 (parked with the partopts panel). When lf-ops-divarray or the partopts panel deploys, swap these
+  exemptions for their ids.
+- PARKED (budget stop from the lead): lf-engine F2, the plan's row listing printing skill-less rows (chart-name-line,
+  lesson-pm-cont, lesson-tab-clear) N/A; fix = judge them with idOnPath's tool rule (precritic or deploy gate) and print why.
