@@ -18,6 +18,8 @@ Steps 1, 2, 4 and the step-5 gates you asked for are done. Step 3: nothing neede
   ws-precritic --strict was skipped on the lead's instruction.
   Known pre-existing: ws-ldiv-hug default run FAILs "quiz-1280 div_facts-mix: no bracket measured" on master too.
 
+## Narrow critic r2 (2026-11-14): PASS 9 / 9 / 9 / 9 - report design/audit/runs/lf-ops/critic-ldiv-r2.md; F1 closed (LDIV-JOIN-RASTER, ba835be98). Ready for the deploy train.
+
 ## Narrow critic r1 (2026-11-14): narrow FAIL, one defect on one host
 Report: design/audit/runs/lf-ops/critic-ldiv-r1.md. The corner joins as one stroke on every page and host. Scores 9 / 9 / 9 / 8.
 - F1 (from master, missed by the check): a hairline break in the bar of the div_remainders card at 1366 (screen-cell.js ringCellHTML mq-rembrk). It is ledgered as the planned check LDIV-JOIN-RASTER.
