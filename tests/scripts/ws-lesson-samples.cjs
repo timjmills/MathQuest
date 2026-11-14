@@ -551,10 +551,14 @@ async function checkMain() {
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [
         { rule: 'SHEET-2PG', lesson: 'round', size: 'L', note: 'Y4.B1.S14 L lesson sheet re-flow (live-pm2 item 6) reverted after critic FAIL; item 6 redone separately - design/status/lf-engine.md' },
+        // (`msg`: the entry covers only the finding it names - the header findings of the same chart still FAIL)
+        { rule: 'CHART-HEAD', lesson: 'detailed/g3-oa8-two-step-wp', size: 'P2', msg: /does not fit at its planned size/, note: 'lesson 7 D1 (design/status/lessons-6-7.md): chartPage fallback zoom 0.77, open from lesson 7 critic r1; the lesson is paused' },
+        { rule: 'CHART-HEAD', lesson: 'detailed/g3-oa8-two-step-wp', size: 'P2b', msg: /does not fit at its planned size/, note: 'lesson 7 D1 (design/status/lessons-6-7.md): chartPage fallback zoom 0.7, open from lesson 7 critic r1; the lesson is paused' },
     ];
-    const known = findings.filter((x) => KNOWN.some((k) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `)));
+    const isKnown = (k, x) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `) && (!k.msg || k.msg.test(x.msg));
+    const known = findings.filter((x) => KNOWN.some((k) => isKnown(k, x)));
     { const keep = findings.filter((x) => !known.includes(x)); findings.length = 0; findings.push(...keep); }
-    for (const x of known) { const k = KNOWN.find((y) => y.rule === x.rule && x.where.startsWith(`${y.lesson} ${y.size} `)); console.log(`${x.rule.padEnd(12)} KNOWN ${x.where}: ${x.msg} [${k.note}]`); }
+    for (const x of known) { const k = KNOWN.find((y) => isKnown(y, x)); console.log(`${x.rule.padEnd(12)} KNOWN ${x.where}: ${x.msg} [${k.note}]`); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); const kn = known.filter((x) => x.rule === r).length; console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}${kn ? ` (+ KNOWN ${kn})` : ''}` : kn ? `KNOWN ${kn}` : na === CORE_N && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); const SHOWN = has("all") ? 1e9 : 8; for (const x of fs2.slice(0, SHOWN)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > SHOWN) console.log(`   ... ${fs2.length - SHOWN} more`); }
     if (!CHART_ONLY && CORE_N && LESSONS.length && na < CORE_N && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
     console.log(`(${LESSONS.length} lessons${arg('detailed', '') ? ` + detailed ${arg('detailed', '')}` : ''}, ${NSEEDS} seeds, sizes ${SIZES.join(',')}; ${read} prerequisite items read)`);

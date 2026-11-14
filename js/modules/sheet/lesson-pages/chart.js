@@ -342,9 +342,9 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // pageHeader's own Name / Date fields under the teacher's header options, the same type and the same 2.25 pt rule (the
     // page renders it through page() -> pageHeader). Score is off: a chart has no graded slot (frameOf, score 0); a chart that
     // ever deals one passes its count there and the Score field follows. The header's height does not move (the row is 11 mm
-    // with or without its fields, layoutHeader), so the chart's sizing is unchanged. A DETAILED lesson's chart (`chartBare`,
-    // print-sheet.js buildLesson) keeps its bare header, byte-identical: the detailed lessons are paused.
-    const header = lesson.chartBare ? Object.assign({}, f.header, { name: false, date: false, score: false }) : f.header;
+    // with or without its fields, layoutHeader), so the chart's sizing is unchanged. EVERY anchor chart, a detailed lesson's
+    // too (lead ruling 2026-11-14: no exception).
+    const header = f.header;
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
     const lay = chartLayout(n, data);
