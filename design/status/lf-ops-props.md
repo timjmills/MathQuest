@@ -442,3 +442,6 @@ CHECKS_FROM_CRITICS (2026-11-14, `exempt: parked ...`, fail commit 8f76b6401), n
 - N1 Guided L and the times options' feet: the lead is asking lf-roles to confirm its ledger covers them.
 - The routed EB reds (lf-roles Guided fit; lf-engine opener and vocab) stand as ledgered on 2026-11-13.
 - Part B (mult_properties / arrays_groups) is still held. Nothing from -props ships now.
+
+## Queued after the weekly reset (lead 2026-11-14)
+- integers:add_int, range −23..1: the number-line labels touch (lf-engine -roles critic r2 F6). Planned check LABEL-GAP; the ledger row is in CHECKS_FROM_CRITICS. Fix when the budget returns: check first, then the fix.
