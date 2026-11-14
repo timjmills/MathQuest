@@ -92,6 +92,14 @@ function layout(items, input) {
 
 export const counts = (pools, input) => ({ main: layout(pools.main || [], input).perPage });
 
+// The page's instruction (PT-TOF-4): no frame row anywhere - judge only; frames that are all write-line lists and no sentence
+// frame - write the right numbers (critic cbt r3 m2); else finish the sentence.
+const tfKey = (items) => {
+    const fr = items.map((it) => (it.thinking && it.thinking.frame) || 'one');
+    if (fr.length && fr.every((f) => f === 'none')) return 'true-false-judge';
+    if (fr.length && fr.includes('list') && !fr.includes('one')) return 'true-false-list';
+    return 'true-false';
+};
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const all = poolItems(input, 'main');
@@ -102,7 +110,7 @@ export function plan(input = {}) {
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     const falseShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(items.length && items.every((it) => it.thinking && it.thinking.frame === 'none') ? 'true-false-judge' : 'true-false'), grid] }], {
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(tfKey(items)), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, falseShare, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });
 }

@@ -32,7 +32,10 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG,TITLE-RANGE'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG,TITLE-RANGE,SENTENCE-FRAME'));
+// SENTENCE-FRAME (lf-ops critic cbt r3 m2): an instruction that says "Finish the sentence" needs a sentence frame on the page - a
+// frame (.mq-frame) that is not a list of write lines (.mq-framelist, "Answer: __, __, __"). The count_by_tables True or False?
+// page said "Finish the sentence." over "Answer:" lines only.
 // TITLE-RANGE (lf-ops critic cbt r3 m1): an "I Can count ... by As to Bs" / "by As, Bs and Cs" title names exactly the steps the
 // page PRINTS (its count rows' step tabs, data-ws-steptab): a range's ends are the min / max step printed, a list is the set
 // printed. The Opener dealt 2s to 5s at M (2s to 4s at L) under "I Can count by 2s to 7s", and the key copied it. Pages with
@@ -75,6 +78,11 @@ function lonePage(key, perPage, ceiling) {
 
 /** TITLE-RANGE: the steps an I Can title names ({kind: 'range', lo, hi} | {kind: 'list', set}) or null. */
 const TITLE_RANGE_SKIP = new Set(['lesson', 'detailed-lesson']);
+/** SENTENCE-FRAME: `info` = {finish: the page says "Finish the sentence", frames: sentence frames, lists: list frames}. */
+function sentenceFrameFindings(info) {
+    if (!info || !info.finish || info.frames > 0) return [];
+    return [{ rule: 'SENTENCE-FRAME', msg: `the instruction says "Finish the sentence" but the page has no sentence frame (${info.lists} list frame(s) "Answer: __, __") (critic cbt r3 m2)` }];
+}
 function titleSteps(title) {
     const t = String(title || '').replace(/\u2013/g, '-');
     if (!/^I Can\b/i.test(t)) return null;
@@ -177,6 +185,10 @@ function selfTest() {
         const trCases = [['I Can count by 2s to 7s', ['2', '3', '4', '5'], 1], ['I Can count by 2s to 5s', ['2', '3', '4', '5'], 0],
             ['I Can count by 3s, 4s and 6s', ['3', '4', '6'], 0], ['I Can count by 3s, 4s and 6s', ['3', '4'], 1], ['I Can count back by 7s', ['−7'], 0],
             ['I Can count by 5s', ['10'], 1], ['I Can count by 2s to 12s', [], 0], ['Pre-skill check: counting', ['2', '9'], 0]];
+        const sfCases = [[{ finish: true, frames: 0, lists: 4 }, 1], [{ finish: true, frames: 2, lists: 2 }, 0], [{ finish: false, frames: 0, lists: 4 }, 0]];
+        const sfBad = sfCases.filter(([c, n]) => sentenceFrameFindings(c).length !== n);
+        if (sfBad.length) bad++;
+        console.log(`  ${sfBad.length ? 'FAIL' : 'ok  '} SENTENCE-FRAME: ${sfCases.length} cases`);
         const trBad = trCases.filter(([t, tabs, n]) => titleRangeFindings(t, tabs).length !== n);
         if (trBad.length) bad++;
         console.log(`  ${trBad.length ? 'FAIL' : 'ok  '} TITLE-RANGE: ${trCases.length} titles against printed step tabs${trBad.length ? ` (wrong: ${trBad.map((c) => c[0]).join('; ')})` : ''}`);
@@ -232,7 +244,8 @@ function selfTest() {
                 const rule = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; const el = d.querySelector('.mq-cchant span, .mq-lstripchant span, .mq-lchant'); return el ? el.textContent.trim() : ''; })();
                 const tabs = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return [...d.querySelectorAll('[data-ws-steptab]')].map((e) => e.getAttribute('data-ws-steptab')); })();
                 const keyTitle = (() => { const d = document.createElement('div'); d.innerHTML = r.keyHtml || ''; const el = d.querySelector('.mq-ican, [data-ws-title], h1'); return el ? el.textContent.trim() : ''; })();
-                return { tabs, keyTitle, want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
+                const sent = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return { finish: /Finish the sentence/i.test(d.textContent || ''), frames: d.querySelectorAll('.mq-frame:not(.mq-framelist)').length, lists: d.querySelectorAll('.mq-framelist').length }; })();
+                return { sent, tabs, keyTitle, want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
@@ -257,6 +270,7 @@ function selfTest() {
             // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
             // only the passed skills)
             ...lonePage(j.opts ? '' : `${j.k} ${j.role} ${j.size}`, built.perPage, built.ceiling),
+            ...sentenceFrameFindings(built.sent),
             ...(TITLE_RANGE_SKIP.has(j.role) ? [] : titleRangeFindings(built.title, built.tabs)),
             ...(!TITLE_RANGE_SKIP.has(j.role) && built.keyTitle && built.keyTitle !== built.title && /^I Can /.test(built.keyTitle) ? titleRangeFindings(built.keyTitle, built.tabs).map((f) => Object.assign({}, f, { msg: `key ${f.msg}` })) : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));

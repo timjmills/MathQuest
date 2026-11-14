@@ -148,6 +148,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'true-false': 'Check one box: True or False. Finish the sentence.',
     // (PT-TOF-4: a page whose statements all have sentence answers prints no frame, so nothing to finish; lf-roles critic r1 R1)
     'true-false-judge': 'Check one box: True or False.',
+    // (critic cbt r3 m2: a page whose frames are all write-line LISTS - a count row's "Answer: __, __, __" - has no sentence to
+    // finish; the pupil writes the right numbers on a False one. ws-cell-checks SENTENCE-FRAME)
+    'true-false-list': 'Check one box: True or False. If False, write the right numbers.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
     'odd-one': 'Circle the one that does not belong. Finish the sentence.',
     asn: 'Check one box: Always, Sometimes or Never. Write an example.',
