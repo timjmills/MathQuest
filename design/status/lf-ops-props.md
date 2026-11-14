@@ -457,5 +457,20 @@ Each finding: check first (FAILs on 8f76b6401), then the fix; backtest row; ledg
 - E9 NOT STARTED (budget): WS-REFLOW per-card exemption + FULLROW-USE stay parked.
 - m2: Review's earlier step and the Pre-skill check skills draw boxes; print-lint SHAPE-ONE judges the whole page; backtest `cbt-r2-m2-shape-page`.
 
+## cbt r3 final (2026-11-14, Opus medium, $22 cap) - lead rulings E7 / AK-2 / E9
+- E7 FIXED (lead ruling): lesson data `headFirst` (times each / given, jumps 15) draws "1 Read the jump" as a numbered HEAD line
+  above the two panels (chart.js stateItems / chartPage, the tail line's twin); panels 2 and 3, tail line 4. ws-node-lint
+  CHART-PANELS counts head + panels + tail against the worked steps; backtest `cbt-r2-e7-chart-panels` (FAIL 8f76b6401, OK
+  0479ee673). CHART-WIDTH stays green (print-lint lesson M / L under each option). LEAD_DECISIONS entry added.
+- L-KEY AK-2 on the Scripted Model (lead ruling): state cells carry `mq-smstate` (scripted-model.js stateItem); AK-2 skips only
+  those. Print-lint self-tests (fires beside a marked cell / not on a marked cell); backtest `cbt-r3-ak2-smstate` (fixture).
+- Error analysis M band FIXED: a page of REDO items holds each row to its ink (layout capRowsToInk, error-analysis.js plan);
+  EB-BAND clear at M / L, E6 top start green. Backtest `cbt-r3-ea-band` (FAIL e6d1b2c19, OK e464b4906).
+- E9 FIXED: the count-row span is per card - worksheet.js `_wsTrainSpans` sets `mq-train-span` only when a card's train is wider
+  than a 2-column column; css/screen-cell.css (additive) keeps the others in the grid, and a train that does not fit a wider
+  column drops a column instead of spanning. number_patterns_rule: 2 columns at 1024 / 1280 / 1366 (baseline keys re-pinned in
+  this change), cbt spans at all four widths (D2 kept). ws-worksheet-reflow FULLROW-SPAN + FULLROW-USE (>= 50 % of the usable
+  width), `--json`; backtest `cbt-r2-e9-fullrow` (fixture measured on 8f76b6401 / d6ef53e53); `ws-reflow-countrow-exempt` green.
+
 ## Queued after the weekly reset (lead 2026-11-14)
 - integers:add_int, range −23..1: the number-line labels touch (lf-engine -roles critic r2 F6). Planned check LABEL-GAP; the ledger row is in CHECKS_FROM_CRITICS. Fix when the budget returns: check first, then the fix.
