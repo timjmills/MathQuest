@@ -35,6 +35,9 @@
 // --raster (LDIV-JOIN-RASTER, ldiv critic r1 F1): also screenshots every screen host (card, worksheet, quiz at 1366, 1280,
 // 1024, 820) at DSF 2 and 3 and fails a bar whose central 1 px, from the arc's corner to the vinculum's end, holds a pixel
 // brighter than 80 (0 = black): an anti-aliased seam where two bar pieces meet at a fractional x.
+// --shape (LDIV-SHAPE, owner 2026-11-14: "I don't like the big curve ... make it straight or almost straight"): the arc's
+// bow - its greatest distance from the straight chord between its ends, in mm (screen at 96 px per inch) - is <= 0.6 mm on
+// paper (M, L) and on every screen host.
 // A skill x host that draws no bracket FAILS (it would pass unseen). word-work.js's own divide frame (M2 1 Q...) is
 // lf-algebra's and is not measured here.
 const fs = require('fs');
@@ -78,6 +81,16 @@ function MEASURE(rootSel, frameSel) {
         return { left: Math.min(...rs.map((r) => r.left)), right: Math.max(...rs.map((r) => r.right)) };
     };
     const out = [];
+    // The arc's outermost point (its centre line's apex) as a fraction of its svg's width, read from the path
+    // (LDIV-SHAPE 2026-11-14 straightened the arc, so a fixed fraction of the box no longer finds it)
+    const apexFrac = (el, dflt) => {
+        const svg = el && (el.tagName.toLowerCase() === 'svg' ? el : el.querySelector('svg'));
+        const pth = svg && svg.querySelector('path');
+        const m2 = pth && /Q\s*([\d.]+)[ ,]+[\d.]+[ ,]+([\d.]+)/.exec(pth.getAttribute('d') || '');
+        const vb = svg && svg.viewBox && svg.viewBox.baseVal;
+        if (!m2 || !vb || !vb.width) return dflt;
+        return ((+m2[1] + +m2[2]) / 2) / vb.width;
+    };
     // Where the answer boxes sit: above the bar, clear of the divisor's digits, inside the cell.
     const placeOf = (boxes, barTop, dsrEl, g) => {
         const bad = [];
@@ -101,7 +114,7 @@ function MEASURE(rootSel, frameSel) {
         const boxes = Array.from(g.querySelectorAll('.mq-ldiv-q input')).filter(vis).map((i) => i.getBoundingClientRect());
         // the arc path is M1 1 Q11 24 1 47 in a 12-wide box: its outer edge is at x = 6 / 12
         out.push({ kind: 'fact', text: (dvd.textContent || '').trim(), em,
-            gap: (t.left - (a.left + a.width * 0.5)) / em, over: (d.right - t.right) / em, space: 0,
+            gap: (t.left - (a.left + a.width * apexFrac(arc, 0.5))) / em, over: (d.right - t.right) / em, space: 0,
             box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0,
             boxOffset: boxes.length ? ((boxes[0].left + boxes[0].right) / 2 - (t.left + t.right) / 2) / em : 0,
             place: placeOf(boxes, d.top, g.querySelector('.mq-ldiv-dsr'), g), join: '' });
@@ -128,7 +141,7 @@ function MEASURE(rootSel, frameSel) {
         if (d.left - a.right > 1) join.push(`bar broken ${(d.left - a.right).toFixed(1)} px at the arc`);
         if (Math.abs(a.top - (d.top + bw / 2)) > 1) join.push(`bar steps ${(a.top - (d.top + bw / 2)).toFixed(1)} px at the arc`);
         out.push({ kind: 'remainder', text: (dvd.textContent || '').trim(), em,
-            gap: (t.left - (a.left + a.width * 0.525)) / em, over: (d.right - t.right) / em, space: 0,
+            gap: (t.left - (a.left + a.width * apexFrac(arcSpan, 0.525))) / em, over: (d.right - t.right) / em, space: 0,
             box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0, boxOffset: 0,
             place: placeOf(boxes, d.top, dsr, g), join: join.join(', ') });
     });
@@ -151,7 +164,7 @@ function MEASURE(rootSel, frameSel) {
         const boxes = Array.from(g.querySelectorAll('input')).filter((i) => vis(i) && !i.classList.contains('mq-opswork')).map((i) => i.getBoundingClientRect());
         // the kit's arc path is M1.5 0 Q9 20 1.5 40 in a 10-wide box: outer edge at x = 5.25 / 10
         out.push({ kind: 'worked', text: digits.map((x) => x.el.textContent.trim()).join(''), em,
-            gap: (ts[0].left - (a.left + a.width * 0.525)) / em, over: (bar.getBoundingClientRect().right - ts[ts.length - 1].right) / em,
+            gap: (ts[0].left - (a.left + a.width * apexFrac(arcSpan.el, 0.525))) / em, over: (bar.getBoundingClientRect().right - ts[ts.length - 1].right) / em,
             space: spaces.length ? Math.max(...spaces) : 0,
             box: boxes.length ? Math.min(...boxes.map((r) => Math.min(r.width, r.height))) : 0, boxOffset: 0,
             place: placeOf(boxes, bar.getBoundingClientRect().top, null, g), join: '' });
@@ -260,9 +273,15 @@ function JOIN(rootSel, frameSel) {
             if (lj === 'round') gap = Math.min(gap, Math.max(0, len(sub(K, T)) - hw));
             else if (/miter/.test(lj) && 1 / Math.sin(phi / 2) <= (parseFloat(cs.strokeMiterlimit) || 4)) gap = 0;
         }
+        // LDIV-SHAPE: the arc's bow, its greatest distance from the straight chord between its two ends
+        let bow = 0;
+        { const ch = sub(A2, A0), cl = len(ch) || 1;
+          for (let i = 0; i <= 200; i++) { const t = i / 200, w0 = (1 - t) * (1 - t), w1 = 2 * t * (1 - t), w2 = t * t;
+              const c = { x: w0 * A0.x + w1 * A1.x + w2 * A2.x, y: w0 * A0.y + w1 * A1.y + w2 * A2.y };
+              bow = Math.max(bow, Math.abs((c.x - A0.x) * ch.y - (c.y - A0.y) * ch.x) / cl); } }
         // the bar's inside, for --raster: from just past the arc's corner to the vinculum's end, its central 1 px
         const yc = (first.t + first.b) / 2;
-        out.push({ gap: Math.max(gap, brk) * MM, step: step * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40),
+        out.push({ gap: Math.max(gap, brk) * MM, step: step * MM, bow: bow * MM, joined, sw: hw * 2 * MM, d: d.slice(0, 40),
             bar: { x0: T.x + 2 * hw + win.scrollX, x1: reach - 1 + win.scrollX, y0: yc - 0.5 + win.scrollY, y1: yc + 0.5 + win.scrollY } });
     });
     return { arcs: out };
@@ -454,7 +473,8 @@ async function joinMain() {
     const want = String(arg('skills', Object.keys(JOIN_SKILLS).join(','))).split(',').map((x) => x.trim()).filter(Boolean);
     const app = await open({ seed: 1, viewport: { width: 1366, height: 900, deviceScaleFactor: SHOTS ? 4 : 1 } });
     const { page } = app;
-    let fails = 0, n = 0, worstGap = 0, worstStep = 0, worstBright = 0;
+    let fails = 0, n = 0, worstGap = 0, worstStep = 0, worstBright = 0, worstBow = 0;
+    const SHAPE = process.argv.includes('--shape'), SHAPE_MAX = 0.6;
     const RASTER = process.argv.includes('--raster');
     const judge = (where, res, needOne) => {
         if (!res || res.error) { fails++; console.log(`FAIL ${where}: ${res ? res.error : 'no result'}`); return; }
@@ -465,11 +485,14 @@ async function joinMain() {
             worstGap = Math.max(worstGap, a.gap); worstStep = Math.max(worstStep, a.step);
         }
         const g = Math.max(...res.arcs.map((a) => a.gap || 0)), st = Math.max(...res.arcs.map((a) => a.step || 0));
+        const bw = Math.max(...res.arcs.map((a) => a.bow || 0));
+        worstBow = Math.max(worstBow, bw);
         const bad = [];
+        if (SHAPE && bw > SHAPE_MAX) bad.push(`bow ${bw.toFixed(2)} mm > ${SHAPE_MAX} (LDIV-SHAPE)`);
         if (g > JOIN_TOL.gap) bad.push(`gap ${g.toFixed(2)} mm > ${JOIN_TOL.gap}`);
         if (st > JOIN_TOL.step) bad.push(`step ${st.toFixed(2)} mm > ${JOIN_TOL.step}`);
         if (bad.length) fails++;
-        console.log(`${bad.length ? 'FAIL' : 'PASS'} LDIV-JOIN ${where}: ${res.arcs.length} arc(s) gap ${g.toFixed(2)} mm step ${st.toFixed(2)} mm${bad.length ? '  <- ' + bad.join(', ') : ''}`);
+        console.log(`${bad.length ? 'FAIL' : 'PASS'} LDIV-JOIN ${where}: ${res.arcs.length} arc(s) gap ${g.toFixed(2)} mm step ${st.toFixed(2)} mm bow ${bw.toFixed(2)} mm${bad.length ? '  <- ' + bad.join(', ') : ''}`);
     };
     try {
         for (const key of want) {
@@ -515,7 +538,7 @@ async function joinMain() {
         }
         const errs = app.problems.filter((p) => p.type !== 'requestfailed');
         if (errs.length) { fails++; errs.slice(0, 5).forEach((e) => console.log(`FAIL console: ${e.text}`)); }
-        console.log(`LDIV-JOIN: ${n} arcs measured; worst gap ${worstGap.toFixed(2)} mm, worst step ${worstStep.toFixed(2)} mm${RASTER ? `; LDIV-JOIN-RASTER brightest bar pixel ${worstBright} (max ${RASTER_MAX})` : ''}`);
+        console.log(`LDIV-JOIN: ${n} arcs measured; worst gap ${worstGap.toFixed(2)} mm, worst step ${worstStep.toFixed(2)} mm, worst bow ${worstBow.toFixed(2)} mm${RASTER ? `; LDIV-JOIN-RASTER brightest bar pixel ${worstBright} (max ${RASTER_MAX})` : ''}`);
     } catch (e) {
         console.log('FAIL ' + (e.stack || e.message));
         fails++;
