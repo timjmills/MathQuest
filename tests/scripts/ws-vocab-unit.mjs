@@ -855,10 +855,12 @@ async function browserChecks() {
     };
     try {
         // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
+        if (ONLY && ONLY.every((k) => ['V-PACK'].includes(k))) { await packChecks(page, fail); return; }
         if (ONLY && ONLY.every((k) => ['V-PAGE'].includes(k))) { await pageRepeatChecks(page, fail); return; }
         if (ONLY && ONLY.every((k) => r16List().includes(k))) { await r16Checks(page, fail, sheet, build); return; }
         if (ONLY && ONLY.every((k) => ['V23', 'V25', 'V26', 'V27'].includes(k))) { await r7Checks(page, fail, sheet); return; }
         await pageRepeatChecks(page, fail);
+        await packChecks(page, fail);
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
         // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
         for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
@@ -939,6 +941,30 @@ async function browserChecks() {
 // only the word row changed): no two Match 3 cells of one printed page match the same pictures to the same letters. Every set
 // and grade pool, the roles that print Match 3 cells, S / M / L, seed 7 and the render seed (ws-grade-render's, as the critic
 // sees the page).
+// V-PACK (lf-placevalue vocab deploy, 2026-11-14; rowcap critic r2 F1, vocab_grade_pictures L lesson pages 9-10): the lesson packet
+// of each vocabulary lesson (practicePages 1, mixed; M / L; seeds 4242 and 1) prints its Practice on the ONE page it was asked for
+// (the default [6, 2] dealt 6 one-across Match 3 rows: 4 + 2, page 2 a third used) and its Mixed page on the pages its packing
+// counted (a 4th Match 3 shelf spilled the anchor chart: Mixed 3 -> 4 pages, page 2 one Match 3 cell alone - L-LONE / PAGEFILL).
+async function packChecks(page, fail) {
+    for (const skillId of ['vocab_grade_pictures', 'vocab_pick3_words']) for (const size of ['M', 'L']) for (const seed of [4242, 1]) {
+        const tag = `V-PACK ${skillId} ${size} seed ${seed}`;
+        const g = await page.evaluate(async (a) => {
+            try {
+                const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [{ categoryId: 'vocabulary', skillId: a.skillId }] }], size: a.size, paper: 'A4', seed: a.seed, key: true, practicePages: 1, mixed: true });
+                const pp = (r.partPlans || []).map((p) => ({ part: p.part, plans: (p.plans || []).map((pl) => ({ pages: (pl.pages || []).length, packed: pl.meta && pl.meta.packedPages })) }));
+                return { pp, note: (r.fits && r.fits.note) || '' };
+            } catch (e) { return { error: String(e && e.message || e) }; }
+        }, { skillId, size, seed });
+        if (g.error) { fail(`${tag}: not composed (${g.error})`); continue; }
+        const part = (id) => g.pp.find((p) => p.part === id);
+        const pr = part('practice');
+        const prPages = pr ? pr.plans.reduce((a, pl) => a + pl.pages, 0) : 0;
+        if (prPages !== 1) fail(`${tag}: the Practice part prints ${prPages} page(s), asked for 1 (${g.note})`);
+        const mx = part('mixed');
+        for (const pl of (mx && mx.plans) || []) if (Number.isFinite(pl.packed) && pl.pages !== pl.packed) fail(`${tag}: the Mixed page prints ${pl.pages} page(s), its packing counted ${pl.packed} (a shelf spilled: ${g.note})`);
+    }
+}
+
 async function pageRepeatChecks(page, fail) {
     const fnv = (x) => { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
     const runs = [{}, ...W.VOCAB_GRADES.map((g) => ({ vocabGrade: g })), ...W.VOCAB_SETS.map((_, i) => ({ vocabSet: i }))];

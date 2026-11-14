@@ -975,6 +975,34 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     ok(instr.includes('Add.') && instr.includes('Subtract.') && instr.includes('Multiply.'), 'DN-34: each skill\'s shelf carries its own instruction');
     eq(plan.meta.scoreOutOf, plan.meta.items, 'PT-FRM-4: Score counts every problem');
 }
+// MIX-PAGES (lf-placevalue vocab deploy, 2026-11-14; vocab_grade_pictures L lesson pages 7-10): a library lesson's Mixed page
+// (lessonFit, over several pages) adds lead shelves while its page count holds - and that count must be the count plan() lays
+// out. A lead shelf that STARTS a page opens a band under its strip; counted without the strip, a 4th Match 3 shelf joined the
+// anchor chart's page on paper only, the chart spilled, and the Mixed page ran 3 -> 4 pages with one Match 3 cell alone on
+// page 2 (L-LONE / PAGEFILL). The lead 54 mm a shelf (1 across), a 180.8 mm chart, a 60 mm row of 6 facts, a 19.7 mm strip.
+{
+    const mod = ROLE_MODULES['mixed-practice'];
+    const skills3 = [FACT_SKILL, SUB_SKILL, ADD_SKILL];
+    const pools = mod.sources(skills3.map((sk, i) => ({ categoryId: sk.categoryId, skillId: sk.skillId, weight: i ? 1 : 2.5 })), { earlier: () => [] });
+    const H = [53, 179.8, 59];   // (+ 1 mm: shelves of 54, 180.8 and 60 mm, as the lesson measures them)
+    const only = (cols, h) => Object.fromEntries([1, 2, 3, 4, 5, 6, 8, 10].map((c) => [c, { hMm: h, fits: c <= cols }]));
+    const deal = (pool, n) => Array.from({ length: n }, (_, i) => {
+        const pi = pools.indexOf(pool);
+        const q = pi === 0 ? factQ(2 + i, 7) : pi === 1 ? subQ(500 + i * 11, 123 + i) : stackQ(111 + i * 7, 222 + i * 3);
+        const it = hostLike(q, H[pi]);
+        it.measured = only(pi === 2 ? 6 : 1, H[pi]);
+        it.footprint = Object.assign({}, it.footprint, { maxCols: pi === 2 ? 6 : 1 });
+        it.pool = pool.id;
+        return it;
+    });
+    const input = { items: [], skills: skills3, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })), ctx: { size: 'L', paper: 'A4' }, seed: 42, form: 'A', floors: {},
+        leadHalf: true, lessonFit: true, latticeN: 6, stepStrip: '<div></div>', stepStripMm: 19.7 };
+    const probe = Object.fromEntries(pools.map((p) => [p.id, deal(p, 8)]));
+    const want = mod.counts(probe, input);
+    input.items = pools.flatMap((p) => deal(p, want[p.id] || 0));
+    const plan = mod.plan(input);
+    eq(plan.pages.length, plan.meta.packedPages, `MIX-PAGES: the Mixed page prints the pages its packing counted (lead ${want[pools[0].id]}, packed ${plan.meta.packedPages})`);
+}
 
 /* ============================================= slot radius and the digit strip (SL-11, SL-12) */
 
