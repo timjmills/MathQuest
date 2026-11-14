@@ -642,8 +642,9 @@ async function selfTest() {
         if (!(await touchAt(1024, 46)).length) fails.push('TOUCH: 46 px answer boxes at 1024 must FAIL');
         if ((await touchAt(1024, 48)).length) fails.push('TOUCH: 48 px answer boxes at 1024 must pass');
         if ((await touchAt(390, 45)).length) fails.push('TOUCH: 45 px answer boxes at an explicit 390 pass (44 px floor)');
-        // TOUCH at a computer width (critic tt-r1 D1): SP-10's 44 px general floor; 48 is the tablets'
-        if ((await touchAt(1280, 45)).length) fails.push('TOUCH: 45 px answer boxes at 1280 pass (44 px computer floor)');
+        // TOUCH at a computer width (critic tt-r2 D6): SP-10's 48 px answer floor holds at every width, as on master
+        if (!(await touchAt(1280, 45)).length) fails.push('TOUCH: 45 px answer boxes at 1280 must FAIL (48 px at every width)');
+        if ((await touchAt(1280, 48)).length) fails.push('TOUCH: 48 px answer boxes at 1280 pass');
         if (!(await touchAt(1366, 40)).length) fails.push('TOUCH: 40 px answer boxes at 1366 must FAIL');
         // GEOM (critic tt-r1 D5): the same tree hashes identically twice; a zoom button or a 0-size node does not change it
         const g = '<div id="g" style="width:300px"><span style="display:inline-block;width:40px;height:40px">7</span><input style="width:48px;height:48px"></div>';

@@ -9,9 +9,9 @@
 //                   answer): that is an 'answer'. Everything else typed is an 'answer'.
 //   FLOOR           { answer: 48, working: 44 } on a tablet (SP-10, RUBRIC H6; fastest plan item 7)
 //   isTablet(w)     the widths where FLOOR is judged: 600 < w <= 1100 (820, 1024)
-//   floorAt(kind, w) the floor at a viewport width: a tablet FLOOR[kind]; a phone (< 600, on request) 44; a computer
-//                   (> 1100: 1280 / 1366) SP-10's 44 px general floor for every box (the 48 px answer floor is the
-//                   tablets'; critic tt-r1 D1: the multiplication chart keeps its compact rows on a computer)
+//   floorAt(kind, w) the floor at a viewport width: FLOOR[kind] at every screen width >= 600 (tablets AND computers:
+//                   SP-10 "digit inputs are at least 48 px tall" holds at every width; critic tt-r2 D6 - a 44 px
+//                   computer floor weakened master's check); a phone (< 600, on request) 44
 //   selfTest()      planted classes, no browser (a fake element) - `node tests/lib/touch-class.cjs --self-test`
 'use strict';
 function touchKind(el) {
@@ -27,7 +27,7 @@ const FLOOR = Object.freeze({ answer: 48, working: 44 });
 const isTablet = (w) => w > 600 && w <= 1100;
 // self-contained (no closure), so a page can take it as `${floorAt}` too
 function floorAt(kind, w) {
-    if (w > 600 && w <= 1100) return kind === 'working' ? 44 : 48;
+    if (w >= 600) return kind === 'working' ? 44 : 48;
     return 44;
 }
 /** the two in-page functions as one injectable source: `page.evaluate(INJECT)` defines window.touchKind / window.floorAt */
@@ -58,8 +58,8 @@ function selfTest() {
     ];
     const bad = [];
     for (const [name, el, want] of cases) if (touchKind(el) !== want) bad.push(`${name}: ${touchKind(el)}, want ${want}`);
-    // the floors: a 46 px sign circle fails on a tablet (both tools), a 44 px working box passes; a computer holds 44
-    const fl = [[floorAt('answer', 820), 48], [floorAt('answer', 1024), 48], [floorAt('working', 1024), 44], [floorAt('answer', 1280), 44], [floorAt('answer', 1366), 44], [floorAt('answer', 390), 44]];
+    // the floors: a 46 px sign circle fails on a tablet (both tools), a 44 px working box passes; a computer holds the same 48 / 44 (tt-r2 D6)
+    const fl = [[floorAt('answer', 820), 48], [floorAt('answer', 1024), 48], [floorAt('working', 1024), 44], [floorAt('answer', 1280), 48], [floorAt('answer', 1366), 48], [floorAt('working', 1366), 44], [floorAt('answer', 390), 44]];
     fl.forEach(([got, want], i) => { if (got !== want) bad.push(`floor case ${i}: ${got}, want ${want}`); });
     const sign46 = 46 < floorAt(touchKind(cases[0][1]), 1024);
     if (!sign46) bad.push('a 46 px sign circle at 1024 must be under its floor');
