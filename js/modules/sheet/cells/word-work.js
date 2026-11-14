@@ -47,7 +47,7 @@ import { register } from '../registry.js';
 import { esc, gradeSlots } from '../cell.js';
 import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
-import { divisionSteps } from './long-division.js';
+import { divisionSteps, bracketSvg, bracketLine } from './long-division.js';
 import { partWholeBar } from '../graphics/part-whole-bar.js';
 import { twoStepBar } from '../graphics/two-step-bar.js';
 import { sentenceFrame, sentenceFrameWidthMm } from '../graphics/sentence-frame.js';
@@ -815,9 +815,14 @@ function divisionWork(ctx, st, show, idx, p = {}, isAnswer = false) {
     const ys = String(y).padStart(Dy, ' '), eys = String(st.bottom).padStart(Dy, ' ');
     for (let i = 0; i < Dy; i++) html += `<span style="grid-row:2;grid-column:${i + 1};">${wbox(ctx, { id: `w${idx}-dv-${i}`, value: put ? ys[i].trim() : '', expect: eys[i].trim(), w: bx, h: bx, pt })}</span>`;
     const hMm = bx + 1.6;
-    html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1};align-self:stretch;display:flex;align-items:stretch;justify-content:center;">`
-        + `<svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:${L(ctx, bw)};height:${isTwin(ctx) ? `max(48px, ${L(ctx, hMm)})` : L(ctx, hMm)};overflow:visible;"><path d="M2 1 Q9 20 2 39" fill="none" stroke="${INK}" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
-    html += `<span style="grid-row:2;grid-column:${c0} / span ${Dx};border-top:${B(ctx, 1.5)} solid ${INK};align-self:start;height:0;"></span>`;
+    // The bracket and the bar are ONE stroke (owner 2026-11-14, LDIV-JOIN; LDIV-SHAPE near-straight side): the kit's shared
+    // bracketSvg, its stroke centred on the bar's centre line (the svg drops half a stroke), and ONE bar from the bracket's corner
+    // (bracketLine) across the gutter and every dividend track - no seam at the join, as long-division.js draws it.
+    const SK = B(ctx, 1.5);
+    const corner = bracketLine(2, 9).x;
+    html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1};align-self:stretch;display:block;position:relative;top:calc(${SK} / 2);">`
+        + bracketSvg({ x: 2, q: 9, ink: INK, stroke: SK, style: `display:block;width:${L(ctx, bw)};height:${isTwin(ctx) ? `max(48px, ${L(ctx, hMm)})` : L(ctx, hMm)};overflow:visible` }) + '</span>';
+    html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1} / span ${Dx + 1};align-self:start;display:block;height:0;margin-left:calc(${L(ctx, bw)} * ${corner / 10});border-top:${SK} solid ${INK};"></span>`;
     const xs = String(x).padStart(Dx, ' '), exs = String(st.top).padStart(Dx, ' ');
     for (let i = 0; i < Dx; i++) html += `<span style="grid-row:2;grid-column:${c0 + i};padding-top:${L(ctx, 0.8)};">${wbox(ctx, { id: `w${idx}-dd-${i}`, value: put ? xs[i].trim() : '', expect: exs[i].trim(), w: bx, h: bx, pt })}</span>`;
     // the working: two rows per step (the product, then the difference and the digit brought down)
