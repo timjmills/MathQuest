@@ -9683,6 +9683,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "key-json",
+   "check": "no answer key (or page) prints the generator's raw JSON as an answer, on any role: plotted points read 'A (5, 3)', a match reads its tile names numbered by the pictures (lf-engine -roles critic r2 F5: coordinate_q1 and shape_name_match_3d lesson keys printed [{\"label\":\"A\",\"x\":5,...}] / {\"t0\":\"b0\",...})",
+   "kind": "commit-pair",
+   "rule": "ws-key-json L-KEY",
+   "browser": true,
+   "fail": {
+    "commit": "d23423151",
+    "state": "coordinate_q1 / shape_name_match_3d lesson M keys: raw JSON in the Answer: line"
+   },
+   "pass": {
+    "commit": "4b3d2dcf9",
+    "state": "'A (5, 3), B (6, 8)' / '1. cube  2. sphere ...'"
+   },
+   "command": "node tests/scripts/ws-key-json.cjs --skills coordinates:coordinate_q1,shapes_early:shape_name_match_3d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

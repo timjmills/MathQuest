@@ -169,6 +169,36 @@ const NO_SUCH_FORMAT = '__ws_no_such_print_format__';
  * the two spans are inline and nothing separated them. The markup now reads correctly with no
  * CSS at all, and the gap the stylesheet adds later simply widens it.
  */
+/**
+ * An object answer in the words a teacher reads on a key (L-KEY): plotted points "A (5, 3), B (6, 8)"; one point "(4, 7)"; a
+ * match of tiles to pictures numbered in the pictures' order "1. cone  2. sphere"; a list of values "3, 4, 5". '' when the
+ * shape is not one of these - the key then prints no answer line rather than the generator's JSON.
+ */
+export function readableAnswer(p = {}, value) {
+    const prim = (v) => v === null || ['string', 'number', 'boolean'].includes(typeof v);
+    const pt = (o) => o && typeof o === 'object' && Number.isFinite(Number(o.x)) && Number.isFinite(Number(o.y));
+    const fmt = (o) => `${o.label ? `${o.label} ` : ''}(${o.x}, ${o.y})`;
+    if (Array.isArray(value)) {
+        if (value.length && value.every(pt)) return value.map(fmt).join(', ');
+        if (value.every(prim)) return value.map(String).join(', ');
+        return '';
+    }
+    if (pt(value)) return fmt(value);
+    const tiles = Array.isArray(p.tiles) ? p.tiles : null;
+    const bins = Array.isArray(p.bins) ? p.bins : null;
+    const entries = Object.entries(value || {});
+    if (tiles && bins && entries.length && entries.every(([, v]) => prim(v))) {
+        const tileLabel = (id) => { const tl = tiles.find((x) => x && x.id === id); return tl ? String(tl.label || tl.text || id) : ''; };
+        const out = bins.map((b, i) => {
+            const hit = entries.filter(([, bin]) => String(bin) === String(b && b.id)).map(([tile]) => tileLabel(tile)).filter(Boolean);
+            return hit.length ? `${i + 1}. ${hit.join(', ')}` : '';
+        }).filter(Boolean);
+        return out.join('  ');
+    }
+    if (entries.length && entries.every(([, v]) => prim(v))) return entries.map(([k, v]) => `${k}: ${v}`).join(', ');
+    return '';
+}
+
 function stamp(key, ctx) {
     // 2026-10-02 (print-check backlog, L-KEY AK-4): the row exists in EVERY state. It used to be
     // omitted on the pupil page ('blank'), so the key had a named slot the pupil page did not and
@@ -239,8 +269,11 @@ const LEGACY_TEMPLATE = register('legacy', {
         // SCC-A7: a simple value stamps itself; anything else is stamped with the legacy hint.
         let display;
         if (value !== null && typeof value === 'object') {
+            // (L-KEY, lf-engine -roles critic r2 F5: the key printed the generator's raw JSON - `[{"label":"A","x":5,...}]` for a
+            // plot, `{"t0":"b0",...}` for a match - as the answer; it now prints the answer in the words a teacher reads)
             const hint = callDep('answerKeyHint', [p], '');
-            display = hint ? `${hint} = ${JSON.stringify(value)}` : JSON.stringify(value);
+            const words = readableAnswer(p, value);
+            display = words ? (hint ? `${hint} = ${words}` : words) : (hint || '');
         } else {
             display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
         }
