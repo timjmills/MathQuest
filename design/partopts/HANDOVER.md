@@ -8,8 +8,8 @@ options-panel sample are now owned by **lf-engine**. This page is the resume poi
 | Work | Branch / commit | State |
 |---|---|---|
 | Step A: How many and on/off for every lesson part (`sheet/part-opts.js`, `teacher-print.js` Parts table) | master 1fe1e6ef | LIVE (critic A r4 PASS) |
-| Follow-up: F1 doc count (PO-DOC), F2 count kept across a size round trip, P6 every page tab (wraps past 8), FU-1 rebuild after a re-snap | `claude/sweet-newton-c8wrv1-lf-partopts` @ cb761d6fa | critic panel r4: follow-up PASS (8/9/8/8 at 1280 and 820); the lead ships it on the next train |
-| Options-panel sample (paged sample, "1 of N", lettered choices, 9 px floor, unclip, whole drawings, scroll cue) | `claude/sweet-newton-c8wrv1-lf-partopts-panel` | **critic r5 PASS** @ 33a488c94 (every criterion ≥ 8 at 1280/1366/1024/820; C1 7→8 at the tablet widths by the scroll cue, check [scroll-cue], backtest row `options-panel-scroll-cue`). Ships on the next train with the follow-up |
+| Follow-up: F1 doc count (PO-DOC), F2 count kept across a size round trip, P6 every page tab (wraps past 8), FU-1 rebuild after a re-snap | `claude/sweet-newton-c8wrv1-lf-partopts` @ 7ef5e96ae | **HELD with part B** (lead, 2026-11-14). The lane branch mixes FU-1 with the paused, unreviewed part B, so the follow-up does NOT ship on the panel train. FU-1 fixes `resnapPartOpts` / A4-F2, code that is only on this branch, so nothing is live-broken. FU-1 ships with part B when part B resumes |
+| Options-panel sample (paged sample, "1 of N", lettered choices, 9 px floor, unclip, whole drawings, scroll cue) | `claude/sweet-newton-c8wrv1-lf-partopts-panel` | **critic r5 PASS** @ 33a488c94, deployed ALONE by the lead (2026-11-14) (every criterion ≥ 8 at 1280/1366/1024/820; C1 7→8 at the tablet widths by the scroll cue, check [scroll-cue], backtest row `options-panel-scroll-cue`). The follow-up does not ride with it (held with part B) |
 | P1 hotfix (the "?" hit area swallowed clicks on its row) | master b9414a659 | LIVE; its [hit] check and backtest row ship with the panel branch |
 | Part B: supports checkboxes per part | lane branch (611ec04c9, c282bdafb; merged at 219e8d907) | PAUSED (FOCUS rule). Resume notes below |
 
@@ -51,6 +51,7 @@ Critic reports: `design/partopts/critic-A-r2.md` … `r4`, `critic-panel-r1.md`,
 
 ## Part B resume notes
 
+- **FU-1 ships with part B.** The lane branch (7ef5e96ae) holds the FU-1 page-count fix together with part B. When part B resumes, re-run FU-1's checks on the branch merged with master and ship them in one deploy. Do not cherry-pick FU-1 alone: it fixes `resnapPartOpts` / A4-F2, which exist only on this branch.
 - Code: the lane branch carries the per-part supports model, the screen checkboxes and the per-size offer gate.
 - The gate's first case was `mult_properties` band=36, offered at size **S only**. The owner dropped size S (2026-11-13):
   that value has no size left that offers it. Drop it, or re-measure it at M. The one-size-only mechanism still works for
