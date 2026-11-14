@@ -9905,6 +9905,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-lone-story",
+   "check": "a one-column Guided page holding ONE two-step story sizes the cell to the story it draws, never stretched to content / 0.7 (lf-roles r10 item 2, live deploy-7 two_step_add_then_div Guided M seed 694812: the lone story 25-31 % empty in its frame)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-LONE-STORY (browser twin: ws-empty-band EB-BAND guided, >= 30 % only)",
+   "browser": false,
+   "fail": {
+    "commit": "66dcb77a0",
+    "state": "lone 135 mm story in a 186.1 mm cell at M and L"
+   },
+   "pass": {
+    "commit": "f8e338139",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-LONE-STORY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
