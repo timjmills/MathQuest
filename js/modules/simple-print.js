@@ -402,7 +402,8 @@ export async function buildSimple(list, o) {
 /** The Auto columns at a size (the size buttons' "n columns"): one small build, no filling. */
 async function probeCols(list, arrangement, o) {
     if (arrangement === 'facts') {
-        const g = list.filter((s) => !isDivisionFact(s));
+        // (MIXED-ALL-OPS: ÷ in the sign's own form prints in the + − × rows, so it is part of what the button measures)
+        const g = list.filter((s) => !isDivisionFact(s) || (signDiv(s) && list.some((x) => !isDivisionFact(x))));
         // (the reach of the skills, as the print takes it: r3 D2 - the size button says what prints)
         const gl = g.length ? g : list;
         const rc = gl.reduce((r, s) => { const x = reachOf(s); return { tracks: Math.max(r.tracks, x.tracks), ans: Math.max(r.ans, isDivisionFact(s) ? 0 : x.ans) }; }, { tracks: 2, ans: 0 });
@@ -587,6 +588,8 @@ async function buildFacts(list, amounts, o) {
         const count = per ? per.reduce((t, x) => t + x, 0) : 0;
         return { skills: grp.parts.map((p, j) => Object.assign(skillRef(p.s), { weight: w[j] })).filter((x) => x.weight > 0), pages: 1, ...(count ? { count } : {}),
             tracks: reach[g].tracks, ansTracks: reach[g].ans, ...(cap ? { maxPt: cap } : {}), sizeCap: true,
+            // (MIXED-ALL-OPS: ÷ in the + − × rows - every page of the group laid as the mixed page, one that dealt ÷ only too)
+            ...(!grp.div && grp.parts.some((p) => isDivisionFact(p.s)) && grp.parts.some((p) => !isDivisionFact(p.s)) ? { signMix: true } : {}),
             ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.div || grp.parts.some((p) => isDivisionFact(p.s)) ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) };
     };
     // one page: `parts` = [{g, per}] (per = how many of each of the group's parts; null: the full page by the shares)

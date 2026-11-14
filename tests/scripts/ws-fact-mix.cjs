@@ -181,6 +181,8 @@ for (const size of ['M', 'L']) for (const cols of ['auto', 9]) ROOM_CASES.push({
                 ['quick-print-mixed-facts-M-6cols', async () => { const mod = await import('/js/modules/simple-print.js'); return (await mod.buildSets(window.__fmList, { how: 'pages', n: 1, sets: 1, size: 'M', cols: 6, colsMode: 'aim', key: true, arrange: 'sections', seed: 4242, title: true, paper: 'A4' })).pupilHtml; }],
                 ['div-facts-long-M', async () => (await window.buildSheet({ role: 'fact-rows', look: 'auto', sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'long' } }], pages: 1 }], size: 'M', paper: 'A4', seed: 4242, key: false })).pupilHtml],
                 ['div-facts-mix-M', async () => (await window.buildSheet({ role: 'fact-rows', look: 'auto', sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'mix' } }], pages: 1 }], size: 'M', paper: 'A4', seed: 4242, key: false })).pupilHtml],
+                ['div-facts-mix-M-9cols', async () => (await window.buildSheet({ role: 'fact-rows', look: 'auto', sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'mix' } }], pages: 1, columns: 9 }], size: 'M', paper: 'A4', seed: 4242, key: false })).pupilHtml],
+                ['div-facts-long-M-9cols', async () => (await window.buildSheet({ role: 'fact-rows', look: 'auto', sections: [{ skills: [{ categoryId: 'division', skillId: 'div_facts', opts: { divForm: 'long' } }], pages: 1, columns: 9 }], size: 'M', paper: 'A4', seed: 4242, key: false })).pupilHtml],
             ];
             await page.evaluate((l) => { window.__fmList = l; }, MIXED);
             await page.setViewport({ width: 820, height: 1200, deviceScaleFactor: 2 });

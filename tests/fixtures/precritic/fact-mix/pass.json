@@ -4,6 +4,7 @@
   {
    "tag": "Mixed facts M Columns 6 In sections Pages 1",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -86,12 +87,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "Mixed facts M Columns 6 Mixed up Pages 1",
    "divOnly": false,
+   "mixedUp": true,
    "pages": [
     {
      "grids": [
@@ -174,12 +175,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": true
+   ]
   },
   {
    "tag": "Mixed facts M Columns 8 In sections Pages 1",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -197,6 +198,10 @@
         "+",
         "+",
         "+",
+        "+",
+        "+",
+        "−",
+        "−",
         "−",
         "−",
         "−",
@@ -221,6 +226,10 @@
         "×",
         "×",
         "×",
+        "×",
+        "×",
+        "÷",
+        "÷",
         "÷",
         "÷",
         "÷",
@@ -250,8 +259,8 @@
          "+",
          "+",
          "+",
-         "−",
-         "−",
+         "+",
+         "+",
          "−",
          "−"
         ],
@@ -264,6 +273,16 @@
          "−",
          "−",
          "−"
+        ],
+        [
+         "−",
+         "−",
+         "−",
+         "−",
+         "×",
+         "×",
+         "×",
+         "×"
         ],
         [
          "×",
@@ -278,8 +297,8 @@
         [
          "×",
          "×",
-         "×",
-         "×",
+         "÷",
+         "÷",
          "÷",
          "÷",
          "÷",
@@ -300,91 +319,119 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "Mixed facts M Columns 8 Mixed up Pages 1",
    "divOnly": false,
+   "mixedUp": true,
    "pages": [
     {
      "grids": [
       {
        "ops": [
-        "+",
-        "×",
-        "−",
-        "÷",
-        "−",
-        "×",
-        "÷",
-        "+",
         "−",
         "+",
         "÷",
         "×",
-        "×",
-        "+",
-        "÷",
         "−",
         "×",
-        "+",
-        "−",
-        "÷",
-        "×",
-        "−",
-        "+",
-        "÷",
-        "÷",
-        "×",
-        "+",
-        "−",
-        "−",
-        "×",
-        "÷",
-        "+",
-        "−",
-        "÷",
-        "+",
-        "×",
-        "×",
-        "−",
         "+",
         "÷",
         "+",
         "÷",
         "×",
         "−",
+        "×",
+        "−",
+        "+",
+        "÷",
         "−",
         "×",
         "+",
+        "÷",
+        "÷",
+        "−",
+        "×",
+        "+",
+        "−",
+        "×",
+        "+",
+        "÷",
+        "÷",
+        "+",
+        "×",
+        "−",
+        "−",
+        "×",
+        "+",
+        "÷",
+        "×",
+        "−",
+        "+",
+        "÷",
+        "+",
+        "−",
+        "÷",
+        "×",
+        "−",
+        "+",
+        "×",
+        "÷",
+        "−",
+        "÷",
+        "+",
+        "×",
+        "+",
+        "×",
+        "−",
         "÷"
        ],
        "rows": [
         [
+         "−",
          "+",
+         "÷",
          "×",
          "−",
+         "×",
+         "+",
+         "÷"
+        ],
+        [
+         "+",
+         "÷",
+         "×",
+         "−",
+         "×",
+         "−",
+         "+",
+         "÷"
+        ],
+        [
+         "−",
+         "×",
+         "+",
+         "÷",
          "÷",
          "−",
          "×",
-         "÷",
          "+"
         ],
         [
          "−",
-         "+",
-         "÷",
-         "×",
          "×",
          "+",
          "÷",
+         "÷",
+         "+",
+         "×",
          "−"
         ],
         [
+         "−",
          "×",
          "+",
-         "−",
          "÷",
          "×",
          "−",
@@ -392,33 +439,23 @@
          "÷"
         ],
         [
-         "÷",
-         "×",
          "+",
          "−",
-         "−",
-         "×",
          "÷",
-         "+"
-        ],
-        [
-         "−",
-         "÷",
-         "+",
-         "×",
          "×",
          "−",
          "+",
+         "×",
          "÷"
         ],
         [
-         "+",
+         "−",
          "÷",
-         "×",
-         "−",
-         "−",
+         "+",
          "×",
          "+",
+         "×",
+         "−",
          "÷"
         ]
        ],
@@ -426,12 +463,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": true
+   ]
   },
   {
    "tag": "Mixed facts M Columns auto In sections Pages 1",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -514,12 +551,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "Mixed facts M Columns auto Mixed up Pages 1",
    "divOnly": false,
+   "mixedUp": true,
    "pages": [
     {
      "grids": [
@@ -602,12 +639,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": true
+   ]
   },
   {
    "tag": "Mixed facts L Columns 6 In sections Pages 1",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -690,12 +727,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "Mixed facts L Columns 6 Mixed up Pages 1",
    "divOnly": false,
+   "mixedUp": true,
    "pages": [
     {
      "grids": [
@@ -778,12 +815,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": true
+   ]
   },
   {
    "tag": "Mixed facts L Columns 8 In sections Pages 1",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -904,12 +941,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "Mixed facts L Columns 8 Mixed up Pages 1",
    "divOnly": false,
+   "mixedUp": true,
    "pages": [
     {
      "grids": [
@@ -1030,12 +1067,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": true
+   ]
   },
   {
    "tag": "Mixed facts L Columns auto In sections Pages 1",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -1108,12 +1145,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "Mixed facts L Columns auto Mixed up Pages 1",
    "divOnly": false,
+   "mixedUp": true,
    "pages": [
     {
      "grids": [
@@ -1186,12 +1223,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": true
+   ]
   },
   {
    "tag": "Mixed facts M Columns 6 In sections Pages 2",
    "divOnly": false,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -1355,12 +1392,12 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   },
   {
    "tag": "÷ alone M Columns 6 In sections Pages 1",
    "divOnly": true,
+   "mixedUp": false,
    "pages": [
     {
      "grids": [
@@ -1443,8 +1480,7 @@
       }
      ]
     }
-   ],
-   "mixedUp": false
+   ]
   }
  ],
  "room": [
@@ -1485,7 +1521,7 @@
    "size": "M",
    "n": 21,
    "short": 0,
-   "minFree": 9.66,
+   "minFree": 8.7,
    "at": "22 ÷ 2"
   },
   {
@@ -1493,7 +1529,7 @@
    "size": "M",
    "n": 12,
    "short": 0,
-   "minFree": 11.2,
+   "minFree": 10.64,
    "at": "55 ÷ 5"
   },
   {
@@ -1531,9 +1567,9 @@
   {
    "tag": "div Mix L Columns 9",
    "size": "L",
-   "n": 21,
+   "n": 18,
    "short": 0,
-   "minFree": 11.09,
+   "minFree": 11.82,
    "at": "22 ÷ 2"
   },
   {
@@ -1541,8 +1577,8 @@
    "size": "L",
    "n": 12,
    "short": 0,
-   "minFree": 12.61,
-   "at": "55 ÷ 5"
+   "minFree": 11.06,
+   "at": "14 ÷ 2"
   },
   {
    "tag": "simple + − × ÷ long In sections M Columns auto",
@@ -1629,7 +1665,7 @@
    "size": "M",
    "n": 6,
    "short": 0,
-   "minFree": 8.6,
+   "minFree": 10.89,
    "at": "28 ÷ 4"
   },
   {
@@ -1637,7 +1673,7 @@
    "size": "M",
    "n": 6,
    "short": 0,
-   "minFree": 8.6,
+   "minFree": 10.89,
    "at": "28 ÷ 4"
   },
   {
@@ -1693,7 +1729,7 @@
    "size": "L",
    "n": 2,
    "short": 0,
-   "minFree": 11.92,
+   "minFree": 11.8,
    "at": "28 ÷ 4"
   },
   {
@@ -1701,7 +1737,7 @@
    "size": "L",
    "n": 2,
    "short": 0,
-   "minFree": 11.92,
+   "minFree": 11.8,
    "at": "28 ÷ 4"
   },
   {
@@ -1725,7 +1761,7 @@
    "size": "L",
    "n": 6,
    "short": 0,
-   "minFree": 11.7,
+   "minFree": 11.19,
    "at": "28 ÷ 4"
   },
   {
@@ -1733,7 +1769,7 @@
    "size": "L",
    "n": 6,
    "short": 0,
-   "minFree": 11.7,
+   "minFree": 11.19,
    "at": "28 ÷ 4"
   },
   {
@@ -1749,7 +1785,7 @@
    "size": "M",
    "n": 21,
    "short": 0,
-   "minFree": 9.66,
+   "minFree": 8.7,
    "at": "22 ÷ 2"
   },
   {
@@ -1763,9 +1799,9 @@
   {
    "tag": "simple ÷ mix alone L Columns 9",
    "size": "L",
-   "n": 21,
+   "n": 18,
    "short": 0,
-   "minFree": 11.09,
+   "minFree": 11.82,
    "at": "22 ÷ 2"
   }
  ]

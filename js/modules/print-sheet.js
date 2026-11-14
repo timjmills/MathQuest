@@ -269,6 +269,9 @@ function normaliseRequest(req = {}) {
             // from the caller's probe - one column count and digit size on every page and set of the print
             tracks: s && Number(s.tracks) > 0 ? clampInt(s.tracks, 1, 7, 0) : 0,
             ansTracks: s && Number(s.ansTracks) > 0 ? clampInt(s.ansTracks, 1, 7, 0) : 0,
+            // ... and whether the section's skills mix ÷ (the sign's own form) with + − × (MIXED-ALL-OPS, owner 2026-11-14): every
+            // page of it is laid as the mixed page, a page that dealt ÷ facts only too
+            ...(s && s.signMix ? { signMix: true } : {}),
             // ... and the section's one row stretch for the whole print (PG-11: at most 1.3, owner 2026-11-05)
             stretch: s && Number(s.stretch) >= 1 ? Math.min(1.3, Number(s.stretch)) : 0,
             // ... and the largest digit size a section may take (facts-print-fix r4: sections sharing a page take one size)
@@ -4460,7 +4463,8 @@ async function buildRoleSheet(n, metaOf) {
             factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
             factPt: (n.sections[0] && n.sections[0].maxPt) || 0,
             factSizeCap: !!(n.sections[0] && n.sections[0].sizeCap),
-            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap })) } : {}),
+            ...(n.sections[0] && n.sections[0].signMix ? { factSignMix: true } : {}),
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap, ...(s.signMix ? { signMix: true } : {}) })) } : {}),
         } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's

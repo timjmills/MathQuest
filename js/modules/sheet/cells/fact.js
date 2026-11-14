@@ -27,7 +27,7 @@ export { FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_AUTO_COLS };
  * @param {string} op
  * @param {{pt?: number, padTop?: number}} [opts]  pt from FACT_LADDER[columns]
  */
-export function fact(a, b, op, { pt, padTop = 2, digits = 0, touch = null } = {}) {
+export function fact(a, b, op, { pt, padTop = 2, digits = 0, touch = null, opEm = 0 } = {}) {
     // VA-2: the operator has a track of its OWN, left of the digit tracks, so "×12", "−10" and
     // "÷12" never touch (the old cell padded both rows to 3 tracks and wrote the operator OVER
     // the first, which at 0.72 em sat flush against a tens digit). The digit tracks stay 0.72 em
@@ -38,7 +38,9 @@ export function fact(a, b, op, { pt, padTop = 2, digits = 0, touch = null } = {}
     // S2: `touch` = {a, b, o}: touch dots laid over the digits of a (and / or) b (support-draw.js).
     // The overlay takes no space, so the fact's geometry is the same with and without it.
     const r = (s, on) => [...s].map((ch) => (ch === ' ' ? '<span></span>' : (touch && on && touchDigit(ch, true, touch.o)) || `<span>${ch}</span>`)).join('');
-    const html = `<div class="ws-fact" style="${factGridStyle(n, b, op)}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
+    // (opEm: the page's one operator track - a fact-rows page mixing ÷ with + − × draws every sign on it, MIXED-ALL-OPS)
+    const grid = opEm > 0 ? `grid-template-columns:${opEm}em repeat(${n}, ${FACT_TRACK_EM}em)` : factGridStyle(n, b, op);
+    const html = `<div class="ws-fact" style="${grid}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
     return { cls: 'fact', style: `--fd:${pt}pt;--fp:${padTop}mm`, html };
 }
 
@@ -420,7 +422,7 @@ register('fact', {
             return hold ? `<div class="ws-eq-hold" style="font-size:${pt}pt;${hold}">${eq}</div>` : eq;
         }
         const n = factDigitTracks(p.a, p.b, p.digits || String(value ?? '').length);
-        const item = fact(p.a, p.b, p.op, { pt, digits: n, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols), touch: tn.a || tn.b ? { ...tn, o: to } : null });
+        const item = fact(p.a, p.b, p.op, { pt, digits: n, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols), touch: tn.a || tn.b ? { ...tn, o: to } : null, opEm: Number(p.opEm) || 0 });
         // `fact()` returns a grid item, so the ladder's point size rides on the CELL. Through
         // the registry the template must stand alone, so the same value is inlined here.
         item.html = item.html.replace('<div class="ws-fact" style="', `<div class="ws-fact" style="--fd:${pt}pt;`);

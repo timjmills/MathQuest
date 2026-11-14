@@ -344,8 +344,9 @@ async function factsCounts(page) {
             if (!p.facts) fails.push(`${tag}: PROBLEMS page ${i + 1} is not a fact-rows grid`);
             if (p.wide) fails.push(`${tag}: PROBLEMS page ${i + 1} has ${p.wide} cell(s) wider than a grid column (NOORPHAN)`);
             const div = p.ops.filter((op) => SIGN[op] === 'div_facts').length;
-            // (r3: ÷ is its own SECTION - its own grid - which may share the page with the + − × grid)
-            if (p.gridOps.some((g) => g.some((op) => SIGN[op] === 'div_facts') && g.some((op) => SIGN[op] !== 'div_facts'))) fails.push(`${tag}: PROBLEMS page ${i + 1} mixes ÷ with other signs in one grid`);
+            // (MIXED-ALL-OPS, owner 2026-11-14 - replaces r3's "÷ is its own SECTION": the owner set's ÷ facts are in the ÷ sign's
+            // own form, so they print INSIDE the + − × grid, never as a grid of ÷ alone beside it; ws-fact-mix holds the rule)
+            if (p.gridOps.length > 1 && p.gridOps.some((g) => g.length && g.every((op) => SIGN[op] === 'div_facts')) && p.gridOps.some((g) => g.some((op) => SIGN[op] && SIGN[op] !== 'div_facts'))) fails.push(`${tag}: PROBLEMS page ${i + 1} prints ÷ in its own grid beside the + − × grid (MIXED-ALL-OPS)`);
             if (div && !p.stacked) fails.push(`${tag}: PROBLEMS page ${i + 1} prints division across, not stacked`);
         });
         // (r2's FILL - each group's pages >= 60 % of its full page - is replaced by r3's FILL in mm, factsSetPage: the ÷
@@ -434,8 +435,10 @@ async function factsSetPage(page) {
             f.remove();
             // each group's full page (Pages 1 of that group alone): rows a page, for the fewest-pages bound
             const full = {};
+            // (MIXED-ALL-OPS: a ÷ fact in the sign's own form joins the + − × group when + − × facts are in the set)
+            const joins = (s) => s.skillId === 'div_facts' && !/^(long|fraction|mix)$/.test(String((s.opts || {}).divForm || '')) && L.some((x) => x.skillId !== 'div_facts');
             for (const div of [false, true]) {
-                const g = L.filter((s) => (s.skillId === 'div_facts') === div);
+                const g = L.filter((s) => (s.skillId === 'div_facts' && !joins(s)) === div);
                 if (!g.length) continue;
                 const fb = await m.buildSimple(g, Object.assign({}, o, { how: 'pages', n: 1, sets: 1, key: false }));
                 full[div ? 'div' : 'main'] = { cols: fb.cols, rows: fb.rows };
@@ -465,7 +468,8 @@ async function factsSetPage(page) {
             ps.forEach((p, k) => {
                 for (const g of p.grids.filter((x) => x.facts)) {
                     const div = g.ops.length && g.ops.every((op) => SIGN[op] === 'div_facts');
-                    if (g.ops.some((op) => SIGN[op] === 'div_facts') && !div) fails.push(`${tag} set ${sn} page ${k + 1}: SETPAGE a grid mixes ÷ with + − ×`);
+                    // (MIXED-ALL-OPS, owner 2026-11-14: the owner set's ÷ - the ÷ sign's own form - prints inside the + − × grid)
+                    if (div && p.grids.some((x) => x.facts && x.ops.some((op) => SIGN[op] && SIGN[op] !== 'div_facts'))) fails.push(`${tag} set ${sn} page ${k + 1}: SETPAGE ÷ prints in its own grid beside the + − × grid (MIXED-ALL-OPS)`);
                     const want = Number(div ? divCols : sumCols);
                     if (g.cols !== want) fails.push(`${tag} set ${sn} page ${k + 1}: SETPAGE ${div ? '÷' : '+ − ×'} grid prints ${g.cols} columns, the summary says ${want} ("${r.line}")`);
                     if (g.cols > 9 && (r.c.cols === 'auto' || div)) fails.push(`${tag} set ${sn} page ${k + 1}: AUTO9 ${g.cols} columns at ${r.c.cols === 'auto' ? 'Auto' : `Columns ${r.c.cols}`}${div ? ' on ÷' : ''}`);
@@ -488,7 +492,9 @@ async function factsSetPage(page) {
             if (ps.length !== sumPages) fails.push(`${tag} set ${sn}: SETPAGE ${ps.length} pages, the summary says ${sumPages}`);
             // FEWEST pages (Problems mode): all groups planned together
             if (r.c.how === 'problems' && r.full.main) {
-                const nMain = per.filter((_, i) => ids[i] !== 'div_facts').reduce((t, x) => t + x, 0), nDiv = per[ids.indexOf('div_facts')];
+                // (MIXED-ALL-OPS: no ÷ group of its own - the ÷ sign's facts are rows of the + − × grid)
+                const joined = !r.full.div;
+                const nMain = per.filter((_, i) => joined || ids[i] !== 'div_facts').reduce((t, x) => t + x, 0), nDiv = joined ? 0 : per[ids.indexOf('div_facts')];
                 const cm = Number(sumCols), cd = Number(divCols);
                 const units = (nMain ? Math.ceil(nMain / cm) / r.full.main.rows : 0) + (nDiv && r.full.div ? Math.ceil(nDiv / cd) / r.full.div.rows : 0);
                 // (+ the ÷ section's own instruction line when it shares a page: about 0.05 of a page, r5)
@@ -1047,7 +1053,8 @@ async function factsR5(app) {
                 grids: [...pg.querySelectorAll('.ws-grid.facts')].map((g) => {
                     const cells = [...g.querySelectorAll(':scope > .ws-cell:not(.blankrun)')];
                     const cols = Number((/repeat\((\d+)/.exec(g.getAttribute('style') || '') || [])[1]) || 0;
-                    const div = cells.some((x) => x.querySelector('[data-ws-ops="division"], [data-ws-notation]') || /÷/.test((x.querySelector('.ws-fact .op') || {}).textContent || ''));
+                    // (MIXED-ALL-OPS, owner 2026-11-14: a ÷ section is a grid of ÷ facts ONLY; ÷ inside the + − × grid is the mixed grid)
+                    const div = cells.length > 0 && cells.every((x) => x.querySelector('[data-ws-ops="division"], [data-ws-notation]') || /÷/.test((x.querySelector('.ws-fact .op') || {}).textContent || ''));
                     return { n: cells.length, cols, div };
                 }),
             }));
@@ -1222,7 +1229,7 @@ async function factsSweep(app, full) {
                             const all = [...bx, ...xs];
                             if (all.length) brkBox = Math.min(brkBox, mm(Math.min(...all.map((v) => v[0])) - L0), mm(R0 - Math.max(...all.map((v) => v[1]))));
                         }
-                        return { n: cells.length, cols, ops, seq, brk: Number.isFinite(brk) ? brk : null, brkBox: Number.isFinite(brkBox) ? brkBox : null, div: !!ops.div, mixed: new Set(cells.map((x) => (x.querySelector('[data-ws-ops="division"]') ? 'b' : x.querySelector('[data-ws-notation]') ? 'f' : 's'))).size > 1, rowH: cells[0] ? mm(cells[0].getBoundingClientRect().height) : 0, bottom: g.getBoundingClientRect().bottom };
+                        return { n: cells.length, cols, ops, seq, brk: Number.isFinite(brk) ? brk : null, brkBox: Number.isFinite(brkBox) ? brkBox : null, div: !!ops.div && Object.keys(ops).every((k) => k === 'div'), anyDiv: !!ops.div, mixed: new Set(cells.map((x) => (x.querySelector('[data-ws-ops="division"]') ? 'b' : x.querySelector('[data-ws-notation]') ? 'f' : 's'))).size > 1, rowH: cells[0] ? mm(cells[0].getBoundingClientRect().height) : 0, bottom: g.getBoundingClientRect().bottom };
                     });
                     const last = grids.length ? Math.max(...grids.map((g) => g.bottom)) : 0;
                     return { grids: grids.map(({ bottom, ...x }) => x), white: foot && grids.length ? mm(Math.min(foot.getBoundingClientRect().top, (pg.querySelector('.ws-body') || foot).getBoundingClientRect().bottom) - last) : null,
@@ -1280,10 +1287,14 @@ async function factsSweep(app, full) {
                 const firsts = [];
                 ps.forEach((p) => p.grids.forEach((g) => g.seq.forEach((op) => { const k2 = KEYOP[op] || op; if (!firsts.includes(k2)) firsts.push(k2); })));
                 const want = ids.filter((id) => firsts.includes(id));
+                // (MIXED-ALL-OPS: a ÷ in the sign's own form is interleaved INSIDE the + − × grid - no ÷ section to place)
+                const divSection = ps.some((p) => p.grids.some((g) => g.div) && p.grids.some((g) => !g.div));
                 if (o.arrange === 'mixed' && ids.length > 1) {
+                    if (!divSection) { /* ÷ mixed through the one grid */ } else {
                     const divAt = firsts.indexOf('div_facts'), mainAt = firsts.findIndex((id) => id !== 'div_facts');
                     const listDivFirst = ids.indexOf('div_facts') >= 0 && ids.indexOf('div_facts') < ids.findIndex((id) => id !== 'div_facts');
                     if (divAt >= 0 && mainAt >= 0 && (divAt < mainAt) !== listDivFirst) F('ORDER', `${tag}: ORDER the ÷ section prints ${divAt < mainAt ? 'before' : 'after'} the + − × facts; the list puts ÷ ${listDivFirst ? 'first' : 'after them'}`);
+                    }
                 } else if (firsts.join() !== want.join()) F('ORDER', `${tag}: ORDER prints ${firsts.join(' > ')}, the list is ${ids.join(' > ')}`);
             }
             let seenDiv = false;
@@ -1303,7 +1314,7 @@ async function factsSweep(app, full) {
                     if (g.brkBox !== null) brkBoxMin = Math.min(brkBoxMin, g.brkBox);
                     // COLNOTE (r7 D-R7-2): a section printing other columns than the ones picked says why
                     const pick = o.cols === 'auto' ? 0 : Number(o.cols);
-                    if (pick && g.cols !== pick && !r.notes.some((t) => new RegExp(`\\b${g.cols} columns\\b`).test(t)) && !(pick > 9 && g.div && g.cols === 9 && /max 9 with division/.test(r.line || ''))) F('COLNOTE', `${tag} page ${k + 1}: COLNOTE a ${g.div ? '÷' : '+ − ×'} section prints ${g.cols} columns for ${pick} picked and no note says why (notes: "${r.notes.join(' | ').slice(0, 100)}")`);
+                    if (pick && g.cols !== pick && !r.notes.some((t) => new RegExp(`\\b${g.cols} columns\\b`).test(t)) && !(pick > 9 && (g.div || g.anyDiv) && g.cols === 9 && /max 9 with division/.test(r.line || ''))) F('COLNOTE', `${tag} page ${k + 1}: COLNOTE a ${g.div ? '÷' : '+ − ×'} section prints ${g.cols} columns for ${pick} picked and no note says why (notes: "${r.notes.join(' | ').slice(0, 100)}")`);
                 });
                 // (excused only where the dialog says whole rows cannot fill every page - and then it does not claim they do)
                 if (p.white !== null && (!lastOfSet || o.how === 'pages') && p.white > fullWhite + 8 && !r.notes.some((t) => /cannot fill every page/.test(t))) F('PAGESFULL', `${tag} page ${k + 1} of ${ps.length}: PAGESFULL ${p.white.toFixed(1)} mm of white under the grid (a full page ${fullWhite.toFixed(1)}; at most 8 more)${o.how === 'pages' ? ' - the dialog says every page is full' : ''}`);
