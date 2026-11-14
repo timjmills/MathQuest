@@ -8646,6 +8646,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "touch-floor-48-every-width",
+  "check": "critic tt-r2 D6: a1ec6ffbb lowered ws-phone-card's answer floor to 44 px at 1280 / 1366 (SP-10 says digit inputs are at least 48 px tall at every width; master held 48), hiding the multiplication chart's 44 x 44 boxes on a computer",
+  "kind": "commit-pair",
+  "rule": "tests/lib/touch-class.cjs floorAt('answer', w) = 48 for every w >= 600; ws-phone-card reads it",
+  "browser": false,
+  "fail": {
+   "commit": "a1ec6ffbb",
+   "state": "floorAt('answer', 1280) = 44"
+  },
+  "pass": {
+   "commit": "1991099ea",
+   "state": "floorAt('answer', 1280 / 1366 / 1024 / 820) = 48; working 44"
+  },
+  "command": "node -e \"const tc=require(process.argv[1]);const src=require('fs').readFileSync(process.argv[2],'utf8');const ok=/touch-class/.test(src)&&[1280,1366,1024,820].every(w=>tc.floorAt('answer',w)===48)&&tc.floorAt('working',1366)===44;console.log(ok?'floor48: OK':'floor48: FAIL ('+[1280,1366].map(w=>w+':'+tc.floorAt('answer',w)).join(' ')+')')\" {root}/tests/lib/touch-class.cjs {root}/tests/scripts/ws-phone-card.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }

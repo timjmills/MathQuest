@@ -780,3 +780,12 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
   `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
 - CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
+
+## 2026-11-14 — touch floor after critic tt-r2 (FAIL 8/8/8/7)
+
+- D6 fixed: the answer floor is SP-10's 48 px at EVERY screen width again (working 44); row `touch-floor-48-every-width`.
+  Consequence, honest and as on master: the multiplication chart's 44 x 44 boxes at 1280 / 1366 are flagged (its tablet
+  rows are 48; at a computer the 48 px rows pushed the instruction under the top bar - FIT-TOP). Open for the lead /
+  facts lane: rule a computer-width exception for the chart, or redesign its rows (the chart digits are D3, facts lane).
+- Parked (budget stop): D5b (~4 practice-card lines of changed-screens.txt move on a zoom timer), D7 (at 1024 the chart's
+  instruction and x row scroll out of view: FIT-TOP covers 1280 / 1366 only). No critic r3 run (owner budget stop).
