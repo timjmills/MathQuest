@@ -915,6 +915,8 @@ function buildPlan(ctx) {
         // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
         // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
+        // (lf-roles 2026-11-14, lf-engine -roles critic r2 F5: no key prints the generator's raw JSON as an answer, any role)
+        add(gate('key-json', 'ws-key-json (L-KEY: no raw JSON answer on any key or page, every role)', scope, 'browser', 'ws-key-json', ['--skills', keys.join(',')], { missingMsg: 'ws-key-json is not in this tree' }));
         // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
         add(gate('tof-stem', 'ws-tof-stem (TOF-STEM: a True or False? "a op b =" stem only over the one number it equals)', scope, 'browser', 'ws-tof-stem', ['--skills', keys.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
