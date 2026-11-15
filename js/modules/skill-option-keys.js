@@ -201,7 +201,8 @@ export const MULTI_KEYS = Object.freeze({
     tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
     familyChart: '4K',   // fact_family_sort (visual-quality lane, owner 2026-10-31): a blank number-family chart to fill in (working space)
     writeValue: '4L',    // identify (lf-placevalue, owner ruling 2026-10-10): also write the value of the underlined digit
-    // NEXT FREE IN 4E-4O: 4L.
+    answerAs: '4M',      // value form unit (owner bug fix 2026-11-15): number + chosen place word / the value in one box
+    // NEXT FREE IN 4E-4O: 4N.
     // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
     msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
     wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
@@ -371,6 +372,7 @@ export const VALUE_TOKENS = Object.freeze({
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     // P9 step 8 (block 0)
     form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
+    answerAs: Object.freeze({ unit: 'U', value: 'V' }),
     tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
     tenWrite: Object.freeze({ both: 'B', top: 'T' }),
     tenTask: Object.freeze({ compare: 'C', story: 'S' }),

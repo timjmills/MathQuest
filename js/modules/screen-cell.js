@@ -3068,6 +3068,14 @@ export function wireClozeBanks(root) {
     });
     root.querySelectorAll('.mq-cloze').forEach((cz) => {
         const boxes = Array.from(cz.querySelectorAll('input.mq-cellslot, input.cloze-cell'));
+        // owner bug fix 2026-11-15: a place-word box is filled by a tap on the bank, never typed
+        if (cz.querySelector('.mq-placetile')) {
+            boxes.forEach((b) => {
+                const host = b.closest('[data-mq-wordbank]') || (b.matches('[data-mq-wordbank]') ? b : null);
+                const last = b === boxes[boxes.length - 1];
+                if (host || last) { b.readOnly = true; b.setAttribute('inputmode', 'none'); b.removeAttribute('maxlength'); b.setAttribute('aria-label', 'the place you chose'); b.classList.add('mq-wordpick'); }
+            });
+        }
         cz.querySelectorAll('.mq-banktile').forEach((btn) => {
             if (btn.dataset.mqWired === '1') return;
             btn.dataset.mqWired = '1';
@@ -4313,6 +4321,29 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
             t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`, fx);
             const box = t.content.firstChild;
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
+            // owner bug fix 2026-11-15: a unit-form place box is CHOSEN from the bank of place words, never typed
+            if (Array.isArray(p.bank) && p.bank.length && k === slots.length - 1) {
+                box.setAttribute('data-mq-kind', 'word');
+                box.setAttribute('data-mq-wordbank', '1');
+                box.setAttribute('data-mq-w', '8');
+                box.style.setProperty('--mq-w', '8');
+                s.replaceWith(box);
+                const row = document.createElement('div');
+                row.className = 'mq-placebank';
+                row.setAttribute('role', 'group');
+                row.setAttribute('aria-label', 'Choose the place');
+                p.bank.forEach((w) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'mq-banktile mq-placetile';
+                    b.dataset.mqBankFor = String(k);
+                    b.dataset.v = w;
+                    b.textContent = w;
+                    row.appendChild(b);
+                });
+                tpl.content.appendChild(row);
+                return;
+            }
             s.replaceWith(box);
         });
         mode = 'slots';
@@ -4346,8 +4377,9 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     // (lf-placevalue compare round, ws-empty-band EB-PARITY: the compare twin is the paper's kit cell on every host - marked
     // [data-ws-cell="pv"] as the words twin is; an inline block, so the mark is the drawing's own box, centred as before)
     const inner = p.kind === 'compare' ? `<div data-ws-cell="pv" style="display:inline-block;max-width:100%;padding:0 2mm;box-sizing:border-box;">${wrap.innerHTML}</div>` : wrap.innerHTML;
-    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
-    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    const banked = Array.isArray(p.bank) && p.bank.length && mode === 'slots';
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin${banked ? ' mq-cloze' : ''}" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
+    const instr = (banked && q.screenInstr) || printInstructionFor(q, categoryId) || plainText(q.text);
     // a chart's digits make ONE number: the host checks the number, not a list of parts
     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
 }
