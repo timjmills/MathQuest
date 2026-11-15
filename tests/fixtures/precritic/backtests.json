@@ -11865,6 +11865,26 @@
    }
   },
   {
+   "id": "t15-preset-ican",
+   "check": "ws-tables15 T15-PRESET: the preset pages mult_facts_15 / div_facts_15 carry the same I Can line as their host at band 225 ('... to 15'), never the host's default 'to 12'",
+   "kind": "commit-pair",
+   "rule": "T15-PRESET (critic t15 D1, 2026-11-15)",
+   "fail": {
+    "commit": "26f8028a9",
+    "state": "optionICan compares the preset's band with the preset's own re-defaulted 225, sees no move, and leaves 'I Can multiply facts to 12'"
+   },
+   "pass": {
+    "commit": "40149f0b7",
+    "state": "band moved is measured against the host's default (144), so the preset line reads 'to 15' like the host at 225"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-PRESET --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "tables15-form-first",
    "check": "ws-tables15 FORM-FIRST: in the rendered Options panel of mult_facts / div_facts, How it is written (notation / divForm) and the Support choices stand above the Multiply by / Divide by tick list",
    "kind": "commit-pair",
