@@ -4373,6 +4373,13 @@ export function optionICan(categoryId, skillId, opts, baseICan) {
             band = bandDef ? normalizeOptions(categoryId, skillId, opts || {}).band : undefined;
         }
     } catch (e) { return ''; }
+    // A preset re-defaults the band (mult_facts_15 -> 225), but its base I Can line is the host's ("to 12"):
+    // measure "moved" against the HOST's default (lf-ops t15 critic D1, T15-PRESET).
+    if (bandDef) {
+        const pre = presetOf(categoryId, skillId);
+        const hostDef = pre ? optionsFor(pre.categoryId, pre.skillId).find((d) => d.id === 'band') : null;
+        if (hostDef) bandDef = hostDef;
+    }
     const bandMoved = bandDef && band !== undefined && band !== null && band !== bandDef.default;
     const hit = bandMoved ? (bandDef.values || []).find((x) => x.v === band) : null;
     const bandPhrase = hit ? `${String(bandDef.label).toLowerCase()} ${hit.l}` : '';
