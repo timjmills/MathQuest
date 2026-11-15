@@ -11883,6 +11883,45 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-count-tight",
+   "check": "a Guided continuation page of count rows holds them to their measured height (lf-roles r11 X1, critic r10: count_by_tables Guided L seed 972334 page 2, 4 rows at 45.8 mm for ~30 mm ink, EB-BAND 33 %)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-COUNT-TIGHT (browser twin: ws-empty-band EB-BAND guided)",
+   "browser": false,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "60 mm count rows stretched to 79.5 / 78.8 mm on page 2 at M / L"
+   },
+   "pass": {
+    "commit": "d3629b594",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-COUNT-TIGHT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "correct-sound-powerup-once",
+   "check": "ws-correct-sound SOUND-PLAN / SOUND-ONCE: the power-up (square C5 E5 G5 70 ms, C6 400 ms decaying) plays exactly once on a correct answer with Sound on, never on a wrong one or with Sound off, on the card, the worksheet and the quiz at 1280 / 1024",
+   "kind": "commit-pair",
+   "rule": "SOUND-ONCE (owner request 2026-11-14, correct-answer sound \"B, power-up\")",
+   "fail": {
+    "commit": "84f8813a1",
+    "state": "no power-up module: the card played the old triangle arpeggio, the worksheet and the quiz played nothing"
+   },
+   "pass": {
+    "commit": "eed07b7c1",
+    "state": "correct-sound.js, called from answer-check.js, worksheet.js wsRecordAnswer (once per item) and quiz-take.js recordAnswer (instant feedback), gated by the Sound toggle"
+   },
+   "command": "node tests/scripts/ws-correct-sound.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

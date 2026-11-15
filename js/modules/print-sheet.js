@@ -1837,7 +1837,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             if (ink === 'trace' && v === answer) st = 'traced';
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
-        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, guided: !!item.guided, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
         // model for its redraw zone, `fix: 'draw'`); the item itself is never changed. S2: the
         // item's supports ride in the payload the same way (`supports`), so the pupil page, the key
@@ -2312,9 +2312,9 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const ctxCache = new Map();
         // (an item's own drawing flags - wrapToCell, tightRows - are part of its context and its key)
         const ctxOf = (state, level, it = null) => {
-            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows);
-            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}`;
-            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}));
+            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows), guided = !!(it && it.guided);
+            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}${guided ? 1 : 0}`;
+            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}, guided ? { guided: true } : {}));
             return ctxCache.get(k);
         };
         // every drawing, at every column count and state (string work, no layout)
@@ -4573,6 +4573,9 @@ async function buildRoleSheet(n, metaOf) {
             }
             // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
             if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
+            // (lf-algebra, lead ruling 2026-11-14: a cell can tell a GUIDED page's Model and tries from the Opener's / Scripted
+            // Model's at the same scaffold level - the two-step bar drops on Guided - so the Guided role marks its items; ctx.guided)
+            if (mod.ROLE_ID === 'guided') prepared.guided = true;
             prepared.section = 0;
             if (rk) for (const x of rk) shareSeen.add(x);
             if (xk) for (const x of xk) { shareSeen.add(x); pageSeen.add(x); }

@@ -849,7 +849,13 @@ function recordAnswer(flatIdx, studentAnswer, { ladder = true } = {}) {
         // (lf-hosts 2026-11-13) a two-step story's graded equation / estimate boxes count as answer boxes too
         if (!partial && String(studentAnswer).trim() !== '' && [...document.querySelectorAll('.qt-question-card [data-mq-part] input')].some((b) => !filled(b))) partial = true;
     } catch (e) { /* no DOM: not partial */ }
+    const prevAnswer = quizAnswers[flatIdx];
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
+    // owner 2026-11-14: the power-up sound when this item's answer newly turns correct - instant feedback only (a test with
+    // end-of-quiz feedback never gives an answer away), never twice for the same answer; gated by the Sound toggle
+    if (correct && !partial && !(prevAnswer && prevAnswer.correct && prevAnswer.studentAnswer === String(studentAnswer))
+        && state.currentQuiz && state.currentQuiz.settings && state.currentQuiz.settings.showFeedback === 'instant'
+        && typeof window !== 'undefined' && typeof window.playCorrectSound === 'function') window.playCorrectSound();
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
     // with the answer (a short list of ids).
     const test = state.currentQuiz;
