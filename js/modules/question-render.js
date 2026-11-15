@@ -4774,6 +4774,7 @@ function _renderQuestionImpl() {
         host.innerHTML = "";
 
         import('./widgets/number-line-extended.js').then(mod => {
+            resetRetryState();
             mod.renderNumberLineExtended(q, host);
             mod.setOnNumberLineSubmit((qq, st) => {
                 const correct = mod.checkNumberLineExtended(qq, st);
@@ -4799,75 +4800,29 @@ function _renderQuestionImpl() {
                     }
                 }
 
-                const feedback = document.getElementById("feedbackArea");
-                if (feedback) {
-                    feedback.style.display = "block";
-                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
-                    let displayAns;
-                    if (isMulti) {
-                        displayAns = qq.ans.map(m => `${m.label || m.id} = ${m.value}`).join(', ');
-                    } else {
-                        displayAns = qq.ans;
-                    }
-                    feedback.innerHTML = correct
-                        ? "🎉 Correct!"
-                        : `Not quite. The answer is ${displayAns}.`;
-                }
-
-                // ===== REVIEW MODE BRANCH =====
-                if (typeof state._reviewingQIndex === 'number'
-                    && state._reviewingQIndex >= 0
-                    && state.mapMode !== true) {
-                    if (typeof window.applyReviewOutcome === 'function') {
-                        window.applyReviewOutcome(correct, JSON.stringify(st));
-                    }
-                    return;
-                }
-
-                // Route through the existing pipeline
-                state.lastAnswerCorrect = correct;
-                state.hasAnswered = true;
-                if (correct) {
-                    state.score++;
-                    state.sessionStreak++;
-                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
-                    document.getElementById("questionCard").classList.add("correct-bg");
-                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
-                    if (typeof window.confetti === 'function') window.confetti();
-                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
-                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
-                } else {
-                    document.getElementById("questionCard").classList.add("incorrect-bg");
-                    state.sessionStreak = 0;
-                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
-                }
-                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
-                // Snapshot for the dot-row redo feature.
-                if (typeof window.recordQuestionStatus === 'function') {
-                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
-                        q: qq || state.currentQ,
-                        userAnswer: 'widget',
-                    });
-                }
-                trackSkillAnswer(correct);
-                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
-                if (typeof window.recordPracticeLog === 'function') {
-                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-                    window.recordPracticeLog(sk, correct, tm);
-                }
-
-                // MAP mode hand-off
-                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
-                    window.recordMapAnswer({ correct });
-                    return;
-                }
-
-                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
-                    setTimeout(() => {
-                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
-                    }, 800);
-                }
+                // Owner bug 2026-11-15 ("if a student gets it wrong they cannot move it afterwards"):
+                // the shared multi-place handler scores the first try once, keeps a wrong try open for
+                // a retry (the markers unlock and can be moved again) and locks only a correct one.
+                let wrongCount = 1, totalScored = 1;
+                if (isMulti) {
+                    const tol = (typeof qq.tolerance === 'number' && qq.tolerance >= 0) ? qq.tolerance
+                        : (typeof qq.minorSnap === 'number' && qq.minorSnap > 0 ? qq.minorSnap / 2 : 0.001);
+                    totalScored = qq.ans.length;
+                    wrongCount = qq.ans.filter(m => {
+                        const v = (st && typeof st === 'object') ? st[m.id] : null;
+                        return !(v != null && Math.abs(v - m.value) <= tol + 1e-9);
+                    }).length;
+                } else if (correct) wrongCount = 0;
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect: correct,
+                    wrongCount,
+                    totalScored,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => { if (nleHost && nleHost._nleUnlockForRetry) nleHost._nleUnlockForRetry(); },
+                    onLockOnAllCorrect: () => { resetAttemptTracking(); },
+                });
             });
         }).catch(err => console.error('Failed to load number-line-extended widget:', err));
 
