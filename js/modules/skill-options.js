@@ -756,7 +756,13 @@ function _pvRoundNl(id) {
 }
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit(), _pvWriteValue()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions(),
+        // owner bug fix 2026-11-15 ("I don't want students typing hundreds"): unit form is a number plus a place word
+        // CHOSEN from a bank, or the value typed in one box. Appended last (share codes).
+        { id: 'answerAs', label: 'Answer as', type: 'enum', default: 'unit', group: 'layout',
+            appliesTo: (cur) => cur.form === 'unit', appliesBase: { form: 'unit' },
+            values: [{ v: 'unit', l: 'A number, then choose the place word (6 hundreds)' }, { v: 'value', l: 'The value in one box (600)' }],
+            help: 'Pupils never type a place word: they type the number and tap the word, or type the value.' }],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',

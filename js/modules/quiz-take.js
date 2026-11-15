@@ -15,7 +15,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor,
-    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
 
@@ -213,7 +213,7 @@ function updateQuizTimer() {
 // and optional: a quiz saved before this reads exactly as it did.
 const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlanksData', 'target', 'maxPlace',
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
-    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
+    'operands', 'placeTapBank', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
     'cell', 'skillId', 'categoryId', 'pv',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
@@ -482,6 +482,7 @@ function _mountQuizCell(flatIdx) {
             }
         }
         if (vis) wireClozeBanks(vis);
+        if (vis && inp && qd && qd.placeTapBank) wirePlaceWordBank(vis, inp, qd);
         // a drawing with its own answer boxes (fact family, area model) answers through them: the
         // answer line under it is not drawn (H8)
         if (vis && inp && area && area.isConnected && wireDrawnAnswers(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordSlotAnswer(flatIdx, v); } })) {
