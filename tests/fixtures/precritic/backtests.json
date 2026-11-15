@@ -11874,7 +11874,7 @@
     "state": "optionICan compares the preset's band with the preset's own re-defaulted 225, sees no move, and leaves 'I Can multiply facts to 12'"
    },
    "pass": {
-    "commit": "40149f0b7",
+    "commit": "9040a38b5",
     "state": "band moved is measured against the host's default (144), so the preset line reads 'to 15' like the host at 225"
    },
    "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-PRESET --skill multiplication:mult_facts,division:div_facts",
