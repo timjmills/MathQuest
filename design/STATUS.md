@@ -915,3 +915,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-14 — Deploy correct-answer sound (owner request; lf-checks critic 9/9/10/9)
 - A correct answer plays a short rising four-note power-up (C5-E5-G5-C6, Web Audio, no file) on the card, worksheet and quiz, only when SOUND is on; never on a wrong answer; silent in end-only-feedback quizzes. ws-correct-sound 18/18.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy mixed facts: ÷ joins the + − × grid; bracket-fact answer room (owner request; lf-ops narrow critic 9/9/8/9)
+- Mixed-up / In-sections quick print: ÷ facts in their sign forms join the one fact grid (no separate "Divide." section), stacked like + − ×, ones aligned (MIXED-ALL-OPS). Long-division bracket facts: quotient row ≥ writing height (LDIV-FACT-ROOM); in Mix grids only the brackets are lowered. ws-fact-mix on precritic.
+- ws-simple-print MIXBASE / SLOTPOS follow lead ruling (a): in Mix rows holding brackets and other forms, the brackets keep one baseline among themselves and the row centring / slot lines are measured on the non-bracket items.
+- Gates: all deploy gates OK; ws-key-json full sweep crashes on unchanged master after the container restart (environment), run on the changed fact skills: OK (5 skills, 85 sheets).

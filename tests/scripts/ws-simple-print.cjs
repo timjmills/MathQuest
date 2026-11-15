@@ -845,22 +845,35 @@ async function factsR4(app) {
                     const byRow = new Map();
                     g.cells.forEach((x) => { const key = Math.round(x.cell.t); if (!byRow.has(key)) byRow.set(key, []); byRow.get(key).push(x); });
                     let worstBase = 0, worstH = 0, worstV = 0, worstSlot = 0, worstBr = 0, hidden = 0;
-                    for (const cs of byRow.values()) {
-                        const bases = cs.map((x) => x.base).filter((v) => v !== null);
-                        worstBase = Math.max(worstBase, mm(Math.max(...bases) - Math.min(...bases)));
+                    for (const all of byRow.values()) {
+                        // Lead ruling (a), 2026-11-14 (lf-ops LDIV-FACT-ROOM): in a Mix row that holds brackets AND other forms,
+                        // only the brackets are lowered (room for the quotient). The brackets keep one baseline among themselves,
+                        // the other forms keep theirs, and the row's centring and slot lines are measured on the non-bracket items.
+                        const brs = all.filter((x) => x.kind === 'bracket'), rest = all.filter((x) => x.kind !== 'bracket');
+                        const lowered = brs.length > 0 && rest.length > 0;
+                        const cs = lowered ? rest : all;
+                        // ruling (a): in a grid that holds brackets every row shares the bracket's (taller) row height and the
+                        // brackets are lowered, so a row's items are not centred down the cell by design (critic mixfacts C3 note)
+                        const brOnly = g.cells.some((y) => y.kind === 'bracket');
+                        for (const grp of lowered ? [brs, rest] : [all]) {
+                            const bases = grp.map((x) => x.base).filter((v) => v !== null);
+                            if (bases.length > 1) worstBase = Math.max(worstBase, mm(Math.max(...bases) - Math.min(...bases)));
+                        }
+                        if (lowered) for (const x of brs) if (x.ink) worstH = Math.max(worstH, Math.abs(mm((x.ink.l + x.ink.r) / 2 - (x.cell.l + x.cell.r) / 2)));
+                        if (lowered) hidden += brs.filter((x) => !x.slot || !x.slot.visible).length;
                         for (const x of cs) if (x.ink) worstH = Math.max(worstH, Math.abs(mm((x.ink.l + x.ink.r) / 2 - (x.cell.l + x.cell.r) / 2)));
                         // the row's items (ink and slots) centred down the cell, below the number tab
                         const top = Math.min(...cs.map((x) => Math.min(x.ink ? x.ink.t : Infinity, x.slot ? x.slot.t : Infinity)));
                         const bot = Math.max(...cs.map((x) => Math.max(x.ink ? x.ink.b : -Infinity, x.slot ? x.slot.b : -Infinity)));
                         const c0 = cs[0];
                         const areaT = c0.tabB + 96 / 25.4, areaB = c0.cell.b - 2 * 96 / 25.4;
-                        worstV = Math.max(worstV, Math.abs(mm((top + bot) / 2 - (areaT + areaB) / 2)));
+                        if (!brOnly) worstV = Math.max(worstV, Math.abs(mm((top + bot) / 2 - (areaT + areaB) / 2)));
                         // slots: under-slots end on one line; a bracket's slot ends on the row's top digit line
                         const under = cs.filter((x) => x.kind !== 'bracket' && x.slot).map((x) => x.slot.b);
                         if (under.length > 1) worstSlot = Math.max(worstSlot, mm(Math.max(...under) - Math.min(...under)));
                         const line1 = cs.filter((x) => x.kind !== 'bracket' && x.top !== null).map((x) => x.top);
                         // (the slot's foot sits on the vinculum, the top line's digits' baseline 0.2 em above it: 0.3 em or 1.5 mm)
-                        for (const x of cs.filter((y) => y.kind === 'bracket' && y.slot)) if (line1.length) worstBr = Math.max(worstBr, Math.abs(mm(x.slot.b - Math.max(...line1))) - Math.max(0, 0.3 * x.pt * 25.4 / 72 - 1.5));
+                        if (!lowered) for (const x of cs.filter((y) => y.kind === 'bracket' && y.slot)) if (line1.length) worstBr = Math.max(worstBr, Math.abs(mm(x.slot.b - Math.max(...line1))) - Math.max(0, 0.3 * x.pt * 25.4 / 72 - 1.5));
                         hidden += cs.filter((x) => !x.slot || !x.slot.visible).length;
                     }
                     const at = `${tag} page ${k + 1} grid ${gi + 1}`;
