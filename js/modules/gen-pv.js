@@ -279,6 +279,9 @@ function genPlace(q, skill, o) {
             q.options = [];
             q.acceptedAnswers = [PLACE_WORD[place], PLACE_WORD[place].replace(/s$/, '')];
             q.wordBank = words.slice();
+            q.placeTapBank = words.slice();   // owner ruling 2026-11-15: tapped on screen, never typed
+            // the paper keeps its instruction (q.printText); the screen asks for the tap (the value is a paper-only box)
+            q.text = 'Choose the place of the underlined digit.';
             q.visual = `${numeralVis}<div class="pv-bank" style="margin:8px auto 0;display:table;border:2px solid #000;border-radius:10px;`
                 + `padding:4px 14px;font-weight:700;color:#000;">${words.join('&nbsp;&nbsp;&nbsp;')}</div>`;
             q.pv = { kind: 'place', n, place, digit, support, response: 'bank', repeat, writeValue };

@@ -18,7 +18,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt, wirePlaceWordBank,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
@@ -1752,6 +1752,7 @@ function _applyScreenCell() {
         // A printed "Check one box." cell is tapped, not typed (PEDAGOGY 10.2, SP-3).
         if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
         if (visualAid) { wireRingGroups(visualAid); wireClozeBanks(visualAid); }
+        if (visualAid && input && q.placeTapBank) wirePlaceWordBank(visualAid, input, q);
     }
     // Green as soon as it is right (owner request 2026-09-25): every digit box, regroup box and
     // answer slot of the cell marks itself when its value is the one it should hold.

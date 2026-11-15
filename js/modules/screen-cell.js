@@ -3095,6 +3095,45 @@ export function wireClozeBanks(root) {
 }
 
 /**
+ * Owner ruling 2026-11-15 ("students never type a place word"): an item whose answer is a place word chosen from a
+ * printed bank (`q.placeTapBank`, placevalue:identify response "bank") is TAPPED on screen: the host's one answer
+ * input turns read-only and the bank's words become buttons under the cell that write the word into it.
+ * Returns true when it wired a bank.
+ */
+export function wirePlaceWordBank(root, input, q) {
+    const words = q && Array.isArray(q.placeTapBank) ? q.placeTapBank : null;
+    if (!root || !input || !words || !words.length || typeof document === 'undefined') return false;
+    input.readOnly = true;
+    input.setAttribute('inputmode', 'none');
+    input.classList.add('mq-wordpick');
+    input.setAttribute('aria-label', 'the place you chose');
+    if (root.querySelector('.mq-placebank')) return true;
+    // the printed bank (words to read) is replaced by the tap bank
+    root.querySelectorAll('.pv-bank').forEach((el) => { el.style.display = 'none'; });
+    const row = document.createElement('div');
+    row.className = 'mq-placebank';
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', 'Choose the place');
+    words.forEach((w) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mq-banktile mq-placetile';
+        b.dataset.v = w;
+        b.textContent = w;
+        b.addEventListener('click', () => {
+            if (input.disabled) return;
+            input.value = w;
+            row.querySelectorAll('.mq-placetile').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        row.appendChild(b);
+    });
+    root.appendChild(row);
+    return true;
+}
+
+/**
  * The number strip of a grid-fill item (number_seq_fill, count_by_*): given tiles in ink, one
  * boxed slot per missing number, wrapping to a second row on a phone instead of crushing the
  * tiles. No range caption: "Numbers 64-73" states the first and last answers (regrade C2).

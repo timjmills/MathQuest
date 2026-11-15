@@ -127,6 +127,37 @@ async function answer(page, num, word) {
             else if (!ok.ok) fail(`${tag}: ${info.ans} not marked correct`);
             else console.log(`  ok ${tag}`);
         }
+        // 6. placevalue:identify, response bank: the place word is TAPPED into a read-only slot, never typed
+        for (const seed of SEEDS.slice(0, 3)) {
+            await fresh(seed);
+            const r = await page.evaluate(() => {
+                const st = window.state;
+                window.clearSetOptions({ silent: true });
+                window.setSetOptions('placevalue', 'identify', { response: 'bank' }, { silent: true });
+                st.category = 'placevalue'; st.skill = 'identify'; st.range = 1000; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+                window.showView('gameView');
+                const q = window.generateQuestion(); st.currentQ = q; window.renderQuestion();
+                return { ans: q.ans };
+            });
+            await new Promise((res) => setTimeout(res, 200));
+            const tag = `identify bank seed ${seed} (ans "${r.ans}")`;
+            const out = await page.evaluate((ans) => {
+                const card = document.querySelector('#questionCard');
+                const vis = (el) => el.offsetWidth > 0 && el.offsetHeight > 0;
+                const typable = Array.from(card.querySelectorAll('input')).filter((i) => vis(i) && !i.readOnly);
+                const tiles = Array.from(card.querySelectorAll('.mq-placetile')).filter(vis);
+                const small = tiles.filter((b) => b.offsetHeight < 48 || b.offsetWidth < 48).map((b) => b.dataset.v);
+                const tile = tiles.find((b) => b.dataset.v === ans);
+                const before = window.state.score;
+                if (tile) { tile.click(); if (!window.state.hasAnswered) window.submitAnswer(); }
+                return { typable: typable.length, tiles: tiles.length, small, ok: window.state.score > before, hasTile: !!tile };
+            }, r.ans);
+            if (out.typable) fail(`${tag}: ${out.typable} typable box(es) for the place word`);
+            if (!out.hasTile) fail(`${tag}: no bank button "${r.ans}" (${out.tiles} buttons)`);
+            if (out.small.length) fail(`${tag}: bank buttons under 48 px: ${out.small.join(', ')}`);
+            if (out.hasTile && !out.ok) fail(`${tag}: tapping "${r.ans}" not marked correct`);
+            if (!out.typable && out.hasTile && out.ok && !out.small.length) console.log(`  ok ${tag}`);
+        }
     } catch (e) { fail('error: ' + (e && e.stack || e)); }
     await close();
     console.log(fails.length ? 'ws-unit-form-bank: FAIL' : 'ws-unit-form-bank: OK');

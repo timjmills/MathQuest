@@ -17,7 +17,7 @@ import {
     wireTickBoxes, adoptVisualBlank, wireCellSlots, wordWorkScreenFilled,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback, blurVocabSlots,
     fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
-    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
 
@@ -1736,6 +1736,7 @@ function _wsRenderCard(grid, q, i) {
             }
         }
         wireStackEntry(cellEl);
+        if (q && q.placeTapBank) wirePlaceWordBank(cellEl, document.getElementById(`ws_input_${i}`), q);
         // green as soon as it is right (owner request 2026-09-25): digit, regroup and answer boxes
         try { wireLiveCorrect(cellEl, { q, kind, single: document.getElementById(`ws_input_${i}`) }); } catch (e) { /* optional */ }
         {
