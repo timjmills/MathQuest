@@ -8,7 +8,7 @@ Spend at the stop: session cost_usd about $1,165 (baseline $756.09).
 |---|---|---|
 | div_facts / add_facts arrays (divship) | -lf-ops-divship | LIVE (master e9cb5797c) |
 | Long-division bracket: joined (LDIV-JOIN, -RASTER), near-straight (LDIV-SHAPE), bigger work boxes at 4 a page (LDIV-ROOM) | -lf-ops-ldiv @ 0b98813ea | every narrow critic PASS; owner approved the boxes as they are; lead deploying |
-| Mixed facts: ÷ inside the shared grid (MIXED-ALL-OPS), room above fact brackets (LDIV-FACT-ROOM) | -lf-ops-mixfacts @ 638971967 | narrow critic PASS 9/9/8/9; lead deploying |
+| Mixed facts: ÷ inside the shared grid (MIXED-ALL-OPS), room above fact brackets (LDIV-FACT-ROOM) | -lf-ops-mixfacts @ 638971967 | narrow critic PASS 9/9/8/9. **Deploy NOT pushed** (lead, 2026-11-15): merged with master 55cbe72d2, ws-simple-print FAILs 6 rows on the OWNER ÷ Mix p1 c9 grid-2 cases (mixed and sections): MIXBASE (baselines 4.8 mm apart, items 2.9 mm off centre) and SLOTPOS (quotient slot 4.8 mm off the top digit line). Ruling (a) contradicts simple-print's one-baseline rule. **First item after the reset:** update MIXBASE / SLOTPOS to ruling (a) (bracket rows in Mix grids are measured against the bracket's own baseline, still ±1 mm among the brackets), drop simple-print's S cases (no-size-s), add a FAIL / OK backtest, rerun the gates and send the head to the lead. |
 
 ## In progress or parked, in resume order
 1. **Tables to 15 × 15 + presets + "How it is written" first** (owner 2026-11-14): -lf-ops-t15 @ 01e8f5498 (from 84f8813a1), stopped at the owner stop.
