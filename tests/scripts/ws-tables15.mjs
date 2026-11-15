@@ -141,11 +141,16 @@ try {
                 const pdefs = so.optionsFor(a.cat, a.preset);
                 const pb = pdefs.find((d) => d.id === 'band');
                 if (!pb || pb.default !== 225) out.preset.push(`${pkey}: its "Tables to" default is ${pb && pb.default}, not 225`);
-                // the preset's "I Can" line names 15 like its host at band 225 (critic t15 D1: it read "to 12")
-                if (typeof so.optionICan === 'function') {
-                    const base = a.cat === 'division' ? 'I Can divide facts to 12' : 'I Can multiply facts to 12';
-                    const pl = so.optionICan(a.cat, a.preset, {}, base), hl = so.optionICan(a.cat, a.id, { band: 225 }, base);
-                    if (pl !== hl || !/15/.test(pl)) out.preset.push(`${pkey}: its I Can line is "${pl || base}", the host at 15 x 15 reads "${hl}"`);
+                // the preset PAGE's "I Can" title names 15, as the host page at band 225 does (critic t15 D1: it read "to 12")
+                {
+                    const titleOf = async (skillId, opts) => {
+                        let sh = null;
+                        try { sh = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: a.cat, skillId, opts }], count: 'auto', columns: 'auto' }], size: 'M', look: 'auto', paper: 'A4', seed: 4242, key: true }); } catch (e) { return 'ERR ' + (e && e.message); }
+                        const m = String(sh && sh.pupilHtml || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').match(/I Can [^.]*?(?:to 1[0-9]|\))/);
+                        return m ? m[0].trim() : '(no I Can line)';
+                    };
+                    const pl = await titleOf(a.preset, {}), hl = await titleOf(a.id, { band: 225 });
+                    if (pl !== hl || !/15/.test(pl)) out.preset.push(`${pkey}: its page title is "${pl}", the host page at 15 x 15 reads "${hl}"`);
                 }
                 const q = window.generateQuestionFor({ category: a.cat, skill: a.preset, seed: 5, itemIndex: 0 });
                 if (!q || q.__error) out.preset.push(`${pkey}: generateQuestionFor gave nothing`);
