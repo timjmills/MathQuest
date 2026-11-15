@@ -381,6 +381,9 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-11-12 chartwindow card preset (hundreds_chart_fill band 120). ZG, the next free code after ZF (ZW-ZZ
     // are taken by the lf-algebra lane). APPEND ONLY. ----
     "composing:chart_to_120": "ZG",
+    // ---- 2026-11-14 lane lf-ops t15 presets (mult_facts / div_facts at "Tables to 15 x 15"). ZH and ZJ (no I or O in a code), the next free codes
+    // after ZG. APPEND ONLY. ----
+    "multiplication:mult_facts_15": "ZH", "division:div_facts_15": "ZJ",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

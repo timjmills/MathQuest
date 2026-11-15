@@ -11845,6 +11845,66 @@
    }
   },
   {
+   "id": "tables15",
+   "check": "ws-tables15 T15-BAND / T15-DEAL / T15-TICKS / T15-FIT / T15-PRESET: Tables to 15 x 15 (band 225) on mult_facts and div_facts deals the 13-15 tables within the band, shows the 13-15 ticks only under it, fits the M / L independent page at the fact size, and the presets mult_facts_15 / div_facts_15 open the host at 225",
+   "kind": "commit-pair",
+   "rule": "T15 (owner request 2026-11-14, lane lf-ops t15: tables to 15 x 15, a distinct size recorded as an option AND a preset skill)",
+   "fail": {
+    "commit": "84f8813a1",
+    "state": "Tables to offers 10 x 10 and 12 x 12 only; no 13-15 tick, no 13-15 fact dealt; no mult_facts_15 / div_facts_15"
+   },
+   "pass": {
+    "commit": "ed4ebc923",
+    "state": "band 225 (15 x 15) offered; 150 items deal every table 0-15 within 225; ticks 13-15 only under 15 x 15; M / L pages fit at the 12 x 12 digit size; both presets live with code, standards, WRM and search terms"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-BAND,T15-DEAL,T15-TICKS,T15-FIT,T15-PRESET --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "t15-preset-ican",
+   "check": "ws-tables15 T15-PRESET: the preset pages mult_facts_15 / div_facts_15 carry the same I Can line as their host at band 225 ('... to 15'), never the host's default 'to 12'",
+   "kind": "commit-pair",
+   "rule": "T15-PRESET (critic t15 D1, 2026-11-15)",
+   "fail": {
+    "commit": "26f8028a9",
+    "state": "optionICan compares the preset's band with the preset's own re-defaulted 225, sees no move, and leaves 'I Can multiply facts to 12'"
+   },
+   "pass": {
+    "commit": "9040a38b5",
+    "state": "band moved is measured against the host's default (144), so the preset line reads 'to 15' like the host at 225"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-PRESET --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tables15-form-first",
+   "check": "ws-tables15 FORM-FIRST: in the rendered Options panel of mult_facts / div_facts, How it is written (notation / divForm) and the Support choices stand above the Multiply by / Divide by tick list",
+   "kind": "commit-pair",
+   "rule": "FORM-FIRST (owner request 2026-11-14: How it is written sat below 13 tick rows and was easy to miss)",
+   "fail": {
+    "commit": "45f7f8b6f",
+    "state": "the panel order is constant > (divForm) > band > support (> notation): the form and support stand below the tick list"
+   },
+   "pass": {
+    "commit": "ed4ebc923",
+    "state": "the tick list is the last group, Which facts: divForm / notation and support stand above it; the option list and codec order are unchanged"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules FORM-FIRST --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "guided-count-tight",
    "check": "a Guided continuation page of count rows holds them to their measured height (lf-roles r11 X1, critic r10: count_by_tables Guided L seed 972334 page 2, 4 rows at 45.8 mm for ~30 mm ink, EB-BAND 33 %)",
    "kind": "commit-pair",

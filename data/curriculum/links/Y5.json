@@ -3682,6 +3682,10 @@
       "band": 10000
      },
      "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:mult_facts_15",
+     "why": "13 x 14 and 15 x 15 known as facts (2-digit x 2-digit products to 225), for checking each partial product"
     }
    ],
    "preBuild": [],

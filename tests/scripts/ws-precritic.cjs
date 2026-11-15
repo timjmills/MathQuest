@@ -1073,6 +1073,11 @@ function buildPlan(ctx) {
         const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
         // (lf-ops divarray r2, owner rule 2026-11-13: the div_facts support-aid page rules of critics r6 / r7 - EB-PAGE on Test and the
         // fade packet, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX - restored as ws-fact-pages after the deploy dropped them)
+        // (lf-ops t15, owner 2026-11-14: "Tables to 15 x 15" on the x / ÷ fact drills and their presets - the band, the deal to 15 x 15
+        // within the band, the 13-15 ticks only under it, the M / L pages fit at the fact size, the presets open the host at 225 - and
+        // FORM-FIRST, the panel's "How it is written" and Support above the tick list)
+        const t15Keys = keys.filter((k) => /^(multiplication:mult_facts|division:div_facts)(_15)?$/.test(k));
+        if (t15Keys.length) add(gate('tables15', 'ws-tables15 (T15-BAND, T15-DEAL, T15-TICKS, T15-FIT, T15-PRESET, FORM-FIRST)', t15Keys.join(','), 'browser', 'ws-tables15', ['--skill', t15Keys.join(',')], { missingMsg: 'ws-tables15 is not in this tree' }));
         const factPageKeys = keys.filter((k) => k === 'division:div_facts');
         if (factPageKeys.length) add(gate('fact-pages', 'ws-fact-pages --page-only (div_facts support-aid page rules: EB-PAGE, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX)', factPageKeys.join(','), 'browser', 'ws-fact-pages',
             ['--skill', factPageKeys.join(','), '--page-only', '--hosts', 'none', '--no-baseline', '--rules', 'EB-PAGE,EB-PAD,EB-COLS,EB-TESTEQ,EB-GAP,EB-FACTX'], { missingMsg: 'no tests/scripts/ws-fact-pages.cjs' }));

@@ -29,7 +29,7 @@ import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole, factTableTop } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -151,10 +151,10 @@ function divUnderTabSection(sec, size) {
     // green - and the taller row would only cost the page a row: ws-print-lint --supports boxsign L H13 32 %)
     const sup = Array.isArray(o.support) ? o.support : [];
     if (!sec.divFade && sup.length && sup.every((v) => v === 'boxsign')) return false;
-    const top = Number(o.band) === 100 ? 10 : 12;
+    const top = factTableTop(o.band);
     let t = o.constant;
     if (typeof t === 'number' || typeof t === 'string') t = [t];
-    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: top + 1 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
     if (!ticked.length) return false;
     const b = Math.max(...ticked);
     return String(b * top).length + String(b).length >= 5;
@@ -2832,7 +2832,7 @@ function optionTitleBase(sk, baseICan) {
     if (!bandPhrase) return '';
     // A mixed page: the skill's own title with its default bound swapped for the chosen one
     // ("I Can add facts to 20" -> "to 10"; the ×/÷ tables name their largest factor).
-    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const tok = (v) => (v === 144 ? '12' : v === 225 && bandDef.default === 144 ? '15' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
 }

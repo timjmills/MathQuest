@@ -442,7 +442,7 @@ export const VALUE_TOKENS = Object.freeze({
 // 10 -> "A"). Listed so the union below is complete: a later string token may not take a
 // character one of these already uses. APPEND a value here when a skill starts offering it.
 export const NUMERIC_SET_VALUES = Object.freeze({
-    constant: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+    constant: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
     level: Object.freeze([0, 1, 2, 3]),
     step: Object.freeze([0, 1, 2, 15, 30]),
     dir: Object.freeze([0, 1]),
