@@ -11854,7 +11854,7 @@
     "state": "Tables to offers 10 x 10 and 12 x 12 only; no 13-15 tick, no 13-15 fact dealt; no mult_facts_15 / div_facts_15"
    },
    "pass": {
-    "commit": "ed4ebc923",
+    "commit": "9040a38b5",
     "state": "band 225 (15 x 15) offered; 150 items deal every table 0-15 within 225; ticks 13-15 only under 15 x 15; M / L pages fit at the 12 x 12 digit size; both presets live with code, standards, WRM and search terms"
    },
    "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-BAND,T15-DEAL,T15-TICKS,T15-FIT,T15-PRESET --skill multiplication:mult_facts,division:div_facts",
