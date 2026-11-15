@@ -1,7 +1,7 @@
 # lf-ops — hand-over at the owner's budget stop (2026-11-14)
 
 The lane stopped on the lead's order: only 1–2 % of the week was left. Resume after the Thursday 22:00 UTC reset.
-Spend at the stop: session cost_usd about $1,165 (baseline $756.09).
+Spend at the stop: session cost_usd $1,216.42 (2026-11-15) (baseline $756.09).
 
 ## Live or with the lead for deploy
 | Work | Branch @ head | State |
@@ -11,22 +11,16 @@ Spend at the stop: session cost_usd about $1,165 (baseline $756.09).
 | Mixed facts: ÷ inside the shared grid (MIXED-ALL-OPS), room above fact brackets (LDIV-FACT-ROOM) | -lf-ops-mixfacts @ 638971967 | narrow critic PASS 9/9/8/9. **Deploy NOT pushed** (lead, 2026-11-15): merged with master 55cbe72d2, ws-simple-print FAILs 6 rows on the OWNER ÷ Mix p1 c9 grid-2 cases (mixed and sections): MIXBASE (baselines 4.8 mm apart, items 2.9 mm off centre) and SLOTPOS (quotient slot 4.8 mm off the top digit line). Ruling (a) contradicts simple-print's one-baseline rule. **First item after the reset:** update MIXBASE / SLOTPOS to ruling (a) (bracket rows in Mix grids are measured against the bracket's own baseline, still ±1 mm among the brackets), drop simple-print's S cases (no-size-s), add a FAIL / OK backtest, rerun the gates and send the head to the lead. |
 
 ## In progress or parked, in resume order
-1. **Tables to 15 × 15 + presets + "How it is written" first** (owner 2026-11-14): -lf-ops-t15 @ 01e8f5498 (from 84f8813a1), stopped at the owner stop.
-   **Built:**
-   - band 225 on mult_facts and div_facts, through one `factTableTop()` helper;
-   - the 13–15 ticks, shown only under 15 × 15;
-   - presets `mult_facts_15` (ZH, grade 4) and `div_facts_15` (ZJ, grade 5; the commit message of 45f7f8b6f wrongly says ZI), each with tags, search terms and links;
-   - the tick list last in the panel, under "Which facts" (display order only; the codec is unchanged).
-   **Check:** `ws-tables15.mjs` (T15-*, FORM-FIRST): 24 findings on 84f8813a1, OK on the fix. Backtests `tables15` and `tables15-form-first` PASS; on precritic; ledger rows added.
-   **Card:** facts card resigned UNSIGNED, sha256 a8a2fbef321e94145c39e5da3f1f9cebc6f881e58b4534a373c8fceda96c289d (blob 667b5786c7f1). It needs the lead's signature.
-   **Hash proof:** 40 default hashes match master.
-   **Gates:** boot-smoke, code-snapshot (741), content-audit, standards, search-terms, wrm, presets-unit, redesign-passed and codec-registry (except msChoose, which fails on master too) all pass.
-   **Not done:**
-   - precritic `--strict` for mult_facts and div_facts. The killed run showed reds in options-verify, empty-band, cell-checks `--card`, sibling-compare and print-lint `--supports array`, not yet compared with master. Look first at whether options-verify and cell-checks' pins fail to cover band 225 and 13–15;
-   - ws-fact-pages;
-   - the PNGs (scripts ready in scratchpad t15/);
-   - ws-catalogue regeneration.
-   Then the narrow critic.
+1. **Tables to 15 × 15 + presets + panel order:** -lf-ops-t15 @ c5adcd2fc. The card is signed (6e3fa9eb8) and precritic is compared with master (only one branch-caused red, now fixed).
+   **Narrow critic FAIL on ONE defect** (C2 7, the others 9): D1, the `mult_facts_15` preset page reads "I Can multiply facts to 12".
+   - Cause: optionICan in skill-options.js. The preset re-defaults band to 225, so band equals the default and there is no rewrite.
+   - Ledgered (fail 26f8028a9). Report: design/audit/runs/lf-ops/critic-t15.md.
+   **Resume:**
+   - check first: T15-PRESET compares the preset's I Can line with the host's;
+   - fix optionICan;
+   - re-check the preset page only (~$5–8);
+   - send the head to the lead to deploy.
+   Nits: the panel title keeps "(÷1 to ÷12)" under 15 × 15; a "Support" heading sits over a "Support" label.
 2. **count_by_tables r4** (-lf-ops-props @ 4c249ee1d, with lf-checks eblast 2225965ce merged). F1 (Pre-skill check L 10 → 14 items) and m1–m3 are fixed, each check first (backtests 5/5). Precritic reds are routed classes only.
    **Before its narrow critic:**
    - hash-prove that passed skills are unchanged, because the pre-skill-check role and the print-sheet.js retitle are shared code;
