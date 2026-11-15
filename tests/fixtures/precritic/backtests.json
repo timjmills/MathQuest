@@ -11882,6 +11882,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mixed-all-ops",
+   "check": "ws-fact-mix MIXED-ALL-OPS (owner 2026-11-14, Mixed facts quick print within 20 / Medium / 6 columns printed ÷ in its own \"Divide.\" section): a fact-rows print of + − × and ÷ facts (div_facts Standard) holds ÷ in the ONE shared grid on every pupil page - no grid of ÷ alone, all four signs on page 1, Mixed up interleaving ÷ through the rows - at M / L, Columns 6 / 8 / Auto, In sections and Mixed up, Pages 1 and 2; ÷ alone stays ÷ only",
+   "kind": "fixture",
+   "rule": "ws-fact-mix MIXED-ALL-OPS",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/fact-mix/fail.json",
+    "state": "84f8813a1 measured (MQ_ROOT, ws-fact-mix --json): + − × in one grid, ÷ in its own Divide. grid under it on every case"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/fact-mix/pass.json",
+    "state": "the fix measured (lf-ops mixfacts): ÷ dealt into the + − × grid (simple-print.js buildFacts, signDiv)"
+   },
+   "command": "node tests/scripts/ws-fact-mix.cjs --rules MIXED-ALL-OPS --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-fact-room",
+   "check": "ws-fact-mix LDIV-FACT-ROOM (owner 2026-11-14: \"10 ⟌ 70\", \"2 ⟌ 6\" squished beside a fraction): on a fact-rows page with div_facts' long-division form the free height over the bar (to the cell's inner top, or 1 mm under the number tab) is at least the size's writing height (M 8, L 10 mm) - Long alone, Mix, Long with + − ×, teacher print and simple print, M / L, Columns Auto / 6 / 9",
+   "kind": "fixture",
+   "rule": "ws-fact-mix LDIV-FACT-ROOM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/fact-mix/fail.json",
+    "state": "84f8813a1 measured: Mix at 9 columns 7.70 mm (M) / 7.13 mm (L), the simple print's shared page 6.64 mm (M)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/fact-mix/pass.json",
+    "state": "the fix measured: the bracket fact's quotient row is at least Hw (cells/long-division.js factRoom)"
+   },
+   "command": "node tests/scripts/ws-fact-mix.cjs --rules LDIV-FACT-ROOM --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
