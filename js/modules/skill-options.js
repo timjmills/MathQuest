@@ -1035,6 +1035,8 @@ const _opsTableConstant = (label, titleVerb) => {
     c.tableBand = true;
     c.group = 'facts';      // the panel draws the tick list last, under "Which facts" (skill-options-ui.js OPTION_GROUPS)
     c.valueHide = (cur) => (factTableTop(cur && cur.band) < 15 ? [13, 14, 15] : []);
+    // (a hidden tick is tried where it IS offered, on "Tables to 15 x 15": ws-options-verify valueBase)
+    c.valueBase = { 13: { band: 225 }, 14: { band: 225 }, 15: { band: 225 } };
     return c;
 };
 const _opsColumnLevel = () => levelSubset([3, 2, 1], 1,
