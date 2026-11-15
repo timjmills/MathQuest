@@ -16,12 +16,12 @@ Spend at the stop: session cost_usd $1,216.42 (2026-11-15) (baseline $756.09).
    - hash-prove that passed skills are unchanged, because the pre-skill-check role and the print-sheet.js retitle are shared code;
    - send every changed passed Pre-skill Check page to the critic, add_facts included. If it now fills, the add_facts open defect closes.
    - eblast must reach master, or merge with it.
-3. **area_model_div_4by2**: PARKED as built (-lf-ops-amdiv @ a910a45f5; card signed d96ee4579). Its area-model-div TEMPLATE round, covering 2by1 / 3by1 / 4by2, comes first after the reset (lead), then its full critic. Do NOT merge it toward master before then: its template change alters the live 2by1 and 3by1 pages ungraded.
-4. Queued:
+2. **area_model_div_4by2**: PARKED as built (-lf-ops-amdiv @ a910a45f5; card signed d96ee4579). Its area-model-div TEMPLATE round, covering 2by1 / 3by1 / 4by2, comes first after the reset (lead), then its full critic. Do NOT merge it toward master before then: its template change alters the live 2by1 and 3by1 pages ungraded.
+3. Queued:
    - add_int number-line LABEL-GAP;
    - divide bracket at range 1000 still on the old template (ldiv-room N3);
    - add_facts Prerequisite Check fill, if item 2 does not close it.
-5. Next build list: the multiplication size pairs (in lf-ops-props.md) — area_model_4by1, mult_4by1_column, area_model_2by2, area_model_3by2, mult_3by2_standard.
+4. Next build list: the multiplication size pairs (in lf-ops-props.md) — area_model_4by1, mult_4by1_column, area_model_2by2, area_model_3by2, mult_3by2_standard.
 
 ## Rules carried forward
 - Every finding gets a check that fails on the bad commit and passes on the fix, a backtest, a place on precritic's path, and a ledger row.
