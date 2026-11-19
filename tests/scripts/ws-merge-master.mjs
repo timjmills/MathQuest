@@ -140,10 +140,11 @@ export function union3(text, size = 19, ref = 'master') {
     return { text: out.join(crlf ? '\r\n' : '\n'), hunks, conflicts };
 }
 
+let ONLY_RE = null;
 export function run(argv, cwd) {
     const args = argv, has = (k) => args.includes(k);
     const val = (k, d) => { const i = args.indexOf(k); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
-    if (has('--self-test')) return selfTest(resolve(val('--target', SELF)));
+    if (has('--self-test')) { ONLY_RE = val('--only', null) ? new RegExp(val('--only', '')) : null; return selfTest(resolve(val('--target', SELF))); }
     if (has('--commit') && !String(process.env.MQ_COMMIT_TRAILER || '').trim()) { console.log(`${TOOL}: FAIL (--commit refused: set MQ_COMMIT_TRAILER to your lane's attribution lines)`); return 2; }
     let ROOT;
     try { ROOT = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { ROOT = ''; }
@@ -234,7 +235,10 @@ export function run(argv, cwd) {
 // ---------------------------------------------------------------- self-test
 function selfTest(target) {
     const bad = []; let n = 0;
-    const eq = (name, got, want) => { n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); else console.log(`  ok   ${name}`); };
+    // --only <regex>: run only the cases whose name matches (an older backtest row proves ITS cases against an older --target;
+    // critic merge r3: the r1 row's pass state must not run the later r2 CRLF cases)
+    const ONLY = ONLY_RE;
+    const eq = (name, got, want) => { if (ONLY && !ONLY.test(name)) return; n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); else console.log(`  ok   ${name}`); };
     const r = (id, v) => ({ id, v });
     // pure: the original 7
     const base = { about: 'a', rows: [r('x', 1), r('y', 1), r('z', 1)] };
