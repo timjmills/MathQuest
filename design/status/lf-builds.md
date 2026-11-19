@@ -37,7 +37,7 @@ Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 - Open minors with no check: F10 (model page fill, engine), F13, F14, F15 (see critic-r1.md).
 
 ## Budget
-- Week from 2026-11-19: stop at cost_usd $1,126.22 (baseline $626.22 + $500, lead).
+- Week from 2026-11-19: stop at cost_usd $776.22 (baseline $626.22 + $150, lead correction). Finish chart blanks, then stop.
 - Week from 2026-11-13: allocation $200 above the session cost_usd baseline $369.70 (stop new agents at $569.70; lead, design/status/usage-week-2026-11-13.md).
 
 ## Open questions
