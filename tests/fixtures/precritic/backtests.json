@@ -12066,6 +12066,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-lastpage-add-facts-pre-skill-check",
+   "check": "ws-empty-band --page-fill EB-LASTPAGE (lf-checks 2225965ce found it on master: add_facts Prerequisite Check 4 items, 78 % empty at M and L): the last / only page of add_facts' pre-skill-check leaves under 30 % of its body empty when its next row fits, at M and L; CAP-PARITY holds",
+   "kind": "commit-pair",
+   "rule": "EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "commit": "d38308824",
+    "state": "master: add_facts checks itself once - one question of 4 items, 78 % of the page empty at M and L (FAIL 2)"
+   },
+   "pass": {
+    "commit": "516ad3fa4",
+    "state": "the fix: preSkills names facts to 10, make 10, number bonds to 10; with the cbt r3 F1 fill, 10 items at M (7 % empty), 8 at L (22 %)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles pre-skill-check --sizes M,L --hosts none --page-fill",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
