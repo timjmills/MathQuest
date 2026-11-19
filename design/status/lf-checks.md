@@ -805,3 +805,45 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - Gate `tests/scripts/ws-correct-sound.mjs` on precritic --skill; backtest `correct-sound-powerup-once` FAIL 84f8813a1 -> OK eed07b7c1.
 - Listen: `design/status/lf-checks/sound/powerup.wav` (OfflineAudioContext render). ws-boot-smoke OK.
 
+## 2026-11-14 — ws-merge-master (lead: "most of today's lost deploy time was merge conflicts")
+
+- `node tests/scripts/ws-merge-master.mjs [--commit] [--ref origin/master]`, run by each lane every few hours: fetch +
+  merge origin/master with no commit; backtests.json merged 3-way BY ROW ID (a row only one side changed takes that side; a
+  row both changed is left for the lane; no base row is ever dropped; the file's own format, so untouched rows stay
+  byte-identical); CHECKS_FROM_CRITICS, LEAD_DECISIONS and design/status/*.md conflict hunks unioned (master's lines,
+  then the branch's, no repeated line); generated reports (QUEUE.md, queue.json, BUILD_QUEUE.md, STANDARDS_COVERAGE.md,
+  BUILD_LIST.md) take master's copy and are regenerated; anything else is listed and the merge is not committed; then
+  ws-conflict-markers. Never touches design/STATUS.md, never pushes. `MQ_COMMIT_TRAILER` adds the lane's footer.
+- Proof: `--self-test` (7 cases) is a deploy session-1 gate; a replay of the real lf-tools-roles merge (d47f0c59e +
+  369173bc2: 3 conflicted files) produced exactly the hand-resolved 577b111da (backtests 486 rows, ledger and status
+  identical).
+- Fix (found on first real use): ws-merge-master took its ROOT from the script's own location, so running another
+  checkout's copy merged into the script's tree. ROOT is now `git rev-parse --show-toplevel` of the current directory.
+
+## 2026-11-19 — ws-merge-master r2 (rebuild after critic-merge-r1 FAIL 6/6/6/8)
+
+- Fixed F1-F8 (`design/status/lf-checks/critic-merge-r1.md`) in aa404bb5c:
+  - backtests.json: a same-id row added on both sides with different content, or a row both sides changed, is a CONFLICT:
+    both versions are written between markers and the file stays UNMERGED (exit 1; git cannot commit it). A side that
+    deleted the file counts as empty (no crash). Duplicate row ids after any merge FAIL.
+  - union files: a true 3-way merge per hunk from the merge base (`git merge-file --diff3` on the :1:/:2:/:3: stages):
+    lines only added are kept, master's first; a line one side deleted stays deleted; a line both sides replaced
+    differently (a prose line, or a table row whose key both re-added with different text) is left with markers, unmerged.
+    Rows only added may share a first cell (the ledger's date column), so the real ledgers still union.
+  - outside a git work tree: exit 2, nothing merged. `--commit` with no `MQ_COMMIT_TRAILER`: exit 2. The commit subject
+    names only what was done. ws-conflict-markers falls back to `--root <merged tree>`.
+  - generated reports are regenerated and staged only when nothing else is left; `design/WRM_COVERAGE.md` added.
+- Proof: `--self-test` 22 cases (the old 7, 5 pure, 10 git fixtures run against `--target`); on the r1 script 10 fail.
+  Backtest row `merge-master-r1` (FAIL 3354f8173 → OK aa404bb5c): PASS. Replays: 80a3444e0 identical to the hand
+  merge; eeb03c94a the same ledger lines and backtest rows (order: master first); 002ca8d87 ledger, decisions and backtests
+  resolved, lesson-baseline.json LEFT; d57c126e3 three sources LEFT, so the three reports are left for regeneration
+  after them (by design now, F7).
+- Not done: stale cleanly-merged reports are not re-validated (F7 last point) - the lane's own report gates catch them.
+- 2026-11-19, critic merge r2 (FAIL 7/7/8/8): CRLF ledger / status files lost master's side; fixed (union3 strips the \r to
+  judge, writes CRLF back). Self-test 26 cases; row `merge-master-crlf`.
+- 2026-11-19, critic merge r3 (FAIL 9/6/9/8: the CRLF fix works; the r1 row's pass state ran the newer r2 cases against an
+  older tool). Fix: `--self-test --only <regex>`; row merge-master-r1 runs `^(?!r2 )`, row merge-master-crlf runs `^r2 `,
+  so each row proves only its own cases. Minors kept: a mixed-ending file comes back all-CRLF, a CRLF backtests.json comes
+  back LF (no content lost).
+- 2026-11-19, critic merge r4 (FAIL 7/7/7/8): an --only matching nothing passed. Fixed (0 cases → FAIL; bad regex → clean
+  FAIL; self-test r4 cases, 28 in all); row `merge-master-only-empty`.
