@@ -995,6 +995,9 @@ function buildPlan(ctx) {
         // (>= 80 % of its free height or the 2x cap, centred); 6 / 8 a page keep the floor row and stay inside the cell
         const roomKeys = keys.filter((k) => /^division:(long_div_2digit|divide)$/.test(k));
         if (roomKeys.length) add(gate('ldiv-room', 'ws-ldiv-hug --room (LDIV-ROOM: the work grid uses a 4-a-page cell, M/L)', `${roomKeys.length} work-grid skill(s)`, 'browser', 'ws-ldiv-hug', ['--room', '--skills', roomKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
+        // LDIV-KIT (lf-ops bugs 2026-11-19, ldiv-room critic N3): every bracket item of division:divide, at Max Number 100 and
+        // 1000, is a kit `division` cell (q.cell), and its bracket pages (independent, test; pupil + key; M / L) hold no legacy cell
+        if (keys.includes('division:divide')) add(gate('ldiv-kit', 'ws-ldiv-hug --kit (LDIV-KIT: divide bracket items on the kit division template, no legacy cell, range 100 / 1000, M/L)', 'division:divide × range 100 / 1000 × M/L', 'browser', 'ws-ldiv-hug', ['--kit', '--skills', 'division:divide'], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         // SOUND-ONCE (owner request 2026-11-14, "B, power-up"): the correct-answer sound plays exactly once on a correct answer

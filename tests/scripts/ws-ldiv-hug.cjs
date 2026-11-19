@@ -39,6 +39,12 @@
 // bow - its greatest distance from the straight chord between its ends, in mm (screen at 96 px per inch) - is <= 0.6 mm on
 // paper (M, L) and on every screen host.
 // --room (LDIV-ROOM, owner 2026-11-14): the work grid uses the room a 4-a-page cell gives (see roomMain).
+// --kit (LDIV-KIT, lf-ops bugs 2026-11-19, ldiv-room critic N3: `divide` with the bracket at Max Number 1000 printed on the
+// legacy long-division markup, an orphan cell 4 across 3 columns and an offset quotient box): every division:divide item dealt
+// with the bracket - at Max Number 100 and 1000, notation Bracket alone, all three mixed, and the default - carries q.cell on
+// the kit's `division` template, and its Independent and Test pages (pupil + key, M / L) draw only `division` cells for
+// bracket-only pages (Bracket alone, or any notation past Max Number 100, where the bracket is forced) and no `data-ws-legacy`
+// cell on them; the across / fraction items of a mixed page at 100 keep their own cells (see kitMain).
 // A skill x host that draws no bracket FAILS (it would pass unseen). word-work.js's own divide frame (M2 1 Q...) is
 // lf-algebra's and is not measured here.
 const fs = require('fs');
@@ -620,7 +626,57 @@ async function roomMain() {
     process.exit(fails ? 1 : 0);
 }
 
-if (process.argv.includes('--room')) roomMain();
+// LDIV-KIT (see the header): the bracket items of division:divide are kit `division` cells, never legacy markup
+async function kitMain() {
+    const app = await open({ seed: 1, viewport: { width: 900, height: 1300, deviceScaleFactor: 1 } });
+    const { page } = app;
+    let fails = 0, seen = 0;
+    const OPTS = [['bracket', { notation: ['bracket'] }], ['mixed', { notation: ['across', 'bracket', 'fraction'] }], ['default', {}]];
+    try {
+        for (const range of [100, 1000]) for (const [tag, opts] of OPTS) {
+            const r = await page.evaluate(async (a) => {
+                const items = [];
+                for (let i = 0; i < 24; i++) {
+                    const q = window.generateQuestionFor({ category: 'division', skill: 'divide', range: a.range, opts: a.opts, seed: 7000 + i, itemIndex: i, itemCount: 24 });
+                    if (q) items.push({ text: q.text, notation: q.notation, t: q.cell && q.cell.template, pf: q.printFormat });
+                }
+                const pages = [];
+                for (const role of ['independent', 'test']) for (const size of ['M', 'L']) {
+                    const res = await window.buildSheet({ role, size, seed: 4242, key: true, sections: [{ skills: [{ categoryId: 'division', skillId: 'divide', opts: a.opts, range: a.range }], count: 6 }] });
+                    for (const [side, html] of [['pupil', res.pupilHtml], ['key', res.keyHtml || '']]) {
+                        const cells = [...String(html).matchAll(/data-ws-cell="([^"]*)"/g)].map((m) => m[1]);
+                        pages.push({ role, size, side, cells, legacy: (String(html).match(/data-ws-legacy="1"/g) || []).length });
+                    }
+                }
+                return { items, pages };
+            }, { range, opts });
+            const br = r.items.filter((q) => q.notation === 'bracket');
+            seen += br.length;
+            const bad = br.filter((q) => q.t !== 'division');
+            if (bad.length) fails++;
+            console.log(`${bad.length ? 'FAIL' : 'PASS'} LDIV-KIT divide range ${range} ${tag}: ${br.length - bad.length} / ${br.length} bracket item(s) on the division template${bad.length ? `  <- ${bad.slice(0, 3).map((q) => `${q.text} (${q.pf}, cell ${q.t || 'none'})`).join('; ')}` : ''}`);
+            const bracketOnly = range > 100 || tag === 'bracket';
+            for (const pg of r.pages) {
+                const why = [];
+                if (bracketOnly && pg.legacy) why.push(`${pg.legacy} legacy cell(s)`);
+                if (bracketOnly && !pg.cells.length) why.push('no cell drawn');
+                if (bracketOnly && pg.cells.some((c) => c !== 'division')) why.push(`cells ${[...new Set(pg.cells)].join(', ')}`);
+                if (bracketOnly || why.length) {
+                    if (why.length) fails++;
+                    console.log(`${why.length ? 'FAIL' : 'PASS'} LDIV-KIT divide range ${range} ${tag} ${pg.role} ${pg.size} ${pg.side}: ${pg.cells.length} cell(s)${why.length ? '  <- ' + why.join(', ') : ''}`);
+                }
+            }
+        }
+        if (!seen) { fails++; console.log('FAIL LDIV-KIT: no bracket item dealt (it would pass unseen)'); }
+        const errs = app.problems.filter((p) => p.type !== 'requestfailed');
+        if (errs.length) { fails++; errs.slice(0, 5).forEach((e) => console.log(`FAIL console: ${e.text}`)); }
+    } catch (e) { console.log('FAIL ' + (e.stack || e.message)); fails++; } finally { await app.close(); }
+    console.log(fails ? `ws-ldiv-hug --kit: FAIL (${fails})` : 'ws-ldiv-hug --kit: OK');
+    process.exit(fails ? 1 : 0);
+}
+
+if (process.argv.includes('--kit')) kitMain();
+else if (process.argv.includes('--room')) roomMain();
 else if (process.argv.includes('--join')) joinMain();
 else (async () => {
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });

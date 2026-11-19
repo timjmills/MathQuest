@@ -2368,7 +2368,11 @@ const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
  * Decimals and the fraction form of ÷ keep their legacy cells.
  */
 function _applyKitFactCell(q, skill, range) {
-    if (!_KIT_FACT_SKILLS.has(skill) || !q || q.cell) return;
+    // lf-ops bugs (ldiv-room critic N3): `divide` at its default size (tiles unset, no remainder) deals a fact or, past
+    // Max Number 100, the legacy long-division branch; a BRACKET item draws the kit's division template, the across and
+    // fraction items keep their own cells (unchanged)
+    const _divBracket = skill === 'divide' && q && q.notation === 'bracket';
+    if ((!_KIT_FACT_SKILLS.has(skill) && !_divBracket) || !q || q.cell) return;
     // P11: a fact drill is whole numbers whatever the Decimals setting, so its cell does not change with it.
     if (state.decimalPlaces > 0 && !/_facts$/.test(skill)) return;
     const op = _KIT_OP[q.op];
