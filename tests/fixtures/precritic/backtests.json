@@ -12002,6 +12002,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "label-gap-add-int",
+   "check": "ws-label-gap LABEL-GAP (lf-engine roles critic r2 F6: integers:add_int with a −23..1 window printed number-line numerals that touch): adjacent tick numerals keep >= 1 mm of white, measured on the glyph boxes - independent, guided, more practice, test (pupil + key) at M / L, Max Number 100 / 1000, page seeds 1-4; the pinned −23..1 window (start −22, + 21) at M / L; the practice card's tap-to-jump line at 1280 / 820",
+   "kind": "commit-pair",
+   "rule": "LABEL-GAP",
+   "browser": true,
+   "fail": {
+    "commit": "d38308824",
+    "state": "master: every numeral labelled, overlaps to −2.37 mm on −31..1 lines, the pinned −23..1 at −0.68 mm (FAIL 102)"
+   },
+   "pass": {
+    "commit": "142169553",
+    "state": "the fix: number-line.js thins the numerals (given point, 0, ends, then every 2nd / 5th / 10th) where they would come within 1.5 mm; closest 1.68 mm on paper"
+   },
+   "command": "node tests/scripts/ws-label-gap.cjs --skills integers:add_int",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
