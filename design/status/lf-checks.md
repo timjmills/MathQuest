@@ -795,6 +795,17 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - N1 (numbers masked whole) not addressed.
 - checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).
 
+## 2026-11-14 correct-answer sound ("B, power-up", owner request)
+- `js/modules/correct-sound.js`: Web Audio synth, square C5 / E5 / G5 70 ms, C6 400 ms exponential decay, peak 0.13, 4 ms attack /
+  10 ms release; lazy AudioContext resumed on the first pointer / key gesture; 300 ms dedupe. Gated by the Sound toggle (`#sfxToggle`,
+  sfx.js `isSfxEnabled`; Voice / TTS is a separate toggle and is not used).
+- Hosts: practice card (answer-check.js celebrateCorrect + _celebrateCorrectAnswer, replacing the old 'correct' / 'streak' cue; map-engine's
+  fallback call too), worksheet (wsRecordAnswer, once per item), quiz (recordAnswer, instant feedback only, so a test with end-of-quiz
+  feedback never gives an answer away). Wrong-answer cue unchanged.
+- Gate `tests/scripts/ws-correct-sound.mjs` on precritic --skill; backtest `correct-sound-powerup-once` FAIL 84f8813a1 -> OK eed07b7c1.
+- Listen: `design/status/lf-checks/sound/powerup.wav` (OfflineAudioContext render). ws-boot-smoke OK.
+
+
 ## 2026-11-14 - ws-tof-stem sweep hardening (deploy timeouts)
 - ws-tof-stem.cjs now sweeps skill by skill: browser restart every 40 skills (--restart-every) and on crash/timeout, protocolTimeout 120 s (ws-harness open() option), one retry per skill, a skill lost twice is a FAIL. Verdict lines unchanged; new `sweep:` line (restarts, retried, seconds).
 - Backtest `tof-stem-retry` (MQ_TOF_CRASH_AT=2): crash retried, 4/4 measured. CHECKS_FROM_CRITICS row added.

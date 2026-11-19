@@ -190,6 +190,18 @@ function PLAN(rootSel, which) {
         ex.forEach(c => { const v = q.expandedValues[Number(c.dataset.expandedIdx)]; tag(c, { type: 'text', value: String(v) }); });
         return { plan, q: String(ans) };
     }
+    // (owner ruling 2026-11-15) a place word is never typed: its read-only box is filled by a tap on the place bank;
+    // any other box of the item (unit form's "how many") is typed
+    const ptiles = all('.mq-placetile');
+    if (ptiles.length) {
+        const sets = q.inlineBlanksData && q.inlineBlanksData.acceptedSets;
+        const words = sets ? sets.map(r => String(r[r.length - 1])) : [String(ans)];
+        const typed = all('input.ib-cell, input.mq-cellslot').filter(c => !c.readOnly);
+        if (sets) sets[0].slice(0, -1).forEach((v, k) => { if (typed[k]) tag(typed[k], { type: 'text', value: String(v) }); });
+        const t = ptiles.find(x => words.includes(x.dataset.v));
+        if (t) tag(t, { type: 'click' });
+        return { plan, q: String(ans) };
+    }
     // several typed cells
     const ib = all('input.ib-cell');
     if (ib.length) { const set = q.inlineBlanksData.acceptedSets[0]; ib.forEach((c, i) => tag(c, { type: 'text', value: String(set[i]) })); return { plan, q: set.join(', ') }; }
@@ -209,7 +221,10 @@ function PLAN(rootSel, which) {
         parts(ans).forEach((v, k) => { if (!tiles.some(x => x.dataset.mqBankFor === String(k)) && typed[k]) tag(typed[k], { type: 'text', value: v }); });
         return { plan, q: String(ans) };
     }
-    const slots = all('input.mq-cellslot, input.cloze-cell');
+    // (lf-hosts 2026-11-13) a two-step story's graded letter equation / estimate (`data-mq-part`, two-step card decisions 7 / 8)
+    // is answered too: the pupil writes each of its boxes (the box's own expected value), then the answer
+    all('[data-mq-part] input').forEach(c => tag(c, { type: 'text', value: c.getAttribute('data-mq-expect') || '' }));
+    const slots = all('input.mq-cellslot, input.cloze-cell').filter(c => !c.closest('[data-mq-part]'));
     if (slots.length) {
         const sets = q.inlineBlanksData && q.inlineBlanksData.acceptedSets;
         const joinEl = slots[0].closest('[data-mq-join]');

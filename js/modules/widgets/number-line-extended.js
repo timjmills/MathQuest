@@ -433,6 +433,20 @@ export function renderNumberLineExtended(q, container) {
     refreshTray();
     refreshSubmit();
 
+    // Retry after a wrong Submit (owner bug 2026-11-15: "if a student gets it wrong they cannot
+    // move it afterwards"): the markers stay where the pupil put them, unlocked and unmarked, so
+    // they can be moved and submitted again. A correct Submit stays locked (the host never calls this).
+    host._nleUnlockForRetry = function () {
+        locked = false;
+        // the red flash stays until the marker moves (a move re-renders it, unmarked)
+        markerLayer.querySelectorAll('.nle-marker').forEach(el => {
+            el.style.pointerEvents = '';
+            el.setAttribute('tabindex', '0');
+        });
+        refreshTray();
+        refreshSubmit();
+    };
+
     // Expose a flash helper for integrators.
     host._nleFlash = function (correctMap) {
         // correctMap: id → boolean OR (single mode) just a boolean

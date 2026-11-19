@@ -39,8 +39,9 @@
 //   node tests/scripts/ws-screen-support-eq.cjs                          # division:div_facts
 //   node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ,CUE,PLACE,ORIENT,DOTMIN
 //   node tests/scripts/ws-screen-support-eq.cjs --self-test             # the pure rules, no browser
-// A skill with no supports model is reported "no supports" (nothing to compare). Prints one line per finding, then
-// `ws-screen-support-eq: OK` or `FAIL (n)`; exits 1 on FAIL.
+// A skill with no supports model is reported "no supports" (nothing to compare). Prints one line per finding, then ONE
+// verdict line from verdict() - `ws-screen-support-eq: OK|N/A|FAIL (n) (checked: <keys> ; no supports (n/a): <keys> )`;
+// exits 1 on FAIL, 0 on OK / N/A. ws-precritic maps that line 1:1 (OK PASS, N/A N/A, FAIL FAIL).
 const NAME = 'ws-screen-support-eq';
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && i + 1 < argv.length ? argv[i + 1] : d; };
@@ -160,6 +161,25 @@ function placeFinding(id, places) {
     return set.length > 1 ? `${id}: worksheet places ${places.map((p, i) => `${i + 1}:${p}`).join(' ')}` : null;
 }
 
+/**
+ * THE verdict, from one place (lf-hosts 2026-11-13: the log said "ws-screen-support-eq: OK" while ws-precritic's row said FAIL
+ * "skill(s) in scope absent from the output" - a skill with no supports model was logged as "algebra:x: no supports", which
+ * the gate's skill-mention rule did not read as a mention, so the tool and the gate judged the same run two ways).
+ * Every skill in scope gets a status here; the line names each skill by its key, space-separated, and says
+ *   FAIL (n)  any finding; or a skill in scope with no status (the run checked nothing for it)
+ *   N/A       no skill in scope has a supports model (nothing to compare - not a pass, not a fail)
+ *   OK        every skill with supports compared clean (the rest named as n/a)
+ * ws-precritic reads this line and nothing else (PARSE.screenSupportEq). Pure.
+ */
+function verdict(keys, status, findings) {
+    const missing = keys.filter((k) => !status[k]);
+    const checked = keys.filter((k) => status[k] === 'checked'), none = keys.filter((k) => status[k] === 'no supports');
+    const names = `checked: ${checked.join(' ') || '-'} ; no supports (n/a): ${none.join(' ') || '-'}`;
+    const n = findings.length + missing.length;
+    if (n) return { word: 'FAIL', line: `${NAME}: FAIL (${n}) (${missing.length ? `not run: ${missing.join(' ')} ; ` : ''}${names} )` };
+    if (!checked.length) return { word: 'N/A', line: `${NAME}: N/A (${names} )` };
+    return { word: 'OK', line: `${NAME}: OK (${names} )` };
+}
 /** ANSWER (critic divarray r2 D7): one answer place and one kit cell height (within 5 %) across a worksheet's cards.
  *  cards: [{ place: 'beside' | 'under' | null, h: px }] */
 function answerPlaceFinding(id, cards) {
@@ -224,6 +244,11 @@ function selfTest() {
     eq('caption 1 row ok (N1)', captionFinding('array', { label: '1 row of 7, for 7 × 1', rows: 1, cols: 7, dots: 7 }, { a: 7, b: 1, op: '×' }), null);
     eq('frame other support', frameFinding('touch', {}, { a: 4, b: 0, op: '×' }), null);
     eq('place one', placeFinding('touch', ['beside', 'beside', null]), null);
+    eq('verdict: no supports is N/A, never OK', verdict(['algebra:a'], { 'algebra:a': 'no supports' }, []).word, 'N/A');
+    eq('verdict: a skill with no status FAILs', verdict(['algebra:a', 'algebra:b'], { 'algebra:a': 'checked' }, []).word, 'FAIL');
+    eq('verdict: findings FAIL', verdict(['algebra:a'], { 'algebra:a': 'checked' }, ['x']).word, 'FAIL');
+    eq('verdict: checked OK', verdict(['algebra:a', 'algebra:b'], { 'algebra:a': 'checked', 'algebra:b': 'no supports' }, []).word, 'OK');
+    eq('verdict line names each key space-separated', / algebra:b /.test(verdict(['algebra:a', 'algebra:b'], { 'algebra:a': 'checked', 'algebra:b': 'no supports' }, []).line), true);
     // caption grammar (N1): one row is "1 row", not "1 rows"
     eq('caption 1 rows (N1)', !!captionFinding('array', { label: '1 rows of 1, for 1 × 1', rows: 1, cols: 1, dots: 1 }, { a: 1, b: 1, op: '×' }), true);
     eq('caption 7 rows ok', captionFinding('array', { label: '7 rows of 11, for 11 × 7', rows: 7, cols: 11, dots: 77 }, { a: 11, b: 7, op: '×' }), null);
@@ -345,6 +370,7 @@ function readCellsInPage({ sel, cellSel }) {
     const app = await open({ seed: 1 });
     const { page } = app;
     const findings = [];
+    const status = {};
     let renders = 0;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     try {
@@ -356,8 +382,9 @@ function readCellsInPage({ sel, cellSel }) {
                     return d ? { render: d.render, base: d.valueBase || null } : null;
                 } catch (e) { return { error: e.message }; }
             }, { cat, skill });
-            if (!def) { console.log(`${key}: no supports (nothing to compare)`); continue; }
-            if (def.error) { findings.push(`${key}: ${def.error}`); continue; }
+            if (!def) { status[key] = 'no supports'; console.log(`${key} - no supports (nothing to compare)`); continue; }
+            if (def.error) { status[key] = 'error'; findings.push(`${key}: ${def.error}`); continue; }
+            status[key] = 'checked';
             // SCREEN-ANSWER-PLACE (critic divarray r2 D7): the worksheet at the four screen hosts, the skill's defaults and each support
             if (ONLY.includes('ANSWER')) for (const sup of [null, ...def.render]) {
                 const opts = sup ? Object.assign({ support: [sup] }, (def.base && def.base[sup]) || {}) : null;
@@ -563,9 +590,9 @@ function readCellsInPage({ sel, cellSel }) {
         findings.push(`crash: ${e.message}`);
     } finally { await app.close(); }
     for (const f of findings) console.log('  ' + f);
-    if (!renders && !findings.length) { console.log(`${NAME}: ${keys.join(', ')} — no renders`); }
-    console.log(`${NAME}: ${findings.length ? `FAIL (${findings.length})` : 'OK'}`);
-    process.exit(findings.length ? 1 : 0);
+    const v = verdict(keys, status, findings);
+    console.log(v.line);
+    process.exit(v.word === 'FAIL' ? 1 : 0);
 })();
 
-module.exports = { answerPlaceFinding, placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding, labelFinding };
+module.exports = { answerPlaceFinding, placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding, labelFinding, verdict };

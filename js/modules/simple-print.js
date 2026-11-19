@@ -176,7 +176,7 @@ export function footerName(s) {
         }
     }
     if (sets) {
-        const all = sets.values.map((x) => x.v);
+        const all = visVals(s, sets);
         const cur = setsOf(s, sets);
         if (cur.length !== all.length) name = `${name.replace(/\s*\([^)]*\)/g, '')}: ${s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'tables' : 'fact sets'} ${setWords(cur, all)}`;
     }
@@ -199,6 +199,9 @@ export function isFactSkill(s) {
     return ok;
 }
 const isDivisionFact = (s) => s.categoryId === 'division';
+/** A ÷ fact in the ÷ sign's own form (div_facts Standard / Vertical, or a ÷ fact skill without divForm): it mixes into the
+ *  + − × rows (MIXED-ALL-OPS); a bracket, a fraction or Mix does not. */
+const signDiv = (s) => isDivisionFact(s) && /^(standard|vertical)$/.test(String((s.opts && s.opts.divForm) || 'standard'));
 /**
  * What a fact skill can REACH (facts-print-fix r3 D2 / D4): the most digit tracks of its numbers and the digits of its
  * answers over one seeded probe of 60 items (x 1-12: 3 tracks, 3-digit answers; + − within 20: 2; ÷ 1-12: 3 for 144).
@@ -399,7 +402,8 @@ export async function buildSimple(list, o) {
 /** The Auto columns at a size (the size buttons' "n columns"): one small build, no filling. */
 async function probeCols(list, arrangement, o) {
     if (arrangement === 'facts') {
-        const g = list.filter((s) => !isDivisionFact(s));
+        // (MIXED-ALL-OPS: ÷ in the sign's own form prints in the + − × rows, so it is part of what the button measures)
+        const g = list.filter((s) => !isDivisionFact(s) || (signDiv(s) && list.some((x) => !isDivisionFact(x))));
         // (the reach of the skills, as the print takes it: r3 D2 - the size button says what prints)
         const gl = g.length ? g : list;
         const rc = gl.reduce((r, s) => { const x = reachOf(s); return { tracks: Math.max(r.tracks, x.tracks), ans: Math.max(r.ans, isDivisionFact(s) ? 0 : x.ans) }; }, { tracks: 2, ans: 0 });
@@ -543,8 +547,14 @@ async function buildFacts(list, amounts, o) {
     // the groups: parts {s (the skill, its options), i (its place in the list), w (its share of the skill)}
     const DIV_SPLIT = ['standard', 'long', 'fraction'];
     const groups = [];
-    const mainParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => !isDivisionFact(p.s) && live(p.i));
-    const divParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => isDivisionFact(p.s) && live(p.i));
+    // MIXED-ALL-OPS (owner 2026-11-14, Mixed facts quick print: "÷ in its own Divide. section at the bottom"): a ÷ fact in
+    // the ÷ sign's own form (div_facts Standard / Vertical - the stacked ÷ fact, drawn as the stacked ÷ page draws it) joins
+    // the + − × rows whenever + − × facts are in the set, so every row mixes all four signs. A bracket, a fraction or Mix
+    // (the forms the teacher picks on purpose) keeps its own ÷ section; ÷ alone keeps the ÷ page.
+    const anyMain = list.some((s, i) => !isDivisionFact(s) && live(i));
+    const inRow = (s) => !isDivisionFact(s) || (anyMain && signDiv(s));
+    const mainParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => inRow(p.s) && live(p.i));
+    const divParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => !inRow(p.s) && live(p.i));
     const splitDiv = !mixed && list.length >= 2 && divParts.length === 1 && divParts[0].s.skillId === 'div_facts' && (divParts[0].s.opts || {}).divForm === 'mix';
     const divGroups = () => (splitDiv
         ? DIV_SPLIT.map((f) => ({ parts: [{ s: Object.assign({}, divParts[0].s, { opts: Object.assign({}, divParts[0].s.opts, { divForm: f }) }), i: divParts[0].i, w: 1 / 3 }], div: true, form: f }))
@@ -561,7 +571,7 @@ async function buildFacts(list, amounts, o) {
         let run = null;
         let divDone = false;
         for (const p of [...mainParts, ...divParts].sort((a, b) => a.i - b.i)) {
-            if (!isDivisionFact(p.s)) { if (!run) { run = { parts: [], div: false }; groups.push(run); } run.parts.push(p); continue; }
+            if (inRow(p.s)) { if (!run) { run = { parts: [], div: false }; groups.push(run); } run.parts.push(p); continue; }
             run = null;
             if (!divDone) { groups.push(...divGroups()); divDone = true; }
         }
@@ -578,7 +588,9 @@ async function buildFacts(list, amounts, o) {
         const count = per ? per.reduce((t, x) => t + x, 0) : 0;
         return { skills: grp.parts.map((p, j) => Object.assign(skillRef(p.s), { weight: w[j] })).filter((x) => x.weight > 0), pages: 1, ...(count ? { count } : {}),
             tracks: reach[g].tracks, ansTracks: reach[g].ans, ...(cap ? { maxPt: cap } : {}), sizeCap: true,
-            ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.div ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) };
+            // (MIXED-ALL-OPS: ÷ in the + − × rows - every page of the group laid as the mixed page, one that dealt ÷ only too)
+            ...(!grp.div && grp.parts.some((p) => isDivisionFact(p.s)) && grp.parts.some((p) => !isDivisionFact(p.s)) ? { signMix: true } : {}),
+            ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.div || grp.parts.some((p) => isDivisionFact(p.s)) ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) };
     };
     // one page: `parts` = [{g, per}] (per = how many of each of the group's parts; null: the full page by the shares)
     const page = (parts, stretch = null) => {
@@ -1056,7 +1068,10 @@ export function numberOptionsOf(s) {
     return { band: { def: band, values: bandVals, answer, title: answer ? 'Highest number' : band.label, labelOf: answer ? (v) => v.toLocaleString('en-US') : lbl }, sets: sets || null };
 }
 const optVal = (s, d) => (s.opts && s.opts[d.id] !== undefined && s.opts[d.id] !== null ? s.opts[d.id] : d.default);
-const setsOf = (s, d) => { const v = optVal(s, d); return Array.isArray(v) && v.length ? v.map(Number) : d.values.map((x) => x.v); };
+// t15: a value the skill's other options hide (the x / ÷ 13-15 ticks off "Tables to 15 x 15", `valueHide`) is neither offered
+// nor counted here, so a 12 x 12 page still reads "Tables: all" and its name is unchanged.
+const visVals = (s, d) => { const hide = new Set(typeof d.valueHide === 'function' ? (d.valueHide(s.opts || {}) || []) : []); return d.values.map((x) => x.v).filter((v) => !hide.has(v)); };
+const setsOf = (s, d) => { const vis = visVals(s, d); const v = optVal(s, d); const got = Array.isArray(v) ? v.map(Number).filter((x) => vis.includes(x)) : []; return got.length ? got : vis; };
 /** "0–12", "6–8", "2, 5, 10": a fact-set list in words. */
 function setWords(v, all) {
     if (v.length === all.length) return 'all';
@@ -1317,7 +1332,7 @@ function skillOptsHTML(s, i) {
     }
     if (sets) {
         const sv = setsOf(s, sets);
-        const allV = sets.values.map((x) => x.v);
+        const allV = visVals(s, sets);
         const lbl = s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'Tables' : 'Fact sets';
         out.below = `<details class="sp-skopt"${S.openOpts && S.openOpts.has(i) ? ' open' : ''}><summary data-sp="skopt" data-v="${i}">${lbl}: ${esc(setWords(sv, allV))}</summary><div class="sp-skopt-body">`
             + `<div class="sp-facts" role="group" aria-label="${lbl}">${allV.map((v) => `<button type="button" class="sp-fact" data-sp="fact" data-i="${i}" data-v="${v}" aria-pressed="${sv.includes(Number(v))}">${v}</button>`).join('')}<button type="button" class="sp-link sp-fact-all" data-sp="factall" data-i="${i}">All</button></div></div></details>`;
@@ -1574,7 +1589,7 @@ function onClick(e) {
         const i = Number(t.dataset.i);
         const d = numberOptionsOf(S.list[i]).sets;
         if (!d) return;
-        const all = d.values.map((x) => Number(x.v));
+        const all = visVals(S.list[i], d).map(Number);
         let cur = setsOf(S.list[i], d);
         if (act === 'factall') cur = all;
         else { const x = Number(v); cur = cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x].sort((a, b) => a - b); if (!cur.length) cur = [x]; }
