@@ -12158,6 +12158,47 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mix-pages",
+   "check": "ws-mix-pages MIX-PAGES (the node twin of ws-layout-unit MIX-PAGES, runnable on an old tree): a library lesson Mixed page dealt the counts counts() chose prints as many pages as the same page with one lead shelf fewer. Critic lf-engine-rowcap r2 F1: the packing (mixed-practice.js pagesOf) counted a lead shelf that starts a page without its strip, so a 4th Match 3 shelf joined the anchor chart page on paper only and the chart spilled: vocab_grade_pictures L Mixed 3 -> 4 pages, one Match 3 cell alone on page 2",
+   "kind": "commit-pair",
+   "rule": "ws-mix-pages MIX-PAGES (precritic node gate mix-pages; twin ws-layout-unit MIX-PAGES)",
+   "fail": {
+    "commit": "9b97befbb",
+    "state": "parent of fbca1a582: lead 4 shelves -> 4 pages, one shelf fewer -> 3 pages"
+   },
+   "pass": {
+    "commit": "fbca1a582",
+    "state": "pagesOf counts the strip: lead 3 shelves -> 3 pages"
+   },
+   "command": "node tests/scripts/ws-mix-pages.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-model-onepage",
+   "check": "vocab_grade_pictures Scripted Model: no page before the last leaves 30 % or more of its body empty (EB-PAGE --page-fill). Builder vocab-blockers 2026-11-19: 3 Match 3 states dealt 2 + 1 (M p1 36 %, L p1 32 %) because roles/scripted-model.js reserves two step-text lines (textH2) on a one-line full-width state",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE (--page-fill)",
+   "browser": true,
+   "fail": {
+    "commit": "b77b1dd9b",
+    "state": "OPEN RED: Scripted Model M p1 36 %, L p1 32 % empty (2 pages)"
+   },
+   "pass": {
+    "commit": "",
+    "state": "the lf-engine fix (scripted-model.js: a one-line full-width state reserves one text line, textH1; lead D3) - arm with its commit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles scripted-model --hosts none --page-fill --no-baseline --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "open red, owner lf-engine (lead D3: roles/scripted-model.js). The check is on precritic path (the default ws-empty-band row runs --page-fill on every offered role); this row is armed with the fix commit when it lands."
   }
  ]
 }
