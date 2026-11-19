@@ -144,7 +144,11 @@ let ONLY_RE = null;
 export function run(argv, cwd) {
     const args = argv, has = (k) => args.includes(k);
     const val = (k, d) => { const i = args.indexOf(k); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
-    if (has('--self-test')) { ONLY_RE = val('--only', null) ? new RegExp(val('--only', '')) : null; return selfTest(resolve(val('--target', SELF))); }
+    if (has('--self-test')) {
+        const only = val('--only', null);
+        if (only != null) { try { ONLY_RE = new RegExp(only); } catch (e) { console.log(`${TOOL} --self-test: FAIL (--only is not a valid regex: ${e.message})`); return 2; } }
+        return selfTest(resolve(val('--target', SELF)));
+    }
     if (has('--commit') && !String(process.env.MQ_COMMIT_TRAILER || '').trim()) { console.log(`${TOOL}: FAIL (--commit refused: set MQ_COMMIT_TRAILER to your lane's attribution lines)`); return 2; }
     let ROOT;
     try { ROOT = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { ROOT = ''; }
@@ -271,6 +275,16 @@ function selfTest(target) {
     const tmp = mkdtempSync(join(top, 'mm-selftest-'));
     try { gitCases(target, tmp, eq); } catch (e) { bad.push(`git fixtures crashed: ${e.message}`); } finally { rmSync(tmp, { recursive: true, force: true }); }
     console.log(bad.length ? bad.map((b) => `  FAIL ${b}`).join('\n') : '');
+    // --only that selects nothing proves nothing (critic merge r4): FAIL, never a silent OK
+    if (ONLY_RE && n === 0) { console.log(`${TOOL} --self-test: FAIL (--only ${ONLY_RE} matched 0 cases)`); return 1; }
+    // the --only behaviour itself, when the whole self-test runs (critic merge r4)
+    if (!ONLY_RE) {
+        const sub = (args) => spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--self-test', ...args], { encoding: 'utf8' });
+        const z = sub(['--only', '^no case is named this$']);
+        eq('r4 --only matching nothing -> FAIL, exit 1', [z.status, /matched 0 cases/.test(z.stdout)], [1, true]);
+        const b = sub(['--only', '(']);
+        eq('r4 --only with a bad regex -> clean FAIL, exit 2, no stack', [b.status, /not a valid regex/.test(b.stdout), /\n\s+at /.test(b.stderr || '')], [2, true, false]);
+    }
     console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length} of ${n})` : `OK (${n} cases: row merge, 3-way union, scope, git fixtures)`}${target !== SELF ? ` [target ${target}]` : ''}`);
     return bad.length ? 1 : 0;
 }
