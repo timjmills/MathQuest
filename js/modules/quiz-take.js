@@ -15,7 +15,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor,
-    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
 
@@ -213,7 +213,7 @@ function updateQuizTimer() {
 // and optional: a quiz saved before this reads exactly as it did.
 const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlanksData', 'target', 'maxPlace',
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
-    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
+    'operands', 'placeTapBank', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
     'cell', 'skillId', 'categoryId', 'pv',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
@@ -482,6 +482,7 @@ function _mountQuizCell(flatIdx) {
             }
         }
         if (vis) wireClozeBanks(vis);
+        if (vis && inp && qd && qd.placeTapBank) wirePlaceWordBank(vis, inp, qd);
         // a drawing with its own answer boxes (fact family, area model) answers through them: the
         // answer line under it is not drawn (H8)
         if (vis && inp && area && area.isConnected && wireDrawnAnswers(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordSlotAnswer(flatIdx, v); } })) {
@@ -849,7 +850,13 @@ function recordAnswer(flatIdx, studentAnswer, { ladder = true } = {}) {
         // (lf-hosts 2026-11-13) a two-step story's graded equation / estimate boxes count as answer boxes too
         if (!partial && String(studentAnswer).trim() !== '' && [...document.querySelectorAll('.qt-question-card [data-mq-part] input')].some((b) => !filled(b))) partial = true;
     } catch (e) { /* no DOM: not partial */ }
+    const prevAnswer = quizAnswers[flatIdx];
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent, partial };
+    // owner 2026-11-14: the power-up sound when this item's answer newly turns correct - instant feedback only (a test with
+    // end-of-quiz feedback never gives an answer away), never twice for the same answer; gated by the Sound toggle
+    if (correct && !partial && !(prevAnswer && prevAnswer.correct && prevAnswer.studentAnswer === String(studentAnswer))
+        && state.currentQuiz && state.currentQuiz.settings && state.currentQuiz.settings.showFeedback === 'instant'
+        && typeof window !== 'undefined' && typeof window.playCorrectSound === 'function') window.playCorrectSound();
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
     // with the answer (a short list of ids).
     const test = state.currentQuiz;

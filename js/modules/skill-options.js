@@ -756,7 +756,13 @@ function _pvRoundNl(id) {
 }
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit(), _pvWriteValue()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions(),
+        // owner bug fix 2026-11-15 ("I don't want students typing hundreds"): unit form is a number plus a place word
+        // CHOSEN from a bank, or the value typed in one box. Appended last (share codes).
+        { id: 'answerAs', label: 'Answer as', type: 'enum', default: 'unit', group: 'layout',
+            appliesTo: (cur) => cur.form === 'unit', appliesBase: { form: 'unit' },
+            values: [{ v: 'unit', l: 'A number, then choose the place word (6 hundreds)' }, { v: 'value', l: 'The value in one box (600)' }],
+            help: 'Pupils never type a place word: they type the number and tap the word, or type the value.' }],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
@@ -1018,10 +1024,27 @@ const _opsFactBand = (sub = false) => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
             + 'than the band is left out.',
 }), helpShort: sub ? 'The largest number you start from. Single-digit facts never pass 18.'
     : 'The largest sum. Single-digit facts never pass 18.' });
-const _opsTableBand = () => _opsBand([100, 144], 144, {
-    label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12' },
-    help: 'Up to the 10s table or the whole 12s table: the largest product (or number shared) is 100 or 144.',
+const _opsTableBand = () => _opsBand([100, 144, 225], 144, {
+    label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12', 225: '15 × 15' },
+    help: 'Up to the 10s table, the whole 12s table or on past it: the largest product (or number shared) is 100, 144 '
+        + 'or 225. The biggest choice adds three more ticks to the fact sets.',
 });
+// lane lf-ops t15 (owner, 2026-11-14): "Tables to 15 × 15". The top factor (× ) / divisor and quotient (÷) of each band, read
+// by the generator, the panel, the array support and the sheet bridge alike.
+export const factTableTop = (band) => (Number(band) === 100 ? 10 : Number(band) === 225 ? 15 : 12);
+// The x / ÷ fact set: 0 to 15, the 13, 14 and 15 ticks shown (and dealt) only under "Tables to 15 × 15" (`valueHide`). Its
+// default is every value, so an untouched 12 x 12 page deals exactly the 0 to 12 it always dealt (the 13-15 are filtered by
+// the band) and "all ticked" stays "mixed" on every band. Values travel by value in a share code (skill-option-codec.js):
+// 13-15 are the tokens D, E, F; an old code's set decodes as it did.
+const _opsTableConstant = (label, titleVerb) => {
+    const c = constantOption(15, label, titleVerb);
+    c.tableBand = true;
+    c.group = 'facts';      // the panel draws the tick list last, under "Which facts" (skill-options-ui.js OPTION_GROUPS)
+    c.valueHide = (cur) => (factTableTop(cur && cur.band) < 15 ? [13, 14, 15] : []);
+    // (a hidden tick is tried where it IS offered, on "Tables to 15 x 15": ws-options-verify valueBase)
+    c.valueBase = { 13: { band: 225 }, 14: { band: 225 }, 15: { band: 225 } };
+    return c;
+};
 const _opsColumnLevel = () => levelSubset([3, 2, 1], 1,
     'Level 3 writes each answer in grey to trace (a worked example), level 2 adds the place-value '
     + 'heads over the columns, level 1 is the bare column. The regroup boxes stay at every level.');
@@ -1064,10 +1087,10 @@ const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
     'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), ..._opsAddCue()],
     'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(true), ..._opsAddCue(true, true)],
-    'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), notationOption('x'), _opsTableBand(), ..._opsMulCue(false)],
+    'multiplication:mult_facts': [_opsTableConstant('Times', 'Multiply by'), notationOption('x'), _opsTableBand(), ..._opsMulCue(false)],
     // Dividing BY 0 is undefined, so the 0 box is the zero facts it really deals: 0 ÷ n.
     'division:div_facts': [(() => {
-        const c = constantOption(12, 'Divide by');
+        const c = _opsTableConstant('Divide by');
         c.values = c.values.map(x => (x.v === 0 ? { v: 0, l: '0 (zero shared: 0 ÷ n)' } : x));
         c.zeroTitle = 'Zero divided by a number';
         return c;
@@ -4265,8 +4288,11 @@ function _joinAnd(parts) {
 export function factSetTitle(categoryId, skillId, opts) {
     const def = optionsFor(categoryId, skillId).find(o => o.id === 'constant');
     if (!def) return '';
-    const legal = (def.values || []).map(x => x.v);
-    const ticked = normalizeOptions(categoryId, skillId, opts).constant;
+    const norm = normalizeOptions(categoryId, skillId, opts);
+    // t15: the x / ÷ fact set's 13-15 count only under "Tables to 15 x 15" (the generator's own reach, _tableLegal)
+    const top = def.tableBand ? Math.max(12, factTableTop(norm.band)) : Infinity;
+    const legal = (def.values || []).map(x => x.v).filter(v => v <= top);
+    const ticked = norm.constant;
     const chosen = Array.isArray(ticked) ? ticked.filter(v => legal.includes(v)) : [];
     // None ticked means "no restriction" (the set semantics at the top of this file), so it is
     // the same page as all ticked: mixed, and unnamed.
@@ -4315,20 +4341,20 @@ export function describeOptions(categoryId, skillId, opts) {
 // table that is not 0, times the band's top quotient (10 on "Tables to 10 x 10", else 12) - the generator's own reach.
 export const DIV_ARRAY_MAX = 50;
 export function divFactsMaxDividend(opts = {}) {
-    const top = Number(opts && opts.band) === 100 ? 10 : 12;
+    const top = factTableTop(opts && opts.band);
     let t = opts && opts.constant;
     if (typeof t === 'number' || typeof t === 'string') t = [t];
-    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: top + 1 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
     return ticked.length ? Math.max(...ticked) * top : 0;
 }
 // lead ruling 2026-11-13 (critic divarray r1 D1 / D4): mult_facts' array support draws ONE frame per band, as div_facts does. The
 // frame is the band's largest SMALLER factor in rows by its largest LARGER factor in columns, read from the options the way the
 // generator deals (gen-operations.js: a ticked table times 0 to the band's top, 10 on "Tables to 10 x 10", else 12).
 export function multFactsArrayFrame(opts = {}) {
-    const top = Number(opts && opts.band) === 100 ? 10 : 12;
+    const top = factTableTop(opts && opts.band);
     let t = opts && opts.constant;
     if (typeof t === 'number' || typeof t === 'string') t = [t];
-    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v >= 0 && v <= top);
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: top + 1 }, (_, i) => i)).filter((v) => v >= 0 && v <= top);
     const maxT = ticked.length ? Math.max(...ticked) : top;
     return { cols: Math.max(top, maxT), rows: Math.max(1, Math.min(maxT, top)) };
 }
@@ -4353,12 +4379,19 @@ export function optionICan(categoryId, skillId, opts, baseICan) {
             band = bandDef ? normalizeOptions(categoryId, skillId, opts || {}).band : undefined;
         }
     } catch (e) { return ''; }
+    // A preset re-defaults the band (mult_facts_15 -> 225), but its base I Can line is the host's ("to 12"):
+    // measure "moved" against the HOST's default (lf-ops t15 critic D1, T15-PRESET).
+    if (bandDef) {
+        const pre = presetOf(categoryId, skillId);
+        const hostDef = pre ? optionsFor(pre.categoryId, pre.skillId).find((d) => d.id === 'band') : null;
+        if (hostDef) bandDef = hostDef;
+    }
     const bandMoved = bandDef && band !== undefined && band !== null && band !== bandDef.default;
     const hit = bandMoved ? (bandDef.values || []).find((x) => x.v === band) : null;
     const bandPhrase = hit ? `${String(bandDef.label).toLowerCase()} ${hit.l}` : '';
     if (set) return `I Can ${set.charAt(0).toLowerCase()}${set.slice(1)}${bandPhrase ? ` (${bandPhrase})` : ''}`;
     if (!bandPhrase) return '';
-    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const tok = (v) => (v === 144 ? '12' : v === 225 && bandDef.default === 144 ? '15' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
 }

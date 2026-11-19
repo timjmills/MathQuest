@@ -911,3 +911,22 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-14 — Deploy lf-roles round 11 (narrow critic r11 PASS: count rows held to ink on continuation pages; X2 ruled; ctx.guided plumbing)
 - Guided continuation pages hold count rows to their ink (GUIDED-COUNT-TIGHT); ctx.guided carried in render and measure (no page change); X2 lone-Model Guided page ruled for the two-step family.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy correct-answer sound (owner request; lf-checks critic 9/9/10/9)
+- A correct answer plays a short rising four-note power-up (C5-E5-G5-C6, Web Audio, no file) on the card, worksheet and quiz, only when SOUND is on; never on a wrong answer; silent in end-only-feedback quizzes. ws-correct-sound 18/18.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-14 — Deploy mixed facts: ÷ joins the + − × grid; bracket-fact answer room (owner request; lf-ops narrow critic 9/9/8/9)
+- Mixed-up / In-sections quick print: ÷ facts in their sign forms join the one fact grid (no separate "Divide." section), stacked like + − ×, ones aligned (MIXED-ALL-OPS). Long-division bracket facts: quotient row ≥ writing height (LDIV-FACT-ROOM); in Mix grids only the brackets are lowered. ws-fact-mix on precritic.
+- ws-simple-print MIXBASE / SLOTPOS follow lead ruling (a): in Mix rows holding brackets and other forms, the brackets keep one baseline among themselves and the row centring / slot lines are measured on the non-bracket items.
+- Gates: all deploy gates OK; ws-key-json full sweep crashes on unchanged master after the container restart (environment), run on the changed fact skills: OK (5 skills, 85 sheets).
+
+## 2026-11-15 — Owner bug fixes (owner: fixes, no critic round): number-line retry; place words are tapped, never typed
+- number-line-extended (place_on_number_line, inequalities number line): after a wrong Submit the marker unlocks for another try; a correct answer stays locked; the answer is no longer shown on a wrong try (ws-nl-retry FAIL on master -> OK).
+- placevalue digit_value_unit_form: type the number, tap the place word (read-only slot, 48 px bank); new option answerAs unit/value (value = one number box, e.g. 600); "Here is how" filled; one prompt. placevalue:identify bank: tap the word, never type it. ws-unit-form-bank FAIL on master -> OK; ws-screen-answer taps place tiles.
+- Gates (merged with master 5c005e18d): conflict-markers, boot-smoke, code-snapshot, nl-retry, unit-form-bank, screen-answer, no-phone-width, no-size-s, precritic-plan OK; earlier on this branch: roles-unit, frame-title, simple-print, pdf-preview, teacher-wrm, capacity-pin, lesson baseline OK; ws-key-json on the changed skills OK (4 skills, 51 sheets; the full sweep crashes on unchanged master after the container restart).
+
+## 2026-11-15 — Deploy tables to 15 x 15 (owner request; lf-ops critic t15 9/9/9 + D1 narrow re-check C2 9)
+- mult_facts / div_facts: "Tables to" offers 15 x 15 (band 225); the 13-15 ticks show only under it; new preset skills mult_facts_15 / div_facts_15 (codes, standards, WRM, search terms); "How it is written" leads the options panel. Facts card signed 2026-11-15.
+- D1 fixed: the preset pages' I Can line reads "to 15" (mult_facts I Can follows the page options like div_facts); ws-tables15 T15-PRESET compares rendered titles (backtest t15-preset-ican).
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.

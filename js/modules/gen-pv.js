@@ -279,6 +279,9 @@ function genPlace(q, skill, o) {
             q.options = [];
             q.acceptedAnswers = [PLACE_WORD[place], PLACE_WORD[place].replace(/s$/, '')];
             q.wordBank = words.slice();
+            q.placeTapBank = words.slice();   // owner ruling 2026-11-15: tapped on screen, never typed
+            // the paper keeps its instruction (q.printText); the screen asks for the tap (the value is a paper-only box)
+            q.text = 'Choose the place of the underlined digit.';
             q.visual = `${numeralVis}<div class="pv-bank" style="margin:8px auto 0;display:table;border:2px solid #000;border-radius:10px;`
                 + `padding:4px 14px;font-weight:700;color:#000;">${words.join('&nbsp;&nbsp;&nbsp;')}</div>`;
             q.pv = { kind: 'place', n, place, digit, support, response: 'bank', repeat, writeValue };
@@ -295,11 +298,18 @@ function genPlace(q, skill, o) {
         return;
     }
     if (skill === 'value' && o.form === 'times') { genTimesValue(q, o); return; }
-    const form = o.form === 'unit' || o.form === 'notation' ? o.form : 'value';
+    // owner bug fix 2026-11-15: unit form answered as the value ("Answer as: value") is one number box (600)
+    const unitAsValue = o.form === 'unit' && o.answerAs === 'value';
+    const form = (o.form === 'unit' && !unitAsValue) || o.form === 'notation' ? o.form : 'value';
     q.skillLabel = 'Value of a Digit';
     q.hint = `${readHint} That place tells you what the digit is worth.`;
     q.printText = 'Write what the underlined digit is worth.';
     q.pv = { kind: 'value', n, place, digit, support, form, zero: digit === 0 };
+    if (unitAsValue) {
+        q.pv.answerAs = 'value';
+        q.sayText = `The ${digit} is worth ${fmt(digit * place)}.`;
+        q.fullWorked = true;
+    }
     if (form === 'value') {
         q.text = 'What is the underlined digit worth?';
         q.ans = digit * place;
@@ -316,8 +326,15 @@ function genPlace(q, skill, o) {
         // F10 (L3, H16): both boxes one width, from the widest place word this number could ask, and labelled - the
         // second box's width no longer tells "tens" from "hundreds", and each box says what goes in it.
         const widest = Math.max(...Array.from({ length: String(n).length }, (_, i) => PLACE_WORD[10 ** i].length));
+        // owner bug fix 2026-11-15 ("I don't want students typing hundreds"): the place is CHOSEN from a bank of the
+        // number's own place words (ones ... its highest place), never typed. The bank is plural for 0 / 2+, singular for 1.
+        const bank = Array.from({ length: String(n).length }, (_, i) => plural(PLACE_WORD[10 ** i], digit));
+        q.placeBank = bank;
+        q.screenInstr = 'What is the underlined digit worth? Type the number. Choose the place.';
+        q.sayText = `The ${digit} is worth ${digit} ${plural(word, digit)}.`;
+        q.fullWorked = true;
         cellFor({ kind: 'blanks', n, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans,
-            slotChars: widest, slotLabels: ['how many', 'place'], oneLine: true });
+            slotChars: widest, slotLabels: ['how many', 'place'], oneLine: true, bank });
     } else {
         inlineBlanks(q, 'The underlined digit is worth ___ × ___.', [[digit, place]], [2, String(place).length + 2]);
         q.ans = `${digit} × ${fmt(place)}`;

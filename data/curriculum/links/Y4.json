@@ -2993,6 +2993,14 @@
     {
      "key": "multiplication:mult_div_fact_family",
      "why": "the same facts as a family of four (× and ÷ both ways); no table option, so it deals any table, not only the 11s"
+    },
+    {
+     "key": "multiplication:mult_facts_15",
+     "why": "the tables on past 12 x 12 to 15 x 15 (the 13, 14 and 15 tables), the next size up from the 11s and 12s"
+    },
+    {
+     "key": "division:div_facts_15",
+     "why": "division facts on past 12 x 12 to 15 x 15 (÷13 to ÷15), the next size up from dividing by 11 and 12"
     }
    ],
    "note": "Direct: mult_facts and div_facts with constant [11] (generated: every item is a 11× or ÷11 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2). The 11 and 12 tables go beyond CCSS 3.OA.C.7 (within 100); WRM teaches them in Y4. The owner's tables_to_15 build (13-15 tables) is the next step up; no Y4 step asks for it."
@@ -3025,7 +3033,16 @@
      }
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_facts_15",
+     "missing": "the 12 times-table carried on to 15 x 15: the 13, 14 and 15 tables go past this step (WRM stops at 12 x 12)"
+    },
+    {
+     "key": "division:div_facts_15",
+     "missing": "dividing by 12 carried on to 15 x 15: ÷13, ÷14 and ÷15 go past this step (WRM stops at 12 x 12)"
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],
