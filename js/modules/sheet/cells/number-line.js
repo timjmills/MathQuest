@@ -52,6 +52,54 @@ const neg = (v) => (Number(v) < 0 ? `\u2212${-Number(v)}` : String(v));
 /** Label size (pt): the zone-label token, never under 12 pt. */
 const LABEL_PT_MIN = 12;
 
+/**
+ * LABEL-GAP: the clear white (mm) between two neighbouring numerals of a line, and a numeral's width
+ * (mm) at `labelMm`: Andika's digit advance (long-division.js DIGIT_ADV_EM) and its true minus, a
+ * little wider than measured so the printed gap is never under the target.
+ */
+const LABEL_GAP_MM = 1.5;
+const labelWidthMm = (v, labelMm) => (String(Math.abs(v)).length * 0.6 + (v < 0 ? 0.62 : 0)) * labelMm;
+/** Do the numerals on the values `on` (a Set of tick indices, or null: every tick) keep LABEL_GAP_MM apart? */
+function labelsClear(t, pitch, labelMm, on) {
+    let prev = null;
+    for (let v = t.min; v <= t.max; v++) {
+        if (on && !on.has(v - t.min)) continue;
+        if (prev !== null && (v - prev) * pitch - (labelWidthMm(prev, labelMm) + labelWidthMm(v, labelMm)) / 2 < LABEL_GAP_MM) return false;
+        prev = v;
+    }
+    return true;
+}
+/**
+ * The ticks that keep a numeral when every asked numeral does not fit (LABEL-GAP): the given point and 0 first,
+ * then the two ends, then every 2nd, 5th or 10th number (the smallest step whose numerals fit on their own), each
+ * only where it keeps LABEL_GAP_MM from the numerals already placed. A tick the option did not label stays bare.
+ * Every tick is still drawn and the hops stay one per number; only numerals are dropped.
+ */
+function thinLabels(t, pitch, labelMm, given, asked) {
+    const units = t.max - t.min;
+    const wants = (i) => !asked || asked.has(i);
+    const step = [2, 5, 10].find((k) => {
+        const s = new Set();
+        for (let v = t.min; v <= t.max; v++) if (v % k === 0) s.add(v - t.min);
+        return labelsClear(t, pitch, labelMm, s);
+    }) || 10;
+    const out = new Set();
+    const fits = (i) => {
+        const v = t.min + i;
+        for (const j of out) {
+            const u = t.min + j;
+            if (Math.abs(v - u) * pitch - (labelWidthMm(v, labelMm) + labelWidthMm(u, labelMm)) / 2 < LABEL_GAP_MM) return false;
+        }
+        return true;
+    };
+    const order = [given];
+    if (t.min <= 0 && t.max >= 0) order.push(-t.min);
+    order.push(0, units);
+    for (let v = t.min; v <= t.max; v++) if (v % step === 0) order.push(v - t.min);
+    order.forEach((i, k) => { if (!out.has(i) && (k === 0 || (wants(i) && fits(i)))) out.add(i); });
+    return out;
+}
+
 /** The item's numbers: start, how many (the unit hops), the operation, the missing number. */
 function partsOf(p) {
     const start = Number(p.start), add = Number(p.add);
@@ -83,9 +131,12 @@ function lineSVG(g, p, hopsTo, ink, from = null) {
     body += `<path d="M${(X(t.max) + 4.5).toFixed(2)} ${yLine} l-2.4 -1.3 v2.6 z" fill="${INK.ink}"/>`;
     // The given point is always labelled (the start, or the landing point when the start is missing).
     const given = (t.unknown === 'a' ? t.end : t.start) - t.min;
-    const lab = t.ticks === 'one' ? null : new Set(tickLabelSet(units, t.ticks, {
+    let lab = t.ticks === 'one' ? null : new Set(tickLabelSet(units, t.ticks, {
         period: 2, zero: t.min <= 0 && t.max >= 0 ? -t.min : null, origin: ((-t.min % 2) + 2) % 2, keep: [given],
     }));
+    // LABEL-GAP (lf-ops bugs 2026-11-19, lf-engine roles critic r2 F6: add_int on −23..1 printed touching numerals): a
+    // line whose numerals would come closer than LABEL_GAP_MM thins them - never a smaller font (see thinLabels)
+    if (!labelsClear(t, pitch, labelMm, lab)) lab = thinLabels(t, pitch, labelMm, given, lab);
     for (let v = t.min; v <= t.max; v++) {
         const tk = v % 5 === 0 ? 2.4 : 1.6;
         const on = !lab || lab.has(v - t.min);

@@ -998,6 +998,10 @@ function buildPlan(ctx) {
         // LDIV-KIT (lf-ops bugs 2026-11-19, ldiv-room critic N3): every bracket item of division:divide, at Max Number 100 and
         // 1000, is a kit `division` cell (q.cell), and its bracket pages (independent, test; pupil + key; M / L) hold no legacy cell
         if (keys.includes('division:divide')) add(gate('ldiv-kit', 'ws-ldiv-hug --kit (LDIV-KIT: divide bracket items on the kit division template, no legacy cell, range 100 / 1000, M/L)', 'division:divide × range 100 / 1000 × M/L', 'browser', 'ws-ldiv-hug', ['--kit', '--skills', 'division:divide'], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
+        // LABEL-GAP (lf-ops bugs 2026-11-19, lf-engine roles critic r2 F6: add_int on −23..1 printed touching numerals): adjacent
+        // number-line numerals keep >= 1 mm of white - every role page (pupil + key) at M / L, the pinned −23..1 window, the screen card
+        const gapKeys = keys.filter((k) => /^integers:(add_int|sub_int)$/.test(k));
+        if (gapKeys.length) add(gate('label-gap', 'ws-label-gap (LABEL-GAP: number-line numerals never touch, >= 1 mm apart, M/L + the screen card)', `${gapKeys.join(', ')} × 4 roles × M/L + card 1280 / 820`, 'browser', 'ws-label-gap', ['--skills', gapKeys.join(',')], { missingMsg: 'ws-label-gap is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         // SOUND-ONCE (owner request 2026-11-14, "B, power-up"): the correct-answer sound plays exactly once on a correct answer
