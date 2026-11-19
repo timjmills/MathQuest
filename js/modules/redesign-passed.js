@@ -75,5 +75,9 @@ const C120_IDS = [
     'composing:hundreds_chart_fill',
     'composing:chart_to_120',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS, ...PVC_IDS, ...C120_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW]), ...PVC_IDS.map((id) => [id, PVC]), ...C120_IDS.map((id) => [id, C120])]);
+const CBT = 'Lane lf-ops, multiplication:count_by_tables (signed count-row card): critic r1 FAIL, r2 FAIL (round-cap root cause: precritic every-role cover, lf-checks), r3 FAIL (one 7: Pre-skill check L foot; EB-LASTPAGE / CAP-PARITY), r4 narrow PASS on F1 + m1-m3 with r3 >= 8 on every other offered page type at M / L, card 1366 / 1280 / 1024 / 820, worksheet, quiz (independent Opus medium critics); changed passed pages (combine / unit_form / vocab_grade_pictures Pre-skill Check, chart_to_120 / unit_form True or False?) re-graded >= 8; routed lf-engine opener / vocab bands and lf-roles Guided fit recorded, not held; design/audit/runs/lf-ops/critic-cbt-r1.md .. critic-cbt-r4.md, 2026-11-19';
+const CBT_IDS = [
+    'multiplication:count_by_tables',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS, ...PVC_IDS, ...C120_IDS, ...CBT_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW]), ...PVC_IDS.map((id) => [id, PVC]), ...C120_IDS.map((id) => [id, C120]), ...CBT_IDS.map((id) => [id, CBT])]);
