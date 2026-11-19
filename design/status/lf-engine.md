@@ -10,6 +10,24 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-19 22:30 UTC: new week, resumed. Budget stop is cost_usd $1,481.60 ($1,181.60 + $300).**
+  - (0) lf-placevalue's pagesOf fix (fbca1a582) is APPROVED.
+    - It counts the strip of a further shelf that opens a page, as plan() does.
+    - Conditions: hash-proof every changed page (only vocab_grade_pictures L Mixed should move), plus a MIX-PAGES backtest row and a ledger row.
+  - (1) rowcap stage 2 (F4) is RUNNING on claude/sweet-newton-c8wrv1-lf-engine-rowcap. Every template is capped by default, the self-built roles fail EB-STRETCH, and ROWCAP-FILL covers every template.
+  - (2) -roles comes next: the F1 WRAP check plus a full-width Model at M; SPILL-P1 reads its reserve from the budget constant and gets a boundary backtest; a critic on ≥ 20 Openers.
+  - (3) -pc r6 after that.
+- **Skill defects for the lead to route** (from -roles critic r4, 2026-11-14; not engine work):
+  - **fractions:fraction_of_set** (legacy cell), Opener Model at M:
+    - colour emoji in the drawing (H4);
+    - two "Answer:" labels (H16);
+    - the Model is a different problem kind from the Guided.
+    - Checks: an L-INK emoji/colour scan on legacy cells; the Model and the Guided must be the same problem kind.
+  - **coordinates:coordinates_plot_q1** (legacy cell), M and L:
+    - the label "C(6,9)" overlaps "Answer:" (H2);
+    - the Model is not worked (no answer ink).
+    - Checks: text bounding boxes inside a cell must not intersect; a Model cell must show answer ink.
+
 - **2026-11-14 21:10 UTC: -roles r4 FAILED; the lane is PARKED.**
   - Code head eb17fe01a; report c32855f68.
   - r3's add_wp_10k M blocker is fixed (1 page, 90 %).
