@@ -1115,6 +1115,8 @@ export const SKILL_WRM = {
     'division:div_3by2_long': ['Y6.B2.S11'],
     // 2026-10-31 (owner, facts card Q4): division facts written in the long-division bracket.
     'division:div_facts_long': [{ step: 'Y4.B5.S11', partial: 'division facts to 12 x 12 in the long-division bracket: the notation, with no exchange past a fact' }],
+    'multiplication:mult_facts_15': [{ step: 'Y4.B4.S10', partial: 'the 12 times-table carried on to 15 x 15 (the 13, 14 and 15 tables; WRM stops at 12 x 12)' }],
+    'division:div_facts_15': [{ step: 'Y4.B4.S10', partial: 'dividing by 12 carried on to 15 x 15 (÷13, ÷14, ÷15; WRM stops at 12 x 12)' }],
     'number_sense:near_doubles': ['Y1.B5.S5'],
     // PRESET skills, batch 2 (2026-10-17): the host's steps that the preset's values ARE.
     'multiplication:mult_break_apart': [{ step: 'Y4.B5.S15', partial: 'breaking a fact apart into two easier facts' }],

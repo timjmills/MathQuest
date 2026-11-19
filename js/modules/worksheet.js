@@ -17,7 +17,7 @@ import {
     wireTickBoxes, adoptVisualBlank, wireCellSlots, wordWorkScreenFilled,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback, blurVocabSlots,
     fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
-    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
 
@@ -1737,6 +1737,7 @@ function _wsRenderCard(grid, q, i) {
             }
         }
         wireStackEntry(cellEl);
+        if (q && q.placeTapBank) wirePlaceWordBank(cellEl, document.getElementById(`ws_input_${i}`), q);
         // green as soon as it is right (owner request 2026-09-25): digit, regroup and answer boxes
         try { wireLiveCorrect(cellEl, { q, kind, single: document.getElementById(`ws_input_${i}`) }); } catch (e) { /* optional */ }
         {
@@ -1908,6 +1909,7 @@ export function newWorksheet() {
 
     state.worksheetQs = [];
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
+    worksheetSoundPlayed.clear();
     worksheetBannerRecorded.clear(); // Reset banner stats tracking
     worksheetMscState.clear(); // Reset multi-select-check per-card verdicts
     worksheetClockSetState.clear(); // Reset clock-set per-card verdicts
@@ -2505,6 +2507,8 @@ export function advanceToNextProblem(currentIdx, pending = null) {
 const worksheetConfettiTriggered = new Set();
 // Track which worksheet questions have been recorded in the banner stats (prevents double-counting)
 const worksheetBannerRecorded = new Set();
+// Track which worksheet questions have already played the correct sound (never twice for one item)
+const worksheetSoundPlayed = new Set();
 // Track debounce timers for single-input wrong-answer delay (2 seconds)
 const worksheetWrongTimers = new Map();
 
@@ -2524,6 +2528,11 @@ function wsNoteWrong(idx) {
 // Record a worksheet answer in the game stats banner (once per problem)
 function wsRecordAnswer(idx, isCorrect) {
     if (!isCorrect) wsNoteWrong(idx);
+    // owner 2026-11-14: the power-up sound, once per item, on its first correct verdict (correct-sound.js)
+    if (isCorrect && !worksheetSoundPlayed.has(idx)) {
+        worksheetSoundPlayed.add(idx);
+        if (typeof window !== 'undefined' && typeof window.playCorrectSound === 'function') window.playCorrectSound();
+    }
     if (worksheetBannerRecorded.has(idx)) return;
     worksheetBannerRecorded.add(idx);
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {

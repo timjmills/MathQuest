@@ -29,7 +29,7 @@ import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole, factTableTop } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -151,10 +151,10 @@ function divUnderTabSection(sec, size) {
     // green - and the taller row would only cost the page a row: ws-print-lint --supports boxsign L H13 32 %)
     const sup = Array.isArray(o.support) ? o.support : [];
     if (!sec.divFade && sup.length && sup.every((v) => v === 'boxsign')) return false;
-    const top = Number(o.band) === 100 ? 10 : 12;
+    const top = factTableTop(o.band);
     let t = o.constant;
     if (typeof t === 'number' || typeof t === 'string') t = [t];
-    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: top + 1 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
     if (!ticked.length) return false;
     const b = Math.max(...ticked);
     return String(b * top).length + String(b).length >= 5;
@@ -269,6 +269,9 @@ function normaliseRequest(req = {}) {
             // from the caller's probe - one column count and digit size on every page and set of the print
             tracks: s && Number(s.tracks) > 0 ? clampInt(s.tracks, 1, 7, 0) : 0,
             ansTracks: s && Number(s.ansTracks) > 0 ? clampInt(s.ansTracks, 1, 7, 0) : 0,
+            // ... and whether the section's skills mix ÷ (the sign's own form) with + − × (MIXED-ALL-OPS, owner 2026-11-14): every
+            // page of it is laid as the mixed page, a page that dealt ÷ facts only too
+            ...(s && s.signMix ? { signMix: true } : {}),
             // ... and the section's one row stretch for the whole print (PG-11: at most 1.3, owner 2026-11-05)
             stretch: s && Number(s.stretch) >= 1 ? Math.min(1.3, Number(s.stretch)) : 0,
             // ... and the largest digit size a section may take (facts-print-fix r4: sections sharing a page take one size)
@@ -2835,7 +2838,7 @@ function optionTitleBase(sk, baseICan) {
     if (!bandPhrase) return '';
     // A mixed page: the skill's own title with its default bound swapped for the chosen one
     // ("I Can add facts to 20" -> "to 10"; the ×/÷ tables name their largest factor).
-    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const tok = (v) => (v === 144 ? '12' : v === 225 && bandDef.default === 144 ? '15' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
 }
@@ -4485,7 +4488,8 @@ async function buildRoleSheet(n, metaOf) {
             factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
             factPt: (n.sections[0] && n.sections[0].maxPt) || 0,
             factSizeCap: !!(n.sections[0] && n.sections[0].sizeCap),
-            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap })) } : {}),
+            ...(n.sections[0] && n.sections[0].signMix ? { factSignMix: true } : {}),
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap, ...(s.signMix ? { signMix: true } : {}) })) } : {}),
         } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
