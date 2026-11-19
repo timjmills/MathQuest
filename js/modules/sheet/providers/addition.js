@@ -130,6 +130,15 @@ registerSkill('addition:add_facts', {
     },
     wrongAnswer: (q) => factWrong(q),
     stories: storiesFor('+'),
+    // The Pre-skill check's skills, nearest first (lf-ops bugs 2026-11-19, EB-LASTPAGE: add_facts is the first addition skill,
+    // so the check fell back to checking itself once - 4 items, 78 % of the page empty at M and L): the facts to 10, make 10
+    // and the number bonds within 10 (its links' Y1.B2 prerequisite, data/curriculum/links) - the parts a fact to 20 is
+    // built from. Three, so the check is one page at M and L; the role's fill (critic cbt r3 F1) adds whole rows to it.
+    preSkills: () => [
+        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10 } },
+        { categoryId: 'composing', skillId: 'make_ten', opts: {} },
+        { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10 } },
+    ],
 });
 
 /* ================================================================================== add */
