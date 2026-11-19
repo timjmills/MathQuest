@@ -12002,6 +12002,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "amdiv-lesson-topstart",
+   "check": "ws-print-lint L-TOPSTART on the lesson's Practice page (area-model-div template round 2026-11-19, ledger 2026-11-14 lf-ops-amdiv): the lesson Practice / Mixed page centred every cell (LESSON_PM_CENTRE_CSS) and the area model, a several-row drawing answered in its own boxes, started 9.6 mm below the top pad at M (x12); it keeps the top of the box (CL-4b)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-TOPSTART CL-4b",
+   "browser": true,
+   "fail": {
+    "commit": "9b52bc399",
+    "state": "precritic: lesson M L-TOPSTART CL-4b x12 (p3 / p6 cells 1-6, 9.6 mm)"
+   },
+   "pass": {
+    "commit": "5b684ed22",
+    "state": "print-sheet.js LESSON_PM_CENTRE_CSS: area-model-div cells flex-start on lesson Practice / Mixed"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M --skills division:area_model_div_4by2 --lints L-TOPSTART",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "amdiv-key-slots",
+   "check": "ws-print-lint L-KEY AK-2 on the area-model-div Scripted Model and True or False? keys (area-model-div template round 2026-11-19): the Scripted Model state cells are blank by design and written in the step inks (mq-smstate: blank slots and key weight skipped, every other key cell judged - self-tests 'light key answer beside a scripted-model state cell' fires, 'light answer in a scripted-model state cell' does not); True or False? TRUE frames blank by design (mq-tofblank)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-KEY AK-2",
+   "browser": true,
+   "fail": {
+    "commit": "9b52bc399",
+    "state": "precritic role-cover: Scripted Model M key p2 9 of 12 slots blank; True or False? M key p2 2-3 of 20-30 blank; weight 700 (minor)"
+   },
+   "pass": {
+    "commit": "5b684ed22",
+    "state": "cherry-picked mq-smstate / mq-tofblank marks (lf-ops cbt r3, lead ruling 2026-11-14) + the weight exemption for mq-smstate"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles scripted-model,true-false --size M --skills division:area_model_div_4by2 --lints L-KEY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
