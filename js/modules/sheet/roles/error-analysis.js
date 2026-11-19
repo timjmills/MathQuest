@@ -38,7 +38,7 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer, equationStemOf,
 } from './compose.js';
-import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
+import { gridHeightMm, SAFETY_H_MM, rowCapMm } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
@@ -915,13 +915,18 @@ export function varied(items) {
 export function rowHeights(items, cols, G, mode) {
     const rows = Math.max(1, Math.ceil(items.length / cols));
     const need = [];
+    // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a row grows at most to what it
+    // draws (its tallest item's measure at the judge mode) + its templates' writing room; the spare stays under the grid
+    const cap = [];
     for (let r = 0; r < rows; r++) {
-        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => heightAt(it, cols, mode)).filter(Number.isFinite);
+        const its = items.slice(r * cols, (r + 1) * cols);
+        const hs = its.map((it) => heightAt(it, cols, mode)).filter(Number.isFinite);
         need.push(hs.length ? Math.min(G / rows, Math.max(...hs) * 1.1) : G / rows);
+        cap.push(hs.length ? Math.max(Math.max(...hs), rowCapMm(Math.max(...hs), its)) : Infinity);
     }
     const sum = need.reduce((a, b) => a + b, 0);
     const grow = sum > 0 ? Math.max(1, Math.min((G - SAFETY_H_MM) / sum, 1.4)) : 1;
-    return need.map((x) => Math.round(Math.min(G / rows, x * grow) * 100) / 100);
+    return need.map((x, r) => Math.round(Math.min(G / rows, x * grow, cap[r]) * 100) / 100);
 }
 
 /**

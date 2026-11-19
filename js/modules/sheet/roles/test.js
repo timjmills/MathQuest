@@ -303,7 +303,9 @@ export function plan(input = {}) {
     // 184 mm cell, 32 %; two_step_estimate_check L: two 83 mm stories in 114 mm rows, 31 %).
     if (rows === 1 || (!sections[1].rowGap && items.every(isStoryWork))) {
         const drawn = sections[1].height ? parseFloat(sections[1].height) : L.gridH;
-        const held = capRowsToInk(items, L.cols, rows, drawn, rows === 1 ? '' : sections[1].rowsTpl || '');
+        // (ROW-STRETCH CAP stage 2: a one-row grid the row cap already holds under its page is the same ruled one-row grid)
+        const held = capRowsToInk(items, L.cols, rows, drawn, rows === 1 ? '' : sections[1].rowsTpl || '')
+            || (rows === 1 && !sections[1].rowGap && drawn < L.gridH - 1 ? { heightMm: Math.round(drawn * 100) / 100, rowsTpl: '' } : null);
         if (held) Object.assign(sections[1], { height: `${held.heightMm}mm`, rowsTpl: held.rowsTpl, rowGap: 0, cls: `${sections[1].cls || 'fixed'} ${rows === 1 ? 'mq-onerow' : 'mq-inkrows'}` });
     }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {

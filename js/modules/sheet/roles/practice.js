@@ -1240,6 +1240,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             if (lone && !noCapSec && !capFill && !its.some((it) => it.anchor) && !L.blocks && !(L.cols === 2 && L.pairs) && (rowsN === 1 || (!gap.gap && its.every(isStoryWork)))) {
                 const drawn = spread ? spread.heightMm : gap.gap ? gap.heightMm : shape ? shape.heightMm : fillByFlex ? avail : rowsN * L.cellH;
                 oneRow = capRowsToInk(its, L.cols, rowsN, drawn, rowsN === 1 ? '' : spread ? spread.rowsTpl : shape ? shape.rowsTpl : '');
+                // (ROW-STRETCH CAP stage 2: a one-row grid the row cap already holds under its page is the same ruled one-row grid)
+                if (!oneRow && rowsN === 1 && drawn > 0 && drawn < avail - 1) oneRow = { heightMm: Math.round(drawn * 100) / 100, rowsTpl: '' };
             }
             if (oneRow) sections.push({
                 kind: 'grid', cols: L.cols, rows: rowsN, labels: labelStyle, start, cls: `fixed mq-spread ${rowsN === 1 ? 'mq-onerow' : 'mq-inkrows'}`, height: `${oneRow.heightMm}mm`, rowsTpl: oneRow.rowsTpl,

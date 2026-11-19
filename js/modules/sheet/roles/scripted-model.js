@@ -20,6 +20,7 @@ import {
 import { isWideRow } from '../cells/count-row.js';
 import { stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueRow } from './guided.js';
+import { rowCapMm } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -282,7 +283,9 @@ function factModel(input, ctx, frame, m) {
             // the jots in the state's body under its 5 mm top pad and 1.5 mm gaps, which natural() does not count: at L the 10s band's
             // third jot ran onto the cell rule with 25 % of the page free. Those rows take the pad and gaps into their need.)
             const padOf = (it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; return pl && (pl.op === '/' || pl.op === '÷') && it.supportsBox && it.supportsBox.plan ? 5 + 2 * 1.5 : 0; };
-            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(natural(1) + Math.max(...exs.slice(0, 2).map(padOf)), ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx));
+            // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: never past what the state draws + its writing room, layout.rowCapMm)
+            const need1 = natural(1) + Math.max(...exs.slice(0, 2).map(padOf));
+            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(need1, ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx), Math.max(need1, rowCapMm(need1, exs.slice(0, 2))));
             const pages = exs.slice(0, 2).map((ex, e) => {
                 const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });
                 const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }];
@@ -300,7 +303,8 @@ function factModel(input, ctx, frame, m) {
         const R = k * rowsEx;
         const H0 = natural(k);
         if (R * H0 > room) continue;
-        const H = Math.min(room / R, H0 * FACT_GROW);
+        // (ROW-STRETCH CAP stage 2: never past what the states draw + their writing room, layout.rowCapMm)
+        const H = Math.min(room / R, H0 * FACT_GROW, Math.max(H0, rowCapMm(H0, exs.slice(0, k))));
         const used = exs.slice(0, k);
         const cells = [];
         used.forEach((ex, e) => cells.push(...exampleCells(ex, e, across, textMm, stepsOf, rowsEx)));

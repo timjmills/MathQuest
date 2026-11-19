@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf, rowCapMm } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -1377,6 +1377,9 @@ export function plan(input = {}) {
         // A one-column page holding ONE word-work story takes the row the story draws - its measured work and writing room, the
         // Model's tab clearance and worked lines, the hint line (w) - and the spare height stays under the grid (PAGE_TYPES 12.1).
         if (cols === 1 && rows === 1 && host.length === 1 && host[0].template === 'word-work') Hr = [Math.min(Hr[0], w[0])];
+        // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a row is held to what it draws
+        // (w: its tallest item, the Model's worked lines, the hint line) + its templates' writing room; the spare stays under the grid
+        Hr = Hr.map((x, r) => Math.min(x, Math.max(w[r], rowCapMm(w[r], rowItems(r)))));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
