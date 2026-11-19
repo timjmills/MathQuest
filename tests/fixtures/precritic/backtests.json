@@ -11982,6 +11982,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "skip-return",
+   "check": "ws-skip SKIP-RETURN / SKIP-RESULTS: on the practice card, online worksheet, quiz and MAP test every skipped item comes back at the end after \"You skipped n. Let's fix them.\", identical (text, answer, drawing), one at a time; each is scored once; a second skip ends it \"skipped\" in the teacher's results",
+   "kind": "commit-pair",
+   "rule": "SKIP-RETURN (owner request via lf-hosts, 2026-11-19: Skip button on every student mode)",
+   "fail": {
+    "commit": "d38308824",
+    "state": "no return pass: Skip appears only after 5 wrong tries; skipped items never come back; quiz has no Skip; the teacher results read a blank as Wrong"
+   },
+   "pass": {
+    "commit": "515d9f54a",
+    "state": "every host returns the skipped items at the end (same item object), scores each once, and shows a second-pass skip as skipped"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280,820 --rules SKIP-RETURN,SKIP-RESULTS",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-not-wrong",
+   "check": "ws-skip SKIP-NOT-WRONG / SKIP-BTN / SKIP-COUNT / SKIP-OFF: a skip never counts as wrong (no incorrect status, streak, XP, adaptive levels, skill progress, Leitner and MAP RIT unchanged); the button is visible from the start, >= 48 x 48, with Hint / Read; 'Skipped: n' is right; the teacher setting off hides it",
+   "kind": "commit-pair",
+   "rule": "SKIP-NOT-WRONG (owner request via lf-hosts, 2026-11-19)",
+   "fail": {
+    "commit": "d38308824",
+    "state": "Skip hidden until 5 wrong tries (a fresh item has no Skip), no Skipped count, no quiz Skip, no MAP / quiz off setting"
+   },
+   "pass": {
+    "commit": "515d9f54a",
+    "state": "Skip on from the first moment on every host, 48 px, never a miss, counted, and off per quiz / MAP test / skill"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280,820 --rules SKIP-NOT-WRONG,SKIP-BTN,SKIP-COUNT,SKIP-OFF",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
