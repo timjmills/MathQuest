@@ -1,10 +1,70 @@
 # Design card: Lessons browser (lessons-passed registry, status chips, grade / area / 8/10 filters, Thumbnails | List)
 
-Status: DESIGN, unsigned (owner questions at the end). Designer: Opus medium, 2026-11-19, branch claude/sweet-newton-c8wrv1-lf-tools-lessons.
+Status: DESIGN, amended with the OWNER RULINGS of 2026-11-19 (section 0; they override anything below that disagrees). Designer: Opus medium, 2026-11-19, branch claude/sweet-newton-c8wrv1-lf-tools-lessons.
 Requests: owner via the lead, 2026-11-14 to 11-19 (items 1-7 below). Mock: `design/status/lf-checks/lessons-browser/mock.html`
 (the app's teacher CSS, real lesson rows from `wrm-links.js` + `data/curriculum/links/<Y>.json`), screenshots beside it at
 1366 x 768 and 1024 x 768, DSF 2: `a-list`, `b-thumbs`, `c-only`, `d-skills`, `e-open` (`-1366.png`, `-1024.png`).
 No 390 px host (FASTEST_PLAN rule 7).
+
+## 0. Owner rulings (2026-11-19, via the lead) — these govern
+
+**R1 Areas, one label table.** Both screens keep the 9 areas of `teacher-areas.js`; each chip and heading is labelled from ONE
+table, `AREA_LABELS`, a new export of **`js/modules/teacher-areas.js`** (beside `AREAS`, read by teacher-library.js AND
+teacher-wrm.js; no other copy):
+
+| Area | Label |
+|---|---|
+| CC | Counting & Cardinality |
+| OA | Operations & Algebraic Thinking |
+| NBT | Number & Operations in Base Ten |
+| NF | Number & Operations—Fractions (decimals live here) |
+| MEAS | Measurement (Measurement & Data) |
+| DATA | Data (Measurement & Data) |
+| G | Geometry |
+| RPNS | Ratios & Proportional Relationships / The Number System (grade 6) |
+| MIXED | Mixed (several domains) |
+| WORDS | Words (maths vocabulary) |
+| NOSTD | No CCSS domain (proposed; the ruling did not name it — 1 grade-3 lesson) |
+
+**R2 Passed marks: "pending re-check".** The 6 lessons of §1 are NOT marked. `lessons-passed.js` ships with
+`LESSONS_PASSED` EMPTY and a separate `PENDING_RECHECK` list (the 6 ids, each with its old evidence line). Pending shows as a
+dotted "Pending re-check" chip on the row / card / header, never ✓ and never the corner. A lesson moves to `LESSONS_PASSED`
+only when a NARROW critic passes it again, and its entry then carries `renderStamp` (the `ws-lesson-hash` stamp of the render the
+critic graded); a later render change makes it stale (ws-lessons-passed fails until re-graded). "Only 8/10 ✓ (0)" shows an
+empty state naming the pending lessons (mock `c-only`).
+
+**R3 Grade: the school's placement wins.** A row's grade = the school grade it is listed in (`WRM_SEQUENCE` grade id).
+UK Year − 1 (`grade-of.js usGradeOfYear`) applies ONLY to a lesson the school places nowhere (a `skill:` lesson: data.js
+`SKILL_GRADES`; a library step lesson with no site row: its step year − 1). This replaces §5's step-year rule; the 13 moved rows
+of §5 stay in their school grade. Q3 is closed.
+
+**R4 Extra lessons are mixed in.** No "Extra lessons" section: every non-WRM row (lesson `type !== 'wr'`: the CCSS BUILD rows and
+the school-site support / project / enrichment lessons) sits under its area with a "CCSS Build" chip. Assessments stay out of
+the list (no skills). Q4 is closed.
+
+**R5 Counts, split.** The summary shows WRM and CCSS Build separately:
+"WRM: 136 lessons · 0 ✓ · 47 built · 68 covers part · 21 to build | CCSS Build: 22 lessons · 0 ✓ · 9 built · 11 covers part · 2 to build"
+(REAL grade 3, school placement, assessments excluded; 3 of the 9 CCSS Build "built" are pending re-check). Chips: exactly one
+coverage chip per row: `Full` / `Covers part` (its own chip) / `To build` (NO skill: `linksFor(l).direct` empty — the build-list
+clause of §3 is dropped). Q5 is closed.
+
+**R6 Build order (owner).** WRM lessons and their associated skills first, then the others (CCSS Build, site extras). Where the
+order lives and what to change (NOT changed here; for the lead):
+- `js/modules/build-list.js` `LANES` (line ~74) and the entry ordering that `design/BUILD_LIST.md` prints: sort entries within each
+  non-frozen lane so an entry whose `wrmSteps` / `lessonsBlocked` names a WRM step lesson (type `wr`) comes before one that
+  serves only CCSS BUILD or site lessons (a stable key `wrmFirst`), then the existing order.
+- `FROZEN_LANES = ['k2', 'operations']` (line 812) keep their order by rule; their NEW entries are appended — appended WRM-serving
+  entries still go after the frozen ones. Changing that needs the owner to unfreeze or to accept "WRM first among appended".
+- The lesson-needs entries (`source: 'lesson'`, appended last, ~line 1157) get the same `wrmFirst` key.
+- `design/lessons-first/QUEUE.md` / `queue.json` rounds: list WRM units' skills before CCSS BUILD skills in each round.
+- Regenerate `design/BUILD_LIST.md` (`ws-standards.cjs --report`) after the change.
+
+**Checks amended.** LESSON-DOMAIN: every row in exactly one area; grade x area counts equal the data; every carried grade has
+a chip; **every row shows under the school grade it is listed in, and only a row with no school placement uses Year − 1**; no
+"Extra lessons" section exists and every `type !== 'wr'` row carries the CCSS Build chip. ws-lessons-passed: `LESSONS_PASSED`
+entries need a `renderStamp` equal to the current `render-stamps.json` value; `PENDING_RECHECK` ids are live and never marked.
+FILTER-PASSED also covers the empty state. New **AREA-LABELS**: both screens render every area chip from `AREA_LABELS`
+(no area label string elsewhere in teacher-*.js).
 
 ## What exists today (read before building)
 
