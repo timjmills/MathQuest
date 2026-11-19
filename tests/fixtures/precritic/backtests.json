@@ -11195,7 +11195,7 @@
     "commit": "9d7772a36",
     "state": "crash at skill 2 retried; 4 of 4 measured"
    },
-   "command": "env MQ_TOF_CRASH_AT=2 node {root}/tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply --restart-every 2 2>&1 | grep -q 'retried 1' && echo 'tof-retry: OK' || echo 'tof-retry: FAIL (no crash retried)'",
+   "command": "env MQ_TOF_CRASH_AT=2 node {root}/tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply --restart-every 2 2>&1 | grep -qE 'retried 1([^0-9]|$)' && echo 'tof-retry: OK' || echo 'tof-retry: FAIL (no crash retried)'",
    "expect": {
    "fail": "FAIL",
    "pass": "OK"
