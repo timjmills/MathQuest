@@ -11200,6 +11200,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "merge-master-crlf",
+  "check": "critic merge r2: in a CRLF ledger / status file the '=' separator line carried a \\r, so union3 never switched to master's side: master's lines were silently lost (exit 0) and a clash on the same row passed silently",
+  "kind": "commit-pair",
+  "rule": "ws-merge-master union3 judges lines without the \\r and writes the file's own line ends (self-test cases 'r2 CRLF')",
+  "browser": false,
+  "fail": {
+   "commit": "a0fc71d43",
+   "state": "self-test's r2 git CRLF cases against a0fc71d43's tool: 2 FAIL (master's appended line lost; same-row clash exit 0)"
+  },
+  "pass": {
+   "commit": "ab5878446",
+   "state": "26 of 26 OK"
+  },
+  "command": "node tests/scripts/ws-merge-master.mjs --self-test --target {root}/tests/scripts/ws-merge-master.mjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }

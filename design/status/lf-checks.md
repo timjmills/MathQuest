@@ -829,3 +829,5 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   resolved, lesson-baseline.json LEFT; d57c126e3 three sources LEFT, so the three reports are left for regeneration
   after them (by design now, F7).
 - Not done: stale cleanly-merged reports are not re-validated (F7 last point) - the lane's own report gates catch them.
+- 2026-11-19, critic merge r2 (FAIL 7/7/8/8): CRLF ledger / status files lost master's side; fixed (union3 strips the \r to
+  judge, writes CRLF back). Self-test 26 cases; row `merge-master-crlf`.
