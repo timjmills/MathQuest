@@ -150,6 +150,11 @@ export const ROW_ROOM_DEFAULT_MM = 3;
 export const ROW_ROOM_MM = Object.freeze({ 'vocab-match3': 2, 'lesson-vocab': 2, 'count-row': 3 });
 export const ROW_STRETCH_EXEMPT = Object.freeze({ 'division': 'LDIV-ROOM (owner 2026-11-14): the long-division writing boxes grow into the row, up to 2x', 'long-multiplication': 'the partial-product rows are the work area; the row is the working space (PT 2.4)', 'word': 'a story cell: the row under the story is the working space (PT 3.7)' });
 /**
+ * The LAYOUT engines that size their rows by their own owner rule and are not held to the row cap (named, each with its reason).
+ * ws-empty-band EB-STRETCH does not judge their cells (it reads the fact grid's class, `.ws-grid.facts`).
+ */
+export const ROW_STRETCH_EXEMPT_LAYOUTS = Object.freeze({ 'fact-rows': 'the fact-row engine (roles/fact-rows.js factRowsLayout): owner FULLPAGE / ROWSAME rules (facts-print-fix r4-r5) - one row height a page, every page but the last full, at most 1.3 x the fact' });
+/**
  * The footprint classes whose spare row height IS the pupil's working space (PT 2.4's 93 x 114 long-division cell, PT 3.7's
  * story): a row holding one of them is never capped (as resolveSectionLayout's `capped` exempts them from the fill limit).
  */

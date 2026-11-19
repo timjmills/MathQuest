@@ -17,7 +17,7 @@ import {
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
     hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, capRowsToInk, isStoryWork } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, capRowsToInk, isStoryWork, rowCapMm } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
 import { scorePoints } from '../paginate.js';
 
@@ -83,7 +83,9 @@ function fillToCeiling(L, size, columns, opts = {}) {
         const capH = Math.round(Math.min(even, Math.max(L.hMin, Math.min(L.cellH, L.hMin * FACT_TEST_ROOM))) * 1000) / 1000;
         return Object.assign({}, L, { rows, perPage, cellH: capH, fill: capH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
     }
-    const cellH = Math.round(Math.min(even, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
+    // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: never past what the row draws + its writing room, layout.rowCapMm)
+    const capRow = Math.max(L.cellH, rowCapMm(L.hMin, opts.items || []));
+    const cellH = Math.round(Math.min(even, capRow, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
     if (rows === L.rows && cellH <= L.cellH + 0.01) return L;
     return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
 }
@@ -112,7 +114,7 @@ function layout(items, input, count) {
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns,
-        { footprintRows: divFact,
+        { footprintRows: divFact, items,
             // (R6-1's full page: the one-line across fact only - div_facts' Long division and Fraction forms keep 12.1's ceiling)
             fullPage: acrossFact });
         if (divFact && acrossFact && (!input.columns || input.columns === 'auto')) {
@@ -241,9 +243,10 @@ function planSplit(input, sp, items) {
     // The page's spare height goes INTO the rows, each up to its fill limit (layout.rowGapFor's one
     // rule: never between rows); what is left stays under the grids.
     const k = Math.max(1, Math.min(FILL_CAP, (sp.G - GRID_BORDERS_MM) / Math.max(1, used)));
-    const grow = (h) => Math.round(Math.max(h, Math.min(k * h, fillLimit(h))) * 10) / 10;
-    const hsN = rowHs.map(grow);
-    const hsW = wideHs.map(grow);
+    // (ROW-STRETCH CAP stage 2: never past what the row draws + its writing room; hMinAt is the measure + 2 mm, layout.rowCapMm)
+    const grow = (h, its) => Math.round(Math.max(h, Math.min(k * h, fillLimit(h), Math.max(h - 2, rowCapMm(h - 2, its)))) * 10) / 10;
+    const hsN = rowHs.map((h, r) => grow(h, nar.slice(r * sp.cols, (r + 1) * sp.cols)));
+    const hsW = wideHs.map((h, r) => grow(h, [wid[r]]));
     const sum = (a) => Math.round(a.reduce((x, y) => x + y, 0) * 100) / 100;
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: scorePoints(all) });

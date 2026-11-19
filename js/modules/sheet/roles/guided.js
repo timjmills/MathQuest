@@ -102,6 +102,8 @@ export const partialEndOf = (cols, span, n = Infinity, span2 = 0) => {
 };
 /** The row the first tries sit in. */
 // (a div_facts Mix page whose Models fill the first row - mixModels - has its first tries in row 2)
+/** The height a fact Model's think cue ("6 x __ = 24") reserves under its fact (mm). */
+const THINK_CUE_MM = 17;
 const partialRowOf = (cols, span, nModels = 1, span2 = 0) => (span || span2 >= cols || cols === 1 || nModels >= cols ? 1 : 0);
 /**
  * A Mix page's hinted tries: the tries in the row after the last Model (the rest of that row when
@@ -497,7 +499,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     const lines = model && items.length > 1 && !thinkCueOf(model) && !noLines ? (span2 ? sideLinesOf(model) : workLinesOf(model)) : [];
     const span = !span2 && !noSpan && cols > 1 && lines.length > 1;
     const extra = !model || items.length < 2 ? 0
-        : thinkCueOf(model) ? 17
+        : thinkCueOf(model) ? THINK_CUE_MM
         : span2 ? (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + Math.max(0, sideLinesMm(lines, cols, m, span2) - h0)
         : span ? TAB_CLEAR_MM + Math.max(0, workLinesMm(lines, 2, m) - h0)
         : (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + workLinesMm(lines, cols, m);
@@ -1382,7 +1384,10 @@ export function plan(input = {}) {
         // (drawn: w is the measure + 1 mm and the measure holds a number tab's keep-out a Guided cell does not draw (CL-14) - unless
         // the tight rows already took it off - so the row draws w - 1 - koMm; never below the planned need where that is larger)
         const koCap = tightAll ? 0 : koMm(ctx.size);
-        Hr = Hr.map((x, r) => Math.min(x, Math.max(w[r] - 1 - koCap, rowCapMm(w[r] - 1 - koCap, rowItems(r)))));
+        // (a fact Model's think cue reserves THINK_CUE_MM in the plan (extra); it draws one boxed text line and its gap - the rest of
+        // the reserve is not drawn, so the cap is reckoned without it)
+        const cueSlack = (r) => (pi === 0 && r === 0 && nModels === 1 && use[0] && thinkCueOf(use[0]) ? Math.max(0, THINK_CUE_MM - (((ctx.s && ctx.s.textPt) || 14) * 1.2 * (25.4 / 72) + 4.7)) : 0);
+        Hr = Hr.map((x, r) => { const d = w[r] - 1 - koCap - cueSlack(r); return Math.min(x, Math.max(d, rowCapMm(d, rowItems(r)))); });
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

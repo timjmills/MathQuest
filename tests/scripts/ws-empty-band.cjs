@@ -275,6 +275,7 @@ const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.
 const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
 // EB-STRETCH's tolerance (mm) and its room table, read once from layout.js (rowRoom, below)
 const STRETCH_TOL_MM = 1.5;
+const STATIC_TOL_MM = 3;
 let ROW_ROOM = null;
 const STRETCH_ROLES = new Set(['independent', 'more-practice', 'mixed-practice', 'test', 'review', 'lesson', 'opener', 'guided', 'scripted-model', 'error-analysis', 'pre-skill-check']);
 const STRETCH_NOTES = [];
@@ -593,7 +594,7 @@ function measureCells(scope) {
                     beside = across && [...up.children].some((k) => k !== br && !k.querySelector('[data-ws-cell]') && k.getBoundingClientRect().height > 0 && (k.textContent || '').trim().length > 0);
                 }
             } catch (e) { beside = false; }
-            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, factGrid: !!c.closest('.ws-grid.facts'), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
@@ -898,13 +899,22 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
         // (a cell whose item is of a working-space class - word / long, WORK_SPACE_CLASSES - keeps its row: c.workSpace)
         // (a `legacy` cell - a skill's old print HTML the kit wraps - is MEASURED taller than it draws (its own text and answer line,
         // pre-skill-check routedLayout), so its natural height is not what the composer sized: noted by judge(), not judged)
-        if (rm === null || c.beside || c.workSpace || c.tmpl === 'legacy') continue;
-        const row = live.filter((d) => d.page === c.page && Math.abs((d.topPx || 0) - (c.topPx || 0)) < 2);
+        // (a cell of the fact-row engine's grid - .ws-grid.facts, layout.js ROW_STRETCH_EXEMPT_LAYOUTS - is sized by its own FULLPAGE rule)
+        // (and a cell with no template - a lesson panel, the I-do box - is no template's row)
+        if (rm === null || !c.tmpl || c.beside || c.workSpace || c.tmpl === 'legacy' || c.factGrid) continue;
+        // (a Scripted Model's states are ONE drawing at successive steps, laid at one height (MOD-GRID; PT-MOD-3 keeps the room a
+        // later mark needs): its "row" is every state cell of the page, the tallest state the drawn height - c.oneHeight)
+        const row = live.filter((d) => d.page === c.page && (c.oneHeight || Math.abs((d.topPx || 0) - (c.topPx || 0)) < 2));
         // (a row that also holds an exempt cell is sized by it)
         if (row.some((d) => roomOf(room, d.tmpl) === null || d.workSpace)) continue;
-        const need = Math.max(...row.map((d) => d.natMm));
+        // (drawn: the larger of what the cell lays out to with no stretch and the bridge's measure + 1 mm, measMm - the height the
+        // engine reckons drawn; EB-FOOT keeps that measure honest)
+        const need = Math.max(...row.map((d) => Math.max(d.natMm, Number(d.measMm) || 0)));
         const cap = need + Math.max(...row.map((d) => roomOf(room, d.tmpl)));
-        if (c.hMm - cap > tol) out.push({ c, need, cap, room: +(cap - need).toFixed(1), over: +(c.hMm - cap).toFixed(1) });
+        // (a row whose cells carry no bridge measure is drawn at its STATIC footprint - the engine's only drawn height for it, held
+        // to the drawing within 10 % by EB-FOOT - so it is judged with STATIC_TOL_MM; a measured row with `tol`)
+        const t = row.every((d) => Number(d.measMm) > 0) ? tol : Math.max(tol, STATIC_TOL_MM);
+        if (c.hMm - cap > t) out.push({ c, need, cap, room: +(cap - need).toFixed(1), over: +(c.hMm - cap).toFixed(1) });
     }
     return out;
 }
@@ -913,6 +923,7 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
 // Guided, Scripted Model, Error Analysis and Pre-skill check - a FAIL there now, not a note. The roles not yet capped (Reason It,
 // True or False, Stretch, Word problems ...) are NOTED with their over-cap cell count.
 function judge(cells, where, F, role) {
+    if (role === 'scripted-model') for (const c of cells) c.oneHeight = true;
     if (process.env.EB_DUMP) for (const c of cells) console.log("DUMP", where, c.page, c.cell, c.tmpl, c.hMm, c.neededMm, c.natMm, c.topPx, c.beside ? 'beside' : '');
     if (!String(role || '').startsWith('host:') && role && !STRETCH_ROLES.has(role)) { const n = stretchFindings(cells).length; if (n) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on this role yet (its composer sizes its own rows): ${n} cell(s) over the cap`); }
     if (!String(role || '').startsWith('host:')) { const lg = cells.filter((c) => c.tmpl === 'legacy' && Number.isFinite(c.natMm) && c.hMm - c.natMm - 3 > STRETCH_TOL_MM).length; if (lg) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on ${lg} legacy cell(s) over natural + 3 mm (old print HTML, measured taller than it draws)`); }
@@ -1035,6 +1046,9 @@ async function main() {
                     if (!cells.length) { F('EB-READ', `${key} ${j.tag}`, 'no kit cell read on the page (markup changed?)'); continue; }
                     // (EB-STRETCH: a cell whose item is of a working-space class - layout WORK_SPACE_CLASSES - keeps its row)
                     for (const c of cells) if ((c.items && c.items.length ? c.items : [c.item]).some((i) => i >= 0 && rowRoom().work.includes((b.fclass || [])[i]))) c.workSpace = true;
+                    // (EB-STRETCH: the bridge's MEASURE of the cell's item at its grid's columns - the height the engine reckons drawn
+                    // (layout.drawnRowMm: the measure + 1 mm); EB-FOOT holds that measure to the drawn height within 10 %)
+                    for (const c of cells) { const ids = c.items && c.items.length ? c.items : [c.item]; const k = footCols(c, cells); const ms = ids.map((i) => (i >= 0 && b.measured && b.measured[i] ? Number(b.measured[i][k]) : NaN)); if (ms.length && ms.every((x) => x > 0)) c.measMm = Math.max(...ms) + 1; }
                     judge(cells, `${key} ${j.tag}`, F, j.role);
                     // EB-PAGE (opt-in --page-fill; lf-placevalue critic r4 E-r4-1): a page that is not the role's last leaves 30 % or more
                     // of its body empty under its last block (identify lesson L p2: 43 %, page 3 never moved up). The last page may end short.
@@ -1206,7 +1220,7 @@ async function main() {
     for (const n of notes) console.log(`note: ${n}`);
     for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
     for (const n of STRETCH_NOTES) console.log(`note: ${n}`);
-    for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
+    for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, process.env.EB_ALL ? 1e9 : 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
     if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ skills: SKILLS, findings, notes, renders, cells: cellsRead }, null, 1));
     const bad = findings.length || !renders ? (findings.length || 1) : 0;

@@ -503,7 +503,8 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const grid = plan.pages[0].sections.find((s) => s.kind === 'band' && s.label === 'Guided Practice:').content;
     // Critic guided-r1: the rows grow only to their content limit (guided.js rowLimit); the rest of
     // the page stays under the grid, never as gaps between rows.
-    ok(parseFloat(grid.height) >= 140 && !grid.rowGap, `Guided: the grid fills the page to its rows' content limit, no row gaps (${grid.height})`);
+    // (ROW-STRETCH CAP stage 2, critic rowcap r1 F4: and never past what the rows draw + their writing room - the rest under the grid)
+    ok(parseFloat(grid.height) >= 60 && parseFloat(grid.height) < 140 && !grid.rowGap, `Guided: the rows are held to what they draw + their room, no row gaps (${grid.height})`);
 }
 // Critic round 2: the fade traces the WORKING (carries), never a lone digit, and cues facts.
 {
@@ -623,7 +624,8 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     // A page's spare height grows its rows, never a strip between them.
     const fake2 = (h) => ({ measured: { 1: { hMm: h, fits: true } } });
     const rh = rowHeights([fake2(40), fake2(40)], 1, 200);
-    ok(rh.every((x) => x > 44 && x <= 100) && Math.abs(rh[0] - rh[1]) < 0.01, `EA r5 A: rows grow alike toward the grid, at most 1.4 times (${rh.join(', ')})`);
+    // (ROW-STRETCH CAP stage 2: alike, and held to the measure + the default writing room, 40 + 3 mm)
+    ok(rh.every((x) => Math.abs(x - 43) < 0.01) && Math.abs(rh[0] - rh[1]) < 0.01, `EA r5 A: rows grow alike, held to drawn + room (${rh.join(', ')})`);
 }
 // Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
 {
