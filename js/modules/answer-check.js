@@ -351,9 +351,8 @@ export function resetAttemptTracking() {
     flushDeferredAdaptive();
     state.currentQAttempts = 0;
     state.currentQAttemptHistory = [];
-    // Hide skip button + clear any cross-outs
-    const skipBtn = document.getElementById('skipQuestionBtn');
-    if (skipBtn) skipBtn.style.display = 'none';
+    // Skip button from the rule (always on for the practice card / MAP; boss / race after N wrong tries)
+    updateSkipButton();
     const histBox = document.getElementById('attemptHistoryBox');
     if (histBox) { histBox.innerHTML = ''; histBox.style.display = 'none'; }
     // Re-enable any wrong-choice buttons (cross-outs cleared on next render anyway)
@@ -475,6 +474,9 @@ export function skipCurrentItem() {
 // Adaptive level changes are held while an item's support ladder climbs (a "Going back to Level
 // 2" toast must not land on a support step): its wrong answers are recorded when the item ends.
 let _deferredAdaptive = null;          // { skillId, n }
+/** A skip is never a miss: forget the wrong tries held back for the adaptive ladder (lf-hosts skip). */
+export function dropDeferredAdaptive() { _deferredAdaptive = null; }
+
 export function flushDeferredAdaptive() {
     const d = _deferredAdaptive;
     _deferredAdaptive = null;
@@ -973,8 +975,7 @@ function _ladderAfter(q, userAns) {
     practiceLadderWrong(q, userAns);
     const sb = document.getElementById('solutionBtn');
     if (sb) sb.style.display = 'none';
-    const skipBtn = document.getElementById('skipQuestionBtn');
-    if (skipBtn) skipBtn.style.display = 'none';
+    updateSkipButton();
     const card = document.getElementById('questionCard');
     if (card) card.classList.remove('incorrect-bg');
 }

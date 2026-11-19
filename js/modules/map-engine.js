@@ -146,6 +146,10 @@ export function startMapSession(opts) {
     state.mapSelectedDomains = opts.domains.slice();
     state.mapItemCountTarget = opts.itemCount || 20;
     state.mapItemCount = 0;
+    // Skip (lf-hosts, owner request 2026-11-19): the setup's "Pupils can skip" (default on). A skip is not
+    // scored until the end: the skipped items come back after the last item, then count once.
+    state.mapSkipAllowed = opts.allowSkip !== false;
+    state.mapSkipReturn = null;
 
     // Initial RIT: midpoint of selected bands
     const mids = opts.bands.map(b => MAP_BAND_MIDPOINTS[b] || 185);
@@ -320,11 +324,16 @@ function startMapWorksheetSession(opts) {
 export function nextMapItem() {
     if (!state.mapMode) return;
 
+    // The end-of-test return pass: the next skipped item, or the results once they are all back.
+    if (state.mapSkipReturn && state.mapSkipReturn.active) return _nextMapSkipReturn();
+
     // Stop conditions — unlimited mode (target <= 0) skips the count cap.
     if (state.mapItemCountTarget > 0 && state.mapItemCount >= state.mapItemCountTarget) {
+        if (_startMapSkipReturn()) return;
         return finalizeMapSession();
     }
     if (state.mapTimeCapMs > 0 && (Date.now() - state.mapStartedAt) >= state.mapTimeCapMs) {
+        if (_startMapSkipReturn()) return;
         return finalizeMapSession();
     }
 
@@ -368,8 +377,6 @@ export function nextMapItem() {
     // Reset wrong-attempt tracking + hide any leftover Skip button / chips
     state.currentQAttempts = 0;
     state.currentQAttemptHistory = [];
-    const _skip = document.getElementById('skipQuestionBtn');
-    if (_skip) _skip.style.display = 'none';
     const _hist = document.getElementById('attemptHistoryBox');
     if (_hist) { _hist.innerHTML = ''; _hist.style.display = 'none'; }
 
@@ -390,9 +397,9 @@ export function nextMapItem() {
         return nextMapItem();
     }
 
-    // Universal Skip button — visible in MAP practice + simulation.
-    const _skipBtn = document.getElementById('skipQuestionBtn');
-    if (_skipBtn) _skipBtn.style.display = 'none'; // shown after N wrong tries (skip-setting.js)
+    // Universal Skip button — visible from the start in MAP practice + simulation unless the teacher
+    // turned it off in the setup (skip-rule.js).
+    if (typeof window !== 'undefined' && typeof window.updateSkipButton === 'function') window.updateSkipButton();
 
     // Refresh the navigator strip — current item just changed.
     renderMapNavBar();
@@ -872,6 +879,9 @@ function _finishRecordMapAnswer(result) {
     if (!state.mapMode) return;
     const q = state.currentQ;
     if (!q || !q._mapSkillId) return;
+    // A skipped item answered in the return pass is scored now, once, on its own history row.
+    const returnIdx = typeof q._mapSkipReturnIdx === 'number' ? q._mapSkipReturnIdx : -1;
+    if (returnIdx >= 0 && !(state.mapHistory[returnIdx] && state.mapHistory[returnIdx].skipped)) return;
 
     const correct = !!(result && result.correct);
     const dom = q._mapDomain;
@@ -948,7 +958,7 @@ function _finishRecordMapAnswer(result) {
         tolerance: q.tolerance,
     };
 
-    state.mapHistory.push({
+    const row = {
         skillId: q._mapSkillId,
         categoryId: q._mapCategoryId,
         domain: dom,
@@ -958,9 +968,15 @@ function _finishRecordMapAnswer(result) {
         ritAfter: state.mapCurrentRit,
         ts: Date.now(),
         fullQ,  // For re-attempt-from-navigator-dot feature.
-    });
-
-    state.mapItemCount++;
+    };
+    if (returnIdx >= 0) {
+        // the skipped row becomes the answered row (same slot, same item); the count already holds it
+        row.returned = true;
+        state.mapHistory[returnIdx] = row;
+    } else {
+        state.mapHistory.push(row);
+        state.mapItemCount++;
+    }
 
     // Refresh the navigator strip — a new item just landed in history.
     renderMapNavBar();
@@ -1033,11 +1049,78 @@ function showCrossTierBanner(opts) {
     const autoTimer = setTimeout(dismiss, 8000);
 }
 
+// ===== The end-of-test return pass (owner request via lf-hosts, 2026-11-19) =====
+// After the last item (count or time cap), every skipped item comes back - the SAME question object
+// (entry.skipQ), one at a time - after "You skipped n. Let's fix them." Its answer is scored then, once,
+// on its own row (_finishRecordMapAnswer); a second skip leaves the row skipped (finalSkip).
+function _startMapSkipReturn() {
+    if (state.mapSkipReturn) return false;
+    const queue = state.mapHistory.map((h, i) => (h && h.skipped && h.skipQ ? i : -1)).filter((i) => i >= 0);
+    if (!queue.length) return false;
+    state.mapSkipReturn = { queue, pos: -1, active: false, done: false };
+    const go = () => { state.mapSkipReturn.active = true; _nextMapSkipReturn(); };
+    if (typeof window !== 'undefined' && typeof window.showSkipReturnIntro === 'function') window.showSkipReturnIntro(queue.length, 'map', go);
+    else go();
+    return true;
+}
+function _nextMapSkipReturn() {
+    const sr = state.mapSkipReturn;
+    sr.pos++;
+    if (sr.pos >= sr.queue.length) {
+        sr.active = false;
+        sr.done = true;
+        return finalizeMapSession();
+    }
+    const idx = sr.queue[sr.pos];
+    const q = state.mapHistory[idx].skipQ;
+    q._mapSkipReturnIdx = idx;
+    state.skill = q._mapSkillId;
+    state.category = q._mapCategoryId || state.category;
+    state.currentQ = q;
+    state.qCount = idx + 1;
+    state.hasAnswered = false;
+    state.lastAnswerCorrect = false;
+    state.questionStartTime = Date.now();
+    state.currentQAttempts = 0;
+    state.currentQAttemptHistory = [];
+    const _hist = document.getElementById('attemptHistoryBox');
+    if (_hist) { _hist.innerHTML = ''; _hist.style.display = 'none'; }
+    ensureSessionScaffold();
+    const itemNum = document.getElementById('mapItemNum');
+    if (itemNum) itemNum.textContent = String(idx + 1);
+    renderQuestion();
+    if (typeof window !== 'undefined' && typeof window.updateSkipButton === 'function') window.updateSkipButton();
+    renderMapNavBar();
+    if (typeof window !== 'undefined' && typeof window.syncPlayChrome === 'function') window.syncPlayChrome();
+    state.lastQuestionRenderTime = Date.now();
+    let b = document.getElementById('mapSkipReturnBanner');
+    const card = document.getElementById('questionCard');
+    if (!b && card && card.parentElement) {
+        b = document.createElement('div');
+        b.id = 'mapSkipReturnBanner';
+        b.className = 'mq-skipret-banner';
+        b.setAttribute('role', 'status');
+        card.parentElement.insertBefore(b, card);
+    }
+    if (b) { b.textContent = `Skipped problem ${sr.pos + 1} of ${sr.queue.length}`; b.style.display = 'block'; }
+    if (state.mapSessionMode === 'simulation') {
+        const hintBtn = document.getElementById('hintBtn');
+        if (hintBtn) hintBtn.style.display = 'none';
+        const solBtn = document.getElementById('solutionBtn');
+        if (solBtn) solBtn.style.display = 'none';
+    }
+}
+function _hideMapSkipReturnBanner() {
+    const b = typeof document !== 'undefined' && document.getElementById('mapSkipReturnBanner');
+    if (b && b.parentNode) b.parentNode.removeChild(b);
+}
+
 export function finalizeMapSession() {
     if (!state.mapMode && !state.mapStartedAt) return;
     state.mapEndedAt = Date.now();
 
-    const itemsTaken = state.mapHistory.length;
+    // Skipped items (still skipped after the return pass) are not answered: out of the percent.
+    const itemsTaken = state.mapHistory.filter((h) => h && !h.skipped).length;
     const totalCorrect = state.mapHistory.reduce(
         (n, h) => n + (h && h.correct ? 1 : 0), 0
     );
@@ -1068,6 +1151,7 @@ export function finalizeMapSession() {
         overallPct,
         correct: totalCorrect,
         answered: itemsTaken,
+        skipped: state.mapHistory.filter((h) => h && h.skipped).length,
         perDomain,
         items: itemsTaken,
         durationMs: state.mapEndedAt - (state.mapStartedAt || state.mapEndedAt),
@@ -1077,6 +1161,10 @@ export function finalizeMapSession() {
     };
 
     state.mapMode = false;
+    state.mapSkipReturn = null;
+    _hideMapSkipReturnBanner();
+    const _sri = typeof document !== 'undefined' && document.getElementById('skipReturnIntro');
+    if (_sri) _sri.remove();
     // Clear any active review state so re-entering a session starts clean.
     state.mapNavigationOpen = false;
     state.mapReviewingIndex = -1;
@@ -1150,8 +1238,19 @@ export function skipMapItem(opts) {
     if (!q || !q._mapSkillId) return;
     // Re-attempt from navigator dot — don't mutate history.
     if (q._isMapReview) return;
+    if (state.hasAnswered) return;   // already answered or skipped: one verdict per item
 
     state.hasAnswered = true;
+
+    // A second skip, in the return pass: the item stays "skipped" (scored as not answered).
+    if (typeof q._mapSkipReturnIdx === 'number') {
+        const prev = state.mapHistory[q._mapSkipReturnIdx];
+        if (prev) prev.finalSkip = true;
+        renderMapNavBar();
+        if (typeof window !== 'undefined' && typeof window.updateSkipCount === 'function') window.updateSkipCount();
+        setTimeout(() => nextMapItem(), 200);
+        return;
+    }
 
     // Snapshot the question payload so the navigator can re-render
     // the original question on click (same shape as recordMapAnswer).
@@ -1193,10 +1292,12 @@ export function skipMapItem(opts) {
         ritAfter: state.mapCurrentRit,
         ts: Date.now(),
         fullQ,
+        skipQ: q,          // the SAME item object: it comes back unchanged in the return pass
     });
 
     state.mapItemCount++;
     renderMapNavBar();
+    if (typeof window !== 'undefined' && typeof window.updateSkipCount === 'function') window.updateSkipCount();
 
     const delay = (state.mapSessionMode === 'practice') ? 700 : 200;
     setTimeout(() => nextMapItem(), delay);

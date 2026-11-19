@@ -171,6 +171,10 @@ export function checkProblemGoals() {
     // Check if total problems limit is reached
     if (settings.totalProblemsEnabled && settings.totalProblems) {
         if (state.qCount >= settings.totalProblems) {
+            // Skip (lf-hosts): skipped problems still to come back, or the return pass under way - the normal advance
+            // (nextQuestion) runs the return pass and then the end screen.
+            if (state.gameMode === 'practice' && !state.quizMode && ((state.skipReturn && state.skipReturn.active)
+                || (!state.skipReturn && (state.questionHistory || []).some((h) => h && h.status === 'skipped' && h.q)))) return false;
             // Check if they met the correct goal
             const metGoal = !settings.correctGoalEnabled || (state.score >= settings.correctGoal);
             setTimeout(() => {
@@ -230,7 +234,7 @@ export function endGame(win, message) {
     showEndGameModal(win, message || (win ? "Nice work!" : "Good try!"));
 }
 
-export function saveWorksheetToHistory(correct, total, isPassing) {
+export function saveWorksheetToHistory(correct, total, isPassing, skipped = 0) {
     const gameDesc = getGameDescriptionText();
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -254,7 +258,8 @@ export function saveWorksheetToHistory(correct, total, isPassing) {
         score: `${correct}/${total}`,
         result: isPassing ? "✅ Pass" : "❌ Retry",
         percentage: percentage,
-        timestamp: now.getTime()
+        timestamp: now.getTime(),
+        skipped: skipped || 0
     });
 
     // Keep only last 100 entries
@@ -316,7 +321,9 @@ export function saveToSessionHistory(win) {
         percentage: state.qCount > 0 ? Math.round((state.score / state.qCount) * 100) : 0,
         timestamp: now.getTime(),
         incomplete: false,
-        skills: skillBreakdown
+        skills: skillBreakdown,
+        // problems still skipped after the return pass (scored as not answered; lf-hosts skip)
+        skipped: (state.questionHistory || []).filter((h) => h && (h === 'skipped' || h.status === 'skipped')).length
     });
 
     // Reset session skill tracking

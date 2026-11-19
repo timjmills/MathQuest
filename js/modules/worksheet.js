@@ -1,6 +1,6 @@
 import { worksheetLadderWrong, markTried, rungsFor } from './support-ladder.js';
 import { state } from './state.js';
-import { skipAfterFor } from './skip-rule.js';
+import { skipAfterFor, showSkipReturnIntro } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
 import { SKILLS, isMixedMetaSkill } from './data.js';
@@ -1652,7 +1652,8 @@ function _wsRenderCard(grid, q, i) {
     // Per-card Skip: grays out the card, marks q._skipped = true,
     // excluded from total in checkAllWorksheet. Universal across all
     // worksheet skills, all answer types.
-    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn" type="button" style="display:none" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
+    // (lf-hosts skip, owner request 2026-11-19: shown from the start, 48 px; skipAfter 0 = the teacher's off)
+    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn mq-skip48" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)" aria-label="Skip problem ${i + 1}">${_tl ? 'Skip' : 'Skip ⏭'}</button>`;
 
     // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
     // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
@@ -1907,6 +1908,9 @@ export function newWorksheet() {
     if (grid) grid.scrollTop = 0;
 
     state.worksheetQs = [];
+    _wsReturn = null;   // a new sheet starts with no return pass
+    { const _b = document.getElementById('wsReturnBar'); if (_b) _b.remove(); }
+    { const _g = document.getElementById('worksheetGrid'); if (_g) _g.classList.remove('mq-ws-returning'); }
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
     worksheetSoundPlayed.clear();
     worksheetBannerRecorded.clear(); // Reset banner stats tracking
@@ -2551,14 +2555,24 @@ export function wsSkipCard(idx) {
     const q = state.worksheetQs[idx];
     const card = document.getElementById(`ws_card_${idx}`);
     if (!q || !card) return;
+    // The return pass: a second Skip leaves the card "skipped" (scored as not answered) and moves on.
+    if (_wsReturn && _wsReturn.active && _wsReturn.queue[_wsReturn.pos] === idx) {
+        q._skipped = true;
+        q._finalSkip = true;
+        card.classList.add('ws-skipped');
+        card.querySelectorAll('input').forEach(el => { el.disabled = true; });
+        wsReturnNext();
+        return;
+    }
     if (q._skipped) {
         // Toggle off — un-skip and let the student answer.
         q._skipped = false;
         card.classList.remove('ws-skipped');
         const btn = card.querySelector('.ws-skip-btn');
-        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : '⏭ Skip';
+        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : 'Skip ⏭';
         // Re-enable inputs.
         card.querySelectorAll('input').forEach(el => { el.disabled = false; });
+        _wsUpdateSkipCount();
         return;
     }
     q._skipped = true;
@@ -2567,6 +2581,7 @@ export function wsSkipCard(idx) {
     if (btn) btn.textContent = _wsTeacherLaunch() ? 'Undo skip' : '↩ Undo Skip';
     // Disable inputs (CSS pointer-events also blocks, but disable is belt+braces).
     card.querySelectorAll('input').forEach(el => { el.disabled = true; });
+    _wsUpdateSkipCount();
     advanceToNextProblem(idx);
 }
 
@@ -2759,7 +2774,88 @@ function wsLogProgress(q, card, isCorrect, pre) {
     }
 }
 
+// ===== The end-of-sheet return pass (owner request via lf-hosts, 2026-11-19) =====
+// Check All (or I'm Finished) with skipped cards: "You skipped n. Let's fix them.", then each skipped
+// card - the SAME card, the same item - shows alone, un-skipped, to answer; Next moves on, Skip again
+// leaves it skipped. After the last one, Check All grades the sheet once (a skipped card stays out of
+// the total and is counted "Skipped").
+let _wsReturn = null;   // { queue: [idx], pos, active, done }
+function _wsReturnBar() {
+    let bar = document.getElementById('wsReturnBar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'wsReturnBar';
+        bar.className = 'mq-ws-return-bar';
+        const grid = document.getElementById('worksheetGrid');
+        if (grid && grid.parentNode) grid.parentNode.insertBefore(bar, grid);
+    }
+    return bar;
+}
+export function wsReturnNext() {
+    const r = _wsReturn;
+    if (!r || !r.active) return;
+    const grid = document.getElementById('worksheetGrid');
+    const prevIdx = r.queue[r.pos];
+    const prev = prevIdx != null && document.getElementById(`ws_card_${prevIdx}`);
+    if (prev) prev.classList.remove('mq-ws-return-now');
+    r.pos++;
+    if (r.pos >= r.queue.length) {
+        r.active = false;
+        r.done = true;
+        if (grid) grid.classList.remove('mq-ws-returning');
+        const bar = document.getElementById('wsReturnBar');
+        if (bar) bar.remove();
+        checkAllWorksheet();
+        return;
+    }
+    const idx = r.queue[r.pos];
+    const q = state.worksheetQs[idx];
+    const card = document.getElementById(`ws_card_${idx}`);
+    if (q && card) {
+        q._skipped = false;
+        card.classList.remove('ws-skipped');
+        card.classList.add('mq-ws-return-now');
+        card.querySelectorAll('input').forEach(el => { el.disabled = false; });
+        const btn = card.querySelector('.ws-skip-btn');
+        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : 'Skip ⏭';
+    }
+    _wsUpdateSkipCount();
+    const bar = _wsReturnBar();
+    bar.innerHTML = `<div class="mq-skipret-banner" role="status" style="margin:0;">Skipped problem ${r.pos + 1} of ${r.queue.length}</div>`
+        + `<button type="button" class="btn btn-primary" id="wsReturnNextBtn" onclick="wsReturnNext()">${r.pos < r.queue.length - 1 ? 'Next ▶' : 'Done ▶'}</button>`;
+    try { window.scrollTo(0, 0); } catch (_) { /* non-fatal */ }
+    const first = card && card.querySelector('input:not([disabled])');
+    if (first) { try { first.focus({ preventScroll: true }); } catch (_) { /* non-fatal */ } }
+}
+/** How many cards are skipped right now (the "Skipped: n" count on the sheet header). */
+function _wsSkipCountNow() {
+    return (state.worksheetQs || []).filter((q) => q && q._skipped).length;
+}
+function _wsUpdateSkipCount() {
+    const pill = document.getElementById('worksheetSkipCount');
+    const n = _wsSkipCountNow();
+    if (pill) { pill.textContent = `Skipped: ${n}`; pill.style.display = n > 0 ? 'inline-flex' : 'none'; }
+}
+
 export function checkAllWorksheet() {
+    if (!_wsReturn || !_wsReturn.done) {
+        if (_wsReturn && _wsReturn.active) { wsReturnNext(); return; }
+        const queue = (state.worksheetQs || []).map((q, i) => (q && q._skipped ? i : -1)).filter((i) => i >= 0);
+        if (queue.length && !_wsReturn) {
+            _wsReturn = { queue, pos: -1, active: false, done: false };
+            const grid = document.getElementById('worksheetGrid');
+            showSkipReturnIntro(queue.length, 'worksheet', () => {
+                _wsReturn.active = true;
+                if (grid) grid.classList.add('mq-ws-returning');
+                wsReturnNext();
+            });
+            return;
+        }
+    }
+    _checkAllWorksheetNow();
+}
+
+function _checkAllWorksheetNow() {
     let correct = 0;
     let skipped = 0;
     let helped = 0;
@@ -3221,7 +3317,7 @@ export function checkAllWorksheet() {
     const isPassing = percentage >= 80;
 
     // Save to session history
-    saveWorksheetToHistory(correct, total, isPassing);
+    saveWorksheetToHistory(correct, total, isPassing, skipped);
 
     // Show big flashing score (pass skipped count for breakdown).
     showWorksheetScore(correct, total, isPassing, skipped);
