@@ -120,6 +120,9 @@ export function mergeHunk(O, B, T) {
 /** Resolve every hunk of `git merge-file --diff3 --marker-size=<size>` output. Returns {text, hunks, conflicts[]}. Pure. */
 export function union3(text, size = 19, ref = 'master') {
     const mk = (c) => c.repeat(size);
+    // CRLF files (critic merge r2): judge lines without the \r, write the file back with its own line ends
+    const crlf = /\r\n/.test(text);
+    if (crlf) text = text.replace(/\r\n/g, '\n');
     const src = text.split('\n'), out = [], conflicts = [];
     let hunks = 0;
     for (let i = 0; i < src.length; i++) {
@@ -134,7 +137,7 @@ export function union3(text, size = 19, ref = 'master') {
         conflicts.push(r.conflict);
         out.push(`${LT} HEAD (this branch)`, ...sec.o, `${BAR} merge base`, ...(sec.b || []), EQ, ...sec.t, `${GT} ${ref} (${r.conflict})`);
     }
-    return { text: out.join('\n'), hunks, conflicts };
+    return { text: out.join(crlf ? '\r\n' : '\n'), hunks, conflicts };
 }
 
 export function run(argv, cwd) {
@@ -247,6 +250,11 @@ function selfTest(target) {
     const u = union3(`| a |\n${H(['| ours 1 |', '| same |'], [], ['| theirs 1 |', '| same |'])}\n| b |\n`);
     eq('union: master first, then this branch, no duplicate line', [u.hunks, u.text], [1, '| a |\n| theirs 1 |\n| same |\n| ours 1 |\n| b |\n']);
     eq('union: no markers left', /^(<{7}|={7}|>{7})/m.test(u.text), false);
+    // critic merge r2: a CRLF ledger: the '=' separator carried a \r, so master's side was silently lost (exit 0)
+    const uc = union3(`| a |\r\n${H(['| ours 1 |', '| same |'], [], ['| theirs 1 |', '| same |']).split('\n').join('\r\n')}\r\n| b |\r\n`);
+    eq('r2 CRLF: both sides kept, CRLF kept, no markers', [uc.hunks, uc.conflicts.length, uc.text], [1, 0, '| a |\r\n| theirs 1 |\r\n| same |\r\n| ours 1 |\r\n| b |\r\n']);
+    const ucc = union3(`${H(['| row | ours text |'], ['| row | base text |'], ['| row | master text |']).split('\n').join('\r\n')}\r\n`);
+    eq('r2 CRLF: a clash on the same row is a conflict, not silent', ucc.conflicts.length, 1);
     eq('union scope', [UNION.some((re) => re.test('design/status/lf-ops.md')), UNION.some((re) => re.test('js/modules/data.js')), NEVER.includes('design/STATUS.md')], [true, false, true]);
     // pure: r1 findings
     eq('F1 pure: same id added on both sides, different content -> conflict', mergeRows({ rows: [] }, { rows: [r('n', 7)] }, { rows: [r('n', 9)] }).conflicts, ['n']);
