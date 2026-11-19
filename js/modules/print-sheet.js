@@ -1750,7 +1750,10 @@ const LESSON_PM_CENTRE_CSS = `<style data-mq-lpmcentre>${LESSON_PM_SEL}:not(.bla
     // place-value cells ("T|O 78 -> __" runs the cell's width; the T O heads of an identify cell sit in the tab's corner) start
     // under the tab - at M / S they clear it sideways, and a 22 mm row has no room to drop them. Practice rows are tall:
     // their centred content clears the tab already.)
-    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
+    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}`
+    // (area-model-div template round 2026-11-19, L-TOPSTART x12: the area model is a several-row drawing whose answers are
+    // its own boxes - it keeps the top of the box (CL-4b) on a lesson's Practice / Mixed page too, never centred down a row)
+    + `${LESSON_PM_SEL}[data-ws-cell="area-model-div"]:not(.blankrun){justify-content:flex-start !important}</style>`;
 const ROUND_PRACTICE_CSS = '<style data-mq-lpracround>.ws-page[data-ws-sheet="lesson-practice"] .ws-grid>.ws-cell:has(>.pv-round1){justify-content:center !important}</style>';
 
 /**

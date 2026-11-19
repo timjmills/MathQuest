@@ -2415,7 +2415,9 @@ function lintKitGeometry(dom, pdf, info, F) {
         // key slot is - the exemption is the cell's mq-smstate mark only, scripted-model.js stateItem)
         const empty = p.cells.reduce((n, c) => n + (c.smState ? 0 : c.slots - c.answered - (c.tofBlank || 0)), 0);
         if (empty > 0) F('L-KEY', 'AK-2', 'critical', { page: p.idx }, `key page ${p.idx}: ${empty} of ${p.slots} answer slot(s) carry no answer (AK-2, AK-4)`, 'unanswered slot');
-        if (p.cells.some(c => !c.weightOk)) F('L-KEY', 'AK-2', 'minor', { page: p.idx }, `key page ${p.idx}: answers not in weight 700 (AK-2)`, 'key weight');
+        // (area-model-div template round 2026-11-19: a Scripted Model state cell - mq-smstate - writes the work so far in the step's
+        // own inks (trace for the steps before), by design like its blank slots; every other key cell keeps weight 700)
+        if (p.cells.some(c => !c.smState && !c.weightOk)) F('L-KEY', 'AK-2', 'minor', { page: p.idx }, `key page ${p.idx}: answers not in weight 700 (AK-2)`, 'key weight');
         for (const o of (p.keyOver || [])) F('L-KEY', 'AK-2', 'major', { page: p.idx }, `key page ${p.idx}: the answer "${o.text}" runs ${o.mm} mm outside its box: a key writes each answer inside the slot the pupil writes in (AK-2, critic r6 D6-1)`, 'key answer outside its box');
     }
 }
@@ -3299,6 +3301,19 @@ const SELF_TESTS = [
         const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
         const c = [...k.querySelectorAll('[data-ws-cell]')].find(x => x.querySelector('[data-ws-slot]'));
         c.classList.add('mq-smstate'); c.querySelectorAll('.p11-key').forEach(e => e.remove());
+    } },
+    // (area-model-div template round 2026-11-19: the weight check skips a marked state cell only - a light answer in any other key
+    // cell still fails)
+    { name: 'light key answer beside a scripted-model state cell', expect: ['L-KEY', 'AK-2'], msg: /weight 700/, fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
+        const cs = [...k.querySelectorAll('[data-ws-cell]')].filter(c => c.querySelector('.p11-key'));
+        cs[0].classList.add('mq-smstate'); cs[0].insertAdjacentHTML('beforeend', '<span data-ws-slot="lt" data-ws-shape="box"><span style="font-weight:400">7</span></span>');
+        cs[1].insertAdjacentHTML('beforeend', '<span data-ws-slot="lt" data-ws-shape="box"><span style="font-weight:400">7</span></span>');
+    } },
+    { name: 'light answer in a scripted-model state cell (by design)', absent: ['L-KEY', 'AK-2'], expect: [], fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
+        const c = [...k.querySelectorAll('[data-ws-cell]')].find(x => x.querySelector('.p11-key'));
+        c.classList.add('mq-smstate'); c.insertAdjacentHTML('beforeend', '<span data-ws-slot="lt" data-ws-shape="box"><span style="font-weight:400">7</span></span>');
     } },
     // (lead ruling 2026-11-14, cbt r3: the True or False? exemption is a TRUE frame's mq-tofblank mark inside .mq-tf - a blank
     // False frame slot, an unmarked slot beside a marked one, and a mark outside a True or False? cell all still fail)

@@ -135,7 +135,11 @@ register('area-model-div', {
         return {
             wMm: Math.ceil(inkRaw + 12),
             inkWMm: Math.ceil(inkRaw),
-            hMm: Math.ceil(g.stripMm + 2 + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 1) + 14),
+            // hMm from the ink (template round 2026-11-19, EB-BAND / L-TOPSTART): the boxes row, the model, the problem row and
+            // their gaps, plus the cell's own pads (CL-8: 3 mm a side) - no slack (was + 14 mm, which the unmeasured planners -
+            // the lesson's Practice band - read as a 70 mm row for 41 mm of ink at M)
+            hMm: Math.ceil(g.stripMm + 0.15 * g.E + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 1) + 6),
+            inkHMm: Math.ceil(g.stripMm + 0.15 * g.E + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 1)),
             measure: true, factLike: false, maxCols: 2,
         };
     },
