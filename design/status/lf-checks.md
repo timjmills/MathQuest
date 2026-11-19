@@ -809,3 +809,23 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   identical).
 - Fix (found on first real use): ws-merge-master took its ROOT from the script's own location, so running another
   checkout's copy merged into the script's tree. ROOT is now `git rev-parse --show-toplevel` of the current directory.
+
+## 2026-11-19 — ws-merge-master r2 (rebuild after critic-merge-r1 FAIL 6/6/6/8)
+
+- Fixed F1-F8 (`design/status/lf-checks/critic-merge-r1.md`) in aa404bb5c:
+  - backtests.json: a same-id row added on both sides with different content, or a row both sides changed, is a CONFLICT:
+    both versions are written between markers and the file stays UNMERGED (exit 1; git cannot commit it). A side that
+    deleted the file counts as empty (no crash). Duplicate row ids after any merge FAIL.
+  - union files: a true 3-way merge per hunk from the merge base (`git merge-file --diff3` on the :1:/:2:/:3: stages):
+    lines only added are kept, master's first; a line one side deleted stays deleted; a line both sides replaced
+    differently (a prose line, or a table row whose key both re-added with different text) is left with markers, unmerged.
+    Rows only added may share a first cell (the ledger's date column), so the real ledgers still union.
+  - outside a git work tree: exit 2, nothing merged. `--commit` with no `MQ_COMMIT_TRAILER`: exit 2. The commit subject
+    names only what was done. ws-conflict-markers falls back to `--root <merged tree>`.
+  - generated reports are regenerated and staged only when nothing else is left; `design/WRM_COVERAGE.md` added.
+- Proof: `--self-test` 22 cases (the old 7, 5 pure, 10 git fixtures run against `--target`); on the r1 script 10 fail.
+  Backtest row `merge-master-r1` (FAIL 3354f8173 → OK aa404bb5c): PASS. Replays: 80a3444e0 identical to the hand
+  merge; eeb03c94a the same ledger lines and backtest rows (order: master first); 002ca8d87 ledger, decisions and backtests
+  resolved, lesson-baseline.json LEFT; d57c126e3 three sources LEFT, so the three reports are left for regeneration
+  after them (by design now, F7).
+- Not done: stale cleanly-merged reports are not re-validated (F7 last point) - the lane's own report gates catch them.
