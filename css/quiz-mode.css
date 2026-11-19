@@ -2333,3 +2333,7 @@ html:not(.dark) .qt-q-dot:hover { border-color: #5B3FD6; }
 .qt-cell .qt-msc-host .msc-counter { background: none; color: #000; font-family: "Andika", sans-serif; }
 .qt-cell .qt-msc-host .qt-msc-check { background: #fff; color: #000; border: 2px solid #000; font-family: "Andika", sans-serif; }
 .qt-cell .qt-msc-host .qt-msc-check:disabled { color: #949494; border-color: #949494; background: #fff; }
+
+/* lf-algebra r8 (critic r1 F1, 2026-11-13): a quiz is a test - a kit twin's FADING hint parts (data-ws-hint="fade":
+   the notice cell's even / odd words, printed track and times-table row; the growing pattern's given counts) never show. */
+#quizTakeView [data-ws-hint="fade"] { display: none !important; }

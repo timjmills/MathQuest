@@ -23,7 +23,7 @@
   },
   "excerptChars": 140,
   "summary": "Family card for the four fact drills. Each deals one two-number fact per boxed cell from a fact set (a constant, the band, the table) and prints it on the kit `fact` template on every page type; on the fact-rows page (5 to 10 columns) every fact is redrawn at the column ladder's digit. div_facts has five written forms (`divForm`): Standard, Long division, Fraction, Vertical and Mix; on fact rows all three notations - the ÷ sign, the fraction and the bracket - reach the full 10 columns (owner ruling 2026-10-30).",
-  "teaches": "Recall the basic facts: addition and subtraction within 20 (1.OA.6, 2.OA.2), multiplication and division within 100 / 144 (3.OA.7). A fact is recalled, not worked: no regroup boxes, no work rows, one answer. \"Facts to N\" bounds the ANSWER for + (the sum) and the number started from for − (the minuend); the × / ÷ band is the largest product or dividend (10 x 10 or 12 x 12).",
+  "teaches": "Recall the basic facts: addition and subtraction within 20 (1.OA.6, 2.OA.2), multiplication and division within 100 / 144 (3.OA.7). A fact is recalled, not worked: no regroup boxes, no work rows, one answer. \"Facts to N\" bounds the ANSWER for + (the sum) and the number started from for − (the minuend); the × / ÷ band is the largest product or dividend (10 x 10, 12 x 12 or 15 x 15: products to 225, quotients to 15).",
   "research": "From repo sources: PAGE_TYPES 4.1 (fact rows, PT-FRW-*) and 4.2 (fact probe), WORKSHEET_DESIGN_STANDARD §10 (VA-1..VA-5, VA-60..VA-66, VA-70, VA-71), TY-22 / TY-30 (the fact ladder), design/catalogue/{addition,subtraction,multiplication,division}.md and the div_facts forms rounds (critic R1 / R2). Reference sites (MathWorksheets4Kids timed fact drills, Math-Drills 100-fact pages, IXL fact fluency) deal 50-100 facts a page in vertical or horizontal form; our density is the fact-rows table, never theirs.",
   "problemTypes": [
     "vertical fact (+ − ×, and ÷ stacked): two numbers, the operator in its own track, the 1.5 pt rule, the open answer row — the core item",
@@ -33,7 +33,7 @@
   ],
   "progression": [
     "a single constant (\"Add 3\", \"Multiply by 4\") before a mixed set; 0 and 1 facts as their own constants",
-    "the band grows: + / − facts to 10, then to 20; × / ÷ to 10 x 10, then 12 x 12",
+    "the band grows: + / − facts to 10, then to 20; × / ÷ to 10 x 10, then 12 x 12, then 15 x 15 (the 13-15 tables, its own preset)",
     "the fact drills move from the Independent page (5 x 5 at S, 4 x 5 at M, 3 x 4 at L) to fact rows (10 / 6 / 5 columns at S / M / L) as recall becomes fluent",
     "÷: one written form a page (Standard first, then the bracket and the fraction), Mix last"
   ],
@@ -246,7 +246,8 @@
   "options": [
     "Declared today (skill-options.js): add_facts / sub_facts / mult_facts / div_facts each have the constant (fact set), the band, the support cue (touch dots, tiles, frame, line, skip strip, array, think box); + − × the notation (stacked / across); div_facts `divForm` (standard / long / fraction / vertical / mix) in place of the notation.",
     "Fact rows' own controls live on the page, not the skill: Columns (Auto / 5 / 6 / 8 / 10), size, labels, Day bands.",
-    "Owner rule 2026-10-17 (a distinct option is also a findable skill): `divForm` long and fraction are candidate presets (\"Division facts: long division form\", \"Division facts as fractions\"); open question 3."
+    "Owner rule 2026-10-17 (a distinct option is also a findable skill): `divForm` long and fraction are candidate presets (\"Division facts: long division form\", \"Division facts as fractions\"); open question 3.",
+    "Owner 2026-11-14 (lane lf-ops t15): mult_facts / div_facts \"Tables to\" offers 10 x 10, 12 x 12 (default) and 15 x 15 (band 225) as one option; under 15 x 15 the fact set gains the 13, 14 and 15 ticks. 15 x 15 is a distinct harder size, so it is also the preset skills `multiplication:mult_facts_15` and `division:div_facts_15` (host at band 225). On the Options panel the fact tick list stands last (\"Which facts\"), below How it is written and Support."
   ],
   "gates": [
     {
@@ -314,11 +315,13 @@
           "10",
           "11",
           "12",
-          "13"
+          "13",
+          "14",
+          "15"
         ],
         "d": "offered",
         "source": "skill-options.js constantOption; PT 4.1 teacher options",
-        "why": "the fact set: one constant a page or the mixed set; 0 is 0 ÷ n for division"
+        "why": "the fact set: one constant a page or the mixed set; 0 is 0 ÷ n for division; on × / ÷ the 13, 14 and 15 ticks show and deal only under Tables to 15 x 15 (owner 2026-11-14)"
       },
       {
         "option": "notation",
@@ -356,11 +359,12 @@
         "option": "band",
         "values": [
           "100",
-          "144"
+          "144",
+          "225"
         ],
         "d": "offered",
-        "source": "skill-options.js _opsTableBand",
-        "why": "tables to 10 x 10 or 12 x 12: the largest product or dividend",
+        "source": "skill-options.js _opsTableBand, factTableTop; ws-tables15",
+        "why": "tables to 10 x 10, 12 x 12 or 15 x 15 (owner 2026-11-14): the largest product or dividend; 15 x 15 adds the 13-15 ticks and is also the presets mult_facts_15 / div_facts_15",
         "skills": [
           "multiplication:mult_facts",
           "division:div_facts"

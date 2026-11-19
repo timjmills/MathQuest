@@ -123,7 +123,10 @@
     "wpFrames": "4Q",
     "msLetter": "4R",
     "msCheck": "4S",
-    "familyChart": "4K"
+    "familyChart": "4K",
+    "patTask": "4U",
+    "patShow": "4V",
+    "growShape": "4W"
   },
   "blocks": {
     "0": {
@@ -784,7 +787,21 @@
     "wpFrames": {},
     "msLetter": {},
     "msCheck": {},
-    "familyChart": {}
+    "familyChart": {},
+    "patTask": {
+      "parity": "P",
+      "feature": "F",
+      "truefalse": "T",
+      "next": "N",
+      "rule": "R",
+      "far": "X"
+    },
+    "patShow": {},
+    "growShape": {
+      "dots": "D",
+      "squares": "S",
+      "mixed": "M"
+    }
   },
   "scalarOnly": {
     "range": "decimal",
@@ -832,7 +849,8 @@
     "wpFrames": "bool",
     "msLetter": "bool",
     "msCheck": "bool",
-    "familyChart": "bool"
+    "familyChart": "bool",
+    "patShow": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

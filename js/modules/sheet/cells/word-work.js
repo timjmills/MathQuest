@@ -44,11 +44,12 @@
 // Pure module (SCC-01): no window, no DOM, no state, no Math.random.
 
 import { register } from '../registry.js';
-import { esc } from '../cell.js';
+import { esc, gradeSlots } from '../cell.js';
 import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
-import { divisionSteps } from './long-division.js';
+import { divisionSteps, bracketSvg, bracketLine } from './long-division.js';
 import { partWholeBar } from '../graphics/part-whole-bar.js';
+import { twoStepBar } from '../graphics/two-step-bar.js';
 import { sentenceFrame, sentenceFrameWidthMm } from '../graphics/sentence-frame.js';
 
 export const WW_TEMPLATE = 'word-work';
@@ -439,26 +440,27 @@ export function tellTwoStep(s1, s2, k = 0) {
             const L = s1.op === '+'
                 ? [`Each ${C.one} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} does ${n1} have?`]
                 : [`Each ${C.one} had ${countOf(s1.a, T)}.`, `${n1} took ${num(s1.b)} out of each ${C.one}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} are in the ${C.many} now?`];
-            return { lines: L, unit: T, ans: s2.ans };
+            // `mid`: the hidden middle question (P-WP-11 v1; two-step card decision 6), printed under Step 1 on Model / Guided
+            return { lines: L, unit: T, ans: s2.ans, mid: s1.op === '+' ? `How many ${T.many} are in each ${C.one}?` : `How many ${T.many} are in each ${C.one} now?` };
         }
         const L = s1.op === '+'
             ? [`${n1} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} shares them equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`]
             : [`${n1} has ${countOf(s1.a, T)}.`, `${n1} keeps ${num(s1.b)}.`, `${n1} shares the rest equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`];
-        return { lines: L, unit: T, ans: s2.ans };
+        return { lines: L, unit: T, ans: s2.ans, mid: s1.op === '+' ? `How many ${T.many} does ${n1} have?` : `How many ${T.many} are left to share?` };
     }
     if (s1.op === '*' || s1.op === '/') {
         const c = s2.bottom;
         if (s1.op === '*') {
             const C = pickAt(WW_CONTAINERS, k * 5 + 1);
             const ch = s2.op === '+' ? `${n1} gets ${num(c)} more ${c === 1 ? T.one : T.many}.` : `${n1} gives away ${countOf(c, T)}.`;
-            return { lines: [`${n1} has ${countOf(s1.a, C)}.`, `Each ${C.one} has ${countOf(s1.b, T)}.`, ch, `How many ${T.many} does ${n1} have ${s2.op === '+' ? 'now' : 'left'}?`], unit: T, ans: s2.ans };
+            return { lines: [`${n1} has ${countOf(s1.a, C)}.`, `Each ${C.one} has ${countOf(s1.b, T)}.`, ch, `How many ${T.many} does ${n1} have ${s2.op === '+' ? 'now' : 'left'}?`], unit: T, ans: s2.ans, mid: `How many ${T.many} are in the ${C.many}?` };
         }
         const ch = s2.op === '+' ? `Each friend gets ${num(c)} more.` : `Each friend gives away ${num(c)}.`;
-        return { lines: [`${n1} has ${countOf(s1.a, T)}.`, `${n1} shares them equally among ${num(s1.b)} friends.`, ch, `How many ${T.many} does each friend have now?`], unit: T, ans: s2.ans };
+        return { lines: [`${n1} has ${countOf(s1.a, T)}.`, `${n1} shares them equally among ${num(s1.b)} friends.`, ch, `How many ${T.many} does each friend have now?`], unit: T, ans: s2.ans, mid: `How many ${T.many} does each friend get?` };
     }
     const c1 = s1.op === '+' ? `${n1} got ${num(s1.bottom)} more.` : `${n1} gave away ${num(s1.bottom)}.`;
     const c2 = s2.op === '+' ? `Then ${n1} found ${num(s2.bottom)} more.` : `Then ${n1} lost ${num(s2.bottom)}.`;
-    return { lines: [`${n1} had ${countOf(s1.top, T)}.`, c1, c2, `How many ${T.many} does ${n1} have now?`], unit: T, ans: s2.ans };
+    return { lines: [`${n1} had ${countOf(s1.top, T)}.`, c1, c2, `How many ${T.many} does ${n1} have now?`], unit: T, ans: s2.ans, mid: `How many ${T.many} did ${n1} have then?` };
 }
 
 /* ---------------------------------------------------------------------- the payload */
@@ -485,6 +487,7 @@ export function wordWorkPayload(q, o = {}) {
     const seed = steps.reduce((s, st) => s + st.a * 7 + st.b * 13, ans);
     // The story is RETOLD in the controlled grammar (the K picture story keeps its own words).
     const schema = steps.length > 1 ? 'two-step' : schemaOf(q.text, last, ans);
+    let mid = '';
     if (o.retell !== false) {
         const k = Number.isFinite(o.seed) ? o.seed : seed;
         const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
@@ -496,6 +499,7 @@ export function wordWorkPayload(q, o = {}) {
             const others = [];
             for (const x of [...WW_CONTAINERS.map((c) => c.many), ...WW_THINGS.map((c) => c.many)]) if (lines.join(' ').includes(` ${x}`) && (!u || x !== u.many)) others.push(x);
             unit = u ? { word: ans === 1 ? u.one : u.many, many: u.many, one: u.one, others } : { word: '', many: '', others };
+            if (steps.length > 1 && told.mid) mid = told.mid;
         }
     }
     // The answer is written ONCE (round-4 critic, H8): in the bottom row of the columns (or the
@@ -510,9 +514,10 @@ export function wordWorkPayload(q, o = {}) {
         // the empty box told the pupil the answer was 1); the singular is for the spoken answer of 1
         unitMany: unit.many || unit.word || '', unitOne: unit.one || (unit.many ? singular(unit.many) : unit.word || ''),
         tracks: Number(o.tracks) > 0 ? Number(o.tracks) : 0,
-        hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, barKind,
+        hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, bar2: !!o.bar && steps.length === 2, barKind,
         ...(steps.length === 2 && steps[0].op === '/' && steps[0].top <= 100 && steps[0].bottom <= 10 && !steps[0].r ? { factDiv: true } : {}),
         pic: o.pic || null,
+        ...(mid ? { mid } : {}),
     };
 }
 
@@ -686,6 +691,53 @@ function signRow(ctx, op, pick, idx, traceIt = false) {
 /** The value in a column row at track i (0 = leftmost digit track), right-aligned. */
 const at = (value, T, i) => { const p = String(value).padStart(T, ' '); return p[i] === ' ' ? '' : p[i]; };
 
+/**
+ * A BASIC FACT step (owner 2026-11-14, ws-two-step STEP-FORM): + / − within 20 with no regrouping (or two one-digit numbers: 6 + 4,
+ * 15 − 7), × / ÷ within the 10 x 10 facts. A two-step story draws such a step as a horizontal number sentence, never columns (the
+ * stray carry box over 6 + 4) or a long-division frame (10 ÷ 2); columns stay for regrouping / multi-digit work, long division for
+ * a multi-digit dividend that is no fact.
+ */
+export function isFactStep(st) {
+    if (!st) return false;
+    const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+    if (st.op === '+') return st.ans <= 20 && ((x < 10 && y < 10) || (x % 10) + (y % 10) < 10);
+    if (st.op === '-') return x <= 20 && ((y < 10 && st.ans < 10) || (x % 10) >= (y % 10));
+    if (st.op === '*') return x <= 10 && y <= 10;
+    if (st.op === '/') return y >= 1 && y <= 10 && !st.r && st.q <= 10;
+    return false;
+}
+/** A two-step column story's step drawn as a fact sentence (a two-step story only: one-step stories keep their pages). */
+const factHere = (p, st) => !!p && Array.isArray(p.steps) && p.steps.length === 2 && !p.layout && isFactStep(st);
+/** The digits of a step's answer (the answer boxes of a fact sentence: the answer's own digits, no spare leading box). */
+const factAnsT = (st) => String(st.op === '/' ? st.q : st.ans).length;
+
+/**
+ * One fact step as a horizontal number sentence: [a] (sign) [b] = [answer]. The pupil writes the two story numbers and the
+ * sign (as in the columns), the answer in its box(es); the last step's answer is the one graded answer place (`ans-i`, one box a
+ * digit, the host's digit boxes on screen), Step 1's result a working box. Every size from ctx.metrics; nothing shrinks.
+ */
+function factSentence(ctx, st, show, idx, p = {}, isAnswer = false) {
+    const bx = boxMm(ctx), pt = digitPt(ctx);
+    const put = filled(ctx);
+    const x = (s) => (s.op === '*' ? s.a : s.top), y = (s) => (s.op === '*' ? s.b : s.bottom), res = (s) => (s.op === '/' ? s.q : s.ans);
+    // (critic r3 F6: on screen a one-digit number box is one digit box wide, so the sentence fits a two-up worksheet cell at 820 on
+    // ONE line - digits and box heights keep their size; only the spare width beside a single digit goes)
+    const nw = (v) => (isTwin(ctx) && String(v).length <= 1 ? bx : Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx))));
+    const num = (id, v, e) => wbox(ctx, { id, value: put ? String(v) : '', expect: String(e), w: nw(e), h: bx, pt, kind: 'number' });
+    const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
+    const sign = wbox(ctx, { id: `w${idx}-sign`, value: put ? GLYPH[show.op] : '', expect: GLYPH[st.op], w: bx * 0.9, h: bx * 0.9, pt: pt * 0.85, kind: 'sign', round: true });
+    let ansHtml;
+    if (isAnswer) {
+        const T = factAnsT(st);
+        const sv = String(res(show)).padStart(T, ' ').slice(-Math.max(T, String(res(show)).length));
+        const ev = String(res(st));
+        const boxes = Array.from({ length: Math.max(T, sv.length) }, (_, i) => abox(ctx, { id: `ans-${i}`, value: put ? (sv[i] || '').trim() : '', expect: ev[i] || '', w: bx, pt })).join('');
+        ansHtml = `<span style="display:inline-flex;gap:${L(ctx, GAP)};"${isTwin(ctx) ? ' data-mq-join=""' : ''}>${boxes}</span>`;
+    } else ansHtml = num(`w${idx}-res`, res(show), res(st));
+    return `<div class="mq-wwfact" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;flex-wrap:nowrap;gap:${L(ctx, isTwin(ctx) ? 0.8 : 2.2)};">`
+        + `${num(`w${idx}-fa`, x(show), x(st))}${sign}${num(`w${idx}-fb`, y(show), y(st))}${sym('=')}${ansHtml}</div>`;
+}
+
 /** The + − × column work of one step: a CSS grid of boxes, the sign box on the bottom row. */
 function columnWork(ctx, st, show, idx, p = {}, isAnswer = false) {
     const minT = Math.max(Number(p.tracks) || 0, columnRows(st).T);
@@ -763,9 +815,14 @@ function divisionWork(ctx, st, show, idx, p = {}, isAnswer = false) {
     const ys = String(y).padStart(Dy, ' '), eys = String(st.bottom).padStart(Dy, ' ');
     for (let i = 0; i < Dy; i++) html += `<span style="grid-row:2;grid-column:${i + 1};">${wbox(ctx, { id: `w${idx}-dv-${i}`, value: put ? ys[i].trim() : '', expect: eys[i].trim(), w: bx, h: bx, pt })}</span>`;
     const hMm = bx + 1.6;
-    html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1};align-self:stretch;display:flex;align-items:stretch;justify-content:center;">`
-        + `<svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:${L(ctx, bw)};height:${isTwin(ctx) ? `max(48px, ${L(ctx, hMm)})` : L(ctx, hMm)};overflow:visible;"><path d="M2 1 Q9 20 2 39" fill="none" stroke="${INK}" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
-    html += `<span style="grid-row:2;grid-column:${c0} / span ${Dx};border-top:${B(ctx, 1.5)} solid ${INK};align-self:start;height:0;"></span>`;
+    // The bracket and the bar are ONE stroke (owner 2026-11-14, LDIV-JOIN; LDIV-SHAPE near-straight side): the kit's shared
+    // bracketSvg, its stroke centred on the bar's centre line (the svg drops half a stroke), and ONE bar from the bracket's corner
+    // (bracketLine) across the gutter and every dividend track - no seam at the join, as long-division.js draws it.
+    const SK = B(ctx, 1.5);
+    const corner = bracketLine(2, 9).x;
+    html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1};align-self:stretch;display:block;position:relative;top:calc(${SK} / 2);">`
+        + bracketSvg({ x: 2, q: 9, ink: INK, stroke: SK, style: `display:block;width:${L(ctx, bw)};height:${isTwin(ctx) ? `max(48px, ${L(ctx, hMm)})` : L(ctx, hMm)};overflow:visible` }) + '</span>';
+    html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1} / span ${Dx + 1};align-self:start;display:block;height:0;margin-left:calc(${L(ctx, bw)} * ${corner / 10});border-top:${SK} solid ${INK};"></span>`;
     const xs = String(x).padStart(Dx, ' '), exs = String(st.top).padStart(Dx, ' ');
     for (let i = 0; i < Dx; i++) html += `<span style="grid-row:2;grid-column:${c0 + i};padding-top:${L(ctx, 0.8)};">${wbox(ctx, { id: `w${idx}-dd-${i}`, value: put ? xs[i].trim() : '', expect: exs[i].trim(), w: bx, h: bx, pt })}</span>`;
     // the working: two rows per step (the product, then the difference and the digit brought down)
@@ -804,7 +861,11 @@ function blockWidthMm(ctx, st, p = {}) {
     const bx = boxMm(ctx);
     const signs = 4 * bx * 0.72 + 3 * 2.6 + 3.2;
     let work;
-    if (st.op === '/') {
+    if (factHere(p, st)) {
+        const nw = (v) => (isTwin(ctx) && String(v).length <= 1 ? bx : Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx))));
+        const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+        work = nw(x) + bx * 0.9 + nw(y) + 4 + factAnsT(st) * (bx + GAP) + 4 * 2.2;
+    } else if (st.op === '/') {
         const Dx = digitsOf(st.top).length, Dy = digitsOf(st.bottom).length;
         work = (Dx + Dy) * (bx + GAP) + bx * 0.45 + (st.top % st.bottom ? bx + 6 : 0);
     } else {
@@ -814,19 +875,20 @@ function blockWidthMm(ctx, st, p = {}) {
 }
 
 /** One step's work block: its sign row over its columns. */
-function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', noSigns = false) {
+function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', noSigns = false, sub = '') {
     const isAnswer = !!unitBlock || (p.inRow && idx === (p.steps || []).length - 1);
-    const grid = st.op === '/' ? divisionWork(ctx, st, show, idx, p, isAnswer) : columnWork(ctx, st, show, idx, p, isAnswer);
+    const grid = factHere(p, st) ? factSentence(ctx, st, show, idx, p, isAnswer)
+        : st.op === '/' ? divisionWork(ctx, st, show, idx, p, isAnswer) : columnWork(ctx, st, show, idx, p, isAnswer);
     // The unit line stands beside the answer row (the bottom row; the quotient row of ÷), its
     // word bank beside it: one answer place, number and label together.
     const work = unitBlock
         ? (isTwin(ctx)
             // on screen the label line and its word chips sit in one row right under the columns
             ? `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">${grid}${unitBlock}</div>`
-            : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
+            : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' || factHere(p, st) ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
         : grid;
     const cap = caption ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;">${esc(caption)}</div>` : '';
-    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx))}`
+    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${sub}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx))}`
         + `<div style="max-width:100%;overflow-x:auto;">${work}</div></div>`;
 }
 
@@ -1024,6 +1086,17 @@ function shownSteps(p, ctx) {
     // It's A or B, Error analysis's wrong answer - is the one written in the answer box; critic visual-quality r2 N4:
     // the sentence frame wrote p.ans, so every "False" claim printed the true answer)
     const wv = w && w.value !== undefined && w.value !== null && w.value !== '' ? String(w.value) : null;
+    // (lf-algebra r13, lead ruling D: a two-step ÷-last story's wrong work is shown at STEP 1 - `op0`, the wrong sign for the
+    // change (M-TS4), the share then done right on that result - or with a story number carried into Step 2 - `from` (M-TS3);
+    // both write a quotient as wide as the answer, so the box never tells. providers/word-work.js wordWorkWrong.)
+    const w0 = w && w.slots && opKey(w.slots.op0);
+    const wfrom = w && w.slots && w.slots.from !== undefined && w.slots.from !== null ? Number(w.slots.from) : null;
+    if (w && p.steps.length === 2 && (w0 || wfrom !== null)) {
+        const [s1, s2] = p.steps;
+        const n1 = w0 ? (w0 === '-' ? makeStep(Math.max(s1.top, s1.bottom), '-', Math.min(s1.top, s1.bottom)) : makeStep(s1.top, w0, s1.bottom)) : s1;
+        const n2 = n1 ? makeStep(wfrom !== null ? wfrom : (n1.op === '/' ? n1.q : n1.ans), s2.op, s2.bottom) : null;
+        if (n1 && n2) return { steps: [n1, n2], picks: [n1.op, n2.op], ans: wv !== null ? wv : String(n2.op === '/' ? n2.q : n2.ans) };
+    }
     if (!wop) return { steps: p.steps, picks: p.steps.map((s) => s.op), ans: wv !== null ? wv : String(p.ans) };
     const out = p.steps.map((s, i) => {
         if (i !== p.steps.length - 1) return s;
@@ -1081,6 +1154,24 @@ export function twoStepPart(p, k, ctx) {
     const [s1, s2] = p.steps;
     const wrap = (html) => `<div class="mq-ww mq-wwpart" data-ww-ops="${s1.op} ${s2.op}" data-read style="box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${html}</div>`;
     if (k <= 0) return wrap(`<div style="white-space:nowrap;">${storyHTML(none, p)}</div>`);
+    // The letter (msLetter) and estimate (msCheck) stories draw THEIR response, the frames rows (lf-algebra R4; the lesson
+    // chart's panels drew the whole cell, the same picture four times, 146 mm in a 92 mm panel): the newest rows grey,
+    // the earlier ones black. Letter: 1 the equation, 2 the two steps worked under it, 3 n = the answer. Estimate: 1 the
+    // two steps solved, 2 the rounded estimate under them, 3 the estimate and "Is my answer close?" ringed. (lf-engine routes
+    // the panels here; the chart's zoom fits a panel wider than its half - the letter equation is one answer, never wrapped.)
+    if (p.letter || p.check) {
+        const fp = (rowsK, c) => framesLayout(Object.assign({}, p, { layout: 'frames', partRows: rowsK }), c);
+        const stepsOnly = (c) => framesLayout(Object.assign({}, p, { layout: 'frames', letter: false, check: null, partRows: ['steps'] }), c);
+        if (p.letter) {
+            if (k === 1) return wrap(fp(['eq'], grey));
+            if (k === 2) return wrap(fp(['eq'], solid) + stepsOnly(grey));
+            return wrap(fp(['eq'], solid) + fp(['n'], grey));
+        }
+        if (k === 1) return wrap(stepsOnly(grey));
+        if (k === 2) return wrap(stepsOnly(solid) + fp(['est'], grey));
+        // (panel 3 keeps the estimate and asks the question: the solved steps stay on panel 2, so the panel fits the chart)
+        return wrap(fp(['est'], solid) + fp(['ok'], grey));
+    }
     if (k === 1) return wrap(stepBlock(grey, s1, s1, s1.op, 0, 'Step 1', p));
     return wrap(stepBlock(grey, s2, s2, s2.op, 1, 'Step 2', p, unitBlock(grey, p, p.unit, s2.op === '/')));
 }
@@ -1100,7 +1191,14 @@ function framesLayout(p, ctx) {
     const pt = digitPt(ctx);
     const two = p.steps.length > 1;
     const lastI = p.steps.length - 1;
-    const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
+    // (lf-roles r9 RI-DISTINCT, two-step round 3b: a worked-WRONG frames cell - Reason It's A or B, Error analysis, True or
+    // False? - draws the work it is shown, as the column layout does: shownSteps' signs and numbers, and the shown value in
+    // the answer box (n = on the letter equation); it drew the model's work in both panels and ignored the wrong value)
+    const sh = put ? shownSteps(p, ctx) : null;
+    const S = sh ? sh.steps : p.steps;
+    const shownAns = sh ? sh.ans : String(p.ans);
+    // (screen: every frames box is a 48 px touch target at the tablet widths - ws-phone-card TOUCH, round 3b: 46 px at 820 / 1024)
+    const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${twin ? `max(48px, ${L(ctx, bx)})` : tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
     // one number box; on screen an input as wide as its number (the answer: the host's own cell, `data-mq-cell`)
     const box = (id, v, digits, graded = false, heavy = false) => {
         const w = Math.max(bx * 1.25, blankWidth(Math.max(2, digits), sizeOf(ctx)));
@@ -1111,45 +1209,84 @@ function framesLayout(p, ctx) {
         return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face(w, heavy)}">${put ? esc(v) : ''}</span>`;
     };
     const sign = (id, op) => (twin
-        ? `<input type="text" class="mq-wwork" data-mq-kind="sign" data-mq-expect="${GLYPH[op]}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign" style="box-sizing:border-box;width:${tw(ctx, bx * 0.9)};height:${tw(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;text-align:center;padding:0;margin:0;">`
+        ? `<input type="text" class="mq-wwork" data-mq-kind="sign" data-mq-expect="${GLYPH[op]}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign" style="box-sizing:border-box;width:max(48px, ${L(ctx, bx * 0.9)});height:max(48px, ${L(ctx, bx * 0.9)});border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;text-align:center;padding:0;margin:0;">`
         : `<span data-ws-slot="${esc(id)}" data-ws-shape="circle" data-ws-graded="0"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, bx * 0.9)};height:${L(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;line-height:1;color:${col};">${put ? GLYPH[op] : ''}</span>`);
     const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
     const cap = (t) => `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">${t}</span>`;
     const row = (html) => `<div class="mq-wwframe" style="display:flex;align-items:center;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.2)};">${html}</div>`;
     let rows;
+    let nRow = '';
+    const parts = {};
     if (p.letter) {
         // msLetter (3.OA.D.8): the whole story as ONE equation with a letter, then the letter's value
-        const [s1, s2] = p.steps;
+        const [s1, s2] = S;
         const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
         const brk = two && (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
-        const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length)}`;
-        const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length)}` : first;
-        rows = row(`${eqn}${sym('=')}${sym('n')}`) + row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
+        // (two-step card decision 7: the EQUATION is a graded answer of its own - both signs and the three numbers, one
+        // answer place, `data-ws-slot="equation"` - and n the second; its boxes are drawn heavy, as an answer place is)
+        const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length, false, true)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length, false, true)}`;
+        const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length, false, true)}` : first;
+        const eqGroup = twin ? `<span data-mq-part="equation" style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>` : `<span data-ws-slot="equation" data-ws-shape="group"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>`;
+        nRow = `${sym('n')}${sym('=')}${box('answer', shownAns, Math.max(String(p.ans).length, shownAns.length), true, true)}`;
+        parts.eq = row(eqGroup); parts.n = row(nRow);
+        rows = parts.eq + parts.n;
     } else {
-        rows = p.steps.map((st, i) => {
+        rows = S.map((st, i) => {
             const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
             const r = st.op === '/' ? st.q : st.ans;
-            const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
+            const t = p.steps[i] ? (p.steps[i].op === '/' ? p.steps[i].q : p.steps[i].ans) : r;
+            // (a box holds the number written in it - KEYFIT: a wrong 152 in a box sized for 99 ran past it)
+            const res = i === lastI ? box('answer', shownAns, Math.max(String(t).length, shownAns.length), true, true) : box(`fr${i}-r`, String(r), Math.max(String(t).length, String(r).length));
             return row(`${two ? cap(`Step ${i + 1}:`) : ''}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${sym('=')}${res}`);
         }).join('');
+        parts.steps = rows;
     }
     // msCheck (3.OA.D.8): each story number rounded to the nearest ten, the estimate, and the pupil's own answer judged
     if (p.check) {
         const c = p.check;
+        // (two-step card decision 8: the estimate is the second graded answer on paper - a heavy box, graded; on the screen
+        // it is a typed box marked as it is filled, AND graded: `data-mq-part` puts it in the host's value, wordWorkVerdict - lf-hosts)
+        const esBox = (v, d) => (twin ? `<span data-mq-part="es-r" style="display:inline-flex;">${box('es-r', v, d, false, true)}</span>`
+            : box('es-r', v, d, false, true).replace(' data-ws-graded="0"', ''));
         const est = row(`${cap('Estimate:')}${box('es-a', String(c.a), String(c.a).length)}${sign('es-op0', p.steps[0].op)}${box('es-b', String(c.b), String(c.b).length)}`
-            + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${box('es-r', String(c.est), String(c.est).length)}`);
+            + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${esBox(String(c.est), String(c.est).length)}`);
+        // (the ring judges the SHOWN answer: within the rounding error - 5 for each number rounded to the nearest ten - is
+        // close; a worked-wrong answer far from the estimate rings No, the estimate check this skill teaches)
+        const close = Math.abs(Number(shownAns) - c.est) <= 5 * (two ? 3 : 2);
         const ring = (w) => (twin
             ? `<button type="button" class="mq-wwword" data-mq-word="${w}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${w}</button>`
-            : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
-        rows += est + row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
+            : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === (close ? 'Yes' : 'No') ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
+        parts.est = est; parts.ok = row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
+        rows += parts.est + parts.ok;
     }
-    const work = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
+    // (`partRows`, two-step lesson chart panels - twoStepPart below: only the named rows, no story, no bar, no tab gutter)
+    if (Array.isArray(p.partRows)) {
+        // (a row wraps inside a half-width chart panel - the estimate row of three numbers and the Yes / No question are
+        // wider than its 92 mm at L; content never shrinks, it wraps)
+        return `<div class="mq-wwpartrows" style="display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${p.partRows.map((k) => parts[k] || '').join('')}</div>`
+            .replace(/class="mq-wwframe" style="display:flex;(?!flex-wrap)/g, `class="mq-wwframe" style="display:flex;flex-wrap:wrap;row-gap:${L(ctx, 1.5)};`);
+    }
+    // (the two-step bar model on the teaching cells and with wpBar, above the sentences; the middle question over Step 1)
+    if (two && !p.letter) { const mq = midQuestion(p, ctx); if (mq) rows = mq + rows; }
     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
-    const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
+    let unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
+    // (two-step round 3b: on paper the letter equation's unit word sits in the n = row - "n = [2] crayons" - not beside the
+    // whole work column, where it ran past a Reason It panel's edge by the equation row's width; a narrow cell only - a full-width
+    // cell keeps the word beside the work, so an Error analysis judgement stands at one x a page, EA-ROWX)
+    if (p.letter && !twin && unit && nRow && Number(ctx.columns || 1) > 1) { rows = parts.eq + row(nRow + unit); unit = ''; }
+    // (lf-hosts 2026-11-13, ws-phone-card CLIP-X: on screen the work column may shrink to the cell, so its rows wrap at 390 px
+    // instead of running 18-34 px past the phone's edge; paper keeps its one-line rows)
+    const work = `<div style="${twin ? 'flex:1 1 auto;min-width:0;' : 'flex:none;'}display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
+    const tsBar = two ? twoStepBarFor(p, ctx) : '';
+    // (two-step round 3b, ws-empty-band EB-SIDE 33-42 % on the letter / estimate cells: the sentences, 95-130 mm, stood at the left
+    // of a 185 mm full-width cell. Centred under the story as the two step columns are (344435351), the space splits into two
+    // margins under the H13 30 %; the rows keep their left edge inside the block, so Step 1 still reads above Step 2. Only a
+    // one-column cell that is not worked wrong: an Error analysis judgement stands at one x a page (EA-ROWX), a Reason It panel
+    // (columns 3) is as narrow as its work.)
     // (the story starts level with the item tab, in a gutter beside it - the frames cell takes no tab spacer, CSS
     // .mq-wwframes in sheet-kit.css: lesson 7 r2, the exit slip half overflowed by 8 mm and content never shrinks)
     return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
-        + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
+        + tsBar + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;flex-wrap:wrap;${two && !twin && Number(ctx.columns || 1) === 1 && ctx.state !== 'wrong' ? 'justify-content:safe center;' : ''}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
 /**
@@ -1241,6 +1378,35 @@ function chooseLayout(p, ctx) {
         + `<div data-ws-slot="answer" data-ws-shape="check"${ink} style="display:grid;grid-template-columns:repeat(2, max-content);column-gap:${L(ctx, 14)};margin-top:${L(ctx, 2)};">${rows}</div></div>`;
 }
 
+/**
+ * The two-step bar model (two-step card 2026-11-13, decision 4 / 5; WDS 18.1; graphics/two-step-bar.js) of a two-step
+ * story: DRAWN on the teaching cells (scaffold level >= 2 - the Model, a Guided try, the lesson's chart and model) and,
+ * on every other page and the screen, with the `wpBar` option (`p.bar2`; default on for multi_step_word). Never on a
+ * worked-wrong cell (Error analysis, True or False?, Reason It): the bar would write the right answer beside the wrong
+ * work. '' when the story is not two steps.
+ */
+function twoStepBarFor(p, ctx) {
+    if (!p || !Array.isArray(p.steps) || p.steps.length !== 2 || ctx.state === 'wrong') return '';
+    const teach = !isTwin(ctx) && Number(ctx.scaffoldLevel) >= 2;
+    if (!p.bar2 && !teach) return '';
+    const put = filled(ctx) && !isTwin(ctx);
+    // (the room the cell gives it: a two-step cell is full width - its inner width less the story's left inset)
+    const maxW = 186 / Math.max(1, Number(ctx.columns || 1)) - 15;
+    return twoStepBar(ctx, { steps: p.steps, show: put, ink: put ? inkOf(ctx) : null, maxW });
+}
+
+/**
+ * The hidden middle question (P-WP-11 v1, two-step card decision 6): "How many stickers are in the bags?" under Step 1,
+ * on the teaching cells only (scaffold level >= 2: Model and Guided) - a hint that fades: never at level 0 or 1 (a test,
+ * a practice page) and never on the screen; marked `data-ws-hint="fade"` so a host that hides hints drops it.
+ */
+function midQuestion(p, ctx, wMm = 50, k = 0, minLines = 0) {
+    if (!p || !p.mid || isTwin(ctx) || !(Number(ctx.scaffoldLevel) >= 2)) return '';
+    // (Step 2's line is the story's own question, so both step columns carry a question line and stand level, P-WP-11)
+    const t = k === 0 ? p.mid : String(p.lines[p.lines.length - 1] || '');
+    return `<div class="mq-wwmid" data-ws-hint="fade" style="max-width:${L(ctx, Math.max(56, wMm))};font-size:${P(ctx, zonePt(ctx))};font-weight:400;line-height:1.25;${minLines ? `min-height:${minLines * 1.25}em;` : ''}">${esc(t)}</div>`;
+}
+
 /** The cell body (everything but a pool caption). */
 function renderWork(p, ctx) {
     if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
@@ -1282,7 +1448,14 @@ function renderWork(p, ctx) {
     // ONE place the sign is answered, so no + − × ÷ row to circle as well (H8).
     const noSigns = p.signs === false || p.signRow === false;
     const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
-    const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns)).join('');
+    // The hidden middle question (P-WP-11 v1, two-step card decision 6) under the Step 1 caption: a HINT, printed on the
+    // teaching cells only (scaffold level >= 2: Model, Guided) - never on practice, a test (level 0) or the screen.
+    // (STEP-ALIGN, lead 2026-11-14: two fact-sentence steps stand on one row - the blocks top-align and the question lines over them
+    // share one width and a two-line height, so both sign rows and both sentences sit on the same lines)
+    // (critic r2 F1b: EVERY two-step row top-aligns - a column step beside a sentence step too - so both question lines share the height)
+    const midW = two ? Math.max(...p.steps.map((st) => blockWidthMm(ctx, st, p))) : 0;
+    const midQ = (i) => (two ? midQuestion(p, ctx, midW, i, 2) : '');
+    const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns, midQ(i))).join('');
     const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
     // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
     // (or a two-step story) makes the cell a full-width one (see fullW below).
@@ -1293,8 +1466,12 @@ function renderWork(p, ctx) {
     // (`storyOnly` / `noStory`: Reason It prints a column story ONCE over its A and B panels, each panel the work only -
     // lf-roles, word-stories critic r1 F2: the story twice in two half-width panels ran the work out of the cell)
     if (p.storyOnly) return `<div class="mq-ww" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${KO(ctx, 2.5)};">${storyHTML(ctx, p, true)}</div>`;
+    // The two-step bar model (two-step card 2026-11-13, WDS 18.1): drawn above the two step columns on
+    // the teaching cells (scaffold level >= 2: model, guided, the lesson chart) and on a practice page
+    // with the `wpBar` option (`p.bar2`). Schematic (graphics/two-step-bar.js), one `?` per bar.
+    const ts2 = two ? twoStepBarFor(p, ctx) : '';
     const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${p.noStory ? '' : storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
-        + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
+        + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '') + ts2;
     // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
     // under it on the left, the columns and the answer on the right. The page then holds three
     // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).
@@ -1309,7 +1486,14 @@ function renderWork(p, ctx) {
         ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`
         : narrow
         ? `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:${twin ? 'center' : 'flex-start'};">${blocks}</div>` : blocks}${answer}</div>`
-        : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
+        // (lf-algebra r13, precritic two-step r12 EB-SIDE 31-38 %: a full-width two-step cell's two step columns are 107-126 mm of a
+        // 185 mm interior; left-packed they left one 57-70 mm band on the right. Centred under the story, the space splits into
+        // two 30-39 mm margins, each under the H13 30 % - the steps still read Step 1 then Step 2, left to right.)
+        // (critic r2 F5: two steps sit in a fit-content box centred in the cell - side by side it is centred; when Step 2 must wrap
+        // the box takes the full width and both steps start at its one left edge, so the = signs and answers stand in one column)
+        : two && !answer
+        ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, p.factDiv || p.steps[0].op === "*" ? 1 : 3)};"><div style="width:fit-content;max-width:100%;display:flex;flex-wrap:wrap;align-items:flex-start;gap:${L(ctx, 3)} ${L(ctx, 8)};">${blocks}</div></div>`
+        : `<div style="display:flex;align-items:${two ? 'flex-start' : 'flex-end'};gap:${L(ctx, 8)};${two ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};` : ''}margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
     // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
     // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
     // it as not fitting the column and prints it in the full-width group at the bottom
@@ -1325,7 +1509,7 @@ function renderWork(p, ctx) {
  */
 const KO = (ctx, mm) => `max(${L(ctx, mm)}, var(--ws-koin, 0mm))`;
 
-register(WW_TEMPLATE, {
+const WW_DEF = {
     render(p, ctx) {
         const html = renderWork(p, ctx);
         // `caption` (a story dealt onto a pool page whose one instruction is "Solve."): the
@@ -1348,7 +1532,7 @@ register(WW_TEMPLATE, {
         // the answer row's digit boxes (the one answer place when the answer is the row's result)
         if (p.inRow !== false && p.layout !== 'bar' && p.layout !== 'frames' && p.layout !== 'sentence' && Array.isArray(p.steps) && p.steps.length) {
             const st = p.steps[p.steps.length - 1];
-            const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
+            const T = factHere(p, st) ? factAnsT(st) : st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
             const d = String(p.ans).padStart(T, ' ');
             for (let i = 0; i < T; i++) slots[`ans-${i}`] = { value: d[i] === ' ' ? '' : d[i], graded: d[i] !== ' ' };
         }
@@ -1361,9 +1545,22 @@ register(WW_TEMPLATE, {
                 slots[`fr${i}-b`] = { value: String(st.op === '*' ? st.b : st.bottom), graded: false };
                 if (i !== lastI && !p.letter) slots[`fr${i}-r`] = { value: String(st.op === '/' ? st.q : st.ans), graded: false };
             });
+            if (p.letter && p.steps.length === 2) {
+                // the equation: ONE graded answer (decision 7), its parts written in its boxes and circles
+                const [s1, s2] = p.steps;
+                const brk = (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
+                const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
+                const eq = `${brk ? '(' : ''}${x(s1)} ${GLYPH[s1.op]} ${y(s1)}${brk ? ')' : ''} ${GLYPH[s2.op]} ${s2.bottom} = n`;
+                // (lf-hosts 2026-11-13, PROBLEM_TYPES "any equivalent answer is accepted" / PAGE_TYPES word problems "commutative equations are accepted": the Step 1
+                // numbers turned around when Step 1 adds or multiplies - 9 × 5 + 13 = n for 5 × 9 + 13 = n - is the same
+                // equation; the boxes fix every other place. Paper and screen read this one list.)
+                const turn = (s1.op === '+' || s1.op === '*') && String(x(s1)) !== String(y(s1))
+                    ? [`${brk ? '(' : ''}${y(s1)}${GLYPH[s1.op]}${x(s1)}${brk ? ')' : ''}${GLYPH[s2.op]}${s2.bottom}=n`] : [];
+                slots.equation = { value: eq, graded: true, accept: [eq.replace(/\s+/g, ''), ...turn] };
+            }
             if (p.check) {
                 const c = p.check;
-                Object.assign(slots, { 'es-a': { value: String(c.a), graded: false }, 'es-b': { value: String(c.b), graded: false }, 'es-r': { value: String(c.est), graded: false }, 'es-op0': { value: GLYPH[p.steps[0].op], graded: false } });
+                Object.assign(slots, { 'es-a': { value: String(c.a), graded: false }, 'es-b': { value: String(c.b), graded: false }, 'es-r': { value: String(c.est), graded: true }, 'es-op0': { value: GLYPH[p.steps[0].op], graded: false } });
                 if (p.steps.length > 1) Object.assign(slots, { 'es-c': { value: String(c.c), graded: false }, 'es-op1': { value: GLYPH[p.steps[1].op], graded: false } });
             }
         }
@@ -1394,7 +1591,44 @@ register(WW_TEMPLATE, {
         return out;
     },
     layout() { return { card: 'card-wide-visual', checker: 'value' }; },
-});
+};
+register(WW_TEMPLATE, WW_DEF);
+
+/* ============================================================== screen grading of the two-step parts */
+// (lane lf-hosts 2026-11-13, two-step card decisions 7 / 8: on paper the letter equation and the estimate are graded answers
+// of their own - the key's `equation` and `es-r` slots. The screen grades them the SAME way: the host composes the cell's
+// answer and each graded part into one value, "58 | equation: 5×9+13=n" / "58 | es-r: 60", and the verdict is the paper
+// key's own gradeSlots on that value, so screen and paper accept exactly the same forms.)
+
+/** The graded parts beyond the answer that a word-work payload's screen twin carries ([] for none). */
+export function wordWorkGradedParts(p) {
+    if (!p || p.layout !== 'frames' || !Array.isArray(p.steps)) return [];
+    const out = [];
+    if (p.letter && p.steps.length === 2) out.push('equation');
+    if (p.check) out.push('es-r');
+    return out;
+}
+/** {answer, <part>: value} from a composed screen value ("58 | equation: 5×9+13=n"). Pure. */
+export function wordWorkScreenValues(value) {
+    const s = String(value == null ? '' : value);
+    const cut = s.split(/\s*\|\s*(?=[\w-]+:)/);
+    const out = { answer: String(cut[0] || '').trim() };
+    for (const seg of cut.slice(1)) { const m = /^([\w-]+):\s*([\s\S]*)$/.exec(seg); if (m) out[m[1]] = m[2].replace(/\s+/g, ''); }
+    return out;
+}
+/** Every graded place of the item filled (the answer and each part's boxes). Pure. */
+export function wordWorkFilled(value, p) {
+    const v = wordWorkScreenValues(value);
+    return !!v.answer && wordWorkGradedParts(p).every((id) => !!v[id] && !/[?_]/.test(v[id]));
+}
+/** The screen verdict of a word-work item with graded parts: the PAPER key's gradeSlots on the composed value; null when
+ *  the item has no graded part beyond the answer (the host's own number check stands). Pure. */
+export function wordWorkVerdict(value, p) {
+    if (!wordWorkGradedParts(p).length) return null;
+    return gradeSlots(WW_DEF.answerKey(p), wordWorkScreenValues(value)).correct;
+}
+/** The paper key's verdict on a pupil's written values ({answer, equation, 'es-r'}): the same function the screen uses. */
+export function wordWorkKeyVerdict(values, p) { return gradeSlots(WW_DEF.answerKey(p), values || {}); }
 
 /* ============================================================== screen twin */
 
