@@ -217,16 +217,18 @@ registerSkill('patterns:number_patterns_rule', {
         return {
             iCan: shown ? 'I Can use the rule of a number pattern' : 'I Can find the rule of a number pattern',
             instructionKey: shown ? 'pattern-rule' : 'pattern-find-rule',   // R3: the default (no item) is find the rule
+            // (lf-algebra r8, critic r1 F6b: the lesson's four step names - lessons/families/algebra.js
+            // 'follow-given-rule' and 'number-patterns-find-rule' - so the Guided band and the anchor chart say the same)
             steps: shown ? [
                 'Read the rule.',
-                'Start at the last number shown.',
-                'Use the rule to get the next number.',
-                'Write each missing number.',
+                'Do it to the number.',
+                'Write the next one.',
+                'Every gap, same rule.',
             ] : [
-                'Look at two numbers side by side.',
-                'Find the rule: more, less, double, half or times 10?',
-                'Check the rule on the next pair.',
-                'Write the rule. Use it to write each missing number.',
+                'Look at the jumps.',
+                'Name the rule.',
+                'Use the rule at the gap.',
+                'Every gap. Check each jump.',
             ],
             say: 'The rule is __. The next number is __.',
             sayValues: (item) => {
@@ -241,10 +243,15 @@ registerSkill('patterns:number_patterns_rule', {
         const d = patternData(q);
         if (!d) return [];
         const out = rowSteps(d.values, d.blanks, `The rule: ${RULE_WORDS[d.kind](d)}.`, JUMP[d.kind](d));
-        if (d.ruleHidden) {
+        if (d.ruleHidden && out.length >= 2) {
+            // lf-algebra r1: finding the rule never STARTS by stating it. Four steps (the lesson's chart): look at the jumps,
+            // name the rule (written in its box), use it at the first gap, then every gap.
+            const J = JUMP[d.kind](d);
             const last = out[out.length - 1];
             last.marks = last.marks.concat([{ slot: 'rule', value: String(d.rule) }]);
-            out.splice(1, 0, step(`${fmt(d.values[0])}, ${fmt(d.values[1])}, ${fmt(d.values[2])}: the rule is ${RULE_WORDS[d.kind](d)}.`));
+            out[0] = step(`${fmt(d.values[0])} to ${fmt(d.values[1])} is ${J(1)}. ${fmt(d.values[1])} to ${fmt(d.values[2])} is ${J(2)}.`);
+            out.splice(1, 0, step(`The rule: ${RULE_WORDS[d.kind](d)}. Write ${fmt(d.rule)}.`, [{ slot: 'rule', value: String(d.rule) }]));
+            if (out.length > 4) out.splice(3, out.length - 4);
         }
         return clampSteps(out);
     },
@@ -261,7 +268,7 @@ registerSkill('patterns:number_patterns_rule', {
             const v = d.blanks.map((i) => d.values[0] + i * jump);
             const k = d.blanks.findIndex((i, n) => v[n] !== d.values[i]);
             if (k >= 0) {
-                c.push({ value: joinLike(q, [...v, ...(rule !== null ? [String(jump)] : [])]), misconception: 'added-not-doubled', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
+                c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'added-not-doubled', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
                     explain: `Added ${fmt(jump)} each time instead of ${d.kind === 'double' ? 'doubling' : 'multiplying by 10'}.` });
             }
         }

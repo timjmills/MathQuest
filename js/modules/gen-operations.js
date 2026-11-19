@@ -5,7 +5,7 @@ import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pi
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
-import { optionsFor, normalizeOptions } from './skill-options.js';
+import { optionsFor, normalizeOptions, factTableTop } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
@@ -119,6 +119,15 @@ function _cyclePerm(len, cycle) {
     for (let i = len - 1; i > 0; i--) { const j = Math.floor(next() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
     return p;
 }
+// lane lf-ops t15: the x / ÷ fact set runs 0 to 15 (`tableBand`, skill-options.js _opsTableConstant); the band's top table
+// (12 on "Tables to 12 x 12", 15 on "15 x 15") bounds what may be dealt, so the 13-15 ticks deal only under 15 x 15 and the
+// default 12 x 12 page deals the 0 to 12 it always did ("Tables to 10 x 10" keeps its own narrowing below, unchanged).
+function _tableLegal(def) {
+    const all = def.values.map(v => v.v);
+    if (!def.tableBand) return all;
+    const top = Math.max(12, factTableTop(_opt('band')));
+    return all.filter(v => v <= top);
+}
 function factConstantFor(narrowTo) {
     let def = null;
     try {
@@ -126,7 +135,7 @@ function factConstantFor(narrowTo) {
     } catch (e) { def = null; }
     if (!def) return null;                       // this skill declares no constant: nothing to honour
 
-    const legal = def.values.map(v => v.v);
+    const legal = _tableLegal(def);
     let ticked = state.skillOptions ? state.skillOptions.constant : undefined;
     // A scalar is a pre-check-box value (share code, saved section): treat it as one tick.
     if (typeof ticked === 'number' || typeof ticked === 'string') ticked = [ticked];
@@ -176,7 +185,7 @@ function _factsAllTicked() {
     try { def = optionsFor(state.category, state.skill).find(o => o.id === 'constant') || null; }
     catch (e) { def = null; }
     if (!def) return true;
-    const legal = def.values.map(v => v.v);
+    const legal = _tableLegal(def);
     let ticked = state.skillOptions ? state.skillOptions.constant : undefined;
     if (typeof ticked === 'number' || typeof ticked === 'string') ticked = [ticked];
     ticked = Array.isArray(ticked) ? ticked.map(Number).filter(v => legal.includes(v)) : [];
@@ -6705,9 +6714,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const _trivialM = _mixedM && _factTrivialSlot();
                     const _untouched = !_tables || _tables.length >= 12;
                     // P11: "Tables to 10 × 10" (band 100) keeps both factors to 10.
-                    const _tMax = factsMode && Number(_opt('band')) === 100 ? 10 : 12;
+                    // t15: "Tables to 15 x 15" (band 225) takes both factors to 15.
+                    const _tMax = factsMode ? factTableTop(_opt('band')) : 12;
                     const _mNarrow = ((_mixedM && !_trivialM && _untouched) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : (_tables || Array.from({ length: 13 }, (_, i) => i))).filter(v => v <= _tMax);
-                    const multC = factConstantFor(_tMax < 12 ? (_mNarrow.length >= 12 ? _mNarrow.slice(0, 11) : _mNarrow) : ((_mixedM && !_trivialM && _untouched) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _tables));
+                    const _mMixTop = Array.from({ length: _tMax - 1 }, (_, i) => i + 2);   // 2 .. the band's top table
+                    const multC = factConstantFor(_tMax < 12 ? (_mNarrow.length >= 12 ? _mNarrow.slice(0, 11) : _mNarrow) : ((_mixedM && !_trivialM && _untouched) ? _mMixTop : _tables));
                     if (multC !== null) {
                         a = multC;
                         b = _mixedM ? (_trivialM ? rng(0, 1) : rng(2, _tMax))
@@ -7054,9 +7065,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const _trivialD = _mixedD && _factTrivialSlot();
                     const _untouchedD = !_divTables || _divTables.length >= 12;
                     // P11: "Tables to 10 × 10" (band 100) keeps the divisor and the quotient to 10.
-                    const _dMax = factsMode && Number(_opt('band')) === 100 ? 10 : 12;
+                    // t15: "Tables to 15 x 15" (band 225) takes the divisor and the quotient to 15.
+                    const _dMax = factsMode ? factTableTop(_opt('band')) : 12;
                     const _dNarrow = ((_mixedD && !_trivialD && _untouchedD) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : (_divTables || Array.from({ length: 13 }, (_, i) => i))).filter(v => v <= _dMax);
-                    const divC = factConstantFor(_dMax < 12 ? (_dNarrow.length >= 12 ? _dNarrow.slice(0, 11) : _dNarrow) : ((_mixedD && !_trivialD && _untouchedD) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _divTables));
+                    const _dMixTop = Array.from({ length: _dMax - 1 }, (_, i) => i + 2);   // 2 .. the band's top table
+                    const divC = factConstantFor(_dMax < 12 ? (_dNarrow.length >= 12 ? _dNarrow.slice(0, 11) : _dNarrow) : ((_mixedD && !_trivialD && _untouchedD) ? _dMixTop : _divTables));
                     let divisor, result;
                     if (divC === 0) {
                         divisor = rng(1, _dMax);

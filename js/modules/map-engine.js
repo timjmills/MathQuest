@@ -786,8 +786,8 @@ function _celebrateMapCorrect() {
         const now = Date.now();
         const last = (typeof window !== 'undefined') ? (window._mapLastSfxAt || 0) : 0;
         if (now - last > 250) {
-            if (typeof window !== 'undefined' && typeof window.playSfx === 'function') {
-                window.playSfx('correct');
+            if (typeof window !== 'undefined' && typeof window.playCorrectSound === 'function') {
+                window.playCorrectSound();   // owner 2026-11-14 power-up (correct-sound.js)
                 window._mapLastSfxAt = now;
             }
         }
