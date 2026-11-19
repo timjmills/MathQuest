@@ -11982,6 +11982,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ldiv-kit-divide",
+   "check": "ws-ldiv-hug --kit LDIV-KIT (lf-ops bugs 2026-11-19, ldiv-room critic N3: divide with the bracket at Max Number 1000 printed on the legacy long-division markup, an orphan cell 4 across 3 columns, an offset quotient box): every division:divide bracket item at Max Number 100 and 1000 (Bracket alone, all three mixed, the default) carries q.cell on the kit division template, and its bracket pages (independent, test; pupil + key; M / L) draw only division cells, no data-ws-legacy cell",
+   "kind": "commit-pair",
+   "rule": "LDIV-KIT",
+   "browser": true,
+   "fail": {
+    "commit": "d38308824",
+    "state": "master: 0 / 24 bracket items on the division template at 100 and at 1000, every bracket page 4-6 legacy cells (FAIL 37)"
+   },
+   "pass": {
+    "commit": "636385dd8",
+    "state": "the fix: _applyKitFactCell takes a divide BRACKET item onto the division template (across / fraction unchanged)"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --kit --skills division:divide",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
