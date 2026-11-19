@@ -23,6 +23,7 @@
 //   node tests/scripts/ws-student-opts.cjs --unit             the node unit check only (no browser)
 //   node tests/scripts/ws-student-opts.cjs --widths 1280,820  some widths
 //   node tests/scripts/ws-student-opts.cjs --shots <dir>      also save screenshots (sheet folded / open, chips, locked)
+//   node tests/scripts/ws-student-opts.cjs --only CARRY       judge only these checks (CARRY, COUNT, PUPIL, UNIT; backtest rows)
 // Prints `ws-student-opts: OK` / `FAIL (n)`. MQ_ROOT serves another checkout (ws-backtest commit-pair rows).
 'use strict';
 const path = require('path');
@@ -101,7 +102,9 @@ async function browser() {
             await page.reload({ waitUntil: 'networkidle2', timeout: 60000 });
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS && !!window.UnifiedSkills, { timeout: 30000 });
             await sleep(300);
+            const before = fails.length;
             await atWidth(page, w, !!vp.touch);
+            console.log(`  @${w}: checked (${fails.length - before} finding(s))`);
         }
         const errs = app.problems.filter((p) => !/favicon/.test(p.text));
         if (errs.length) F(`PUPIL ${errs.length} page error(s): ${errs.slice(0, 3).map((p) => p.type + ' ' + p.text).join(' | ')}`);
@@ -462,6 +465,9 @@ async function pupilChecks(page, w, touch, k) {
         await unit();
         if (!has('unit')) await browser();
     } catch (e) { F('ERROR ' + (e && e.stack || e)); }
+    // --only CARRY,COUNT: judge just those checks (a backtest row proves one check; the run itself is the same)
+    const only = String(arg('only', '')).split(',').map((x) => x.trim().toUpperCase()).filter(Boolean);
+    if (only.length) for (let i = fails.length - 1; i >= 0; i--) if (!only.some((o) => fails[i].startsWith(o + ' ')) && !fails[i].startsWith('ERROR')) fails.splice(i, 1);
     for (const f of fails) console.error('  FAIL ' + f);
     console.log(fails.length ? `ws-student-opts: FAIL (${fails.length})` : 'ws-student-opts: OK');
     process.exit(fails.length ? 1 : 0);

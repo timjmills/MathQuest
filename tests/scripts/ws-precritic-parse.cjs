@@ -19,6 +19,9 @@
 //   ws-partopts-unit: OK but a check the scope asks for never printed       -> FAIL (it judged nothing for it)
 //   ws-partopts-unit: FAIL                                                  -> FAIL, the per-check rows as findings
 //   ws-partopts-unit: ERROR (a check could not run)                         -> FAIL "could not run", never PASS
+// Cases (lf-studentopts, 2026-11-19; PARSE.studentOpts):
+//   ws-student-opts: OK with every asked width checked -> PASS; a width missing -> FAIL naming it; FAIL -> FAIL with findings;
+//   --unit OK with its unit line -> PASS; OK with no unit line -> FAIL
 // Last line `ws-precritic-parse: OK (...)` or `ws-precritic-parse: FAIL - ...`.
 'use strict';
 const path = require('path');
@@ -98,5 +101,27 @@ const p4 = PARSE.partOpts(poGate, poErr, 2);
 t(p4.result === 'FAIL' && /could not run/.test(p4.findings), `partopts ERROR: FAIL "could not run" (got ${p4.result} ${p4.findings})`);
 
 N += 4;   // (the partopts cases above)
+
+// ---- lane lf-studentopts (PARSE.studentOpts, 2026-11-19)
+if (PARSE.studentOpts) {
+    const W = [1280, 1366, 1024, 820];
+    const soGate = { id: 'student-opts', expect: { widths: W } };
+    const unitGate = { id: 'student-opts-unit' };
+    const unitLine = '  unit: 742 live skills, 690 with pupil options; groups {"difficulty":1241,"facts":5}';
+    const allW = [unitLine, ...W.map((w) => `  @${w}: checked (0 finding(s))`), 'ws-student-opts: OK'].join('\n');
+    const threeW = [unitLine, ...W.slice(0, 3).map((w) => `  @${w}: checked (0 finding(s))`), 'ws-student-opts: OK'].join('\n');
+    const red = [unitLine, '  @1280: checked (1 finding(s))', '  FAIL CARRY @1280 STALE game style practice after ✕ + a changed option: the game dealt subtraction:subtract', 'ws-student-opts: FAIL (1)'].join('\n');
+    const s1 = PARSE.studentOpts(soGate, allW, 0);
+    t(s1.result === 'PASS', `student-opts, every width checked: PASS (got ${s1.result} ${s1.findings})`);
+    const s2 = PARSE.studentOpts(soGate, threeW, 0);
+    t(s2.result === 'FAIL' && /820/.test(s2.findings), `student-opts, a width missing: FAIL naming it (got ${s2.result} ${s2.findings})`);
+    const s3 = PARSE.studentOpts(soGate, red, 1);
+    t(s3.result === 'FAIL' && s3.explainsExit && /STALE/.test(s3.findings), `student-opts, FAIL: the findings (got ${s3.result} ${s3.findings})`);
+    const s4 = PARSE.studentOpts(unitGate, [unitLine, 'ws-student-opts: OK'].join('\n'), 0);
+    t(s4.result === 'PASS', `student-opts --unit: PASS (got ${s4.result} ${s4.findings})`);
+    const s5 = PARSE.studentOpts(unitGate, 'ws-student-opts: OK', 0);
+    t(s5.result === 'FAIL', `student-opts with no unit line: FAIL (got ${s5.result} ${s5.findings})`);
+    N += 5;
+}
 if (fails.length) { for (const f of fails) console.log(`  FAIL ${f}`); console.log(`ws-precritic-parse: FAIL - ${fails.length} of ${N} case(s)`); process.exit(1); }
 console.log(`ws-precritic-parse: OK (${N} cases)`);

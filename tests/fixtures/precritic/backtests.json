@@ -11982,6 +11982,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "student-opts-carry",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "A pupil's chosen options and selection reach every play host: the sheet's Play this skill / Play all selected, each game style card, the bottom Play, and a game style tapped at once after a chip's ✕ and a changed option (student-opts card §6 CARRY)",
+   "rule": "ws-student-opts STUDENT-OPTS-CARRY (12 deals per host + the game's own first question; options captured at each generate)",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only CARRY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "no sheet (a Quick Start tap toggles, no Play this skill / Play all selected), and the REAL stale case: after a first play, a chip's ✕ then a game style tapped at once - startMode -> startGame skipped the rebuild (state.isMixedMode still true) and the game dealt subtraction:subtract, the removed skill"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "every pupil start goes through playSelectedSkills(mode[, {only}]): 0 findings at 1280 and 820"
+   }
+  },
+  {
+   "id": "student-opts-count",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "\"You will play N skills\" (sheet, game style row, bottom row), \"Play all selected (N)\" and the dealt skills equal the selection after adding, after ✕ and after Clear; N = 1 hides Play all selected (card §6 COUNT)",
+   "rule": "ws-student-opts STUDENT-OPTS-COUNT",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only COUNT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "no \"You will play N skills\" line anywhere (the rows read null after adding, after ✕ and with 1 selected)"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "the three lines and the button follow the selection: 0 findings"
+   }
+  },
+  {
+   "id": "student-opts-pupil",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The sheet opens folded, shows only pupilOptionsFor, every target >= 48 x 48 and tappable at its centre, the chip ✕ 48 x 48, inside the window (popover >= 1024, bottom sheet at 820), a teacher-link option locked \"Set by your teacher\", Esc returns focus to the card (card §6 PUPIL)",
+   "rule": "ws-student-opts STUDENT-OPTS-PUPIL (real pointer / touch taps, elementFromPoint)",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only PUPIL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "a Quick Start tap opens no sheet (the teacher-link card opens none either), no pupilOptionsFor; the chip × is 18 x 18"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "0 findings at 1280 (popover) and 820 (bottom sheet, touch)"
+   }
+  },
+  {
+   "id": "student-opts-unit",
+   "kind": "commit-pair",
+   "browser": false,
+   "check": "pupilOptionsFor on every live skill never returns a layout / appearance / more / nline / play / support / level / hidden / role-gated option, and its counts per group match the pin (card §6 Unit)",
+   "rule": "ws-student-opts --unit STUDENT-OPTS-UNIT (node; pin tests/fixtures/student-opts/pupil-counts.json)",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "skill-options.js has no pupilOptionsFor: no curated pupil subset (a pupil would see every teacher option)"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "742 live skills, 690 with pupil options (difficulty 1,241, facts 5); no teacher option; the pin holds"
+   }
   }
  ]
 }
