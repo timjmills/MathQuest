@@ -276,7 +276,7 @@ const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE
 // EB-STRETCH's tolerance (mm) and its room table, read once from layout.js (rowRoom, below)
 const STRETCH_TOL_MM = 1.5;
 let ROW_ROOM = null;
-const STRETCH_ROLES = new Set(['independent', 'more-practice', 'mixed-practice', 'test', 'review', 'lesson', 'opener']);
+const STRETCH_ROLES = new Set(['independent', 'more-practice', 'mixed-practice', 'test', 'review', 'lesson', 'opener', 'guided', 'scripted-model', 'error-analysis', 'pre-skill-check']);
 const STRETCH_NOTES = [];
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
@@ -423,6 +423,16 @@ if (argv.includes('--self-test')) {
         const st = [['57 mm row, 50 mm drawn (master Match 3 L)', stretchFindings([sc(57, 50)], R).length, 1], ['52.5 mm row, 50 mm drawn (capped)', stretchFindings([sc(52.5, 50)], R).length, 0],
             ['undeclared template', stretchFindings([sc(57, 50, { tmpl: 'fact' })], R).length, 0], ['beside its Steps', stretchFindings([sc(70, 55, { beside: true })], R).length, 0],
             ['short beside a tall one', stretchFindings([sc(57, 50), sc(57, 56, { cell: 2 })], R).length, 0]];
+        // stage 2 (critic rowcap r1 F4): the full table - an UNLISTED template is judged at the default room, an exempt one and a
+        // working-space cell are not, and a Guided page is a FAIL, not a note
+        const RT = { rooms: { 'vocab-match3': 2 }, exempt: { division: 'LDIV-ROOM' }, def: 3, work: ['word', 'long'] };
+        st.push(['unlisted template, default room (57 mm row, 50 drawn)', stretchFindings([sc(57, 50, { tmpl: 'fact' })], RT).length, 1],
+            ['unlisted template within the default room (53 mm, 50 drawn)', stretchFindings([sc(53, 50, { tmpl: 'stack' })], RT).length, 0],
+            ['exempt template (LDIV-ROOM)', stretchFindings([sc(80, 50, { tmpl: 'division' })], RT).length, 0],
+            ['working-space cell (word / long)', stretchFindings([sc(80, 50, { tmpl: 'legacy', workSpace: true })], RT).length, 0],
+            ['a row holding an exempt cell', stretchFindings([sc(80, 50, { tmpl: 'fact' }), sc(80, 78, { tmpl: 'division', cell: 2 })], RT).length, 0]);
+        { const got = []; const n0 = STRETCH_NOTES.length; ROW_ROOM = RT; judge([sc(70, 50, { tmpl: 'fact' })], 't', (rule) => got.push(rule), 'guided'); ROW_ROOM = null;
+            st.push(['Guided over the cap: FAIL, not a note', got.filter((r) => r === 'EB-STRETCH').length + (STRETCH_NOTES.length - n0), 1]); }
         const sbad = st.filter(([, got, want]) => got !== want);
         for (const [nm, got, want] of sbad) console.log(`self-test FAIL: EB-STRETCH ${nm}: ${got} finding(s), want ${want}`);
         const n = bad.length + kbad.length + cbad.length + sbad.length;
@@ -854,14 +864,29 @@ function measureVocab(scope) {
 // Screen hosts are not judged (their card is the app's). Pure: stretchFindings(cells, room, tol).
 function rowRoom() {
     if (ROW_ROOM) return ROW_ROOM;
-    // (read from the ESM source's one frozen literal: `export const ROW_ROOM_MM = Object.freeze({ 'tmpl': mm, ... })`)
-    ROW_ROOM = {};
+    // (read from the ESM source's frozen literals - stage 2, critic rowcap r1 F4: EVERY template is capped at drawn +
+    // ROW_ROOM_DEFAULT_MM unless ROW_ROOM_MM names its own room or ROW_STRETCH_EXEMPT exempts it)
+    ROW_ROOM = { rooms: {}, exempt: {}, def: null, work: [] };
     try {
         const src = fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'modules', 'sheet', 'layout.js'), 'utf8');
         const m = /export const ROW_ROOM_MM = Object\.freeze\(\{([^}]*)\}\)/.exec(src);
-        if (m) for (const [, k, v] of m[1].matchAll(/'([\w-]+)'\s*:\s*([\d.]+)/g)) ROW_ROOM[k] = Number(v);
+        if (m) for (const [, k, v] of m[1].matchAll(/'([\w-]+)'\s*:\s*([\d.]+)/g)) ROW_ROOM.rooms[k] = Number(v);
+        const d = /export const ROW_ROOM_DEFAULT_MM = ([\d.]+)/.exec(src);
+        if (d) ROW_ROOM.def = Number(d[1]);
+        const x = /export const ROW_STRETCH_EXEMPT = Object\.freeze\(\{([^\n]*)\}\);/.exec(src);
+        if (x) for (const [, k, why] of x[1].matchAll(/'([\w-]+)'\s*:\s*'([^']*)'/g)) ROW_ROOM.exempt[k] = why;
+        const w = /export const WORK_SPACE_CLASSES = Object\.freeze\(\[([^\]]*)\]\)/.exec(src);
+        if (w) ROW_ROOM.work = [...w[1].matchAll(/'([\w-]+)'/g)].map((k) => k[1]);
     } catch (e) { /* no table: nothing is judged */ }
     return ROW_ROOM;
+}
+// the room a template gets under table R (mm), or null when it is not judged: R is the layout table ({rooms, exempt, def}) or a
+// plain {template: mm} list (the self-test's stage-1 form: only the listed templates)
+function roomOf(R, t) {
+    const own = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
+    if (!R || !R.rooms) return own(R, t) ? R[t] : null;
+    if (own(R.exempt, t)) return null;
+    return own(R.rooms, t) ? R.rooms[t] : (Number.isFinite(R.def) ? R.def : null);
 }
 function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
     const out = [];
@@ -869,22 +894,26 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
     // (the Match 3 work, the vocabulary match lines) inks a stretched row, so its ink is not what it asks)
     const live = (cells || []).filter((c) => c && !c.noInk && Number.isFinite(c.natMm) && c.natMm > 0 && Number.isFinite(c.hMm));
     for (const c of live) {
-        if (!Object.prototype.hasOwnProperty.call(room, c.tmpl) || c.beside) continue;
+        const rm = roomOf(room, c.tmpl);
+        // (a cell whose item is of a working-space class - word / long, WORK_SPACE_CLASSES - keeps its row: c.workSpace)
+        if (rm === null || c.beside || c.workSpace) continue;
         const row = live.filter((d) => d.page === c.page && Math.abs((d.topPx || 0) - (c.topPx || 0)) < 2);
+        // (a row that also holds an exempt cell is sized by it)
+        if (row.some((d) => roomOf(room, d.tmpl) === null || d.workSpace)) continue;
         const need = Math.max(...row.map((d) => d.natMm));
-        const cap = need + room[c.tmpl];
-        if (c.hMm - cap > tol) out.push({ c, need, cap, over: +(c.hMm - cap).toFixed(1) });
+        const cap = need + Math.max(...row.map((d) => roomOf(room, d.tmpl)));
+        if (c.hMm - cap > tol) out.push({ c, need, cap, room: +(cap - need).toFixed(1), over: +(c.hMm - cap).toFixed(1) });
     }
     return out;
 }
-// EB-STRETCH judges the roles whose composer holds its rows to the cap today (layout.resolveSectionLayout + the practice spread:
-// the grid roles; roles/lesson.js and lesson-pages; roles/opener.js). The roles that size their own rows - Guided, Scripted Model,
-// Error Analysis, Reason It, True or False ... - are NOTED with their over-cap cell count, not failed, until their composer takes
-// layout.rowCapMm (lf-engine follow-up, CRITIC-READY.md).
+// EB-STRETCH judges every role whose composer holds its rows to the cap: the grid roles (layout.resolveSectionLayout + the
+// practice spread), roles/lesson.js and lesson-pages, roles/opener.js, and (stage 2, critic rowcap r1 F4) the self-built rows of
+// Guided, Scripted Model, Error Analysis and Pre-skill check - a FAIL there now, not a note. The roles not yet capped (Reason It,
+// True or False, Stretch, Word problems ...) are NOTED with their over-cap cell count.
 function judge(cells, where, F, role) {
     if (process.env.EB_DUMP) for (const c of cells) console.log("DUMP", where, c.page, c.cell, c.tmpl, c.hMm, c.neededMm, c.natMm, c.topPx, c.beside ? 'beside' : '');
     if (!String(role || '').startsWith('host:') && role && !STRETCH_ROLES.has(role)) { const n = stretchFindings(cells).length; if (n) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on this role yet (its composer sizes its own rows): ${n} cell(s) over the cap`); }
-    else if (!String(role || '').startsWith('host:')) for (const x of stretchFindings(cells)) F('EB-STRETCH', `${where} p${x.c.page} cell ${x.c.label || x.c.cell}`, `a ${x.c.hMm} mm row holds a cell drawn ${x.need.toFixed(1)} mm: its cap is drawn + ${rowRoom()[x.c.tmpl]} mm writing room = ${x.cap.toFixed(1)} mm, ${x.over} mm over (tolerance ${STRETCH_TOL_MM} mm; layout.js ROW_ROOM_MM) [${x.c.tmpl}]`);
+    else if (!String(role || '').startsWith('host:')) for (const x of stretchFindings(cells)) F('EB-STRETCH', `${where} p${x.c.page} cell ${x.c.label || x.c.cell}`, `a ${x.c.hMm} mm row holds a cell drawn ${x.need.toFixed(1)} mm: its cap is drawn + ${x.room} mm writing room = ${x.cap.toFixed(1)} mm, ${x.over} mm over (tolerance ${STRETCH_TOL_MM} mm; layout.js ROW_ROOM_MM / ROW_ROOM_DEFAULT_MM) [${x.c.tmpl}]`);
     cells.forEach((c, i) => {
         // --slot-ink off judges the lane's KIT cells: a `legacy` cell (another skill's old print HTML) is a note (lf-vocab r6)
         if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(legacyNote(where, c)); return; }
@@ -979,7 +1008,7 @@ async function main() {
                         const cols = r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
                         const sections = new Set((r.items || []).map((it) => it.section)).size;
                         const tries = r.plan && r.plan.meta ? Number(r.plan.meta.scoreOutOf) : NaN;
-                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), pupilHtml: grid ? r.pupilHtml : null, keyHtml: grid ? r.keyHtml : null, plainPupil: plain ? plain.pupilHtml : null, plainKey: plain ? plain.keyHtml : null, cols, sections, tries, measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).map(([k, v]) => [k, v && v.hMm])) : null)) };
+                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), pupilHtml: grid ? r.pupilHtml : null, keyHtml: grid ? r.keyHtml : null, plainPupil: plain ? plain.pupilHtml : null, plainKey: plain ? plain.keyHtml : null, cols, sections, tries, fclass: (r.items || []).map((it) => (it && it.fclass) || ''), measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).map(([k, v]) => [k, v && v.hMm])) : null)) };
                     } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
                 }, { categoryId, skillId, j, SEED, grid });
                 // a role the signed card OFFERS that the app cannot compose is a failure, not a note (critic eb-r1 D3); with no
@@ -1000,6 +1029,8 @@ async function main() {
                     const cells = await pixRead(sh, await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page'), false);
                     renders++; cellsRead += cells.length;
                     if (!cells.length) { F('EB-READ', `${key} ${j.tag}`, 'no kit cell read on the page (markup changed?)'); continue; }
+                    // (EB-STRETCH: a cell whose item is of a working-space class - layout WORK_SPACE_CLASSES - keeps its row)
+                    for (const c of cells) if ((c.items && c.items.length ? c.items : [c.item]).some((i) => i >= 0 && rowRoom().work.includes((b.fclass || [])[i]))) c.workSpace = true;
                     judge(cells, `${key} ${j.tag}`, F, j.role);
                     // EB-PAGE (opt-in --page-fill; lf-placevalue critic r4 E-r4-1): a page that is not the role's last leaves 30 % or more
                     // of its body empty under its last block (identify lesson L p2: 43 %, page 3 never moved up). The last page may end short.

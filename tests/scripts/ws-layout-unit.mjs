@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight, rowCapMm,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight, rowCapMm, ROW_ROOM_DEFAULT_MM, ROW_STRETCH_EXEMPT,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -146,7 +146,8 @@ for (const s of SIZES) {
     eq([lay.cols, lay.rows, lay.perPage], [2, 3, 6], `PT 2.4 standard grid at ${s}`);
     // Critic guided-r1 (one spare-height rule): a cell grows to layout.fillLimit of its content
     // (1.5 x the content plus the pads, never past FILL_CAP), no longer to the whole even share.
-    near(lay.cellH, Math.min(s === 'L' ? 75.667 : 76, fillLimit(lay.hMin)), `PT 2.4 standard cell height at ${s} (fill limit)`, 0.01);
+    // (ROW-STRETCH CAP stage 2, critic rowcap r1 F4: and never past its drawn height + the default writing room)
+    near(lay.cellH, Math.min(s === 'L' ? 75.667 : 76, fillLimit(lay.hMin), lay.hMin + ROW_ROOM_DEFAULT_MM), `PT 2.4 standard cell height at ${s} (fill limit, row cap)`, 0.01);
     eq(lay.cellW, 93, `PT 2.4 standard cell width at ${s}`);
 }
 // RUBRIC H13: a row held back by a ceiling is never stretched past FILL_CAP x its content, and
@@ -200,7 +201,11 @@ for (const s of SIZES) {
 }
 // Wide visual rows: 1 column x 5 / 4 / 3 (12.1 ceilings).
 eq(SIZES.map((s) => { const lay = L(run(5, () => Object.assign(plainItem(30), { fclass: 'wide' })), 'auto', s); return [lay.cols, lay.rows]; }),
-    [[1, 5], [1, 4], [1, 3]], 'PT 2.4 / 12.1 wide-visual rows S/M/L');
+    // (ROW-STRETCH CAP stage 2: a 30 mm wide row is held to 33 mm, so the page fill COUNTS it there - all 5 dealt fit at every
+    // size, where a stretched row of the fill limit stopped at the 12.1 ceiling; taller wide rows keep the ceiling, below)
+    [[1, 5], [1, 5], [1, 5]], 'PT 2.4 / 12.1 wide-visual rows S/M/L (30 mm rows: the deal of 5 fits)');
+eq(SIZES.map((s) => { const lay = L(run(5, () => Object.assign(plainItem(52), { fclass: 'wide' })), 'auto', s); return [lay.cols, lay.rows]; }),
+    [[1, 3], [1, 3], [1, 3]], 'PT 2.4 / 12.1 wide-visual rows S/M/L (52 mm rows: the page and the ceiling)');
 // Word problems: 1 column; 4 / 3 / 3 rows; fewer when a problem is taller (v2: two a page).
 eq(SIZES.map((s) => L(run(4, () => plainItem(40, { size: 'spacious' })), 'auto', s).rows), [4, 3, 3], 'PT 3.7 word-problem rows S/M/L');
 eq(L(run(4, () => plainItem(100, { size: 'spacious' }))).rows, 2, 'PT 3.7: tall word problems print two a page');
@@ -335,8 +340,13 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     ok(r.keyPages[0].includes('data-ws-key="name">Answer Key') && !r.keyPages[0].includes('class="ws-tabbox'), 'AK-3: the key is marked on the Name rule (no strand tab, owner ruling 2026-10-23)');
     ok(/Key · Form A · seed 42/.test(r.keyPages[0]), 'AK-3: the key footer');
     // (a short page spends its spare height as row gaps, each row keeping the cell height)
-    ok(/height:151\.33\dmm/.test(r.pupilPages[2]) || (r.pupilPages[2].match(/ws-gridrow" style="[^"]*height:75\.6[67]\d*mm/g) || []).length === 2, 'PT-ENG-6: a rebalanced page keeps the section\'s cell height (2 x 75.67 mm)');
-    ok(!/height:/.test((r.pupilPages[0].match(/<div class="ws-grid[^"]*" style="[^"]*"/) || [''])[0]), 'PG-10: page 1 fills the body by flex');
+    // (ROW-STRETCH CAP stage 2, critic rowcap r1 F4: a stack row is held to its drawn height + its writing room, so page 1 no
+    // longer fills the body by flex - its 3 rows and the rebalanced page's 2 rows are one height, the cap)
+    {
+        const gh = (html) => { const m = /<div class="ws-grid[^"]*" style="[^"]*grid-template-rows:repeat\((\d+),1fr\);height:([\d.]+)mm/.exec(html); return m ? Number(m[2]) / Number(m[1]) : NaN; };
+        ok(Math.abs(gh(r.pupilPages[2]) - gh(r.pupilPages[0])) < 0.05, `PT-ENG-6: a rebalanced page keeps the section's cell height (${gh(r.pupilPages[2])} vs ${gh(r.pupilPages[0])} mm)`);
+        ok(gh(r.pupilPages[0]) <= 75.67 && gh(r.pupilPages[0]) > 37, `PG-10 / ROW-STRETCH CAP: page 1's rows are held to the cap, not spread by flex to the body (${gh(r.pupilPages[0])} mm)`);
+    }
     ok(/data-ws-page="1" data-ws-paper="a4" data-ws-role="independent" data-ws-mode="print"/.test(r.pupilPages[0]), '17.1: page hooks');
     ok(/data-ws-cell="stack" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number"/.test(r.pupilPages[0]), '17.1: cell hooks');
     ok(/data-ws-cell="stack" data-ws-state="answered"/.test(r.keyPages[0]), '17.1: key cells are answered');
@@ -643,10 +653,11 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const plain = L(short, 'auto', 'L');
     const dense = L(short, 'auto', 'L', { dense: true });
     ok(dense.perPage > plain.perPage && dense.perPage <= 20, `dense: more items than the 2 x 3 default, within DN-1's 20 (${plain.perPage} -> ${dense.perPage})`);
-    ok(dense.cellH >= 30 * 1.2 - 0.01, 'dense: every cell keeps 1.2 x its measured content');
+    // (ROW-STRETCH CAP stage 2: the room is kept up to the cap - drawn 31 mm + the default writing room - never past it)
+    ok(dense.cellH >= 31 - 0.01 && dense.cellH <= 31 + ROW_ROOM_DEFAULT_MM + 0.01, `dense: every cell keeps its drawn height + its writing room (${dense.cellH} mm)`);
     const tall = run(6, (i) => ({ q: stackQ(11 + i, 22 + i), measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 70, fits: true }])), footprint: { measure: true, hMm: null, maxCols: 6 } }));
     ok(L(tall, 'auto', 'L', { dense: true }).perPage >= L(tall, 'auto', 'L').perPage, 'dense: never fewer items than the default grid');
-    ok(L(tall, 'auto', 'L', { dense: true }).cellH >= 70 * 1.2 - 0.01, 'dense: tall cells keep their room');
+    ok(L(tall, 'auto', 'L', { dense: true }).cellH >= 71 - 0.01, 'dense: tall cells keep their drawn height (and their writing room, the cap)');
     const narrow = run(20, (i) => ({ q: stackQ(11 + i, 22 + i), measured: { 1: { hMm: 30, fits: true }, 2: { hMm: 30, fits: true }, 3: { hMm: 30, fits: false }, 4: { hMm: 30, fits: false } }, footprint: { measure: true, hMm: null, maxCols: 6 } }));
     ok(L(narrow, 'auto', 'L', { dense: true }).cols <= 2, 'dense: never more columns than the measurement fits (minimum column width)');
     eq(L(short, 2, 'L', { dense: true }).cols, 2, 'dense: an explicit column count is honoured (DN-12)');
@@ -915,6 +926,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 ok(L.mixed === true && !L.across && L.forms, `${tag}: one mixed grid of forms, never across`);
                 ok(L.digitPt >= 16, `${tag}: digits ${L.digitPt} pt >= 16`);
                 const inner = cellWidthMm(L.cols, LIVE_W_MM, 'daily').inner;
+                if (!L.row) { ok(false, `${tag}: factRowsLayout returned no row (${JSON.stringify(Object.keys(L))})`); continue; }
                 ok(L.row.inkMm + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: widest ink ${L.row.inkMm} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
                 eq(L.perPage, L.cols * L.rows, `${tag}: the page is filled (no thirds trim)`);
                 ok(L.rows * L.hMin <= L.gridH, `${tag}: ${L.rows} rows of ${L.hMin} mm fit the ${L.gridH} mm grid`);
@@ -1454,6 +1466,19 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
         const free = Lc.gridH - Lc.rows * Lc.cellH;
         ok(Lc.cellH <= cap + 0.01 && free < cap, `ROWCAP-FILL ${size} footprint ${hMm}: ${Lc.rows} rows of ${Lc.cellH} mm (cap ${cap}) leave ${free.toFixed(1)} mm of a ${Lc.gridH} mm grid free - at most one row`);
     }
+}
+
+/* ============================================ ROW-STRETCH CAP stage 2: every template capped by default (critic rowcap r1 F4) */
+{
+    // a template missing from ROW_ROOM_MM and ROW_STRETCH_EXEMPT is capped at drawn + ROW_ROOM_DEFAULT_MM, never Infinity
+    ok(rowCapMm(50, [{ template: 'zz-unlisted-template' }]) === 50 + ROW_ROOM_DEFAULT_MM, `ROWCAP-DEFAULT: an unlisted template is capped at drawn + ${ROW_ROOM_DEFAULT_MM} mm (got ${rowCapMm(50, [{ template: 'zz-unlisted-template' }])})`);
+    ok(rowCapMm(50, ['stack', 'fact']) === 50 + ROW_ROOM_DEFAULT_MM, 'ROWCAP-DEFAULT: stack / fact rows take the default room');
+    for (const [t, why] of Object.entries(ROW_STRETCH_EXEMPT)) ok(rowCapMm(50, [{ template: t }]) === Infinity && String(why).length > 10, `ROWCAP-EXEMPT: ${t} is exempt with a reason`);
+    ok(rowCapMm(50, [{ template: 'stack', fclass: 'long' }]) === Infinity && rowCapMm(50, [{ template: 'legacy', fclass: 'word' }]) === Infinity, 'ROWCAP-EXEMPT: a word / long row keeps its working space (WORK_SPACE_CLASSES)');
+    // the unlisted template's section is also COUNTED at its cap: 6 rows of 33 mm where they fit (ROWCAP-FILL, every template)
+    const its = Array.from({ length: 6 }, () => ({ template: 'zz-unlisted-template', footprint: { wMm: 170, hMm: 28, measure: false, factLike: false, maxCols: 1 }, measured: { 1: { hMm: 30, fits: true } } }));
+    const Lc = resolveSectionLayout({ role: 'independent', columns: 'auto' }, its, 'A4', 186, { size: 'M', look: 'ican', header: FULL_HEADER });
+    ok(Lc.cellH <= 31 + ROW_ROOM_DEFAULT_MM + 0.01 && Lc.rows === 6, `ROWCAP-FILL unlisted template M: ${Lc.rows} rows of ${Lc.cellH} mm (want 6 rows at most ${31 + ROW_ROOM_DEFAULT_MM} mm)`);
 }
 
 /* ======================================================================= report */
