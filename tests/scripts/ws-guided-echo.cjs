@@ -319,6 +319,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         // prints as many pages as the pupil copy
                         if (packet && on('LESSON-EMPTY-PAGE')) {
                             packet.forEach((pg, pi) => { if (pi > 0 && !pg.items.some((it) => it && (it.q || it.source || it.anchor))) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: page ${pi + 1} of ${packet.length} holds no item`); });
+                            // (B1 on 335e6cc2b: the practice part drew a page from a plan of none - pageCount 3 over 2 planned pages)
+                            if (Number(r.pageCount) > packet.length) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: ${r.pageCount} pupil page(s) printed, ${packet.length} with a plan (an empty page)`);
                             if (Number(r.keyPageCount) > 0 && Number(r.pageCount) !== Number(r.keyPageCount)) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: ${r.pageCount} pupil page(s), ${r.keyPageCount} key page(s)`);
                         }
                         // GUIDED-TRY-COUNT (critic blanks B4): a Guided chart page deals at least two tries after its Model
