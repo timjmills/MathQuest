@@ -1,0 +1,410 @@
+  OK   lone-item                      ws-print-lint --roles scripted-model on multiplication:count_by_tables (via --role scripted-model)
+  OK   chromebook-viewport            ws-viewport-check on subtraction:sub_100_regroup,multiplication:nl_mult (deploy path: ws-deploy-gates.sh)
+  OK   repeats-lesson                 ws-detailed-lesson --repeats on lesson g4-nbt1-ten-times-value (via ws-precritic --lesson g4-nbt1-ten-times-value)
+  OK   sibling-compare-pilot          ws-sibling-compare on subtraction:sub_100_no_regroup
+  OK   sibling-compare-unpinned-pilot ws-sibling-compare on subtraction:sub_2d_1d
+  OK   slot-clip-pilot                ws-slot-clip on subtraction:sub_100_no_regroup
+  OK   slot-clip-heads-pilot          ws-slot-clip on subtraction:sub_1m_no_regroup
+  OK   phone-card-pilot               ws-phone-card on subtraction:sub_100_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_1m_no_regroup
+  OK   card-rulings-partial-pilot     ws-card-rulings on subtraction:sub_100_no_regroup,subtraction:sub_2d_1d
+  OK   s1-zero-case-content-audit     ws-content-audit on subtraction:sub_50_no_regroup
+  OK   s1-dealer-uniform              ws-dealer-uniform on subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_2d_1d
+  OK   s1-lesson-data                 ws-node-lint on subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d
+  OK   s1-option-help                 ws-node-lint on subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_2d_1d
+  OK   s1-wrong-fits                  ws-node-lint on subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_2d_1d
+  OK   options-render-pilot           ws-options-verify on subtraction:sub_100_no_regroup
+  OK   ansarea-ty21-pilot             ws-print-lint on subtraction:sub_100_no_regroup
+  OK   overlap-d7-pilot               ws-print-lint on subtraction:sub_1m_no_regroup
+  OK   overlap-n8-pilot               ws-print-lint on subtraction:sub_1m_no_regroup
+  OK   wrap-op-pilot                  ws-print-lint --roles lesson on subtraction:sub_1m_no_regroup
+  OK   h13-lesson-warmup-pilot        ws-print-lint --roles lesson on subtraction:sub_50_no_regroup
+  OK   d1-real-partner                ws-sibling-compare on subtraction:sub_50_no_regroup
+  OK   d1-real-unattributed           ws-sibling-compare on subtraction:sub_50_no_regroup
+  OK   arc-ink-laned                  ws-print-lint --roles fact-rows on division:div_facts (via --role fact-rows)
+  OK   grid-even-probe-laned          ws-print-lint --roles fact-probe on addition:add_facts (via --role fact-probe)
+  OK   grid-even-laned                ws-print-lint --roles fact-rows on division:div_facts (via --role fact-rows)
+  OK   frac-keepout-laned             ws-print-lint --roles opener on division:div_facts (via --role opener)
+  OK   screen-uniform-laned           ws-screen-slots on division:div_facts
+  OK   section-overlap-lesson-warmup  ws-print-lint --roles lesson on addition:add_facts
+  OK   support-fact-x-laned           ws-print-lint --roles test on division:div_facts (via --role test)
+  OK   vq-rep-commit                  ws-visual-quality on addition:fact_family_sort
+  OK   vq-oneanswer-commit            ws-visual-quality on addition:fact_family_sort
+  OK   vq-live-commit                 ws-visual-quality on addition:add_wp_10,addition:add_wp_10_plain,addition:add_wp_20,addition:add_wp_20_plain,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20,subtraction:sub_wp_20_plain
+  OK   vq-title-commit                ws-visual-quality on addition:fact_family_sort
+  OK   vq-nolegacy-commit             ws-visual-quality on addition:fact_family_sort
+  OK   vq-r2-render-gate              ws-grade-render --roles lesson on addition:add_wp_20_plain
+  OK   vq-r2-inplace-h13              ws-print-lint on addition:fact_family_sort,addition:add_wp_20_plain
+  OK   vq-once-reason-it-story        ws-visual-quality on subtraction:sub_wp_20,addition:add_wp_20_plain
+  OK   pv-combine-dealer              ws-dealer-uniform on placevalue:combine
+  OK   pv-equation-row-cl40           ws-print-lint on placevalue:expand,placevalue:combine
+  OK   pv-lesson-data                 ws-node-lint on placevalue:expand,placevalue:combine,placevalue:identify,placevalue:unit_form,placevalue:value
+  OK   pv-expand-card-kit             ws-chromebook-fit on placevalue:expand
+  OK   optin-options-render-bands     ws-options-verify on placevalue:expand,placevalue:unit_form
+  OK   cc-card-overflow               ws-cell-checks on multiplication:mult_properties
+  OK   cc-card-overflow-cbt           ws-cell-checks on multiplication:count_by_tables
+  OK   cc-tagink                      ws-cell-checks on multiplication:arrays_groups
+  OK   cc-keyjoin                     ws-cell-checks on multiplication:mult_properties
+  OK   cc-size-s                      ws-cell-checks on multiplication:arrays_groups
+  OK   cc-title                       ws-cell-checks on multiplication:mult_properties
+  OK   cc-title-cbt                   ws-cell-checks on multiplication:count_by_tables
+  OK   pl-sections-pagefill           ws-print-lint on multiplication:mult_properties,multiplication:arrays_groups
+  OK   pv-r2-option-fit               ws-cell-checks on placevalue:combine
+  OK   pv-r2-band-h13                 ws-options-verify on placevalue:value
+  OK   pv-r3-band99-s                 ws-options-verify on placevalue:combine,placevalue:expand
+  OK   pv-r2-cell-h13-abs             ws-cell-checks on placevalue:unit_form
+  OK   pv-r2-review-one-layout        ws-print-lint --roles review on placevalue:unit_form (via --role review)
+  OK   pv-r2-red-no-baseline          ws-coverage-matrix on placevalue:expand,placevalue:unit_form
+  OK   e24-family                     ws-detailed-lesson --lp on lesson g3-oa8-two-step-wp (via ws-precritic --lesson g3-oa8-two-step-wp)
+  OK   lp-text-no-x                   ws-detailed-lesson --lp on lesson g3-oa8-two-step-wp (via ws-precritic --lesson g3-oa8-two-step-wp)
+  OK   lp-fallback                    ws-detailed-lesson --lp on lesson g3-oa8-two-step-wp (via ws-precritic --lesson g3-oa8-two-step-wp)
+  OK   lp-numbers                     ws-detailed-lesson --lp on lesson g4-nbt1-ten-times-value (via ws-precritic --lesson g4-nbt1-ten-times-value)
+  OK   lp-prereq                      ws-detailed-lesson --lp on lesson g3-oa5-mult-properties (via ws-precritic --lesson g3-oa5-mult-properties)
+  OK   lp-raster                      ws-detailed-lesson --lp on lesson g3-oa9-input-output-rule (via ws-precritic --lesson g3-oa9-input-output-rule)
+  OK   lp-giveaway                    ws-detailed-lesson --lp on lesson g3-oa9-mult-table-patterns (via ws-precritic --lesson g3-oa9-mult-table-patterns)
+  OK   lp-modelled                    ws-detailed-lesson --lp on lesson g1-oa1-bar-model-wp-20 (via ws-precritic --lesson g1-oa1-bar-model-wp-20)
+  OK   lp-measure                     ws-detailed-lesson --lp on lesson g4-nbt1-ten-times-value (via ws-precritic --lesson g4-nbt1-ten-times-value)
+  OK   lp-sweep                       ws-detailed-lesson --sweep on lesson g3-oa5-mult-properties (via ws-precritic --lesson g3-oa5-mult-properties)
+  OK   pv-combine-side-band           ws-empty-band --roles independent,more-practice,test,review on placevalue:combine (per role: independent, more-practice via --role, test via --role, review via --role)
+  OK   pv-detailed-lesson-1           ws-detailed-lesson --check on lesson g2-nbt3-read-write-1000 (via ws-precritic --lesson g2-nbt3-read-write-1000)
+  OK   pv-identify-vocab-ink          ws-empty-band --roles lesson --vocab-ink on placevalue:identify (per role: lesson)
+  OK   pv-unit-form-rename-side       ws-empty-band --roles independent,more-practice,test,review on placevalue:unit_form (per role: independent, more-practice via --role, test via --role, review via --role)
+  OK   e12-practice-pages             ws-detailed-lesson --check on lesson g3-oa5-mult-properties (via ws-precritic --lesson g3-oa5-mult-properties)
+  OK   pv-unit-form-rename-margin     ws-empty-band --roles independent,more-practice,test,review on placevalue:unit_form (per role: independent, more-practice via --role, test via --role, review via --role)
+  OK   pv-unit-form-fixit-words       ws-fixit-words on placevalue:unit_form
+  OK   pv-identify-lesson-page-fill   ws-empty-band --roles lesson --page-fill on placevalue:identify (per role: lesson)
+  OK   eb-fact-roles                  ws-empty-band --roles guided,scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: guided via --role, scripted-model via --role)
+  OK   guided-cap-facts               ws-empty-band --roles guided on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role guided)
+  OK   guided-edge-facts              ws-empty-band --roles guided,scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: guided via --role, scripted-model via --role)
+  OK   model-marks-facts              ws-empty-band --roles scripted-model --model-states on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: scripted-model via --role)
+  OK   model-lines-facts              ws-empty-band --roles scripted-model --model-states on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: scripted-model via --role)
+  OK   model-fill-facts               ws-empty-band --roles scripted-model --model-states on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: scripted-model via --role)
+  OK   model-grid-facts               ws-empty-band --roles scripted-model --model-states on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: scripted-model via --role)
+  OK   model-interior-band-facts      ws-empty-band --roles scripted-model --model-states on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (per role: scripted-model via --role)
+  OK   screen-support-eq-divfacts     ws-screen-support-eq on division:div_facts
+  OK   screen-cue-size-divfacts       ws-screen-support-eq on division:div_facts
+  OK   screen-support-place-divfacts  ws-screen-support-eq on division:div_facts
+  OK   screen-ink-size-divfacts       ws-screen-ink-size on division:div_facts
+  OK   pv-words-provider              ws-words-checks on composing:number_word_form
+  OK   pv-words-parity                ws-empty-band on composing:number_word_form
+  OK   pv-words-claim                 ws-cell-checks on composing:number_word_form
+  OK   pv-words-model                 ws-cell-checks on composing:number_word_form
+  OK   pv-words-text                  ws-cell-checks on composing:number_word_form
+  OK   pv-words-break                 ws-cell-checks on composing:number_word_form
+  OK   pv-words-rowy                  ws-cell-checks on composing:number_word_form
+  OK   pv-words-rowy-1000             ws-cell-checks --roles independent,lesson on composing:number_word_form (per role: independent, lesson)
+  OK   pv-words-towords-side          ws-empty-band --roles independent on composing:number_word_form
+  OK   capacity-no-drop               ws-capacity-pin --roles reason-it on placevalue:unit_form (via --role reason-it)
+  OK   roles-ri-band-passed           ws-empty-band --roles reason-it on placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts (via --role reason-it)
+  OK   roles-ri-signmatch             ws-cell-checks --roles reason-it on addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 (via --role reason-it)
+  OK   eb-foot-div-facts              ws-empty-band --roles independent on division:div_facts
+  OK   eb-foot-reorder-arrays-groups  ws-empty-band on multiplication:arrays_groups
+  OK   eb-vocab-match3-guided         ws-empty-band --roles guided on vocabulary:vocab_grade_pictures (via --role guided)
+  OK   eb-vocab-pick3-ea-s-critic     ws-empty-band --roles error-analysis on vocabulary:vocab_pick3_words (via --role error-analysis)
+  OK   vocab-r9-guided-s-set8         ws-grade-render --roles guided on vocabulary:vocab_grade_pictures (via --role guided)
+  OK   vocab-r9-sections-density      ws-print-lint on vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words
+  OK   vocab-r9-gdpcap                ws-empty-band on vocabulary:vocab_grade_pictures
+  OK   vocab-r14-sis-pick3            ws-screen-ink-size on vocabulary:vocab_pick3_words
+  OK   vocab-r14-sis-match3-tile      ws-screen-ink-size on vocabulary:vocab_grade_pictures
+  OK   ri-overflow-stack              ws-cell-checks --roles reason-it on subtraction:sub_word_problems,addition:add_word_problems,subtraction:sub_1m_no_regroup (via --role reason-it)
+  OK   guided-tight-rows              ws-empty-band --roles guided on placevalue:expand,placevalue:unit_form,placevalue:combine (via --role guided)
+  OK   key-fit                        ws-cell-checks --roles reason-it,true-false on placevalue:identify (per role: reason-it via --role, true-false via --role)
+  OK   lone-page                      ws-cell-checks --roles reason-it on subtraction:sub_word_problems,addition:add_wp_10 (via --role reason-it)
+  OK   ri-countrow-overflow           ws-cell-checks --roles reason-it on patterns:number_patterns_rule (via --role reason-it)
+  OK   ri-stack-band                  ws-empty-band --roles reason-it on patterns:number_patterns_rule (via --role reason-it)
+  OK   mc-make-a-ten-choice           ws-content-audit on algebra_mixed:algebraic_all
+  OK   eb-wsheet-cl4b-stretch         ws-empty-band on placevalue:unit_form
+  OK   sa-focus-gap-unit-form         ws-screen-answer on placevalue:unit_form
+  OK   sa-focus-gap-cellslot-ws       ws-screen-answer on multiplication:arrays_groups,algebra:function_table_hard,measurement:elapsed_find_duration
+  OK   sa-focus-gap-ibcell-card       ws-screen-answer on multiplication:arrays_groups
+  OK   eb-foot-review-add-facts       ws-empty-band --roles review on addition:add_facts (via --role review)
+  OK   screen-digit-npr-worksheet     ws-screen-slots on patterns:number_patterns_rule
+  OK   pupiltag-ink                   ws-cell-checks --roles error-analysis on addition:add_facts (via --role error-analysis)
+  OK   ea-rowx                        ws-cell-checks --roles error-analysis on division:div_facts_long (via --role error-analysis)
+  OK   ea-pad                         ws-cell-checks --roles error-analysis on division:div_facts_long (via --role error-analysis)
+  OK   pupiltag-table                 ws-cell-checks --roles error-analysis on algebra:function_table_easy,patterns:number_patterns_rule (via --role error-analysis)
+  OK   key-fit-letters                ws-cell-checks --roles reason-it on vocabulary:vocab_grade_pictures (via --role reason-it)
+  OK   ea-rowx-redo                   ws-cell-checks --roles error-analysis on patterns:number_patterns_rule (via --role error-analysis)
+  OK   rr-clip-npr-model-l            ws-grade-render --roles scripted-model --raster-fit on patterns:number_patterns_rule (per role: scripted-model via --role)
+  OK   partopts-f1-sheet-foot         ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-f12-combined-state    ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-f2-count-coverage     ws-partopts-unit --coverage-only (via ws-precritic --role lesson)
+  OK   partopts-wedo-floor-ratchet    ws-partopts-unit (via ws-precritic --role lesson)
+  OK   partopts-f6-f7-fixed-counts    ws-partopts-unit (via ws-precritic --role lesson)
+  OK   partopts-f3-f10-screen         ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-n1-rowfit             ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-n2-remember-off       ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-n3-n6-part-texts      ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-n3-screen-caption     ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-n4-one-pair-match     ws-partopts-unit (via ws-precritic --role lesson)
+  OK   partopts-n5-lock-reason        ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-n6-range-text         ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-n6-range-text-unit    ws-partopts-unit (via ws-precritic --role lesson)
+  OK   partopts-n7-step-walk          ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-r3-edge-margin        ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-r1-lock-on-unprinted  ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-r2-clamp-note         ws-partopts-unit (via ws-precritic --role lesson)
+  OK   partopts-r2-clamp-note-screen  ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-r4-no-sideways-scroll ws-partopts-shots (via ws-precritic --role lesson)
+  OK   partopts-r3-rowfit-plus-detects ws-partopts-unit --lessons (via ws-precritic --role lesson)
+  OK   partopts-fill-bt-low           ws-partopts-unit --bt-only (via ws-precritic --role lesson)
+  OK   partopts-fill-bt-high          ws-partopts-unit --bt-only (via ws-precritic --role lesson)
+  OK   partopts-rowfit-bt-low         ws-partopts-unit --bt-only (via ws-precritic --role lesson)
+  OK   partopts-rowfit-bt-high        ws-partopts-unit --bt-only (via ws-precritic --role lesson)
+  OK   partopts-band-bt-low           ws-partopts-unit --bt-only (via ws-precritic --role lesson)
+  OK   partopts-band-bt-high          ws-partopts-unit --bt-only (via ws-precritic --role lesson)
+  OK   guided-size-order-s            ws-capacity-pin --roles guided on subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_2d_1d (via --role guided)
+  OK   guided-stack-side              ws-empty-band --roles guided on subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d (via --role guided)
+  OK   guided-model-row-wp            ws-empty-band --roles guided on addition:add_wp_10,subtraction:sub_wp_10 (via --role guided)
+  OK   guided-tight-refill            ws-empty-band --roles guided on placevalue:expand,placevalue:unit_form,placevalue:combine (via --role guided)
+  OK   copy-light-eligibility         ws-copy-light on placevalue:compare
+  OK   copy-light-stack-batch         ws-copy-light on addition:add_sub_10s
+  OK   copy-light-sample-widths-per-skill ws-copy-light on addition:add_sub_10s,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup
+  OK   copy-light-advisory-mult-div   ws-copy-light on multiplication:mult_facts
+  OK   frame-title-place-long         ws-frame-title on addition:add_facts
+  OK   frame-title-ident-planted      ws-frame-title on addition:add_facts
+  OK   title-code-roundtrip           ws-title-code (via ws-precritic --teacher)
+  OK   title-ui-caret                 ws-frame-title-ui (via ws-precritic --teacher)
+  OK   cell-read-ss-mult-facts-card   ws-screen-slots on multiplication:mult_facts
+  OK   cell-read-sa-mult-facts-card   ws-screen-answer on multiplication:mult_facts
+  OK   cell-read-pc-mult-facts-card   ws-phone-card on multiplication:mult_facts
+  OK   touch-target-sub-wp-390        ws-phone-card on subtraction:sub_word_problems
+  OK   screen-ink-size-growing        ws-screen-ink-size on patterns:growing_shape_patterns
+  OK   screen-ink-size-text-label     ws-screen-ink-size on patterns:growing_shape_patterns
+  OK   screen-ink-size-cell-read      ws-screen-ink-size on multiplication:mult_facts
+  OK   screen-ink-size-text-countrow  ws-screen-ink-size on patterns:number_patterns_rule
+  OK   focus-ring-sub-wp-tablet       ws-phone-card on subtraction:sub_word_problems
+  OK   touch-unique-sub-wp-tablet     ws-phone-card on subtraction:sub_word_problems
+  OK   touch-hit-word-work-tablet     ws-phone-card on division:div_word_problems,subtraction:sub_word_problems,addition:add_wp_20
+  OK   pv-gridfoot-combine-test-s     ws-empty-band --roles test,review on placevalue:combine (per role: test via --role, review via --role)
+  OK   pv-compare-pages3-fill         ws-print-lint on placevalue:compare
+  OK   pv-gridfoot-teacher-cols       ws-empty-band --roles independent,more-practice on placevalue:compare (per role: independent, more-practice via --role)
+  OK   pv-compare-thinking-bands      ws-cell-checks on placevalue:compare
+  OK   pv-compare-eq-live             ws-pv-compare-deal on placevalue:compare
+  OK   pv-compare-close-depth         ws-pv-compare-deal on placevalue:compare
+  OK   pv-compare-mixed-1digit        ws-pv-compare-deal on placevalue:compare
+  OK   pv-compare-m6-wrong            ws-pv-compare-deal on placevalue:compare
+  OK   pv-compare-worked-step-does    ws-pv-compare-deal on placevalue:compare
+  OK   pv-compare-m6-shown            ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-eq-model            ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-state-marks         ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-cl4d-stretched-top  ws-print-lint on placevalue:compare
+  OK   pv-compare-exgroup-fill        ws-print-lint on placevalue:compare
+  OK   pv-compare-cl4d-twin-row       ws-print-lint on placevalue:compare
+  OK   pv-compare-guided-model-reserve ws-pv-compare-pages on placevalue:compare
+  OK   pv-identify-heads-unaided      ws-pv-identify-heads on placevalue:identify
+  OK   pv-vocab-cell-growth           ws-empty-band --roles lesson --vocab-ink on placevalue:identify (per role: lesson)
+  OK   pv-identify-warmup-side-l      ws-empty-band --roles lesson on placevalue:identify
+  OK   pv-unit-form-ws-host-band      ws-empty-band --roles independent on placevalue:unit_form
+  OK   pv-words-plural                ws-words-checks on composing:number_word_form
+  OK   pv-compare-cl4d-guided         ws-print-lint --roles guided on placevalue:compare (via --role guided)
+  OK   pv-compare-tof-share           ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-mark-clear          ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-model-m6            ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-eq-share-page       ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-wrap-sign           ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-side-pad            ws-pv-compare-pages on placevalue:compare
+  OK   pv-compare-sign-parity         ws-pv-compare-deal on placevalue:compare
+  OK   pv-compare-eq-share            ws-pv-compare-deal on placevalue:compare
+  OK   pv-identify-heads-chosen       ws-pv-identify-heads on placevalue:identify
+  OK   pv-grade-render-quiz           ws-grade-render on placevalue:identify
+  OK   pv-screen-text-size            ws-screen-ink-size on placevalue:identify,placevalue:unit_form,placevalue:value
+  OK   pv-compare-wrap-sign-bands     ws-pv-compare-pages on placevalue:compare
+  OK   story-pronouns-p-wp-19         ws-story-pronouns on algebra:multi_step_word,algebra:multi_step_word_plain,algebra:tape_diagram,algebra:write_equation
+  OK   copy-light-pipe-verdict        ws-copy-light on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare
+  OK   pv-words-guided-hint-leak      ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-guided-one-kind       ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-guided-eb-band        ws-empty-band --roles guided on composing:number_word_form (via --role guided)
+  OK   pv-expand-ws-numeral           ws-pv-screen-numeral on placevalue:expand
+  OK   screen-digit-worksheet-chrome  ws-screen-slots on composing:number_word_form
+  OK   pv-expand-card-numeral         ws-screen-slots on placevalue:expand
+  OK   pv-words-hint-any-digit        ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-hint-garble           ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-to-words-steps        ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-one-kind-roles        ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-lesson-rule-fits      ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-opener-to-words-overflow ws-grade-render --roles opener on composing:number_word_form (via --role opener)
+  OK   pv-words-thousand-kind         ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-kind-steps-all        ws-words-checks on composing:number_word_form
+  OK   pv-words-hint-garble-places    ws-pv-words-pages on composing:number_word_form
+  OK   pv-words-opener-one-kind       ws-pv-words-pages on composing:number_word_form
+  OK   pv-expand-ws-one-line          ws-pv-screen-numeral on placevalue:expand
+  OK   pv-expand-touch-target         ws-grade-render --roles independent on placevalue:expand,placevalue:unit_form
+  OK   tof-stem                       ws-tof-stem on multiplication:count_by_tables,addition:add_missing_digit,addition:add_three
+  OK   options-panel-sample           ws-options-shots on addition:add_word_problems,coordinates:geo_translate
+  OK   options-panel-legibility       ws-options-shots on coordinates:geo_translate,algebra:multi_step_word
+  OK   options-panel-controls         ws-options-shots on addition:add_5_pictures,comparing:classify_count
+  OK   options-panel-resize           ws-options-shots on coordinates:geo_translate
+  OK   options-panel-frame-scale      ws-options-shots on coordinates:coord_distance_q1,multiplication:mult_chart_easy
+  OK   options-panel-option-change    ws-options-shots on comparing:classify_count,fractions:fraction_of_set
+  OK   options-panel-clip             ws-options-shots on coordinates:geo_translate
+  OK   options-panel-pageerror        ws-options-shots on coordinates:geo_translate
+  OK   options-panel-inner-clip       ws-options-shots on multiplication:mult_chart_easy
+  OK   options-panel-cover            ws-options-shots on multiplication:mult_chart_easy
+  OK   options-panel-choices          ws-options-shots on coordinates:geo_translate
+  OK   options-panel-svgtext          ws-options-shots on coordinates:geo_translate,fractions:fraction_of_set
+  OK   options-panel-summary          ws-options-shots on algebra_mixed:algebra_all
+  OK   options-panel-repeat           ws-options-shots on algebra:multi_step_word
+  OK   options-panel-inner-clip-fixture ws-options-shots on multiplication:mult_chart_easy
+  OK   options-panel-parts-cap        ws-options-shots on coordinates:geo_translate
+  OK   options-panel-part-ink         ws-options-shots on coordinates:geo_translate
+  OK   options-panel-hit              ws-options-shots on coordinates:geo_translate,multiplication:mult_chart_easy
+  OK   options-panel-slice            ws-options-shots on multiplication:nl_mult,integers:add_int
+  OK   options-panel-scroll-cue       ws-options-shots on data_analysis:histogram_read,shapes_classify:hotspot_quads
+  OK   key-json                       ws-key-json on coordinates:coordinate_q1,shapes_early:shape_name_match_3d
+  OK   precritic-role-cover-plan      ws-role-cover --roles opener,error-analysis,scripted-model on multiplication:count_by_tables (per role: opener via --role, error-analysis via --role, scripted-model via --role)
+  OK   role-cover-cbt-e3-e5-e6        ws-role-cover on multiplication:count_by_tables
+  OK   role-cover-buildsheet-variants ws-role-cover --roles guided on addition:add_facts (via --role guided)
+  OK   precritic-copy-light-role-cover-size ws-role-cover --roles opener,error-analysis,scripted-model on multiplication:count_by_tables (per role: opener via --role, error-analysis via --role, scripted-model via --role)
+  OK   role-cover-add-facts-guided-frame ws-role-cover --roles guided on addition:add_facts (via --role guided)
+  OK   array-orient-divfacts          ws-screen-support-eq on division:div_facts
+  OK   array-dot-min-divfacts         ws-screen-support-eq on division:div_facts
+  OK   array-caption-multfacts        ws-screen-support-eq on multiplication:mult_facts
+  OK   array-orient-multfacts         ws-screen-support-eq on multiplication:mult_facts
+  OK   review-stack-side-multfacts-array ws-empty-band --roles review on multiplication:mult_facts (via --role review)
+  OK   review-zero-row-multfacts-array ws-print-lint --roles review on multiplication:mult_facts (via --role review)
+  OK   array-frame-multfacts          ws-screen-support-eq on multiplication:mult_facts
+  OK   support-not-slot-multfacts-array ws-screen-support-eq on multiplication:mult_facts
+  OK   array-caption-grammar-multfacts ws-screen-support-eq on multiplication:mult_facts
+  OK   size-order-opt-multfacts-array ws-capacity-pin on multiplication:mult_facts
+  OK   test-eq-ind-multfacts          ws-capacity-pin on multiplication:mult_facts
+  OK   pagefill-review-multfacts-touch ws-print-lint --roles review on multiplication:mult_facts (via --role review)
+  OK   supband-below-support-multfacts-array ws-empty-band --roles test on multiplication:mult_facts (via --role test)
+  OK   capacity-ruled-review-touch-multfacts ws-capacity-pin --roles review on multiplication:mult_facts (via --role review)
+  OK   eb-page-divfacts-test          ws-fact-pages on division:div_facts
+  OK   eb-page-divfacts-fade          ws-fact-pages on division:div_facts
+  OK   eb-pad-divfacts-M              ws-fact-pages on division:div_facts
+  OK   eb-pad-page-divfacts-L         ws-fact-pages on division:div_facts
+  OK   eb-cols-divfacts-array         ws-fact-pages on division:div_facts
+  OK   eb-factx-divfacts              ws-fact-pages on division:div_facts
+  OK   test-eq-ind-divfacts           ws-fact-pages on division:div_facts
+  OK   eb-gap-divfacts                ws-fact-pages on division:div_facts
+  OK   array-gap-divfacts             ws-screen-support-eq on division:div_facts
+  OK   support-label-facts            ws-screen-support-eq on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts
+  OK   screen-digit-ws-divfacts       ws-screen-slots on division:div_facts
+  OK   screen-answer-place-divfacts   ws-screen-support-eq on division:div_facts
+  OK   sm-array-overflow-divfacts     ws-grade-render --roles scripted-model on division:div_facts (via --role scripted-model)
+  OK   screen-digit-ws-floor-table    ws-screen-slots on division:div_facts,addition:add_facts
+  OK   c120-wrong-fits                ws-node-lint on composing:chart_to_120
+  OK   c120-tagink                    ws-cell-checks on composing:chart_to_120
+  OK   c120-lesson-wide               ws-cell-checks on composing:hundreds_chart_fill
+  OK   c120-title-band                ws-cell-checks on composing:hundreds_chart_fill
+  OK   c120-ri-under                  ws-cell-checks --roles reason-it on composing:chart_to_120 (via --role reason-it)
+  OK   c120-pupiltag                  ws-cell-checks on composing:chart_to_120
+  OK   c120-role-hidden               ws-role-hidden on composing:hundreds_chart_fill,composing:chart_to_120
+  OK   c120-text-misc                 ws-text-misconception on composing:chart_to_120
+  OK   c120-guided-echo               ws-guided-echo on composing:chart_to_120
+  OK   c120-score-slots               ws-guided-echo on composing:chart_to_120
+  OK   c120-screen-digit              ws-screen-slots on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r2-wrong-multi             ws-providers-unit on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r2-steps-all-slots         ws-providers-unit on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r2-say-agree               ws-providers-unit on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r2-hint-all                ws-providers-unit on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r2-tf-false                ws-guided-echo on composing:chart_to_120
+  OK   c120r2-ea-pattern              ws-guided-echo on composing:chart_to_120
+  OK   c120r2-score-roles             ws-guided-echo on composing:chart_to_120
+  OK   c120r2-cross-giveaway          ws-guided-echo on composing:hundreds_chart_fill
+  OK   c120r2-strip-numbers           ws-guided-echo on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r2-chart-square            ws-guided-echo on composing:hundreds_chart_fill
+  OK   c120r2-touch-hit               ws-phone-card on composing:hundreds_chart_fill
+  OK   c120r2-ea-rowx                 ws-cell-checks --roles error-analysis on composing:chart_to_120 (via --role error-analysis)
+  OK   c120r2-one-window-hidden       ws-options-verify on composing:chart_to_120
+  OK   c120r3-model-state-marks       ws-guided-echo on composing:chart_to_120
+  OK   c120r3-screen-giveaway         ws-guided-echo on composing:chart_to_120
+  OK   c120r3-say-frame               ws-providers-unit on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   c120r3-overlap-giveaway        ws-guided-echo on composing:chart_to_120
+  OK   c120-blank-count               ws-guided-echo on composing:chart_to_120,composing:hundreds_chart_fill
+  OK   ldiv-join                      ws-ldiv-hug on division:long_div_2digit,division:div_facts
+  OK   ldiv-join-raster               ws-ldiv-hug on division:div_remainders
+  OK   ldiv-shape                     ws-ldiv-hug on division:long_div_2digit
+  OK   ldiv-room                      ws-ldiv-hug on division:long_div_2digit
+  OK   dealer-declared-set            ws-dealer-uniform on patterns:growing_shape_patterns
+  OK   patterns-cells-g5-g6-g8        ws-patterns-cells on patterns:pattern_features,patterns:growing_shape_patterns
+  OK   precritic-clean-list           ws-precritic-clean on patterns:number_patterns_rule
+  OK   two-step-card-d2-d6            ws-two-step on algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   two-step-visual-cap-band       ws-two-step on algebra:multi_step_word
+  OK   two-step-band100-alias         ws-two-step on algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   patterns-hint-on-test-f1       ws-patterns-cells on patterns:notice_patterns,patterns:pattern_features,patterns:growing_shape_patterns
+  OK   patterns-state-progress-f5     ws-patterns-cells on algebra:function_table_easy
+  OK   steps-follow-preset-f6         ws-node-lint on patterns:pattern_features
+  OK   steps-follow-preset-two-step-addfirst ws-node-lint on algebra:two_step_add_then_mult,algebra:two_step_add_then_div
+  OK   vq-title-and-f7                ws-visual-quality on patterns:growing_shape_patterns
+  OK   two-step-letter-wpbar-L-band   ws-two-step on algebra:two_step_letter_equation
+  OK   two-step-part-frames           ws-two-step on algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   lfhosts-phone-focus-twostep    ws-phone-card on algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   lfhosts-screen-grade-twostep   ws-screen-grade on algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   lfhosts-support-eq-agree       ws-gate-agree on algebra:two_step_letter_equation,algebra:multi_step_word
+  OK   lfhosts-focus-twostep-desktop  ws-phone-card on algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   two-step-page-fresh            ws-two-step on algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation
+  OK   two-step-band-bites            ws-two-step on algebra:two_step_add_then_div,algebra:two_step_letter_equation
+  OK   options-verify-wide-band       ws-options-verify on algebra:two_step_add_then_div,algebra:two_step_letter_equation
+  OK   two-step-ea-composes           ws-two-step on algebra:two_step_add_then_div
+  OK   two-step-eb-side-plain         ws-empty-band --roles independent,more-practice,test on algebra:multi_step_word_plain (per role: independent, more-practice via --role, test via --role)
+  OK   two-step-band-bites-50-mdf-atm ws-two-step on algebra:two_step_mult_div_first,algebra:two_step_add_then_mult
+  OK   two-step-ri-distinct-frames    ws-cell-checks --roles reason-it on algebra:two_step_letter_equation,algebra:two_step_estimate_check (via --role reason-it)
+  OK   two-step-div-bar-guided-l      ws-cell-checks --roles guided on algebra:two_step_add_then_div (via --role guided)
+  OK   two-step-frames-eb-side        ws-empty-band --roles independent,test on algebra:two_step_letter_equation,algebra:two_step_estimate_check (per role: independent, test via --role)
+  OK   two-step-letter-ea-rowx        ws-cell-checks --roles error-analysis on algebra:two_step_letter_equation (via --role error-analysis)
+  OK   two-step-touch-48              ws-phone-card on algebra:multi_step_word,algebra:two_step_letter_equation,algebra:two_step_estimate_check
+  OK   gate-agree-batch-ctx           ws-gate-agree on algebra:two_step_letter_equation
+  OK   two-step-step-align            ws-two-step on algebra:two_step_add_then_div,algebra:two_step_mult_div_first
+  OK   two-step-step-align-all        ws-two-step on algebra:two_step_add_then_div,algebra:two_step_add_then_mult
+  OK   two-step-screen-sentence       ws-two-step on algebra:two_step_add_then_div,algebra:two_step_add_then_mult,algebra:two_step_mult_div_first
+  OK   two-step-ldiv-join-bracketsvg  ws-two-step on algebra:two_step_add_then_div
+  OK   tables15                       ws-tables15 on multiplication:mult_facts,division:div_facts
+  OK   t15-preset-ican                ws-tables15 on multiplication:mult_facts,division:div_facts
+  OK   tables15-form-first            ws-tables15 on multiplication:mult_facts,division:div_facts
+  OK   c120b-option-items             ws-guided-echo on composing:chart_to_120
+  OK   c120b-blank-count-lesson       ws-guided-echo on composing:chart_to_120
+  OK   c120b-guided-try-count         ws-guided-echo on composing:chart_to_120
+  OK   c120b-lesson-empty-page        ws-guided-echo on composing:chart_to_120
+  OK   c120b-packet-giveaway          ws-guided-echo on composing:chart_to_120
+  not applicable (no skill in the command): notation, l1-sizes, l3-key, l6-steps, l10-cycle, node-lint-keys, mc-production, baseline-night-keeps-red, text-generator-wrm-page, text-generator-wrm-tagging, card-rulings-pilot, card-not-offered-pilot, s1-presets-obey, s1-presets-obey-seeded, card-gate-decisions, card-gate-rulings, d1-partner-attribution, e41-relation, detailed-link-every-use, pupil-link-every-use, link-default-use, link-stale-uses, link-seeded-uses, link-identical-repeats, vq-rep, vq-oneanswer, vq-live, vq-title, vq-nolegacy, rp1-skipstrip-laned, simple-print-exact-missing-add-sub, facts-print-fix, facts-print-fix-r2, facts-print-fix-r3, facts-print-fix-r4, facts-print-fix-r5, facts-print-fix-r6, facts-print-fix-r7, facts-print-fix-r8, card-rulings-value-reader, precritic-offered-na, pv-r1-wrong-per-slot, pv-r1-plural, pv-r1-grade2-times, pv-r1-model-not-ones, optin-h13-abs, optin-grid-even-all, optin-wrong-fits-slots, optin-wrong-fill, optin-slot-w-equal, optin-draw-cap, optin-screen-digit, pv-r2-wrong-differs, pv-r2-printed-instruction, pv-r2-combine-parts, pv-r2-place-word-live, lesson-title-constant, lesson-routing-one-builder, lesson-route-no-literal-styles, lesson-routed-plan-units, lesson-prereq-checks-field, lesson-bind-stamps-refuses, lesson-parts-plugin, lesson-chart-sizing-fails, lesson2-page-fresh, lesson-practice-cap, lesson-dealer-seeds, lesson-repeat-key, lesson-route-floor, lesson-sheet-indep, pool-capacity-3a, e24b-lesson2-near-twins, lp-family-repeat-3a-p0, e27-five-gap, practice-units, solve-story-e24b, pack-feasible-p0, pack-feasible-sources, p0-overlap, lesson-baseline-phase0-optin, lesson-baseline-deploy-gate, runner-orphan-slot, screen-ink-size-ink, screen-ink-size-width, screen-ink-size-inkbox, screen-ink-size-sameitem, screen-ink-size-relabel, screen-ink-size-noref, screen-ink-size-spacer, lesson-pm-h13, screen-ink-size-halo, screen-ink-size-ring, screen-ink-size-ring-large, lesson-live-carry, pv-words-chant, roles-keyjoin-frame, roles-review-title, roles-model-across, roles-list-rule-named, roles-key-true-blank, lesson-pm-h13-spot, lesson-pm-cont, lesson-tab-clear, lesson-sheet-2pg, roles-fix-minimal, model-marks-ink, vocab-sets-split, vocab-v11r-score-roles, vocab-v14-hint-unique, vocab-v15-writeline, vocab-v16-base10-unit, vocab-v17-lookalikes, vocab-v18-guided-rows, vocab-v19-ws-tiles, vocab-v16-base10-per-item, vocab-v18-rendered-rows, vocab-v20-ea-s-height, vocab-v17-printed-text, vocab-v21-referent, vocab-v22-focal, vocab-v24-explain, vocab-v23-v25-screen-feedback, vocab-v23-painted, vocab-o1-next-box-blue, vocab-r8-v25plus-v26-v27, vocab-r8-v22plus-v24plus, vocab-r8-v-ambig, vocab-r9-v26-preskills, vocab-r9-nb6-quiz-red, vocab-r9-nb7-pick3-line, vocab-r9-v-ambig-plus, vocab-r9-v27-minors, vocab-minitems-answers, vocab-r10-rule-machine, vocab-r10-cycle-loop, vocab-r10-v-fit, vocab-r10-v-fit6, vocab-r10-nb8-wrong-focus-tick, vocab-r10-lesson-render, vocab-r11-feat-r7-row-pattern, vocab-r11-feat-r9-rule-cycle, vocab-r11-feat-r10-term, vocab-r11-hatch, vocab-r11-vref, vocab-r11-nb9-blur, vocab-r12-vstd-product-multiple, vocab-r12-feat-term-rule, vocab-r12-nb9-every-card, vocab-r13-v7all, vocab-r13-vnum, vocab-r13-feat-product-row, vocab-r13-vtwin, vocab-r14-vnum-one, vocab-r14-vplace, vocab-r14-vtwin-run, ri-one-answer, ri-layout, line-tell, line-tell-number, ri-ink-inner, eb-fixture-band, eb-fixture-svg-black, eb-fixture-padding-leading, eb-fixture-blank-cell, eb-fixture-band-above, eb-fixture-band-between, eb-fixture-screen-side, eb-fixture-screen-slot, eb-fixture-toppad-real-band, eb-foot-gridcols-patterns (not live here: <cat>:pattern_features), eb-fixture-faint-slot, fonts-late, fonts-never, eb-fixture-wide-slot-faint, eb-fixture-wide-slot-invisible, no-dropped-row, ea-redo-align, psc-2pg-balance, test-level, ri-distinct, abtag, overflow-not-pinnable, sa-focus-gap-fixture-below, sa-focus-gap-wrap-line, eb-fixture-interior-hole, eb-fixture-item-key, eb-fixture-item-parity, conflict-markers-3c7b, capacity-roles, guided-model-span, guided-stack-side-unit, guided-model-row, no-phone-width-default, copy-light-drawing-batch, copy-light-sample-widths, copy-light-brief-names, drawing-key-complete, no-phone-width-pupil-allow, no-phone-width-derived, no-size-s-76bc, fact-cols-m-fixture, no-size-s-browser-c81, no-size-s-r1-mutations, no-size-s-docs-c81, no-size-s-n1-4a8e, no-size-s-r3-static-4a8e, no-size-s-r2-mutations, nos-runtime-s-button, screen-digit-mult-facts-worksheet, screen-ink-size-dealt, screen-ink-size-term, screen-ink-size-text-fixture, ws-reflow-raise-3c7b, cell-read-empty-card, cell-read-kind-card, ws-reflow-shrink-r2, screen-widths-plan-owner-set, pv-compare-chant-fit, pv-compare-cl4d-unstretched-centred, pv-compare-remember-fit, touch-hit-settle-retap, touch-hit-overlay-true-miss, ws-reflow-slot-x, precritic-mode-verdict, one-row-cap, guided-drawn-fit, opener-spill, ri-twostep, lone-page-ruled, onerow-strip-tight, spill-p1, screen-digit-worksheet-floor, screen-digit-no-numeral-skip, nos-browser-settle-reclick, role-cover-e3e5e6-pass-can-fail, chart-name-line, chart-name-line-detailed, eb-centred-band, c120-card-plan-preset, ea-stem, guided-frame-fit, guided-lone-story, gdpcap-answers, two-step-step-form, guided-count-tight, correct-sound-powerup-once, mixed-all-ops, ldiv-fact-room
+  OK   opt-in lf-placevalue print-lint-kit     --rules H13-ABS,GRID-EVEN-ALL,TOPSTART-STRETCH
+  OK   opt-in lf-placevalue print-lint-kit-S   --rules H13-ABS,GRID-EVEN-ALL,TOPSTART-STRETCH
+  OK   opt-in lf-placevalue print-lint-kit-M   --rules H13-ABS,GRID-EVEN-ALL,TOPSTART-STRETCH
+  OK   opt-in lf-placevalue node-lint-s1       WRONG-FITS-SLOTS WRONG-FILL
+  OK   opt-in lf-placevalue slot-clip          --slot-w-equal --draw-cap
+  OK   opt-in lf-placevalue options-render     --bands --band-h13
+  OK   opt-in lf-placevalue providers          --pv-r2 N1,N2,N3,N4
+  OK   opt-in lf-placevalue print-lint-lesson-L --rules H13-ABS,GRID-EVEN-ALL
+  OK   opt-in lf-placevalue print-lint-lesson-S --rules H13-ABS,GRID-EVEN-ALL
+  OK   opt-in lf-placevalue print-lint-review-S --rules H13-ABS,GRID-EVEN-ALL
+  OK   opt-in lf-placevalue print-lint-review-L --rules H13-ABS,GRID-EVEN-ALL
+  OK   opt-in lf-placevalue cell-checks-identify --h13-abs
+  OK   opt-in lf-placevalue cell-checks-value  --h13-abs
+  OK   opt-in lf-placevalue cell-checks-expand --h13-abs
+  OK   opt-in lf-placevalue cell-checks-combine --h13-abs
+  OK   opt-in lf-placevalue cell-checks-unit_form --h13-abs
+  OK   opt-in lf-placevalue coverage-matrix    --red-no-baseline PAGEFILL,H5
+  OK   opt-in lf-placevalue detailed-g2-nbt3-read-write-1000 
+  OK   opt-in lf-placevalue detailed-g3-oa5-mult-properties 
+  OK   opt-in lf-placevalue detailed-g3-oa9-input-output-rule 
+  OK   opt-in lf-placevalue detailed-g3-oa9-mult-table-patterns 
+  OK   opt-in lf-placevalue detailed-g4-nbt1-ten-times-value 
+  OK   opt-in lf-placevalue detailed-g2-nbt3-read-write-1000-repeats 
+  OK   opt-in lf-placevalue empty-band         --screen-parity --grid-foot
+  OK   opt-in lf-placevalue fixit-words        
+  OK   opt-in lf-placevalue words-checks       
+  OK   opt-in lf-placevalue words-cells        
+  OK   opt-in lf-placevalue words-rowy-1000    
+  OK   opt-in lf-placevalue gridfoot-teacher-cols 
+  OK   opt-in lf-placevalue cell-checks-compare --opt-roles lesson,independent,guided,test,review,true-false,reason-it,error-analysis,opener,scripted-model
+  OK   opt-in lf-placevalue pv-compare-deal    
+  OK   opt-in lf-placevalue pv-compare-pages   
+  OK   opt-in lf-placevalue pv-screen-text-size 
+  OK   opt-in lf-placevalue pv-identify-heads  
+  OK   opt-in lf-placevalue pv-touch-gate      
+  OK   opt-in lf-placevalue pv-words-pages     
+  OK   opt-in lf-placevalue pv-screen-numeral  
+  OK   opt-in lf-placevalue pv-words-opener-gate 
+  OK   opt-in lf-placevalue: not on another skill's plan (addition:add_sub_10s)
+  OK   opt-in lf-ops empty-band         --model-states
+  OK   opt-in lf-ops: not on another skill's plan (addition:add_sub_10s)
+  OK   opt-in lf-algebra node-lint-s1       STEPS-FOLLOW-PRESET
+  OK   opt-in lf-algebra: not on another skill's plan (addition:add_sub_10s)
+  OK   capacity-roles                 ws-capacity-pin --roles-check: OK (16 grid roles pinned)
+  checks-from-critics: every ledger row; blocking (since 2026-11-14T13:00:00.000Z)
+
+  checks-from-critics (design/lessons-first/CHECKS_FROM_CRITICS.md): 439 finding rows
+  checks-from-critics: 349 pass, 90 exempt, 0 fail
+ws-precritic-plan: OK (404 rows on the lane's path, 248 not applicable; checks-from-critics OK)
