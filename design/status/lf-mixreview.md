@@ -3,10 +3,10 @@ Title: Mixed review page type: spec card (grades x areas mix, sendable, playable
 Session: session_01HVwpAE3g6EZH8idgErP6LP
 Branch: claude/lf-mixreview
 Owner of files: design/cards/mixed-review/ (card.json, mixed-review.md); this status file
-State: planned
+State: fix
 Updated: 2026-11-19
 Builder profile: mq-opus-medium
-Critic rounds: 0, none
+Critic rounds: 1, card critic r1 FAIL (min 6), fixed in the card (§9c)
 
 ## Now
 - The spec card is written: design/cards/mixed-review/mixed-review.md (hand-written; card.json alongside). No product code.
@@ -22,5 +22,6 @@ Critic rounds: 0, none
 - Times: builder card, start —, end 2026-11-19T23:12Z, profile mq-opus-medium
 
 ## Log
+- 2026-11-19: Card critic r1 FAIL min 6 (design/lanes/lf-mixreview/card-critic-r1.md, 7afebf5f). All 13 defects fixed in card.json and mixed-review.md (§9c table, each verified against the code): ceil(N/2) cap; adapt weights choose skills only; shelf-level mixed order, no separate screen order; one dealer dealReviewItems in print-sheet.js running the RETRIES / rung ladder; V1 freezes deal, rotation and shelf order with a pinned week-v1 fixture; wide visuals 4 / 3 a page; at most 3 skills a page (page-aware deal, capacity re-derived); COUNT backtest fixture count-ignored; nine POOL fixtures; labels assert as step 1b's gate; allLessons() cited; 2-up counted per half; pinned precritic filter sample. 13 rows added to design/lessons-first/CHECKS_FROM_CRITICS.md (exempt: card text). Still unsigned; ready for card critic r2.
 - 2026-11-19: Lead rulings applied to card.json and mixed-review.md: section 9 became Rulings (each dated 2026-11-19, lead); AREA_LABELS (exact table from the lessons-browser card at 55ae9d090) added and its build as step 1b; weighting named EX-MXR-ADAPT in the card and PT-MXR-9 (plus PT-DLG-26 / P-RV-9 diff sentences); Only 8/10 ✓ defaults OFF with a ✓ mark per passed skill and the count on the toggle, MIX-REVIEW-POOL updated; N = 5 prints 2-up (capacity row, PT-MXR-3, MIX-REVIEW-COUNT). Still unsigned.
 - 2026-11-19: Card written by hand in the generated nine-section structure (ws-spec-card knows only template / family kinds; the tool was not changed). It has no spec-card machine block, so `ws-spec-card --check-coverage --all` adds one "no spec-card block" FAIL line for it (that run already fails on master for 13 other cards' stale rule excerpts); `--check-signed --skill` output is unchanged. Reuse found: mixed-practice.js (GROUPED + M1 mixed, dealCounts, interleave), review.js PT-REV-2, answer-key.js skillItemMap / answerListRows, teacher-plan.js largest-remainder allocation, teacher-areas.js areaOf / AREA_ORDER, wrm-links.js pacing + weekForDate, gamification.js spaced repetition, progress.js mastery, quiz-results.js skillAnalysis, game-flow.js skillBreakdown, the enhanced share code (weight digits carry the item counts). Blockers: mixed-practice fills the page (no exact count yet); M2 block packer not built; no AREA_LABELS; no area grouping in any results screen.

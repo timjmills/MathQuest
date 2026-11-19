@@ -26,34 +26,34 @@ Retrieval of skills already taught: a short sheet of 5 to 30 problems drawn from
 ## 2. Problem types and progression
 
 - No new problem type: each item is its own skill's cell at level 1 (PT-REV-2) with its own instruction in the cell or in its band strip (PT-MIX-4, PT-MIX-5).
-- **The mix:** N items over k skills, **k = min(|pool|, ceil(N / 3))**, 2 or 3 items each (`dealCounts` min 2). N = 5 → 2 skills (3 + 2); 10 → 4; 15 → 5; 20 → 7; 25 → 9; 30 → 10. A pool smaller than k deals every pool skill and the counts grow, but no skill takes more than half the sheet; a pool of 0 or 1 skill is refused with its reason (§9.6).
+- **The mix (page-aware deal, `dealReviewItems`, §7a):** pages and their item counts n_p come from §3; **a page holds at most 3 distinct skills** (12.1 Review: 2–3 instruction-led sections), s_p = max(1, min(3, floor(n_p / 2))); each skill's count on a page is n_p split evenly over its s_p skills (largest first), so 2–5 items (5 only on a 2-skill page of 10); **over the sheet no skill takes more than ceil(N / 2)** items. Skills are new to each page while the pool allows (k = Σ s_p distinct skills), then reused. N = 5 → 2 skills (3 + 2); N = 10 at M → 3 skills on one page (4 + 3 + 3). A pool of 0 or 1 skill is refused with its reason (§9.6).
 - **Order** (the teacher's choice; §7a):
-  - `mixed` (default): interleaved; no two items of one skill side by side where the pool allows (`interleave`, maxRun 1).
+  - `mixed` (default): no two SHELVES of one skill side by side on a page (a shelf holds 2–5 cells of one skill); when every dealt skill on a page is one size class, the M1 arrangement interleaves ITEMS instead, with no two items of one skill side by side where the counts allow. The screen plays the printed order (§7a Order modes).
   - `easyhard`: by placement grade K → 6+, then `data.js` teaching order.
   - `area`: `AREA_ORDER` (CC, OA, NBT, NF, MEAS, DATA, G, RPNS, WORDS), easy → hard inside an area.
 - **Supports:** level 1 for every item, as a Review (PT-REV-2): structural scaffolds stay, hint scaffolds, steps, models and traces do not appear. No anchors.
 
 ## 3. The drawing
 
-- **Sizes M and L only** (owner 2026-11-13; S dropped: a stored S or an S code reads as M through `offeredSize`). Look **Daily** (mixed-practice `DEFAULT_LOOK`); lattice Auto N = 6 at M, 4 at L. Shelves at most **7 at M, 5 at L** (12.1 Mixed practice). Problems a page at most **12 at M, 10 at L** (12.1 Review 12 / 8–12; DN-1: never over 20 at L).
+- **Sizes M and L only** (owner 2026-11-13; S dropped: a stored S or an S code reads as M through `offeredSize`). Look **Daily** (mixed-practice `DEFAULT_LOOK`); lattice Auto N = 6 at M, 4 at L. Shelves at most **7 at M, 5 at L** (12.1 Mixed practice). Problems a page at most **12 at M, 10 at L** (12.1 Review 12 / 8–12; DN-1: never over 20 at L), and at most **4 at M, 3 at L** when the page's items are wide visuals (12.1 Wide-visual rows: number lines, base-10 over 100, coin rows). **At most 3 distinct skills a page** (12.1 Review: 2–3 instruction-led sections).
 - **Header:** Name · Date · Score ___ / N; two-line tab `Level <grades> | Review` (a week: `Week n | Mon`); title `Mixed review` (HD-13). Footer: the plain CCSS codes of the dealt skills (PT-MIX-7) and, on the teacher footer line, the code and seed.
 - **Body:** shelves of one skill each, each opening with its band strip (the skill's own instruction, no skill title, no area name), in the order of §2; or, when every dealt skill is one size class, the M1 mixed arrangement (one "Solve." strip, each cell keeps its own instruction). Numbering 1..N row-major across pages. No in-cell skill letter (PT-MIX-7).
 - **Key:** the facsimile pages (PT-KEY-1), then the **key summary** (§7a breakdown).
 
 **Capacity / density** (A4, full header; the engine measures, the dialog never plans pages, L16; these are the targets the checks hold the measured pages to):
 
-| N | M typical / compact (12 a page) | M all-wide (7) | L compact (10) | L typical (8) | L all-wide (5) |
+| N | M typical / compact (12 a page) | M all-wide (4) | L compact (10) | L typical (8) | L all-wide (3) |
 |--:|---|---|---|---|---|
-| 5 | 1 sheet **2-up** (5 + the same 5) | 1 sheet 2-up | 1 sheet 2-up | 1 sheet 2-up | 2-up when the 5 fit a half page, else 1 page (5) |
-| 10 | 1 (10) | 2 (5 + 5) | 1 (10) | 2 (5 + 5) | 2 (5 + 5) |
-| 15 | 2 (8 + 7) | 3 (5 + 5 + 5) | 2 (8 + 7) | 2 (8 + 7) | 3 (5 + 5 + 5) |
-| 20 | 2 (10 + 10) | 3 (7 + 7 + 6) | 2 (10 + 10) | 3 (7 + 7 + 6) | 4 (5 × 4) |
-| 25 | 3 (9 + 8 + 8) | 4 (7 + 6 + 6 + 6) | 3 (9 + 8 + 8) | 4 (7 + 6 + 6 + 6) | 5 (5 × 5) |
-| 30 | 3 (10 × 3) | 5 (6 × 5) | 3 (10 × 3) | 4 (8 + 8 + 7 + 7) | 6 (5 × 6) |
+| 5 | 1 sheet **2-up** (5 \| 5); 2 skills | 2 (3 + 2); 2 skills | 1 sheet 2-up (5 \| 5); 2 skills | 1 (5); 2 skills — the 5 do not fit a half page | 2 (3 + 2); 2 skills |
+| 10 | 1 (10); 3 skills | 3 (4 + 3 + 3); 4 skills | 1 (10); 3 skills | 2 (5 + 5); 4 skills | 4 (3 + 3 + 2 + 2); 4 skills |
+| 15 | 2 (8 + 7); 6 skills | 4 (4 + 4 + 4 + 3); 7 skills | 2 (8 + 7); 6 skills | 2 (8 + 7); 6 skills | 5 (3 × 5); 5 skills |
+| 20 | 2 (10 + 10); 6 skills | 5 (4 × 5); 10 skills | 2 (10 + 10); 6 skills | 3 (7 + 7 + 6); 9 skills | 7 (3 × 6 + 2); 7 skills |
+| 25 | 3 (9 + 8 + 8); 9 skills | 7 (4 × 4 + 3 × 3); 11 skills | 3 (9 + 8 + 8); 9 skills | 4 (7 + 6 + 6 + 6); 12 skills | 9 (3 × 7 + 2 + 2); 9 skills |
+| 30 | 3 (10 × 3); 9 skills | 8 (4 × 6 + 3 + 3); 14 skills | 3 (10 × 3); 9 skills | 4 (8 + 8 + 7 + 7); 12 skills | 10 (3 × 10); 10 skills |
 
-- *Typical* = shelves of 2 to 3 cells (stacks, equations, small visuals). *Compact* = facts and one-line equations. *All-wide* = number lines, coin rows, word problems: one cell a shelf.
+- *Typical* = shelves of 2 to 3 cells (stacks, equations, small visuals). *Compact* = facts and one-line equations. *All-wide* = number lines, coin rows, base-10 over 100: one cell a shelf, 12.1's 4 / 3 a page. "k skills" = distinct skills when the pool is large enough (Σ s_p; a page of 2–3 items holds 1 skill). A mixed sheet's real per-page count is measured by the engine between these columns.
 - pages = ceil(N / per-page); items split as evenly as whole shelves allow (largest page first, the rebalanced last page of `paginate.js`); never a page under half of another (H5); a shelf never splits (PT-MIX-9).
-- **N = 5 prints 2-up** (§9.7): the same 5 items twice on one sheet, each half with its own header (Name, Date, Score ___ / 5), a dashed cut line between; the key is 2-up the same way. Only when the 5 do not fit a half page (all-wide at L) does it print one full page, shelves grown to the fill limit.
+- **N = 5 prints 2-up** (§9.7) **when the 5 items fit a half page** (M typical / compact, L compact): the same 5 items twice on one sheet, each half with its own header (Name, Date, Score ___ / 5) and numbered 1–5, a dashed cut line between; the key is 2-up the same way, each half numbered 1–5. When the 5 do not fit a half page (L typical, all-wide) the table's own pages apply.
 - Key pages = pupil pages + the summary: under the last key page's grid when its rows fit (rows × 7 mm + 14 mm), else one more key page. A week adds one weekly-table page.
 
 ## 4. Rules that apply
@@ -175,21 +175,22 @@ The options belong to the **page type** (job / section scope, PAGE_TYPES 9), not
 ?c=<same>|V1-N10-S2N9C-Y12-Oa-K3                    Wednesday of that week
 ```
 
-- **Skills part:** the DEALT list in deal order, each the frozen 2-char code + its item count written as the existing weight digits + its `~option` suffix. The counts are explicit, so decoding never re-runs the deal.
+- **Skills part:** the DEALT list in deal order, each the frozen 2-char code + its item count written as the existing weight digits + its `~option` suffix (a count is always ≥ 2, so the 'weight 1 writes no digit' rule never bites). For a single sheet the counts are explicit, so decoding never re-runs the skill choice.
 - **New tokens (appended):** `V1` mixed review, format 1 · `S<base36>` the seed · `O<e|a>` order easy → hard / by area (absent = mixed) · `Y<week>` a Mon–Fri week (absent = one sheet) · `K<1–5>` one day of a week code · `P1` adapt to each pupil on screen (absent = off). Reused: `N<n>` count, `G<p|b|r|w>` host, `H`, `T` as today. Letters already taken: T N G R D A Q H W F X.
 - **Compatibility:** append-only. No frozen code, position or token meaning changes; a code with none of the new tokens decodes byte-for-byte as before (`ws-code-snapshot`, `ws-share-options`). An OLD app skips V / S / O / Y / K / P (its `switch` ignores unknown keys) and plays the same skills with the same weights as an ordinary mixed set: the skills survive, the identical items do not. This is stated in the Copy-link panel, not hidden.
-- **Identical:** same code + same release ⇒ byte-identical items on every host: item i = `generateQuestionFor({category, skill, opts, seed: deriveSeed('mixed-review', S, day, i)})`. A later release that changes a generator may change the numbers; the skills, counts, order and seed never change (MIX-REVIEW-SHARE pins both). With `P1` the list is built on each pupil's device from their own record, so it is identical per device, not across pupils.
+- **Frozen under V1 (week and day codes):** a week code carries the week's union with week totals, so a `K<d>` day is rebuilt by re-running the rotation. The V1 rotation (`weekOf`), the page-aware deal and the shelf-order function are therefore FROZEN under `V1`: any change to them ships as `V2`, and the V1 functions stay in the code so every V1 code keeps rebuilding the same days. MIX-REVIEW-SHARE pins a week fixture (`tests/fixtures/mix-review/week-v1.json`: codes → each day's skill list, counts, shelf order and item sha) that fails on any change. (Encoding each day's list in the code was rejected: the skills part's `-` grammar has no day separator an old decoder would skip safely.)
+- **Identical — one dealer:** `dealReviewItems(req)`, ONE exported function (in `print-sheet.js`, beside the duplicate ladder it must run: `RETRIES` = 40 and the rungs unique / answers / turn / repeat), takes the decoded request and returns the ACCEPTED item list `[{categoryId, skillId, opts, seed, q}]` in printed order. Its seeds are the formula: try r of item i = `deriveSeed('mixed-review', S, day, i, r)` fed to `generateQuestionFor`. `buildSheet`'s mixed-review path lays out exactly that list (step 3 changes its seeding to the formula), and every screen host plays exactly that list — none calls `generateQuestionFor` itself — so print and screen match by construction, retries included. Same code + same release ⇒ byte-identical items. A later release that changes a generator may change numbers; the skills, counts, order and seed never change. With `P1` the list is dealt on each pupil's device from their own record: identical per device, not across pupils.
 
 **Weekly set**
 
 - Five sheets Mon–Fri of N problems each. Day d seed = `deriveSeed('mixed-review-week', S, d)`.
-- Rotation: the pool is shuffled by S into a cycle; each day takes the next k skills (wrapping), so every pool skill appears before any skill repeats; no skill on two consecutive days unless |pool| < 2k; from Wednesday one skill a day is the comeback of a skill from two days before (spacing) when the pool allows.
+- Rotation (frozen under V1): the pool is shuffled by S into a cycle; each day deals its k_d = Σ s_p skills (the page-aware deal of §2) from the next skills of the cycle (wrapping), so every pool skill appears before any skill repeats; no skill on two consecutive days unless |pool| < 2·k_d; from Wednesday one skill a day is the comeback of a skill from two days before (spacing) when the pool allows.
 - Print: 5 pupil sheets (tab `Week n | Mon` … `Fri`, footer code with K1–K5), then 5 keys, then one weekly key table (PT-KEY-5: areas and skills as rows, Mon–Fri as columns, item numbers in the cells). Each day reprints exactly from its day code (P-RV-13). The week reuses its one plan for each day; a day code rebuilds that same day, never re-plans it differently (L24).
 
 **Weighting** (screen only, `adapt` on) — **EX-MXR-ADAPT, the named screen-only exception to PT-DLG-26 / P-RV-9** (owner request 2026-11-14; §9.2): never printed, never sent, never a teacher record, off on teacher links unless "Adapt to each pupil" (`P1`).
 
 - w(skill) = 1 + due + weak. due = 1 when `state.spacedRepetition[skillId].nextReview` ≤ today (+1 more at Leitner box 1 or 2); weak = 1 when `state.skillProgress[skillId].total` ≥ 5 and `mastery` < 70; a skill with no record has w = 1; w ∈ 1..4.
-- w is the probability weight of the seeded sample of k skills from the pool AND the `dealCounts` weight of the N items.
+- w chooses only WHICH skills are dealt: it is the probability weight of the seeded sample of the k skills from the pool. The per-skill counts are the §2 deal unchanged (n_p split evenly over a page's skills, at most ceil(N / 2) over the sheet); w never reaches `dealCounts`.
 - Read once at start (a snapshot): the session's list is fixed. Results go back through the `updateSkillProgress` / `updateSpacedRepetition` path every host already calls. Never on print, never sent, never a teacher record (EX-MXR-ADAPT, §9.2). Keyed by bare `skillId`, as `progress.js` keys it today.
 
 **Breakdown layout** (key and results)
@@ -200,14 +201,14 @@ The options belong to the **page type** (job / section scope, PAGE_TYPES 9), not
 
 **Order modes**
 
-- `mixed`: screen order = `interleave(items, weights, S, {maxRun: 1})`. Print: the M1 mixed arrangement when every dealt skill is one size class (`mixedClass` ok); otherwise GROUPED shelves whose ORDER is seeded so no two shelves of one skill are adjacent (a shelf-level interleave; the M2 block packer is not needed, §9.4).
+- `mixed`: across size classes, GROUPED shelves whose ORDER on each page is seeded (frozen under V1) so no two shelves of one skill are adjacent; items inside a shelf run 2–5 of one skill. When every skill on a page is one size class, the M1 mixed arrangement interleaves the items (`interleave`, maxRun 1 where the counts allow). The M2 block packer is not needed (§9.4). There is no separate screen order: the hosts play the printed order.
 - `easyhard`: shelves and items by placement grade, then `data.js` position.
 - `area`: `AREA_ORDER`, then easy → hard.
 - Numbering 1..N row-major on paper; every screen host plays the items in the printed number order, so item 7 is the same problem everywhere.
 
 **Lessons pool** (`fromLessons` on)
 
-- For each ticked grade g: the lessons of g's school sequence (`wrm-links` LESSONS with `seq` and `weeks`) whose week lies in the window ending at `weekForDate(g, today)` → their WRM steps → the skills listed `direct` for those steps in `data/curriculum/links/<YEAR>.json`, plus `skillsForWrmStep(step)` (`SKILL_WRM`).
+- For each ticked grade g: the lessons of g's school sequence (`allLessons()` from `wrm-links.js`, the rows with `grade` = g, `seq` and `weeks`; `unitLessons(g, unit)` for the `unit` window) whose week lies in the window ending at `weekForDate(g, today)` → their WRM steps → the skills listed `direct` for those steps in `data/curriculum/links/<YEAR>.json`, plus `skillsForWrmStep(step)` (`SKILL_WRM`).
 - Then the area, only-8/10 and untick filters apply as usual.
 - Outside the school year (no week): `year` = the whole sequence; `unit` / `4w` say "No school week today" and fall back to `year`.
 - No pupil data and no teacher records (P-RV-9).
@@ -216,8 +217,8 @@ The options belong to the **page type** (job / section scope, PAGE_TYPES 9), not
 
 Each runs as `node tests/scripts/<script> …`.
 
-- `ws-mix-review.mjs --check count|pool|share|hosts|week|breakdown` — **PLANNED** (lane MR-E): the six checks below, each a `ws-backtest` row on `ws-precritic-plan`'s path
-- `ws-precritic.cjs --role mixed-practice --strict` — and `--role mixed-review` once the alias lands; rule 0b
+- `ws-mix-review.mjs --check count|pool|share|hosts|week|breakdown|labels` — **PLANNED** (lane MR-E): the six checks below plus the `labels` assert of step 1b, each a `ws-backtest` row on `ws-precritic-plan`'s path
+- `ws-precritic.cjs --role mixed-review --strict` — on the pinned filter sample `tests/fixtures/precritic/mix-review-sample.json` (step 1: grades, areas, onlyPassed, N, seed, order, size; a mixed review is driven by filters, not by a role sample of skills); and `--role mixed-practice --strict`; rule 0b
 - `ws-print-lint.cjs --source kit` — the pupil and key pages at M / L
 - `ws-empty-band.cjs` — every offered host at 1366 / 820 (L25); H13 inside every shelf
 - `ws-code-snapshot.mjs` — no code moves; the count does not fall
@@ -232,12 +233,12 @@ Each runs as `node tests/scripts/<script> …`.
 
 | Id | What it measures | FAIL state | Backtest |
 |---|---|---|---|
-| **MIX-REVIEW-COUNT** | A sweep (L21, L22): every N ∈ {5, 10, 15, 20, 25, 30} × M, L × the 3 orders × 3 seeds × 12 seeded pools (one class, mixed classes, all-wide, all-facts, a 2-skill pool). On the MEASURED rendered pupil pages: exactly N numbered scored cells 1..N; Score denominator N; pages within the §3 table; no page over 12 / 10 problems or 7 / 5 shelves; no page under half of another (H5); N = 5 is one 2-up sheet (two identical halves, a cut line, each /5) unless its items do not fit a half page; no split cell; the key has the same N cells in the same places (PT-KEY-1) plus the summary. | the count differs from N on any print (the page filled to shelves × k = 14 for N = 10); a page over the ceiling; a lone-shelf continuation page; a key whose cell count differs; an N = 5 sheet printed as one half-empty page when its items fit 2-up | commit-pair: FAIL on master d3830882 (mixed-practice fills the page and ignores the count), PASS on the build commit |
-| **MIX-REVIEW-POOL** | Node, no browser, 200 seeded filter sets: every dealt skill is live (not retired, not a tombstone), matches a ticked grade by placement and a ticked area, is in `REDESIGN_PASSED` when only-8/10 is on (default OFF: a request without the flag deals non-passed skills too), is not unticked, is in the lessons window when `fromLessons` is on; k = min(\|pool\|, ceil(N / 3)) skills, 2–3 items each, none over half; the order holds (mixed: no avoidable adjacent pair; easyhard: grades non-decreasing; area: `AREA_ORDER` non-decreasing); adapt weights from a progress fixture give each weak / due skill at least its share; a print request never reads progress. Picker: every `REDESIGN_PASSED` skill carries the ✓ and no other does; the toggle's count equals the filtered pool ∩ `REDESIGN_PASSED`. | a non-8/10 skill dealt with the toggle on; an unticked or retired skill dealt; a grade or area outside the filters; an order violated; a print deal that changes when the progress fixture changes; a default request that drops non-passed skills (the old ON default); a missing or stray ✓; a toggle count that differs from the pool | fixture: FAIL on a deal with a skill outside `REDESIGN_PASSED` (toggle on) that reads `skillProgress` on a print request; PASS on the correct deal |
-| **MIX-REVIEW-SHARE** | Encode → decode → rebuild, 100 seeded mixes (sheets and weeks, every order, adapt off): the same skills, counts, order, seed and the same item text and answers (sha of the items); every baseline code decodes byte-identically (`ws-code-snapshot`, `ws-share-options`); master's `parseEnhancedSkillCode` reads a new code without error and returns the same skills (the old-app degrade). | a code that drops the seed or carries the filters instead of the list (the rebuild deals another mix); a moved or changed old code; an old decoder that throws | fixture: FAIL on a codec that writes the filters and no `S` token; PASS on the lane's codec |
-| **MIX-REVIEW-HOSTS** | Browser, one row a host: one code opened in print (pupil + key), practice card at 1366 and 820, online worksheet at 1366 and 820, quiz (built from the mix and taken), boss and race: the same N items in the same order with the same answers as the key; every answer box is a slot of the cell (`ws-screen-slots`); 48 px targets at 820; the quiz scores out of N; no console errors; no 390 px row. | a host that generates unseeded (`generateQuestion`), so its items differ from the key; a host with more or fewer than N items; a quiz scored out of another total | commit-pair (browser): FAIL on master d3830882 (a V1 code opens as plain mixed play with unseeded items), PASS on the build commit |
-| **MIX-REVIEW-WEEK** | Node + one print sweep: 5 sheets with tabs Mon–Fri and distinct day seeds; no two days identical; every pool skill once before any repeats; no skill on two consecutive days unless \|pool\| < 2k; each day rebuilt alone from its `K<d>` code equals that day of the week build byte for byte (L24); the weekly table holds every dealt item exactly once. | days that share one seed or repeat a sheet; a pool skill missing while another repeats; a day code that rebuilds a different sheet | fixture: FAIL on a week built with one seed for all five days; PASS on the lane's week builder |
-| **MIX-REVIEW-BREAKDOWN** | Every key and every results screen of the HOSTS sweep: each item tagged with its skill and its area (`areaOf`); per-skill and per-area subtotals each sum to N (and to the score on screen); the area rows are the dealt areas in `AREA_ORDER`; the summary's item numbers equal `skillItemMap(plan)`; the screen breakdown equals the key's. | an item missing from the summary or listed twice; an item under the wrong area; subtotals that do not sum to N; a results screen whose numbers differ from the key's | fixture: FAIL on a summary with one item mapped to the wrong area (its area short by one); PASS on the lane's summary |
+| **MIX-REVIEW-COUNT** | A sweep (L21, L22): every N ∈ {5, 10, 15, 20, 25, 30} × M, L × the 3 orders × 3 seeds × 12 seeded pools (one class, mixed classes, all-wide, all-facts, a 2-skill pool). On the MEASURED rendered pupil pages: exactly N numbered scored cells 1..N — for a 2-up N = 5 sheet, two identical halves of 5 cells, each numbered 1..5 with Score /5; Score denominator N; pages within the §3 table; no page over 12 / 10 problems, over 4 / 3 wide visuals, over 7 / 5 shelves, or over 3 distinct skills; mixed order: no two adjacent shelves of one skill (and, in the M1 arrangement, no avoidable adjacent pair of items); no page under half of another (H5); no split cell; the key has the same cells in the same places (PT-KEY-1; 2-up: each half 1..5) plus the summary. | the count differs from N; a page over a ceiling or over 3 skills; two adjacent shelves of one skill in mixed order; a lone-shelf continuation page; a key whose cell count differs; an N = 5 sheet printed as one half-empty page when its items fit 2-up, or a 2-up half not numbered 1..5 | fixture: FAIL on `tests/fixtures/mix-review/count-ignored.json`, a plan in which the `mixed-review` alias and `input.review` exist but `input.total` is ignored (total = shelves × k: 14 cells for N = 10); PASS on the build commit's plan for the same request |
+| **MIX-REVIEW-POOL** | Node, no browser, 200 seeded filter sets through `dealReviewItems`: every dealt skill is live (not retired, not a tombstone), matches a ticked grade by placement and a ticked area, is in `REDESIGN_PASSED` when only-8/10 is on, is not unticked, is in the lessons window when `fromLessons` is on; a request without the flag deals non-passed skills too (default OFF); at most 3 skills a page, s_p = max(1, min(3, floor(n_p / 2))), counts split evenly on a page, no skill over ceil(N / 2) on the sheet; the order holds at SHELF level (mixed: no two adjacent shelves of one skill; easyhard: grades non-decreasing; area: `AREA_ORDER` non-decreasing); adapt weights from a progress fixture change WHICH skills are dealt (weak / due skills chosen at least as often as their weight share over the sweep) and never the counts; a print request never reads progress. Picker: every `REDESIGN_PASSED` skill carries the ✓ and no other does; the toggle's count equals the filtered pool ∩ `REDESIGN_PASSED`. | each its own fixture (below) | fixtures, one per FAIL state, under `tests/fixtures/mix-review/pool-*.json`: `passed-leak` (a non-passed skill dealt with the toggle on), `print-reads-progress` (a print deal that changes when the progress fixture changes), `default-on` (a default request that drops non-passed skills: the old ON default), `stray-check` (a ✓ on a non-passed skill, or a passed skill without it), `toggle-count` (a count that differs from the pool), `filter-leak` (an unticked, retired or off-filter skill dealt), `cap` (a skill over ceil(N / 2) or a page over 3 skills), `adjacent` (two adjacent shelves of one skill in mixed order), `adapt-counts` (adapt weights that change the counts); each FAILs, and the correct deal PASSes |
+| **MIX-REVIEW-SHARE** | Encode → decode → `dealReviewItems` for 100 seeded mixes (sheets and weeks, every order, adapt off): the same skills, counts, order, seed and the same item text and answers (sha of the items); the pinned V1 week fixture `tests/fixtures/mix-review/week-v1.json` rebuilds every day's skill list, counts, shelf order and item sha exactly (the frozen V1 rotation and shelf order); every baseline code decodes byte-identically (`ws-code-snapshot`, `ws-share-options`); master's `parseEnhancedSkillCode` reads a new code without error and returns the same skills (the old-app degrade). | a code that drops the seed or carries the filters instead of the list; a change to the V1 rotation, deal or shelf order that moves a pinned day; a moved or changed old code; an old decoder that throws | fixture: FAIL on a codec that writes the filters and no `S` token, and on a week fixture whose rotation was changed without a `V2`; PASS on the lane's codec and the frozen V1 functions |
+| **MIX-REVIEW-HOSTS** | Browser, one row a host: one code opened in print (pupil + key), practice card at 1366 and 820, online worksheet at 1366 and 820, quiz (built from the mix and taken), boss and race: every host's item list is `dealReviewItems`' list (the same N items, the printed order, the key's answers, retries included); every answer box is a slot of the cell (`ws-screen-slots`); 48 px targets at 820; the quiz scores out of N; no console errors; no 390 px row. | a host that generates its own items (`generateQuestion` or its own `generateQuestionFor` seeds), so its items differ from the key whenever a retry fired; a host with more or fewer than N items; a quiz scored out of another total | commit-pair (browser): FAIL on master d3830882 (a V1 code opens as plain mixed play with unseeded items), PASS on the build commit; plus a fixture where a forced duplicate retry makes a host that calls the formula directly differ from the key |
+| **MIX-REVIEW-WEEK** | Node + one print sweep: 5 sheets with tabs Mon–Fri and distinct day seeds; no two days identical; every pool skill once before any repeats; no skill on two consecutive days unless \|pool\| < 2·k_d; each day rebuilt alone from its `K<d>` code equals that day of the week build byte for byte (L24); the weekly table holds every dealt item exactly once. | days that share one seed or repeat a sheet; a pool skill missing while another repeats; a day code that rebuilds a different sheet | fixture: FAIL on a week built with one seed for all five days; PASS on the lane's week builder |
+| **MIX-REVIEW-BREAKDOWN** | Every key and every results screen of the HOSTS sweep: each item tagged with its skill and its area (`areaOf`), labelled from `AREA_LABELS`; per-skill and per-area subtotals each sum to N (2-up: to 5 a half) and to the score on screen; the area rows are the dealt areas in `AREA_ORDER`; the summary's item numbers equal `skillItemMap(plan)`; the screen breakdown equals the key's. Includes the `labels` assert of step 1b: `AREA_LABELS` deep-equals the §7a table (11 keys, exact strings), and no area label string appears in `teacher-*.js` outside `teacher-areas.js`. | an item missing from the summary or listed twice; an item under the wrong area; subtotals that do not sum; a results screen whose numbers differ from the key's; an `AREA_LABELS` entry that differs from §7a or a second copy of a label | fixture: FAIL on a summary with one item mapped to the wrong area (its area short by one), and on an `AREA_LABELS` fixture with one label changed; PASS on the lane's summary and table |
 
 ## 9. Rulings (lead, 2026-11-19)
 
@@ -249,7 +250,7 @@ The lead ruled on the 16 open questions on 2026-11-19 (via the coordinator). Eac
 4. **Order 'mixed' when the dealt skills have different size classes (the usual case across grades and areas): the M2 2 x 2 block packer is not built.** Ruling (2026-11-19, lead): Order mixed across size classes: a shelf-level interleave (each shelf one skill with its band strip, shelf order seeded, no two shelves of one skill adjacent); the M1 interleaved shelves for one size class; M2 later, no format change.
 5. **Grade 'M' (Mixed levels) skills, e.g. the two vocabulary skills, and the 6+ chip: where do they sit?** Ruling (2026-11-19, lead): Grade M skills sit under every chip their school placement lists, else under every ticked chip (counted once). 6+ = grade 6 skills.
 6. **The only-8/10 pool is small: 32 skills, all OA / NBT / Words (grade 4: 1 skill, grade 6+: none). With the default ON most area chips are empty.** Ruling (2026-11-19, lead): 'Only 8/10 ✓ skills' defaults OFF while the passed pool is small. Every passed skill shows a ✓ in the picker; the toggle stays visible with its count, e.g. 'Only 8/10 ✓ (32)'. A pool under 2 skills is refused with its reason; never widened silently.
-7. **N = 5 is a short page (about 40 % at L): H5 says a page under half used is wasted.** Ruling (2026-11-19, lead): N = 5 prints 2-up: the same 5 items twice on one sheet with a dashed cut line, each half with its own header and Score /5, the key 2-up the same way; one full page only when the 5 do not fit a half page.
+7. **N = 5 is a short page (about 40 % at L): H5 says a page under half used is wasted.** Ruling (2026-11-19, lead; wording corrected after card critic r1, D12): N = 5 prints 2-up when the 5 items fit a half page (M typical / compact, L compact): the same 5 items twice on one sheet with a dashed cut line, each half with its own header, numbered 1–5 and scored /5, the key 2-up the same way. Otherwise the §3 table's pages apply.
 8. **Per-skill options inside a mix (a teacher who wants mult_facts 7s and 8s only).** Ruling (2026-11-19, lead): Per-skill options in v1: each skill at its defaults or its preset's values; the code already carries ~opts.
 9. **Week sharing: one week link with a day picker, or five day links?** Ruling (2026-11-19, lead): Week sharing: one week link (Y) that opens a day picker; the Copy menu also gives each day's link (K).
 10. **Quiz host: a new G letter, or the existing quiz builder and ?quiz= share?** Ruling (2026-11-19, lead): Quiz host: 'Make a quiz' builds a one-section quiz of the mix's N items (each tagged with its skill), shared with the existing ?quiz=; no new G letter.
@@ -282,21 +283,24 @@ The lead ruled on the 16 open questions on 2026-11-19 (via the coordinator). Eac
 +  off while the passed pool is small; the toggle shows its count, every passed skill shows a ✓), that is not
 +  unticked, and, with "From my lessons", that the school pacing lists in the window. Mixed pools and skills with no
 +  standard are never in it. A pool under 2 skills is refused with its reason; it is never widened silently.
-+- **PT-MXR-2. Deal.** N in {5, 10, 15, 20, 25, 30} (default 10). k = min(|pool|, ceil(N / 3)) skills, sampled by the seed;
-+  2 or 3 items each (`dealCounts` min 2); no skill over half the sheet. Print weights are equal; nothing about a pupil is read.
++- **PT-MXR-2. Deal.** N in {5, 10, 15, 20, 25, 30} (default 10). A page holds at most 3 distinct skills
++  (max(1, min(3, floor(n_p / 2)))), its items split evenly over them; no skill over ceil(N / 2) on the sheet; skills are
++  sampled by the seed, new to each page while the pool allows. One dealer (`dealReviewItems`) gives print and every
++  screen host the same accepted items. Print weights are equal; nothing about a pupil is read.
 +- **PT-MXR-3. Exact count.** The sheet holds exactly N scored cells over ceil(N / per-page) pages (per page at most 12 at M,
-+  10 at L; at most 7 / 5 shelves), split as evenly as whole shelves allow. N = 5 prints 2-up: the same 5 items twice on one
-+  sheet, a dashed cut line, each half with its header and Score /5, the key 2-up alike; one full page only when the 5 do
-+  not fit a half page.
-+- **PT-MXR-4. Order.** Mixed (default): no two items of one skill side by side where the pool allows; one size class takes
-+  the M1 mixed arrangement, several take GROUPED shelves in a seeded order with no two shelves of one skill adjacent.
++  10 at L; at most 4 / 3 wide visuals, 12.1; at most 7 / 5 shelves), split as evenly as whole shelves allow. N = 5 prints
++  2-up when the 5 fit a half page: the same 5 items twice on one sheet, a dashed cut line, each half with its header,
++  numbered 1 to 5 and scored /5, the key 2-up alike; otherwise the pages of the table below.
++- **PT-MXR-4. Order.** Mixed (default): no two shelves of one skill side by side on a page; where every skill on a page is
++  one size class, the M1 mixed arrangement interleaves the items. The screen plays the printed order.
 +  Easy to hard: placement grade, then teaching order. By area: AREA_ORDER, then easy to hard. The pupil page never names
 +  the area.
 +- **PT-MXR-5. Supports** are those of a Review (PT-REV-2): level 1, no steps, models, traces or anchors. Each skill keeps
 +  its own options (SCC-P14).
 +- **PT-MXR-6. Seed and code.** The seed, the dealt list with its counts, the order and N travel in the share code
 +  (`V1`, `S`, `O`, `N`; a week `Y`, a day `K`), appended to the enhanced skill code; the same code and release reprint
-+  and replay the identical mix on every host. Old codes decode unchanged.
++  and replay the identical mix on every host. The V1 deal, week rotation and shelf order are frozen: a change ships as
++  V2. Old codes decode unchanged.
 +- **PT-MXR-7. Week.** A Mon-Fri set is five sheets of N, each seeded from (seed, day); every pool skill appears before
 +  any repeats, no skill on two consecutive days when the pool allows, and one comeback a day from two days before.
 +- **PT-MXR-8. Key.** Every sheet has the facsimile key (PT-KEY-1) and a key summary: Area | Skill | Items | Score per
@@ -307,14 +311,14 @@ The lead ruled on the 16 open questions on 2026-11-19 (via the coordinator). Eac
 +  each pupil" weights due and weak skills from the pupil's own record on that device; it is never printed, never sent,
 +  never a teacher record, and is off on a teacher's link unless the teacher ticks it.
 +
-+| N | M (12 a page) | M all-wide (7) | L compact (10) | L typical (8) | L all-wide (5) |
++| N | M (12 a page) | M all-wide (4) | L compact (10) | L typical (8) | L all-wide (3) |
 +|---|---|---|---|---|---|
-+| 5 | 1 (2-up) | 1 (2-up) | 1 (2-up) | 1 (2-up) | 1 (2-up if it fits, else 1 page) |
-+| 10 | 1 | 2 | 1 | 2 | 2 |
-+| 15 | 2 | 3 | 2 | 2 | 3 |
-+| 20 | 2 | 3 | 2 | 3 | 4 |
-+| 25 | 3 | 4 | 3 | 4 | 5 |
-+| 30 | 3 | 5 | 3 | 4 | 6 |
++| 5 | 1 (2-up) | 2 | 1 (2-up) | 1 | 2 |
++| 10 | 1 | 3 | 1 | 2 | 4 |
++| 15 | 2 | 4 | 2 | 2 | 5 |
++| 20 | 2 | 5 | 2 | 3 | 7 |
++| 25 | 3 | 7 | 3 | 4 | 9 |
++| 30 | 3 | 8 | 3 | 4 | 10 |
 +
 +**Teacher options.** Grades (chips K to 6+); areas (9 chips, `AREA_LABELS`); Only 8/10 ✓ (default off, with its count); untick skills; From my lessons (unit, 4
 +weeks, year); problems; order; week; New mix; size M / L; key. **Skill supplies.** Nothing new: `renderCell` level 1,
@@ -329,7 +333,7 @@ The lead ruled on the 16 open questions on 2026-11-19 (via the coordinator). Eac
 -| P-RV-9 | "Taught" is read from the Teaching sequence list. … No pupil data is involved. |
 +| P-RV-9 | "Taught" is read from the Teaching sequence list. … No pupil data is involved (screen-only exception EX-MXR-ADAPT, PAGE_TYPES 5.5 PT-MXR-9). |
 @@ ## Appendix
-+16. Mixed review (5.5): k = ceil(N / 3) skills a sheet, the 12 / 10 per-page targets and the week's rotation are this
++16. Mixed review (5.5): at most 3 skills a page (max(1, min(3, floor(n_p / 2)))), no skill over ceil(N / 2), the 12 / 10 per-page targets and the week's rotation are this
 +    file's choices; the 2-up rule at N = 5, only-8/10 off by default and EX-MXR-ADAPT are lead rulings of 2026-11-19
 +    (card design/cards/mixed-review, section 9).
 ```
@@ -339,15 +343,35 @@ The lead ruled on the 16 open questions on 2026-11-19 (via the coordinator). Eac
 | Step | Lane | What | Gates it must pass | Profile |
 |---|---|---|---|---|
 | 0 | lead | Sign this card (the §9 rulings are in). Apply the §9a diff (PAGE_TYPES 5.5, the PT-DLG-26 and P-RV-9 sentences); regenerate the rule index (`ws-spec-card --index`). | `ws-spec-card --index --check` | — |
-| 1 | MR-E checks | `ws-mix-review.mjs` with the six checks and their `backtests.json` rows FIRST (pending where the build is missing), on `ws-precritic-plan`'s path. | `ws-backtest --row mix-review-*` | mq-opus-medium (first build of a new tool) |
-| 1b | MR-B pool, deal, code | `AREA_LABELS`: a NEW export of `js/modules/teacher-areas.js` beside `AREAS`, the exact 11-row table of §7a (lessons-browser card R1, 55ae9d090). The mixed-review chips, key summary and results read it; lf-checks and the lessons browser reuse it (no second copy). | the lessons-browser AREA-LABELS check; BREAKDOWN | mq-opus-low (a table copy) |
+| 1 | MR-E checks | `ws-mix-review.mjs` with the six checks, the `labels` assert and their `backtests.json` rows FIRST (pending where the build is missing), with every fixture of §8 (`count-ignored`, the nine `pool-*`, `week-v1`, the codec, retry, summary and labels fixtures); the pinned filter sample `tests/fixtures/precritic/mix-review-sample.json` and its use by `ws-precritic --role mixed-review`; all on `ws-precritic-plan`'s path. | `ws-backtest --row mix-review-*` | mq-opus-medium (first build of a new tool) |
+| 1b | MR-B pool, deal, code | `AREA_LABELS`: a NEW export of `js/modules/teacher-areas.js` beside `AREAS`, the exact 11-row table of §7a (lessons-browser card R1, 55ae9d090). The mixed-review chips, key summary and results read it; lf-checks and the lessons browser reuse it (no second copy). | `ws-mix-review --check labels` (`AREA_LABELS` deep-equals §7a; no second copy), inside MIX-REVIEW-BREAKDOWN | mq-opus-low (a table copy) |
 | 2 | MR-B pool, deal, code | `js/modules/mixed-review.js` (pure): `placementGrades`, `poolOf(filters)`, `deal(pool, N, seed, order, weights)`, `weekOf(…)`, `weightsFrom(progress, sr)`; the V / S / O / Y / K / P tokens in `skill-codes.js` + `design/SHARE_CODES.md`. Research the reference sites first. | POOL, SHARE, WEEK; `ws-code-snapshot`, `ws-share-options` | mq-opus-medium |
-| 3 | MR-A engine (lf-engine files) | `mixed-practice.js`: `input.total` (exact N, balanced pages), `input.review` (title, tab, supports 1, no anchors), `input.order`, the shelf-level interleave; `roles/index.js` alias; `answer-key.js` key summary + weekly table; `print-sheet.js` week as five sections; 2-up at N = 5. | COUNT, BREAKDOWN (print); `ws-print-lint`, `ws-precritic --role mixed-practice --strict` | mq-opus-medium (first build) |
+| 3 | MR-A engine (lf-engine files) | `print-sheet.js`: export `dealReviewItems(req)` (the page-aware deal of §2 through the existing duplicate ladder) and change `buildSheet`'s mixed-review seeding to `deriveSeed('mixed-review', S, day, i, r)`, so print lays out exactly that list; `mixed-practice.js`: `input.total` (exact N, balanced pages, ≤ 3 skills a page, wide-visual 4 / 3), `input.review` (title, tab, supports 1, no anchors), `input.order`, the shelf-level interleave (frozen under V1); `roles/index.js` alias; `answer-key.js` key summary + weekly table; `print-sheet.js` week as five sections; 2-up at N = 5. | COUNT, BREAKDOWN (print); `ws-print-lint`, `ws-precritic --role mixed-practice --strict` | mq-opus-medium (first build) |
 | 4 | MR-C teacher screen | `teacher-print.js`: the "Mixed review" card in the picker (Check group), the panel (grade chips, area chips, Only 8/10, skill list, From my lessons, count, order, week, New mix, size, key), live preview through `buildSheet`, Print, Copy link (with day links), Make a quiz. 1280–1366 and 820–1024. | `ws-no-size-s`, `ws-boot-smoke`, `ws-empty-band` on the panel | mq-opus-medium (first build of a screen) |
-| 5 | MR-D screen hosts | `init.js` landing for V1 codes; `mixed-mode-play.js` plays a fixed seeded item list; `worksheet.js`; the quiz-builder import; boss / race; adapt weighting; results by area in `game-flow.js`, `worksheet.js`, `quiz-results.js`. | HOSTS, BREAKDOWN (screen); `ws-screen-slots`, `ws-chromebook-fit` | mq-opus-medium |
+| 5 | MR-D screen hosts | `init.js` landing for V1 codes; `mixed-mode-play.js` and every host play `dealReviewItems`' list (no host generates its own items); `worksheet.js`; the quiz-builder import; boss / race; adapt weighting; results by area in `game-flow.js`, `worksheet.js`, `quiz-results.js`. | HOSTS, BREAKDOWN (screen); `ws-screen-slots`, `ws-chromebook-fit` | mq-opus-medium |
 | 6 | critic | Full independent critic (first page type: no copy-light): every N at M / L, every order, a week, keys and summary, every offered host at 1366 / 820; RUBRIC ≥ 8 on every criterion. Then the speed reflection (`design/status/speed-audit.md`, `metrics.md`). | all of §8 | mq-opus-medium |
 
 Steps 2 and 3 can run side by side once step 1 is in (step 3 needs only the item-list shape of step 2, fixed here). Steps 4 and 5 start when 2 and 3 are merged.
+
+### 9c. Card critic r1 (2026-11-19, FAIL min 6): defects and fixes
+
+Report: `design/lanes/lf-mixreview/card-critic-r1.md` (7afebf5f). Each fix was checked against the code named.
+
+| # | Defect | Fix in this card | Verified against |
+|---|---|---|---|
+| D1 | "No skill over half" contradicts N = 5 (3 + 2) and odd N with 2 skills | "no skill over ceil(N / 2)" (§2, PT-MXR-2, POOL) | `dealCounts` largest remainder (interleave.js 74–83) |
+| D2 | Adapt weights also fed `dealCounts`, breaking 2–3 a skill | w chooses only WHICH skills; counts are the §2 deal (§7a Weighting, POOL `adapt-counts`) | — |
+| D3 | Mixed order: item-level no-adjacency vs GROUPED shelves vs printed order | shelf-level no-adjacency across size classes; item level only in M1; the separate screen `interleave` line dropped (§2, §7a, PT-MXR-4, COUNT, POOL) | `mixedClass` and its fallback (mixed-practice.js 381, 433) |
+| D4 | Identical-mix claim skipped the print dedupe ladder | ONE dealer `dealReviewItems(req)` in print-sheet.js runs the ladder; print and every host use its list; step 3 moves buildSheet's seeding to the formula (§7a Identical, HOSTS, §9b) | `RETRIES` = 40 (print-sheet.js 184), rungs unique / answers / turn / repeat (4505–4644) |
+| D5 | Week / day codes re-run the deal | V1 freezes the deal, rotation and shelf order (a change is V2, V1 functions kept); pinned `week-v1.json` in SHARE; per-day lists rejected (no safe separator) (§7a) | `parseSkillCodeParts` splits on `-` (skill-codes.js 57–80) |
+| D6 | All-wide 7 / 5 a page breaks 12.1 Wide-visual rows 4 / 3 | 4 at M, 3 at L; §3 and §9a tables recomputed | WORKSHEET_DESIGN_STANDARD 12.1 |
+| D7 | 4+ skills a page vs 12.1 Review "2–3 instruction-led sections" | at most 3 distinct skills a page, page-aware deal; skills a sheet re-derived in §3 | WORKSHEET_DESIGN_STANDARD 12.1 Review row |
+| D8 | COUNT backtest failed on a missing role, not on the count | fixture `count-ignored.json`: alias and `input.review` present, `input.total` ignored | `ROLE_ALIASES` (roles/index.js) |
+| D9 | One POOL fixture mixed two faults; old ON default and stray ✓ untested | nine `pool-*` fixtures, one per FAIL state | — |
+| D10 | Step 1b's gate (lessons-browser AREA-LABELS) does not exist here | `ws-mix-review --check labels` inside BREAKDOWN: `AREA_LABELS` deep-equals §7a, no second copy | `grep AREA_LABELS` on this tree: only this card |
+| D11 | Cited the private `LESSONS` | `allLessons()` / `unitLessons()` (§7a Lessons pool, §7b) | wrm-links.js exports (337, 212) |
+| D12 | 2-up N = 5 vs "exactly N cells" | per half: two identical halves, each numbered 1..5, key alike (§3, COUNT, PT-MXR-3, ruling 7) | — |
+| D13 | No precritic path for a filter-driven role | step 1 pins `tests/fixtures/precritic/mix-review-sample.json` for `ws-precritic --role mixed-review` (§8, §9b) | ws-precritic.cjs `--role` reads role-sample.json (91–93) |
 
 Signed: (not yet signed)
 
@@ -364,7 +388,7 @@ Read by hand from the repo on 2026-11-19 (master d3830882). Not part of the sign
 
 **Share-code settings tokens in use** (`generateEnhancedSkillCode`): T timer, N count, G mode (p b r w), R range, D decimals, A adaptive, Q Quick Start lock, H help, W arrangement (m p), F fill, X related facts. Skill parts: 2-char code + weight digits + `~options`.
 
-**Pool sources:** `REDESIGN_PASSED` 32 ids (2026-11-19); `teacher-areas.js` `AREA_ORDER` (CC OA NBT NF MEAS DATA G RPNS MIXED WORDS NOSTD) — no `AREA_LABELS`; school pacing in `wrm-links.js` (`LESSONS`, `schoolWeeksOf`, `weekForDate`), grades PK–5 (WRM R, Y1–Y6); progress `state.skillProgress` and `state.spacedRepetition` keyed by bare skill id.
+**Pool sources:** `REDESIGN_PASSED` 32 ids (2026-11-19); `teacher-areas.js` `AREA_ORDER` (CC OA NBT NF MEAS DATA G RPNS MIXED WORDS NOSTD) — no `AREA_LABELS`; school pacing in `wrm-links.js` (`allLessons()`, `unitLessons()`, `schoolWeeksOf`, `weekForDate`), grades PK–5 (WRM R, Y1–Y6); progress `state.skillProgress` and `state.spacedRepetition` keyed by bare skill id.
 
 **Results today:** `quiz-results.js` groups by skill (`skillAnalysis`, weakest first); `game-flow.js` saves `skillBreakdown` per session; `answer-key.js` has `skillItemMap` and `answerListRows`. No area grouping anywhere yet.
 <!-- /informational -->
