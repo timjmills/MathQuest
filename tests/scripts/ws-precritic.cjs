@@ -999,6 +999,9 @@ function buildPlan(ctx) {
         if (roomKeys.length) add(gate('ldiv-room', 'ws-ldiv-hug --room (LDIV-ROOM: the work grid uses a 4-a-page cell, M/L)', `${roomKeys.length} work-grid skill(s)`, 'browser', 'ws-ldiv-hug', ['--room', '--skills', roomKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
+        // SOUND-ONCE (owner request 2026-11-14, "B, power-up"): the correct-answer sound plays exactly once on a correct answer
+        // with Sound on, never on a wrong one, never with Sound off - card, worksheet and quiz at 1280 / 1024; SOUND-PLAN: the notes
+        add(gate('correct-sound', 'ws-correct-sound (SOUND-PLAN, SOUND-ONCE: the power-up once on a correct answer, card / worksheet / quiz at 1280 / 1024)', scope, 'browser', 'ws-correct-sound', ['--skill', keys.join(',')], { missingMsg: 'ws-correct-sound is not in this tree' }));
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
         // (lf-algebra r10, lead rule after lf-algebra critic r2: precritic r9's "Clean for the critic" list named pages with an open
         // critic finding (F2, npr / fgr card + worksheet) and roles no page-fill lint ran on (G4 Reason It one item a page). The lane
@@ -1072,6 +1075,11 @@ function buildPlan(ctx) {
         const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
         // (lf-ops divarray r2, owner rule 2026-11-13: the div_facts support-aid page rules of critics r6 / r7 - EB-PAGE on Test and the
         // fade packet, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX - restored as ws-fact-pages after the deploy dropped them)
+        // (lf-ops t15, owner 2026-11-14: "Tables to 15 x 15" on the x / ÷ fact drills and their presets - the band, the deal to 15 x 15
+        // within the band, the 13-15 ticks only under it, the M / L pages fit at the fact size, the presets open the host at 225 - and
+        // FORM-FIRST, the panel's "How it is written" and Support above the tick list)
+        const t15Keys = keys.filter((k) => /^(multiplication:mult_facts|division:div_facts)(_15)?$/.test(k));
+        if (t15Keys.length) add(gate('tables15', 'ws-tables15 (T15-BAND, T15-DEAL, T15-TICKS, T15-FIT, T15-PRESET, FORM-FIRST)', t15Keys.join(','), 'browser', 'ws-tables15', ['--skill', t15Keys.join(',')], { missingMsg: 'ws-tables15 is not in this tree' }));
         const factPageKeys = keys.filter((k) => k === 'division:div_facts');
         if (factPageKeys.length) add(gate('fact-pages', 'ws-fact-pages --page-only (div_facts support-aid page rules: EB-PAGE, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX)', factPageKeys.join(','), 'browser', 'ws-fact-pages',
             ['--skill', factPageKeys.join(','), '--page-only', '--hosts', 'none', '--no-baseline', '--rules', 'EB-PAGE,EB-PAD,EB-COLS,EB-TESTEQ,EB-GAP,EB-FACTX'], { missingMsg: 'no tests/scripts/ws-fact-pages.cjs' }));
@@ -1133,6 +1141,9 @@ function buildPlan(ctx) {
         // owner 2026-11-13 (size S dropped, fact sheets keep everything): 9- and 10-column fact sheets print at M with the
         // picked columns at the 16 pt rung, on the teacher print and the simple print (ws-fact-cols-m: FCM-COLS, FCM-PT, FCM-FIT)
         if (factKeys.length) add(gate('fact-cols-m', 'ws-fact-cols-m (9 / 10 picked columns at M: FCM-COLS, FCM-PT, FCM-FIT)', 'the four fact skills × 9 / 10 columns × M × teacher + simple print', 'browser', 'ws-fact-cols-m', [], { missingMsg: 'ws-fact-cols-m is not in this tree' }));
+        // owner 2026-11-14 (lf-ops mixfacts): the Mixed facts print keeps ÷ in the shared rows (MIXED-ALL-OPS), and a bracket fact on
+        // fact rows keeps a writing row over its bar (LDIV-FACT-ROOM)
+        if (factKeys.length) add(gate('fact-mix', 'ws-fact-mix (MIXED-ALL-OPS: ÷ in the + − × rows; LDIV-FACT-ROOM: Hw over the bracket bar)', 'Mixed facts simple print × M/L × Columns 6/8/Auto; div_facts Long / Mix / Long + − × fact rows × M/L', 'browser', 'ws-fact-mix', [], { missingMsg: 'ws-fact-mix is not in this tree' }));
         // Visual-quality critic r1 (root cause of F3 / F4): ws-grade-render MEASURED a lesson cell overflowing its pad and a
         // 41 x 44 px phone-card input, but no --skill gate failed on either (print-lint's L-OVERFLOW reads rectangles past the
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a

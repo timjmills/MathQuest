@@ -816,12 +816,15 @@ export function workedStepsFor(q, ctx = {}) {
         } catch (e) { /* keep what there is */ }
     }
     if (!raw.length && q && q.hint) raw = [{ text: plain(q.hint), marks: [] }];
-    const tokens = answerTokens(q, raw);
+    // owner bug fix 2026-11-15: an item that asks for its help filled (q.fullWorked: the unit-form value of a digit)
+    // shows every step with the item's own numbers - no "___" left for the pupil to decode
+    const tokens = q && q.fullWorked ? [] : answerTokens(q, raw);
     return raw.slice(0, 6).map((s) => hideAnswer(plain(s.text), tokens));
 }
 
 /** The Say: frame with this item's given numbers and the answer left as a blank. */
 export function sayFor(q, ctx = {}) {
+    if (q && typeof q.sayText === 'string' && q.sayText) return q.sayText;
     const { cat, skill } = whereFrom(q, ctx);
     let frame = '';
     try {

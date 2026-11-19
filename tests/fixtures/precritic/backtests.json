@@ -11845,6 +11845,145 @@
    }
   },
   {
+   "id": "tables15",
+   "check": "ws-tables15 T15-BAND / T15-DEAL / T15-TICKS / T15-FIT / T15-PRESET: Tables to 15 x 15 (band 225) on mult_facts and div_facts deals the 13-15 tables within the band, shows the 13-15 ticks only under it, fits the M / L independent page at the fact size, and the presets mult_facts_15 / div_facts_15 open the host at 225",
+   "kind": "commit-pair",
+   "rule": "T15 (owner request 2026-11-14, lane lf-ops t15: tables to 15 x 15, a distinct size recorded as an option AND a preset skill)",
+   "fail": {
+    "commit": "84f8813a1",
+    "state": "Tables to offers 10 x 10 and 12 x 12 only; no 13-15 tick, no 13-15 fact dealt; no mult_facts_15 / div_facts_15"
+   },
+   "pass": {
+    "commit": "9040a38b5",
+    "state": "band 225 (15 x 15) offered; 150 items deal every table 0-15 within 225; ticks 13-15 only under 15 x 15; M / L pages fit at the 12 x 12 digit size; both presets live with code, standards, WRM and search terms"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-BAND,T15-DEAL,T15-TICKS,T15-FIT,T15-PRESET --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "t15-preset-ican",
+   "check": "ws-tables15 T15-PRESET: the preset pages mult_facts_15 / div_facts_15 carry the same I Can line as their host at band 225 ('... to 15'), never the host's default 'to 12'",
+   "kind": "commit-pair",
+   "rule": "T15-PRESET (critic t15 D1, 2026-11-15)",
+   "fail": {
+    "commit": "26f8028a9",
+    "state": "optionICan compares the preset's band with the preset's own re-defaulted 225, sees no move, and leaves 'I Can multiply facts to 12'"
+   },
+   "pass": {
+    "commit": "9040a38b5",
+    "state": "band moved is measured against the host's default (144), so the preset line reads 'to 15' like the host at 225"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-PRESET --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tables15-form-first",
+   "check": "ws-tables15 FORM-FIRST: in the rendered Options panel of mult_facts / div_facts, How it is written (notation / divForm) and the Support choices stand above the Multiply by / Divide by tick list",
+   "kind": "commit-pair",
+   "rule": "FORM-FIRST (owner request 2026-11-14: How it is written sat below 13 tick rows and was easy to miss)",
+   "fail": {
+    "commit": "45f7f8b6f",
+    "state": "the panel order is constant > (divForm) > band > support (> notation): the form and support stand below the tick list"
+   },
+   "pass": {
+    "commit": "ed4ebc923",
+    "state": "the tick list is the last group, Which facts: divForm / notation and support stand above it; the option list and codec order are unchanged"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules FORM-FIRST --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-count-tight",
+   "check": "a Guided continuation page of count rows holds them to their measured height (lf-roles r11 X1, critic r10: count_by_tables Guided L seed 972334 page 2, 4 rows at 45.8 mm for ~30 mm ink, EB-BAND 33 %)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-COUNT-TIGHT (browser twin: ws-empty-band EB-BAND guided)",
+   "browser": false,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "60 mm count rows stretched to 79.5 / 78.8 mm on page 2 at M / L"
+   },
+   "pass": {
+    "commit": "d3629b594",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-COUNT-TIGHT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "correct-sound-powerup-once",
+   "check": "ws-correct-sound SOUND-PLAN / SOUND-ONCE: the power-up (square C5 E5 G5 70 ms, C6 400 ms decaying) plays exactly once on a correct answer with Sound on, never on a wrong one or with Sound off, on the card, the worksheet and the quiz at 1280 / 1024",
+   "kind": "commit-pair",
+   "rule": "SOUND-ONCE (owner request 2026-11-14, correct-answer sound \"B, power-up\")",
+   "fail": {
+    "commit": "84f8813a1",
+    "state": "no power-up module: the card played the old triangle arpeggio, the worksheet and the quiz played nothing"
+   },
+   "pass": {
+    "commit": "eed07b7c1",
+    "state": "correct-sound.js, called from answer-check.js, worksheet.js wsRecordAnswer (once per item) and quiz-take.js recordAnswer (instant feedback), gated by the Sound toggle"
+   },
+   "command": "node tests/scripts/ws-correct-sound.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mixed-all-ops",
+   "check": "ws-fact-mix MIXED-ALL-OPS (owner 2026-11-14, Mixed facts quick print within 20 / Medium / 6 columns printed ÷ in its own \"Divide.\" section): a fact-rows print of + − × and ÷ facts (div_facts Standard) holds ÷ in the ONE shared grid on every pupil page - no grid of ÷ alone, all four signs on page 1, Mixed up interleaving ÷ through the rows - at M / L, Columns 6 / 8 / Auto, In sections and Mixed up, Pages 1 and 2; ÷ alone stays ÷ only",
+   "kind": "fixture",
+   "rule": "ws-fact-mix MIXED-ALL-OPS",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/fact-mix/fail.json",
+    "state": "84f8813a1 measured (MQ_ROOT, ws-fact-mix --json): + − × in one grid, ÷ in its own Divide. grid under it on every case"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/fact-mix/pass.json",
+    "state": "the fix measured (lf-ops mixfacts): ÷ dealt into the + − × grid (simple-print.js buildFacts, signDiv)"
+   },
+   "command": "node tests/scripts/ws-fact-mix.cjs --rules MIXED-ALL-OPS --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ldiv-fact-room",
+   "check": "ws-fact-mix LDIV-FACT-ROOM (owner 2026-11-14: \"10 ⟌ 70\", \"2 ⟌ 6\" squished beside a fraction): on a fact-rows page with div_facts' long-division form the free height over the bar (to the cell's inner top, or 1 mm under the number tab) is at least the size's writing height (M 8, L 10 mm) - Long alone, Mix, Long with + − ×, teacher print and simple print, M / L, Columns Auto / 6 / 9",
+   "kind": "fixture",
+   "rule": "ws-fact-mix LDIV-FACT-ROOM",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/fact-mix/fail.json",
+    "state": "84f8813a1 measured: Mix at 9 columns 7.70 mm (M) / 7.13 mm (L), the simple print's shared page 6.64 mm (M)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/fact-mix/pass.json",
+    "state": "the fix measured: the bracket fact's quotient row is at least Hw (cells/long-division.js factRoom)"
+   },
+   "command": "node tests/scripts/ws-fact-mix.cjs --rules LDIV-FACT-ROOM --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "vocab-r15-vones",
    "check": "V-ONES: a run whose visible ones digits repeat, or whose step divides 10, reads as cycle; sequence 5, 10, 15 dealt with cycle in set 6 {product, sequence, cycle}: critic r14 #1",
    "kind": "commit-pair",

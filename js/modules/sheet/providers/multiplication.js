@@ -9,13 +9,27 @@
 import { registerSkill } from '../contract.js';
 import { num, arr, obj, operands, countList, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
 import { storiesFor } from './stories.js';
+import { optionICan } from '../../skill-options.js';
+
+/** A strings() function whose I Can line follows the options a page is built with (ref.opts), as division.js does
+ *  (critic t15 D1: the 15 x 15 page read "I Can multiply facts to 12"). */
+function withOptionICan(cat, id, fn) {
+    const out = (ref = {}) => {
+        const s = fn(ref);
+        let t = '';
+        try { t = ref && ref.opts ? optionICan(cat, id, ref.opts, s.iCan) : ''; } catch (e) { t = ''; }
+        return t ? Object.assign({}, s, { iCan: t }) : s;
+    };
+    out.def = fn.def;
+    return out;
+}
 
 /* =========================================================================== mult_facts */
 
 registerSkill('multiplication:mult_facts', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
     supports: Object.freeze(['touch', 'skip', 'array', 'boxsign']),
-    strings: strings({
+    strings: withOptionICan('multiplication', 'mult_facts', strings({
         iCan: 'I Can multiply facts to 12',
         instructionKey: 'multiply',
         steps: [
@@ -25,7 +39,7 @@ registerSkill('multiplication:mult_facts', {
             'Write the product.',
         ],
         say: '__ times __ equals __.',
-    }),
+    })),
     misconceptions: ['added', 'times-zero', 'times-one', 'one-group-short'],
     workedSteps: (q) => {
         const [a, b] = operands(q);

@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 402 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 404 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -2546,6 +2546,8 @@ whatever happens to the WRM gaps.
   Vocabulary: partition, multiple, reverse  
 - **Y4.B4.S10** 12 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 12}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 12}  
+  Partial: Multiplication Facts to 15 × 15 (`multiplication:mult_facts_15`), missing the 12 times-table carried on to 15 x 15 (the 13, 14 and 15 tables; WRM stops at 12 x 12)  
+  Partial: Division Facts to 15 × 15 (÷1 to ÷15) (`division:div_facts_15`), missing dividing by 12 carried on to 15 x 15 (÷13, ÷14, ÷15; WRM stops at 12 x 12)  
   Vocabulary: partition, double, exchange  
 - **Y4.B4.S11** Multiply by 1 and 0 — covered. _3.OA.B.5_  
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
