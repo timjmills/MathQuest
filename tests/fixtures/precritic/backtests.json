@@ -11195,7 +11195,7 @@
     "commit": "aa404bb5c",
     "state": "OK"
    },
-   "command": "node tests/scripts/ws-merge-master.mjs --self-test --target {root}/tests/scripts/ws-merge-master.mjs",
+   "command": "node tests/scripts/ws-merge-master.mjs --self-test --only '^(?!r2 )' --target {root}/tests/scripts/ws-merge-master.mjs",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -11215,7 +11215,7 @@
    "commit": "ab5878446",
    "state": "26 of 26 OK"
   },
-  "command": "node tests/scripts/ws-merge-master.mjs --self-test --target {root}/tests/scripts/ws-merge-master.mjs",
+  "command": "node tests/scripts/ws-merge-master.mjs --self-test --only '^r2 ' --target {root}/tests/scripts/ws-merge-master.mjs",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

@@ -831,3 +831,7 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - Not done: stale cleanly-merged reports are not re-validated (F7 last point) - the lane's own report gates catch them.
 - 2026-11-19, critic merge r2 (FAIL 7/7/8/8): CRLF ledger / status files lost master's side; fixed (union3 strips the \r to
   judge, writes CRLF back). Self-test 26 cases; row `merge-master-crlf`.
+- 2026-11-19, critic merge r3 (FAIL 9/6/9/8: the CRLF fix works; the r1 row's pass state ran the newer r2 cases against an
+  older tool). Fix: `--self-test --only <regex>`; row merge-master-r1 runs `^(?!r2 )`, row merge-master-crlf runs `^r2 `,
+  so each row proves only its own cases. Minors kept: a mixed-ending file comes back all-CRLF, a CRLF backtests.json comes
+  back LF (no content lost).
