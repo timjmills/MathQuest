@@ -1,0 +1,191 @@
+{
+  "$schema": "../manifest.schema.json",
+  "version": 1,
+  "lane": "lf-algebra",
+  "mergeOrder": 60,
+  "description": "Lane lf-algebra (lessons-first wave 1, 2026-11-07): patterns:notice_patterns (build-list patterns_notice), its preset patterns:pattern_features, and patterns:growing_shape_patterns (Y5 links proposal). Generators in js/modules/gen-patterns-notice.js, cells notice.js / growing-pattern.js, provider sheet/providers/patterns.js. Codes ZW-ZY (free on 2026-11-07; the lead confirms against the other wave-1 lanes).",
+  "skills": [
+    {
+      "key": "patterns:notice_patterns",
+      "entry": {
+        "v": "notice_patterns",
+        "l": "What Do You Notice? Even and Odd Products, Pattern Features"
+      },
+      "code": "ZW",
+      "grade": 3,
+      "printSize": "medium",
+      "standards": {
+        "ccss": [
+          "3.OA.D.9",
+          "4.OA.C.5"
+        ],
+        "ee": [
+          "M.EE.3.OA.8",
+          "M.EE.4.OA.5"
+        ]
+      },
+      "wrm": [
+        {
+          "step": "Y4.B4.S6",
+          "partial": "the patterns in the times-tables: even and odd products, the ones digits (not the 3, 6, 9 doubling link)"
+        }
+      ],
+      "terms": [
+        "what do you notice",
+        "notice patterns",
+        "even or odd product",
+        "is the product even or odd",
+        "odd times odd",
+        "even times odd",
+        "patterns in the multiplication table",
+        "times table patterns",
+        "true or false times table",
+        "explain a pattern",
+        "4 times a number is always even",
+        "ones digit pattern"
+      ],
+      "concepts": [
+        "patterns",
+        "odd_even",
+        "times_tables"
+      ],
+      "generatorCategory": "patterns_notice"
+    },
+    {
+      "key": "patterns:growing_shape_patterns",
+      "entry": {
+        "v": "growing_shape_patterns",
+        "l": "Growing Shape Patterns: Draw and Count the Next Term"
+      },
+      "code": "ZX",
+      "grade": 4,
+      "printSize": "wide",
+      "standards": {
+        "ccss": [
+          "4.OA.C.5"
+        ],
+        "ee": [
+          "M.EE.4.OA.5"
+        ]
+      },
+      "wrm": [
+        {
+          "step": "Y6.B7.S1",
+          "partial": "the one-step rule of a growing pattern of shapes (term 4, term 10), not yet the rule in words for any term"
+        }
+      ],
+      "terms": [
+        "growing pattern",
+        "growing patterns",
+        "growing shape pattern",
+        "shape pattern that grows",
+        "next term",
+        "draw the next term",
+        "term 4",
+        "term 10",
+        "dot pattern",
+        "square pattern",
+        "visual pattern",
+        "pattern rule add 2"
+      ],
+      "concepts": [
+        "patterns"
+      ],
+      "generatorCategory": "patterns_notice"
+    },
+    {
+      "key": "patterns:pattern_features",
+      "entry": {
+        "v": "pattern_features",
+        "l": "Features of a Number Pattern: Odd, Even and Ones Digits",
+        "presetOf": "notice_patterns"
+      },
+      "code": "ZY",
+      "grade": 4,
+      "preset": {
+        "skill": "notice_patterns",
+        "opts": {
+          "patTask": "feature"
+        }
+      },
+      "standards": {
+        "ccss": [
+          "4.OA.C.5"
+        ],
+        "ee": [
+          "M.EE.4.OA.5"
+        ]
+      },
+      "wrm": [
+        {
+          "step": "Y5.B12.S9",
+          "partial": "features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals"
+        }
+      ],
+      "terms": [
+        "pattern features",
+        "features of a pattern",
+        "emergent features",
+        "units digit cycle",
+        "ones digit repeats",
+        "odd even alternate",
+        "alternates odd and even",
+        "what else does the pattern show",
+        "start at 5 add 5"
+      ],
+      "concepts": [
+        "patterns",
+        "odd_even"
+      ]
+    },
+    {
+      "key": "patterns:follow_given_rule",
+      "entry": {
+        "v": "follow_given_rule",
+        "l": "Follow a Given Rule: Extend a Number Pattern",
+        "presetOf": "number_patterns_rule"
+      },
+      "code": "ZZ",
+      "grade": 4,
+      "preset": {
+        "skill": "number_patterns_rule",
+        "opts": {
+          "rule": false
+        }
+      },
+      "standards": {
+        "ccss": [
+          "4.OA.C.5"
+        ],
+        "ee": [
+          "M.EE.4.OA.5"
+        ]
+      },
+      "wrm": [
+        {
+          "step": "Y5.B12.S9",
+          "partial": "extend a whole-number sequence from a given rule (add, subtract, double), not decimals"
+        }
+      ],
+      "terms": [
+        "follow a given rule",
+        "follow the rule",
+        "extend a number pattern",
+        "use the rule",
+        "given rule pattern",
+        "continue the pattern from the rule",
+        "start at 3 add 4",
+        "rule add each time",
+        "generate a number pattern",
+        "next numbers in the pattern"
+      ],
+      "concepts": [
+        "patterns"
+      ]
+    }
+  ],
+  "providers": [
+    "./patterns.js"
+  ],
+  "lessons": []
+}

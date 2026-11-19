@@ -229,7 +229,7 @@ registerSkill('placevalue:value', {
         if (!v) return [];
         // F11: the count decides the noun ("1 hundred", "4 hundreds"); F12: × only where the form IS notation.
         const unit = `${v.digit} ${placeWord(v.place, v.digit)}`;
-        const last = v.form === 'unit' ? step(`Write ${unit}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: placeWord(v.place, v.digit) }])
+        const last = v.form === 'unit' ? step(`Write ${v.digit}, then choose ${placeWord(v.place, v.digit)}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: placeWord(v.place, v.digit) }])
             : v.form === 'notation' ? step(`Write ${v.digit} × ${f(v.place)}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: f(v.place) }])
                 : step(`Write ${f(v.value)}.`, [{ slot: 'answer', value: f(v.value) }]);
         const worth = v.digit === 0 ? step('A zero is worth nothing. It holds the place.')

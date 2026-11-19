@@ -86,6 +86,7 @@ import { shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPrevi
 
 // Sound effects (procedural Web Audio — no asset files)
 import { playSfx, setSfxEnabled, isSfxEnabled } from './modules/sfx.js';
+import { playCorrectSound } from './modules/correct-sound.js';
 
 // TTS voice picker — let the user choose among the browser's installed voices,
 // persists choice in localStorage so it survives across sessions.
@@ -362,7 +363,7 @@ Object.assign(window, {
     shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview, closeWorkedPreview,
 
     // Sound effects
-    playSfx, setSfxEnabled, isSfxEnabled,
+    playSfx, setSfxEnabled, isSfxEnabled, playCorrectSound,
 
     // TTS voice picker
     getAvailableVoices, getSelectedVoiceURI, setSelectedVoiceURI, applyVoice,
