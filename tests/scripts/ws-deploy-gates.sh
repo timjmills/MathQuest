@@ -103,6 +103,8 @@
 #            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
 #            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
 #            No pin in the tree: the gate is SKIPPED (INCOMPLETE). Backtest row lesson-baseline-deploy-gate.
+#            Also session 4: ws-lesson-pages --grade 3 --warn (owner via the lead 2026-11-19: LESSON-EMPTY-FIRST, LESSON-OPENER-SAME
+#            on every built grade-3 WRM lesson; nfn, so its exit 4 is a WARNING until lf-engine's fix lands, then it blocks).
 #            (merge 2026-11-13: ws-options-shots moved from sessions 4-5 to 5-6; session 4 is the lesson baseline)
 # Session 5  ws-options-shots (lf-partopts, from lf-algebra F8/G11, 2026-11-13): the Options panel's live sample of EVERY
 #            skill whose Sets row offers Options (725 on 2026-11-13), opened the teacher's way at 1280 and 390 px, must lie
@@ -953,6 +955,11 @@ build_list() {
   # commit message names the changed lessons / pages; until then this gate FAILS - no lesson page changes unseen.
   if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
   else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-baseline --all-lessons --check" "$LESSON_BASE (the pin is not in the tree)"; fi
+  # (owner via the lead, 2026-11-19) LESSON-EMPTY-FIRST + LESSON-OPENER-SAME on every built grade-3 WRM lesson the White Rose
+  # screen prints (size M, seed 4242). A WARNING (nfn, exit 4) until lf-engine's fix lands: then drop --warn and it blocks.
+  # The browser runner is inside the command (an nfn gate runs on a node worker).
+  if [ -f tests/scripts/ws-lesson-pages.mjs ]; then add "${MQ_LESSON_BASELINE_SESSION:-4}" nfn "ws-lesson-pages --grade 3 (WARNING until lf-engine's fix)" "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" node tests/scripts/ws-lesson-pages.mjs --grade 3 --warn"
+  else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-pages --grade 3" "tests/scripts/ws-lesson-pages.mjs"; fi
   # session 5-6 (lf-partopts, sessions 4-5 before the lesson baseline took 4, from lf-algebra F8/G11, 2026-11-13): the Options panel sample of every skill with an options
   # panel (725 x 1280 / 390 px; ≈ 1.8 s a skill a width, ≈ 2,600 slot-s in all), sharded over the two browser slots, one
   # browser a shard (--workers 1: the runner's slot is one Chromium). No session 1-3 has room (27-28 of 30 min each).
