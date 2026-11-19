@@ -12022,6 +12022,106 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-option-items",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo OPTION-ITEMS",
+   "check": "every offered 'Numbers to fill in' value deals Independent / Test windows at least two thirds of the default's (critic blanks B3: tiles 8 on band 120 dealt 2 windows where the default deals 6)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --seeds 1 --score-roles independent --variants --only OPTION-ITEMS",
+   "fail": {
+    "commit": "335e6cc2b",
+    "state": "tiles 8 on band 120 capped at 7 a window: the consistent deal held 2 windows"
+   },
+   "pass": {
+    "commit": "f3cca806d",
+    "state": "band-120 cap 6 a window (one pattern every five columns, chartGapCap per5): tiles 8 keeps the default's windows"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-blank-count-lesson",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo BLANK-COUNT (min(N, cap); band-120 lesson 3)",
+   "check": "every pupil window of the whole lesson packet holds exactly min(N, cap) blanks - a band-120 lesson's N is 3 (lead ruling (a) 2026-11-14)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --seed-list 4242 --score-roles lesson --only BLANK-COUNT",
+   "fail": {
+    "commit": "335e6cc2b",
+    "state": "band-120 lesson windows held the skill's 5"
+   },
+   "pass": {
+    "commit": "f3cca806d",
+    "state": "band-120 lesson pupil windows hold 3 on the columns beside the worked example (print-sheet _cwEdge, chart-giveaway chartEdge)"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-guided-try-count",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo GUIDED-TRY-COUNT",
+   "check": "a Guided chart page deals 2 or more tries after its Model (critic blanks B4: band 120 Guided dealt 1 try, half the try row empty)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --seed-list 4242 --score-roles guided --only GUIDED-TRY-COUNT",
+   "fail": {
+    "commit": "335e6cc2b",
+    "state": "band-120 Guided: the Model's five shown columns left room for 1 try"
+   },
+   "pass": {
+    "commit": "f3cca806d",
+    "state": "the first try keeps within three columns of the Model, so a second try fits (gen-counting shown preference)"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-lesson-empty-page",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo LESSON-EMPTY-PAGE",
+   "check": "no lesson packet page past the first is empty: every printed page has a plan holding an item, and the key prints as many pages (critic blanks B1: page 3 printed only its header)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --seed-list 4242 --score-roles lesson --only LESSON-EMPTY-PAGE",
+   "fail": {
+    "commit": "335e6cc2b",
+    "state": "the practice part dealt no window it could keep and printed an empty page (3 pages, 2 planned)"
+   },
+   "pass": {
+    "commit": "f3cca806d",
+    "state": "lesson parts keyed apart (_cwPart) and the band-120 practice page fills with 5 windows of 3"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-packet-giveaway",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo CROSS-GIVEAWAY (lesson packet)",
+   "check": "a lesson packet is one sheet: no pupil window leaves empty a square any other window prints, and the chart page's and teaching sheet's worked examples print every square of theirs (critic blanks B2: the anchor printed the pupil's practice answers)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --seed-list 4242 --score-roles lesson --only CROSS-GIVEAWAY",
+   "fail": {
+    "commit": "335e6cc2b",
+    "state": "the teaching sheet's worked example was picked from its dealt pool after the pupil windows, and shared their gaps"
+   },
+   "pass": {
+    "commit": "f3cca806d",
+    "state": "the teaching sheet works the chart page's example, dealt first and SHOWN (print-sheet _cwForceFirst, pickExample pinned); every later window keeps its gaps off it"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
