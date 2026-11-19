@@ -343,13 +343,13 @@ export function counts(pools, input) {
     input.guidedKind = kind;
     input.guidedCols = cols;
     const cut = items.length < all.length;
-    let total = sheetFit(ordered(items, cols), cols, ctx, input, cut ? items.length : Infinity).total;
+    let total = fitOrdered(items, cols, ctx, input, cut ? items.length : Infinity).fit.total;
     // The plan sees only the items dealt (the first `total`), so it may choose another Model (the
     // shortest of THOSE) and hold fewer (teen_compose at L: Model + 3 planned on the probe, Model
     // + 2 printed). Settle on a count the dealt items themselves fill.
     for (let k = 0; k < 4; k++) {
         const sub = items.slice(0, total);
-        const t2 = Math.min(total, sheetFit(ordered(sub, cols), cols, ctx, input, sub.length).total);
+        const t2 = Math.min(total, fitOrdered(sub, cols, ctx, input, sub.length).fit.total);
         if (t2 === total) break;
         total = t2;
     }
@@ -526,6 +526,29 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
  * continues on page 2 (and 3) under the continuation header, the Steps band repeated so the steps
  * stay in view (PT-GDP-2, PG-22). A continuation page is filled, never above the ceiling.
  */
+/**
+ * MODEL-PROMOTE (lf-roles r12, lead decision X2 2026-11-14): a two-step Guided Model drawn as a column-step story (117-124 mm at
+ * M) leaves no room for a try on page 1, which then held the Model alone. When page 1 would hold the Model alone, a dealt
+ * word-work story that draws SHORTER as the Model (a row-form story: both steps basic facts) is promoted - the shortest that
+ * gives page 1 the Model and a try - and the old Model becomes the last try. Same items, same seed, only their order; the key
+ * renders from the same plan. When no dealt item fits, the lone Model stays (the ruled exception).
+ */
+function fitOrdered(items, cols, ctx, input, limit = Infinity) {
+    const seq = ordered(items, cols);
+    const fit = sheetFit(seq, cols, ctx, input, limit);
+    const m0 = seq[0];
+    if (fit.pages[0].cap >= 2 || seq.length < 3 || !m0 || m0.template !== 'word-work' || mixModels(seq) > 1) return { seq, fit };
+    const h = (it) => drawnMm(it, cols, 3);
+    const cands = seq.slice(1).filter((it) => it && it.template === 'word-work' && !(it.q && (it.q.missing || it.q.noModel)) && h(it) > 0 && h(it) < h(m0))
+        .sort((x, y) => h(x) - h(y));
+    for (const c of cands) {
+        const s2 = [c, ...seq.slice(1).filter((x) => x !== c), m0];
+        const f2 = sheetFit(s2, cols, ctx, input, limit);
+        if (f2.pages[0].cap >= 2 && f2.total >= fit.total && seq.slice(0, fit.total).every((x) => s2.slice(0, f2.total).includes(x))) return { seq: s2, fit: f2 };
+    }
+    return { seq, fit };
+}
+
 function sheetFit(items, cols, ctx, input, limit = Infinity) {
     const a = sheetFitPlain(items, cols, ctx, input, limit);
     // DRAWN-FIT (lf-roles r9): a one-column sheet whose continuation pages hold ONE story each is fitted again at the heights its
@@ -1203,8 +1226,8 @@ export function plan(input = {}) {
         const nForms = new Set(items.map(formOfItem)).size;
         if (nForms > cols && fitsAt(items, nForms, ctx)) cols = nForms;
     }
-    const fit = sheetFit(ordered(items, cols), cols, ctx, input, items.length);
-    const use = ordered(items, cols).slice(0, Math.min(items.length, fit.total));
+    const { seq, fit } = fitOrdered(items, cols, ctx, input, items.length);
+    const use = seq.slice(0, Math.min(items.length, fit.total));
     const key = instructionKeyOf(use, input.skills);
     // Critic round 2 (C4): the Guided page is labelled and scored like every other role. The
     // worked example carries the "Model" tab and is not scored; the rest run a. b. c. ...
