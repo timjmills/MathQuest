@@ -1,0 +1,4219 @@
+{
+  "skill": "patterns:notice_patterns",
+  "category": "patterns",
+  "skillId": "notice_patterns",
+  "label": "What Do You Notice? Even and Odd Products, Pattern Features",
+  "grade": "3",
+  "dir": "patterns__notice_patterns",
+  "roles": {
+    "lesson-L": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 3,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 1 page. Fits: an anchor chart of 4 steps, 2 warm-up, 2 guided and 0 independent on 1 page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 2 warm-up, 2 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 3,
+      "keyPageCount": 3,
+      "seed": 809816,
+      "title": "I Can tell if a product is even or odd",
+      "notes": [
+        "Dense: 2 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 51.1,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "5 × 6 = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "12 × 4 = ?",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 × 10 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "4 × 7 = ?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 51.1,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "5 × 6 = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "12 × 4 = ?",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 × 10 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "4 × 7 = ?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "L",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-L-p1.png",
+          "words": 161,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p2.png",
+          "words": 141,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p3.png",
+          "words": 135,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-L-key-p1.png",
+          "words": 163,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p2.png",
+          "words": 145,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p3.png",
+          "words": 138,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          6
+        ],
+        "problems": [
+          "page 1: the body overflows by 3.2 mm"
+        ],
+        "fonts": {
+          "Andika": 188
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "6e6f5c65270f9d50",
+          "f2cfbd480421bb7f",
+          "63fb60bf06740c41"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 22.2,
+              "wPct": 4.3,
+              "cell": 1
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                21.3,
+                10.1
+              ],
+              "sizes": [
+                "54x10 mm ×2",
+                "179x11 mm ×1",
+                "49x16 mm ×1",
+                "21x11 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 32.5,
+              "wPct": 28.9,
+              "cell": 3
+            },
+            "footPct": 6.7
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                53.5,
+                10.1
+              ],
+              "sizes": [
+                "54x10 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 15,
+              "wPct": 17.8,
+              "cell": 6
+            },
+            "footPct": 23.4
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          6
+        ],
+        "problems": [
+          "page 1: the body overflows by 3.2 mm"
+        ],
+        "fonts": {
+          "Andika": 190
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "29deb64034c6a202",
+          "91c2696e0f81341d",
+          "34dc17d51f78094a"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 22.2,
+              "wPct": 4.3,
+              "cell": 1
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                21.3,
+                10.1
+              ],
+              "sizes": [
+                "54x10 mm ×2",
+                "179x11 mm ×1",
+                "49x16 mm ×1",
+                "21x11 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 28.7,
+              "wPct": 28.9,
+              "cell": 3
+            },
+            "footPct": 6.7
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                53.5,
+                10.1
+              ],
+              "sizes": [
+                "54x10 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 11.9,
+              "wPct": 17.8,
+              "cell": 1
+            },
+            "footPct": 23.4
+          }
+        ]
+      }
+    },
+    "lesson-S": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 3,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 1 page. Fits: an anchor chart of 4 steps, 6 warm-up, 2 guided and 0 independent on 1 page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 6 warm-up, 2 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 3,
+      "keyPageCount": 3,
+      "seed": 809816,
+      "title": "I Can tell if a product is even or odd",
+      "notes": [
+        "A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.",
+        "Dense: 2 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 51.4,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 51.1,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 67.7
+            },
+            "2": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 21.4
+            },
+            "3": {
+              "hMm": 65.5,
+              "fits": true,
+              "slackMm": 6
+            },
+            "4": {
+              "hMm": 65,
+              "fits": false,
+              "slackMm": -1.3
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "5 × 6 = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "12 × 4 = ?",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 × 10 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "4 × 7 = ?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            },
+            "3": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 3
+            },
+            "4": {
+              "hMm": 43.1,
+              "fits": false,
+              "slackMm": -4.8
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 70.2
+            },
+            "2": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 23.9
+            },
+            "3": {
+              "hMm": 46.4,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "4": {
+              "hMm": 46.2,
+              "fits": false,
+              "slackMm": 1.2
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Odd or even? Tap one box.",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 70.2
+            },
+            "2": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 23.9
+            },
+            "3": {
+              "hMm": 59.1,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "4": {
+              "hMm": 58.6,
+              "fits": false,
+              "slackMm": 1.2
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "5 × 6 = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "12 × 4 = ?",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 × 10 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "4 × 7 = ?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 78.2
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 31.9
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 16.5
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 8.7
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 64.7
+            },
+            "2": {
+              "hMm": 43.1,
+              "fits": true,
+              "slackMm": 18.4
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "S",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-S-p1.png",
+          "words": 161,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p2.png",
+          "words": 156,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p3.png",
+          "words": 135,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-S-key-p1.png",
+          "words": 163,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p2.png",
+          "words": 163,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p3.png",
+          "words": 138,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 3,
+        "cells": [
+          4,
+          9,
+          6
+        ],
+        "problems": [
+          "page 1: the body overflows by 3.2 mm"
+        ],
+        "fonts": {
+          "Andika": 205
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "6e6f5c65270f9d50",
+          "65e7405e160d9806",
+          "e8b53198d785de12"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 22.2,
+              "wPct": 4.3,
+              "cell": 1
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 9,
+            "digitPt": {
+              "max": 28,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                21.3,
+                8.4
+              ],
+              "sizes": [
+                "21x11 mm ×4",
+                "44x14 mm ×2",
+                "51x9 mm ×2",
+                "179x8 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 31.8,
+              "wPct": 25.8,
+              "cell": 9
+            },
+            "footPct": 1
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                50.5,
+                9.4
+              ],
+              "sizes": [
+                "51x9 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 18.2,
+              "wPct": 20,
+              "cell": 1
+            },
+            "footPct": 28.3
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 3,
+        "cells": [
+          4,
+          9,
+          6
+        ],
+        "problems": [
+          "page 1: the body overflows by 3.2 mm"
+        ],
+        "fonts": {
+          "Andika": 213
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "29deb64034c6a202",
+          "1316270838381fb1",
+          "102c0c09ddd2f1c0"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 22.2,
+              "wPct": 4.3,
+              "cell": 1
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 9,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 10
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                21.3,
+                8.4
+              ],
+              "sizes": [
+                "21x11 mm ×4",
+                "44x14 mm ×2",
+                "51x9 mm ×2",
+                "179x8 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 29,
+              "wPct": 25.8,
+              "cell": 9
+            },
+            "footPct": 1
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                50.5,
+                9.4
+              ],
+              "sizes": [
+                "51x9 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 14.8,
+              "wPct": 20,
+              "cell": 1
+            },
+            "footPct": 28.3
+          }
+        ]
+      }
+    },
+    "independent-L": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "perPage": 8,
+        "pages": 1,
+        "trimmed": 0,
+        "note": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 28 pt. Dense: 2 x 4, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 53.312,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 2 x 4, cells sized to the problems.",
+            "line": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 28 pt. Dense: 2 x 4, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 47.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 703298,
+      "title": "I Can tell if a product is even or odd",
+      "notes": [
+        "Dense: 2 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 47.6,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 47.6,
+              "fits": false,
+              "slackMm": 1
+            },
+            "4": {
+              "hMm": 54.4,
+              "fits": false,
+              "slackMm": -6.8
+            }
+          }
+        }
+      ],
+      "role": "independent",
+      "size": "L",
+      "opts": null,
+      "pages": [
+        {
+          "file": "independent-L-p1.png",
+          "words": 130,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-L-key-p1.png",
+          "words": 133,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 83
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "5ea7ca21f87c8ff4"
+        ],
+        "measured": [
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                53.5,
+                10.1
+              ],
+              "sizes": [
+                "54x10 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 17.5,
+              "wPct": 17.8,
+              "cell": 8
+            },
+            "footPct": 7.2
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 83
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "af4655d95cfb72b4"
+        ],
+        "measured": [
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                53.5,
+                10.1
+              ],
+              "sizes": [
+                "54x10 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 14.5,
+              "wPct": 17.8,
+              "cell": 1
+            },
+            "footPct": 7.2
+          }
+        ]
+      }
+    },
+    "independent-S": {
+      "fits": {
+        "cols": 3,
+        "rows": 5,
+        "perPage": 15,
+        "pages": 1,
+        "trimmed": 0,
+        "note": "Fits: 3 columns x 5 rows, 15 per page, 1 page. Digits 16 pt. Dense: 3 x 5, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 5,
+            "perPage": 15,
+            "pages": 1,
+            "cellW": 62,
+            "cellH": 43.232,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 3 x 5, cells sized to the problems.",
+            "line": "Fits: 3 columns x 5 rows, 15 per page, 1 page. Digits 16 pt. Dense: 3 x 5, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 38.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 703298,
+      "title": "I Can tell if a product is even or odd",
+      "notes": [
+        "Dense: 3 x 5, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "odd",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        },
+        {
+          "template": "notice",
+          "fclass": "standard",
+          "text": "Is the product even or odd?",
+          "ans": "even",
+          "measured": {
+            "1": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 66.7
+            },
+            "2": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 20.4
+            },
+            "3": {
+              "hMm": 38.6,
+              "fits": true,
+              "slackMm": 5
+            },
+            "4": {
+              "hMm": 38.6,
+              "fits": false,
+              "slackMm": -2.8
+            },
+            "5": {
+              "hMm": 43.7,
+              "fits": false,
+              "slackMm": -7.4
+            }
+          }
+        }
+      ],
+      "role": "independent",
+      "size": "S",
+      "opts": null,
+      "pages": [
+        {
+          "file": "independent-S-p1.png",
+          "words": 207,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-S-key-p1.png",
+          "words": 210,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          15
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 146
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "97c1f68456d89585"
+        ],
+        "measured": [
+          {
+            "cells": 15,
+            "digitPt": {
+              "max": 16,
+              "median": 16,
+              "min": 8
+            },
+            "slots": {
+              "n": 15,
+              "minMm": [
+                47.5,
+                8.6
+              ],
+              "sizes": [
+                "48x9 mm ×15"
+              ]
+            },
+            "band": {
+              "hPct": 19.3,
+              "wPct": 8.1,
+              "cell": 1
+            },
+            "footPct": 6.4
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          15
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 146
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "2256b4293692926e"
+        ],
+        "measured": [
+          {
+            "cells": 15,
+            "digitPt": {
+              "max": 16,
+              "median": 16,
+              "min": 8
+            },
+            "slots": {
+              "n": 15,
+              "minMm": [
+                47.5,
+                8.6
+              ],
+              "sizes": [
+                "48x9 mm ×15"
+              ]
+            },
+            "band": {
+              "hPct": 15.5,
+              "wPct": 8.1,
+              "cell": 15
+            },
+            "footPct": 6.4
+          }
+        ]
+      }
+    }
+  },
+  "consoleErrors": []
+}

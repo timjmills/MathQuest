@@ -62,6 +62,8 @@
 //                §12.1 ceiling (10 / 8 / 6 + the Model): the ceiling counted answers only when EVERY cell scored > 1 (pointsOf), so
 //                chart_120 Guided L dealt 7 answers against 6 (lf-builds precritic EB-GDPCAP; lf-roles r10 item 3a). Control:
 //                1-point cells keep their tries (the Model and 3 at least).
+//   GUIDED-MODEL-ALONE page 1 of a Guided sheet holds the Model AND its hinted try when both fit the drawn page (§2.3).
+//   GUIDED-COUNT-TIGHT continuation-page count rows are held to their measured height (lf-roles r11 X1, EB-BAND).
 //   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
@@ -575,6 +577,38 @@ if (on('GUIDED-LONE-STORY')) {
             for (const f of lone) if (f.cellH > (135 + 1) / 0.9) findings.push(`GUIDED-LONE-STORY ${size}: a lone 135 mm story in a ${f.cellH.toFixed(1)} mm cell (${Math.round((1 - 136 / f.cellH) * 100)} % of it empty under the work; want <= ${((135 + 1) / 0.9).toFixed(1)} mm)`);
             if (!fits.some((f) => f.rows === 2)) findings.push(`GUIDED-LONE-STORY ${size} control: no page of two plain tries (${fits.map((f) => f.rows).join(' + ')})`);
         } catch (e) { findings.push(`GUIDED-LONE-STORY ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-MODEL-ALONE')) {
+    // PAGE_TYPES §2.3: a Model too tall for a row of tries under it takes a cell with a hinted try beside it, never a page alone.
+    // A planted story whose Model row (101 mm) and hinted try (81 mm) fit the drawn page 1 together: page 1 holds both. (lf-roles
+    // r11 X2: two_step_add_then_div Guided M seed 694812 needs Model 119.6 + hinted try 100.2 = 219.8 mm against 193.7 mm drawn
+    // room, L 133.9 + 103.9 + 8.6 against 179.9: no try can share that page without overflow, so its lone Model stays)
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 8 }, (_, i) => twoStep(i, { h3: 100, h1: 80 })) });
+            const f0 = (pl.meta.fits || [])[0] || {};
+            if (f0.rows * f0.cols < 2) findings.push(`GUIDED-MODEL-ALONE ${size}: page 1 holds the Model alone (${(pl.meta.fits || []).map((f) => f.rows).join(' + ')}) though a 100 mm Model and its hinted try fit the drawn page`);
+        } catch (e) { findings.push(`GUIDED-MODEL-ALONE ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-COUNT-TIGHT')) {
+    // lf-roles r11 X1 (critic r10, count_by_tables Guided L seed 972334 page 2: 4 count rows stretched to 45.8 mm for ~30 mm of
+    // ink, EB-BAND 33 %): on a continuation page count rows are held to their measured height; the spare height stays under the grid.
+    const cRowT = (i, h) => ({ q: { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted count row', answerType: 'number', seed: i, cell: { template: 'count-row', payload: {} } },
+        key: { value: '42', display: '42', slots: {} }, render: () => '<div class="ws-cell-work">row</div>', template: 'count-row', pool: 'main',
+        measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: h, fits: c === 1, slackMm: 3 }])), footprint: { measure: true, wMm: 170, hMm: null, maxCols: 1 }, fclass: 'standard' });
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 12 }, (_, i) => cRowT(i, 60)) });
+            const fits = pl.meta.fits || [];
+            if (fits.length < 2) findings.push(`GUIDED-COUNT-TIGHT ${size}: no continuation page planted (${fits.map((f) => f.rows).join(' + ')}) - the fixture moved`);
+            fits.slice(1).forEach((f, i) => { if (f.cellH > 61 + 0.5) findings.push(`GUIDED-COUNT-TIGHT ${size} p${i + 2}: 60 mm count rows stretched to ${f.cellH.toFixed(1)} mm (EB-BAND; want <= 61.5)`); });
+        } catch (e) { findings.push(`GUIDED-COUNT-TIGHT ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 

@@ -6,10 +6,511 @@
 //   NEEDS     [need]          what a lesson waits for (merged into build-list.js)
 // A lesson lane never edits generators, providers, options or the engine; ids are never deleted.
 // Pure data.
+//
+// lf-algebra (lessons-first wave 1, 2026-11-07; moved here from lessons/prereqs.js in the r5 merge with master,
+// 2026-11-12): six lessons (BUILD lessons #3 #5 #19 #20 #21). lessonFor() returns each one's record as prereqs.js
+// held it, plus `guidedRows: 1` on the chartWide lessons (one full-width Guided row: sheet/lesson-pages/we-do.js).
 
-export const ROUTINES = Object.freeze({});
+const NOT_CARDED = 'lf-algebra lesson (2026-11-07), moved from prereqs.js; its cases are declared when the lesson passes its critic (lessons-first).';
+const NO_CHECK = 'lf-algebra lesson moved from prereqs.js with its Warm-up until its Prerequisite Check is written (LR-17).';
+const TWO_STEP_CASES = 'lf-algebra two-step build (2026-11-13, card decision 11): its cases are declared when the lesson passes its critic (lessons-first).';
+const TWO_STEP_CHECK = 'lf-algebra two-step build (2026-11-13): the Warm-up deals the one-step facts each step is, until its Prerequisite Check is written (LR-17).';
 
-export const LESSONS = Object.freeze({});
+export const ROUTINES = Object.freeze({
+    // ------------------------------------------------ Function tables: use a rule (3.OA.D.9, 4.OA.C.5)
+    // The skill's default page (ftTask 'outputs'): the rule is given, the pupil writes each Out. The four
+    // steps are the provider's four worked steps (sheet/providers/function-table.js): read the rule, work
+    // row 1, work row 2, every row the same way.
+    'function-table-use-rule': {
+        archetype: 'partwhole',
+        casesPending: NOT_CARDED,
+        concepts: [
+            { id: 'in-out', text: 'A number goes in. The rule changes it. A number comes out.' },
+            { id: 'same-rule', text: 'Every row uses the same rule.' },
+            { id: 'across', text: 'Read each row across: In, then Out.' },
+        ],
+        vocab: [
+            { word: 'In', meaning: 'the number that goes in', picture: { kind: 'text', text: 'In: 3' } },
+            { word: 'rule', meaning: 'what happens to every In number', picture: { kind: 'text', text: 'n + 7' } },
+            { word: 'Out', meaning: 'the number that comes out', picture: { kind: 'text', text: 'Out: 10' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the rule.' },
+            { icon: 'start', text: 'Do it to the In.' },
+            { icon: 'write', text: 'Write the Out.' },
+            { icon: 'check', text: 'Same rule again.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'numbered steps with icons',
+            why: 'Four short actions done the same on every row; the Say band reads one row aloud ("When the input is 3, the output is 10"), so a chant would only add words.',
+        },
+        example: { match: 'The rule is' },
+    },
+
+    // ------------------------------------------------ Number patterns: find and use the rule (3.OA.D.9, 4.OA.C.5)
+    // The skill's default page finds the rule (option `rule` on): look at the jumps, name the rule, then use it at
+    // every gap. The pattern track is wider than half the page (8 tiles), so every chart panel is a full-width row
+    // (`chartWide`). The four steps are the provider's four worked steps (sheet/providers/countby.js).
+    'number-patterns-find-rule': {
+        archetype: 'partwhole',
+        casesPending: NOT_CARDED,
+        concepts: [
+            { id: 'jump', text: 'The jump is the change from one number to the next.' },
+            { id: 'same-jump', text: 'The rule makes every jump the same.' },
+            { id: 'test', text: 'Test the rule on more than one pair.' },
+        ],
+        vocab: [
+            { word: 'pattern', meaning: 'numbers that follow a rule', picture: { kind: 'text', text: '5, 10, 15, 20' } },
+            { word: 'rule', meaning: 'what makes the next number', picture: { kind: 'text', text: 'add 5' } },
+            { word: 'jump', meaning: 'from one number to the next', picture: { kind: 'text', text: '5 → 10' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Look at the jumps.' },
+            { icon: 'decide', text: 'Name the rule.' },
+            { icon: 'write', text: 'Use the rule at the gap.' },
+            { icon: 'check', text: 'Every gap. Check each jump.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'numbered steps with icons',
+            why: 'The skill is one decision (which rule?) and then the same move at every gap; the Say band names the rule aloud, so no chant.',
+        },
+        chartWide: true,
+        guidedRows: 1,
+        // the chart models a count-on pattern (the default page mixes in doubling; the Guided rows show it)
+        example: { match: ' is \\+ \\d' },
+    },
+
+    // ------------------------------------------------ What Do You Notice? (3.OA.D.9): parity of a product
+    // Four steps, as many as the provider's worked steps of the example (patterns.js).
+    'notice-parity': {
+        archetype: 'partwhole',
+        casesPending: NOT_CARDED,
+        iconsPending: 'Built by lf-algebra with two "look" steps (check each factor); the icons are settled when the lesson passes its critic.',
+        concepts: [
+            { id: 'even-groups', text: 'An even number is two equal groups.' },
+            { id: 'even-factor', text: 'One even number in the fact makes the product even.' },
+            { id: 'odd-odd', text: 'Odd times odd is odd.' },
+        ],
+        vocab: [
+            { word: 'product', meaning: 'the answer to a times fact', picture: { kind: 'text', text: '6 × 7 = 42' } },
+            { word: 'even', meaning: 'two equal groups: ends in 0, 2, 4, 6 or 8', picture: { kind: 'text', text: '2, 4, 6, 8' } },
+            { word: 'odd', meaning: 'one left over: ends in 1, 3, 5, 7 or 9', picture: { kind: 'text', text: '1, 3, 5, 7' } },
+        ],
+        steps: [
+            // (r2: one short line each - the wrapped Steps list set the Guided band's height and left a 22 mm band
+            // under each Guided cell, H13)
+            { icon: 'look', text: 'Check the first.' },
+            { icon: 'look', text: 'Check the second.' },
+            { icon: 'decide', text: 'An even one? Even.' },
+            { icon: 'check', text: 'Circle the word.' },
+        ],
+        chant: 'One even factor: even. Odd × odd: odd.',
+        format: {
+            kind: 'numbered steps with icons + a rule chant',
+            why: 'The whole lesson is one rule about the factors; saying it as a rhythm is what pupils keep when the hint words are gone.',
+        },
+        example: { match: 'Circle' },
+    },
+
+    // ------------------------------------------------ Features of a pattern (3.OA.D.9): the pattern preset of notice
+    'pattern-features': {
+        archetype: 'partwhole',
+        casesPending: NOT_CARDED,
+        iconsPending: 'Built by lf-algebra with two "check" steps (test one sentence, then the next); the icons are settled when the lesson passes its critic.',
+        concepts: [
+            { id: 'rule', text: 'The rule makes every number of the pattern.' },
+            { id: 'every', text: 'A sentence about a pattern must be true for every number.' },
+            { id: 'ones', text: 'The ones digit can repeat.' },
+        ],
+        vocab: [
+            { word: 'pattern', meaning: 'numbers made by a rule', picture: { kind: 'text', text: '5, 10, 15, 20' } },
+            { word: 'rule', meaning: 'what to do each time', picture: { kind: 'text', text: 'add 5' } },
+            { word: 'ones digit', meaning: 'the last digit', picture: { kind: 'text', text: '1(5)' } },
+        ],
+        steps: [
+            { icon: 'start', text: 'Read the rule. Write the numbers.' },
+            { icon: 'check', text: 'Test a sentence.' },
+            { icon: 'check', text: 'Test the next one.' },
+            { icon: 'decide', text: 'Check the true one.' },
+        ],
+        chant: 'True for every number, not just the first.',
+        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout), the
+        // step's name and words BESIDE the drawing (chartRow: four ~50 mm panels hold the S-size drawing, r2)
+        chartWide: true,
+        chartRow: true,
+        guidedRows: 1,
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error the lesson fights is reading a pattern off the first numbers; the chant names it.',
+        },
+        example: { match: 'Check it' },
+    },
+
+    // ------------------------------------------------ Growing Shape Patterns (4.OA.C.5)
+    'growing-shape-patterns': {
+        archetype: 'partwhole',
+        casesPending: NOT_CARDED,
+        concepts: [
+            { id: 'term', text: 'Each picture in the pattern is a term.' },
+            { id: 'more', text: 'Each term has the same number more than the one before.' },
+            { id: 'count', text: 'Count each term and write the number.' },
+        ],
+        vocab: [
+            { word: 'term', meaning: 'one picture of the pattern', picture: { kind: 'text', text: 'Term 1, Term 2' } },
+            { word: 'rule', meaning: 'how many more each time', picture: { kind: 'text', text: '+ 2' } },
+            { word: 'grow', meaning: 'get bigger by the rule', picture: { kind: 'text', text: '3, 5, 7' } },
+        ],
+        steps: [
+            // (r2: short names, so the Guided strip holds the four steps on one line)
+            { icon: 'count', text: 'Count.' },
+            { icon: 'look', text: 'Find the more.' },
+            { icon: 'start', text: 'Draw Term 4.' },
+            { icon: 'write', text: 'Write it.' },
+        ],
+        chant: 'Count, find the more, draw, write.',
+        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout), the
+        // step's name and words BESIDE the drawing (chartRow: four ~50 mm panels hold the S-size drawing, r2)
+        chartWide: true,
+        chartRow: true,
+        guidedRows: 1,
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Four actions in a fixed order; the chant is the order.',
+        },
+        example: { match: 'Write' },
+    },
+
+    // ------------------------------------------------ Follow a Given Rule (4.OA.C.5, BUILD lesson #20; owner 2026-11-07 P7)
+    // The preset number_patterns_rule rule:false. Four steps, as many as the provider's worked steps (countby.js: the
+    // rule, the first gap, the next gap, every gap).
+    'follow-given-rule': {
+        archetype: 'partwhole',
+        casesPending: NOT_CARDED,
+        concepts: [
+            { id: 'given', text: 'The rule is given. Do it to each number.' },
+            { id: 'from-last', text: 'Start from the number before the gap.' },
+            { id: 'same', text: 'Do the same thing every time.' },
+        ],
+        vocab: [
+            { word: 'rule', meaning: 'what to do each time', picture: { kind: 'text', text: 'add 4' } },
+            { word: 'pattern', meaning: 'numbers made by a rule', picture: { kind: 'text', text: '3, 7, 11, 15' } },
+            { word: 'extend', meaning: 'write the next numbers', picture: { kind: 'text', text: '15, 19, 23' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the rule.' },
+            { icon: 'start', text: 'Do it to the number.' },
+            { icon: 'write', text: 'Write the next one.' },
+            { icon: 'check', text: 'Every gap, same rule.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'numbered steps with icons',
+            why: 'The same move at every gap; the Say band reads one step aloud, so no chant.',
+        },
+        chartWide: true,
+        guidedRows: 1,
+        // (prereqs.js named no worked-example strategy; a match-anything pattern keeps the chart example the one it
+        // printed - pickExample's first tier is then its no-pattern tier - until the lesson is carded)
+        example: { match: '[\\s\\S]' },
+    },
+
+    // ------------------------------------------------ Two-step stories (two-step card 2026-11-13, decision 11; card §3)
+    // Seven skills on the word-work drawing: multi_step_word(_plain) (BUILD #17, G2: + / − then + / −) and the five
+    // presets of detailed lesson 7 (BUILD #7, 3.OA.D.8). Each routine's four steps are the four worked steps of
+    // sheet/providers/word-work.js (twoStepSteps / the x / ÷-first moves), one a chart panel. The two-step bar model is
+    // drawn on the teaching cells (scaffold level >= 2), so the chart and the model show the structure.
+    'two-step-addsub': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'two-steps', text: 'A two-step story has two changes. Do them in order.' },
+            { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer, not a story number.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'Step 1', meaning: 'what happens first', picture: { kind: 'text', text: '27 + 31 = 58' } },
+            { word: 'Step 2', meaning: 'what happens next, from the Step 1 answer', picture: { kind: 'text', text: '58 + 19 = 77' } },
+            { word: 'two-step', meaning: 'a story with two changes', picture: { kind: 'text', text: '+ then −' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What happens first?' },
+            { icon: 'decide', text: 'Step 1: circle the sign. Solve.' },
+            { icon: 'start', text: 'Step 2: use my Step 1 answer.' },
+            { icon: 'write', text: 'Write the answer and the unit.' },
+        ],
+        chant: 'First this. Then that.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error pupils make is to stop after Step 1 or to start Step 2 from a story number; a four-word chant said at step 3 keeps the order.',
+        },
+        example: { match: 'Step 2: use' },
+    },
+    'two-step-muldiv-first': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'groups-first', text: 'Equal groups or a fair share come first: × or ÷.' },
+            { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'equal groups', meaning: 'groups with the same number', picture: { kind: 'text', text: '4 bags of 6' } },
+            { word: 'share', meaning: 'split into equal groups', picture: { kind: 'text', text: '28 ÷ 4 = 7' } },
+            { word: 'Step 1 answer', meaning: 'the number Step 2 uses', picture: { kind: 'text', text: '24 − 5' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What do I find first?' },
+            { icon: 'decide', text: 'Step 1: groups or share. × or ÷.' },
+            { icon: 'start', text: 'Step 2: use my Step 1 answer.' },
+            { icon: 'write', text: 'Write the answer and the unit.' },
+        ],
+        chant: 'First the groups. Then the change.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Detailed lesson 7: the two chunks (× first, ÷ first) say "First the groups / First the share. Then the change."; the chant orders the two steps.',
+        },
+        example: { match: 'Step 1: \\d+ [×÷]' },
+    },
+    'two-step-add-first': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'brackets', text: 'Add or take away first, then share or make groups.' },
+            { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'in each', meaning: 'how many one group has', picture: { kind: 'text', text: '6 + 3 in each bag' } },
+            { word: 'the rest', meaning: 'what is left to share', picture: { kind: 'text', text: '17 − 5 = 12' } },
+            { word: 'brackets', meaning: 'do this part first', picture: { kind: 'text', text: '(6 + 3) × 2' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What do I find first?' },
+            // (both adds and take-aways come first on the add-first presets: one step name fits every item, so the page's
+            // Steps band is the preset's own, never the host's - ws-node-lint STEPS-FOLLOW-PRESET, critic r1 F6 / L28)
+            { icon: 'decide', text: 'Step 1: add or take away.' },
+            { icon: 'start', text: 'Step 2: share or make groups.' },
+            { icon: 'write', text: 'Write the answer and the unit.' },
+        ],
+        chant: 'First this. Then that.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error is doing the × or ÷ first (brackets left out, M-TS5); the chant keeps the story order.',
+        },
+        example: { match: 'Step 2: use' },
+    },
+    'two-step-letter': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'one-equation', text: 'One equation can show both steps.' },
+            { id: 'letter', text: 'A letter, n, stands for the number we find.' },
+            { id: 'order', text: 'Brackets show the step to do first.' },
+        ],
+        vocab: [
+            { word: 'equation', meaning: 'two sides that are equal', picture: { kind: 'text', text: '5 × 9 + 13 = n' } },
+            { word: 'n', meaning: 'the unknown number', picture: { kind: 'text', text: 'n = 58' } },
+            { word: 'brackets', meaning: 'do this part first', picture: { kind: 'text', text: '(6 + 3) × 2' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What do I find first?' },
+            { icon: 'write', text: 'Write one equation.' },
+            { icon: 'start', text: 'Work it out.' },
+            { icon: 'check', text: 'n is the answer.' },
+        ],
+        chant: 'Write one equation. n is the answer.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Detailed lesson 7 follow-on (card §3): the equation and the letter are the new thing; the chant names both.',
+        },
+        example: { match: 'My equation is' },
+    },
+    'two-step-estimate': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'round', text: 'Round each story number to the nearest ten.' },
+            { id: 'estimate', text: 'Work the rounded numbers: that is the estimate.' },
+            { id: 'close', text: 'A right answer is close to the estimate.' },
+        ],
+        vocab: [
+            { word: 'round', meaning: 'to the nearest ten', picture: { kind: 'text', text: '37 → 40' } },
+            { word: 'estimate', meaning: 'a number close to the answer', picture: { kind: 'text', text: '40 − 30 + 40 = 50' } },
+            { word: 'close', meaning: 'not far from', picture: { kind: 'text', text: '47 is close to 50' } },
+        ],
+        steps: [
+            { icon: 'start', text: 'Solve the two steps.' },
+            { icon: 'look', text: 'Round each number to the nearest ten.' },
+            { icon: 'write', text: 'Estimate.' },
+            { icon: 'check', text: 'Is my answer close?' },
+        ],
+        chant: 'Round. Estimate. Is my answer close?',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Detailed lesson 7 follow-on (card §3): the three words are the three new moves; the chant is the check the pupil says.',
+        },
+        example: { match: 'Estimate:' },
+    },
+});
+
+export const LESSONS = Object.freeze({
+    'skill:algebra:function_table_easy': {
+        routine: 'function-table-use-rule',
+        practice: { skill: 'algebra:function_table_easy' },
+        defaultFor: true,
+        prereqsPending: NO_CHECK,
+        // The Warm-up deals the + / − facts each row is.
+        warmup: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each row of a + rule is an addition fact.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each row of a − rule is a take-away fact.' },
+        ],
+        mixWith: [{ key: 'addition:add_facts', opts: { band: 20 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
+    },
+    'skill:patterns:number_patterns_rule': {
+        routine: 'number-patterns-find-rule',
+        practice: { skill: 'patterns:number_patterns_rule' },
+        defaultFor: true,
+        prereqsPending: NO_CHECK,
+        warmup: [
+            // (one row of column facts: a skip-count line here took a second Warm-up row and pushed Guided Practice to the
+            // next page, DN-2)
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each jump of a count-on pattern is an addition fact.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each jump of a count-back pattern is a take-away fact.' },
+        ],
+        mixWith: [{ key: 'patterns:skip_count_line' }, { key: 'addition:add_facts', opts: { band: 20 } }],
+    },
+    'skill:patterns:notice_patterns': {
+        routine: 'notice-parity',
+        practice: { skill: 'patterns:notice_patterns' },
+        defaultFor: true,
+        prereqsPending: NO_CHECK,
+        warmup: [
+            // (r2: numbers to 10, so the two dot cards are one height - a 20 beside a 10 left a 22 mm band, H13)
+            { key: 'composing:odd_even', opts: { range: 10 }, why: 'Tell if a number is odd or even: pairs with none left over.' },
+            { key: 'multiplication:mult_facts', why: 'The facts whose products we test.' },
+        ],
+        mixWith: [{ key: 'composing:odd_even' }, { key: 'multiplication:mult_facts' }],
+    },
+    'skill:patterns:pattern_features': {
+        routine: 'pattern-features',
+        practice: { skill: 'patterns:pattern_features' },
+        defaultFor: true,
+        prereqsPending: NO_CHECK,
+        warmup: [
+            // (r2: one row of four facts, so the Guided Practice starts on the Warm-up page - the odd / even dot cards took
+            // 75 mm and pushed it to the next page, DN-2)
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each number of the pattern is the one before plus the step.' },
+            { key: 'multiplication:mult_facts', why: 'Counting on by 5 or 10 lands on the 5 or 10 times-table: its ones digits repeat.' },
+        ],
+        mixWith: [{ key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] } }, { key: 'composing:odd_even' }],
+    },
+    'skill:patterns:growing_shape_patterns': {
+        routine: 'growing-shape-patterns',
+        practice: { skill: 'patterns:growing_shape_patterns' },
+        defaultFor: true,
+        prereqsPending: NO_CHECK,
+        warmup: [
+            // (r2: column facts, one short row - the shape-pattern card was a legacy cell ("Type ..." on paper, BD-12) and
+            // with the pattern track it pushed the Guided Practice to the next page, DN-2)
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each term is the one before plus the same number.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'How many more: the next count take away this one.' },
+        ],
+        mixWith: [{ key: 'patterns:shape_pattern' }, { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] } }],
+    },
+    'skill:patterns:follow_given_rule': {
+        routine: 'follow-given-rule',
+        practice: { skill: 'patterns:follow_given_rule' },
+        defaultFor: true,
+        prereqsPending: NO_CHECK,
+        warmup: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each step of an add rule is an addition fact.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each step of a take-away rule is a subtraction fact.' },
+        ],
+        mixWith: [{ key: 'patterns:skip_count_line' }, { key: 'addition:add_facts', opts: { band: 20 } }],
+    },
+    // ---- two-step stories (two-step card 2026-11-13, decision 11): the G2 lesson (BUILD #17) on the host and its twin at
+    // "no band" (lead ruling R2 2026-11-13: band 100 dropped; at Max Number 100 it dealt the same); lesson 7's x / ÷ first and
+    // its four follow-ons on the presets
+    'skill:algebra:multi_step_word': {
+        routine: 'two-step-addsub',
+        practice: { skill: 'algebra:multi_step_word' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_100_mixed', why: 'Each + step is a 2-digit addition.' },
+            { key: 'subtraction:sub_100_mixed', why: 'Each − step is a 2-digit subtraction.' },
+        ],
+        mixWith: [{ key: 'addition:add_wp_100' }, { key: 'subtraction:sub_wp_100' }],
+    },
+    'skill:algebra:multi_step_word_plain': {
+        routine: 'two-step-addsub',
+        practice: { skill: 'algebra:multi_step_word_plain' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_100_mixed', why: 'Each + step is a 2-digit addition.' },
+            { key: 'subtraction:sub_100_mixed', why: 'Each − step is a 2-digit subtraction.' },
+        ],
+        mixWith: [{ key: 'addition:add_wp_100' }, { key: 'subtraction:sub_wp_100' }],
+    },
+    'skill:algebra:two_step_mult_div_first': {
+        routine: 'two-step-muldiv-first',
+        practice: { skill: 'algebra:two_step_mult_div_first' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'multiplication:mult_facts', why: 'Step 1 of an equal-groups story is a times-table fact.' },
+            { key: 'division:div_facts', why: 'Step 1 of a sharing story is a division fact.' },
+        ],
+        mixWith: [{ key: 'multiplication:mult_word_problems' }, { key: 'division:div_word_problems' }],
+    },
+    'skill:algebra:two_step_add_then_mult': {
+        routine: 'two-step-add-first',
+        practice: { skill: 'algebra:two_step_add_then_mult' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Step 1 puts two numbers together.' },
+            { key: 'multiplication:mult_facts', why: 'Step 2 makes equal groups: a times-table fact.' },
+        ],
+        mixWith: [{ key: 'algebra:two_step_mult_div_first' }, { key: 'multiplication:mult_word_problems' }],
+    },
+    'skill:algebra:two_step_add_then_div': {
+        routine: 'two-step-add-first',
+        practice: { skill: 'algebra:two_step_add_then_div' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Step 1 puts two numbers together or takes some away.' },
+            { key: 'division:div_facts', why: 'Step 2 shares equally: a division fact.' },
+        ],
+        mixWith: [{ key: 'algebra:two_step_mult_div_first' }, { key: 'division:div_word_problems' }],
+    },
+    'skill:algebra:two_step_letter_equation': {
+        routine: 'two-step-letter',
+        practice: { skill: 'algebra:two_step_letter_equation' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'multiplication:mult_facts', why: 'Step 1 of the equation is a times-table fact.' },
+            { key: 'algebra:solve_unknown', why: 'A letter or a box stands for the number we find.' },
+        ],
+        mixWith: [{ key: 'algebra:two_step_mult_div_first' }, { key: 'algebra:two_step_add_then_mult' }],
+    },
+    'skill:algebra:two_step_estimate_check': {
+        routine: 'two-step-estimate',
+        practice: { skill: 'algebra:two_step_estimate_check' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'number_sense:nearest_10', why: 'Each story number is rounded to the nearest ten.' },
+            { key: 'addition:add_100_mixed', why: 'The two steps are 2-digit additions and subtractions.' },
+        ],
+        mixWith: [{ key: 'algebra:multi_step_word_plain' }, { key: 'number_sense:nearest_10' }],
+    },
+});
 
 export const NEEDS = Object.freeze([]);
 
