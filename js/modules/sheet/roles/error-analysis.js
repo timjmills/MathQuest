@@ -922,7 +922,8 @@ export function rowHeights(items, cols, G, mode) {
         const its = items.slice(r * cols, (r + 1) * cols);
         const hs = its.map((it) => heightAt(it, cols, mode)).filter(Number.isFinite);
         need.push(hs.length ? Math.min(G / rows, Math.max(...hs) * 1.1) : G / rows);
-        cap.push(hs.length ? Math.max(Math.max(...hs), rowCapMm(Math.max(...hs), its)) : Infinity);
+        // (heightAt is the measure + 4 mm for the grid's rules; the cell draws its measure, so the cap is reckoned on that)
+        cap.push(hs.length ? rowCapMm(Math.max(...hs) - 4, its) : Infinity);
     }
     const sum = need.reduce((a, b) => a + b, 0);
     const grow = sum > 0 ? Math.max(1, Math.min((G - SAFETY_H_MM) / sum, 1.4)) : 1;

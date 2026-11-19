@@ -12016,7 +12016,7 @@
     "commit": "f5c025e4c",
     "state": "4 rows of 53 mm: under one row free at M and L"
    },
-   "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --r1 --root {root}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

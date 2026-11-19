@@ -1379,7 +1379,10 @@ export function plan(input = {}) {
         if (cols === 1 && rows === 1 && host.length === 1 && host[0].template === 'word-work') Hr = [Math.min(Hr[0], w[0])];
         // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a row is held to what it draws
         // (w: its tallest item, the Model's worked lines, the hint line) + its templates' writing room; the spare stays under the grid
-        Hr = Hr.map((x, r) => Math.min(x, Math.max(w[r], rowCapMm(w[r], rowItems(r)))));
+        // (drawn: w is the measure + 1 mm and the measure holds a number tab's keep-out a Guided cell does not draw (CL-14) - unless
+        // the tight rows already took it off - so the row draws w - 1 - koMm; never below the planned need where that is larger)
+        const koCap = tightAll ? 0 : koMm(ctx.size);
+        Hr = Hr.map((x, r) => Math.min(x, Math.max(w[r] - 1 - koCap, rowCapMm(w[r] - 1 - koCap, rowItems(r)))));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

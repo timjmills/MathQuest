@@ -896,7 +896,9 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
     for (const c of live) {
         const rm = roomOf(room, c.tmpl);
         // (a cell whose item is of a working-space class - word / long, WORK_SPACE_CLASSES - keeps its row: c.workSpace)
-        if (rm === null || c.beside || c.workSpace) continue;
+        // (a `legacy` cell - a skill's old print HTML the kit wraps - is MEASURED taller than it draws (its own text and answer line,
+        // pre-skill-check routedLayout), so its natural height is not what the composer sized: noted by judge(), not judged)
+        if (rm === null || c.beside || c.workSpace || c.tmpl === 'legacy') continue;
         const row = live.filter((d) => d.page === c.page && Math.abs((d.topPx || 0) - (c.topPx || 0)) < 2);
         // (a row that also holds an exempt cell is sized by it)
         if (row.some((d) => roomOf(room, d.tmpl) === null || d.workSpace)) continue;
@@ -913,6 +915,8 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
 function judge(cells, where, F, role) {
     if (process.env.EB_DUMP) for (const c of cells) console.log("DUMP", where, c.page, c.cell, c.tmpl, c.hMm, c.neededMm, c.natMm, c.topPx, c.beside ? 'beside' : '');
     if (!String(role || '').startsWith('host:') && role && !STRETCH_ROLES.has(role)) { const n = stretchFindings(cells).length; if (n) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on this role yet (its composer sizes its own rows): ${n} cell(s) over the cap`); }
+    if (!String(role || '').startsWith('host:')) { const lg = cells.filter((c) => c.tmpl === 'legacy' && Number.isFinite(c.natMm) && c.hMm - c.natMm - 3 > STRETCH_TOL_MM).length; if (lg) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on ${lg} legacy cell(s) over natural + 3 mm (old print HTML, measured taller than it draws)`); }
+    if (!String(role || '').startsWith('host:') && role && !STRETCH_ROLES.has(role)) { /* noted above */ }
     else if (!String(role || '').startsWith('host:')) for (const x of stretchFindings(cells)) F('EB-STRETCH', `${where} p${x.c.page} cell ${x.c.label || x.c.cell}`, `a ${x.c.hMm} mm row holds a cell drawn ${x.need.toFixed(1)} mm: its cap is drawn + ${x.room} mm writing room = ${x.cap.toFixed(1)} mm, ${x.over} mm over (tolerance ${STRETCH_TOL_MM} mm; layout.js ROW_ROOM_MM / ROW_ROOM_DEFAULT_MM) [${x.c.tmpl}]`);
     cells.forEach((c, i) => {
         // --slot-ink off judges the lane's KIT cells: a `legacy` cell (another skill's old print HTML) is a note (lf-vocab r6)

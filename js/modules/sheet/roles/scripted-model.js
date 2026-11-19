@@ -20,7 +20,7 @@ import {
 import { isWideRow } from '../cells/count-row.js';
 import { stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueRow } from './guided.js';
-import { rowCapMm } from '../layout.js';
+import { rowCapMm, koMm } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -236,6 +236,9 @@ function exampleCells(ex, e, across, textMm, stepsOf, rowsEx, row = false) {
 }
 
 function factModel(input, ctx, frame, m) {
+    // (ROW-STRETCH CAP stage 2: hMinAt is the measure + 2 mm, and the measure holds a number tab's keep-out a Model state does not
+    // draw (CL-14), so a state draws about hMinAt - 2 - koMm; its row is capped on that, layout.rowCapMm)
+    const drawnOff = 2 + koMm(ctx.size);
     const pool = poolItems(input, 'main');
     const cand = pool.filter((it) => drawnSteps(it) && modelOk(it));
     if (!cand.length) return null;
@@ -285,7 +288,7 @@ function factModel(input, ctx, frame, m) {
             const padOf = (it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; return pl && (pl.op === '/' || pl.op === '÷') && it.supportsBox && it.supportsBox.plan ? 5 + 2 * 1.5 : 0; };
             // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: never past what the state draws + its writing room, layout.rowCapMm)
             const need1 = natural(1) + Math.max(...exs.slice(0, 2).map(padOf));
-            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(need1, ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx), Math.max(need1, rowCapMm(need1, exs.slice(0, 2))));
+            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(need1, ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx), Math.max(need1 - drawnOff, rowCapMm(need1 - drawnOff, exs.slice(0, 2))));
             const pages = exs.slice(0, 2).map((ex, e) => {
                 const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });
                 const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }];
@@ -304,7 +307,7 @@ function factModel(input, ctx, frame, m) {
         const H0 = natural(k);
         if (R * H0 > room) continue;
         // (ROW-STRETCH CAP stage 2: never past what the states draw + their writing room, layout.rowCapMm)
-        const H = Math.min(room / R, H0 * FACT_GROW, Math.max(H0, rowCapMm(H0, exs.slice(0, k))));
+        const H = Math.min(room / R, H0 * FACT_GROW, Math.max(H0 - drawnOff, rowCapMm(H0 - drawnOff, exs.slice(0, k))));
         const used = exs.slice(0, k);
         const cells = [];
         used.forEach((ex, e) => cells.push(...exampleCells(ex, e, across, textMm, stepsOf, rowsEx)));
@@ -431,6 +434,9 @@ export function plan(input = {}) {
         deal = [steps.length];
     }
     const acrossRows = across ? Math.ceil(steps.length / across) : 0;
+    // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4, layout.rowCapMm): a state row is held to what it draws + its writing
+    // room - hMinAt is the measure + 2 mm and the measure holds a tab keep-out a Model state does not draw (CL-14)
+    { const off = 2 + koMm(ctx.size); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
