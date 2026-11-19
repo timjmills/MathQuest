@@ -835,3 +835,5 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   older tool). Fix: `--self-test --only <regex>`; row merge-master-r1 runs `^(?!r2 )`, row merge-master-crlf runs `^r2 `,
   so each row proves only its own cases. Minors kept: a mixed-ending file comes back all-CRLF, a CRLF backtests.json comes
   back LF (no content lost).
+- 2026-11-19, critic merge r4 (FAIL 7/7/7/8): an --only matching nothing passed. Fixed (0 cases → FAIL; bad regex → clean
+  FAIL; self-test r4 cases, 28 in all); row `merge-master-only-empty`.

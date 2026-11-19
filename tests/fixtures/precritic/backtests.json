@@ -11220,6 +11220,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "merge-master-only-empty",
+  "check": "critic merge r4: `ws-merge-master --self-test --only <regex>` that matched no case printed OK and exited 0, so a typo in a backtest row's filter would prove nothing and still pass",
+  "kind": "commit-pair",
+  "rule": "ws-merge-master --self-test: --only matching 0 cases FAILs (exit 1); a bad regex FAILs cleanly (exit 2)",
+  "browser": false,
+  "fail": {
+   "commit": "877580b42",
+   "state": "--only '^no such case$' -> OK (0 cases), exit 0"
+  },
+  "pass": {
+   "commit": "3a9b779ff",
+   "state": "--only '^no such case$' -> FAIL (matched 0 cases), exit 1"
+  },
+  "command": "node {root}/tests/scripts/ws-merge-master.mjs --self-test --only '^no such case$' > /dev/null; [ $? -ne 0 ] && echo 'only-empty: OK' || echo 'only-empty: FAIL (an empty --only passed)'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
