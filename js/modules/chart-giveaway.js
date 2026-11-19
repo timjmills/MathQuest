@@ -81,6 +81,12 @@ export function setChartSheet(seenOrItems) {
 }
 /** The kept windows of the sheet being dealt ([{rows, cols, gaps}]), or null. */
 export const chartSheet = () => SHEET;
+/* A band-120 LESSON packet (lead ruling (a) 2026-11-14, critic blanks B2): its worked example prints five of the ten columns, so a
+ * pupil window there leaves empty only the column either side of the example's - one a row, 3 a window - and the packet holds five
+ * pupil windows beside its one shown window, none printing another's answer. Set by the lesson dealer, `false` elsewhere. */
+let EDGE = false;
+export const setChartEdge = (v) => { EDGE = !!v; };
+export const chartEdge = () => EDGE;
 
 /**
  * "Numbers to fill in" (lead ruling 2026-11-14): the most empty squares a window of R rows and C columns can legally hold -

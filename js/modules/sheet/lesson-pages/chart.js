@@ -27,6 +27,9 @@ import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, 
  * research: easy numbers first, but never the trivial 1 + 1).
  */
 export function pickExample(items, data) {
+    // (critic blanks B2: a lesson's teaching sheet works the chart page's example - the host deals it first, pinned)
+    const pinned = items.find((it) => it && it.q && it.q.cwExample);
+    if (pinned) return pinned;
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const want = data && Array.isArray(data.steps) ? data.steps.length : 0;
     const all0 = items.map((it, i) => ({ it, i, steps: workedStepsOf(it) })).filter((x) => x.steps.length >= 2);

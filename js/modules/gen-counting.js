@@ -39,7 +39,7 @@ import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
 import { onNewPage } from './page-deal.js';
-import { chartSheet, chartGapCap, CHART_TILES_DEFAULT } from './chart-giveaway.js';
+import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge } from './chart-giveaway.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -968,6 +968,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (k.shows) { for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n)) barred.add(idxOf(n)); } continue; }
                 k.gaps.filter(inWin).forEach((n) => forced.add(idxOf(n)));
                 for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n) && !k.gaps.includes(n)) barred.add(idxOf(n)); }
+            }
+            // (a band-120 lesson packet - chart-giveaway.js chartEdge: only the columns either side of the shown example's are left empty)
+            if (_to120 && R === 3 && C === 5 && chartEdge() && kept.some((k) => k.shows)) {
+                const sc = kept.filter((k) => k.shows).flatMap((k) => k.cols);
+                const ok = new Set([Math.min(...sc) - 1, Math.max(...sc) + 1]);
+                for (let i = 0; i < N; i++) if (!ok.has(cols[i % C])) barred.add(i);
             }
             // Band 120's windows all lie on rows 91-120 (six of them, side by side), so a sheet's gaps repeat every five columns: a
             // later window blanks exactly the squares of the first kept window's pattern (row, column mod 5) - every window then

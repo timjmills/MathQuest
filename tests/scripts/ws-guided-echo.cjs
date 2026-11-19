@@ -310,7 +310,9 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         // (critic blanks B2: a lesson PACKET is one sheet - every page's windows together, its worked examples printed)
                         const packet = role === 'lesson' ? (r.keyPlans || [r.plan]).flatMap((pl) => planPages(pl)) : null;
                         if (packet && on('CROSS-GIVEAWAY') && /chart/.test(skillId)) {
-                            const ex = ((r.plan && r.plan.meta && r.plan.meta.exampleQs) || []).map((q) => ({ q, anchor: true }));
+                            // (every part's worked examples - the chart page's and the teaching sheet's - are printed windows of the packet)
+                            const exQs = (r.partPlans || [{ plans: [r.plan] }]).flatMap((pp0) => (pp0.plans || []).flatMap((pl) => (pl && pl.meta && pl.meta.exampleQs) || []));
+                            const ex = (exQs.length ? exQs : ((r.plan && r.plan.meta && r.plan.meta.exampleQs) || [])).map((q) => ({ q, anchor: true }));
                             judgeGiveaway(`${key} lesson packet ${size} seed ${s}`, ex.concat(packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model)));
                         }
                         // LESSON-EMPTY-PAGE (critic blanks B1): no page of a lesson packet past its first is printed empty, and the key
@@ -325,7 +327,9 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             if (tries < 2) out.push(`GUIDED-TRY-COUNT ${key} guided ${size} seed ${s}: ${tries} try window(s) after the Model (want 2 or more)`);
                         }
                         // (BLANK-COUNT: the whole sheet's windows; Score /N equals their blanks is SCORE-SLOTS, judged above)
-                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, pp.flatMap((pg) => pg.items), role === 'guided' ? 3 : tilesWant);   // (lead ruling (a) 2026-11-14: Guided 3)
+                        // (lead ruling (a) 2026-11-14: Guided 3; a band-120 LESSON's pupil windows 3 - its whole packet is judged, B2)
+                        const lesson120 = role === 'lesson' && skillId === 'chart_to_120';
+                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, packet ? packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model) : pp.flatMap((pg) => pg.items), role === 'guided' || lesson120 ? 3 : tilesWant);
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
                         if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {
