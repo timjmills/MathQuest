@@ -8,7 +8,7 @@ import { generatePvRounding, generatePvPlaceValue, generatePvEstimation, pvSpan,
 import { numeralTracksHTML, k2Twin } from './sheet/index.js';
 import { generateFunctionTable } from './gen-function-table.js';
 import { genNumberPatterns, genSkipCountGrid, genSkipCountLine } from './gen-mult-patterns.js';
-import { onNewPage } from './page-deal.js';
+import { onNewPage, freshDeal } from './page-deal.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -5002,10 +5002,18 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 // and not the Step 1 answer (M1 / M3 always give a different number). Fixed domain: the
                 // Max Number does not apply. Default 'addsub' = the four + / − archetypes below, unchanged.
                 const msOpsOpt = state.skillOptions && typeof state.skillOptions.msOps === 'string' ? state.skillOptions.msOps : 'addsub';
+                // "Within N" (two-step card decision 2): a chosen band caps EVERY computed number - the Step 1 result and the
+                // answer - on the × / ÷ stories too (their facts domain stands; the band only takes the items over it out).
+                const msBand = state.skillOptions && Number(state.skillOptions.band) > 0 ? Number(state.skillOptions.band) : 0;
+                const inBand = (...v) => !msBand || v.every((x) => x <= msBand);
                 // 'addmult' / 'adddiv' (3.OA.D.8, brackets): a + or − step first, then × or ÷ -
                 // (5 red + 3 blue) in each of 4 bags; (12 + 18) shared by 5; (30 − 6) shared by 4.
                 if (msOpsOpt === 'addmult' || msOpsOpt === 'adddiv') {
-                    let a1, b1, op1, s1v, n2, fin, guard = 0;
+                    let a1, b1, op1, s1v, n2, fin;
+                    // (dealt FRESH on the page - ws-dealer-uniform PAGE, precritic two-step r11: the small Step 1 domain printed the same
+                    // first number 3-4 times and the same Step 1 pair twice on a page of 6)
+                    const msAddDraw = () => {
+                    let guard = 0;
                     for (;;) {
                         guard++;
                         op1 = pick(['+', '-']);
@@ -5019,9 +5027,14 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                             fin = qq;
                         }
                         const story = [a1, b1, n2];
-                        const ok = a1 !== b1 && !story.includes(fin) && fin !== s1v && !story.includes(s1v) && n2 !== a1 && n2 !== b1 && a1 >= 1 && b1 >= 1;
+                        const ok = a1 !== b1 && !story.includes(fin) && fin !== s1v && !story.includes(s1v) && n2 !== a1 && n2 !== b1 && a1 >= 1 && b1 >= 1
+                            && inBand(a1, b1, s1v, fin);
                         if (ok || guard > 400) break;
                     }
+                    return [a1, b1, op1, s1v, n2, fin];
+                    };
+                    [a1, b1, op1, s1v, n2, fin] = freshDeal(`msa:${msOpsOpt}:${msBand}`, msAddDraw,
+                        { sig: (v) => `${v[0]},${v[1]}`, tags: (v) => [String(v[0]), `${v[2]}${v[0]},${v[1]}`, String(v[5])], caps: [2, 1, 3] });
                     const G1 = op1 === '+' ? '+' : '\u2212', G2 = msOpsOpt === 'addmult' ? '\u00d7' : '\u00f7';
                     q._variant = `${op1 === '+' ? 'add' : 'sub'}_then_${msOpsOpt === 'addmult' ? 'mult' : 'div'}`;
                     q.msOps = { first: op1 === '+' ? 'add' : 'sub', second: msOpsOpt === 'addmult' ? 'mult' : 'div', a: a1, b: b1, step1: s1v, c: n2 };
@@ -5040,13 +5053,18 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     return;
                 }
                 if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
-                    const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    let first;
                     // msChoose (lesson 7 r3, critic rule: the board Check Question's A-D online): a take-away Step 2, and the
                     // three two-step errors (ms-stop-step1 / ms-story-number / ms-one-op, providers/word-work.js
                     // wordWorkWrongs) are three different whole numbers with the answer neither the biggest nor the
                     // smallest of the four - an add Step 2 makes the answer the biggest, so the set would give it away.
                     const msChoose = !!(state.skillOptions && state.skillOptions.msChoose === true);
-                    let s1a, s1b, p1, c2, op2, fin, guard = 0;
+                    let s1a, s1b, p1, c2, op2, fin;
+                    // (dealt FRESH on the page - ws-dealer-uniform PAGE, precritic two-step r11: a x / ÷ fact's first number up to 4
+                    // times and the same fact twice on a page of 6)
+                    const msMulDraw = () => {
+                    first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    let guard = 0;
                     for (;;) {
                         guard++;
                         op2 = msChoose ? '-' : pick(['+', '-']);
@@ -5058,7 +5076,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         const story = [s1a, s1b, c2];
                         const ok = s1a !== s1b && !(first === 'div' && s1b === p1) && fin >= 1 && fin <= 100
                             && !story.slice(0, 2).includes(c2) && c2 !== p1 && !story.includes(fin) && fin !== p1
-                            && !small.includes(fin) && c2 >= 2;
+                            && !small.includes(fin) && c2 >= 2 && inBand(s1a, p1, fin, c2);
                         let okChoose = true;
                         if (msChoose) {
                             const m3 = Math.abs(s1b - c2), m2 = (first === 'mult' ? s1a + s1b : s1a - s1b) - c2;
@@ -5067,6 +5085,10 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         }
                         if ((ok && okChoose) || guard > 2000) break;
                     }
+                    return [first, s1a, s1b, p1, c2, op2, fin];
+                    };
+                    [first, s1a, s1b, p1, c2, op2, fin] = freshDeal(`msm:${msOpsOpt}:${msBand}:${msChoose ? 1 : 0}`, msMulDraw,
+                        { sig: (v) => `${v[1]},${v[2]}`, tags: (v) => [String(v[1]), `${v[0]}${v[1]},${v[2]}`, String(v[6])], caps: [2, 1, 3] });
                     const G1 = first === 'mult' ? '×' : '÷', G2 = op2 === '+' ? '+' : '−';
                     q._variant = `${first}_then_${op2 === '+' ? 'add' : 'sub'}`;
                     q.msOps = { first, op2, a: s1a, b: s1b, step1: p1, c: c2 };
@@ -5090,54 +5112,105 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q._variant = problemType;
                 let startVal, step1Val, step2Val, afterStep1, finalVal;
                 let step1Text, step2Text;
-                const msMax = Math.max(20, Math.min(algMax, 100));
+                // "Within N" (two-step card 2026-11-13, §9.2): the band caps EVERY computed number -
+                // the Step 1 result AND the answer (not the operands). Bands 30 / 50 / 100; with no
+                // band the Max Number is that cap. Ranges leave headroom so the computed numbers land
+                // within the band, and a guard loop rejects the rest (and the ~0.7 % whose answer
+                // equalled a story number, or equalled the Step 1 result, or cancelled Step 1).
+                const msMax = (state.skillOptions && Number(state.skillOptions.band) > 0)
+                    ? Number(state.skillOptions.band) : Math.max(20, Math.min(algMax, 100));
+                // msCheck (two_step_estimate_check, card decision 8): every story number has two digits, so rounding to the
+                // nearest ten means something, and the estimate (each number rounded, then the two steps) is never below 0.
+                const msCheckOn = !!(state.skillOptions && state.skillOptions.msCheck === true);
+                const r10 = (n) => Math.round(n / 10) * 10;
+                const msEstOk = (a, b, c) => {
+                    if (a < 10 || b < 10 || c < 10) return false;
+                    const add1 = problemType === "add_then_sub" || problemType === "add_then_add";
+                    const add2 = problemType === "sub_then_add" || problemType === "add_then_add";
+                    const e1 = add1 ? r10(a) + r10(b) : r10(a) - r10(b);
+                    const est = add2 ? e1 + r10(c) : e1 - r10(c);
+                    return e1 >= 0 && est >= 0;
+                };
+                // (dealt FRESH on the page - ws-dealer-uniform PAGE: no start number three times, no story twice on a page)
+                const msDraw = () => {
+                let msGuard = 0;
+                for (;;) {
+                msGuard++;
 
                 if (problemType === "add_then_sub") {
-                    startVal = rng(20, msMax);
-                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 2)));
-                    step2Val = rng(3, Math.min(Math.floor(msMax / 2), startVal + step1Val - 1));
+                    step1Val = rng(3, Math.max(3, Math.floor(msMax / 3)));
+                    startVal = rng(Math.max(10, Math.floor(msMax / 3)), Math.max(Math.floor(msMax / 3) + 1, msMax - step1Val));
                     afterStep1 = startVal + step1Val;
+                    step2Val = rng(3, Math.max(3, afterStep1 - 1));
                     finalVal = afterStep1 - step2Val;
                     step1Text = `bought ${step1Val} more`;
                     step2Text = `gave ${step2Val} to a friend`;
                 } else if (problemType === "sub_then_add") {
-                    startVal = rng(30, msMax);
-                    step1Val = rng(5, startVal - 5);
-                    step2Val = rng(3, Math.max(3, Math.floor(msMax / 2)));
+                    startVal = rng(Math.max(12, Math.floor(msMax / 2)), msMax);
+                    step1Val = rng(3, Math.max(3, startVal - 3));
                     afterStep1 = startVal - step1Val;
+                    step2Val = rng(3, Math.max(3, msMax - afterStep1));
                     finalVal = afterStep1 + step2Val;
                     step1Text = `lost ${step1Val}`;
                     step2Text = `found ${step2Val} more`;
                 } else if (problemType === "add_then_add") {
-                    startVal = rng(10, Math.max(10, Math.floor(msMax * 0.6)));
-                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 3)));
-                    step2Val = rng(5, Math.max(5, Math.floor(msMax / 3)));
+                    startVal = rng(5, Math.max(6, Math.floor(msMax / 2)));
+                    step1Val = rng(3, Math.max(3, Math.floor((msMax - startVal) / 2)));
                     afterStep1 = startVal + step1Val;
+                    step2Val = rng(3, Math.max(3, msMax - afterStep1));
                     finalVal = afterStep1 + step2Val;
                     step1Text = `earned ${step1Val} more`;
                     step2Text = `received ${step2Val} more`;
                 } else {
-                    startVal = rng(50, msMax);
-                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 4)));
-                    step2Val = rng(3, Math.max(3, Math.min(Math.floor(msMax / 4), startVal - step1Val - 1)));
+                    startVal = rng(Math.max(14, Math.floor(msMax / 2)), msMax);
+                    step1Val = rng(3, Math.max(3, startVal - 4));
                     afterStep1 = startVal - step1Val;
+                    step2Val = rng(2, Math.max(2, afterStep1 - 1));
                     finalVal = afterStep1 - step2Val;
                     step1Text = `used ${step1Val}`;
                     step2Text = `gave away ${step2Val}`;
                 }
 
-                // (no cancel - lesson 7 research: "got 9 more, then lost 9" leaves the start, a one-step answer)
-                if ((problemType === "add_then_sub" || problemType === "sub_then_add") && step2Val === step1Val) {
-                    step2Val += step2Val > 3 ? -1 : 1;
-                    finalVal = problemType === "add_then_sub" ? afterStep1 - step2Val : afterStep1 + step2Val;
-                    step2Text = problemType === "add_then_sub" ? `gave ${step2Val} to a friend` : `found ${step2Val} more`;
+                // msCheck: the three story numbers are drawn from the two-digit numbers (10 to the band) and the two steps
+                // worked from them, so a small band still deals two-digit stories (the texts are written after the loop).
+                if (msCheckOn) {
+                    const add1 = problemType === "add_then_sub" || problemType === "add_then_add";
+                    const add2 = problemType === "sub_then_add" || problemType === "add_then_add";
+                    startVal = add1 ? rng(10, Math.max(10, msMax - 10)) : rng(20, Math.max(20, msMax));
+                    step1Val = add1 ? rng(10, Math.max(10, msMax - startVal)) : rng(10, Math.max(10, startVal - 1));
+                    afterStep1 = add1 ? startVal + step1Val : startVal - step1Val;
+                    step2Val = add2 ? rng(10, Math.max(10, msMax - afterStep1)) : rng(10, Math.max(10, afterStep1 - 1));
+                    finalVal = add2 ? afterStep1 + step2Val : afterStep1 - step2Val;
                 }
+
+                // "Within N": every computed number (the Step 1 result and the answer) within [1, band];
+                // no cancel ("+9 then −9" leaves the start - a one-step answer); and the answer is no
+                // story number and not the Step 1 result (the ~0.7 % that used to leak this are rejected).
+                {
+                    const cancel = (problemType === "add_then_sub" || problemType === "sub_then_add") && step2Val === step1Val;
+                    const story = [startVal, step1Val, step2Val];
+                    // (the Step 2 number is no Step 1 number either: "had 12, got 12 more" reads as one number - card §3 guards)
+                    const ok = afterStep1 >= 1 && afterStep1 <= msMax && finalVal >= 1 && finalVal <= msMax
+                        && finalVal !== afterStep1 && !story.includes(finalVal) && !cancel
+                        && step2Val !== startVal && step2Val !== step1Val && step1Val !== startVal
+                        && (!msCheckOn || msEstOk(startVal, step1Val, step2Val));
+                    if (ok || msGuard > 3000) break;
+                }
+                }
+                return [startVal, step1Val, step2Val, afterStep1, finalVal];
+                };
+                [startVal, step1Val, step2Val, afterStep1, finalVal] = freshDeal(`ms:${msMax}:${msCheckOn ? 1 : 0}`, msDraw,
+                    { sig: (v) => `${v[0]},${v[1]},${v[2]}`, tags: (v) => [String(v[0]), `${v[0]},${v[1]}`, String(v[4])], caps: [2, 1, 2] });
+                step1Text = { add_then_sub: `bought ${step1Val} more`, sub_then_add: `lost ${step1Val}`, add_then_add: `earned ${step1Val} more`, sub_then_sub: `used ${step1Val}` }[problemType];
+                step2Text = { add_then_sub: `gave ${step2Val} to a friend`, sub_then_add: `found ${step2Val} more`, add_then_add: `received ${step2Val} more`, sub_then_sub: `gave away ${step2Val}` }[problemType];
                 q.text = `${msName} had ${startVal} ${msItem}. ${msName} ${step1Text}, then ${step2Text}. How many ${msItem} does ${msName} have now?`;
                 q.ans = finalVal;
 
                 const msStep1Op = (problemType === "add_then_sub" || problemType === "add_then_add") ? '+' : '-';
                 const msStep2Op = (problemType === "add_then_sub" || problemType === "sub_then_sub") ? '-' : '+';
                 q.hint = `Step 1: ${startVal} ${msStep1Op} ${step1Val} = ${afterStep1}. Step 2: ${afterStep1} ${msStep2Op} ${step2Val} = ${finalVal}`;
+                // (the Step 1 numbers, as the × / ÷ blocks give them: what a checker reads as the item's operands)
+                q.op = msStep1Op === '+' ? '+' : '\u2212'; q.a = startVal; q.b = step1Val;
 
                 // Multi-bar visual. Use a placeholder width for the
                 // start bar only; intermediate and final bars are kept

@@ -202,14 +202,19 @@ export const MULTI_KEYS = Object.freeze({
     tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
     familyChart: '4K',   // fact_family_sort (visual-quality lane, owner 2026-10-31): a blank number-family chart to fill in (working space)
     writeValue: '4L',    // identify (lf-placevalue, owner ruling 2026-10-10): also write the value of the underlined digit
-    // NEXT FREE IN 4E-4O: 4L.
+    answerAs: '4M',      // value form unit (owner bug fix 2026-11-15): number + chosen place word / the value in one box
+    // NEXT FREE IN 4E-4O: 4N.
     // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
     msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
     wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
     msLetter: '4R',      // multi_step_word(_plain): write the story as one equation with a letter (5 × 4 − 6 = n), then n
     msCheck: '4S',       // multi_step_word(_plain): + / − stories - estimate from tens, then judge the answer
     msChoose: '4T',      // multi_step_word(_plain), × / ÷ first: choose the answer from four (A-D), the three two-step errors (lesson 7 r3)
-    // NEXT FREE IN 4P-4Z: 4U (lane A/B fixers take 4Z downwards).
+    // lane lf-algebra (2026-11-07): patterns:notice_patterns / growing_shape_patterns
+    patTask: '4U',       // the task: parity / feature / truefalse (notice), next / rule / far (growing)
+    patShow: '4V',       // the fading hint: factor labels, the printed numbers / row, the counts of Terms 1-3
+    growShape: '4W',     // growing_shape_patterns: dots / squares / mixed
+    // NEXT FREE IN 4P-4Z: 4X (lane A/B fixers take 4Z downwards).
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -319,6 +324,9 @@ export const VALUE_TOKENS = Object.freeze({
         // block 1 P10 time + money (`all` reuses A)
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
+    // lane lf-algebra (2026-11-07)
+    patTask: Object.freeze({ parity: 'P', feature: 'F', truefalse: 'T', next: 'N', rule: 'R', far: 'X' }),
+    growShape: Object.freeze({ dots: 'D', squares: 'S', mixed: 'M' }),
     // lane lf-vocab (2026-11-07)
     vocabTask: Object.freeze({ match3: 'M', pick3: 'P' }),
     answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
@@ -365,6 +373,7 @@ export const VALUE_TOKENS = Object.freeze({
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     // P9 step 8 (block 0)
     form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
+    answerAs: Object.freeze({ unit: 'U', value: 'V' }),
     tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
     tenWrite: Object.freeze({ both: 'B', top: 'T' }),
     tenTask: Object.freeze({ compare: 'C', story: 'S' }),
@@ -435,7 +444,7 @@ export const VALUE_TOKENS = Object.freeze({
 // 10 -> "A"). Listed so the union below is complete: a later string token may not take a
 // character one of these already uses. APPEND a value here when a skill starts offering it.
 export const NUMERIC_SET_VALUES = Object.freeze({
-    constant: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+    constant: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
     level: Object.freeze([0, 1, 2, 3]),
     step: Object.freeze([0, 1, 2, 15, 30]),
     dir: Object.freeze([0, 1]),
@@ -488,6 +497,8 @@ export const SCALAR_ONLY = Object.freeze({
     tenValues: 'bool', tenPlain: 'bool',
     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
+    // lane lf-algebra (2026-11-07)
+    patShow: 'bool',
 });
 
 /**

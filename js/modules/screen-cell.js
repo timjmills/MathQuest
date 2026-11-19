@@ -28,6 +28,7 @@
 // No window writes; no state import.
 
 import { bracketSvg, bracketLine, opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { wordWorkVerdict, wordWorkFilled } from './sheet/index.js';
 import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
@@ -2254,11 +2255,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // denominator, the whole or the fraction left out when its boxes are empty.
     const mixed = join === 'mixed';
     const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
-    let saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // (lf-hosts 2026-11-13) a word-work twin's graded parts beyond the answer - the letter equation, the estimate
+    // (`data-mq-part`) - ride in the same value after the answer, "58 | equation: 5×9+13=n", so every host grades them
+    // with the paper key (wordWorkVerdict); a saved value's parts are not the answer's
+    const partEls = Array.from(cellEl.querySelectorAll('[data-mq-part]'));
+    const baseValue = partEls.length ? String(input.value || '').split(/\s*\|\s*(?=[\w-]+:)/)[0] : String(input.value || '');
+    let saved = mixed ? splitMixed(baseValue) : baseValue.split(join.trim() || ',').map((t) => t.trim());
     // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
     // digits in the rightmost boxes (the row's spare boxes stand on the left) - small fixes item 4, "[816|_|_|_]" on going back.
     if (!mixed && join === '' && slots.length > 1) {
-        const ch = [...String(input.value || '').replace(/\s/g, '')];
+        const ch = [...baseValue.replace(/\s/g, '')];
         saved = ch.length <= slots.length ? [...Array(slots.length - ch.length).fill(''), ...ch] : saved;
     }
     const boxes = slots.map((slot, k) => {
@@ -2282,7 +2288,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         slot.appendChild(el);
         return el;
     });
-    const compose = () => {
+    // a part's text as written: its printed symbols and each box's value (an empty box reads "?", never a right part)
+    const partText = (el) => {
+        let t = '';
+        const walk = (n) => { for (const c of n.childNodes) { if (c.nodeType === 3) t += c.nodeValue; else if (c.tagName === 'INPUT') t += (c.value || '').trim() || '?'; else if (c.nodeType === 1) walk(c); } };
+        walk(el);
+        return t.replace(/\s+/g, '');
+    };
+    const withParts = (v) => (partEls.length ? `${v}${partEls.map((el) => ` | ${el.getAttribute('data-mq-part')}: ${partText(el)}`).join('')}` : v);
+    const compose = () => withParts(composeAnswer());
+    const composeAnswer = () => {
         const v = boxes.map((b) => (b.value || '').trim());
         if (!mixed) return v.join(join);
         const [w, n, d] = v;
@@ -2326,6 +2341,10 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
             }
         });
     });
+    partEls.forEach((el) => el.querySelectorAll('input').forEach((b) => {
+        b.addEventListener('input', () => { input.value = compose(); input.dispatchEvent(new Event('input', { bubbles: true })); });
+        b.addEventListener('change', () => { if (onChange) onChange(compose()); });
+    }));
     input.classList.add('mq-cellslot-host');
     return true;
 }
@@ -3049,6 +3068,14 @@ export function wireClozeBanks(root) {
     });
     root.querySelectorAll('.mq-cloze').forEach((cz) => {
         const boxes = Array.from(cz.querySelectorAll('input.mq-cellslot, input.cloze-cell'));
+        // owner bug fix 2026-11-15: a place-word box is filled by a tap on the bank, never typed
+        if (cz.querySelector('.mq-placetile')) {
+            boxes.forEach((b) => {
+                const host = b.closest('[data-mq-wordbank]') || (b.matches('[data-mq-wordbank]') ? b : null);
+                const last = b === boxes[boxes.length - 1];
+                if (host || last) { b.readOnly = true; b.setAttribute('inputmode', 'none'); b.removeAttribute('maxlength'); b.setAttribute('aria-label', 'the place you chose'); b.classList.add('mq-wordpick'); }
+            });
+        }
         cz.querySelectorAll('.mq-banktile').forEach((btn) => {
             if (btn.dataset.mqWired === '1') return;
             btn.dataset.mqWired = '1';
@@ -3065,6 +3092,45 @@ export function wireClozeBanks(root) {
             });
         });
     });
+}
+
+/**
+ * Owner ruling 2026-11-15 ("students never type a place word"): an item whose answer is a place word chosen from a
+ * printed bank (`q.placeTapBank`, placevalue:identify response "bank") is TAPPED on screen: the host's one answer
+ * input turns read-only and the bank's words become buttons under the cell that write the word into it.
+ * Returns true when it wired a bank.
+ */
+export function wirePlaceWordBank(root, input, q) {
+    const words = q && Array.isArray(q.placeTapBank) ? q.placeTapBank : null;
+    if (!root || !input || !words || !words.length || typeof document === 'undefined') return false;
+    input.readOnly = true;
+    input.setAttribute('inputmode', 'none');
+    input.classList.add('mq-wordpick');
+    input.setAttribute('aria-label', 'the place you chose');
+    if (root.querySelector('.mq-placebank')) return true;
+    // the printed bank (words to read) is replaced by the tap bank
+    root.querySelectorAll('.pv-bank').forEach((el) => { el.style.display = 'none'; });
+    const row = document.createElement('div');
+    row.className = 'mq-placebank';
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', 'Choose the place');
+    words.forEach((w) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mq-banktile mq-placetile';
+        b.dataset.v = w;
+        b.textContent = w;
+        b.addEventListener('click', () => {
+            if (input.disabled) return;
+            input.value = w;
+            row.querySelectorAll('.mq-placetile').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        row.appendChild(b);
+    });
+    root.appendChild(row);
+    return true;
 }
 
 /**
@@ -3242,10 +3308,24 @@ export function workRowsHTML(k) {
  *   - an array answer (cloze addends, the missing numbers of a strip): position by position
  *   - "q R r": quotient and remainder
  */
+/** The word-work verdict of a composed value ("58 | equation: 5×9+13=n") on every host: the paper key's gradeSlots over the
+ *  answer and each graded part (wordWorkVerdict); null for an item with no graded part beyond its answer. */
+export function wordWorkScreenVerdict(value, q) {
+    const p = q && q.cell && q.cell.template === 'word-work' ? q.cell.payload : null;
+    return p ? wordWorkVerdict(value, p) : null;
+}
+/** Every graded place of such an item filled (null when it is not one): a host waits for it before it marks. */
+export function wordWorkScreenFilled(value, q) {
+    const p = q && q.cell && q.cell.template === 'word-work' ? q.cell.payload : null;
+    return p && wordWorkVerdict('', p) !== null ? wordWorkFilled(value, p) : null;
+}
 export function slotAnswerMatches(value, q) {
     if (!q) return null;
     // A function table checks each slot against the rule (a 'make your own' table has no one answer).
     if (q.ftCheck) return ftAnswerMatches(value, q.ftCheck);
+    // a two-step word-work item's letter equation / estimate: the paper key's verdict (lf-hosts 2026-11-13)
+    const wv = wordWorkScreenVerdict(value, q);
+    if (typeof wv === 'boolean') return wv;
     const cv = cellInputVerdict(value, q);
     if (typeof cv === 'boolean') return cv;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());
@@ -4280,6 +4360,29 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
             t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`, fx);
             const box = t.content.firstChild;
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
+            // owner bug fix 2026-11-15: a unit-form place box is CHOSEN from the bank of place words, never typed
+            if (Array.isArray(p.bank) && p.bank.length && k === slots.length - 1) {
+                box.setAttribute('data-mq-kind', 'word');
+                box.setAttribute('data-mq-wordbank', '1');
+                box.setAttribute('data-mq-w', '8');
+                box.style.setProperty('--mq-w', '8');
+                s.replaceWith(box);
+                const row = document.createElement('div');
+                row.className = 'mq-placebank';
+                row.setAttribute('role', 'group');
+                row.setAttribute('aria-label', 'Choose the place');
+                p.bank.forEach((w) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'mq-banktile mq-placetile';
+                    b.dataset.mqBankFor = String(k);
+                    b.dataset.v = w;
+                    b.textContent = w;
+                    row.appendChild(b);
+                });
+                tpl.content.appendChild(row);
+                return;
+            }
             s.replaceWith(box);
         });
         mode = 'slots';
@@ -4313,8 +4416,9 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     // (lf-placevalue compare round, ws-empty-band EB-PARITY: the compare twin is the paper's kit cell on every host - marked
     // [data-ws-cell="pv"] as the words twin is; an inline block, so the mark is the drawing's own box, centred as before)
     const inner = p.kind === 'compare' ? `<div data-ws-cell="pv" style="display:inline-block;max-width:100%;padding:0 2mm;box-sizing:border-box;">${wrap.innerHTML}</div>` : wrap.innerHTML;
-    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
-    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    const banked = Array.isArray(p.bank) && p.bank.length && mode === 'slots';
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin${banked ? ' mq-cloze' : ''}" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
+    const instr = (banked && q.screenInstr) || printInstructionFor(q, categoryId) || plainText(q.text);
     // a chart's digits make ONE number: the host checks the number, not a list of parts
     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
 }

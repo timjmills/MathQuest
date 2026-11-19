@@ -1405,6 +1405,10 @@
     {
      "key": "division:div_remainders",
      "why": "Y5.B5.S9 Divide with remainders (prior learning wk W04)"
+    },
+    {
+     "key": "division:div_facts_15",
+     "why": "the multiples of 13, 14 and 15 known as facts: the trial quotients of dividing by a 2-digit number"
     }
    ],
    "preBuild": [],
