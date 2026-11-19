@@ -9,11 +9,13 @@
 //
 //   node tests/scripts/ws-rowcap-fill.mjs                 # this tree
 //   node tests/scripts/ws-rowcap-fill.mjs --root <tree>   # another checkout's layout.js (the backtest's {root})
+//   node tests/scripts/ws-rowcap-fill.mjs --only UNLISTED # the unit assertion alone: an unlisted template is capped
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const argv = process.argv.slice(2);
 const at = argv.indexOf('--root');
+const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1] : '';   // --only UNLISTED: the unit assertion alone
 const ROOT = at >= 0 ? resolve(argv[at + 1]) : resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const L = await import(pathToFileURL(resolve(ROOT, 'js', 'modules', 'sheet', 'layout.js')).href);
 // THE RULE is this script's own tree's (as ws-empty-band EB-STRETCH): a commit-pair backtest judges an old tree's layout by
@@ -27,7 +29,7 @@ else {
     const exempt = R.ROW_STRETCH_EXEMPT || {};
     const tmpls = [...new Set([...(S.listCells ? S.listCells() : []), 'vocab-match3', 'lesson-vocab', 'count-row'])].filter((t) => !Object.prototype.hasOwnProperty.call(exempt, t));
     let judged = 0;
-    for (const t of tmpls) {
+    for (const t of ONLY === 'UNLISTED' ? [] : tmpls) {
         // (drawn 50 mm under a 46 / 48 mm footprint - the Match 3 shapes of r1 F3 - and a 30 mm row: one column, 6 dealt)
         for (const [size, hMm, drawn] of [['M', 46, 50], ['L', 46, 50], ['M', 48, 50], ['L', 48, 50], ['M', 28, 30], ['L', 28, 30]]) {
             const its = Array.from({ length: 6 }, () => ({ template: t, footprint: { wMm: 170, hMm, measure: false, factLike: false, maxCols: 1, points: 3, evenRows: true, wholeRows: true },

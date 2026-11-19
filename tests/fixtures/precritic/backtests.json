@@ -12021,6 +12021,64 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-stretch-selfbuilt",
+   "check": "ws-empty-band EB-STRETCH (stage 2, critic lf-engine-rowcap r1 F4): every template not in layout.js ROW_STRETCH_EXEMPT is capped at drawn + its room (ROW_ROOM_MM, else ROW_ROOM_DEFAULT_MM), and the self-built rows of Guided, Scripted Model, Error Analysis and Pre-skill check are a FAIL over it, not a note (on master they were 5-12 mm over)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH stage 2 (critic rowcap r1 F4)",
+   "browser": true,
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: Guided / Scripted Model / Error Analysis / Pre-skill check rows stretched past drawn + room (count_by_tables)"
+   },
+   "pass": {
+    "commit": "87f3bd42f",
+    "state": "0 EB-STRETCH findings: those composers hold each row to layout.rowCapMm"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --sizes M,L --roles guided,scripted-model,error-analysis,pre-skill-check --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-fill-all",
+   "check": "ws-rowcap-fill ROWCAP-FILL over EVERY registered template (stage 2, critic rowcap r1 F4 (c)): rows are never drawn past drawn + room, and counted at that height, so a page never ends with more than one row free unless the deal or the role caps the count",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL every template (critic rowcap r1 F4)",
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: every unlisted template's rows stretched past the cap (e.g. add-three 57-76 mm for a 50 mm drawing), 294 findings"
+   },
+   "pass": {
+    "commit": "87f3bd42f",
+    "state": "53 templates x 6 shapes: every row at most its cap, at most one row free"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-unlisted",
+   "check": "ws-rowcap-fill --only UNLISTED (stage 2 unit assertion): a template missing from every table is capped by the tree's rowCapMm at drawn + the default room, never Infinity; an exempt template is not capped",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill UNLISTED (critic rowcap r1 F4 (a))",
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: rowCapMm(50, an unlisted template) = Infinity"
+   },
+   "pass": {
+    "commit": "87f3bd42f",
+    "state": "rowCapMm(50, an unlisted template) = 53"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --only UNLISTED --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
