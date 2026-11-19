@@ -13,12 +13,12 @@ Claude-Session: https://claude.ai/code/session_013pHDnMSgfoUzyk67mk3yjW" >/dev/n
 step() { local log="$D/$1"; shift; if done_ok "$log"; then echo "skip $log"; return; fi; "$@" > "$log" 2>&1; echo "$(basename "$log"): $(tail -1 "$log")"; commit_log "$log"; }
 step r2-boot-smoke.log node tests/scripts/ws-boot-smoke.cjs
 step r2-code-snapshot.log node tests/scripts/ws-code-snapshot.mjs
-step r2-content-120.log node tests/scripts/ws-content-audit.cjs --skill composing:chart_to_120
-step r2-content-hcf.log node tests/scripts/ws-content-audit.cjs --skill composing:hundreds_chart_fill
-step r2-providers-120.log node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120
-step r2-providers-hcf.log node tests/scripts/ws-providers-unit.mjs --skill composing:hundreds_chart_fill
-step r2-optverify-120.log node tests/scripts/ws-options-verify.cjs --skill composing:chart_to_120
-step r2-optverify-hcf.log node tests/scripts/ws-options-verify.cjs --skill composing:hundreds_chart_fill
+step r2-content-120.log node tests/scripts/ws-content-audit.cjs --skill chart_to_120
+step r2-content-hcf.log node tests/scripts/ws-content-audit.cjs --skill hundreds_chart_fill
+step r2-providers-120.log node tests/scripts/ws-providers-unit.mjs --skill chart_to_120
+step r2-providers-hcf.log node tests/scripts/ws-providers-unit.mjs --skill hundreds_chart_fill
+step r2-optverify-120.log node tests/scripts/ws-options-verify.cjs --skill chart_to_120
+step r2-optverify-hcf.log node tests/scripts/ws-options-verify.cjs --skill hundreds_chart_fill
 step r2-guided-echo.log node tests/scripts/ws-guided-echo.cjs --skills $S --seeds 4 --variants
 step r2-guided-echo-lesson6.log node tests/scripts/ws-guided-echo.cjs --skills $S --seed-list 1,2,3,4,4242,777 --score-roles lesson --only CROSS-GIVEAWAY,LESSON-EMPTY-PAGE,BLANK-COUNT,SCORE-SLOTS
 ROWS=$(node -e "const d=require('./tests/fixtures/precritic/backtests.json');console.log(d.rows.filter(r=>/^c120/.test(r.id)).map(r=>r.id).join(','))")
