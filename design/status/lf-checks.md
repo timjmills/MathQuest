@@ -805,3 +805,14 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - Gate `tests/scripts/ws-correct-sound.mjs` on precritic --skill; backtest `correct-sound-powerup-once` FAIL 84f8813a1 -> OK eed07b7c1.
 - Listen: `design/status/lf-checks/sound/powerup.wav` (OfflineAudioContext render). ws-boot-smoke OK.
 
+
+## 2026-11-19 - ws-key-json full sweep survives a dead browser (lf-tools-keyjson, lead urgent)
+- Symptom: since the 2026-11-15 container restart the FULL ws-key-json sweep (deploy gate) ended with an uncaught
+  "TargetCloseError: Target closed" / "Navigating frame was detached"; `--skills` subsets passed.
+- Cause: the harness, not a skill. The sweep drove ~600 skills x every role through one browser with no crash handling (it
+  restarted every 40 skills, but any renderer / browser death ended the whole gate). /dev/shm is 16 GB, so not shm.
+  A planted browser kill reproduces the exact error on d38308824.
+- Fix (same pattern as ws-tof-stem 9d7772a36): one evaluate per skill, restart every --restart-every (40) and on a
+  crash / protocol timeout (protocolTimeout 120 s, new H.open option, same edit as the tof branch), retry the skill once,
+  a skill lost twice is a finding; a `sweep:` line names restarts and retries, each retry names its skill.
+- Backtest `key-json-retry` (MQ_KEYJSON_CRASH_AT): FAIL d38308824 -> OK a9051bb03 (ws-backtest PASS). CHECKS_FROM_CRITICS row added.

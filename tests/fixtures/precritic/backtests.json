@@ -11982,6 +11982,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "key-json-retry",
+   "check": "ws-key-json sweep: the browser restarts every --restart-every skills and on a crash / protocol timeout, and a crashed skill is retried once in a fresh browser (MQ_KEYJSON_CRASH_AT kills the browser on that skill's first try)",
+   "kind": "commit-pair",
+   "rule": "ws-key-json sweep retry (lead 2026-11-19: the full deploy sweep died with Target closed / Navigating frame was detached after the 2026-11-15 container restart)",
+   "browser": true,
+   "fail": {
+    "commit": "d38308824",
+    "state": "one browser for the whole sweep: a dead browser ends the gate with an uncaught TargetCloseError"
+   },
+   "pass": {
+    "commit": "a9051bb03",
+    "state": "restart every 40 skills and on a crash, retry once, protocolTimeout 120 s; the planted crash is retried and the run ends OK"
+   },
+   "command": "env MQ_KEYJSON_CRASH_AT=2 node {root}/tests/scripts/ws-key-json.cjs --skills addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply,geometry:coordinate_q1 --restart-every 2 2>&1 | grep -q 'retried 1' && echo 'key-json-retry: OK' || echo 'key-json-retry: FAIL (no crash retried)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
