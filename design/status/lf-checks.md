@@ -804,3 +804,13 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   empty; L 10 vs M 16 items) -> OK 3038af154 test / true-false / reason-it / error-analysis (re-point the pass side to the F1 fix).
 - master 448bc5e74: count_by_tables has no pre-skill-check role on its card; both rules PASS on every role. **add_facts FAILS
   EB-LASTPAGE**: pre-skill-check M and L 78 % empty (4 items, 42.6 mm rows) - a real defect for the role's owner, not exempted.
+## 2026-11-14 correct-answer sound ("B, power-up", owner request)
+- `js/modules/correct-sound.js`: Web Audio synth, square C5 / E5 / G5 70 ms, C6 400 ms exponential decay, peak 0.13, 4 ms attack /
+  10 ms release; lazy AudioContext resumed on the first pointer / key gesture; 300 ms dedupe. Gated by the Sound toggle (`#sfxToggle`,
+  sfx.js `isSfxEnabled`; Voice / TTS is a separate toggle and is not used).
+- Hosts: practice card (answer-check.js celebrateCorrect + _celebrateCorrectAnswer, replacing the old 'correct' / 'streak' cue; map-engine's
+  fallback call too), worksheet (wsRecordAnswer, once per item), quiz (recordAnswer, instant feedback only, so a test with end-of-quiz
+  feedback never gives an answer away). Wrong-answer cue unchanged.
+- Gate `tests/scripts/ws-correct-sound.mjs` on precritic --skill; backtest `correct-sound-powerup-once` FAIL 84f8813a1 -> OK eed07b7c1.
+- Listen: `design/status/lf-checks/sound/powerup.wav` (OfflineAudioContext render). ws-boot-smoke OK.
+

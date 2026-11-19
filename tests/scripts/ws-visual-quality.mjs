@@ -156,6 +156,22 @@ export function titleProblems(title, label = '') {
     return out;
 }
 
+/**
+ * VQ-TITLE "X and Y" (lf-algebra critic r1 F7, 2026-11-13): the role title a Test / Review / Model sheet makes from an
+ * I Can of two verbs ("I Can draw and count the next term" -> compose.js topicOf) gives BOTH verbs the same form - "drawing
+ * and counting", or both left bare - never "drawing and count". `topic` is topicOf(iCan) from the tree under test.
+ */
+export function andTitleProblems(iCan, topic) {
+    const m = /^I Can\s+([a-z]+)\s+and\s+([a-z]+)\b/i.exec(String(iCan || '').trim());
+    if (!m || topic === undefined || topic === null) return [];
+    const [v1, v2] = [m[1].toLowerCase(), m[2].toLowerCase()];
+    if (!VERBS.has(v1) || !VERBS.has(v2)) return [];
+    const t = /^([a-z]+)\s+and\s+([a-z]+)\b/i.exec(String(topic).trim());
+    if (!t) return [];
+    const ing = (w) => /ing$/i.test(w);
+    return ing(t[1]) === ing(t[2]) ? [] : [`the role title "${topic}" gives "${v1} and ${v2}" two forms ("${t[1]} and ${t[2]}")`];
+}
+
 /** The sign choices a word-work cell may draw for a skill that deals `dealt` at grade `grade`. */
 export function allowedSigns(dealt, grade) {
     const d = new Set(dealt);
@@ -210,7 +226,7 @@ export function judgeSkill(f, rules = RULES) {
     const reps = kit.filter((it) => (it.riStory || 0) > 1);
     if (reps.length) add('VQ-ONCE', 'reason-it-story-repeated', `a Reason It item prints its story ${Math.max(...reps.map((it) => it.riStory))} times (${reps.length} of ${kit.length} item(s)): print it once over the A and B panels`);
     // VQ-TITLE
-    const tp = titleProblems(f.iCan, f.label);
+    const tp = titleProblems(f.iCan, f.label).concat(andTitleProblems(f.iCan, f.topic));
     if (tp.length) add('VQ-TITLE', 'title', `"${f.iCan}": ${tp.join('; ')}`);
     // VQ-NOLEGACY
     if (!kit.length) add('VQ-NOLEGACY', 'no-kit-cell', `no kit cell on any of ${items.length} item(s) (${[...new Set(items.map((it) => it.kind))].join(', ')})`);
@@ -237,7 +253,8 @@ async function loadApp(root) {
     let standards = null; try { standards = await import(M('standards.js')); } catch (e) { standards = null; }
     let fillers = DEFAULT_FILLERS;
     try { const m = /const FILLERS = \[([^\]]*)\]/.exec(readFileSync(join(root, 'js/modules/sheet/cells/word-work.js'), 'utf8')); if (m) fillers = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]); } catch (e) { /* default */ }
-    return { gq, data, pg, kit, practice, standards, fillers, reasonIt };
+    let compose = null; try { compose = await import(M('sheet/roles/compose.js')); } catch (e) { compose = null; }
+    return { gq, data, pg, kit, practice, standards, fillers, reasonIt, compose };
 }
 
 /** The facts of one skill (see judgeSkill). `items` given (a fixture) or generated. */
@@ -279,7 +296,9 @@ function factsOf(app, s, n, given) {
     if (iCan === undefined) {
         try { iCan = practice.skillWords({ categoryId: s.cat, skillId: s.id, label, answerType: first && first.answerType, printFormat: first && first.printFormat }).iCan; } catch (e) { iCan = ''; }
     }
-    return { key, id: s.id, cat: s.cat, label, grade: String(grade ?? ''), ccss, iCan, fillers, items };
+    // (VQ-TITLE "X and Y": the role title the tree makes from this I Can, compose.js topicOf)
+    let topic; try { topic = app.compose && iCan ? app.compose.topicOf(iCan) : undefined; } catch (e) { topic = undefined; }
+    return { key, id: s.id, cat: s.cat, label, grade: String(grade ?? ''), ccss, iCan, topic, fillers, items };
 }
 
 /** VQ-ONCE: the Reason It item of a word-work question, drawn through the role's own `prepare` and the pure kit; how many
@@ -362,6 +381,9 @@ function selfTest() {
     eq('fact_family_sort base fails four rules', judgeSkill({ ...ffs, items: [{ kind: 'legacy', resp: { choice: 2, answerLine: false, sayBlanks: true } }] }).map((x) => x.rule), ['VQ-REP', 'VQ-ONEANSWER', 'VQ-TITLE', 'VQ-NOLEGACY']);
     eq('fact_family_sort fixed passes', judgeSkill({ ...ffs, iCan: 'I Can tell if three numbers make a fact family', items: [{ kind: 'kit', template: 'family-check', resp: { choice: 2, answerLine: false, sayBlanks: false } }] }), []);
     eq('--rules filters', judgeSkill({ ...ffs, items: [{ kind: 'legacy', resp: null }] }, ['VQ-TITLE']).map((x) => x.rule), ['VQ-TITLE']);
+    eq('VQ-TITLE X and Y: "drawing and count" fails', andTitleProblems('I Can draw and count the next term', 'drawing and count the next term').length, 1);
+    eq('VQ-TITLE X and Y: "drawing and counting" passes', andTitleProblems('I Can draw and count the next term', 'drawing and counting the next term'), []);
+    eq('VQ-TITLE X and Y: one verb is not judged', andTitleProblems('I Can find the next term', 'finding the next term'), []);
     eq('baseline sig key', pinKey({ rule: 'VQ-LIVE', key: 'a:b', sig: 'grid-within-20' }), 'VQ-LIVE|a:b|grid-within-20');
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);

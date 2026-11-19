@@ -720,6 +720,8 @@ export const SKILL_STANDARDS = {
     'division:div_4by1_long': { ccss: ['4.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 4-Digit by 1-Digit Numbers (Long Division)
     'division:div_3by2_long': { ccss: ['5.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 3-Digit by 2-Digit Numbers (Long Division)
     'division:div_facts_long': { ccss: ['3.OA.C.7', '4.NBT.B.6'], ee: ['M.EE.3.OA.6', 'M.EE.5.NBT.6'] }, // Divide: Long-Division Form (preset 2026-10-31: div_facts, divForm long)
+    'multiplication:mult_facts_15': { ccss: ['3.OA.C.7', '4.NBT.B.5'], ee: ['M.EE.3.OA.6', 'M.EE.5.NBT.5'] }, // Multiplication Facts to 15 × 15 (preset 2026-11-14: mult_facts, band 225; 13-15 x 13-15 is 2-digit x 2-digit)
+    'division:div_facts_15': { ccss: ['3.OA.C.7', '5.NBT.B.6'], ee: ['M.EE.3.OA.6', 'M.EE.5.NBT.6'] }, // Division Facts to 15 × 15 (preset 2026-11-14: div_facts, band 225; ÷13 to ÷15 are 2-digit divisors)
     'fractions:compare_to_half': { ccss: ['4.NF.A.2'], ee: ['M.EE.4.NF.2'] }, // Compare Fractions to One Half
     'placevalue:expanded_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.3'], ee: ['M.EE.4.NBT.2'] }, // Write Numbers in Expanded Notation
     'number_sense:near_doubles': { ccss: ['1.OA.C.6'], ee: [] }, // Near Doubles (Doubles Plus One, Doubles Minus One)
@@ -835,6 +837,10 @@ export const SKILL_STANDARDS = {
     'number_theory:missing_multiples': { ccss: ['4.OA.B.4'], ee: ['M.EE.4.OA.4'] }, // Fill In the Missing Multiples
     'number_theory:common_factors': { ccss: ['6.NS.B.4', '4.OA.B.4'], ee: [] }, // Find Every Common Factor
     'number_theory:common_multiples': { ccss: ['6.NS.B.4', '4.OA.B.4'], ee: [] }, // Find Every Common Multiple
+    'patterns:notice_patterns': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // What Do You Notice? Even and Odd Products, Pattern Features
+    'patterns:growing_shape_patterns': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Growing Shape Patterns: Draw and Count the Next Term
+    'patterns:pattern_features': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Features of a Number Pattern: Odd, Even and Ones Digits
+    'patterns:follow_given_rule': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Follow a Given Rule: Extend a Number Pattern
     'vocabulary:vocab_grade_pictures': { ccss: ['3.OA.D.9', '3.OA.B.5', '3.OA.D.8'], ee: ['M.EE.3.OA.8'], note: 'the default word pool: the grade 3 BUILD lessons of round 1 (the pilot unit G3-Y4.B4); vocabGrade / vocabSet move the words to grades 1, 2 and 4 (1.NBT.A.1, 2.NBT.A.3, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5)' }, // Vocabulary: Match 3 Pictures (Lesson Words)
     'vocabulary:vocab_pick3_words': { ccss: ['3.OA.D.9', '3.OA.B.5', '3.OA.D.8'], ee: ['M.EE.3.OA.8'], note: 'the default word pool: the grade 3 BUILD lessons of round 1 (the pilot unit G3-Y4.B4); vocabGrade / vocabSet move the words to grades 1, 2 and 4 (1.NBT.A.1, 2.NBT.A.3, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5)' }, // Vocabulary: 1 Picture, 3 Words
 };

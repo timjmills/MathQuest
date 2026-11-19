@@ -1051,6 +1051,22 @@ themselves; wrapped, the outer call holds a slot while its rows queue for one, a
 | r4: ruling (a) (group by height) proved by a node model to move nothing (16 -> 16 cells >= 30 %) | the root cause was taken as "mixed-height rows"; the larger cause is the practice SPREAD stretching rows of one height (1.28-1.47 x their tallest), which skips the footprint's `noStretch` | model a proposed fix on measured rows before a ruling (scratchpad tools/model.js: A now / B regrouped / C, D row cap) - one probe run, ~10 min |
 | r3b / r4: EB-FOOT findings on every grid page of arrays_groups | ws-empty-band pairs cells with buildSheet's items in DEAL order; groupByHeight prints them in another order (the drawn heights are a permutation of the footprints) | pair by the plan's printed order (or return items in printed order); until then EB-FOOT on a height-grouped page is not evidence |
 
+### lf-algebra critic r2 (2026-11-13): precritic's "clean" list was not an evidence list
+**Lost:** critic r2 failed every skill on pages precritic r9 had listed "clean for the critic". Three of its five failure classes sat
+there: (1) pages with an OPEN critic finding - F2, the npr / fgr screen count-row train, was known and handed to lf-ops, yet the npr /
+fgr card and worksheet were listed clean (G1); (2) roles no page-fill lint ever ran on - reason-it, error-analysis, test, true-false
+and more-practice were listed clean because ws-grade-render --gate rendered them without overflow, but print-lint (LONE / PAGEFILL /
+H13) ran on independent and lesson only, so G4 (Reason It one item a page, three skills) and G7 (growing lesson PAGEFILL 43 %, 54 %
+warm-up band - a page print-lint DID run on and passed, so that lint needs a backtest at lf-engine) reached the critic; (3) the r1
+critic's proposed panel gate (F8) was never built and the blank sample spread to a second skill (G11).
+**Rule (made a check, lf-algebra r10):** a lane's "Clean for the critic" list names only pages with no open finding of the latest
+critic round (a finding closes only by a `- <ID> fixed` line under `## Fixes after critic rN`) and only print roles that a print-lint
+row of the same precritic run linted. `node tests/scripts/ws-precritic-clean.mjs` reads the lane status file; precritic runs it on
+every --skill plan (gate precritic-clean); backtest row precritic-clean-list FAILS on d20c8a003 (r9: npr worksheet clean while F2
+open, 43 claims) and PASSES on the r10 status.
+**Speed-ups next time:** run `ws-print-lint --roles reason-it,error-analysis,true-false,test --skills <family>` once (about a minute)
+before writing any clean list; when a critic proposes a check, building it is part of the fix round's done (F8 / G11);
+`ws-patterns-cells` (node, 1 s) now holds the cell-vs-page contracts G5 / G6 / G8 (LABEL-REF, TILE-CARD, ROW2-S).
 ### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
 
 Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix

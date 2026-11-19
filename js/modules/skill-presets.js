@@ -157,10 +157,16 @@ export const SKILL_PRESETS = Object.freeze({
     // 2026-10-31 (owner, facts card Q4): the long-division bracket on division facts is its own lesson; the
     // fraction form stays an option.
     'division:div_facts_long': { skill: 'div_facts', opts: { divForm: 'long' } },
+    'patterns:pattern_features': { skill: 'notice_patterns', opts: { patTask: 'feature' } },
+    'patterns:follow_given_rule': { skill: 'number_patterns_rule', opts: { rule: false } },
     'vocabulary:vocab_pick3_words': { skill: 'vocab_grade_pictures', opts: { vocabTask: 'pick3' } },
     // 2026-11-12 (owner, chartwindow card §9.1): the chart to 120 (every window across 100) is its own lesson
     // (Count on to 120); band 120 stays an option of hundreds_chart_fill.
     'composing:chart_to_120': { skill: 'hundreds_chart_fill', opts: { band: 120 } },
+    // 2026-11-14 (owner, lane lf-ops t15): the tables on to 15 x 15 are a harder size of their own; band 225 stays an option of
+    // mult_facts and div_facts ("Tables to 15 x 15").
+    'multiplication:mult_facts_15': { skill: 'mult_facts', opts: { band: 225 } },
+    'division:div_facts_15': { skill: 'div_facts', opts: { band: 225 } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

@@ -14,10 +14,10 @@ import { syncWorksheetRefLine } from './refline-screen.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
-    wireTickBoxes, adoptVisualBlank, wireCellSlots,
+    wireTickBoxes, adoptVisualBlank, wireCellSlots, wordWorkScreenFilled,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback, blurVocabSlots,
     fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
-    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
 
@@ -1790,6 +1790,7 @@ function _wsRenderCard(grid, q, i) {
             }
         }
         wireStackEntry(cellEl);
+        if (q && q.placeTapBank) wirePlaceWordBank(cellEl, document.getElementById(`ws_input_${i}`), q);
         // green as soon as it is right (owner request 2026-09-25): digit, regroup and answer boxes
         try { wireLiveCorrect(cellEl, { q, kind, single: document.getElementById(`ws_input_${i}`) }); } catch (e) { /* optional */ }
         {
@@ -1961,6 +1962,7 @@ export function newWorksheet() {
 
     state.worksheetQs = [];
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
+    worksheetSoundPlayed.clear();
     worksheetBannerRecorded.clear(); // Reset banner stats tracking
     worksheetMscState.clear(); // Reset multi-select-check per-card verdicts
     worksheetClockSetState.clear(); // Reset clock-set per-card verdicts
@@ -2558,6 +2560,8 @@ export function advanceToNextProblem(currentIdx, pending = null) {
 const worksheetConfettiTriggered = new Set();
 // Track which worksheet questions have been recorded in the banner stats (prevents double-counting)
 const worksheetBannerRecorded = new Set();
+// Track which worksheet questions have already played the correct sound (never twice for one item)
+const worksheetSoundPlayed = new Set();
 // Track debounce timers for single-input wrong-answer delay (2 seconds)
 const worksheetWrongTimers = new Map();
 
@@ -2577,6 +2581,11 @@ function wsNoteWrong(idx) {
 // Record a worksheet answer in the game stats banner (once per problem)
 function wsRecordAnswer(idx, isCorrect) {
     if (!isCorrect) wsNoteWrong(idx);
+    // owner 2026-11-14: the power-up sound, once per item, on its first correct verdict (correct-sound.js)
+    if (isCorrect && !worksheetSoundPlayed.has(idx)) {
+        worksheetSoundPlayed.add(idx);
+        if (typeof window !== 'undefined' && typeof window.playCorrectSound === 'function') window.playCorrectSound();
+    }
     if (worksheetBannerRecorded.has(idx)) return;
     worksheetBannerRecorded.add(idx);
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
@@ -2636,7 +2645,10 @@ export function checkWorksheetAnswer(idx, settled) {
     const value = input.value.trim();
     // A multi-slot twin (a cloze, a strip, q R r, a sentence's boxes) is checked once every box
     // is filled; a build is marked when it is right and left neutral while the pupil builds.
-    const slotVerdict = value && q && q._mqSlots ? (slotsFilled(value, q._mqSlots) ? slotAnswerMatches(value, q) : 'wait') : null;
+    // (a two-step story's letter equation / estimate: graded with the answer once every graded place is in - lf-hosts)
+    const wwFill = value && q ? wordWorkScreenFilled(value, q) : null;
+    const slotVerdict = value && q && typeof wwFill === 'boolean' ? (wwFill ? slotAnswerMatches(value, q) : 'wait')
+        : value && q && q._mqSlots ? (slotsFilled(value, q._mqSlots) ? slotAnswerMatches(value, q) : 'wait') : null;
     const deferVerdict = value && input.dataset.mqDefer === '1'
         ? (normalizeText(value) === normalizeText(q.ans) ? true : 'wait') : null;
     if (slotVerdict === 'wait' || deferVerdict === 'wait') {
@@ -3214,7 +3226,7 @@ export function checkAllWorksheet() {
             value = input.value;
             // Strip commas from user input before comparing
             const cleanedValue = value.replace(/,/g, "");
-            const slotVerdictAll = q._mqSlots ? slotAnswerMatches(value, q) : null;
+            const slotVerdictAll = q._mqSlots || typeof wordWorkScreenFilled(value, q) === 'boolean' ? slotAnswerMatches(value, q) : null;
             if (typeof slotVerdictAll === 'boolean') {
                 isCorrect = slotVerdictAll;
             } else if (q.answerType === "number" || typeof q.ans === "number") {

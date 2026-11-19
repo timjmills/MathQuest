@@ -325,7 +325,13 @@
       "name": "ws-screen-ink-size --only TEXT-SIZE --no-baseline on identify / unit_form / value (opt-in lf-placevalue lead 15:35: identify's screen numeral 30 px under the card / quiz digit floor 40-56 px; unit_form / value words 14 pt under their 16 pt print)",
       "script": "ws-screen-ink-size",
       "kind": "browser",
-      "args": ["--skill", "placevalue:identify,placevalue:unit_form,placevalue:value", "--only", "TEXT-SIZE", "--no-baseline"]
+      "args": [
+       "--skill",
+       "placevalue:identify,placevalue:unit_form,placevalue:value",
+       "--only",
+       "TEXT-SIZE",
+       "--no-baseline"
+      ]
      }
     },
     "pv-identify-heads": {
@@ -341,7 +347,16 @@
       "name": "ws-grade-render --gate --quiz-builder (opt-in lf-placevalue critic live1 N5: TOUCH-TARGET on the lane skills' card, online worksheet and builder-made quiz at 820 / 1024 - an answer box >= 48 px; the render-gate row renders no builder quiz)",
       "script": "ws-grade-render",
       "kind": "browser",
-      "args": ["--roles", "independent", "--size", "M", "--gate", "--quiz-builder", "--out", "/tmp/mq-pv-touch-gate"]
+      "args": [
+       "--roles",
+       "independent",
+       "--size",
+       "M",
+       "--gate",
+       "--quiz-builder",
+       "--out",
+       "/tmp/mq-pv-touch-gate"
+      ]
      }
     },
     "pv-words-pages": {
@@ -357,7 +372,10 @@
       "name": "ws-pv-screen-numeral (opt-in lf-placevalue live1, lf-hosts critic via the lead 2026-11-13: expand's online-worksheet numerals at the 29 px digit floor, WS-NUMERAL; no operator alone at a line's end, WS-WRAP-OP)",
       "script": "ws-pv-screen-numeral",
       "kind": "browser",
-      "args": ["--skills", "placevalue:expand"]
+      "args": [
+       "--skills",
+       "placevalue:expand"
+      ]
      }
     },
     "pv-words-opener-gate": {
@@ -365,7 +383,18 @@
       "name": "ws-grade-render --gate --roles opener --size L on the to_words deal (opt-in lf-placevalue critic live1 r2 N7: the numeral-to-words Model's answer line left its cell, OVERFLOW; the lane's precritic dealt the opener only the default way)",
       "script": "ws-grade-render",
       "kind": "browser",
-      "args": ["--roles", "opener", "--size", "L", "--opts", "{\"wordform\":[\"to_words\"]}", "--gate", "--no-screen", "--out", "/tmp/mq-pv-words-opener-gate"]
+      "args": [
+       "--roles",
+       "opener",
+       "--size",
+       "L",
+       "--opts",
+       "{\"wordform\":[\"to_words\"]}",
+       "--gate",
+       "--no-screen",
+       "--out",
+       "/tmp/mq-pv-words-opener-gate"
+      ]
      }
     }
    }
@@ -496,7 +525,33 @@
     "screen-slots": {
      "args": [
       "--screen-digit",
-     "--array-orient"
+      "--array-orient"
+     ]
+    }
+   }
+  },
+  {
+   "lane": "lf-algebra",
+   "why": "critic r1 F6 / L28 (2026-11-13): a preset's Guided / Model Steps band followed the HOST's default steps (pattern_features printed notice_patterns' parity steps); ws-node-lint STEPS-FOLLOW-PRESET judges the lane's preset skills (and their hosts, which it skips as not presets). Backtest row steps-follow-preset-f6.",
+   "skills": [
+    "patterns:pattern_features",
+    "patterns:follow_given_rule",
+    "patterns:notice_patterns",
+    "patterns:number_patterns_rule",
+    "patterns:growing_shape_patterns",
+    "algebra:function_table_easy",
+    "algebra:multi_step_word",
+    "algebra:multi_step_word_plain",
+    "algebra:two_step_mult_div_first",
+    "algebra:two_step_add_then_mult",
+    "algebra:two_step_add_then_div",
+    "algebra:two_step_letter_equation",
+    "algebra:two_step_estimate_check"
+   ],
+   "gates": {
+    "node-lint-s1": {
+     "addRules": [
+      "STEPS-FOLLOW-PRESET"
      ]
     }
    }
