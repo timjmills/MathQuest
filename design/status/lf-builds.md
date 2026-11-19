@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-19 22:20Z: new week; chart blanks resumed from 4b55744ee (fix builder, medium). Then narrow critic r2, then the queue.
 - 2026-11-14 22:15Z: WRAPPED UP for the week (owner). A short un-park was stopped. HEAD has the master 4df29a5b2 merge (f72ed8763) plus one WIP commit (B2 example registration + band-120 lesson N=3), UNTESTED. The builder's last note: band-120 lesson practice now deals 3 blanks but only 1–2 windows, because the example's 5 columns plus the teaching-sheet windows leave no more consistent squares, so ruling (a) alone may not fill the page; the rows-grid fallback may be needed. Next: run the packet CROSS-GIVEAWAY, then the backtest rows, gates, and narrow critic r2.
 - 2026-11-14 21:05Z: chart blanks change (tiles default 5, Guided 3, overlap giveaway) PARKED at 9cb0b5ba6 on -lf-builds. NOT for deploy; the deploy branch 969306c1e (passed chart_120) is unaffected. Narrow critic r1 FAILED (critic-blanks.md, 50c756432).
   - Fixed after the critic: B3 (band-120 cap 6; OPTION-ITEMS, BLANK-COUNT min(N, cap)), B4 (GUIDED-TRY-COUNT), B1 empty page 3 (runs keyed by lesson part; LESSON-EMPTY-PAGE), the help text, helpShort visible on tablet.
@@ -36,6 +37,7 @@ Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 - Open minors with no check: F10 (model page fill, engine), F13, F14, F15 (see critic-r1.md).
 
 ## Budget
+- Week from 2026-11-19: stop at cost_usd $1,126.22 (baseline $626.22 + $500, lead).
 - Week from 2026-11-13: allocation $200 above the session cost_usd baseline $369.70 (stop new agents at $569.70; lead, design/status/usage-week-2026-11-13.md).
 
 ## Open questions
