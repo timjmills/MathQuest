@@ -309,6 +309,15 @@ function gitCases(target, tmp, eq) {
     x = go(d);
     eq('F2 git: a line master deleted is not restored', [x.code, read(d, LED)], [0, '# L\n| A1 | x |\n| A9 | z |\n| A3 | w |\n']);
 
+    // critic merge r2: CRLF ledger: both appends kept (master's side was silently lost), CRLF kept; a same-row clash conflicts
+    const C = (t) => t.replace(/\n/g, '\r\n');
+    d = repo({ [LED]: C('# L\n| A1 | x |\n') }, { [LED]: C('# L\n| A1 | x |\n| A2 | lane |\n') }, { [LED]: C('# L\n| A1 | x |\n| A9 | master |\n') });
+    x = go(d);
+    eq('r2 git CRLF: both appends kept, CRLF kept', [x.code, read(d, LED)], [0, C('# L\n| A1 | x |\n| A9 | master |\n| A2 | lane |\n')]);
+    d = repo({ [LED]: C('# L\n| A1 | old |\n') }, { [LED]: C('# L\n| A1 | lane |\n') }, { [LED]: C('# L\n| A1 | master |\n') });
+    x = go(d);
+    eq('r2 git CRLF: a same-row clash -> exit 1, unmerged', [x.code, unmerged(d, LED)], [1, true]);
+
     // F3: run from a directory outside git, with a copy of the target inside a repo
     d = repo({ 'f.txt': 'a\n' }, { 'g.txt': 'lane\n' }, { 'h.txt': 'master\n' });
     mkdirSync(join(d, 'tests/scripts'), { recursive: true }); copyFileSync(target, join(d, 'tests/scripts/ws-merge-master.mjs'));
