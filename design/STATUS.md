@@ -930,3 +930,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - mult_facts / div_facts: "Tables to" offers 15 x 15 (band 225); the 13-15 ticks show only under it; new preset skills mult_facts_15 / div_facts_15 (codes, standards, WRM, search terms); "How it is written" leads the options panel. Facts card signed 2026-11-15.
 - D1 fixed: the preset pages' I Can line reads "to 15" (mult_facts I Can follows the page options like div_facts); ws-tables15 T15-PRESET compares rendered titles (backtest t15-preset-ican).
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-19 — Deploy two-step Guided (lf-algebra; lead ruling 2026-11-14: the two-step bar drops on Guided via ctx.guided)
+- Two-step family Guided pages: cells read ctx.guided and drop the bar scaffold on Guided Models / tries; ws-two-step --guided / --align / --screen-align / --ldiv / --print / --ea OK on the lane head; lesson baseline identical.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
