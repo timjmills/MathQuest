@@ -1,0 +1,48 @@
+ok   multiplication:mult_chart_easy @1280: ink 9.19 % (own box 13.0 %), scale 0.6545, text >= 11.8 px, frame 300 px, options 453/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @1280 part 2: ink 10.53 % (own box 13.8 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 453/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @1280 part 3: ink 10.17 % (own box 13.3 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 453/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @1280 part 4: ink 11.17 % (own box 14.6 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 453/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @1280 (all parts): 4 reading(s), choices -
+ok   coordinates:geo_translate @1280: ink 8.66 % (own box 9.3 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   coordinates:geo_translate @1280 part 2: ink 12.90 % (own box 18.6 %), scale 0.701, text >= 12.6 px, frame 300 px, options 375/375 px, part 2 of 2
+ok   coordinates:geo_translate @1280 (all parts): 2 reading(s), choices 0123
+ok   algebra:multi_step_word @1280: ink 5.52 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 300 px, options 453/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1280 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 453/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1280 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 453/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1280 (all parts): 3 reading(s), choices -
+ok   fractions:fraction_of_set @1280: ink 1.87 % (own box 9.6 %), scale 1, text >= 16.0 px, frame 300 px, options 439/439 px, part 1 of 3
+ok   fractions:fraction_of_set @1280 part 2: ink 4.14 % (own box 7.9 %), scale 0.7079, text >= - px (svg text 9.2 px), frame 300 px, options 439/439 px, part 2 of 3
+ok   fractions:fraction_of_set @1280 part 3: ink 1.17 % (own box 4.5 %), scale 1, text >= 15.2 px, frame 300 px, options 439/439 px, part 3 of 3
+ok   fractions:fraction_of_set @1280 (all parts): 3 reading(s), choices -
+ok   algebra_mixed:algebra_all @1280: ink 6.09 % (own box 9.7 %), scale 0.96, text >= 24.2 px, frame 300 px, options 453/2199 px, part 1 of 3
+ok   algebra_mixed:algebra_all @1280 part 2: ink 3.57 % (own box 6.7 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 453/2199 px, part 2 of 3
+ok   algebra_mixed:algebra_all @1280 part 3: ink 4.75 % (own box 8.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 453/2199 px, part 3 of 3
+ok   algebra_mixed:algebra_all @1280 (all parts): 3 reading(s), choices -
+ok   measurement:elapsed_find_start @1280: ink 4.18 % (own box 10.6 %), scale 0.7164, text >= 12.9 px, frame 220 px, options 533/638 px, part 1 of 2
+ok   measurement:elapsed_find_start @1280 part 2: ink 3.17 % (own box 3.4 %), scale 0.96, text >= 22.7 px (svg text 9.4 px), frame 220 px, options 533/638 px, part 2 of 2
+ok   measurement:elapsed_find_start @1280 (all parts): 2 reading(s), choices -
+ok   multiplication:mult_chart_easy @820: ink 9.19 % (own box 13.0 %), scale 0.6545, text >= 11.8 px, frame 300 px, options 633/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @820 part 2: ink 10.53 % (own box 13.8 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 633/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @820 part 3: ink 10.17 % (own box 13.3 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 633/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @820 part 4: ink 11.17 % (own box 14.6 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 633/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @820 (all parts): 4 reading(s), choices -
+ok   coordinates:geo_translate @820: ink 8.66 % (own box 9.3 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   coordinates:geo_translate @820 part 2: ink 12.90 % (own box 18.6 %), scale 0.701, text >= 12.6 px, frame 300 px, options 375/375 px, part 2 of 2
+ok   coordinates:geo_translate @820 (all parts): 2 reading(s), choices 0123
+ok   algebra:multi_step_word @820: ink 5.52 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 300 px, options 633/1407 px, part 1 of 3
+ok   algebra:multi_step_word @820 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 633/1407 px, part 2 of 3
+ok   algebra:multi_step_word @820 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 633/1407 px, part 3 of 3
+ok   algebra:multi_step_word @820 (all parts): 3 reading(s), choices -
+ok   fractions:fraction_of_set @820: ink 1.87 % (own box 9.6 %), scale 1, text >= 16.0 px, frame 300 px, options 439/439 px, part 1 of 3
+ok   fractions:fraction_of_set @820 part 2: ink 4.14 % (own box 7.9 %), scale 0.7079, text >= - px (svg text 9.2 px), frame 300 px, options 439/439 px, part 2 of 3
+ok   fractions:fraction_of_set @820 part 3: ink 1.17 % (own box 4.5 %), scale 1, text >= 15.2 px, frame 300 px, options 439/439 px, part 3 of 3
+ok   fractions:fraction_of_set @820 (all parts): 3 reading(s), choices -
+ok   algebra_mixed:algebra_all @820: ink 6.09 % (own box 9.7 %), scale 0.96, text >= 24.2 px, frame 300 px, options 633/2199 px, part 1 of 3
+ok   algebra_mixed:algebra_all @820 part 2: ink 3.57 % (own box 6.7 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 633/2199 px, part 2 of 3
+ok   algebra_mixed:algebra_all @820 part 3: ink 4.75 % (own box 8.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 633/2199 px, part 3 of 3
+ok   algebra_mixed:algebra_all @820 (all parts): 3 reading(s), choices -
+ok   measurement:elapsed_find_start @820: ink 4.18 % (own box 10.6 %), scale 0.7164, text >= 12.9 px, frame 220 px, options 638/638 px, part 1 of 2
+ok   measurement:elapsed_find_start @820 part 2: ink 3.17 % (own box 3.4 %), scale 0.96, text >= 22.7 px (svg text 9.4 px), frame 220 px, options 638/638 px, part 2 of 2
+ok   measurement:elapsed_find_start @820 (all parts): 2 reading(s), choices -
+  6 skills × 2 widths (1280, 820 px), 46 readings, 1 worker(s), 31 s
+ws-options-shots: OK (6 skills × 2 widths)

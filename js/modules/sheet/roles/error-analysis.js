@@ -36,7 +36,7 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
+    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer, equationStemOf,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
 import { scorePoints } from '../paginate.js';
@@ -310,12 +310,12 @@ function partLabels(it, parts, c) {
 }
 
 /** The number sentence of a story item, as the pupil would have written it. */
-function storyWork(it, shown, wrong, isWrong) {
+function storyWork(it, shown, wrong, isWrong, correct) {
     if (isWrong && wrong && wrong.work) return wrong.work;
-    const q = it.q || {};
-    const o = operandsOf(q);
-    const g = opGlyphOf(opOf(q));
-    return o.length >= 2 && g ? `${o[0]} ${g} ${o[1]} = ${shown}` : '';
+    // (EA-STEM, the class of TOF-STEM: the sentence restates the problem only when its operands give the RIGHT answer, so a
+    // correct item's work is true and a wrong one shows the pupil's error in the result - never "44 - 8 = 44" for a missing start)
+    const stem = equationStemOf(it.q || {}, correct);
+    return stem ? `${stem}${shown}` : '';
 }
 
 /**
@@ -577,7 +577,7 @@ export function prepare(it, info = {}) {
         }
         kind = labels ? 'parts' : REDO.has(it.template) || (it.template === 'clock' && isList(glue)) ? 'redo' : glue ? 'parts' : 'value';
     } else kind = /[A-Za-z]{2}/.test(correct) && !/^\d/.test(correct) ? 'text' : 'value';
-    const work = story ? storyWork(it, shown, wrong, isWrong) : '';
+    const work = story ? storyWork(it, shown, wrong, isWrong, correct) : '';
     // The key's slots: the judgement, and the fix in EVERY slot of its kind (critic round 3: a key
     // that fills only the changed boxes leaves a pupil slot unanswered, and "blank" reads as 0).
     const slots = { 'ea-ok': isWrong ? '' : '✓', 'ea-fix': isWrong ? '✓' : '' };
@@ -760,6 +760,11 @@ export function prepare(it, info = {}) {
             zone = zone.replace(/\sdata-ws-slot="/g, ' data-ws-part="');
             fix = `<span class="mq-redraw mq-fixslot" data-ws-slot="ea-draw" data-ws-shape="open" data-ws-graded="0"><small>Fix it: ${kind === 'draw' || redraw === 'draw' ? 'draw' : redraw === 'mark' ? 'mark' : 'write'} it again.</small>${zone}</span>`;
         }
+        // (`o.fixW`: the page's widest chart-window fix, so every cell's judgement is one width and starts at one x - EA-ROWX)
+        // (a one-column page only, where the widest fix already stands beside the same work: a two-column page wraps its fixes
+        // in their own width, and its judgement column is already one place a column)
+        const workMm = Number((it.footprint && (it.footprint.inkWMm || it.footprint.wMm)) || fp0.wMm) || 0;
+        if (Number(o.fixW) > 0 && it.template === 'chartwindow' && fix && (Number(o.cols) || 1) === 1 && workMm + 6 + Number(o.fixW) <= cellIn + 4) fix = fix.replace(/^<span class="([^"]*mq-fixslot[^"]*)"/, `<span class="$1" style="min-width:${Number(o.fixW).toFixed(1)}mm;justify-content:flex-start"`);
         const below = kind === 'redo';
         const judge = judgeGroup('ea-judge', `${checkLine('ea-ok', JUDGE_LABELS.correct, c, key, { graded: false })}`
             + `<span class="mq-fixrow">${checkLine('ea-fix', JUDGE_LABELS.fixIt, c, key, { graded: false })}${below ? '' : fix}</span>`);
@@ -806,13 +811,19 @@ export function prepare(it, info = {}) {
         judgeModes: kind === 'draw' || kind === 'redo' ? undefined : JUDGE_MODES,
         fixRoom: room0,
         workWMm: Number(fp0.wMm) || 0,
+        // (the fix's width at a size and the page's room - a chart window's lettered boxes or its one box - so a page of chart
+        // windows with 1, 2 and 3 gaps holds every fix at the widest one's width: chart_120 r2, ws-cell-checks EA-ROWX)
+        fixWBy: it.template === 'chartwindow' && ((kind === 'parts' && labels) || (kind === 'value' && !ownLine))
+            ? (size, pageRoom) => { const r0 = room; room = Math.max(room0, Number(pageRoom) || 0); const w = kind === 'parts' ? P.parts.reduce((a, x, i) => a + boxW(x, i, size), 0) + 3 * (P.parts.length - 1) : fixWidth(size); room = r0; return w; } : null,   // (.mq-fixes gap 3 mm)
         // the fix's SHAPE (boxes / a sign circle / a stacked fraction / check boxes / a word line),
         // so a page keeps to one (critic EA r5, B: a line, "+" boxes and a sign circle on one page)
         fixSig: kind === 'value' && /^[<>=]$/.test(correct) ? 'sign' : fracFix ? 'frac' : kind === 'choice' ? 'check'
             : kind === 'value' ? (ownLine ? 'line' : 'box') : kind === 'parts' ? 'boxes' : kind,
         // The judgement column sits beside the work; a word problem or a wide picture keeps its
         // own single column (PT-WPR-1).
-        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(3, (it.footprint && it.footprint.maxCols) || 3) }),
+        // (a template that scores each empty slot - `slotPoints`, chartwindow: SCORE-SLOTS - is ONE judgement here: the pupil
+        // marks the shown work and fixes it, never fills its squares; lf-builds chart_120, lf-roles critic r8b n5)
+        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(3, (it.footprint && it.footprint.maxCols) || 3) }, it.footprint && it.footprint.slotPoints ? { points: 1 } : {}),
         fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong, basis: wrong ? wrong.basis : '', kind, redraw },
         cellCls: [it.cellCls || '', 'mq-thinkcell mq-eacell'].join(' ').trim(),
     });
@@ -1053,7 +1064,10 @@ export function plan(input = {}) {
     const ws = items.map((it) => Number(it.workWMm) || 0).filter((w) => w > 0);
     // (only where the items' planned widths differ, so a page of equal items prints as before)
     const pageWork = ws.length > 1 && Math.max(...ws) - Math.min(...ws) > 1 ? Math.max(...ws) : 0;
-    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom }, pageWork ? { workW: pageWork } : {})) : undefined);
+    // one fix width a page where chart windows' fixes differ (1, 2 or 3 boxes: EA-ROWX; equal fixes print as before)
+    const fws = items.map((it) => (typeof it.fixWBy === 'function' ? it.fixWBy(ctx.size, pageRoom) : 0)).filter((w) => w > 0);
+    const pageFix = fws.length > 1 && Math.max(...fws) - Math.min(...fws) > 1 ? Math.max(...fws) : 0;
+    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom }, pageWork ? { workW: pageWork } : {}, pageFix ? { fixW: pageFix } : {})) : undefined);
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's

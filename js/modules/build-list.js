@@ -576,15 +576,6 @@ export const STANDARD_PROPOSALS = {
     }),
 
     // ------------------------------------------------------------------ place value
-    chart_120: P({
-        kind: 'option', preset: false, skill: 'composing:hundreds_chart_fill', option: 'band 120: chart windows from 100 to 120 (crossing 100)',
-        name: 'Count to 120 on the Chart (option)', grade: '1', family: 'counting', standards: ['1.NBT.A.1'], ee: ['M.EE.1.NBT.1'],
-        teaches: 'counting, reading and writing numerals to 120 starting anywhere, across 100',
-        problemTypes: ['fill the window 95-115', 'what comes after 109?', 'count on from 98', 'fill the row 111-120'],
-        templates: ['chartwindow'], newTemplates: [], answer: 'write the missing numerals',
-        ladder: 'O2 90-110 → 100-120 · O3 row starts given → none · O6 window / whole chart',
-        misconceptions: ['writes 1010 for 110', '109 → 200'], wrmSteps: ['Y2.B1.S5'], after: [],
-    }),
     value_ten_times: P({
         kind: 'option', preset: true, skill: 'placevalue:value', option: 'form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10) (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Ten Times the Place to the Right (option)', grade: '4-5', family: 'placevalue', standards: ['4.NBT.A.1', '5.NBT.A.1'], ee: [],
@@ -614,14 +605,17 @@ export const STANDARD_PROPOSALS = {
     }),
 
     // ------------------------------------------------------------------ algebra / patterns
-    patterns_notice: P({
-        kind: 'new', skill: 'patterns:notice_patterns', name: 'What Do You Notice?', grade: '3-4', family: 'algebra',
-        standards: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'],
-        teaches: 'identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)',
-        problemTypes: ['shade the pattern in the table, tick what you notice', 'true or false: every product in the 5 row ends in 0 or 5', 'generate the terms, then say what alternates', 'why is 4 × n always even? (reason bank)', 'predict the 10th term'],
-        templates: ['mult-grid', 'count-row'], newTemplates: [], answer: 'tick statements from a bank; write terms',
-        ladder: 'O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track',
-        misconceptions: ['a pattern seen in three terms always continues', 'odd × odd is even'], wrmSteps: ['Y3.B3.S13', 'Y4.B4.S15'], after: [],
+    // patterns_notice: BUILT by lane lf-algebra 2026-11-07 (patterns:notice_patterns, preset patterns:pattern_features)
+    // lf-algebra 2026-11-07: the clause of 3.OA.D.9 notice_patterns leaves (patterns in the ADDITION table)
+    addition_table_patterns: P({
+        kind: 'option', preset: true, skill: 'patterns:notice_patterns', option: "patTask 'addtable': a window of the addition table; circle what you notice (each row goes up by 1; the sums on a diagonal are equal; even + even is even)",
+        name: 'Patterns in the Addition Table', grade: '3', family: 'algebra',
+        standards: ['3.OA.D.9'], ee: ['M.EE.3.OA.8'],
+        teaches: 'identifying arithmetic patterns in the addition table and explaining them with properties (the turn-around: the table is the same on both sides of its diagonal; odd + odd is even)',
+        problemTypes: ['a window of the addition table: true or false about it', 'odd + odd: even or odd?', 'which sums on the diagonal are equal?'],
+        templates: ['notice'], newTemplates: [], answer: 'circle a word; check one sentence',
+        ladder: 'O2 sums to 10 -> to 20 · O3 window shaded -> none · O6 table / plain',
+        misconceptions: ['odd + odd is odd', 'a row pattern read off two cells'], wrmSteps: [], after: [],
     }),
     multi_step_four_ops: P({
         kind: 'option', preset: false, skill: 'algebra:multi_step_word', also: ['algebra:multi_step_word_plain'], option: 'two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate',
@@ -772,6 +766,35 @@ export const STANDARD_PROPOSALS = {
         // 3×2 sizes remain to build; each becomes a `tiles` value on multiply plus its own preset.
         built: { presets: ['multiplication:mult_2by1_column', 'multiplication:mult_3by1_column', 'multiplication:mult_2by2_standard'], remaining: ['4×1', '3×2'] },
         wrmSteps: ['Y4.B5.S11', 'Y5.B5.S1'], after: [],
+    }),
+
+    // ------------------------------------------------------------------ operations (appended 2026-11-12, lf-builds: MAP gaps)
+    // design/audit/runs/wrm-tagging/MAP-report.md; lessons G1-Y2.B2 / G2-Y3.B2 "Solve one-step word problems ... using bar
+    // models" (design/lessons-first/BUILD_QUEUE.md rows 2 and 16). Spec card: design/cards/word-stories (unsigned).
+    // What exists today (gen-operations.js): add Type 5 change-unknown is dealt only under the forms value labelled
+    // 'part_part_whole'; sub Type 3 (missing subtrahend) and Type 4 (compare fewer) are unreachable branches (a string
+    // variant compared with 0.72 / 0.86); the word-work retell turns a past-tense join change-unknown into "wants / needs".
+    map_change_unknown_story: P({
+        kind: 'option', preset: true, skill: 'addition:add_word_problems', also: ['addition:add_word_problems_plain', 'subtraction:sub_word_problems', 'subtraction:sub_word_problems_plain'],
+        option: 'forms value "change" (appended, never in the default set): past-tense join with the change unknown (had 8, got some, now 13) on add_word_problems; separate with the change unknown (had 15, some went, 9 left) on sub_word_problems; an answer-bounded band 10 / 20 / 100 so "within 20" is a page (also named preset skills once built: addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown)',
+        name: 'How Many Were Added? How Many Went? (change unknown)', grade: '1', family: 'operations', standards: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'],
+        teaches: 'join and separate stories told in the past tense where the CHANGE is unknown: start and end are known, the pupil finds how many were added or how many went, modelled on a part-whole bar (First + Then = Now)',
+        problemTypes: ['join, change unknown: had 8, got some, now 13 - how many did she get?', 'separate, change unknown: had 15, some went, 9 left - how many went?', 'write the number sentence that solves it (13 - 8 = 5) and the answer with its unit', 'bar drawn: First and Now in the bar, "?" on the Then part'],
+        templates: ['word-work'], newTemplates: [], answer: 'write the solving number sentence and the answer with its unit (one answer place: the sentence result box)',
+        ladder: 'O2 band 10 -> 20 -> 100 · O3 bar with First / Then / Now captions and "?" on the change (structural on teaching pages; an option, default off, on practice) · join before separate, one schema a page (P-21) · O6 pictures / plain',
+        misconceptions: ['adds the two numbers (8 + 13 = 21)', 'writes the "now" number as the answer (13)', 'reads "got some" as the total'],
+        wrmSteps: ['Y1.B5.S10', 'Y2.B2.S21'], after: [],
+    }),
+    map_compare_smaller_unknown: P({
+        kind: 'option', preset: true, skill: 'subtraction:sub_word_problems', also: ['subtraction:sub_word_problems_plain'],
+        option: 'forms values "fewer" (Tom has 6 fewer than Maya, Maya 14) and "more-bigger-known" (Maya has 6 more than Tom, Maya 14: the language trap), appended, never in the default set; the two-bar compare drawing made schematic (also a named preset skill once built: subtraction:sub_wp_compare_smaller)',
+        name: 'Compare Stories: Find the Smaller Amount', grade: '1', family: 'operations', standards: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'],
+        teaches: 'compare stories where the SMALLER quantity is unknown, told with "fewer than" and with "more than" about the bigger, known amount; solved by subtracting the difference from the bigger amount, modelled on two bars',
+        problemTypes: ['fewer than: Maya has 14, Tom has 6 fewer than Maya - how many does Tom have?', 'more than, bigger known: Maya has 14, Maya has 6 more than Tom - how many does Tom have?', 'write the number sentence that solves it (14 - 6 = 8) and the answer with its unit', 'two bars drawn: the longer bar for the bigger amount, the difference beside the shorter bar, "?" on the shorter bar'],
+        templates: ['word-work'], newTemplates: [], answer: 'write the solving number sentence and the answer with its unit (one answer place: the sentence result box)',
+        ladder: 'O2 band 20 -> 100 · O3 two-bar frame with names (structural on teaching pages; an option, default off, on practice), difference segment shaded grey (hint, fades) · "fewer than" before "more than, bigger known" (the trap is its own value) · O6 pictures / plain',
+        misconceptions: ['"more" means add: 14 + 6 = 20 for "Maya has 6 more than Tom"', '"fewer" always means subtract, with no check of who has more', 'writes the difference (6) instead of the quantity (8)'],
+        wrmSteps: ['Y1.B5.S8', 'Y2.B2.S19'], after: [],
     }),
 };
 

@@ -1038,6 +1038,22 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
 
+### lf-algebra critic r2 (2026-11-13): precritic's "clean" list was not an evidence list
+**Lost:** critic r2 failed every skill on pages precritic r9 had listed "clean for the critic". Three of its five failure classes sat
+there: (1) pages with an OPEN critic finding - F2, the npr / fgr screen count-row train, was known and handed to lf-ops, yet the npr /
+fgr card and worksheet were listed clean (G1); (2) roles no page-fill lint ever ran on - reason-it, error-analysis, test, true-false
+and more-practice were listed clean because ws-grade-render --gate rendered them without overflow, but print-lint (LONE / PAGEFILL /
+H13) ran on independent and lesson only, so G4 (Reason It one item a page, three skills) and G7 (growing lesson PAGEFILL 43 %, 54 %
+warm-up band - a page print-lint DID run on and passed, so that lint needs a backtest at lf-engine) reached the critic; (3) the r1
+critic's proposed panel gate (F8) was never built and the blank sample spread to a second skill (G11).
+**Rule (made a check, lf-algebra r10):** a lane's "Clean for the critic" list names only pages with no open finding of the latest
+critic round (a finding closes only by a `- <ID> fixed` line under `## Fixes after critic rN`) and only print roles that a print-lint
+row of the same precritic run linted. `node tests/scripts/ws-precritic-clean.mjs` reads the lane status file; precritic runs it on
+every --skill plan (gate precritic-clean); backtest row precritic-clean-list FAILS on d20c8a003 (r9: npr worksheet clean while F2
+open, 43 claims) and PASSES on the r10 status.
+**Speed-ups next time:** run `ws-print-lint --roles reason-it,error-analysis,true-false,test --skills <family>` once (about a minute)
+before writing any clean list; when a critic proposes a check, building it is part of the fix round's done (F8 / G11);
+`ws-patterns-cells` (node, 1 s) now holds the cell-vs-page contracts G5 / G6 / G8 (LABEL-REF, TILE-CARD, ROW2-S).
 ### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
 
 Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
@@ -1059,3 +1075,10 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Round | What was lost | Cause | Fix |
 |---|---|---|---|
 | r14 critic PASS min 8 | - | Medium rebuild closed the complete defect list from r13 in one round; master merge brought ws-screen-ink-size (2 real screen size defects fixed, 4 SIZE-REF coverage findings ruled known) | Keep the dealt-banks table; the 3 minors are follow-ups |
+
+- 2026-11-13 lf-placevalue compare: a defect fixed in ONE string recurs in its siblings (the wrap: the "differ" step joined, the "Write" step not), and a check built on the default option misses the wide bands. Rule: fix the class at one helper, and run every layout check on the widest offered option value.
+## Per-round findings: lf-hosts (2026-11-13)
+- r1 (FAIL): automatic checks added - WS-REFLOW/WS-DIGIT (worksheet reflow ratchet), ws-conflict-markers, FOCUS-RING, TOUCH-UNIQUE; existing SCREEN-DIGIT judged digit size only, so it passed a reflow. Speed-ups: never commit a merge without `git diff --name-only --diff-filter=U` empty and ws-conflict-markers OK (the lane's own merge cost a finding); probes wait on DOM, not sleeps.
+- r2 (FAIL): TOUCH-HIT (real clicks; elementFromPoint missed a covering wrapper), ws-screen-widths-plan (tablet checks never ran on precritic's path), CELL-READ needs a mark/slot and card kind = quiz kind. Speed-up: a real-tap probe found the regression in 2 min - fold probes the critic writes into the tool the same round.
+- r3 (PASS): TOUCH-HIT timing flake on untouched cells handed to lf-checks (re-tap after 2 rAF, 3-run backtest). Speed-up: owner scope changes (no 390, M/L) mid-lane cost one re-scope message per agent; brief agents to read the width/size table, not hard-coded widths.
+- 2026-11-13 lf-placevalue compare: a defect fixed in ONE string recurs in its siblings (the wrap: the "differ" step joined, the "Write" step not), and a check built on the default option misses the wide bands. Rule: fix the class at one helper, and run every layout check on the widest offered option value.

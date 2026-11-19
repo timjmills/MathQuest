@@ -108,10 +108,14 @@ register('words', {
         // Model, the Scripted Model's last row and the opener's Model cells printed an EMPTY answer line)
         const key = ctx.state === 'answered' || ctx.state === 'traced' ? keyOf(p) : null;
         if (toWords(p)) {
-            const line = blank({ id: 'answer', kind: 'text', shape: 'line', widthMm: ctx.size === 'S' ? 70 : ctx.size === 'M' ? 85 : 100, graded: true }, ctx, key);
-            return `<div class="ws-words" data-ws-words="to_words" style="display:flex;flex-direction:column;align-items:center;gap:2mm;">`
+            // (critic live1 r2 N7: the L line is 100 mm, and the Opener's half-width Model cell is narrower - the line ran out of the
+            // cell into the Steps column. The line keeps its width where the cell has it and never leaves the cell; a name longer
+            // than the line wraps on it at its own size, never smaller)
+            const line = blank({ id: 'answer', kind: 'text', shape: 'line', widthMm: ctx.size === 'S' ? 70 : ctx.size === 'M' ? 85 : 100, graded: true }, ctx, key)
+                .replace('style="--w:', 'style="max-width:100%;box-sizing:border-box;min-height:var(--ws-hw);height:auto;overflow-wrap:break-word;--w:');
+            return `<div class="ws-words" data-ws-words="to_words" style="display:flex;flex-direction:column;align-items:center;gap:2mm;max-width:100%;">`
                 + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${esc(Number(p.n).toLocaleString('en-US'))}</span>`
-                + `<span style="font-size:${pt(textPt + 4)};line-height:1.2;">${line}</span></div>`;
+                + `<span style="font-size:${pt(textPt + 4)};line-height:1.2;display:block;max-width:100%;text-align:center;">${line}</span></div>`;
         }
         if (p.slot === 'hto') {
             // (critic nwf r1 N2: a True or False? / Reason It / error-analysis cell draws the CLAIM in state `wrong`; the boxes read
@@ -158,7 +162,9 @@ register('words', {
         // more rows instead of a 31-40 % band under every cell. A lesson ref may keep the old fill: cellPayload {inPlace: false}.)
         // (and its columns are capped by size - 4 / 3 / 3 at S / M / L: five across a 30-item S page left six rows for thirty
         // short cells, each stretched 31-37 % past its ink; more rows at the item's own height fill the page instead)
-        const ip = p.inPlace === false ? {} : { inPlace: true, denseRoom: 1, hardCap: true };
+        // (`guidedTight`, lf-roles critic r8b D2: on the Guided page the rows keep their measured height - 35-50 % of every cell was
+        // empty under its line at M / L - and the spare height stays under the grid; read by the Guided role only)
+        const ip = p.inPlace === false ? {} : { inPlace: true, denseRoom: 1, hardCap: true, guidedTight: true };
         // (critic nwf r1 band 20: the 21 names 0-20 cannot fill the S page's 4 x 7 - its rows were stretched 45 % past their ink;
         // three across x 7 rows holds all 21 at about the item's own height)
         const capCols = p.pool === 20 && ctx && ctx.size === 'S' ? 3 : (({ S: 4, M: 3, L: 3 })[ctx && ctx.size] || 3);

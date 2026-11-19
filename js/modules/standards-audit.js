@@ -57,7 +57,7 @@ export const CCSS_AUDIT = {
     'K.G.B.6': F(['shapes_early:compose_shapes']),
 
     // ================================================================ Grade 1
-    '1.OA.A.1': F(['addition:add_word_problems', 'subtraction:sub_word_problems', 'addition:comparison_word', 'subtraction:unknown_start_wp', 'addition:add_wp_20', 'subtraction:sub_wp_20'], 'every situation and unknown position at range 20; bar and equation supports'),
+    '1.OA.A.1': P(['addition:add_word_problems', 'subtraction:sub_word_problems', 'addition:comparison_word', 'subtraction:unknown_start_wp', 'addition:add_wp_20', 'subtraction:sub_wp_20'], ['change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today)', 'compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known)'], ['map_change_unknown_story', 'map_compare_smaller_unknown'], 'lf-builds 2026-11-12: change-unknown and compare-smaller branches unreachable (word-stories card); was full. Range 20, bar and equation supports and unknown position at range 20; bar and equation supports'),
     '1.OA.A.2': P(['addition:add_three'], ['word problems with three addends (the skill is bare sums)'], ['add_three_forms']),
     '1.OA.B.3': P(['addition:add_sub_fact_family', 'addition:fact_family_sort'], ['the associative property as a strategy: add three numbers by making a ten first (2 + 6 + 4 = 2 + 10)'], ['add_three_forms']),
     '1.OA.B.4': F(['addition:add_sub_fact_family', 'addition:number_families_add', 'subtraction:missing_add_sub']),
@@ -65,7 +65,7 @@ export const CCSS_AUDIT = {
     '1.OA.C.6': P(['addition:add_facts', 'subtraction:sub_facts', 'number_sense:make_a_ten', 'number_sense:doubles_near_doubles', 'addition:number_families_add'], ['decomposing a number leading to a ten in subtraction (13 − 4 = 13 − 3 − 1)'], ['make_ten_subtract']),
     '1.OA.D.7': P(['algebra:balance_addsub'], ['decide whether equations are true or false: addition:equal_sign is tagged but deals plain column addition (it routes to the operations generator)', 'the forms 6 = 6 and 7 = 8 − 1'], ['equal_sign_repair', 'compare_sentences']),
     '1.OA.D.8': F(['subtraction:missing_add_sub', 'addition:cloze_addition', 'algebra:balance_addsub']),
-    '1.NBT.A.1': P(['counting:number_seq_fill', 'composing:hundreds_chart_fill'], ['counting across 100 to 120 on a chart', 'writing the numeral for a counted set above 20'], ['chart_120', 'tens_ones_group']),
+    '1.NBT.A.1': P(['counting:number_seq_fill', 'composing:hundreds_chart_fill', 'composing:chart_to_120'], ['writing the numeral for a counted set above 20'], ['tens_ones_group']),
     '1.NBT.B.2': F(['composing:base10_build'], 'own clause: the two digits are tens and ones'),
     '1.NBT.B.2a': F(['composing:tens_foundation_visual', 'composing:base10_regroup']),
     '1.NBT.B.2b': F(['composing:teen_compose', 'composing:ten_frame_build_teen'], 'teen numbers as a ten and some ones'),
@@ -83,7 +83,7 @@ export const CCSS_AUDIT = {
     '1.G.A.3': P(['shapes_early:partition_shapes'], ['the words halves, fourths, quarters and "half of / quarter of" (the skill writes 1/2)', 'the whole as two or four of the shares', 'more equal shares make smaller shares'], ['half_quarter']),
 
     // ================================================================ Grade 2
-    '2.OA.A.1': F(['addition:add_word_problems', 'subtraction:sub_word_problems', 'subtraction:unknown_start_wp', 'addition:add_wp_100', 'subtraction:sub_wp_100', 'algebra:multi_step_word'], 'one step: every situation and unknown to 100; two steps: multi_step_word (+ and −)'),
+    '2.OA.A.1': P(['addition:add_word_problems', 'subtraction:sub_word_problems', 'subtraction:unknown_start_wp', 'addition:add_wp_100', 'subtraction:sub_wp_100', 'algebra:multi_step_word'], ['change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today)', 'compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known)'], ['map_change_unknown_story', 'map_compare_smaller_unknown'], 'lf-builds 2026-11-12: was full. One step every situation and unknown to 100; two steps: multi_step_word (+ and −)'),
     '2.OA.B.2': F(['addition:add_facts', 'subtraction:sub_facts']),
     '2.OA.C.3': P(['composing:odd_even', 'composing:select_even_odd', 'patterns:double'], ['decide odd or even for a group of objects (up to 20) by pairing or counting in 2s (the skills use the last digit)', 'write an even number as a sum of two equal addends'], ['odd_even_pairs']),
     '2.OA.C.4': P(['multiplication:arrays_groups', 'multiplication:dot_array_mult', 'multiplication:repeated_add_to_mult'], ['the pupil writes the total of an array (to 5 × 5) as a sum of equal addends (repeated_add_to_mult prints the sum)'], ['equal_groups_early']),
@@ -121,7 +121,7 @@ export const CCSS_AUDIT = {
     '3.OA.B.6': F(['multiplication:mult_div_fact_family', 'division:missing_mult_div']),
     '3.OA.C.7': F(['multiplication:mult_facts', 'division:div_facts']),
     '3.OA.D.8': F(['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult', 'algebra:two_step_add_then_div', 'algebra:two_step_letter_equation', 'algebra:two_step_estimate_check', 'number_sense:estimate_sums_diffs'], 'two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)'),
-    '3.OA.D.9': P(['multiplication:mult_chart', 'patterns:number_patterns_rule', 'patterns:count_by_fill'], ['patterns in the addition table', 'explain a pattern with a property (4 × n is always even)'], ['patterns_notice']),
+    '3.OA.D.9': P(['multiplication:mult_chart', 'patterns:number_patterns_rule', 'patterns:count_by_fill', 'patterns:notice_patterns'], ['patterns in the addition table'], ['addition_table_patterns'], 'lf-algebra 2026-11-07: explaining a multiplication-table pattern (even products, a times-table sentence true or false) is patterns:notice_patterns'),
     '3.NBT.A.1': F(['number_sense:nearest_10', 'number_sense:nearest_100', 'number_sense:rounding_visual']),
     '3.NBT.A.2': F(['addition:add_1k_mixed', 'subtraction:sub_1k_mixed']),
     '3.NBT.A.3': F(['multiplication:mult_zeros']),
@@ -152,7 +152,7 @@ export const CCSS_AUDIT = {
     '4.OA.A.2': P(['multiplication:mult_comparison', 'multiplication:mult_comparison_plain'], ['distinguish multiplicative comparison from additive comparison'], ['add_or_mult']),
     '4.OA.A.3': P(['division:remainder_interpret', 'division:remainder_contexts', 'algebra:multi_step_word', 'number_sense:estimate_products'], ['multistep problems using × and ÷', 'an equation with a letter for the unknown'], ['multi_step_four_ops']),
     '4.OA.B.4': F(['number_theory:factor_tchart_easy', 'number_theory:factors_identify', 'number_theory:multiples', 'number_theory:prime_composite', 'number_theory:divisibility_sort']),
-    '4.OA.C.5': P(['patterns:number_patterns_rule', 'patterns:shape_pattern', 'patterns:number_pattern'], ['identify features of the pattern not explicit in the rule, and explain them informally'], ['patterns_notice']),
+    '4.OA.C.5': F(['patterns:number_patterns_rule', 'patterns:shape_pattern', 'patterns:number_pattern', 'patterns:pattern_features', 'patterns:growing_shape_patterns', 'patterns:follow_given_rule'], 'lf-algebra 2026-11-07: features not explicit in the rule (pattern_features) and growing shape patterns'),
     '4.NBT.A.1': P(['placevalue:value', 'placevalue:identify', 'placevalue:pv_digit_drag'], ['a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10)'], ['value_ten_times']),
     '4.NBT.A.2': F(['placevalue:number_word_names', 'placevalue:expand', 'placevalue:compare', 'placevalue:combine']),
     '4.NBT.A.3': F(['number_sense:nearest_1000', 'number_sense:nearest_10000', 'number_sense:nearest_100000', 'number_sense:round_nl_thousands']),

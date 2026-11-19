@@ -24,17 +24,18 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
+import { chartOfQ, cwKey, chartGivesAway } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole, factTableTop } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { applySheetTags, ebItemOf } from './sheet/index.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, roleOptions, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
@@ -150,10 +151,10 @@ function divUnderTabSection(sec, size) {
     // green - and the taller row would only cost the page a row: ws-print-lint --supports boxsign L H13 32 %)
     const sup = Array.isArray(o.support) ? o.support : [];
     if (!sec.divFade && sup.length && sup.every((v) => v === 'boxsign')) return false;
-    const top = Number(o.band) === 100 ? 10 : 12;
+    const top = factTableTop(o.band);
     let t = o.constant;
     if (typeof t === 'number' || typeof t === 'string') t = [t];
-    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: top + 1 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
     if (!ticked.length) return false;
     const b = Math.max(...ticked);
     return String(b * top).length + String(b).length >= 5;
@@ -216,6 +217,13 @@ export function normaliseFamilies(v) {
     return v === true || /^(allow|on|true|yes|1)$/i.test(String(v === undefined || v === null ? '' : v).trim()) ? 'allow' : 'off';
 }
 
+/** True when a list of skill refs prints the count_by_tables "All rows on one page" sheet, which buildSheet draws in the
+ *  compact layout (COMPACT_LABEL) whatever size is asked: every size control shows that one label instead of M / L. */
+export function printsCompactOnePage(skills) {
+    return (skills || []).some((k) => {
+        try { return !!k && !k.leftOut && k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+    });
+}
 function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     const role = ROLES.has(asked) ? asked : 'independent';
@@ -229,7 +237,10 @@ function normaliseRequest(req = {}) {
         ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
     const sections = (Array.isArray(req.sections) ? req.sections : [])
         .map((s) => ({
-            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId),
+            // (a support that follows the role - provider `roleOpts`: identify's place heads off on Review / Test / the
+            // pre-skill check, lead ruling PEDAGOGY 4.1a 2026-11-13; every other skill's opts pass through unchanged)
+            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId)
+                .map((k) => { const o = roleOptions(role, k.categoryId, k.skillId, k.opts); return o === k.opts ? k : Object.assign({}, k, { opts: o }); }),
             count: s && s.count !== undefined && s.count !== null && s.count !== 'auto' ? clampInt(s.count, 1, MAX_ITEMS, null) : null,
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
@@ -258,6 +269,9 @@ function normaliseRequest(req = {}) {
             // from the caller's probe - one column count and digit size on every page and set of the print
             tracks: s && Number(s.tracks) > 0 ? clampInt(s.tracks, 1, 7, 0) : 0,
             ansTracks: s && Number(s.ansTracks) > 0 ? clampInt(s.ansTracks, 1, 7, 0) : 0,
+            // ... and whether the section's skills mix ÷ (the sign's own form) with + − × (MIXED-ALL-OPS, owner 2026-11-14): every
+            // page of it is laid as the mixed page, a page that dealt ÷ facts only too
+            ...(s && s.signMix ? { signMix: true } : {}),
             // ... and the section's one row stretch for the whole print (PG-11: at most 1.3, owner 2026-11-05)
             stretch: s && Number(s.stretch) >= 1 ? Math.min(1.3, Number(s.stretch)) : 0,
             // ... and the largest digit size a section may take (facts-print-fix r4: sections sharing a page take one size)
@@ -269,6 +283,15 @@ function normaliseRequest(req = {}) {
             ...(s && Number(s.blockShare) > 0 ? { blockShare: Number(s.blockShare) } : {}),
         }))
         .filter((s) => s.skills.length);
+    // Lead ruling 2026-11-13 (chartwindow card §7a, role-scoped hidden): an option value the ROLE hides (`hiddenOnRoles`,
+    // grid whole / rows on Lesson, Guided, Test) falls back to the option's default, so the role never deals or draws it.
+    for (const sec of sections) {
+        sec.skills = sec.skills.map((k) => {
+            let o;
+            try { o = optsForRole(k.categoryId, k.skillId, k.opts || {}, role); } catch (e) { o = k.opts; }
+            return o === k.opts || (o && k.opts === undefined && !Object.keys(o).length) ? k : { ...k, opts: o };
+        });
+    }
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
     // problems' size: its rows share the whole grid instead of leaving a strip under capped rows.
     // The ceiling is the section's own dense ceiling too, so the grid is laid for that count.
@@ -298,7 +321,7 @@ function normaliseRequest(req = {}) {
         }
     }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
-    // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
+    // page in one column, drawn at the compact S token (COMPACT_LABEL; lead ruling 2026-11-13: at M, Letter holds 11 rows).
     let onePage = false;
     for (const sec of sections) {
         let rowCount = ONE_PAGE_ITEMS;
@@ -932,6 +955,10 @@ const POOL_LEGACY_TRIES = 16;
 /** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
 const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
 
+/* CROSS-GIVEAWAY (chart_120 critic r1 F4 / F9; r2 N2): the window rule lives in chart-giveaway.js, shared with the screen deal
+ * (the online worksheet and the quiz), so paper and screen never repeat a window's squares. */
+export { chartGivesAway };
+
 /**
  * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
  * column work, to fill that group's last row (buildSheetOnce, whole rows). A draw of another kind
@@ -995,7 +1022,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // deals as before); absent on every other ref: skH is sk)
         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
         const pass = (rotate, relaxLast, soft, words = true) => {
-            let got = null;
+            let got = null, altCw = null;
             for (let k = 0; k <= tries; k++) {
                 const seed = (runSeed + i + 7919 * k) >>> 0;
                 let cand = null;
@@ -1036,9 +1063,17 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (want && k < tries && !want(cand, sk)) { if (!got) got = cand; continue; }
                 // (a case the last row WANTS is kept for it: no other place of the page deals it)
                 if (strict && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
+                // (CROSS-GIVEAWAY: a window that would print another window's answer is passed over while tries remain)
+                if (k < tries && chartGivesAway(cand, seen)) {
+                    // (a NEW window that only overlaps a kept one is the fallback: never a repeat of a kept window)
+                    if (!altCw && !seen.has(signature(cand)) && !chartGivesAway(cand, seen, { same: true })) altCw = cand;
+                    if (!got) got = cand;
+                    continue;
+                }
                 got = cand;
                 if (!seen.has(signature(cand))) break;
             }
+            if (altCw && got && got !== altCw && (seen.has(signature(got)) || chartGivesAway(got, seen))) got = altCw;
             return got;
         };
         // (a detailed lesson's ref - `avoidKeys` - rotates the generator's case before it relaxes: a
@@ -1050,6 +1085,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
+        // (CROSS-GIVEAWAY: every try drew a window of squares already on the sheet - a one-window chart, or more items than the
+        // chart has windows - so this item is not dealt)
+        if (chartGivesAway(q, seen, { same: true })) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
@@ -1068,6 +1106,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
+        { const cw = chartOfQ(q); if (cw) seen.add(cwKey(cw)); }
         // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
         if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
@@ -1517,7 +1556,7 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     }
     // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
     if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
-    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(o) / extra.tally), rows: extra.tally };
+    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: extra.tally, rows: Math.max(1, divFactsMaxDividend(o) / extra.tally) };   // (facts card §5.9: landscape, the divisor's rows)
     return {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',
@@ -1803,7 +1842,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             if (ink === 'trace' && v === answer) st = 'traced';
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
-        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, guided: !!item.guided, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         // (lf-partopts B: the skill's `off` - the role-drawn supports its part turned off - with any the role adds, read by the
         // template as ctx.off; absent when nothing is off, so every standard cell's context is exactly as before)
         const offC = offIds.length || (Array.isArray(c.off) && c.off.length) ? [...new Set([...(Array.isArray(c.off) ? c.off : []), ...offIds])] : null;
@@ -2286,9 +2325,9 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const ctxCache = new Map();
         // (an item's own drawing flags - wrapToCell, tightRows - are part of its context and its key)
         const ctxOf = (state, level, it = null) => {
-            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows);
-            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}`;
-            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}));
+            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows), guided = !!(it && it.guided);
+            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}${guided ? 1 : 0}`;
+            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}, guided ? { guided: true } : {}));
             return ctxCache.get(k);
         };
         // every drawing, at every column count and state (string work, no layout)
@@ -2614,6 +2653,78 @@ function measureTitleLines(text, size) {
     return wMm <= LIVE_W_MM - 0.6 ? 1 : 2;
 }
 
+/**
+ * The teacher's own page title (owner request 2026-11-13, PT-DLG-20), fitted to the header band. The title keeps the size's
+ * title token (HD-14: it never shrinks); it wraps to at most TWO lines at the live width (the layout already takes the
+ * second line's 6 mm off the body, HEADER_PARTS_MM.titleWrap); past two lines it is cut at the last whole word that
+ * still fits with "…", and `truncated` tells the dialog to warn. Measured in Andika 700 with the kit's custom-title rule
+ * (css/sheet-kit.css [data-ws-title="custom"]: line-height 7 mm, overflow-wrap anywhere). The fit is taken at the size the
+ * page prints (at least M, the size a lesson packet prints when S is asked), so every page of the job prints the same words.
+ * @returns {{asked: string, text: string, lines: number, truncated: boolean, size: string}}
+ */
+export const TITLE_MAX_LINES = 2;
+export const TITLE_MAX_CHARS = 200;
+export function fitTitle(asked, size = 'L') {
+    // (a title over TITLE_MAX_CHARS is far past two lines at any size: it is measured from its first TITLE_MAX_CHARS)
+    const text0 = String(asked || '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MAX_CHARS).trim();
+    const sz = size === 'S' ? 'M' : (SIZES[size] ? size : 'L');
+    const res = { asked: text0, text: text0, lines: text0 ? 1 : 0, truncated: false, size: sz };
+    if (!text0 || typeof globalThis.document === 'undefined' || !globalThis.document.body) return res;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
+    const s = SIZES[sz];
+    const box = document.createElement('div');
+    box.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;width:${LIVE_W_MM - 0.6}mm;white-space:normal;overflow-wrap:anywhere;text-align:center;line-height:7mm;font-family:'Andika',sans-serif;font-weight:700;font-size:${s.titlePt}pt;font-feature-settings:"cv04" 1;`;
+    document.body.appendChild(box);
+    const lineMm = 7;
+    const linesOf = (t) => { box.textContent = t; return Math.max(1, Math.round(box.getBoundingClientRect().height / PX_PER_MM / lineMm)); };
+    try {
+        res.lines = linesOf(text0);
+        if (res.lines <= TITLE_MAX_LINES) return res;
+        // the longest run of whole words that fits two lines with the ellipsis
+        const words = text0.split(' ');
+        let lo = 1, hi = words.length - 1, best = 0;
+        while (lo <= hi) {
+            const mid = (lo + hi) >> 1;
+            if (linesOf(`${words.slice(0, mid).join(' ').replace(/[\s,;:.\-–—]+$/, '')}…`) <= TITLE_MAX_LINES) { best = mid; lo = mid + 1; } else hi = mid - 1;
+        }
+        let cut = best ? `${words.slice(0, best).join(' ').replace(/[\s,;:.\-–—]+$/, '')}…` : '';
+        // one word longer than two lines on its own: cut inside it (overflow-wrap anywhere)
+        if (!cut) { let n = words[0].length; while (n > 1 && linesOf(`${words[0].slice(0, n)}…`) > TITLE_MAX_LINES) n--; cut = `${words[0].slice(0, n)}…`; }
+        res.text = cut;
+        res.lines = linesOf(cut);
+        res.truncated = true;
+        return res;
+    } finally { box.remove(); }
+}
+
+/**
+ * The page-title option on a request (`req.header.titleText`, `req.header.titlePos`) turned into the header every role
+ * already reads: `title` (the fitted words), `titleLines` (their measured lines, which the layout reserves), `titleCustom`
+ * and `titlePos`. A request with neither option (or with them at the defaults: no text, 'below') is returned UNCHANGED, so
+ * its pages are byte-identical to the pages before the option existed (ws-frame-title TITLE-IDENT).
+ */
+async function withTitleOption(req) {
+    const h = req && req.header;
+    if (!h || typeof h !== 'object' || (!('titleText' in h) && !('titlePos' in h))) return { req, fit: null };
+    const text = typeof h.titleText === 'string' ? h.titleText.replace(/\s+/g, ' ').trim() : '';
+    const pos = h.titlePos === 'above' ? 'above' : 'below';
+    const header = Object.assign({}, h);
+    delete header.titleText;
+    delete header.titlePos;
+    if (pos === 'above') header.titlePos = 'above';
+    let fit = null;
+    if (text && header.title !== false) {
+        await fontsReady();
+        // (a lesson packet prints its teaching sheet at L whatever size is asked: its title is fitted at L, so every page
+        // of the packet prints the same words)
+        fit = fitTitle(text, req.role === 'lesson' ? 'L' : String(req.size || 'L').toUpperCase());
+        header.title = fit.text;
+        header.titleLines = fit.lines;
+        header.titleCustom = true;
+    }
+    return { req: Object.assign({}, req, { header }), fit };
+}
+
 /* ==================================================================== the one entry point */
 
 async function fontsReady() {
@@ -2731,7 +2842,7 @@ function optionTitleBase(sk, baseICan) {
     if (!bandPhrase) return '';
     // A mixed page: the skill's own title with its default bound swapped for the chosen one
     // ("I Can add facts to 20" -> "to 10"; the ×/÷ tables name their largest factor).
-    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const tok = (v) => (v === 144 ? '12' : v === 225 && bandDef.default === 144 ? '15' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
 }
@@ -2776,6 +2887,8 @@ function skillMeta(sk, q) {
             titleOpts = { opts: no };
         } catch (e) { titleOpts = {}; }
     }
+    // chart_120 (card chartwindow §3, L28): the chart's I Can follows its band (band 120: "a chart to 120"), read from the options
+    if (sk.skillId === 'hundreds_chart_fill' && sk.opts && Number(sk.opts.band) === 120) titleOpts = { opts: { band: 120 } };
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
@@ -3258,7 +3371,7 @@ async function buildSheetDeal(req = {}) {
     const titles = [...new Set(skills.map((s) => s.iCan))];
     const title = typeof n.header.title === 'string' && n.header.title.trim() ? n.header.title.trim()
         : titles.length === 1 ? titles[0] : 'Mixed practice';
-    const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : measureTitleLines(title, n.size) });
+    const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : n.header.titleCustom && n.header.titleLines ? Number(n.header.titleLines) : measureTitleLines(title, n.size) });
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
     // Wave 5.2: the number line at the top of the page. Its band is reserved NOW, from a seeded
@@ -4050,6 +4163,8 @@ async function buildSheetDeal(req = {}) {
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template, cell: cellRefOf(it),
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
+            // (`keepCols`, additive: the re-seat below reads it - a pv compare page keeps its columns)
+            ...(it.footprint && it.footprint.keepCols ? { keepCols: true } : {}),
         })),
         gaps: out.gaps,
         numberLine,
@@ -4289,6 +4404,12 @@ async function buildRoleSheet(n, metaOf) {
     const reqSkills = n.sections.flatMap((s) => s.skills);
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
+    // (the skills a role sources for itself - a pre-skill check's earlier skills, a review's - take the role's option values
+    // too: provider roleOpts, identify's place heads off on the unaided roles, lead ruling PEDAGOGY 4.1a 2026-11-13)
+    for (let i = 0; i < pools.length; i++) {
+        const sk2 = pools[i].skills.map((k) => { const o = roleOptions(n.role, k.categoryId, k.skillId, k.opts); return o === k.opts ? k : Object.assign({}, k, { opts: o }); });
+        if (sk2.some((k, j) => k !== pools[i].skills[j])) pools[i] = Object.assign({}, pools[i], { skills: sk2 });
+    }
     const allSkills = [];
     const seenSkill = new Set();
     for (const p of pools) for (const sk of p.skills) {
@@ -4296,7 +4417,8 @@ async function buildRoleSheet(n, metaOf) {
         if (!seenSkill.has(k)) { seenSkill.add(k); allSkills.push(metaOf(sk)); }
     }
     const header = Object.assign({}, n.header);
-    delete header.titleLines;
+    // (a teacher's own title keeps the lines it was fitted to: frameOf reserves them - withTitleOption)
+    if (!header.titleCustom) delete header.titleLines;
     // Wave 5.2: the number line, reserved before any capacity is worked out (see buildSheet).
     // A test / check page carries no hint scaffold unless the teacher allows hints on tests
     // (PEDAGOGY P-SC-5: a teacher option, `req.testHints`); every other role carries it.
@@ -4351,7 +4473,8 @@ async function buildRoleSheet(n, metaOf) {
             factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
             factPt: (n.sections[0] && n.sections[0].maxPt) || 0,
             factSizeCap: !!(n.sections[0] && n.sections[0].sizeCap),
-            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap })) } : {}),
+            ...(n.sections[0] && n.sections[0].signMix ? { factSignMix: true } : {}),
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap, ...(s.signMix ? { signMix: true } : {}) })) } : {}),
         } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
@@ -4464,6 +4587,9 @@ async function buildRoleSheet(n, metaOf) {
             }
             // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
             if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
+            // (lf-algebra, lead ruling 2026-11-14: a cell can tell a GUIDED page's Model and tries from the Opener's / Scripted
+            // Model's at the same scaffold level - the two-step bar drops on Guided - so the Guided role marks its items; ctx.guided)
+            if (mod.ROLE_ID === 'guided') prepared.guided = true;
             prepared.section = 0;
             if (rk) for (const x of rk) shareSeen.add(x);
             if (xk) for (const x of xk) { shareSeen.add(x); pageSeen.add(x); }
@@ -4532,7 +4658,26 @@ async function buildRoleSheet(n, metaOf) {
         if (noRepeat) { out.counts = counts; out.short = Math.max(0, want - out.length); }
         return out;
     };
-    const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
+    // (lf-roles r9, Guided DRAWN-FIT: a role that measures at its tallest level - the Model's - may also ask, item by item
+    // (`MEASURE_LO(item)` -> the lower scaffold levels it draws the item at, or null), for the height the item draws at each:
+    // `measured[c].atLevel[level]`. Guided reads it for the tries of a page that would otherwise hold one story a page.
+    // Measurement only: no drawing changes.)
+    const measureLo = (items) => {
+        if (typeof mod.MEASURE_LO !== 'function') return;
+        const asks = items.map((it) => [it, it.measured ? [].concat(mod.MEASURE_LO(it) ?? []).filter((lv) => Number.isFinite(lv)) : []]).filter(([, lvs]) => lvs.length);
+        const levels = [...new Set(asks.flatMap(([, lvs]) => lvs))];
+        for (const lv of levels) {
+            const mine = asks.filter(([, lvs]) => lvs.includes(lv)).map(([it]) => it);
+            const clones = mine.map((it) => Object.assign({}, it, { measureLevel: lv, measured: undefined }));
+            measureItems(clones, { size: n.size, look: n.look, colsList });
+            mine.forEach((it, i) => {
+                for (const [c, m] of Object.entries(clones[i].measured || {})) {
+                    if (it.measured[c] && m && Number.isFinite(m.hMm)) it.measured[c].atLevel = Object.assign({}, it.measured[c].atLevel || {}, { [lv]: m.hMm });
+                }
+            });
+        }
+    };
+    const measure = (items) => { measureItems(items, { size: n.size, look: n.look, colsList }); measureLo(items); };
     // A mixed page of 1 x 1 fact cells may run the whole lattice across (8 Daily / 10 I Can at S,
     // the TY-30 fact ladder; critic M1 r1 D1), so its cells are measured at 8 and 10 too.
     const measureMixed = (items) => measureItems(items, { size: n.size, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
@@ -6358,7 +6503,17 @@ export function buildSheet(req = {}) {
         if (!ref) return Promise.reject(new Error(`buildSheet: no lesson "${req.lessonId}" in the library`));
         req = Object.assign({}, req, { lessonId: lessonById(req.lessonId).id, sections: [Object.assign({}, (req.sections || [])[0] || {}, { skills: [ref] })] });
     }
-    const run = buildQueue.then(() => keyedSheet(req, buildSheetCounted));
+    // the teacher's page title (lf-roles 2026-11-13): a request without the option goes through exactly as before
+    const h = req && req.header;
+    const titled = !!(h && typeof h === 'object' && ('titleText' in h || 'titlePos' in h));
+    const run = titled
+        ? buildQueue.then(async () => {
+            const t = await withTitleOption(req);
+            const res = await keyedSheet(t.req, buildSheetCounted);
+            if (res && typeof res === 'object' && t.fit) res.titleFit = t.fit;
+            return res;
+        })
+        : buildQueue.then(() => keyedSheet(req, buildSheetCounted));
     buildQueue = run.catch(() => {});
     return run;
 }
@@ -6846,7 +7001,11 @@ async function buildSheetFill0(req = {}) {
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
                     // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
-                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    // (nor a section whose footprints say `keepCols` - pv compare, lf-placevalue compare round: "408 ( ) 666" at S in
+                    // rows held to its ink fills 3 x 10 to about 80 %, and the re-lay to 2 x 14 left a 31 % band each side of every
+                    // cell; the spare height stays under the grid, as `tightRows` keeps it on every role)
+                    const keepCols = (best.items || []).length > 0 && best.items.every((it) => !!(it && it.keepCols));
+                    const cMin = divFactsPlainSection(s) || keepCols ? c0 : 1;
                     for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;

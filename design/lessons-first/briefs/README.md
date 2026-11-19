@@ -69,6 +69,9 @@ calls pass `subagent_type: "mq-opus-medium"` and `model: "opus"`. Say in each su
 | `w1-vocab-lessons.md` | `lf-vocab` (only after the owner's yes to Q7) | cloud |
 | `w1-inflight.md` | the two in-flight items | in-session worktree agents |
 
+**Sizes (owner, 2026-11-13).** Every brief grades the print sizes **M and L**. Size S is dropped: no brief asks for it, and
+`ws-no-size-s` fails a picker or a gate default that still offers it (RUBRIC "Every size").
+
 ## Critic brief templates (owner rule 2026-11-13, fastest plan 2-3)
 
 | Brief | When |

@@ -156,6 +156,20 @@ export const IN_PLACE_FILL = 1.12;
  */
 export const tightRows = (infos) => Array.isArray(infos) && infos.length > 0
     && infos.every((i) => !!i && !!((i.fp || i.footprint || {}).tightRows));
+/**
+ * CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): does a row of `rowMm` stretch this item by 30 % or more?
+ * The room inside the cell's pads (CL-8: 3 mm a side) against the item's one-line ink (`footprint.inkHMm`, the compare line's
+ * height) - what ws-print-lint L-TOPSTART measures - or, with no ink height, against its measured height. A cell it holds carries
+ * `ws-rowstretch`; css/sheet-kit.css centres it only when its template opted in (`data-ws-stretchmid`).
+ */
+export const STRETCH_MID = 1.3;
+export const rowStretches = (it, cols, rowMm) => {
+    if (!it || !(rowMm > 0)) return false;
+    const ink = Number((it.footprint || it.fp || {}).inkHMm);
+    if (ink > 0) return rowMm - 6 >= STRETCH_MID * ink;
+    const h = measuredH(it, cols);
+    return h > 0 && rowMm >= STRETCH_MID * h;
+};
 /** DN-1: outside fact layouts no page holds more than 20 scored problems. */
 export const DN1_MAX = 20;
 /**
@@ -989,6 +1003,50 @@ const legacyH = (it, cols, cellH) => {
     const m = it.measured && it.measured[cols];
     return m && Number.isFinite(m.hMm) && m.hMm > 0 ? Math.min(cellH, m.hMm + 1) : cellH;
 };
+
+/**
+ * ONE-ROW (lead ruling R1 / R4a, 2026-11-13, on the owner's capacity pin): a practice page (independent, more practice, test)
+ * that holds ONE grid row - a story whose card capacity is 1 at M / L, the bar model above the column work - is never
+ * stretched to its page. Its row stops where the band under the work would reach 30 % of the cell (RUBRIC H13): at most
+ * the row's tallest MEASURED cell's ink (less its pads) / ONE_ROW_FILL, its content top-aligned; the rest of the page stays under the grid (the
+ * grid carries `mq-onerow`, so PAGEFILL / EB-PAGE read the strip as ruled, not as a page left unfilled).
+ */
+export const ONE_ROW_FILL = 0.72;
+/** The tallest a one-row grid of `items` at `cols` may stand, in mm (0 when a cell is unmeasured: the grid is left as it was). */
+export const oneRowMm = (items, cols) => {
+    const hs = (items || []).map((it) => measuredH(it, cols));
+    if (!hs.length || !hs.every((h) => h > 0)) return 0;
+    const h = Math.max(...hs);
+    return Math.round(Math.max(h, oneRowCapOf(h)) * 100) / 100;
+};
+/** The tallest a one-row cell measured `h` mm (its pads included) may stand: its INK (h less CELL_PAD_MM of pads and keep-out)
+ * over ONE_ROW_FILL - ws-empty-band reads the band from the ink to the cell's foot, so h / 0.72 still left 31-33 %. */
+export const oneRowCapOf = (h) => (h > 0 ? Math.max(h, (h - CELL_PAD_MM) / ONE_ROW_FILL) : h);
+
+/** A column story (word-work, not the sentence layout): its cell's spare height under the work is never the pupil's room. */
+export const isStoryWork = (it) => !!it && it.template === 'word-work' && ((((it.q || {}).cell || {}).payload || {}).layout !== 'sentence');
+/**
+ * ONE-ROW, per row (lf-roles r9): each row of a grid drawn `heightMm` tall (`rowsTpl` its fr shares, '' even) held to
+ * oneRowCapOf its tallest measured cell. {heightMm, rowsTpl} when a row was held, else null (a row with an unmeasured cell keeps
+ * its height).
+ */
+export function capRowsToInk(items, cols, rows, heightMm, rowsTpl = '') {
+    if (!(rows >= 1) || !(heightMm > 0)) return null;
+    const fr = rowsTpl ? String(rowsTpl).split(/\s+/).map((t) => parseFloat(t)) : Array(rows).fill(1);
+    if (fr.length !== rows || fr.some((f) => !(f > 0))) return null;
+    const tot = fr.reduce((a, b) => a + b, 0);
+    let held = false;
+    const H = fr.map((f, r) => {
+        const h = (heightMm * f) / tot;
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols));
+        if (!hs.length || hs.some((x) => !(x > 0))) return h;
+        const cap = oneRowCapOf(Math.max(...hs));
+        if (h > cap + 0.05) { held = true; return cap; }
+        return h;
+    });
+    if (!held) return null;
+    return { heightMm: Math.round(H.reduce((a, b) => a + b, 0) * 100) / 100, rowsTpl: rows > 1 ? H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') : '' };
+}
 
 /**
  * Rows of the same content stand at the same height (round 5 D-E: number_families_add S printed

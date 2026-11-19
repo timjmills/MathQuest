@@ -5,7 +5,7 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
-import { operandsOf } from '../roles/compose.js';
+import { operandsOf, stringsOf } from '../roles/compose.js';
 import { workedStepsOf } from '../anchors.js';
 import { iconForText } from '../lesson-icons.js';
 
@@ -94,6 +94,38 @@ export function generalStep(text) {
     return t;
 }
 
+/** The numbers an item prints or asks for: a chart window's every square, its text, answer, key parts and payload. */
+export function itemNumbers(it) {
+    const q = (it && it.q) || {};
+    const out = new Set();
+    const add = (v) => (String(v === undefined || v === null ? '' : v).replace(/(\d),(?=\d{3})/g, '$1').match(/\d+(?:\.\d+)?/g) || []).forEach((x) => out.add(String(Number(x))));
+    const w = q.chartWindow;
+    if (w && Array.isArray(w.rows) && Array.isArray(w.cols)) for (const r of w.rows) for (const c of w.cols) out.add(String(r * 10 + c + 1));
+    else if (q.cell && q.cell.payload) add(JSON.stringify(q.cell.payload));
+    add(q.text);
+    add(Array.isArray(q.ans) ? q.ans.join(' ') : q.ans && typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans);
+    (Array.isArray(q.keyParts) ? q.keyParts : []).forEach(add);
+    return out;
+}
+
+/**
+ * The steps the lesson sheet's Steps zone and strip show (chart_120 critic r1 F5). They stand beside the Guided and
+ * Independent cells, never beside the worked example, so a step that still names one of the EXAMPLE's own numbers once
+ * generalised ("The number before is 109 ... Write 110." beside windows with no 109 or 110) walks an item that is not on
+ * the page: the skill's general `strings.steps` ("Look left: the number before. Add 1.") take its place. A lesson with its
+ * own step words (`data.steps` / `data.chartSteps`) and steps that name no example number keep the example's steps.
+ */
+export function stripStepsFor(example, steps, data) {
+    if (!example || !Array.isArray(steps) || !steps.length) return steps;
+    if (data && ((Array.isArray(data.steps) && data.steps.length) || (Array.isArray(data.chartSteps) && data.chartSteps.length))) return steps;
+    const own = itemNumbers(example);
+    const specific = steps.some((s) => (generalStep(s.text).match(/\d[\d,]*(?:\.\d+)?/g) || []).some((n) => own.has(String(Number(n.replace(/,/g, ''))))));
+    if (!specific) return steps;
+    let gen = [];
+    try { const st = stringsOf(example).steps; gen = Array.isArray(st) ? st.map(String).filter(Boolean) : []; } catch (e) { gen = []; }
+    return gen.length ? gen.map((text) => ({ text, marks: [] })) : steps;
+}
+
 export function namedSteps(steps, data, { general = false } = {}) {
     const own = data && Array.isArray(data.steps) && data.steps.length === steps.length ? data.steps : null;
     // The provider's words in the lesson's own terms (`words`: [{from, to}] regex rewrites).
@@ -122,4 +154,4 @@ export const fitsWidth = (items, cols) => items.every((it) => {
 });
 export const hOf = (x, cols) => (x && x.measured && x.measured[cols] && Number.isFinite(x.measured[cols].hMm) ? x.measured[cols].hMm + 1 : 0);
 
-export default { PT_MM, EXAMPLE_KEYS, reflowsAt, CL8_MM, warmPools, sigOf, digitsOfOps, stateGroups, kindOf, generalStep, namedSteps, stepMarker, band, hAt, fitsWidth, hOf };
+export default { PT_MM, EXAMPLE_KEYS, reflowsAt, CL8_MM, warmPools, sigOf, digitsOfOps, stateGroups, kindOf, generalStep, namedSteps, itemNumbers, stripStepsFor, stepMarker, band, hAt, fitsWidth, hOf };

@@ -59,8 +59,20 @@ export function cardsFor(root, skillKey) {
 const applies = (line, id) => !line.on || line.on.includes(id);
 
 export async function cardPlanFor(root, skillKey) {
-    const [cat, id] = skillKey.split(':');
-    const cards = cardsFor(root, skillKey);
+    let [cat, id] = skillKey.split(':');
+    let cards = cardsFor(root, skillKey);
+    // A PRESET skill (skill-presets.js: the host skill with option values set) is graded on its host's signed card: every
+    // role and host the card offers, with the preset's values as the base and the host's other option values as variants
+    // (lf-builds chart_120 fix: composing:chart_to_120 fell back to the 9 default roles and no option values, so its
+    // pre-skill-check, opener, scripted-model ... pages and its whole chart at 12 rows were never rendered before a critic; L25).
+    let preset = null;
+    if (!cards.length) {
+        try {
+            const PR = await import(pathToFileURL(join(root, 'js', 'modules', 'skill-presets.js')).href);
+            const p = PR.presetOf ? PR.presetOf(cat, id) : null;
+            if (p) { preset = { host: `${p.categoryId}:${p.skillId}`, opts: p.opts }; id = p.skillId; cards = cardsFor(root, preset.host); }
+        } catch (e) { /* no presets in this tree */ }
+    }
     const lines = cards.flatMap((c) => readDecisions(c.md));
     const roles = [];
     for (const l of lines.filter((x) => x.group === 'roles' && applies(x, id))) {
@@ -82,6 +94,7 @@ export async function cardPlanFor(root, skillKey) {
         const oid = l.key.slice(0, eq), vals = l.key.slice(eq + 1).split('|').map((v) => v.trim());
         const def = defs.find((d) => d.id === oid);
         if (!def) { skipped.push(`${oid}: not an option ${skillKey} declares`); continue; }
+        if (preset && Object.prototype.hasOwnProperty.call(preset.opts || {}, oid)) { skipped.push(`${oid}: set by the preset (${JSON.stringify(preset.opts[oid])})`); continue; }
         if (vals.includes('*') || !['set', 'enum', 'bool'].includes(def.type)) { skipped.push(`${oid}: values ${vals.join('|')} (type ${def.type})`); continue; }
         const typed = (v) => {
             if (def.type === 'bool') return v === 'true';
@@ -103,7 +116,9 @@ export async function cardPlanFor(root, skillKey) {
             }
         }
     }
-    return { skill: skillKey, cards: cards.map((c) => c.file), roles: roles.filter((r) => !hidden.includes(r)), hidden, variants, skipped };
+    const out = { skill: skillKey, cards: cards.map((c) => c.file), roles: roles.filter((r) => !hidden.includes(r)), hidden, variants, skipped };
+    if (preset) out.preset = preset;
+    return out;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -120,8 +135,19 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         const d2 = readDecisions(md2);
         const ok2 = d2.length === 2 && Array.isArray(d2[0].on) && d2[0].on.join(',') === 'add_wp_10,add_wp_20'
             && d2[1].decision === 'out of scope' && d2[1].on[0] === 'fact_family_sort';
-        const ok = ok1 && ok2;
-        console.log(`ws-card-plan --self-test: ${ok ? 'OK' : 'FAIL'} (${d.length} + ${d2.length} lines; tagged on-list ${ok2 ? 'kept' : 'DROPPED'})`);
+        // a preset skill is planned from its host's card: every role it offers, the preset's own option never a variant
+        // (lf-builds chart_120 fix: composing:chart_to_120 fell back to the 9 default roles; skipped in a tree without it)
+        let okP = true, noteP = 'preset case n/a';
+        if (existsSync(join(root, 'design', 'cards', 'chartwindow', 'chartwindow.md'))) {
+            const pp = await cardPlanFor(root, 'composing:chart_to_120').catch(() => null);
+            const hp = await cardPlanFor(root, 'composing:hundreds_chart_fill').catch(() => null);
+            if (pp && hp && hp.cards.length) {
+                okP = !!pp.preset && pp.cards.join() === hp.cards.join() && pp.roles.join() === hp.roles.join() && !pp.variants.some((v) => v.option === 'band');
+                noteP = `preset case ${okP ? 'ok' : 'FAIL'} (${pp.roles.length} roles, ${pp.variants.length} variants)`;
+            }
+        }
+        const ok = ok1 && ok2 && okP;
+        console.log(`ws-card-plan --self-test: ${ok ? 'OK' : 'FAIL'} (${d.length} + ${d2.length} lines; tagged on-list ${ok2 ? 'kept' : 'DROPPED'}; ${noteP})`);
         process.exit(ok ? 0 : 1);
     }
     const out = [];

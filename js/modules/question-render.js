@@ -18,7 +18,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenOffFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt, wirePlaceWordBank,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
@@ -1550,8 +1550,17 @@ function _applyMapSlots(q) {
         input.style.setProperty('display', 'none', 'important');
         visualAid.classList.add('mq-map-cellslots');
         const first = _firstWriteBox(visualAid);
-        if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+        if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } _centreTwoStepBox(first); }
     }
+}
+
+// (lf-hosts 2026-11-13, ws-phone-card INVIEW) A two-step story's first box sits at the top of a tall cell, above where the
+// host's own #answerInput focus left the page; active-box's 'nearest' reveal set it at exactly 0 and the drawing's late
+// 1-2 px settle pushed it over the top edge. It is brought to the middle of the screen instead.
+function _centreTwoStepBox(first) {
+    if (!first || !first.closest('.mq-ww[data-ww-ops*=" "]')) return;
+    const r = first.getBoundingClientRect();
+    if (r.top < 8 || r.bottom > innerHeight - 8) { try { first.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) { /* ignore */ } }
 }
 
 // The box the pupil writes in FIRST. A word-problem number sentence (`[ ] ◯ [ ] = [ ] unit`, the
@@ -1563,6 +1572,16 @@ function _firstWriteBox(visualAid) {
     if (sentence) {
         const box = [...sentence.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
             .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
+        if (box) return box;
+    }
+    // A two-step story (lf-hosts 2026-11-13, ws-phone-card FOCUS on the 7 two-step skills): the pupil writes Step 1 -
+    // or the letter equation - before the answer, so its first box takes the focus, not the answer box at the foot.
+    // (Before, the answer slot was focused: the cell holds no .mq-wwsentence.)
+    const two = visualAid.querySelector('.mq-wwtwin .mq-ww[data-ww-ops*=" "]');
+    if (two) {
+        // (a regroup box is optional, never first; a copy box whose place holds no digit stays blank - active-box.js)
+        const box = [...two.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
+            .find((el) => !el.disabled && el.getAttribute('data-mq-kind') !== 'regroup' && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
         if (box) return box;
     }
     return visualAid.querySelector('input.mq-cellslot');
@@ -1600,6 +1619,7 @@ function _applyScreenCell() {
     card.classList.toggle('mq-card', practice);
     ['mq-qpaper', 'mq-scell', 'mq-mono'].forEach(c => paper.classList.toggle(c, practice));
     paper.classList.remove('mq-kind-eq', 'mq-kind-fact', 'mq-kind-stack', 'mq-kind-division', 'mq-kind-legacy', 'mq-slot-moved', 'mq-tick-mode');
+    paper.removeAttribute('data-ws-cell');
     card.classList.remove('mq-wide');
     const qt = document.getElementById('questionText');
     if (qt) qt.classList.remove('mq-dup');
@@ -1719,6 +1739,7 @@ function _applyScreenCell() {
             const first = _firstWriteBox(visualAid);
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+                _centreTwoStepBox(first);
             }
         } else if (!(q.options && q.options.length) && input && !input.disabled && qt && !qt.classList.contains('mq-dup')
             && !(visualAid && visualAid.style.display !== 'none' && visualAid.querySelector('input, [data-mq-cell], [data-mq-blank]'))
@@ -1731,6 +1752,7 @@ function _applyScreenCell() {
         // A printed "Check one box." cell is tapped, not typed (PEDAGOGY 10.2, SP-3).
         if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
         if (visualAid) { wireRingGroups(visualAid); wireClozeBanks(visualAid); }
+        if (visualAid && input && q.placeTapBank) wirePlaceWordBank(visualAid, input, q);
     }
     // Green as soon as it is right (owner request 2026-09-25): every digit box, regroup box and
     // answer slot of the cell marks itself when its value is the one it should hold.
@@ -1739,6 +1761,20 @@ function _applyScreenCell() {
     try { if (q && q.answerType === 'coord-input') wireLiveCorrect(document.getElementById('answerInputArea'), { q }); } catch (e) { /* optional */ }
     // Widgets mount late (dynamic import) and re-render on interaction: each time the cell
     // changes, the mono pass re-inks it and the repeated prompt is looked for again.
+    // Screen parity (lf-checks queue 20, lead 2026-11-13): the card's B&W cell carries [data-ws-cell] as the online worksheet's
+    // (.ws-card-visual) and the quiz's (.qt-cell) do - the kit template's kind, else 'legacy' - so every host check reads the
+    // card (the mult_facts card drew none, and the card-host checks read nothing there). A kit twin that already draws its own
+    // [data-ws-cell] cell (the words twin) keeps it as the card's cell.
+    // lf-hosts critic r2 F3: the label is the kind the quiz stamps on the same item (quiz-take.js: 'msc' for a "Click ALL" item,
+    // else the kit template's kind for ANY answer type), so the card and the quiz agree; 'legacy' only where no template exists.
+    if (!paper.querySelector('[data-ws-cell]')) {
+        let label = kind ? kind.kind : null;
+        if (!label && q) {
+            if (q.answerType === 'multi-select-check' && Array.isArray(q.options) && q.options.length) label = 'msc';
+            else { try { const k2 = cellKindFor({ ...q, options: [] }); label = k2 && k2.kind ? k2.kind : null; } catch (e) { label = null; } }
+        }
+        paper.setAttribute('data-ws-cell', label || 'legacy');
+    }
     monoCell(paper, {
         afterInk: () => {
             const va = document.getElementById('visualAid');
@@ -1850,6 +1886,24 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         const line = document.createElement('div');
         line.className = 'mq-ibline';
         while (qt.firstChild) line.appendChild(qt.firstChild);
+        // (lead ruling 2026-11-13 c, lf-placevalue live1: placevalue:expand's number sentence is set at the card's digit size,
+        // bold as on paper - it was the 24 px sentence size under the 40-56 px card floor - and each operator keeps its box,
+        // as the worksheet twin does: screen-cell.js inlineBlanksHTML `numeric`)
+        if (q.cell && q.cell.payload && q.cell.payload.kind === 'expand') {
+            line.classList.add('mq-ibnum');
+            line.querySelectorAll('input.ib-cell').forEach((inp) => {
+                const prev = inp.previousSibling;
+                if (!prev || prev.nodeType !== 3) return;
+                const m = /^([\s\S]*?)([+=\u2212\u00d7])\s*$/.exec(prev.nodeValue);
+                if (!m) return;
+                prev.nodeValue = m[1];
+                const keep = document.createElement('span');
+                keep.className = 'mq-ibkeep';
+                inp.parentNode.insertBefore(keep, inp);
+                keep.appendChild(document.createTextNode(`${m[2]} `));
+                keep.appendChild(inp);
+            });
+        }
         visualAid.insertBefore(line, visualAid.firstChild);
         visualAid.style.display = 'block';
         paper.classList.add('mq-twin');
@@ -4721,6 +4775,7 @@ function _renderQuestionImpl() {
         host.innerHTML = "";
 
         import('./widgets/number-line-extended.js').then(mod => {
+            resetRetryState();
             mod.renderNumberLineExtended(q, host);
             mod.setOnNumberLineSubmit((qq, st) => {
                 const correct = mod.checkNumberLineExtended(qq, st);
@@ -4746,75 +4801,29 @@ function _renderQuestionImpl() {
                     }
                 }
 
-                const feedback = document.getElementById("feedbackArea");
-                if (feedback) {
-                    feedback.style.display = "block";
-                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
-                    let displayAns;
-                    if (isMulti) {
-                        displayAns = qq.ans.map(m => `${m.label || m.id} = ${m.value}`).join(', ');
-                    } else {
-                        displayAns = qq.ans;
-                    }
-                    feedback.innerHTML = correct
-                        ? "🎉 Correct!"
-                        : `Not quite. The answer is ${displayAns}.`;
-                }
-
-                // ===== REVIEW MODE BRANCH =====
-                if (typeof state._reviewingQIndex === 'number'
-                    && state._reviewingQIndex >= 0
-                    && state.mapMode !== true) {
-                    if (typeof window.applyReviewOutcome === 'function') {
-                        window.applyReviewOutcome(correct, JSON.stringify(st));
-                    }
-                    return;
-                }
-
-                // Route through the existing pipeline
-                state.lastAnswerCorrect = correct;
-                state.hasAnswered = true;
-                if (correct) {
-                    state.score++;
-                    state.sessionStreak++;
-                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
-                    document.getElementById("questionCard").classList.add("correct-bg");
-                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
-                    if (typeof window.confetti === 'function') window.confetti();
-                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
-                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
-                } else {
-                    document.getElementById("questionCard").classList.add("incorrect-bg");
-                    state.sessionStreak = 0;
-                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
-                }
-                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
-                // Snapshot for the dot-row redo feature.
-                if (typeof window.recordQuestionStatus === 'function') {
-                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
-                        q: qq || state.currentQ,
-                        userAnswer: 'widget',
-                    });
-                }
-                trackSkillAnswer(correct);
-                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
-                if (typeof window.recordPracticeLog === 'function') {
-                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-                    window.recordPracticeLog(sk, correct, tm);
-                }
-
-                // MAP mode hand-off
-                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
-                    window.recordMapAnswer({ correct });
-                    return;
-                }
-
-                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
-                    setTimeout(() => {
-                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
-                    }, 800);
-                }
+                // Owner bug 2026-11-15 ("if a student gets it wrong they cannot move it afterwards"):
+                // the shared multi-place handler scores the first try once, keeps a wrong try open for
+                // a retry (the markers unlock and can be moved again) and locks only a correct one.
+                let wrongCount = 1, totalScored = 1;
+                if (isMulti) {
+                    const tol = (typeof qq.tolerance === 'number' && qq.tolerance >= 0) ? qq.tolerance
+                        : (typeof qq.minorSnap === 'number' && qq.minorSnap > 0 ? qq.minorSnap / 2 : 0.001);
+                    totalScored = qq.ans.length;
+                    wrongCount = qq.ans.filter(m => {
+                        const v = (st && typeof st === 'object') ? st[m.id] : null;
+                        return !(v != null && Math.abs(v - m.value) <= tol + 1e-9);
+                    }).length;
+                } else if (correct) wrongCount = 0;
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect: correct,
+                    wrongCount,
+                    totalScored,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => { if (nleHost && nleHost._nleUnlockForRetry) nleHost._nleUnlockForRetry(); },
+                    onLockOnAllCorrect: () => { resetAttemptTracking(); },
+                });
             });
         }).catch(err => console.error('Failed to load number-line-extended widget:', err));
 

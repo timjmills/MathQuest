@@ -1,0 +1,51 @@
+ 0 96-120 5x3 blanks=100,118,120 ans=100, 118, 120 cross100=true neighbour=true label=120-Chart Fill
+ 1 91-115 5x3 blanks=113 ans=113 cross100=true neighbour=true label=120-Chart Fill
+ 2 93-117 5x3 blanks=107,117 ans=107, 117 cross100=true neighbour=true label=120-Chart Fill
+ 3 91-115 5x3 blanks=92,111 ans=92, 111 cross100=true neighbour=true label=120-Chart Fill
+ 4 92-116 5x3 blanks=95,104,113 ans=95, 104, 113 cross100=true neighbour=true label=120-Chart Fill
+ 5 93-117 5x3 blanks=97 ans=97 cross100=true neighbour=true label=120-Chart Fill
+ 6 91-115 5x3 blanks=101,105 ans=101, 105 cross100=true neighbour=true label=120-Chart Fill
+ 7 96-120 5x3 blanks=100,117 ans=100, 117 cross100=true neighbour=true label=120-Chart Fill
+ 8 95-119 5x3 blanks=109,117,119 ans=109, 117, 119 cross100=true neighbour=true label=120-Chart Fill
+ 9 96-120 5x3 blanks=100 ans=100 cross100=true neighbour=true label=120-Chart Fill
+10 93-117 5x3 blanks=104,113 ans=104, 113 cross100=true neighbour=true label=120-Chart Fill
+11 96-120 5x3 blanks=97,117 ans=97, 117 cross100=true neighbour=true label=120-Chart Fill
+12 91-115 5x3 blanks=101,103,115 ans=101, 103, 115 cross100=true neighbour=true label=120-Chart Fill
+13 91-115 5x3 blanks=91 ans=91 cross100=true neighbour=true label=120-Chart Fill
+14 91-115 5x3 blanks=102,112 ans=102, 112 cross100=true neighbour=true label=120-Chart Fill
+15 91-115 5x3 blanks=95,111 ans=95, 111 cross100=true neighbour=true label=120-Chart Fill
+16 96-120 5x3 blanks=98,108,110 ans=98, 108, 110 cross100=true neighbour=true label=120-Chart Fill
+17 92-116 5x3 blanks=106 ans=106 cross100=true neighbour=true label=120-Chart Fill
+18 96-120 5x3 blanks=97,100 ans=97, 100 cross100=true neighbour=true label=120-Chart Fill
+19 91-115 5x3 blanks=102,114 ans=102, 114 cross100=true neighbour=true label=120-Chart Fill
+20 91-115 5x3 blanks=94,105,112 ans=94, 105, 112 cross100=true neighbour=true label=120-Chart Fill
+21 96-120 5x3 blanks=110 ans=110 cross100=true neighbour=true label=120-Chart Fill
+22 96-120 5x3 blanks=98,118 ans=98, 118 cross100=true neighbour=true label=120-Chart Fill
+23 94-118 5x3 blanks=94,96 ans=94, 96 cross100=true neighbour=true label=120-Chart Fill
+24 91-115 5x3 blanks=92,101,111 ans=92, 101, 111 cross100=true neighbour=true label=120-Chart Fill
+25 96-120 5x3 blanks=118 ans=118 cross100=true neighbour=true label=120-Chart Fill
+26 92-116 5x3 blanks=95,104 ans=95, 104 cross100=true neighbour=true label=120-Chart Fill
+27 91-115 5x3 blanks=111,113 ans=111, 113 cross100=true neighbour=true label=120-Chart Fill
+28 91-115 5x3 blanks=91,102,113 ans=91, 102, 113 cross100=true neighbour=true label=120-Chart Fill
+29 91-115 5x3 blanks=92 ans=92 cross100=true neighbour=true label=120-Chart Fill
+30 96-120 5x3 blanks=100,120 ans=100, 120 cross100=true neighbour=true label=120-Chart Fill
+31 96-120 5x3 blanks=98,100 ans=98, 100 cross100=true neighbour=true label=120-Chart Fill
+32 95-119 5x3 blanks=95,97,105 ans=95, 97, 105 cross100=true neighbour=true label=120-Chart Fill
+33 96-120 5x3 blanks=110 ans=110 cross100=true neighbour=true label=120-Chart Fill
+34 95-119 5x3 blanks=109,118 ans=109, 118 cross100=true neighbour=true label=120-Chart Fill
+35 94-118 5x3 blanks=94,116 ans=94, 116 cross100=true neighbour=true label=120-Chart Fill
+36 96-120 5x3 blanks=98,100,109 ans=98, 100, 109 cross100=true neighbour=true label=120-Chart Fill
+37 94-118 5x3 blanks=105 ans=105 cross100=true neighbour=true label=120-Chart Fill
+38 91-115 5x3 blanks=112,115 ans=112, 115 cross100=true neighbour=true label=120-Chart Fill
+39 96-120 5x3 blanks=99,110 ans=99, 110 cross100=true neighbour=true label=120-Chart Fill
+40 91-115 5x3 blanks=101,112,114 ans=101, 112, 114 cross100=true neighbour=true label=120-Chart Fill
+41 93-117 5x3 blanks=105 ans=105 cross100=true neighbour=true label=120-Chart Fill
+42 91-115 5x3 blanks=101,113 ans=101, 113 cross100=true neighbour=true label=120-Chart Fill
+43 93-117 5x3 blanks=96,103 ans=96, 103 cross100=true neighbour=true label=120-Chart Fill
+44 92-116 5x3 blanks=96,102,113 ans=96, 102, 113 cross100=true neighbour=true label=120-Chart Fill
+45 91-115 5x3 blanks=101 ans=101 cross100=true neighbour=true label=120-Chart Fill
+46 94-118 5x3 blanks=98,106 ans=98, 106 cross100=true neighbour=true label=120-Chart Fill
+47 94-118 5x3 blanks=104,108 ans=104, 108 cross100=true neighbour=true label=120-Chart Fill
+48 91-115 5x3 blanks=101,113,115 ans=101, 113, 115 cross100=true neighbour=true label=120-Chart Fill
+49 96-120 5x3 blanks=99 ans=99 cross100=true neighbour=true label=120-Chart Fill
+bad=0 distinct answers=48/50 crossingGapItems=21

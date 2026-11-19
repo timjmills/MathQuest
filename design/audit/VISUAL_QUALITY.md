@@ -5,7 +5,7 @@ choices are not always high quality and using all resources possible revise any 
 the visuals to make excellent visuals for each problem."
 
 Evidence (Phase 1, three independent explorers): `design/audit/runs/visual-quality/a-renders.md` (17 skills rendered on
-print S/M/L and card 390/820/1280, worksheet, quiz), `b-causes.md` (process root causes, census of 659 skills),
+print S/M/L and card 390/820/1280, worksheet, quiz), `b-causes.md` (process root causes, census of 659 skills), <!-- nos: history / token list of the kit -->
 `c-research.md` (how strong K–6 materials draw each representation; content model only). Before-screenshots:
 `design/status/visual-quality/before/`.
 
@@ -101,7 +101,7 @@ skills (families, bonds, make ten, compare), **21 have no kit drawing** — all 
 - **VQ-NOLEGACY** — the pinned list of skills with no kit cell may only shrink (a new legacy skill fails).
 
 ### 4.3 The graphic library (start)
-`js/modules/sheet/graphics/` — pure ES (SCC-01), token-driven (sizes S/M/L, ink, the one grey, stroke ladder), one
+`js/modules/sheet/graphics/` — pure ES (SCC-01), token-driven (sizes S/M/L, ink, the one grey, stroke ladder), one <!-- nos: history / token list of the kit -->
 drawing on paper and screen. First entries: number bond, fact triangle, labelled answer area (box + unit), number
 sentence frame, part-whole bar. The catalogue is `design/GRAPHIC_LIBRARY.md` (id, what it shows, sizes approved, where
 used, critic evidence). Existing approved drawings (ten frame, number line, base-10, clocks, coins, fraction models)

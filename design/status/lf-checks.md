@@ -9,6 +9,26 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-13 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-touch, builder Opus medium; lf-hosts hand-over d23e42fa6 merged in):
+  1. TOUCH-HIT de-flake (ws-phone-card). Measured on d23e42fa6, 3 runs of sub_100_no_regroup + placevalue:expand + add_facts
+     (--only TOUCH-HIT, 4 widths x card/worksheet/quiz): run 1 sub_100 1280 card item 1 bottom-right; run 2 expand 1280 item 2
+     bottom; run 3 sub_100 1280 item 1 bottom + add_facts 1280 item 3 bottom. Every miss "focuses nothing (body)", at 1280 x 900,
+     on a bottom edge / corner, never the same twice. Cause: the tap point was read in the same task as the blur and the
+     scrollIntoView, so a scroll / focusout layout that settled on the next frames left the point stale. Fix in the CHECK: the
+     point is read after two frames and once the scroll and the box rect hold still; a miss is re-tapped the same way and only
+     a REPEATED miss is a finding (`--no-retap` = the old tap, `--touch-debug` prints misses that held). After: 3 of 3 runs OK
+     with 0 re-taps needed (settling alone removed them). Rows `touch-hit-settle-retap` (stale single tap FAIL -> settled OK) and
+     `touch-hit-overlay-true-miss` (a planted overlay on the box's bottom 12 px FAILs every run, 3 of 3) PASS; ledger row added.
+  2. WS-REFLOW per-slot x (ws-worksheet-reflow): each typed answer place's left edge inside its card vs the baseline's slotXs,
+     tolerance 1.5 px; self-test 1 px holds / 2 px fails; `--pin-slots` adds slotXs only (pinned from master a8258e3f3);
+     sub_word_problems' slotXs pinned from d23e42fa6 (lf-hosts' word-work gap moved its working boxes 3-4 px; passed critic r3,
+     so re-pinned in this change per the ratchet rule). Row `ws-reflow-slot-x` (`--judge-fixture`, 2 px FAIL -> 1 px OK).
+  3. `ws-backtest --help` prints the usage and exits 0 (its --self-test asserts it). New `tests/scripts/ws-touch-diff.mjs`:
+     one command runs today's ws-phone-card (TOUCH-HIT by default, `--rules`) on HEAD and on origin/master (temporary worktree)
+     and prints only the cells that differ (`--self-test`).
+  WAITING until the de-flaked TOUCH-HIT is live on master (lf-hosts hand-over item 4): the touch-target re-check at 820 / 1024 of
+  box_division_hard, time_hour, money, vocab_grade_pictures, the mult_chart family, long_div_2digit, order_negatives, the fact
+  families, arrays_groups / mult_arrays.
 - 2026-11-13 (lf-tools, branch claude/sweet-newton-c8wrv1-lf-tools): COPY-LIGHT and BATCH critic routes (owner rule, fastest plan 2-3).
   `tests/scripts/ws-copy-light.mjs` (new): eligibility = every kit template the generator draws (defaults + the card's option values,
   q.cell via kitCellSpec) has an ANCHOR in redesign-passed.js whose signed card offers every role and host the skill's card offers
@@ -425,6 +445,10 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 - CHECKS_FROM_CRITICS SWEEP (builder, Opus medium, 11-13; queue item 0): `ws-precritic-plan --checks-from-critics` (also in its default run; `--no-sweep` skips). Lives in ws-precritic-plan because "on the lane's path" is decided there: the per-row verdict is now one function (rowPath) that the path check and the sweep share; a no-skill fixture row is on the path when its tool is a precritic or deploy gate. Each ledger row's "Backtest row" cell names ids in backticks (older bare ids still read; free text reads as an unknown id), or `exempt:` / `not machine-measurable:` / a process rule. Self-test: 12 planted rows (missing, unknown, off-path, exempt, good, legacy, same row, process rule, free text, empty reason, column kept) - 37 cases. On every precritic plan (node gate checks-from-critics) and deploy session 1. Ledger: 29 lf-checks rows added (eb-r3..r7, sis-r1..r3, ebitem-r1) + ids filled on the 11-07 and owner SCREEN-INK-SIZE rows. Today: 43 pass, 12 exempt, 16 FAIL (lf-checks 3 queued minors with no row yet; other lanes 13) - the gate is RED until the owning lanes fill their ids.
 - Sweep HYBRID (lead 11-13): precritic --skill/--role runs --checks-from-critics --skills <its skills> and BLOCKS on rows naming them (div_facts: 2 open, unit_form: 1 open); deploy session 1 / the default plan judge every row but WARN until the ledger header's 'Blocks globally from: 2026-11-14 13:00 UTC', then block (MQ_NOW overrides for tests). Self-test 43 cases.
 - NO DROPPED ROW (lead / lf-ops 11-13): ws-precritic-plan --checks-from-critics now FAILS, always (past the warning date), when the tree lacks a backtest row id the baseline held (origin/master, or --rows-before <file>). It runs in deploy session 1 on the deploy tree. Row no-dropped-row (fixtures in tests/fixtures/precritic/no-dropped-row/) PASS; ledger row added; self-test 46.
+- 2026-11-13 queue 10 / 11+18+21 / 20 (builder, Opus medium; branch worktree-agent-af010c942e0eb2056): checks first (1fbdb8eca), fixes (46a7c3c45), rows (6 PASS in ws-backtest).
+  - 20a CELL-READ: ws-screen-slots (host:read; a host that did not render, a worksheet of 0 cards, a cell with no [data-ws-cell]), ws-screen-answer (--cell-read-self-test), ws-phone-card (card + worksheet/quiz); ws-empty-band already EB-READ. ws-screen-ink-size (read only, other owner) still passes a host with 0 drawings / 0 cells (`if (!sc.drawings.length) continue`): routed.
+  - 20b the card paper carries data-ws-cell (kit kind, else legacy). 10: ws-phone-card TOUCH-TARGET on card, worksheet and quiz at 390 (answer >= 48 x 48, working box >= 44); .mq-wwans inputs fixed. A 39-skill sample still shows 33 under-48 groups (mostly [data-mq-cell] > input.mq-cellslot 44-47 px tall: time, money, mult_chart, long_div, arrays_groups, div_remainders, count_sequence, fact_family, add_three worksheet) - owning lanes.
+  - 11/18/21: #worksheetView grid cells take the host floor 40 / 48 / 56 px (additive CSS). screen-digit-npr-worksheet re-armed: pass b6107d339 = this fix + lf-ops-props 63b26321a (contains 85c694896; npr already passes from lf-ops' count-row rule, the floor covers mult_facts / div_facts / mult_properties / pv).
 - OPEN LEDGER ROWS CLOSED (builder, Opus medium, 11-13; commits 7bd6f3d31, 96ba50e36, c484ffca7, 5a8e27ec9 + this note):
   - eb-r6 m2: ws-screen-answer `--focus-gap-html <file>` judges a saved page. Row `sa-focus-gap-fixture-below`: "tens" 1 px under the ring gives no finding with 8dc176e6's FOCUS_GAP (proven by running that commit's function on the fixture) and FAILs now; 10 px clear is OK.
   - eb-r7 m1: FOCUS-GAP reads text above and below the ring LINE BY LINE (a Range per character on each line box). Self-test: 12 cases. Row `sa-focus-gap-wrap-line`: its pass fixture ("wer once" 5 px clear over "Tall") read 0 px at 7bd6f3d31 and is OK now.
@@ -569,3 +593,215 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
   its drawing key; a must-differ pair list (fact × vs ÷, clock 12 vs 4 numerals, part-whole vs comparison bar, regroup row vs none);
   a seed-stability check (a skill's key set is stable across seeds; count_by_2s anchors count_by_3s). Then lift ADVISORY.
 - Open, routed: ws-simple-print student-view print-dialog step at 390 (→ no-size-S branch).
+
+### lf-tools-nos: print size S dropped (owner 2026-11-13, CLAUDE.md plan item 9) - builder, Opus medium
+- Guard first: `tests/scripts/ws-no-size-s.mjs` (node, < 1 s). APP-PICKER (a size control offers S), APP-RESTORE (a stored
+  size kept as S), APP-ALIAS (the kit's `offeredSize` reads S as M, `OFFERED_SIZES` = M,L, the S token kept so old settings
+  decode), GATE-DEFAULT (an arg default, literal size list, planned `--size(s)` or deploy line with S). A reasoned allow-list
+  (buildSheet's explicit-S bridge, kit-token unit tests, 9 dated lane scripts on no gate path); a stale entry fails. On every
+  ws-precritic run and in deploy session 1. Row `no-size-s-76bc` (76bc11c6 FAIL 52 -> a3b128cd1 OK, ws-backtest PASS).
+- App: teacher print, simple print, worksheet sheet (+ fact Columns row) and print settings offer M and L. A stored S
+  (print defaults, simple-print prefs, saved quick prints, recent printouts in buildAll, the legacy kit ctx, buildSimple)
+  prints at M. "All 12 tables on one page" still forces the kit S internally (12 rows fit only there); its locked Size
+  control now shows M / L with "Size fixed" - a lead decision whether that option should move to M.
+- Gates default to M,L (precritic S runs -> M with the M pin; empty-band, cell-checks, capacity-pin, fixit-words, slot-clip,
+  options-verify, lesson-samples/-hash/-check, coverage-matrix, simple-print, columns, sheet-*). Every backtest row that
+  relied on an old default now names it (`--sizes S,M,L` etc., 49 rows, text edits; none dropped).
+- Pins: capacity / empty-band S keys removed; lesson-baseline S keys RENAMED M (lesson at S always printed at M; the M
+  hashes equal the S keys, 30/30 checked), deploy session 4 runs `--sizes L,M`; print-lint.M.json gains the 22 lesson pages
+  from the S pin; print-lint.S.json kept for old `--baseline` rows.
+- Fact sheets: `ws-fact-cols-m` (FCM-COLS / FCM-PT / FCM-FIT: 9 and 10 picked columns at M, 16 pt, teacher + simple print),
+  on precritic's fact-skill path; row `fact-cols-m-fixture`.
+- Screenshots (before 76bc11c6 / after, dsf 2): design/status/lf-checks/no-size-s/.
+- Verified: ws-no-size-s OK (76bc11c6 FAIL 52); ws-code-snapshot OK (nothing moved); ws-boot-smoke OK; ws-content-audit
+  add_facts OK; ws-simple-print (default, now M,L) OK; ws-fact-cols-m OK (x facts at their own cap of 8 - the same at S on
+  76bc11c6); ws-precritic-plan OK + --checks-from-critics (15 old warnings, unchanged; none dropped); ws-print-lint kit
+  add_facts + combine at M and L OK; ws-backtest no-size-s-76bc and fact-cols-m-fixture PASS.
+- Open (not caused here): add_facts#lesson L-TOPSTART CL-4b 0 -> 32 against the M pin, identical on 76bc11c6 at S with the
+  S pin (a lesson at S is the M page) - the precritic lesson-M row will show it until lf-ops / lf-engine fixes or re-pins it.
+
+### lf-tools-nos r2 (2026-11-13, Opus medium rebuild after critic r1 FAIL: C1 6, C2 6, C3 9, C4 7)
+Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
+- F1 (blocker) fixed: `applyPrintSettings` (saved set from the Library, tray snapshot / Undo, `&set=` link opened),
+  `decodeSetParam` (the link's imported set), the worksheet sheet's build request and the Library's set words all read the
+  size through `offeredSize`. Recent printouts (`buildAll`), the simple print / quick prints (`cleanPrint`), the stores and
+  Settings already did. Grep found no URL size parameter, no cookie size and no size in saved quizzes.
+- F2: `ws-no-size-s --browser` (new; ~15 s). It seeds S in 3 localStorage keys, a saved set, a `&set=` link and a quick
+  print, then calls `tvSheetPrint.set`. It then opens Settings, Library > My sets, the worksheet sheet, the Print screen and
+  the simple print (stored, and from a quick print). Each must read M, with no S option, M checked and no preview page at S.
+  On every ws-precritic run and in deploy session 1. Row `no-size-s-browser-c81` (FAIL 17, then OK).
+  The static guard now flags any S tuple list, a regex restore (`/^[SML]$/`, `/^(S|M|L)$/`) and a forced `'S'` (APP-FORCE).
+  Self-test: 30 lines, including the critic's mutations, which I also re-ran on a mutated copy (both FAIL now). Row
+  `no-size-s-r1-mutations` (fixture, via the new `--lines` mode).
+- F3, measured (buildSheet, count_by_tables onePage, forced to M on a scratch copy): A4 fits 12 rows on 1 page at 22 pt
+  with no slack. Letter fits 11 rows, so 2 pages plus a 2-page key. The rows do not fit at M on every paper, so per the
+  lead's ruling the layout stays compact for this ONE layout. The allow-list reason is "ruled exception (lead, owner
+  informed)".
+  - One label everywhere: `COMPACT_LABEL` = "Compact (12 tables on one page)" (sheet/tokens.js). It is used on the Print
+    screen Setup, in the section note, in the worksheet sheet's Size row and in the simple print.
+  - No M/L control is drawn for this layout. The option help says "compact layout", and `ONE_PAGE_WHY` now names the
+    option's real label ("All rows on one page").
+  - The browser gate's COMPACT checks: one label, no Size control, every radiogroup has exactly one checked, no "Small"
+    caption.
+  - For the lead: the owner may prefer M on A4 only (it fits), with compact on Letter.
+- F4: LESSONS_LEARNED PRE-FLIGHT 1-2 (M and L; card hosts 1280/820), the L1/L2/L25 rules, the template-first rule and the
+  family-round rule now say M and L. The same change was made in RUBRIC scope, PAGE_TYPES PT-DLG-5 / PT-CMP-4, EXTENSION_PLAYBOOK #27
+  and TEACHER_SCREENS. Dated history rows and the signed cards are kept as records. `ws-no-size-s --docs` (DOC) scans RUBRIC,
+  the PRE-FLIGHT section, the PT-DLG rows and .claude/agents; precritic and deploy pass `--docs`, so the old row
+  `no-size-s-76bc` stays valid. Row `no-size-s-docs-c81` (FAIL 4, then OK).
+- Verified:
+  - ws-no-size-s --docs OK, plus --self-test OK and --browser OK (41 checks).
+  - ws-backtest rows no-size-s-browser-c81 / -r1-mutations / -docs-c81 / -76bc all PASS (347 rows, none deleted).
+  - ws-precritic-plan OK; --checks-from-critics 104 pass / 24 exempt / 15 fail (the 15 are the same old rows, none dropped).
+  - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK.
+  - node --check on every edited module.
+  - ws-node-lint FAIL 50, identical on the base.
+
+### lf-tools-nos r3 (2026-11-13, ROUND CAP: fresh builder, Opus medium; critic r1 and r2 both failed on reintroduced S)
+- **Root cause.** The static and doc guards listed PHRASINGS with regexes, so every new spelling ('SML'.split(''), "at size S
+  and at L", "Small and Large") slipped through. The browser gate read ATTRIBUTES (`hidden`, `aria-label="Size"`), not what
+  is VISIBLE, so a CSS rule (`.sp-root .sp-sizes { display: grid }`) that put a hidden picker back on screen passed (N1).
+- **Checks first** (each FAILs on 4a8e539b4 or on a planted mutation):
+  - `ws-no-size-s --browser` judges visibility: computed style up the tree, a box, and elementFromPoint at the centre. It
+    finds a size option by what it does (data-act/sp/k "size") or says (S M L Small Medium Large Big under a size label),
+    not by aria-label. Surfaces: Settings, the worksheet sheet, the Print screen, and simple print (fact rows, quick print,
+    cells, compact). In each it asserts no visible or clickable S option, no visible picker where the layout is fixed, and
+    that every visible option, clicked with the mouse, changes the preview page's data-ws-size. 4a8e539b4: FAIL 3 (N1). The
+    head passes 73 checks.
+  - TOKEN rules replace phrase lists: APP-TOKEN, GATE-TOKEN, and DOC over every non-record *.md (records: DOC_RECORDS with
+    reasons). Exemptions are explicit: dropped / alias / compact token / history wording, or a `<!-- nos: why -->` marker
+    (one line, one block, or a `nos-section` for a dated findings log).
+  - A MUTATION corpus of 29 rows: the critic's r1 code mutations, r2 A-F and E, the six N2 doc phrasings, and our own (a CSS
+    display override, a new picker array, an S built with String.fromCharCode, a renamed label, S defaults in a gate, plus
+    doc lines in CLAUDE.md, an agent brief and PEDAGOGY). Every run of this tree plants the static rows (precritic and deploy
+    session 1), so the self-test is on precritic's path. `--self-test --browser` plants the 9 browser rows in a copy of the
+    served tree. All 29 are caught.
+  - Backtest rows (text insertion; none deleted, 347 -> 350): `no-size-s-n1-4a8e` (browser), `no-size-s-r3-static-4a8e` and
+    `no-size-s-r2-mutations` (fixture). Three older rows had a pass commit that the stricter check now rightly fails:
+    a3b128cd1 (fitsNotes "Small") and 6b59329af (N1, N3). Their pass side moves to 32689e907, and each row's state says so.
+  - CHECKS_FROM_CRITICS: 3 rows (N1, N2, N3 + nit).
+- **Fixes.** N1: additive `.sp-root .sp-sizes[hidden] { display: none; }`. Screenshot:
+  `design/status/lf-checks/no-size-s/r3-simple-print-compact.png` shows the one label, with no picker. N3: WDS:22 and
+  EXTENSION_PLAYBOOK:72 now say "S dropped as a choice; the token stays as the decode alias and the compact layout". L2 now
+  reads "M and L". The other live docs: instructions are rewritten to M / L, and token values are marked. The nit:
+  fitsNotes maps S to the compact label, never "Small".
+- **Owner file.** CLAUDE.md:60 ("Size S ignored") and :461 ("Tokens (sizes S/M/L ...") fail the DOC rule. They are not
+  edited, are reported to the lead, and are allow-listed with that reason. These entries go stale, and so FAIL, once the
+  owner rewrites the lines.
+- **Coordinator item.** ws-simple-print's student-view COLSFIT/OPTKEY step now runs at 1024, not 390. ws-simple-print OK.
+- **Verified:**
+  - ws-no-size-s (default, --docs, --self-test, --self-test --browser, --browser): all OK.
+  - Backtests: no-size-s-76bc / -docs-c81 / -r1-mutations / -browser-c81 / -n1-4a8e / -r3-static-4a8e / -r2-mutations all
+    PASS.
+  - ws-precritic-plan --checks-from-critics: 107 pass / 24 exempt / 15 fail. The 15 are the same older rows; none dropped.
+  - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK; node --check on teacher-print.js and both scripts.
+
+## 2026-11-13 — no size S after critic nos r3 (round cap): NOS-DOCS-ADVISORY
+
+- Critic nos r3 (df9682751): FAIL C1 9 / C2 7 / C3 9 / C4 9; the app change and the browser gate pass; the text guards miss
+  phrasings (third round on doc phrasing).
+- Lead decision NOS-DOCS-ADVISORY: precritic and deploy session 1 run `ws-no-size-s --docs-advisory` (doc findings report as
+  ADVISORY, never block). `--docs` alone still blocks (the old rows keep their meaning). The --browser visibility gate and the
+  app / gate code guard stay blocking. New `--plant <row|none>` runs one browser mutation in a copy of the served tree; row
+  `nos-runtime-s-button` proves the browser gate FAILs an S button added by JS at runtime and is OK unplanted.
+- KNOWN HOLE (D2), beside the browser gate: the code guard reads lines, so a gate default built another way
+  (`Object.keys({S:1,M:1,L:1})`, `String.fromCharCode(83)`) passes it; the browser gate covers the behaviour (every Size control
+  offers M / L only), not a gate's own --sizes default.
+- PARKED under FOCUS (D1-D4): one shared SIZES constant every gate reads, checked on the resolved `--dry-run` sizes (D2);
+  per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
+  `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
+- CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
+
+## 2026-11-13 — precritic "unparsed" verdict fix (lead, urgent; reported by lf-ops)
+
+- `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output": precritic's verdict reader accepted only
+  `<tool>: OK|FAIL`. It now accepts `<tool>[ --mode]*: OK|FAIL` (self-test: 6 verdict cases). Row `precritic-mode-verdict`.
+- copy-light "unparsed": NOT reproduced on master 7a5bc902c (precritic's parser reads `ws-copy-light --skill
+  multiplication:count_by_tables` as PASS); asked the lead for lf-ops' log line and branch.
+- copy-light "unparsed" (lf-ops log, 594642d49): reproduced. ws-copy-light ended with process.exit(), which drops stdout
+  still queued for a pipe; precritic's reader got no verdict line. Fix: process.exitCode, plus the drawings / reasons lists
+  capped at 12. Row `copy-light-pipe-verdict` (30 skills through a slow pipe). The count-row key granularity lf-ops noted
+  (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
+- Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
+  exit uses exitCode when its output can exceed the 64 KB pipe buffer).
+
+## 2026-11-14 ledger sweep before the 13:00 UTC flip (branch claude/sweet-newton-c8wrv1-lf-tools-ledger)
+
+- `ws-precritic-plan --checks-from-critics`: 15 failing rows -> 0 (222 pass, 58 exempt). Only backtest cells edited.
+- (a) named existing on-path ids: 6 rows (49, 51, 60, 137, 302 by id; 178 as a process rule).
+- (b) brought from lf-partopts: 0 (the partopts step-A / panel rows were already green on master; options-panel-sample's
+  fix d7847568 and ws-options-shots gate are not on master, so it could not run here).
+- (c) reasoned exemptions: 9 rows - div_facts 27/45/46/47/48 (ws-fact-pages.cjs + 8 rows parked on lf-ops-divarray
+  6e5fe3415), 43 (nits under the bar), 131 (overflowOf runs in every precritic run and its --self-test), 140 (open, needs a
+  PDF-raster check), 141 (parked with the partopts panel). When lf-ops-divarray or the partopts panel deploys, swap these
+  exemptions for their ids.
+- PARKED (budget stop from the lead): lf-engine F2, the plan's row listing printing skill-less rows (chart-name-line,
+  lesson-pm-cont, lesson-tab-clear) N/A; fix = judge them with idOnPath's tool rule (precritic or deploy gate) and print why.
+## 2026-11-14 — ws-no-size-s --browser de-flake (lead; seen on lf-builds chart_to_120)
+
+- Cause: a size click landed while the previous build still redrew the controls, so the click was lost. Fix: wait until the
+  built size reads the same 3 times, re-scan just before each click (a rebuild drops the old tags), and on a miss re-click
+  once; a re-click is printed as a note, and only a repeat miss fails. 2 of 2 plain runs OK; the 30-mutation browser
+  self-test still catches every planted S / dead control. Row `nos-browser-settle-reclick` (a planted lost first click:
+  master's tool FAIL, this tool OK).
+## 2026-11-14 — precritic --skill covers every offered role x M/L x drawing option value (lead; lf-ops critic cbt r2 root cause)
+
+- Root cause (critic-cbt-r2.md, lf-ops-props 319b2ae0b): precritic `--skill` ran print-lint on Independent and the lesson page
+  only, raster-fit on Scripted Model / Guided only, and empty-band on the card's roles at defaults (variants: Independent L, 6
+  at most). E3 (Scripted Model L, L-OVERLAP SECTION), E5 (Opener, CL40-INK) and E6 (Error analysis, L-TOPSTART CL-4b) were red
+  in plain print-lint on roles no row rendered.
+- New: `tests/scripts/ws-role-cover.mjs` (rows `role-cover-1..n` on every --skill run) runs print-lint, empty-band and
+  raster-fit on every role the signed card offers (no card: every buildSheet role) at M and L, AND under every option value
+  that changes the drawing. `tests/lib/ws-drawing-variants.mjs` picks those values in node (~1 s): the card's offered values
+  (no card: the skill's own set / enum / bool values), kept when the cells' drawing VOCABULARY (templates + element
+  signatures of the rendered skeleton, any order or count) or SIZE class (median element count, x1.25 steps) differs from the
+  defaults, or when the option is a page option (group layout); one value a distinct drawing. count_by_tables: 8 of 16
+  (times each / given, onePage, jumps 15, shape circle / hex / mixed, spaces line; fill, missing, order dropped as the same
+  drawing). add_facts: 1 of 30 (notation across; its supports keep their own print-lint-supports rows).
+- No repeat renders: units another row already renders are left out (lint independent / lesson, band the card's roles,
+  raster scripted-model / guided, all at defaults). Each tool still renders its own documents (DOM lint, measured cells,
+  printed PDF): one shared render would need the three tools merged, parked. Lint is one `--jobs` browser start a shard.
+- Pins: a defaults lint document is ratcheted against print-lint.json / print-lint.M.json (id cat:skill#role); variant
+  documents and unpinned roles must be clean. A card role buildSheet cannot compose FAILs (no card: a note).
+- Shards: ~45 min of slot time each (at least 2 above 10 min); each shard one runner slot, the tools inside run in it.
+  `--dry-run` prints `role cover size: N print-lint + N empty-band + N raster-fit unit(s) in N shard(s); est N min`.
+- Backtests: `precritic-role-cover-plan` (FAIL master 22752843c, OK d17e76aa7; read by `ws-role-cover --plan-check`) and
+  `role-cover-cbt-e3-e5-e6` (8f76b6401 both states: the new role lint FAILs with E3 / E5 / E6 visible, the old Independent-only
+  lint is OK). Ledger row in CHECKS_FROM_CRITICS.md. ws-precritic-plan: ws-role-cover is an every-role tool.
+- MEASURED (count_by_tables on 8f76b6401, its signed card: 13 roles, 8 drawing variants; 2 slots shared with another lane):
+  shard 1/2 ran 126 lint + 104 band + 126 raster units in 37.7 min (estimate 40.4): print-lint 4.9 s a document (126 in
+  613 s, one browser start), empty-band ~3.8 s a role x size (26 in ~100 s a group), raster-fit ~9.8 s (26 in ~258 s a
+  group). Whole skill ~70 min of slot time, ~36 min wall on two slots (shard 2 not run; estimate 34.7). With no card on this
+  tree (17 roles) the plan is ~94 min of slot time. add_facts (card, 1 variant): ~18 min. The shard found E3 / E5 / E6 on
+  defaults and under every variant, AK-2 on scripted-model / true-false (N4: likely false positive), CL40-INK on
+  reason-it under onePage, EB-BAND on the opener under onePage (E8 class), EB-VOCAB on lesson M, EB-GDPCAP on guided L.
+- Cost note for the lead: raster-fit is half the time. If ~36 min wall a carded skill is too slow, the next cut is raster on
+  variants at L only (about -20 %), or variants on the roles each option line of §7a names (needs the card to say so).
+
+## 2026-11-14 — role cover after critic roles r1 (FAIL C1 6 / C2 7): rebuild at medium
+
+- **D1** `tests/lib/ws-drawing-variants.mjs` also signs the BUILT page: buildSheet pupil HTML (role independent, size M, seed
+  7000, no key; node, DOM stub removed so its measuring is skipped), skeleton vocabulary (`pg:` tokens), one buildSheet a value.
+  add_facts 1 -> 8 of 30 variants (notation=across + 7 support values); count_by_tables unchanged (8 of 16). Planning cost
+  ~1.2 s for both skills. `ws-role-cover` lints a support variant with `--supports` (print-lint runs L-SUPPORT only then);
+  new `--variants opt=v` focus and `--plan-check --variant`. Proven: `--skill addition:add_facts --roles guided --variants
+  support=frame` names L-SUPPORT SCC-T10 at M and L.
+- **Runtime**: add_facts role cover 2 shards / 18.2 min -> 3 shards, 302 + 272 + 302 units, est 92.6 min slot, ~46.3 min wall;
+  count_by_tables unchanged (93.9 / ~46.9).
+- **D2** expect-e3-e5-e6.sh re-states only with `--expect-e3e5e6` (fail args); the pass side can fail.
+- **D3** every precritic dry run (copy-light too) prints the role cover and its size.
+- Rows: role-cover-buildsheet-variants, role-cover-add-facts-guided-frame (browser), role-cover-e3e5e6-pass-can-fail (ws-role-cover --check-wrapper),
+  precritic-copy-light-role-cover-size: all PASS; role-cover-cbt-e3-e5-e6 and precritic-role-cover-plan re-run PASS.
+- N1 (numbers masked whole) not addressed.
+- checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).
+
+## 2026-11-14 correct-answer sound ("B, power-up", owner request)
+- `js/modules/correct-sound.js`: Web Audio synth, square C5 / E5 / G5 70 ms, C6 400 ms exponential decay, peak 0.13, 4 ms attack /
+  10 ms release; lazy AudioContext resumed on the first pointer / key gesture; 300 ms dedupe. Gated by the Sound toggle (`#sfxToggle`,
+  sfx.js `isSfxEnabled`; Voice / TTS is a separate toggle and is not used).
+- Hosts: practice card (answer-check.js celebrateCorrect + _celebrateCorrectAnswer, replacing the old 'correct' / 'streak' cue; map-engine's
+  fallback call too), worksheet (wsRecordAnswer, once per item), quiz (recordAnswer, instant feedback only, so a test with end-of-quiz
+  feedback never gives an answer away). Wrong-answer cue unchanged.
+- Gate `tests/scripts/ws-correct-sound.mjs` on precritic --skill; backtest `correct-sound-powerup-once` FAIL 84f8813a1 -> OK eed07b7c1.
+- Listen: `design/status/lf-checks/sound/powerup.wav` (OfflineAudioContext render). ws-boot-smoke OK.
+

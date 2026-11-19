@@ -17,8 +17,13 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, writeLine, slotKey, judgeGroup, answerPlace, answerPlaceHtml, answerFrameCls,
-    esc, operandsOf, opOf, opGlyphOf,
+    esc, equationStemOf,
 } from './compose.js';
+
+import { getProvider } from '../index.js';
+
+/** The item's provider declares `falseNeedsWrong` (contract.js OPTIONAL_MEMBERS). */
+const falseNeedsWrongOf = (it) => { const q = (it && it.q) || {}; try { return getProvider(q.categoryId || '', q.skillId || '').falseNeedsWrong === true; } catch (e) { return false; } };
 
 export const ROLE_ID = 'true-false';
 const CEILING = { S: 8, M: 6, L: 4 };
@@ -30,6 +35,9 @@ export function prepare(it, info = {}) {
     const correct = answerOf(it);
     if (!correct) return null;
     const wrong = wrongOf(it);
+    // (opt-in, lf-placevalue compare r4 / critic r2 N1: a provider declaring `falseNeedsWrong` skips an item with no named error
+    // in a False slot - the host deals the next - so PT-TOF-1's 40-60 % false holds; every other skill prints it True, as before)
+    if (info.wrong && !wrong && falseNeedsWrongOf(it)) return null;
     const isFalse = !!(wrong && info.wrong);
     const shown = isFalse ? wrong.value : correct;
     // the frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one line a part of a list ("12, 15, 18"), or no frame row
@@ -43,11 +51,12 @@ export function prepare(it, info = {}) {
     key.short = `${isFalse ? 'False' : 'True'}; ${correct}`;
     // 09-A mock-up: the frame restates the problem ("6 x 7 = ____."), so the pupil writes the
     // true answer beside its own question; a skill with no operation says "The answer is ____."
-    const ops = operandsOf(it.q || {});
-    const glyph = opGlyphOf(opOf(it.q || {}));
+    // (TOF-STEM: the equation stem only when it is TRUE of the answer - one number equal to the operands combined; a list, a
+    // missing part or a third addend takes the plain stem, never "3 x 12 = 12, 18, 24")
+    const eq = place.kind === 'one' ? equationStemOf(it.q || {}, correct) : '';
     // a list's lines keep their handwriting width, so its stem is the short "Answer:" - "The answer is" wrapped a 5-part list
     // at L and cost the page an item (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3)
-    const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : place.kind === 'list' ? 'Answer: ' : 'The answer is ';
+    const stem = eq || (place.kind === 'list' ? 'Answer: ' : 'The answer is ');
     const render = (c, o = {}) => {
         const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
         // no frame row (a sentence answer, PT-TOF-4): the True / False boxes stand BESIDE the statement (10 mm off any box column

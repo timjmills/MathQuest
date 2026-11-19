@@ -12,6 +12,7 @@
 import { DOMAINS, SKILLS, getSkillGrade, isMixedMetaSkill, visibleSkills } from './data.js';
 import { optionsFor, describeOptions } from './skill-options.js';
 import { UnifiedSkills } from './unified-skills.js';
+import { offeredSize } from './sheet/tokens.js';
 
 /* ------------------------------------------------------------------ icons */
 
@@ -209,7 +210,11 @@ export function decodeSetParam(text) {
         if (o.l && typeof o.l === 'object') rec.locks = o.l;
         if (Array.isArray(o.g)) rec.groups = o.g;
         if (Array.isArray(o.ls)) rec.lessons = o.ls;
-        if (o.p && typeof o.p === 'object') rec.print = o.p;
+        if (o.p && typeof o.p === 'object') {
+            rec.print = o.p;
+            // owner 2026-11-13: a link made when S was offered keeps decoding; its size is read as M (critic nos r1 F1)
+            if (rec.print.opts && typeof rec.print.opts === 'object' && rec.print.opts.size != null) rec.print.opts.size = offeredSize(rec.print.opts.size, 'M');
+        }
         return rec;
     } catch (e) { return null; }
 }
@@ -231,7 +236,8 @@ export function importSharedSet(text) {
 export function printDefaults() {
     const d = readStore(PRINT_DEFAULTS_KEY, {}) || {};
     return {
-        size: ['S', 'M', 'L'].includes(d.size) ? d.size : 'L',
+        // owner 2026-11-13: size S is dropped; a stored S is read as M (an alias, never a deletion), anything else unknown as L
+        size: offeredSize(d.size, 'L'),
         paper: d.paper === 'Letter' ? 'Letter' : 'A4',
         photocopySafe: !!d.photocopySafe,
         // Wave 4.4: the teacher's last answer-key choice (critic r1, D7). Not in any share code.

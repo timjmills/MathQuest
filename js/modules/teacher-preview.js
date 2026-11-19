@@ -27,7 +27,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, hideScreenOnlyCaptions,
-    hideRepeatedPrompt, monoCell, unmonoCell, screenGlyphs, screenTextLine, plainText,
+    hideRepeatedPrompt, visualRepeatsText, monoCell, unmonoCell, screenGlyphs, screenTextLine, plainText,
 } from './screen-cell.js';
 import { formatProblemForPrint } from './print-generate.js';
 import { esc, icon, findSkill, levelText, optionsSummary, readStore, writeStore, skillCatalogue } from './teacher-ui.js';
@@ -175,7 +175,8 @@ function tidySample(cell) {
         if (!el.children.length && /^\s*1\.\s*$/.test(el.textContent || '')) el.style.display = 'none';
     });
     cell.querySelectorAll('button').forEach((b) => {
-        if (/^\s*(check|submit|reset|clear|undo|start over|try again)\b/i.test(b.textContent || '')) b.style.display = 'none';
+        // (a widget's own "✓ Check Answers" too: its tick mark is not the item's)
+        if (/^\s*[✓✔]?\s*(check|submit|reset|clear|undo|start over|try again)\b/i.test(b.textContent || '')) b.style.display = 'none';
     });
     // A print header that held only the item number is an empty ruled line: drop it.
     cell.querySelectorAll('.tvp-printed .p-head, .tvp-printed .problem-header').forEach((h) => {
@@ -204,8 +205,11 @@ export function fit(frame) {
     const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
     const s = Math.min(1, fw / w, fh / h);
-    // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop
-    if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop')) {
+    // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop.
+    // The option panel's sample (.tv-sko-sample) is not one: skill-options-ui _tidySample centres and scales it
+    // (translate(-50%,-50%) scale(k)), and a top-left crop under that transform put the stage off the frame
+    // (lf-algebra F8/G11: a blank sample for growing_shape_patterns and pattern_features).
+    if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop, .tv-sko-sample')) {
         frame.classList.add('is-cropped');
         stage.style.transform = `scale(${CROP_SCALE})`;
         return;
@@ -259,8 +263,13 @@ function mountBuilt(frame, s, name, what = 'Sample question', opts = {}) {
         const line = cell.querySelector('.tvp-q');
         if (line) {
             screenTextLine(line);
-            const vis = cell.querySelector('.tvp-visual');
-            if (vis) hideRepeatedPrompt(vis, line.textContent);
+            // (a legacy printed item says its own prompt inside `.tvp-printed`)
+            const vis = cell.querySelector('.tvp-visual') || cell.querySelector('.tvp-printed');
+            // Said once, as live play does (question-render's mq-dup): a copy inside the visual is hidden, or, when the
+            // visual says it as part of a larger block (a word problem's story, one sentence a line), the line is hidden
+            // instead (critic-panel-r2 F6: the sample printed the story twice).
+            // (judged on what the visual SHOWS: a copy already marked screen-only counts as found but stays drawn)
+            if (vis) { hideRepeatedPrompt(vis, line.textContent); if (visualRepeatsText({ textContent: vis.innerText || '' }, line.textContent)) line.style.display = 'none'; }
         }
         monoCell(cell);
         // The mono pass re-reads the cell for ~0.7 s while styles settle; a static sample then

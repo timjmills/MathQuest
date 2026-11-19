@@ -19,7 +19,10 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern, answerPlace, answerPlaceHtml, answerFrameCls,
+    esc,
 } from './compose.js';
+import { getProvider } from '../index.js';
+import { oneRowMm } from '../layout.js';
 
 export const ROLE_ID = 'reason-it';
 const ROWS = { S: 4, M: 3, L: 2 };
@@ -29,9 +32,28 @@ export const measureCols = () => [1];
 
 const TRUE_W = new Set(['equation', 'stack', 'word-work', 'count-row']);
 
+/**
+ * A provider's TEXT-only wrong answer (`wrongText`, contract OPTIONAL_MEMBERS): a misconception whose wrong number does not
+ * fit the cell's own writing place (chart_120 'writes-ten-ten', 1010 in a three-digit chart square; lead ruling 2026-11-13).
+ * Reason It shows it as a statement in words beside the right one, never drawn in the cell. Null when none.
+ */
+function wrongTextOf(it, correct) {
+    const q = it.q || {};
+    let w = null;
+    try { const p = getProvider(q.categoryId || '', q.skillId || ''); w = typeof p.wrongText === 'function' ? p.wrongText(q) : null; } catch (e) { w = null; }
+    if (!w || w.value === undefined || w.value === null || !w.statement || !w.rightStatement) return null;
+    const v = String(w.value);
+    if (v.replace(/\s+/g, '') === String(correct).replace(/\s+/g, '')) return null;
+    return Object.assign({}, w, { value: v, display: v, text: true });
+}
+
 export function prepare(it, info = {}) {
     const correct = answerOf(it);
-    const wrong = correct ? wrongOf(it) : null;
+    // (lead ruling 2026-11-13, chart_120: a TEXT-only misconception takes half the items that have one, seeded, so the page
+    // teaches it in words while every other misconception keeps its drawn panels)
+    const wt = correct ? wrongTextOf(it, correct) : null;
+    const useText = !!wt && rng(deriveSeed(info.seed === undefined ? 0 : info.seed, `${ROLE_ID}-text`, info.index || 0))() < 0.5;
+    const wrong = useText ? wt : (correct ? wrongOf(it) || wt : null);
     if (!wrong) return null;
     // Which letter holds the right answer is a seeded half-and-half pattern over the page
     // (`wrongFlags`, handed in as `info.wrong`), so there is no A / B tell to learn.
@@ -51,12 +73,16 @@ export function prepare(it, info = {}) {
     // (a column story - word-work's default layout - prints its story once too: twice, in two half-width panels, the work
     // ran out of the cell; word-stories critic r1 F2)
     const column = it.template === 'word-work' && !pl.layout && !pl.pic;
+    // (a TWO-STEP column story - its Step 1 and Step 2 columns side by side, 107-115 mm at M, and with the bar model a 132 mm bar -
+    // is wider than half the cell: side by side its A and B ran out of the cell (lf-algebra precritic two-step r11, Reason It
+    // OVERFLOW at M / L). Its story prints once with the response beside it, and A stands over B at the cell's full width.)
+    const twoCol = column && Array.isArray(pl.steps) && pl.steps.length === 2;
     // (a sentence story prints ONCE, over both panels; each panel holds its number sentence only - critic r3 N12: a
     // panel that repeated the story held one item a page at L. `noFrame` + `bar: false`: the story with no work zone)
     // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
     // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
     const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
-    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
+    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: twoCol ? 1 : sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
     const story = (c) => (sentence || column ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: column ? { storyOnly: true } : { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
@@ -79,14 +105,41 @@ export function prepare(it, info = {}) {
     // (a sentence story is a story too: its number sentence fits half the cell, so it lays out like a column story - it stacked,
     // and add_wp_10's picture story printed one a page at every size: ws-cell-checks LONE-PAGE)
     const story1 = sentence || column;
+    // TEXT mode (a `wrongText` answer): the item drawn ONCE on top, its writing places empty; A and B are statements in words
+    // ("The missing number is 110." / "The missing number is 1010."), side by side; the response row under them, its answer
+    // slot as wide as the wrong number (answerPlace above reads it)
+    if (wrong.text) {
+        // (A over B in the left column, each statement on its own line, the response beside them: side by side the two
+        // sentences ran out of a half-cell at L, and a response row under them cost the cell its height at M - ws-cell-checks
+        // OVERFLOW, precritic r5)
+        const statement = (isRight) => `<div class="mq-frame" style="padding-left:9mm;white-space:normal">${esc(isRight ? wrong.rightStatement : wrong.statement)}</div>`;
+        const respT = (c) => `<div class="mq-abresp" style="grid-column:2;grid-row:1 / 3;flex-direction:column;align-items:flex-start;justify-content:center;gap:3mm">`
+            + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
+            + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
+            + `</div>`;
+        const renderT = (c, o = {}) => `<div class="mq-abstory" style="margin-bottom:2mm;">${it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { prompt: false }))}</div>`
+            + `<div class="mq-ab" data-ws-misc="${esc(wrong.misconception || '')}" style="margin-top:auto;margin-bottom:auto;grid-template-columns:minmax(0,1fr) auto;row-gap:2mm;column-gap:6mm">`
+            + `<div class="mq-abbox" style="grid-column:1;grid-row:1"><span class="mq-abtag">A</span>${statement(aRight)}</div>`
+            + `<div class="mq-abbox" style="grid-column:1;grid-row:2"><span class="mq-abtag">B</span>${statement(!aRight)}</div>`
+            + respT(c) + `</div>`;
+        return Object.assign({}, it, {
+            render: renderT, key, measured: null, drawsAnswer: true,
+            footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),
+            fclass: 'standard', thinking: { correct, wrong: wrong.value, right, text: true },
+            cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
+        });
+    }
     // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A, centred, as before - lf-vocab r5, ws-empty-band)
+    // (a chart window past 100 - chart_120's band 120, three-digit squares, 85 mm at L - states its true width as footprint
+    // inkWMm, so it takes the UNDER layout: A | B at half the cell each, the response under them; stacked it held one a page)
     const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && workW > halfBeside);
-    const under = !legacy && (story1 ? true : workW > halfBeside && workW <= halfCell);
-    const wide = legacy || (!under && workW > halfBeside);
+    const under = !legacy && !twoCol && (story1 ? true : workW > halfBeside && workW <= halfCell);
+    const wide = legacy || twoCol || (!under && workW > halfBeside);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
     const abStyle = under ? 'margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm'
+        : twoCol ? 'margin-top:0;margin-bottom:auto;grid-template-columns:1fr;row-gap:3mm'
         : wide ? `${legacy ? 'margin-top:auto;margin-bottom:auto' : 'margin-top:0;margin-bottom:auto'};grid-template-columns:1fr ${!legacy && place.kind !== 'one' ? 'auto' : 'minmax(52mm,auto)'};row-gap:3mm`
             : 'margin-top:auto;margin-bottom:auto';
     const respStyle = under ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm'
@@ -94,7 +147,7 @@ export function prepare(it, info = {}) {
     // (UNDER, the response row centres under the pair - critic r6d N1. A column STORY puts the response BESIDE the story instead:
     // the story takes two thirds of the line, and the row under the panels held a Grade 2 story to one item a page at L, critic
     // r6d D1 - the panels then follow both)
-    const topResp = under && story1;
+    const topResp = (under || twoCol) && story1;
     const resp = (c) => `<div class="mq-abresp" style="${topResp ? 'flex:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3mm' : respStyle}">`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
@@ -149,6 +202,13 @@ export function plan(input = {}) {
     const rows = Math.max(1, items.length);
     const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
+    // ONE-ROW (layout.oneRowMm, lf-roles r9): a Reason It page of ONE tall pair (a two-step story, A over B) is held to its work,
+    // top-aligned - the row flexed to the page left 33-46 % under it (ws-empty-band EB-BAND, letter / x-first M / L)
+    if (rows === 1) {
+        const cap = oneRowMm(items, 1);
+        const drawn = grid.height ? parseFloat(grid.height) : L.gridH;
+        if (cap > 0 && drawn > cap + 0.05) Object.assign(grid, { cls: 'fixed mq-onerow', height: `${cap}mm`, rowsTpl: '' });
+    }
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart('which'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, format: 'which-is-correct', fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });

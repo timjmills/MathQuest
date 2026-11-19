@@ -54,7 +54,7 @@ const PV4_IDS = [
     'placevalue:identify',
     'placevalue:unit_form',
 ];
-const PVW = 'Lane lf-placevalue week 2, critic nwf r1 FAIL, r2 FAIL, r3 PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every option value of the signed pv card, card 1280 / 820 / 390, worksheet, quiz >= 8; the live detailed lesson 1 re-graded; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-nwf1.md + critic-nwf2.md + critic-nwf3.md, 2026-11-13';
+const PVW = 'Lane lf-placevalue week 2, critic nwf r1 FAIL, r2 FAIL, r3 PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every option value of the signed pv card, card 1280 / 820 / 390, worksheet, quiz >= 8; the live detailed lesson 1 re-graded; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-nwf1.md + critic-nwf2.md + critic-nwf3.md, 2026-11-13; live2 critic-live2.md PASS (N3 / N6 / N7), N9 closed by check pv-words-thousand-kind';
 const PVW_IDS = [
     'composing:number_word_form',
 ];
@@ -66,5 +66,14 @@ const OPS_DF = 'Lane lf-ops, division:div_facts: support-aid print pages narrow 
 const OPS_DF_IDS = [
     'division:div_facts',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW])]);
+const PVC = 'Lane lf-placevalue week 2, placevalue:compare: critic compare r1 FAIL, r2 FAIL, r3 FAIL (one 7: N9 wrap), round-cap root cause + r4 PASS (independent Opus medium critics; every page type at M / L - print S dropped, owner 2026-11-13 - every option value of the signed pv card, card 1280 / 820, worksheet, quiz via the quiz builder >= 8; changed passed pages B1-B3 re-graded PASS; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-compare1.md .. critic-compare4.md, 2026-11-13';
+const PVC_IDS = [
+    'placevalue:compare',
+];
+const C120 = 'Lane lf-builds, chart_120 (composing:hundreds_chart_fill band 120 + preset composing:chart_to_120, signed chartwindow card): critic r1 FAIL, r2 FAIL (N1-N3; round-cap root cause, checks MODEL-STATE-MARKS / CROSS-GIVEAWAY screen / SAY-AGREE frames), r3 PASS (independent Opus medium critics; every offered page type at M / L, card 1366 / 820, worksheet and quiz 1366 / 820 >= 8; routed lesson-anchor / guided / pre-skill-check bands to lf-engine / lf-roles); design/audit/runs/lf-builds/chart120/critic-r1.md .. critic-r3.md, 2026-11-14';
+const C120_IDS = [
+    'composing:hundreds_chart_fill',
+    'composing:chart_to_120',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS, ...PVC_IDS, ...C120_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW]), ...PVC_IDS.map((id) => [id, PVC]), ...C120_IDS.map((id) => [id, C120])]);

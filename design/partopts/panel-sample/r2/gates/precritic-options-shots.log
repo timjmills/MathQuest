@@ -1,0 +1,12 @@
+ws-precritic: 1 gate(s) (1 browser), logs /tmp/mq-precritic/20261113-132957-10007
+  PASS            ws-options-shots (Options panel sample at 1280 / 390 / 1280x720 px and after an option change: inside its frame, inked, text >= 9 px, panel controls in the window, no page error) (77 s)
+
+### ws-precritic — --skill coordinates:geo_translate,coordinates:rotate_quarter_turn,coordinates:reflect_x_axis,algebra:multi_step_word,addition:add_word_problems
+
+commit `cdf7a76dd1` + uncommitted changes (12 file(s)) (claude/sweet-newton-c8wrv1-lf-partopts-panel) · started 2026-11-13T13:29:57Z · finished 2026-11-13T13:31:15Z · wall 77 s · logs `/tmp/mq-precritic/20261113-132957-10007`
+
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-options-shots (Options panel sample at 1280 / 390 / 1280x720 px and after an option change: inside its frame, inked, text >= 9 px, panel controls in the window, no page error) | 5 skills × 1280, 390 px | PASS | 5 skill(s) × 2 widths: the sample is inside its frame, inked and legible (text >= 9 px, every part), the panel's controls in the window | 77 |
+
+ws-precritic: OK: 1 PASS, 0 N/A, 0 SKIPPED-NOT-BUILT of 1; --only: 1 of 30 gates

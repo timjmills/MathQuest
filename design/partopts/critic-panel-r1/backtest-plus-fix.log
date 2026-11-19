@@ -1,0 +1,6 @@
+ok   patterns:pattern_features @1280: ink 6.27 %, covers 26.7 %
+ok   patterns:growing_shape_patterns @1280: ink 3.76 %, covers 26.7 %
+ok   patterns:pattern_features @390: ink 7.17 %, covers 30.7 %
+ok   patterns:growing_shape_patterns @390: ink 4.28 %, covers 30.5 %
+  2 skills × 2 widths (1280, 390 px), 1 worker(s), 10 s
+ws-options-shots: OK (2 skills × 2 widths)

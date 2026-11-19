@@ -1,0 +1,122 @@
+-- fixture with every go line (must pass)
+lane-fractions: fractions - Owner go 2026-10-23
+lane-fractions: measurement - Owner go 2026-10-23
+owner go: 1 manifest(s), 2 families, 0 refused
+owner-go: OK
+  ok   passes
+-- fixture missing one go line (must be refused)
+lane-fractions: fractions - Owner go 2026-10-23
+REFUSED lane-fractions: the deploy makes "measurement" live and tests/fixtures/precritic/deploy/no-go/status/lane-fractions.md has no "Owner go: measurement, <date>" line
+owner go: 1 manifest(s), 2 families, 1 refused
+owner-go: FAIL
+  ok   refused
+-- no manifests (must pass: nothing made live by a lane)
+owner go: no lane manifests under tests/fixtures/precritic/deploy/none/lanes; no family is made live by a lane
+owner-go: OK
+  ok   passes
+-- flake rule: a gate that fails, then passes alone (FLAKE, logged); the same again (BLOCKED)
+  ok   FLAKE then BLOCKED, 2 flake lines with the item
+-- the final verdict
+  ok   all OK: exit 0, "ws-deploy-gates: OK"
+  ok   OK + FLAKE (logged): exit 0, "ws-deploy-gates: OK (1 FLAKE logged)"
+  ok   OK + SKIPPED (a renamed tool): exit 2, "ws-deploy-gates: INCOMPLETE (1 gate(s) did not run; nothing failed)"
+  ok   OK + NOT YET (digests, not accepted): exit 2, "ws-deploy-gates: INCOMPLETE (1 gate(s) did not run; nothing failed)"
+  ok   OK + ACCEPTED (digests, --accept-notyet): exit 0, "ws-deploy-gates: OK (accepted not yet: digests hook (M4 record/replay))"
+  ok   OK + NEEDS-SHARDED-RUN: exit 2, "ws-deploy-gates: INCOMPLETE (1 gate(s) did not run; nothing failed)"
+  ok   FAIL + NOT YET: exit 1, "ws-deploy-gates: FAIL (1 failed, 1 did not run)"
+  ok   BLOCKED: exit 1, "ws-deploy-gates: FAIL (1 failed)"
+  ok   no gate ran at all: exit 2, "ws-deploy-gates: INCOMPLETE (no gate ran)"
+  ok   --accept-notyet digests: the gate shows ACCEPTED and the timings line logs it
+  ok   --accept-notyet nosuch is refused (no NOT YET gate of that name)
+-- the matrix budget and the nightly rule (MQ_NOW=2026-10-23T12:00:00Z)
+   within the budget (the rows run inline; the nightly rule is read on EVERY deploy, D1.3)
+  ok   within, fresh green nightly (its 10-20 red row cleared by 10-23's OK): OK: exit 0 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) + the inline run (3 row(s) known))
+  ok   within, a red row fails inline: exit 1 (ws-coverage-matrix: FAIL - 1 red row(s))
+  ok   within, a RED row of a live skill in the nightly: refused although the inline run is OK: exit 1 (nightly: REFUSED - 1 row(s) of live skills are RED / ERROR in the folded state of 2 run file(s) + the inline run (3 row(s) known), and no later run lists them O)
+  ok   within, the inline run re-ran the nightly's red row OK: OK: exit 0 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) + the inline run (3 row(s) known))
+  ok   within, the critic r2 status-only deploy (0 rows) with no nightly, before the full baseline: WARNING: exit 4 (nightly: WARNING - no nightly run file (tests/fixtures/precritic/deploy/nightly/none/<YYYY-MM-DD>[T<HHMM>][.shard-i-of-n].json); not refused until the first ful)
+  ok   within, no nightly, AFTER the full baseline: refused: exit 1 (nightly: REFUSED - no nightly run file (tests/fixtures/precritic/deploy/nightly/none-complete/<YYYY-MM-DD>[T<HHMM>][.shard-i-of-n].json), and the first full bas)
+  ok   within, stale nightly (31 h) before the full baseline: WARNING, passes: exit 4 (nightly: WARNING - the newest nightly (2026-10-22) finished 31.0 h ago, more than 24 h; not refused until the first full baseline is complete (owner 2026-10-23))
+  ok   within, stale nightly (31 h) after the full baseline: refused: exit 1 (nightly: REFUSED - the newest nightly (2026-10-22) finished 31.0 h ago, more than 24 h)
+  ok   within, a row with no baseline entry (PENDING(no-baseline)) is not red: OK: exit 0 (nightly: no RED / ERROR row of a live skill in the folded state of 1 run file(s) + the inline run (2 row(s) known))
+  ok   within, A10: a lane re-check dated 20 h in the future lists the red row OK: refused (it clears nothing): exit 1 (nightly: WARNING - lane-recheck.json lists 1 red row(s) OK that it may not clear, so they stay red: the run file finished 2026-10-24T08:00:00Z, 20.0 h after now)
+  ok   A10: the future-dated file is named in a WARNING
+  ok   within, A10: the only nightly file is dated in the future: not the newest nightly (no nightly: WARNING): exit 4 (nightly: WARNING - 2026-10-23T0900.json finished 2026-10-25T09:00:00Z, 45.0 h after now (beyond the 10-min clock skew): its rows clear nothing and it is not the)
+  ok   A10: a future-dated nightly is never the newest nightly (age / cover)
+  ok   within, A11: a run file with no baseline field, finished 19:58 (after the 19:46 cut-off), lists the red row OK: refused: exit 1 (nightly: WARNING - lane-recheck.json lists 1 red row(s) OK that it may not clear, so they stay red: the run file records no baseline and finished 2026-10-23T19:)
+  ok   A11: the refusal's WARNING says why the file clears nothing
+  ok   within, A11: the same file finished 06:30 (before the cut-off): it clears, with the pre-N2 WARNING: exit 4 (nightly: WARNING - lane-recheck.json records no baseline (written before N2): its OK cleared 1 red row(s) unchecked (addition:add_20_regroup|sections/ex-each))
+  ok   within, every row PENDING (matrix exit 2): passed through as 2: exit 2 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) + the inline run (3 row(s) known))
+   over the budget
+  ok   over, no nightly before the full baseline: WARNING (owner: not held): exit 4 (nightly: WARNING - no nightly run file (tests/fixtures/precritic/deploy/nightly/none/<YYYY-MM-DD>[T<HHMM>][.shard-i-of-n].json); not refused until the first ful)
+  ok   over, no nightly after the full baseline: refused: exit 1 (nightly: REFUSED - no nightly run file (tests/fixtures/precritic/deploy/nightly/none-complete/<YYYY-MM-DD>[T<HHMM>][.shard-i-of-n].json), and the first full bas)
+  ok   over, stale nightly before the full baseline: WARNING: exit 4 (nightly: WARNING - the newest nightly (2026-10-22) finished 31.0 h ago, more than 24 h; not refused until the first full baseline is complete (owner 2026-10-23))
+  ok   over, stale nightly after the full baseline: refused: exit 1 (nightly: REFUSED - the newest nightly (2026-10-22) finished 31.0 h ago, more than 24 h)
+  ok   over, a RED row of a live skill (shard 2 of 2): refused: exit 1 (nightly: REFUSED - 1 row(s) of live skills are RED / ERROR in the folded state of 2 run file(s) (3 row(s) known), and no later run lists them OK: addition:add_2)
+  ok   over, RED only on a skill that is not live: NEEDS-SHARDED-RUN: exit 3 (nightly: no RED / ERROR row of a live skill in the folded state of 1 run file(s) (2 row(s) known))
+  ok   over, fresh and green on another commit: NEEDS-SHARDED-RUN: exit 3 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) (3 row(s) known))
+  ok   over, a shard of the run missing: NEEDS-SHARDED-RUN: exit 3 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) (2 row(s) known))
+  ok   over, a complete green run on HEAD: OK: exit 0 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) (3 row(s) known))
+  ok   over, a fired run (T0900) on HEAD that did NOT re-run that date's red row: refused (D1.4): exit 1 (nightly: REFUSED - 1 row(s) of live skills are RED / ERROR in the folded state of 3 run file(s) (3 row(s) known), and no later run lists them OK: addition:add_2)
+  ok   over, a later fired run lists the red row OK: OK (D1.4): exit 0 (nightly: no RED / ERROR row of a live skill in the folded state of 3 run file(s) (3 row(s) known))
+  ok   over, critic r2 reproduce (10-22 RED on HEAD, 10-23 green without it): refused: exit 1 (nightly: REFUSED - 1 row(s) of live skills are RED / ERROR in the folded state of 2 run file(s) (2 row(s) known), and no later run lists them OK: addition:add_2)
+  ok   over, an ERROR id only in the run file's red list: refused: exit 1 (nightly: REFUSED - 1 row(s) of live skills are RED / ERROR in the folded state of 1 run file(s) (3 row(s) known), and no later run lists them OK: addition:add_2)
+  ok   over, a shard without finished: NEEDS-SHARDED-RUN: exit 3 (nightly: no RED / ERROR row of a live skill in the folded state of 2 run file(s) (2 row(s) known))
+  ok   over, a row PENDING(no-baseline) before the full baseline: WARNING, not refused: exit 4 (nightly: no RED / ERROR row of a live skill in the folded state of 1 run file(s) (2 row(s) known))
+  ok   critic r2 command: nightly_check reproduce 0 refuses, naming the row and the run it went red in
+   critic r3: baseline invariants and nits at deploy
+  ok   I4: a row pinned in two baseline files with different contents: refused naming both: exit 1 (REFUSED - the merged baseline pins 1 row(s) in two files with different contents (I4; never resolved by file order): addition:add_20_regroup|single/ex-each in baseline.js)
+  ok   I5: RED on 10-22, printed with no baseline entry on 10-23: still refused (not a fix): exit 1 (addition:add_20_regroup|single/ex-each RED since run 2026-10-22 (S L-DENSITY DN-1: 0 -> 1); printed since in run 2026-10-23 with no baseline entry, which does not clear i)
+  ok   N1: red ids that are no longer rows and match no current row: RETIRED-ROW warnings, not refused: exit 4 (WARNING - RETIRED-ROW addition:add_20_regroup|single/more-oldname RED since run 2026-10-23 (S L-DENSITY DN-1: 0 -> 1): no current row of addition:add_20_regroup has kind )
+  ok   N1: the critic's ghost row (red-list only, no flags recorded): RETIRED-ROW, not refused: exit 4 (RETIRED-ROW addition:add_20_regroup|single/more-gone RED since run 2026-10-23: the run file recorded no flags for it, so it cannot be matched)
+  ok   N1: a red id renamed (same kind and flags as ex-each): mapped, refused until that row runs OK: exit 1 (single/ex-beside RED since run 2026-10-23 (S L-DENSITY DN-1: 0 -> 1); the row is now addition:add_20_regroup|single/ex-each)
+  ok   N1: the mapped row ran OK later: cleared: exit 0 (ex-beside (RED since run 2026-10-23) is now the row addition:add_20_regroup|single/ex-each (same kind and flags), which run 2026-10-23T0900 lists OK: cleared)
+  ok   N5: a .json without finished is listed as skipped, with why: exit 1 (WARNING skipped e1-check-2026-10-23.json: not a run file: no finished)
+  ok   N5: a run file under another name is folded, and its red row is the refusal: exit 1 (REFUSED - 1 row(s) of live skills are RED / ERROR in the folded state of 2 run file(s) (1 under another name) + the inline run (2 row(s) known), and no later run lists th)
+  ok   N4: over the budget before the full baseline: the WARNING names the baselined rows as NOT checked: exit 4 (3 affected row(s): 2 HAVE a baseline entry and are NOT checked at this deploy (addition:add_100_regroup|single/defaults, addition:add_20_regroup|single/ex-each); 1 have n)
+  ok   N4: without the matrix's list the WARNING says it is unknown which are baselined (never claims coverage): exit 4 (unknown which are baselined: any affected row that has a baseline entry is NOT checked)
+   critic r4: fold order (D2), the baseline a clearing run was judged against (N2), dirty runs (N3), N/A (N9)
+  ok   D2: lane-check.json (finished 00:30, OK) is older than 2026-10-23.json (02:10, RED): refused: exit 1 (addition:add_20_regroup|single/ex-each RED since run 2026-10-23 )
+  ok   D2 reverse: an earlier lane RED (00:30), a later nightly OK (02:10): OK, no false refusal: exit 0 (no RED / ERROR row of a live skill)
+  ok   critic r4 D2 command: MQ_NOW=2026-10-23T03:00:00Z nightly_check <fold-order> 0 fresh refuses
+  ok   N2: RED, then OK judged against another directory's baseline: refused, the OK warned and ignored: exit 1 (WARNING - 2026-10-23.json lists 1 red row(s) OK that it may not clear, so they stay red: judged against design/elsewhere/baseline.json, not this directory's baseline)
+  ok   N3: RED, then a DIRTY run lists it OK: refused, the OK warned and ignored: exit 1 (WARNING - 2026-10-23.json lists 1 red row(s) OK that it may not clear, so they stay red: the run was on a tree with local edits (dirty: true); a dirty run never clears)
+  ok   N9: RED, then N/A: stays red (not re-run), refused: exit 1 (single/ex-each RED since run 2026-10-22 (S L-DENSITY PG-23: 0 -> 2); not re-run (now N/A) in run 2026-10-23)
+  ok   N9: a pinned row that turned N/A is a WARNING: exit 4 (WARNING - 1 row(s) with a baseline entry are N/A now)
+  ok   OK + NOTHING RUN: exit 2, "ws-deploy-gates: INCOMPLETE (1 gate(s) did not run; nothing failed)"
+  ok   OK + WARNING (the matrix gate passed with a warning): exit 0, "ws-deploy-gates: OK (1 WARNING)"
+  ok   NEEDS-SHARDED-RUN prints the sharded run to fire
+  ok   N10: the OK line names the run and what it ran (nightly: run 2026-10-23 (2 file(s): affected 60c4fa53..HEAD (2 rows reached) + slice 5/28 + 0 re-selected red ...)
+-- N7: the matrix gate's flake re-run
+  ok   a red inline row that passes alone: FLAKE, and the re-run ran only --rows addition:add_100_regroup|single/defaults
+  ok   a nightly-rule refusal: the re-run re-reads the rule only (no matrix run), still FAIL
+-- critic r4 D1: the options gate (ws-options-pin --gate) on fixture dirs (MQ_NOW=2026-10-23T12:00:00Z)
+  ok   no options-pin file: WARNING: exit 4 (WARNING - no options-pin run file)
+  ok   a NEW pair of a live skill: refused: exit 1 (REFUSED - 1 live skill(s) have a failing pair the pin does not list, and no later check fixed it: composing:number_word_form: zeroPlace="always")
+  ok   NEW on 10-22, fixed by the 10-23 check: OK: exit 0 (ws-options-pin --gate: OK)
+  ok   stale (57.9 h), fewer than 28 slices checked: WARNING: exit 4 (WARNING - the newest options-pin file finished 57.9 h ago)
+  ok   stale (57.9 h) after a complete full run (all 28 slices): refused: exit 1 (REFUSED - the newest options-pin file finished 57.9 h ago)
+  ok   NEW on 10-22, a DIRTY clean check on 10-23 does not clear it: refused: exit 1 (dirty tree and lists no new pair; it does not clear)
+  ok   D2 class: a lane file (00:30, clean) does not override the later nightly (02:10, NEW): refused: exit 1 (newest result: options-pin-2026-10-23.json)
+  ok   on the gate list (nfn): exit 4 shows as WARNING, slot wait 0 s, 0.1 s
+  ok   session 1 lists the read-only options gate (nfn, --gate) and never ws-options-pin --check
+-- A8: the deploy-list time budget (timings of the 2026-10-23 timed runs, 30-min budget)
+  ok   the old list (ws-viewport-check in session 2): FAIL: exit 1 (FAIL - session 2 is predicted at 34.3 min)
+  ok   today's list (viewport in session 3): passes (the options gate is UNTIMED: WARNING): exit 4 (session 2: predicted 28.1 min)
+       budget: session 1: predicted 27.3 min (1638 s) - browser 2 slots 27.3 min (3271 slot-s of work incl. 3 s pauses; floor 27.3 min; longest-first order 27.3 min), node 2 workers 1.3 min; budget 30 min: within; 15 UNTIMED
+       budget: session 2: predicted 28.1 min (1689 s) - browser 2 slots 28.1 min (3366 slot-s of work incl. 3 s pauses; floor 28.1 min; longest-first order 28.2 min), node 2 workers 0.0 min; budget 30 min: within
+       budget: session 3: predicted 27.8 min (1665 s) - browser 2 slots 27.8 min (3330 slot-s of work incl. 3 s pauses; floor 27.8 min; longest-first order 27.8 min), node 2 workers 0.0 min; budget 30 min: within; 1 UNTIMED
+       budget: session 4: predicted 0.0 min (0 s) - browser 2 slots 0.0 min (0 slot-s of work incl. 3 s pauses; floor 0.0 min; longest-first order 0.0 min), node 2 workers 0.0 min; budget 30 min: within; 2 UNTIMED
+  ok   today's list: no session over 30 min; the gate with no measure is listed UNTIMED
+  ok   critic r4 D1: ws-options-pin --check added to session 1: FAIL: exit 1 (FAIL - session 1 is predicted at 139.3 min, over the 30-min budget (the longest: ws-options-pin --check 13440 s)
+  ok   ws-options-shots shards 1-2 of 4 in session 4: within 30 min: exit 4 (session 4: predicted 22.5 min (1350 s) - browser 2 slots 22.5 min (2695 slot-s of work incl. 3 s pauses; floor 22.5 min; longest-first order 22.5 min))
+  ok   ws-options-shots shards 3-4 of 4 in session 5: within 30 min: exit 4 (session 5: predicted 23.4 min (1407 s) - browser 2 slots 23.4 min (2744 slot-s of work incl. 3 s pauses; floor 22.9 min; longest-first order 23.4 min))
+  ok   ws-options-shots added to session 3 instead (MQ_OPTSHOTS_SESSION=3): FAIL: exit 1 (FAIL - session 3 is predicted at 50.2 min, over the 30-min budget)
+  ok   a gate with no measure (no timings file at all) is UNTIMED, never a FAIL: exit 4 (WARNING - UNTIMED ws-content-audit)
+  ok   the matrix budget is modelled from MQ_MATRIX_BUDGET (900 documents x 5.26 slot-s): session 3 over 30 min: exit 1 (FAIL - session 3 is predicted)
+  ok   a session run starts with the budget row (deploy-list time budget OK, then the gate)
+  ok   a session over its budget FAILs the deploy (the budget row is FAIL; it is not re-run as a flake)
+  ok   no --max-docs in the tree: measured with --list, over budget, then the nightly rule (stale: refused)
+  ok   no origin/master: FAIL with "matrix: origin/master is not fetched, so the deployed tip is unknown a..."
+  ok   MQ_DEPLOY_BASE=nosuchref: FAIL (matrix: MQ_DEPLOY_BASE=nosuchref is not a commit here)
+ws-deploy-gates --self-test: OK

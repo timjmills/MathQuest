@@ -112,6 +112,9 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
         score: on('score') && score > 0 ? score : false,
         tab, title: titleText, titleNote: h.titleNote || '', titleLines,
     };
+    // the teacher's page-title option (lf-roles 2026-11-13): placement and "custom words", only when set (frame.js pageHeader)
+    if (titleText && h.titlePos === 'above') header.titlePos = 'above';
+    if (titleText && h.titleCustom) header.titleCustom = true;
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const contHeader = { name: on('name'), date: false, score: false, title: '', tab: contTab };
     // Wave 5.2: the reference number line under the header of every page (the host reserved its
@@ -303,7 +306,24 @@ export function answerOf(it) {
     if (q.ans !== undefined && q.ans !== null && typeof q.ans !== 'object') return String(q.ans);
     // A several-part answer (a cloze's two parts): its parts in order, comma separated - the
     // form the host writes into a cell's boxes one part per box.
-    if (Array.isArray(q.ans) && q.ans.length && q.ans.every((v) => v !== null && typeof v !== 'object')) return q.ans.map(String).join(', ');
+    if (Array.isArray(q.ans) && q.ans.length && q.ans.every((v) => v !== null && typeof v !== 'object')) {
+        // (L-KEY: an order / pick answer keyed by the generator's tile or option ids - "t3", "opt1" - reads as their labels,
+        // never as the ids; when an id has no label the item has no one-line answer)
+        const idLike = (v) => /^(t|opt)\d+$/.test(String(v));
+        if (q.ans.some(idLike)) {
+            const labelOf = (id) => {
+                for (const arr of [q.tiles, q.options, q.items, q.choices]) {
+                    if (!Array.isArray(arr)) continue;
+                    const hit = arr.find((x) => x && typeof x === 'object' && String(x.id) === String(id));
+                    if (hit) return String(hit.label ?? hit.text ?? hit.name ?? '');
+                }
+                return '';
+            };
+            const labs = q.ans.map(labelOf);
+            return labs.every(Boolean) ? labs.join(', ') : '';
+        }
+        return q.ans.map(String).join(', ');
+    }
     if (k.value !== undefined && k.value !== null && typeof k.value !== 'object') return String(k.value);
     return '';
 }
@@ -443,6 +463,36 @@ export function stringsOf(it) {
     } catch (e) { return {}; }
 }
 
+/**
+ * PT 2.3, "the Steps on a page fit EVERY item on that page" (lf-placevalue round-cap r3, critic live1 r2 N3 / N6): the kind of
+ * problem an item is, for a Model and Steps set over it - the Steps its provider writes for THIS item. Two items are one kind
+ * when their Steps are the same. A skill whose Steps never change with the item is one kind throughout.
+ */
+export function stepsKindOf(it) {
+    try { return JSON.stringify((stringsOf(it || {}) || {}).steps || null); } catch (e) { return ''; }
+}
+
+/**
+ * The ONE place a role takes its Model's kind for its worked and guided items (opener, lesson We Do, guided): the pool
+ * reordered, stably, so the items of one kind come first - `lead`'s kind when a lead (the Model) is given, else the kind the
+ * pool deals most (ties: the kind dealt first). A pool of one kind is returned as it was.
+ */
+export function oneKindFirst(pool, lead = null) {
+    if (!Array.isArray(pool) || pool.length < 2) return pool;
+    const keys = pool.map(stepsKindOf);
+    if (new Set(keys).size < 2) return pool;
+    let top = lead ? stepsKindOf(lead) : keys[0];
+    if (!lead) {
+        const n = new Map();
+        keys.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
+        for (const [k, c] of n) if (c > n.get(top)) top = k;
+    }
+    return [...pool.filter((_, i) => keys[i] === top), ...pool.filter((_, i) => keys[i] !== top)];
+}
+
+/** True when two items are the same kind of problem (stepsKindOf). */
+export const sameKind = (a, b) => stepsKindOf(a) === stepsKindOf(b);
+
 /** A deterministic 40-60% "wrong" pattern over n items (PT-ERR-1, PT-TOF-1). */
 export function wrongPattern(n, seed, tag) {
     const r = rng(deriveSeed(seed === undefined ? 0 : seed, tag || 'wrong', n));
@@ -494,6 +544,22 @@ export function operandsOf(q = {}) {
         return [num(chain[1]), num(rest[0][2])];
     }
     return [];
+}
+
+/**
+ * The "a op b = " stem a frame may restate the problem with, ONLY when that equation is true of the answer: one number equal to
+ * the operands combined by the operation (TOF-STEM, lf-ops critic-cbt-r2 E1: count_by_tables printed "3 x 12 = 12, 18, 24, 30,
+ * 36"; a missing-part or 3-addend item printed "49 + 49 = 4"). '' when it is not, and the caller uses its plain stem.
+ */
+export function equationStemOf(q = {}, correct = '') {
+    const ops = operandsOf(q);
+    const op = opOf(q);
+    const g = opGlyphOf(op);
+    const s = String(correct === undefined || correct === null ? '' : correct).trim();
+    if (ops.length < 2 || !g || !/^-?[\d,]+(\.\d+)?$/.test(s)) return '';
+    const f = { add: (a, b) => a + b, subtract: (a, b) => a - b, multiply: (a, b) => a * b, divide: (a, b) => a / b }[op];
+    const val = ops.reduce((a, b) => f(a, b));
+    return Math.abs(val - Number(s.replace(/,/g, ''))) < 1e-9 ? `${ops.join(` ${g} `)} = ` : '';
 }
 
 const isWhole = (v) => /^-?\d+$/.test(String(v).replace(/,/g, '').trim());

@@ -9,7 +9,7 @@ import { generateQuestion } from './generate-question.js';
 // The sheet kit owns every printed millimetre, point size, stroke width and ink
 // value (WORKSHEET_DESIGN_STANDARD.md). tokens.js is a pure module with no
 // imports of its own, so pulling it in here adds no cycle.
-import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos } from './sheet/tokens.js';
+import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos, offeredSize } from './sheet/tokens.js';
 // The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
 import { inkHTML } from './print-ink.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
@@ -4901,7 +4901,7 @@ export function kitCellSpec(problem) {
 function kitCtxFor(problem, columns, spec = {}) {
     const w = typeof window !== 'undefined' ? window : {};
     const look = spec.look || (w.printSheetLook === 'daily' ? 'daily' : 'ican');
-    const size = spec.size || (['S', 'M', 'L'].includes(w.printSheetSize) ? w.printSheetSize : 'M');
+    const size = spec.size || offeredSize(w.printSheetSize, 'M');   // (owner 2026-11-13: a stored S reads as M)
     const cols = Math.max(1, Math.min(10, Math.floor(Number(columns) || 1)));
     const ctx = kitResolveCtx({
         mode: 'print', look, size, paper: w.printPaperLetter ? 'Letter' : 'A4',

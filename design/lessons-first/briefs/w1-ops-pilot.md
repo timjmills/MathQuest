@@ -46,7 +46,7 @@ registry additions through the manifest `design/lanes/lf-ops/manifest.json`; lin
 4. **Build entries** `tables_links`, `div_by_itself`, `mult_three` as presets / options / new skills per the owner rule
    (a distinct option is also a findable preset skill), each tagged in the same change.
 5. **Clean before critic** on the branch merged with the integration tip; then one independent critic for the family
-   (batch: every scope skill on every page type, S / M / L, keys, the three screen hosts, the option panel). PASS → add each
+   (batch: every scope skill on every page type, M / L (size S dropped, owner 2026-11-13), keys, the three screen hosts, the option panel). PASS → add each
    passing skill to `redesign-passed.js` with its evidence line in the same commit.
 
 ## Gates

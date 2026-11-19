@@ -1,0 +1,8 @@
+FAIL multiplication:mult_chart_easy @1280: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL coordinates:geo_translate @1280: [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @1280 part 2: [choices] answer choice(s) B, C shown with no letter or label
+FAIL coordinates:geo_translate @1280 part 3: [choices] answer choice(s) D shown with no letter or label
+FAIL coordinates:geo_translate @1280 (all parts): [choices] the 4 answer choices are spread over 3 parts (A | BC | D)
+  2 skills × 1 widths (1280 px), 7 readings, 1 worker(s), 7 s
+ws-options-shots: FAIL (6)

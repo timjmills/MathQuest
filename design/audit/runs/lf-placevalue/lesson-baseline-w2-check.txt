@@ -1,0 +1,158 @@
+  detailed/g1-oa1-bar-model-wp-20/1/html: CHANGED
+  detailed/g1-oa1-bar-model-wp-20/1/p12: CHANGED
+  detailed/g1-oa1-bar-model-wp-20/1/p19: CHANGED
+  detailed/g1-oa1-bar-model-wp-20/4242/html: CHANGED
+  detailed/g1-oa1-bar-model-wp-20/4242/p12: CHANGED
+  detailed/g1-oa1-bar-model-wp-20/4242/p19: CHANGED
+  detailed/g2-nbt3-read-write-1000/1/html: CHANGED
+  detailed/g2-nbt3-read-write-1000/1/p04: CHANGED
+  detailed/g2-nbt3-read-write-1000/1/p15: CHANGED
+  detailed/g2-nbt3-read-write-1000/1/p26: CHANGED
+  detailed/g2-nbt3-read-write-1000/4242/html: CHANGED
+  detailed/g2-nbt3-read-write-1000/4242/p04: CHANGED
+  detailed/g2-nbt3-read-write-1000/4242/p15: CHANGED
+  detailed/g2-nbt3-read-write-1000/4242/p26: CHANGED
+  detailed/g3-oa5-mult-properties/1/html: CHANGED
+  detailed/g3-oa5-mult-properties/1/p12: CHANGED
+  detailed/g3-oa5-mult-properties/1/p21: CHANGED
+  detailed/g3-oa5-mult-properties/1/p29: CHANGED
+  detailed/g3-oa5-mult-properties/4242/html: CHANGED
+  detailed/g3-oa5-mult-properties/4242/p12: CHANGED
+  detailed/g3-oa5-mult-properties/4242/p21: CHANGED
+  detailed/g3-oa5-mult-properties/4242/p29: CHANGED
+  detailed/g3-oa8-two-step-wp/1/html: CHANGED
+  detailed/g3-oa8-two-step-wp/1/p04: CHANGED
+  detailed/g3-oa8-two-step-wp/1/p15: CHANGED
+  detailed/g3-oa8-two-step-wp/1/p25: CHANGED
+  detailed/g3-oa8-two-step-wp/1/p34: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/html: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/p15: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/p25: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/p34: CHANGED
+  detailed/g3-oa9-input-output-rule/1/html: CHANGED
+  detailed/g3-oa9-input-output-rule/1/p12: CHANGED
+  detailed/g3-oa9-input-output-rule/1/p20: CHANGED
+  detailed/g3-oa9-input-output-rule/1/p27: CHANGED
+  detailed/g3-oa9-input-output-rule/4242/html: CHANGED
+  detailed/g3-oa9-input-output-rule/4242/p12: CHANGED
+  detailed/g3-oa9-input-output-rule/4242/p20: CHANGED
+  detailed/g3-oa9-input-output-rule/4242/p27: CHANGED
+  detailed/g3-oa9-mult-table-patterns/1/html: CHANGED
+  detailed/g3-oa9-mult-table-patterns/1/p12: CHANGED
+  detailed/g3-oa9-mult-table-patterns/1/p19: CHANGED
+  detailed/g3-oa9-mult-table-patterns/1/p25: CHANGED
+  detailed/g3-oa9-mult-table-patterns/4242/html: CHANGED
+  detailed/g3-oa9-mult-table-patterns/4242/p12: CHANGED
+  detailed/g3-oa9-mult-table-patterns/4242/p19: CHANGED
+  detailed/g3-oa9-mult-table-patterns/4242/p25: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/html: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/p04: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/p05: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/p11: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/p12: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/p19: CHANGED
+  detailed/g4-nbt1-ten-times-value/1/p20: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/html: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/p04: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/p05: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/p11: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/p12: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/p19: CHANGED
+  detailed/g4-nbt1-ten-times-value/4242/p20: CHANGED
+  number_sense:nearest_10/L/1/key-p3: CHANGED
+  number_sense:nearest_10/L/1/key-p4: CHANGED
+  number_sense:nearest_10/L/1/keyHtml: CHANGED
+  number_sense:nearest_10/L/1/pupil-p3: CHANGED
+  number_sense:nearest_10/L/1/pupil-p4: CHANGED
+  number_sense:nearest_10/L/1/pupilHtml: CHANGED
+  number_sense:nearest_10/L/4242/key-p3: CHANGED
+  number_sense:nearest_10/L/4242/key-p4: CHANGED
+  number_sense:nearest_10/L/4242/keyHtml: CHANGED
+  number_sense:nearest_10/L/4242/pupil-p3: CHANGED
+  number_sense:nearest_10/L/4242/pupil-p4: CHANGED
+  number_sense:nearest_10/L/4242/pupilHtml: CHANGED
+  number_sense:nearest_10/M/1/key-p2: CHANGED
+  number_sense:nearest_10/M/1/key-p3: CHANGED
+  number_sense:nearest_10/M/1/keyHtml: CHANGED
+  number_sense:nearest_10/M/1/pupil-p2: CHANGED
+  number_sense:nearest_10/M/1/pupil-p3: CHANGED
+  number_sense:nearest_10/M/1/pupilHtml: CHANGED
+  number_sense:nearest_10/M/4242/key-p2: CHANGED
+  number_sense:nearest_10/M/4242/key-p3: CHANGED
+  number_sense:nearest_10/M/4242/keyHtml: CHANGED
+  number_sense:nearest_10/M/4242/pupil-p2: CHANGED
+  number_sense:nearest_10/M/4242/pupil-p3: CHANGED
+  number_sense:nearest_10/M/4242/pupilHtml: CHANGED
+  placevalue:value/L/1/key-p2: CHANGED
+  placevalue:value/L/1/keyHtml: CHANGED
+  placevalue:value/L/1/pupil-p2: CHANGED
+  placevalue:value/L/1/pupilHtml: CHANGED
+  placevalue:value/L/4242/key-p2: CHANGED
+  placevalue:value/L/4242/keyHtml: CHANGED
+  placevalue:value/L/4242/pupil-p2: CHANGED
+  placevalue:value/L/4242/pupilHtml: CHANGED
+  round/L/1/key-p3: CHANGED
+  round/L/1/key-p4: CHANGED
+  round/L/1/keyHtml: CHANGED
+  round/L/1/pupil-p3: CHANGED
+  round/L/1/pupil-p4: CHANGED
+  round/L/1/pupilHtml: CHANGED
+  round/L/4242/key-p3: CHANGED
+  round/L/4242/key-p4: CHANGED
+  round/L/4242/keyHtml: CHANGED
+  round/L/4242/pupil-p3: CHANGED
+  round/L/4242/pupil-p4: CHANGED
+  round/L/4242/pupilHtml: CHANGED
+  round/M/1/key-p2: CHANGED
+  round/M/1/key-p3: CHANGED
+  round/M/1/keyHtml: CHANGED
+  round/M/1/pupil-p2: CHANGED
+  round/M/1/pupil-p3: CHANGED
+  round/M/1/pupilHtml: CHANGED
+  round/M/4242/key-p2: CHANGED
+  round/M/4242/key-p3: CHANGED
+  round/M/4242/keyHtml: CHANGED
+  round/M/4242/pupil-p2: CHANGED
+  round/M/4242/pupil-p3: CHANGED
+  round/M/4242/pupilHtml: CHANGED
+  [add] 40/40 identical
+  [addition:add_facts] 40/40 identical
+  [addition:add_wp_10] 44/44 identical
+  [addition:add_wp_10_plain] 40/40 identical
+  [addition:add_wp_20] 40/40 identical
+  [addition:add_wp_20_plain] 40/40 identical
+  [addition:fact_family_sort] 44/44 identical
+  [composing:number_word_form] 40/40 identical
+  [g1-oa1-bar-model-wp-20] 46/52 identical
+  [g2-nbt3-read-write-1000] 66/74 identical
+  [g3-oa5-mult-properties] 52/60 identical
+  [g3-oa8-two-step-wp] 61/70 identical
+  [g3-oa9-input-output-rule] 48/56 identical
+  [g3-oa9-mult-table-patterns] 44/52 identical
+  [g4-nbt1-ten-times-value] 42/56 identical
+  [division:div_facts] 40/40 identical
+  [number_sense:nearest_10] 20/44 identical
+  [placevalue:combine] 40/40 identical
+  [placevalue:expand] 40/40 identical
+  [placevalue:identify] 40/40 identical
+  [placevalue:unit_form] 40/40 identical
+  [placevalue:value] 32/40 identical
+  [round] 20/44 identical
+  [sub] 40/40 identical
+  [subtraction:sub_100_no_regroup] 40/40 identical
+  [subtraction:sub_100_regroup] 40/40 identical
+  [subtraction:sub_100k_no_regroup] 40/40 identical
+  [subtraction:sub_10k_no_regroup] 40/40 identical
+  [subtraction:sub_1k_no_regroup] 40/40 identical
+  [subtraction:sub_1m_no_regroup] 40/40 identical
+  [subtraction:sub_2d_1d] 40/40 identical
+  [subtraction:sub_50_no_regroup] 40/40 identical
+  [subtraction:sub_wp_10] 40/40 identical
+  [subtraction:sub_wp_10_plain] 40/40 identical
+  [subtraction:sub_wp_20] 40/40 identical
+  [subtraction:sub_wp_20_plain] 40/40 identical
+  [vocabulary:vocab_grade_pictures] 76/76 identical
+  [vocabulary:vocab_pick3_words] 60/60 identical
+  placevalue:compare: UNPINNED (the tree prints this lesson; design/audit/baselines/lesson-baseline.json does not pin it)
+  (on purpose? re-pin in the same commit: --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write design/audit/baselines/lesson-baseline.json, and name the changed lessons / pages in the commit message)
+ws-lesson-baseline: FAIL (117 of 1732 differ; 1 lesson(s) UNPINNED)

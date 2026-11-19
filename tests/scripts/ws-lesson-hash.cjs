@@ -16,7 +16,7 @@ const { ROOT, open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes('--' + k);
 const SEEDS = (arg('seeds', '4242,1001,777') || '').split(',').map((s) => parseInt(s, 10) >>> 0);
-const SIZES = (arg('sizes', 'L,S') || '').split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'L,M') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const FILE = path.join(ROOT, 'design', 'lessons', 'render-stamps.json');
 
 /** The sample lessons: by lesson id once the library lands, else by skill (the old request). */

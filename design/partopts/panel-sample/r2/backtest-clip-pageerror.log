@@ -1,0 +1,26 @@
+=== clip: old gate (74c2519c)
+ok   addition:add_word_problems @1280: ink 3.99 %, covers 100.0 %
+  1 skills × 1 widths (1280 px), 1 worker(s), 11 s
+ws-options-shots: OK (1 skills × 1 widths)
+=== clip: new gate
+FAIL addition:add_word_problems @1280: stage (-1,-196) 400×578 is not inside the 398×186 frame (transform translate(-50%, -50%) scale(1))
+FAIL addition:add_word_problems @1280 changed +50ms: stage (-1,-208) 400×613 is not inside the 398×196 frame (transform translate(-50%, -50%) scale(1))
+FAIL addition:add_word_problems @1280 changed +1.5s: stage (-1,-208) 400×613 is not inside the 398×196 frame (transform translate(-50%, -50%) scale(1))
+FAIL addition:add_word_problems @1280x720: stage (-1,-196) 400×578 is not inside the 398×186 frame (transform translate(-50%, -50%) scale(1))
+FAIL addition:add_word_problems @1280x1000>720: stage (-1,-196) 400×578 is not inside the 398×186 frame (transform translate(-50%, -50%) scale(1)); the panel footer's bottom is at 987, below the 720 px window; the Done button (1129,927 80×44) is not inside the 1280×720 window
+  1 skills × 1 widths (1280 px); spot passes on 1 skill(s): 1280x720, a resize to 720, an option change at 1280, 5 readings, 1 worker(s), 12 s
+ws-options-shots: FAIL (5)
+=== err: old gate (74c2519c)
+ok   addition:add_word_problems @1280: ink 4.27 %, covers 27.6 %
+  page errors: BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+  1 skills × 1 widths (1280 px), 1 worker(s), 5 s
+ws-options-shots: OK (1 skills × 1 widths)
+=== err: new gate
+FAIL addition:add_word_problems @1280: text drawn at 3.8 px ("crayons"; needs >= 9 px; translate(-50%, -50%) scale(0.2976)); page error: BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+FAIL addition:add_word_problems @1280 changed +50ms: text drawn at 3.8 px ("crayons"; needs >= 9 px; translate(-50%, -50%) scale(0.2969)); page error: BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+FAIL addition:add_word_problems @1280 changed +1.5s: text drawn at 3.8 px ("crayons"; needs >= 9 px; translate(-50%, -50%) scale(0.2969)); page error: BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+FAIL addition:add_word_problems @1280x720: text drawn at 3.8 px ("crayons"; needs >= 9 px; translate(-50%, -50%) scale(0.2976)); page error: BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+FAIL addition:add_word_problems @1280x1000>720: text drawn at 3.8 px ("crayons"; needs >= 9 px; translate(-50%, -50%) scale(0.2976)); the panel footer's bottom is at 987, below the 720 px window; the Done button (1129,927 80×44) is not inside the 1280×720 window; page error: BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+  page errors (each FAILs the check it was thrown in): BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws | BACKTEST: a page error while the panel draws
+  1 skills × 1 widths (1280 px); spot passes on 1 skill(s): 1280x720, a resize to 720, an option change at 1280, 5 readings, 1 worker(s), 12 s
+ws-options-shots: FAIL (5)

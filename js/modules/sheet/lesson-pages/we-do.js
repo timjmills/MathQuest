@@ -6,7 +6,7 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
-import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc } from '../roles/compose.js';
+import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc, oneKindFirst } from '../roles/compose.js';
 import { resolveCtx } from '../index.js';
 import { workedStepsOf, stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueOf, countCueRow } from '../roles/guided.js';
@@ -15,6 +15,7 @@ import { CASE_TESTS } from '../lesson-arch/index.js';
 import { ringFactRow } from '../lesson-arch/fact.js';
 import { roundLineSvg, roundLineMm, roundLinePad, GUIDED_BOX_MM, isRound } from '../lesson-arch/line.js';
 import { isExpand } from '../lesson-arch/pv.js';
+import { rowStretches } from '../layout.js';
 import { isWordBar, barNums, msOf } from '../lesson-arch/story.js';
 import { arrTurnOf } from '../lesson-arch/array.js';
 import { winShare } from '../lesson-arch/grid.js';
@@ -43,6 +44,11 @@ export function pickWeDo(items, example, data, n, others = []) {
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
     let order = [...new Set([...liked.filter((it) => !kind || sameKind.includes(it)), ...same.filter((it) => sameKind.includes(it)), ...sameKind,
         ...liked, ...same, ...rest])];
+    // PT 2.3 (round-cap r3, lf-placevalue critic live1 r2 N6): the Guided cells are the example's kind - the items whose Steps
+    // are the example's Steps (compose.js oneKindFirst, the rule the Opener and the Guided page share); every other kind comes
+    // after them, so it is dealt only when the pool has too few of the example's. A one-kind pool keeps its order; a lesson's own
+    // named cases (`guidedWants`, `guided`, the div_facts Mix forms) still lead - they are the lesson's chosen set.
+    order = oneKindFirst(order, example);
     // (`guidedWants` - the detailed lesson maker, lesson 2: the Guided cells' cases, in order, first)
     if (data && Array.isArray(data.guidedWants)) {
         const lead = [];
@@ -277,7 +283,12 @@ function weDoBandOwn(env) {
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
-    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, weDoFirstOn(input)), nolabel: true }));
+    // (CL-4d, lead 2026-11-13; lf-placevalue compare r3: a pv cell whose row stretches it by 30 % or more (layout.rowStretches) carries
+    // `ws-rowstretch`, so a template that opted in - data-ws-stretchmid, the compare line - is centred down the box,
+    // css/sheet-kit.css; the Guided rows split the Steps panel's height, lesson S Guided row 2 left 30 % under the line)
+    const rowStretch = (it, cols, cellH) => (it && it.template === 'pv' && rowStretches(it, cols, cellH) ? 'ws-rowstretch' : '');
+    const weCellH = stackRows ? weH / stackRows : weH;
+    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter', rowStretch(it, gcols, weCellH)].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, weDoFirstOn(input)), nolabel: true }));
     const zoneCtx = resolveCtx({ size: ctx.size, look: ctx.look, mode: 'print' });
     const weBand = {
         kind: 'row', cls: 'mq-modelrow mq-lwedorow', widths: ['1fr', `${WEDO_W_MM}mm`],
@@ -289,7 +300,7 @@ function weDoBandOwn(env) {
     // The Guided cells take little of the page's spare height: they are sized to their problems
     // (or to the Steps beside them); the Independent rows under them take the rest.
     if (top) {
-        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i, weDoFirstOn(input)), nolabel: true }));
+        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter', rowStretch(it, top.cols, top.h)].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i, weDoFirstOn(input)), nolabel: true }));
         const grid = top.rows ? gridPart(items, { cols: 1, rows: top.rows, cellH: top.h, labels: 'none' }) : gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
         const stripH = hOf(stripX, 1);
         // The chant: on the Remember line when the sheet has one (it becomes the Rule line - the

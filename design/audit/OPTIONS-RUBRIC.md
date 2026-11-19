@@ -117,9 +117,9 @@ Two layers, both graded:
     never turning a production item into multiple choice on screen only.
   A skill with genuinely one correct form (a hundreds chart, a place-value chart) scores O6 = 8
   without an item-form control only when the critic can say in one sentence why.
-- **Page choices honoured by the skill (on the Print screen).** Size S / M / L and Columns really
+- **Page choices honoured by the skill (on the Print screen).** Size M / L and Columns really
   change this skill's layout: the drawings scale, and the column-fit rule holds (most skills reach 2
-  columns at S, operations 3, fact drills 4+; an item that must stay one column is placed at the top
+  columns at M, operations 3, fact drills 4+; an item that must stay one column is placed at the top
   or bottom of a multi-column page, never forcing the whole page to 1 column). Wasted space inside a
   cell (RUBRIC H13) at any size counts against O6.
 
@@ -164,7 +164,7 @@ Score down when in doubt. A score of 8+ must be defensible in one sentence.
 | OC11 | Two controls duplicate each other, or a value label repeats | O5 ≤ 6 |
 | OC12 | A value makes the generator throw, return nothing, or hang | O4 ≤ 2 |
 | OC13 | An appearance value changes nothing visible on print or screen | O6 ≤ 3 |
-| OC14 | The skill ignores Size or Columns (same layout at S and L, or stays 1 column when 2 fit) | O6 ≤ 5 |
+| OC14 | The skill ignores Size or Columns (same layout at M and L, or stays 1 column when 2 fit) | O6 ≤ 5 |
 | OC15 | The family's essential appearance choice (§1 O6 list) is missing | O6 ≤ 6 |
 
 ---

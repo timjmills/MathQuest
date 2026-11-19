@@ -14,7 +14,7 @@
 export {
     INK, LESSON_ACCENT, STROKE, STROKE_WIDTHS, DASH, HATCH,
     PAPER, DEFAULT_PAPER, PAGE_CHROME,
-    SIZES, SIZE_IDS, DEFAULT_SIZE,
+    SIZES, SIZE_IDS, DEFAULT_SIZE, OFFERED_SIZES, offeredSize, COMPACT_LABEL,
     LOOKS, LOOK_IDS, DEFAULT_LOOK,
     FACT_TRACK_EM, FACT_TRACKS,
     MINUS, TIMES, DIV, opGlyph,
@@ -36,7 +36,7 @@ export {
 
 /* --------------------------------------------------------------------------- frame */
 export {
-    headerFields, strandTab, pageTitle, pageFooter, page, doc,
+    headerFields, strandTab, pageTitle, pageHeader, HEADER_DEFAULTS, TITLE_POSITIONS, pageFooter, page, doc,
     instruction, BAND_LABELS, band, sayBand, steps, story, sideStrip, withStrip,
 } from './frame.js';
 
@@ -66,7 +66,7 @@ export {
     CONTRACT_MEMBERS, OPTIONAL_MEMBERS,
     INSTRUCTION_LIBRARY, JUDGE_LABELS, PRINT_VERBS, BANNED_INSTRUCTION_WORDS,
     instructionFor, instructionKeyOf, isLibraryInstruction, toScreenInstruction, lintInstruction,
-    registerSkill, getProvider, hasProvider, listProviders,
+    registerSkill, getProvider, hasProvider, listProviders, roleOptions,
     installDefaultAdapters, defaultAdapters, adaptersInstalled,
     QUALITY, coverageFor, summariseCoverage, worstOffenders,
 } from './contract.js';
@@ -111,7 +111,7 @@ export {
 
 // The operations templates that are not a plain stack or fact (long division, area model,
 // chart window, arrays, remainder, number line, fact family, cloze bank).
-export { divisionSteps } from './cells/long-division.js';
+export { divisionSteps, bracketSvg, bracketLine } from './cells/long-division.js';
 import './cells/pv-times.js';
 import './cells/area-model.js';
 import './cells/area-model-div.js';
@@ -142,11 +142,18 @@ import './cells/frac-wall.js';
 // "Is it a fact family?" (visual-quality lane 2026-10-31): the fact triangle and a circled Yes / No.
 import './cells/family-check.js';
 export { FAMILY_CHECK } from './cells/family-check.js';
+// ---- lane lf-algebra (2026-11-07), APPEND ONLY: patterns:notice_patterns and patterns:growing_shape_patterns.
+import './cells/notice.js';
+import './cells/growing-pattern.js';
+export { noticeStatements, NOTICE_TEMPLATE } from './cells/notice.js';
+export { growthCells, growCount, GROW_TEMPLATE } from './cells/growing-pattern.js';
+// ---- end lf-algebra
 // The graphic library (design/GRAPHIC_LIBRARY.md): one drawing per representation, paper and screen.
 export * as graphics from './graphics/index.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
 export { barMini } from './cells/word-work.js';
 export { wordWorkPayload, wordWorkTwin, solveStory, parseTwoStep, storyLines, unitOf, cueRanges, columnRows, KEYWORD_BANK, WW_TEMPLATE } from './cells/word-work.js';
+export { wordWorkGradedParts, wordWorkScreenValues, wordWorkFilled, wordWorkVerdict, wordWorkKeyVerdict } from './cells/word-work.js';
 // Count-by rows, number patterns, the chart to complete, and × / ÷ on a number line (2026-09-25).
 import './cells/count-row.js';
 import './cells/mult-grid.js';

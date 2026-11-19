@@ -1,0 +1,608 @@
+{
+ "tool": "ws-worksheet-reflow",
+ "about": "BACKTEST FIXTURE (lf-hosts critic r2 F5): master baseline with mult_facts@1280 set 20 px taller / wider and card 1 numeral +4 px, so the measured sheet reads as SHRUNK, a card width change and a numeral drop on one card - the cases the r1 ratchet (growth only) passed.",
+ "pinnedFrom": "77f0acad2",
+ "cards": 6,
+ "keys": {
+  "placevalue:expand@820": {
+   "cards": 6,
+   "cols": 1,
+   "cardH": 234.8,
+   "cardW": 756,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18,
+   "cardHs": [
+    234.8,
+    234.8,
+    234.8,
+    234.8,
+    234.8,
+    234.8
+   ],
+   "digits": [
+    18,
+    18,
+    18,
+    18,
+    18,
+    18
+   ]
+  },
+  "subtraction:sub_100_no_regroup@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 387.4,
+   "cardW": 370,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "multiplication:mult_facts@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 345.4,
+   "cardW": 370,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "addition:add_facts@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 345.4,
+   "cardW": 370,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "subtraction:sub_word_problems@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 769.4,
+   "cardW": 370,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2,
+   "cardHs": [
+    698.8,
+    698.8,
+    769.4,
+    769.4,
+    734.1,
+    734.1
+   ],
+   "digits": [
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2
+   ]
+  },
+  "placevalue:expand@1024": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 312.1,
+   "cardW": 478,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18,
+   "cardHs": [
+    312.1,
+    312.1,
+    312.1,
+    312.1,
+    312.1,
+    312.1
+   ],
+   "digits": [
+    18,
+    18,
+    18,
+    18,
+    18,
+    18
+   ]
+  },
+  "subtraction:sub_100_no_regroup@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 387.4,
+   "cardW": 313.3,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "multiplication:mult_facts@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 313.3,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "addition:add_facts@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 313.3,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "subtraction:sub_word_problems@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 875.3,
+   "cardW": 313.3,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2,
+   "cardHs": [
+    840,
+    840,
+    840,
+    875.3,
+    875.3,
+    875.3
+   ],
+   "digits": [
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2
+   ]
+  },
+  "placevalue:expand@1280": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 231.2,
+   "cardW": 560,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18,
+   "cardHs": [
+    231.2,
+    231.2,
+    231.2,
+    231.2,
+    231.2,
+    231.2
+   ],
+   "digits": [
+    18,
+    18,
+    18,
+    18,
+    18,
+    18
+   ]
+  },
+  "subtraction:sub_100_no_regroup@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 387.4,
+   "cardW": 368,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "multiplication:mult_facts@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 365.4,
+   "cardW": 388,
+   "boxW": 106.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    365.4,
+    365.4,
+    365.4,
+    365.4,
+    365.4,
+    365.4
+   ],
+   "digits": [
+    44,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "addition:add_facts@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 368,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "subtraction:sub_word_problems@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 769.4,
+   "cardW": 368,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2,
+   "cardHs": [
+    769.4,
+    769.4,
+    769.4,
+    769.4,
+    769.4,
+    769.4
+   ],
+   "digits": [
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2
+   ]
+  },
+  "placevalue:expand@1366": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 231.2,
+   "cardW": 566,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18,
+   "cardHs": [
+    231.2,
+    231.2,
+    231.2,
+    231.2,
+    231.2,
+    231.2
+   ],
+   "digits": [
+    18,
+    18,
+    18,
+    18,
+    18,
+    18
+   ]
+  },
+  "subtraction:sub_100_no_regroup@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 387.4,
+   "cardW": 372,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4,
+    387.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "multiplication:mult_facts@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 372,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "addition:add_facts@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 372,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40,
+   "cardHs": [
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4,
+    345.4
+   ],
+   "digits": [
+    40,
+    40,
+    40,
+    40,
+    40,
+    40
+   ]
+  },
+  "subtraction:sub_word_problems@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 769.4,
+   "cardW": 372,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2,
+   "cardHs": [
+    769.4,
+    769.4,
+    769.4,
+    769.4,
+    769.4,
+    769.4
+   ],
+   "digits": [
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2,
+    25.2
+   ]
+  },
+  "patterns:number_patterns_rule@820": {
+   "cards": 6,
+   "cols": 1,
+   "cardH": 359.3,
+   "cardW": 756,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.5,
+   "cardHs": [
+    359.3,
+    359.3,
+    259,
+    359.3,
+    359.3,
+    359.3
+   ],
+   "digits": [
+    26.5,
+    26.5,
+    26.5,
+    26.5,
+    26.5,
+    26.5
+   ]
+  },
+  "patterns:number_patterns_rule@1024": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 382.6,
+   "cardW": 478,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.2,
+   "cardHs": [
+    382.6,
+    382.6,
+    379.5,
+    379.5,
+    382.6,
+    382.6
+   ],
+   "digits": [
+    26.2,
+    26.5,
+    26.5,
+    26.2,
+    26.5,
+    26.5
+   ]
+  },
+  "patterns:number_patterns_rule@1280": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 359.3,
+   "cardW": 560,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.5,
+   "cardHs": [
+    359.3,
+    359.3,
+    359.3,
+    359.3,
+    359.3,
+    359.3
+   ],
+   "digits": [
+    26.5,
+    26.5,
+    26.5,
+    26.5,
+    26.5,
+    26.5
+   ]
+  },
+  "patterns:number_patterns_rule@1366": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 359.3,
+   "cardW": 566,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.5,
+   "cardHs": [
+    359.3,
+    359.3,
+    359.3,
+    359.3,
+    359.3,
+    359.3
+   ],
+   "digits": [
+    26.5,
+    26.5,
+    26.5,
+    26.5,
+    26.5,
+    26.5
+   ]
+  }
+ }
+}

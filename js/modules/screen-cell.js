@@ -27,7 +27,8 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { bracketSvg, bracketLine, opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { wordWorkVerdict, wordWorkFilled } from './sheet/index.js';
 import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
@@ -432,11 +433,14 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
  * quotient slot in the row above, right-aligned over the dividend.
  */
 export function divisionHTML(k, slotHtml) {
-    const arc = '<svg class="mq-ldiv-arc" viewBox="0 0 12 48" preserveAspectRatio="none" aria-hidden="true">'
-        + '<path d="M1 1 Q11 24 1 47" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+    // ONE stroke (owner 2026-11-14, LDIV-JOIN): the kit's bracketSvg, its y 0 on the vinculum's centre
+    // (`.mq-ldiv-arcj`); the bracket column's own border stays for layout but is clear (`.mq-ldiv-brkj`), so the
+    // bar over the arc is the path's and it starts at the arc's corner; it runs 1/12 of the column on under the
+    // dividend's border (LDIV-JOIN-RASTER: butt end against border at a fractional x drew a light seam).
+    const arc = bracketSvg({ x: 1, q: 11, w: 12, h: 48, bar: 13, foot: 47, qy: 23.5, ink: '#000', stroke: 2, cls: 'mq-ldiv-arcj', style: '' });
     return `<div class="ws-sheet mq-kit"><div class="mq-ldiv" role="group" aria-label="${attr(`${k.a} divided by ${k.b}`)}">`
         + `<span class="mq-ldiv-q">${slotHtml || ''}</span>`
-        + `<span class="mq-ldiv-dsr">${k.b}</span><span class="mq-ldiv-brk">${arc}</span>`
+        + `<span class="mq-ldiv-dsr">${k.b}</span><span class="mq-ldiv-brk mq-ldiv-brkj">${arc}</span>`
         + `<span class="mq-ldiv-dvd">${k.a}</span></div></div>`;
 }
 
@@ -515,7 +519,7 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     if (opKey(k.op) === '/') out.tally = Number(o.band) >= 144 ? 12 : 10;
     if (arrayFrame) {
         out.tally = Number(no.band) >= 144 ? 12 : 10;
-        out.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(no) / out.tally), rows: out.tally };
+        out.arrayFrame = { cols: out.tally, rows: Math.max(1, divFactsMaxDividend(no) / out.tally) };   // (facts card §5.9: landscape)
     }
     if (opKey(k.op) === '*' && Array.isArray(o.constant)) {
         const cs = o.constant;
@@ -2265,11 +2269,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // denominator, the whole or the fraction left out when its boxes are empty.
     const mixed = join === 'mixed';
     const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
-    let saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // (lf-hosts 2026-11-13) a word-work twin's graded parts beyond the answer - the letter equation, the estimate
+    // (`data-mq-part`) - ride in the same value after the answer, "58 | equation: 5×9+13=n", so every host grades them
+    // with the paper key (wordWorkVerdict); a saved value's parts are not the answer's
+    const partEls = Array.from(cellEl.querySelectorAll('[data-mq-part]'));
+    const baseValue = partEls.length ? String(input.value || '').split(/\s*\|\s*(?=[\w-]+:)/)[0] : String(input.value || '');
+    let saved = mixed ? splitMixed(baseValue) : baseValue.split(join.trim() || ',').map((t) => t.trim());
     // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
     // digits in the rightmost boxes (the row's spare boxes stand on the left) - small fixes item 4, "[816|_|_|_]" on going back.
     if (!mixed && join === '' && slots.length > 1) {
-        const ch = [...String(input.value || '').replace(/\s/g, '')];
+        const ch = [...baseValue.replace(/\s/g, '')];
         saved = ch.length <= slots.length ? [...Array(slots.length - ch.length).fill(''), ...ch] : saved;
     }
     const boxes = slots.map((slot, k) => {
@@ -2293,7 +2302,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         slot.appendChild(el);
         return el;
     });
-    const compose = () => {
+    // a part's text as written: its printed symbols and each box's value (an empty box reads "?", never a right part)
+    const partText = (el) => {
+        let t = '';
+        const walk = (n) => { for (const c of n.childNodes) { if (c.nodeType === 3) t += c.nodeValue; else if (c.tagName === 'INPUT') t += (c.value || '').trim() || '?'; else if (c.nodeType === 1) walk(c); } };
+        walk(el);
+        return t.replace(/\s+/g, '');
+    };
+    const withParts = (v) => (partEls.length ? `${v}${partEls.map((el) => ` | ${el.getAttribute('data-mq-part')}: ${partText(el)}`).join('')}` : v);
+    const compose = () => withParts(composeAnswer());
+    const composeAnswer = () => {
         const v = boxes.map((b) => (b.value || '').trim());
         if (!mixed) return v.join(join);
         const [w, n, d] = v;
@@ -2337,6 +2355,10 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
             }
         });
     });
+    partEls.forEach((el) => el.querySelectorAll('input').forEach((b) => {
+        b.addEventListener('input', () => { input.value = compose(); input.dispatchEvent(new Event('input', { bubbles: true })); });
+        b.addEventListener('change', () => { if (onChange) onChange(compose()); });
+    }));
     input.classList.add('mq-cellslot-host');
     return true;
 }
@@ -2995,14 +3017,18 @@ export function cellSlot(w = 2, label = '', fixed = false) {
 }
 
 /** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
-export function inlineBlanksHTML(text, widths, fixed = false) {
+export function inlineBlanksHTML(text, widths, fixed = false, { numeric = false } = {}) {
     let i = 0;
-    const html = esc(plainText(text)).replace(/_{3,}/g, () => {
+    let html = esc(plainText(text)).replace(/_{3,}/g, () => {
         const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
         i++;
         return cellSlot(w, '', fixed && !!(widths && widths[i - 1]));
     });
-    return i ? `<div class="mq-ibline">${html}</div>` : '';
+    // `numeric` (lf-placevalue live1, the lead via lf-hosts: placevalue:expand's "144 = [ ] + [ ] + [ ]" on the online worksheet
+    // was set at the sentence size, 18 px, under the 29 px digit floor): a number sentence is set at the host's digit size, bold
+    // as on paper, and each operator keeps its box on its line (ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP)
+    if (numeric) html = html.replace(/([+=\u2212\u00d7])\s*(<span class="mq-cellbox"[^>]*><\/span>)/g, '<span class="mq-ibkeep">$1 $2</span>');
+    return i ? `<div class="mq-ibline${numeric ? ' mq-ibnum' : ''}">${html}</div>` : '';
 }
 
 /**
@@ -3056,6 +3082,14 @@ export function wireClozeBanks(root) {
     });
     root.querySelectorAll('.mq-cloze').forEach((cz) => {
         const boxes = Array.from(cz.querySelectorAll('input.mq-cellslot, input.cloze-cell'));
+        // owner bug fix 2026-11-15: a place-word box is filled by a tap on the bank, never typed
+        if (cz.querySelector('.mq-placetile')) {
+            boxes.forEach((b) => {
+                const host = b.closest('[data-mq-wordbank]') || (b.matches('[data-mq-wordbank]') ? b : null);
+                const last = b === boxes[boxes.length - 1];
+                if (host || last) { b.readOnly = true; b.setAttribute('inputmode', 'none'); b.removeAttribute('maxlength'); b.setAttribute('aria-label', 'the place you chose'); b.classList.add('mq-wordpick'); }
+            });
+        }
         cz.querySelectorAll('.mq-banktile').forEach((btn) => {
             if (btn.dataset.mqWired === '1') return;
             btn.dataset.mqWired = '1';
@@ -3072,6 +3106,45 @@ export function wireClozeBanks(root) {
             });
         });
     });
+}
+
+/**
+ * Owner ruling 2026-11-15 ("students never type a place word"): an item whose answer is a place word chosen from a
+ * printed bank (`q.placeTapBank`, placevalue:identify response "bank") is TAPPED on screen: the host's one answer
+ * input turns read-only and the bank's words become buttons under the cell that write the word into it.
+ * Returns true when it wired a bank.
+ */
+export function wirePlaceWordBank(root, input, q) {
+    const words = q && Array.isArray(q.placeTapBank) ? q.placeTapBank : null;
+    if (!root || !input || !words || !words.length || typeof document === 'undefined') return false;
+    input.readOnly = true;
+    input.setAttribute('inputmode', 'none');
+    input.classList.add('mq-wordpick');
+    input.setAttribute('aria-label', 'the place you chose');
+    if (root.querySelector('.mq-placebank')) return true;
+    // the printed bank (words to read) is replaced by the tap bank
+    root.querySelectorAll('.pv-bank').forEach((el) => { el.style.display = 'none'; });
+    const row = document.createElement('div');
+    row.className = 'mq-placebank';
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', 'Choose the place');
+    words.forEach((w) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mq-banktile mq-placetile';
+        b.dataset.v = w;
+        b.textContent = w;
+        b.addEventListener('click', () => {
+            if (input.disabled) return;
+            input.value = w;
+            row.querySelectorAll('.mq-placetile').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        row.appendChild(b);
+    });
+    root.appendChild(row);
+    return true;
 }
 
 /**
@@ -3196,8 +3269,7 @@ export function ringCellHTML(p) {
             // (`contain: inline-size`), so the arc and the bar hug the digits. The boxes are sized
             // from the dividend and the divisor, never the answer (SL-2).
             const qw = Math.max(String(p.a).length, 2), rw = Math.max(String(p.b).length, 2);
-            const arc = '<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">'
-                + '<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+            const arc = bracketSvg({ ink: '#000', stroke: 2 });   // ONE stroke (owner 2026-11-14, LDIV-JOIN)
             const at = (c, r, inner, extra = '') => `<span style="grid-column:${c};grid-row:${r};display:flex;align-items:flex-end;justify-content:center;${extra}">${inner}</span>`;
             return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
                 + `<div style="text-align:center"><div class="ws-eq mq-eq mq-remeq mq-rembrk" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}" `
@@ -3207,6 +3279,9 @@ export function ringCellHTML(p) {
                 + at(1, 2, String(p.b), 'align-items:center;padding-right:0.1em;')
                 + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block;position:relative;top:1px">${arc}</span>`
                 + at(3, 2, String(p.a), 'align-self:stretch;align-items:center;border-top:2px solid #000;padding:0 0.12em;')
+                // LDIV-JOIN-RASTER (ldiv critic r1 F1): one rule from the arc's corner over the dividend, laid over the
+                // svg's bar, so the svg's butt end and the dividend's border never meet at a fractional x (a light seam)
+                + `<span aria-hidden="true" style="grid-column:2 / span 2;grid-row:2;align-self:start;height:0;margin-left:calc(0.55em * ${bracketLine().x / 10});border-top:2px solid #000"></span>`
                 + '</div></div>';
         }
         return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
@@ -3247,10 +3322,24 @@ export function workRowsHTML(k) {
  *   - an array answer (cloze addends, the missing numbers of a strip): position by position
  *   - "q R r": quotient and remainder
  */
+/** The word-work verdict of a composed value ("58 | equation: 5×9+13=n") on every host: the paper key's gradeSlots over the
+ *  answer and each graded part (wordWorkVerdict); null for an item with no graded part beyond its answer. */
+export function wordWorkScreenVerdict(value, q) {
+    const p = q && q.cell && q.cell.template === 'word-work' ? q.cell.payload : null;
+    return p ? wordWorkVerdict(value, p) : null;
+}
+/** Every graded place of such an item filled (null when it is not one): a host waits for it before it marks. */
+export function wordWorkScreenFilled(value, q) {
+    const p = q && q.cell && q.cell.template === 'word-work' ? q.cell.payload : null;
+    return p && wordWorkVerdict('', p) !== null ? wordWorkFilled(value, p) : null;
+}
 export function slotAnswerMatches(value, q) {
     if (!q) return null;
     // A function table checks each slot against the rule (a 'make your own' table has no one answer).
     if (q.ftCheck) return ftAnswerMatches(value, q.ftCheck);
+    // a two-step word-work item's letter equation / estimate: the paper key's verdict (lf-hosts 2026-11-13)
+    const wv = wordWorkScreenVerdict(value, q);
+    if (typeof wv === 'boolean') return wv;
     const cv = cellInputVerdict(value, q);
     if (typeof cv === 'boolean') return cv;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());
@@ -3585,7 +3674,9 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth)) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        // (a place-value expanded form - the paper's pv `expand` cell - is a number sentence: set at the digit size)
+        const numeric = !!(q.cell && q.cell.payload && q.cell.payload.kind === 'expand');
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth), { numeric }) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
@@ -4190,7 +4281,15 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     } catch (e) { return null; }
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
-    tpl.innerHTML = _screenSizes(html, digitPt);
+    // (lf-placevalue, lead 15:35 / ws-screen-ink-size TEXT-SIZE: the cell is drawn at L and scaled to the host's digit, so on the
+    // online worksheet (29 px digits) a 16 pt place word - "hundreds", "worth" - fell to 14 pt. A word never prints smaller on
+    // screen than on the M page: its size is the larger of the scaled one and its print size at M (L less the text step).)
+    let textStep = 2;
+    try { const mM = resolveCtx({ mode: 'print', size: 'M', look: 'ican', state: 'blank' }).metrics; const mL = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' }).metrics; textStep = Math.max(0, mL.textPt - mM.textPt); } catch (e) { /* 2 */ }
+    tpl.innerHTML = _screenSizes(html, digitPt).replace(/font-size:calc\(var\(--mq-digit\) \* ([\d.]+)\)/g, (m, r) => {
+        const v = Number(r) * digitPt;
+        return Number(r) < 0.85 && v - textStep > 0 ? `font-size:max(calc(var(--mq-digit) * ${r}), ${(v - textStep).toFixed(1)}pt)` : m;
+    });
     // A unit-form frame ("6,725 = __ thousands __ hundreds __ tens __ ones") keeps its slots on one
     // nowrap line for paper; on a phone that line ran off both edges of the card. On screen each
     // slot and its place word become one unbreakable pair, and the pairs wrap between them, so a
@@ -4275,6 +4374,29 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
             t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`, fx);
             const box = t.content.firstChild;
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
+            // owner bug fix 2026-11-15: a unit-form place box is CHOSEN from the bank of place words, never typed
+            if (Array.isArray(p.bank) && p.bank.length && k === slots.length - 1) {
+                box.setAttribute('data-mq-kind', 'word');
+                box.setAttribute('data-mq-wordbank', '1');
+                box.setAttribute('data-mq-w', '8');
+                box.style.setProperty('--mq-w', '8');
+                s.replaceWith(box);
+                const row = document.createElement('div');
+                row.className = 'mq-placebank';
+                row.setAttribute('role', 'group');
+                row.setAttribute('aria-label', 'Choose the place');
+                p.bank.forEach((w) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'mq-banktile mq-placetile';
+                    b.dataset.mqBankFor = String(k);
+                    b.dataset.v = w;
+                    b.textContent = w;
+                    row.appendChild(b);
+                });
+                tpl.content.appendChild(row);
+                return;
+            }
             s.replaceWith(box);
         });
         mode = 'slots';
@@ -4305,8 +4427,12 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     });
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
-    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;
-    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    // (lf-placevalue compare round, ws-empty-band EB-PARITY: the compare twin is the paper's kit cell on every host - marked
+    // [data-ws-cell="pv"] as the words twin is; an inline block, so the mark is the drawing's own box, centred as before)
+    const inner = p.kind === 'compare' ? `<div data-ws-cell="pv" style="display:inline-block;max-width:100%;padding:0 2mm;box-sizing:border-box;">${wrap.innerHTML}</div>` : wrap.innerHTML;
+    const banked = Array.isArray(p.bank) && p.bank.length && mode === 'slots';
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin${banked ? ' mq-cloze' : ''}" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
+    const instr = (banked && q.screenInstr) || printInstructionFor(q, categoryId) || plainText(q.text);
     // a chart's digits make ONE number: the host checks the number, not a list of parts
     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
 }

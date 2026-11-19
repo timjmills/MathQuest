@@ -43,6 +43,11 @@
 //             ws-phone-card --skills (THE TABLET CARD CHECK since the owner rule of 2026-11-13 - no phone width: the
 //               practice card at 820 x 1180 and 1024 x 768: nothing cut off sideways, the first answer box focused and in
 //               view, every answer box a 48 px touch target),
+//             ws-options-shots --skill --skip-no-panel --workers 1 (lf-partopts, from lf-algebra F8/G11, 2026-11-13: the
+//               Options panel's live sample, opened the teacher's way at 1280x1000, 1366x768, 1024x768 and 820x1180 (owner
+//               scope 2026-11-13; 390 dropped), lies inside its frame, holds ink, is legible (HTML and SVG text >= 9 px),
+//               unclipped, whole across its parts, its answer choices one lettered part; a scope skill with no options panel is skipped and named, and a scope where none has one is N/A;
+//               the whole 725 x 2 sweep is deploy session 4),
 //             ws-card-rulings --check rulings (the spec card's numeric rulings against 300 seeded items a skill) and
 //             ws-card-rulings --check offered (the option panel offers nothing the card lists as not offered). A skill
 //               whose card has no machine-readable rulings block makes these two rows SKIPPED (no rulings): not run,
@@ -79,6 +84,10 @@
 //               scope's skills of that lane>, only when the scope holds them, so no other lane's run changes
 //             ws-grade-render --raster-fit (lf-checks queue 13, F3: the lane skills' scripted-model and guided pages at
 //               S / M / L printed to a real PDF and rasterised: RR-PAGES, RR-EDGE, RR-CLIP; tests/lib/ws-role-raster.cjs)
+//             ws-role-cover --shard i/n (lf-ops critic cbt r2 root cause, 2026-11-14: print-lint, empty-band and raster-fit on
+//               EVERY role the signed card offers - no card: every buildSheet role - at M and L, AND under every option value
+//               that changes the drawing, tests/lib/ws-drawing-variants.mjs; the units the rows above already render are left
+//               out; sharded at ~45 min of slot time a shard, each shard one runner slot; --dry-run prints its size and minutes)
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline, + ws-grade-render --raster-fit on the sample at L. The sample is tests/fixtures/precritic/role-sample.json
 //             + ws-empty-band --roles <role> --hosts none on the lane's --skill skills (the role sample when none is given;
@@ -147,6 +156,10 @@
 //                        (exit 0): the skipped and N/A gates are named in the table AND in the verdict line, never counted
 //                        as passed. (--allow-not-built, the old opt-in, is accepted and now the default.)
 //   --report-only        print everything, exit 0
+//   --only <id,...>      run only these gate rows of the plan (ids as the table and --dry-run name them, e.g.
+//                        options-shots): a quick re-run or a backtest of one row. A row whose plan waits on another
+//                        (`after`) needs that one listed too. The verdict says `--only: n of m gates`; never with --strict
+//                        (a partial run is never the clean-before-critic run).
 //
 // PREREQUISITES (checked first when a browser gate is planned; the run stops with the fix when one is missing)
 //   Chromium in /opt/pw-browsers (or PUPPETEER_EXECUTABLE_PATH), puppeteer, the proxy CA in /root/.pki/nssdb
@@ -356,7 +369,9 @@ function shownCmd(g) {
 // a non-zero exit (the tool exits 1 because of exactly those findings). judge() turns any other non-zero exit, and any
 // time-out, into FAIL whatever the parser read: a gate that crashed or was killed never shows PASS (critic r1, D1/D8).
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
+// a gate's verdict line: "<tool>: OK|FAIL ..." or, for a tool run in one of its modes, "<tool> --mode[ --mode2]: OK|FAIL ..."
+// (lf-ops 2026-11-13: `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output" and turned every --strict run red)
+const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}(?: --[\\w-]+)*: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
 const NOISE = /MODULE_TYPELESS_PACKAGE_JSON|Reparsing as ES module|eliminate this warning|--trace-warnings|^\$ /;
 const tailLines = (out, n = 6) => String(out).split('\n').map((l) => l.trimEnd()).filter((l) => l.trim() && !NOISE.test(l)).slice(-n);
 const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output (${what})`, detail: tailLines(out), explainsExit: false });
@@ -368,6 +383,14 @@ const fmtMin = (m) => String(+(+m).toFixed(3));
 const mentioned = (out, k) => new RegExp(`(^|[\\s,;()\\[\\]{}"'])${reEsc(k)}($|[\\s,;:()\\[\\]{}"'.])`, 'm').test(out);
 
 if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more cases go here
+    // the verdict line of a tool run in a mode (lf-ops 2026-11-13: ws-no-size-s --browser read as unparsed)
+    const vl = (out, name) => { const v = lastVerdict(out, name); return v ? v[1] : null; };
+    const tv = [['plain verdict', vl('x\nws-no-size-s: OK (205 app files)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict', vl('  ok   no page errors\nws-no-size-s --browser: OK (73 checks)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict FAIL', vl('ws-no-size-s --browser: FAIL - 2 finding(s)\n', 'ws-no-size-s'), 'FAIL'],
+        ['two modes', vl('ws-x --a --b-c: OK\n', 'ws-x'), 'OK'],
+        ['another tool is not this one', vl('ws-no-size-s-extra: OK\n', 'ws-no-size-s'), null],
+        ['a non-flag word is not a mode', vl('ws-no-size-s browser: OK\n', 'ws-no-size-s'), null]];
     const t = [['one per line', mentioned('vocabulary:vocab_grade_pictures OK\n', 'vocabulary:vocab_grade_pictures'), true],
         ['comma list on one line', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_words'), true],
         ['last in the list', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_pictures'), true],
@@ -376,6 +399,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
         ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
     const bad = t.filter(([, got, want]) => got !== want);
     for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
+    for (const [n, got, want] of tv) if (got !== want) { bad.push([`verdict ${n}`, got, want]); console.log(`self-test FAIL: verdict ${n}: ${got}, want ${want}`); }
     // the copy-light eligibility, batch and sample cases (owner rule 2026-11-13) live in ws-copy-light --self-test
     const cl = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-copy-light.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const clLine = String(cl.stdout || '').trim().split('\n').pop();
@@ -384,7 +408,15 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const dkLine = String(dk.stdout || '').trim().split('\n').pop();
     if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
+    // ... and the role cover's plan, shard and pin cases (lf-ops critic cbt r2 root cause) in ws-role-cover / ws-drawing-variants
+    const rcLines = [];
+    for (const [nm, f] of [['role-cover', path.join(SCRIPTS, 'ws-role-cover.mjs')], ['drawing-variants', path.join(ROOT, 'tests', 'lib', 'ws-drawing-variants.mjs')]]) {
+        const r = spawnSync(process.execPath, [f, '--self-test'], { cwd: ROOT, encoding: 'utf8' });
+        const line = String(r.stdout || '').trim().split('\n').pop() || '';
+        if (r.status !== 0) { bad.push([nm, line, 'OK']); console.log(String(r.stdout || r.stderr || '').trim()); }
+        rcLines.push(`${nm} ${(/: (OK|FAIL)\b.*$/.exec(line) || ['', 'FAIL'])[0].replace(/^: /, '').slice(0, 40)}`);
+    }
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')}; ${rcLines.join('; ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -417,6 +449,19 @@ function judge(g, run, p) {
 }
 
 const PARSE = {
+    // ws-screen-support-eq (lf-hosts 2026-11-13): its verdict comes from ONE place, the tool's own verdict() line, which
+    // accounts for every skill in scope (checked / no supports / not run). The row maps it 1:1 - OK PASS, N/A N/A, FAIL FAIL -
+    // and applies no rule of its own (the generic skill-mention rule read "algebra:x: no supports" as an absent skill, so the
+    // log said OK and the row FAIL). ws-gate-agree holds the two together.
+    screenSupportEq(g, out, code) {
+        const m = [...out.matchAll(/^ws-screen-support-eq: (OK|N\/A|FAIL)\b(.*)$/gm)];
+        if (!m.length) return unparsed('no "ws-screen-support-eq: OK|N/A|FAIL" line', out);
+        const v = m[m.length - 1];
+        const says = v[2].trim().replace(/^\(|\)$/g, '').trim().slice(0, 200);
+        if (v[1] === 'OK') return { result: 'PASS', findings: says || '-', detail: [], explainsExit: false };
+        if (v[1] === 'N/A') return { result: 'N/A', findings: says || 'no supports model in scope', detail: [], explainsExit: code === 0 };
+        return { result: 'FAIL', findings: v[0].slice(0, 200), detail: out.split('\n').filter((l) => /^\s+SCREEN-|^\s+\S+: /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: true };
+    },
     // ws-detailed-lesson prints `ws-detailed-lesson: OK|FAIL` (--check), `ws-detailed-lesson --repeats|--lp|--sweep: OK|FAIL (n)`;
     // the last such line is the verdict, and the FAIL rows (E.. / LP-.. / seed ..) are the findings
     lessonSamples(g, out, code) {
@@ -433,6 +478,24 @@ const PARSE = {
         if (v[1] === 'OK' && !m.some((x) => x[1] === 'FAIL')) return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
         const rows = out.split('\n').filter((l) => /^(E\w+|LP-[\w-]+)\s+FAIL\b|^\s+(R-\w+|seed \d+)/.test(l)).map((l) => l.trim().replace(/\s+/g, ' '));
         return { result: 'FAIL', findings: rows.length ? listShort(rows.map((r) => r.slice(0, 140)), 3) : v[0].slice(0, 160), detail: rows.slice(0, 12), explainsExit: true };
+    },
+    // ws-options-shots --skip-no-panel: `ok   <key> @<w>: ...` per checked width, `skip <key>: no options panel`, `FAIL <key>
+    // @<w>: ...`; every scope skill must be checked at every width or skipped by name (else it checked something else)
+    optionsShots(g, out, code) {
+        const v = lastVerdict(out, 'ws-options-shots');
+        if (!v) return unparsed('no "ws-options-shots: OK|FAIL" line', out);
+        const fails = out.split('\n').filter((l) => /^FAIL /.test(l)).map((l) => l.trim());
+        if (v[1] !== 'OK') return { result: 'FAIL', findings: fails.length ? `${fails.length} panel sample(s) failed: ${listShort(fails.map((l) => l.slice(5, 150)), 3)}` : v[0].slice(0, 160), detail: fails.slice(0, 10), explainsExit: code === 1 };
+        const keys = g.keys || [], want = (g.expect && g.expect.skills) || keys.length;
+        const widths = (g.expect && g.expect.widths) || [1280, 1366, 1024, 820];
+        const skipped = keys.filter((k) => new RegExp(`^skip ${reEsc(k)}: no options panel`, 'm').test(out));
+        const checked = keys.filter((k) => widths.every((w) => new RegExp(`^ok   ${reEsc(k)} @${w}:`, 'm').test(out)));
+        const absent = keys.filter((k) => !skipped.includes(k) && !checked.includes(k));
+        if (absent.length || checked.length + skipped.length < want) return { result: 'FAIL', findings: `only ${checked.length} of ${want} skill(s) checked at ${widths.join(' and ')} px (${skipped.length} skipped, no panel); absent: ${listShort(absent)}`, detail: tailLines(out), explainsExit: false };
+        const unav = (/^ {2}sample unavailable \(reported, not failed\): (.*)$/m.exec(out) || [])[1];
+        const skipNote = skipped.length ? `; ${skipped.length} with no options panel, not checked: ${listShort(skipped, 4)}` : '';
+        if (!checked.length) return { result: 'N/A', findings: `no skill in scope has an options panel${skipNote}`, detail: [], explainsExit: false };
+        return { result: 'PASS', findings: `${checked.length} skill(s) × ${widths.length} widths: the sample is inside its frame, inked and legible (text >= 9 px, every part), the panel's controls in the window${skipNote}${unav ? `; sample unavailable (its own message): ${unav}` : ''}`, detail: [], explainsExit: false };
     },
     nodeLint(g, out, code) {
         const v = lastVerdict(out, g.script);
@@ -578,10 +641,11 @@ const PARSE = {
         const v = lastVerdict(out, g.script);
         // "[<mode> sweep (...), ][shard i/n, ]N skills, R host renders, D doubled answer area(s), P paper verb(s) on screen[, C low-contrast host(s)]"
         // (", K screen-digit miss(es)": the opt-in SCREEN-DIGIT, opt-in-rules.json; its "host@width:digit" findings count with the rest)
-        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?$/m.exec(out);
+        // (", U unread host(s)": CELL-READ, lf-checks queue 20 - a host render that read 0 [data-ws-cell] cells; "host:read")
+        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?(?:, (\d+) unread host\(s\))?$/m.exec(out);
         if (!v) return unparsed(`no "${g.script}: OK|FAIL" line`, out);
         if (!sm) return unparsed('no "N skills, R host renders, ..." summary', out);
-        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0);
+        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0) + +(sm[7] || 0);
         const want = (g.expect && g.expect.skills) || 0, hosts = (g.expect && g.expect.hosts) || 4;
         const errs = out.split('\n').filter((l) => /^\S+:\S+\s+ERR /.test(l));
         if (nSk < want) return { result: 'FAIL', findings: `only ${nSk} of ${want} skill(s) in scope found by the script`, detail: tailLines(out), explainsExit: false };
@@ -600,8 +664,8 @@ const PARSE = {
         const found = [];
         for (const l of out.split('\n')) {
             // the pin's entries are "host:kind" (kinds doubled, paper, contrast), as ws-screen-slots --baseline reads them
-            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT )/.exec(l);
-            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
+            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT |CELL-READ )/.exec(l);
+            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : m[3].startsWith('CELL') ? 'read' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
         }
         if (found.length !== dbl + pv + lc) return unparsed(`${found.length} finding line(s) for a summary of ${dbl + pv + lc}`, out);
         const explainsExit = code === 0 || found.length > 0; // the script exits 1 on any doubled area or paper verb
@@ -628,7 +692,7 @@ const PARSE = {
         const red = st('RED'), err = st('ERROR');
         const redUnpinned = red.filter((r) => !inPin(r));
         const okOnPin = st('OK').filter((r) => inPin(r) && Object.values(base[r.id] || {}).some((c) => Object.values(c || {}).some((n) => n > 0)));
-        const parts = [`${ran.length} of ${rows.length} row(s) run × S/M/L: OK ${st('OK').length}${st('CACHED').length ? `, CACHED ${st('CACHED').length}` : ''}, RED ${red.length}${redUnpinned.length ? ` (${redUnpinned.length} not in the pin)` : ''}, ERROR ${err.length}; PENDING ${st('PENDING').length}, N/A ${st('N/A').length}`];
+        const parts = [`${ran.length} of ${rows.length} row(s) run × M/L: OK ${st('OK').length}${st('CACHED').length ? `, CACHED ${st('CACHED').length}` : ''}, RED ${red.length}${redUnpinned.length ? ` (${redUnpinned.length} not in the pin)` : ''}, ERROR ${err.length}; PENDING ${st('PENDING').length}, N/A ${st('N/A').length}`];
         if (!base) parts.push(`no pin: ${rel(MATRIX_BASE)} missing, so any finding is red`);
         if (redUnpinned.length) parts.push(`rows not in the pin hold pre-existing or new findings; pin with a STATUS note: node tests/scripts/ws-coverage-matrix.cjs --skills ${keys.join(',')} --baseline ${rel(MATRIX_BASE)} --write-baseline`);
         const detail = [];
@@ -774,8 +838,24 @@ function cardPlans(keys) {
     try { return Object.fromEntries(JSON.parse(String(r.stdout || '').trim().split('\n').pop()).map((p) => [p.skill, p])); } catch (e) { return {}; }
 }
 
+/* ============================================================== the role-cover plan (tests/scripts/ws-role-cover.mjs --plan) */
+/** {plan, n} for the --skill keys, n = shards (each <= ~45 min of slot time, at least 2 when the work is over 10 min); null when
+ *  the tool is not in this tree; {error} when it cannot plan. */
+function roleCoverPlan(keys) {
+    const file = scriptPath('ws-role-cover');
+    if (!keys.length || !file) return null;
+    const r = spawnSync(process.execPath, [file, '--skill', keys.join(','), '--plan', '--json'], { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 << 20 });
+    let plan;
+    try { plan = JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { return { error: String(r.stderr || r.stdout || 'no output').trim().split('\n').slice(-2).join(' | ').slice(0, 200) }; }
+    const n = Math.max(plan.estMin > 10 ? 2 : 1, Math.ceil(plan.estMin / 45));
+    if (n === 1) return { plan, n };
+    const r2 = spawnSync(process.execPath, [file, '--skill', keys.join(','), '--plan', '--json', '--shard', `1/${n}`], { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 << 20 });
+    try { plan = JSON.parse(String(r2.stdout || '').trim().split('\n').pop()); } catch (e) { return { error: 'cannot shard the plan' }; }
+    return { plan, n };
+}
+
 /* ============================================================== plan */
-function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
+function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N] [--only gate-id,...]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
 const OPT_IN_FILE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'opt-in-rules.json');
 /** Add each opted-in lane's args to its gate rows (opt-in-rules.json), judged only on the scope's skills of that lane. */
@@ -893,6 +973,9 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
+        // below with no overlap, TITLE-LONG never shrinks / at most two lines / cut with a warning - on every role, M and L)
+        add(gate('frame-title', 'ws-frame-title (the page-title option on every role and key: TITLE-IDENT, TITLE-PLACE, TITLE-LONG)', `${scope} × every role × M/L`, 'browser', 'ws-frame-title', ['--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-frame-title.cjs' }));
         // (lf-roles 2026-11-13, lead: CAPACITY-NO-DROP - a page never prints fewer items than the pinned master page)
         add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(','), ...(ctx.role ? ['--roles', ctx.role] : [])], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
@@ -905,16 +988,58 @@ function buildPlan(ctx) {
         // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
         // at S / M / L, its option variants, and the screen hosts (card 1280 / 1366 / 820 / 1024, worksheet, quiz; owner 2026-11-13: no phone width), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
-        add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(','), ...emptyBandDefaults(keys)], { missingMsg: 'ws-empty-band is not in this tree' }));
+        add(gate('empty-band', 'ws-empty-band (every offered role x M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(','), ...emptyBandDefaults(keys)], { missingMsg: 'ws-empty-band is not in this tree' }));
         // FIX-WORDS on every skill (folded from lf-placevalue's opt-in, lf-checks 2026-11-12): the error-analysis Fix-it frame
         // prints the frame's own words, never the answer's singular
         add(gate('fixit-words', 'ws-fixit-words (FIX-WORDS: the error-analysis Fix-it frame prints its own words)', scope, 'browser', 'ws-fixit-words', ['--skills', keys.join(',')], { missingMsg: 'ws-fixit-words is not in this tree' }));
         // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
         // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
+        // (lf-roles 2026-11-14, lf-engine -roles critic r2 F5: no key prints the generator's raw JSON as an answer, any role)
+        add(gate('key-json', 'ws-key-json (L-KEY: no raw JSON answer on any key or page, every role)', scope, 'browser', 'ws-key-json', ['--skills', keys.join(',')], { missingMsg: 'ws-key-json is not in this tree' }));
+        // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
+        add(gate('tof-stem', 'ws-tof-stem (TOF-STEM: a True or False? "a op b =" stem only over the one number it equals)', scope, 'browser', 'ws-tof-stem', ['--skills', keys.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
+        // LDIV-JOIN (owner 2026-11-14, lf-ops: the long-division bracket was "disconnected"): the arc and the vinculum are ONE
+        // stroke - no white at the outer corner, no step - on paper (M/L, pupil + key, the card roles) and on screen (1366, 820)
+        const ldivKeys = keys.filter((k) => /^division:(long_div_2digit|div_facts|div_facts_long|divide|div_remainders)$/.test(k));
+        if (ldivKeys.length) add(gate('ldiv-join', 'ws-ldiv-hug --join --raster (LDIV-JOIN: the bracket arc runs into the vinculum, gap <= 0.3 mm, no step; LDIV-JOIN-RASTER: no pixel > 80 in the bar at DSF 2 / 3; LDIV-SHAPE: the side bows <= 0.6 mm)', `${ldivKeys.length} bracket skill(s)`, 'browser', 'ws-ldiv-hug', ['--join', '--raster', '--shape', '--skills', ldivKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
+        // LDIV-ROOM (owner 2026-11-14: "a lot of white area to work with"): the long-division work grid fills a 4-a-page cell
+        // (>= 80 % of its free height or the 2x cap, centred); 6 / 8 a page keep the floor row and stay inside the cell
+        const roomKeys = keys.filter((k) => /^division:(long_div_2digit|divide)$/.test(k));
+        if (roomKeys.length) add(gate('ldiv-room', 'ws-ldiv-hug --room (LDIV-ROOM: the work grid uses a 4-a-page cell, M/L)', `${roomKeys.length} work-grid skill(s)`, 'browser', 'ws-ldiv-hug', ['--room', '--skills', roomKeys.join(',')], { missingMsg: 'ws-ldiv-hug is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
-        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        // SOUND-ONCE (owner request 2026-11-14, "B, power-up"): the correct-answer sound plays exactly once on a correct answer
+        // with Sound on, never on a wrong one, never with Sound off - card, worksheet and quiz at 1280 / 1024; SOUND-PLAN: the notes
+        add(gate('correct-sound', 'ws-correct-sound (SOUND-PLAN, SOUND-ONCE: the power-up once on a correct answer, card / worksheet / quiz at 1280 / 1024)', scope, 'browser', 'ws-correct-sound', ['--skill', keys.join(',')], { missingMsg: 'ws-correct-sound is not in this tree' }));
+        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        // (lf-algebra r10, lead rule after lf-algebra critic r2: precritic r9's "Clean for the critic" list named pages with an open
+        // critic finding (F2, npr / fgr card + worksheet) and roles no page-fill lint ran on (G4 Reason It one item a page). The lane
+        // status file's clean list may name only pages with no open finding of the latest critic and a print-lint row in the run.)
+        add(gate('precritic-clean', 'ws-precritic-clean (the lane status clean list: no open critic finding, every claimed role page-fill linted)', scope, 'node', 'ws-precritic-clean', ['--skill', keys.join(',')], { missingMsg: 'ws-precritic-clean is not in this tree' }));
+        // (lf-algebra r10, critic r2 G5 / G6 / G8: the patterns cells against the page - Fix-it letters printed in the item, the card's
+        // feature tile size, the growing row two across at S; OK (n/a) for a skill outside the patterns card)
+        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
+        // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
+        // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
+        add(gate('two-step', 'ws-two-step (WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM)', scope, 'node', 'ws-two-step', ['--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra, lead ruling R1 2026-11-13: multi_step_word (Visual) practice pages hold the card's ruled capacity S 2 / M 1 / L 1
+        // with no cell stretched past a 30 % band under its work; browser, OK (n/a) without multi_step_word)
+        add(gate('two-step-print', 'ws-two-step --print (CAP-BAND: (Visual) capacity S 2 / M 1 / L 1, no 30 % band on independent / more-practice / test)', scope, 'browser', 'ws-two-step', ['--print', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra r13, precritic two-step r12 EB-ROLE / lead ruling D: the Error analysis page composes on every two-step skill
+        // at M / L - a wrong answer that does not fit the box made the role refuse two_step_add_then_div; browser, OK (n/a) off the card)
+        add(gate('two-step-ea', 'ws-two-step --ea (EA-COMPOSES: Error analysis composes on every two-step skill at M / L)', scope, 'browser', 'ws-two-step', ['--ea', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (owner 2026-11-14, two-step round 3b: a long-division frame left on a two-step step is one connected stroke - the bracket's top
+        // end meets the bar within 0.3 mm at M / L, print and screen; lf-ops' LDIV-JOIN rule on word-work's ÷ frame; browser, OK (n/a) off ÷)
+        add(gate('two-step-ldiv', 'ws-two-step --ldiv (LDIV-JOIN: the ÷ bracket meets its bar within 0.3 mm)', scope, 'browser', 'ws-two-step', ['--ldiv', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lead 2026-11-14 + STEP-FORM critic F1: two fact-sentence steps top-align, blocks and sentences within 1 mm; browser, OK (n/a) off the card)
+        add(gate('two-step-align', 'ws-two-step --align (STEP-ALIGN: fact-pair step blocks and sentences top-align)', scope, 'browser', 'ws-two-step', ['--align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (STEP-FORM critic r3 F6: a two-step fact sentence never wraps on the worksheet / card at 820-1366; browser, OK (n/a) off the card)
+        add(gate('two-step-screen-align', 'ws-two-step --screen-align (STEP-ALIGN-SCREEN: a fact sentence on one line on screen)', scope, 'browser', 'ws-two-step', ['--screen-align', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
+        // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
+        add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own
@@ -922,16 +1047,16 @@ function buildPlan(ctx) {
         const cmJson = path.join(ctx.logs, 'coverage-matrix.json');
         const cm = ['--skills', keys.join(','), '--slots', '2', '--out', cmJson];
         if (fs.existsSync(MATRIX_BASE)) cm.splice(2, 0, '--baseline', rel(MATRIX_BASE));
-        const matrix = gate('coverage-matrix', 'ws-coverage-matrix --skills', `${scope} × kinds × S/M/L`, 'node', 'ws-coverage-matrix', cm, { needFlags: ['skills', 'slots'], parse: PARSE.coverageMatrix, jsonOut: cmJson, keys });
+        const matrix = gate('coverage-matrix', 'ws-coverage-matrix --skills', `${scope} × kinds × M/L`, 'node', 'ws-coverage-matrix', cm, { needFlags: ['skills', 'slots'], parse: PARSE.coverageMatrix, jsonOut: cmJson, keys });
         add(matrix);
         const dup = matrix.missing ? 'independent; until the coverage matrix' : "independent defaults; duplicates the matrix's single/defaults row";
         const pl = ['--source', 'kit', '--skills', keys.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
         add(gate('print-lint-kit', `ws-print-lint --source kit --size L (${dup})`, scope, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: keys } }));
-        // S and M (LESSONS_LEARNED L1: "Size S ignored"): their own pins, print-lint.<S|M>.json. A skill missing from a
-        // size's pin runs without --baseline, so any finding there is red (print-lint's rule: an unpinned document
-        // must be clean) and the row says how to pin it.
-        for (const sz of ['S', 'M']) {
+        // M (LESSONS_LEARNED L1: "Size S ignored"; owner 2026-11-13: the print sizes are M and L, size S is dropped): its own
+        // pin, print-lint.M.json. A skill missing from the pin runs without --baseline, so any finding there is red
+        // (print-lint's rule: an unpinned document must be clean) and the row says how to pin it.
+        for (const sz of ['M']) {
             const file = sizeBase(sz);
             const pinned = pinnedIds(file);
             const all = keys.every((k) => pinned.has(k));
@@ -944,11 +1069,11 @@ function buildPlan(ctx) {
         // lesson pages, N2 / N6 / N7, and the role sample never held them). Against the lesson pins (ids cat:skill#lesson); a
         // lesson page the pin does not hold must be clean. With --role lesson the keys join that role's sample instead.
         if (ctx.role !== 'lesson') {
-            for (const sz of ['L', 'S']) {
-                const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+            for (const sz of ['L', 'M']) {   // (owner 2026-11-13: M and L; a lesson asked for at S always printed at M)
+                const file = sz === 'L' ? PRINT_BASE : sizeBase('M');
                 const ids = keys.map((k) => `${k}#lesson`);
                 const pinnedL = pinnedIds(file);
-                const a = ['--source', 'kit', '--roles', 'lesson', ...(sz === 'S' ? ['--size', 'S'] : []), '--skills', keys.join(',')];
+                const a = ['--source', 'kit', '--roles', 'lesson', ...(sz === 'M' ? ['--size', 'M'] : []), '--skills', keys.join(',')];
                 if (fs.existsSync(file)) a.push('--baseline', rel(file));
                 const unp = keys.filter((k) => !pinnedL.has(`${k}#lesson`));
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
@@ -958,11 +1083,21 @@ function buildPlan(ctx) {
         // (the fraction's numerator sat in the L tab's keep-out on the Opener, Review and Reason It; the card's own gate
         // line listed only fact rows). One run per form and size, every fact-family role, against the size's pin.
         const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
+        // (lf-ops divarray r2, owner rule 2026-11-13: the div_facts support-aid page rules of critics r6 / r7 - EB-PAGE on Test and the
+        // fade packet, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX - restored as ws-fact-pages after the deploy dropped them)
+        // (lf-ops t15, owner 2026-11-14: "Tables to 15 x 15" on the x / ÷ fact drills and their presets - the band, the deal to 15 x 15
+        // within the band, the 13-15 ticks only under it, the M / L pages fit at the fact size, the presets open the host at 225 - and
+        // FORM-FIRST, the panel's "How it is written" and Support above the tick list)
+        const t15Keys = keys.filter((k) => /^(multiplication:mult_facts|division:div_facts)(_15)?$/.test(k));
+        if (t15Keys.length) add(gate('tables15', 'ws-tables15 (T15-BAND, T15-DEAL, T15-TICKS, T15-FIT, T15-PRESET, FORM-FIRST)', t15Keys.join(','), 'browser', 'ws-tables15', ['--skill', t15Keys.join(',')], { missingMsg: 'ws-tables15 is not in this tree' }));
+        const factPageKeys = keys.filter((k) => k === 'division:div_facts');
+        if (factPageKeys.length) add(gate('fact-pages', 'ws-fact-pages --page-only (div_facts support-aid page rules: EB-PAGE, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX)', factPageKeys.join(','), 'browser', 'ws-fact-pages',
+            ['--skill', factPageKeys.join(','), '--page-only', '--hosts', 'none', '--no-baseline', '--rules', 'EB-PAGE,EB-PAD,EB-COLS,EB-TESTEQ,EB-GAP,EB-FACTX'], { missingMsg: 'no tests/scripts/ws-fact-pages.cjs' }));
         if (divFormKeys.length) {
             const DF_ROLES = 'fact-rows,independent,more-practice,test,fact-probe,mixed-practice,opener,guided,review,reason-it,true-false,stretch';
             for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) {
-                for (const sz of ['S', 'L']) {
-                    const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                for (const sz of ['M', 'L']) {
+                    const file = sz === 'L' ? PRINT_BASE : sizeBase('M');
                     const a = ['--source', 'kit', '--skills', divFormKeys.join(','), '--roles', DF_ROLES, '--size', sz, '--opts', JSON.stringify({ divForm: [form] })];
                     if (fs.existsSync(file)) a.push('--baseline', rel(file));
                     add(gate(`print-lint-divform-${form}-${sz}`, `ws-print-lint --source kit --roles (fact family) --size ${sz} --opts divForm=${form} (critic r1 R1-15: each written form on every page type)`, `${divFormKeys.join(',')} × divForm ${form} × ${sz}`, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint }));
@@ -986,20 +1121,22 @@ function buildPlan(ctx) {
             'division:div_facts': ['touch', 'skip', 'array', 'think', 'boxsign'],
         };
         if (factKeys.length) {
-            add(gate('print-lint-supports-S', `ws-print-lint --source kit --supports all --size S --roles ${SUP_ROLES} (fact skills with every support on: PG-12, PG-21, CL-40, SCC-T10)`, `${factKeys.join(', ')} × supports × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
-                ['--source', 'kit', '--supports', 'all', '--size', 'S', '--roles', SUP_ROLES, '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
+            add(gate('print-lint-supports-M', `ws-print-lint --source kit --supports all --size M --roles ${SUP_ROLES} (fact skills with every support on: PG-12, PG-21, CL-40, SCC-T10)`, `${factKeys.join(', ')} × supports × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--size', 'M', '--roles', SUP_ROLES, '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
             const singles = [...new Set(factKeys.flatMap((k) => FACT_SUPPORTS[k] || []))];
             for (const sup of singles) {
                 const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
-                add(gate(`print-lint-supports-${sup}-S`, `ws-print-lint --source kit --supports ${sup} --size S --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
-                    ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
+                // --fill-roles runs PAGEFILL / the PG-23 orphan on review + test too (critic divarray r1 D2: a support page -
+                // mult_facts Review S touch at the ruled 15 - left a 30 % blank strip under the grid that no gate measured)
+                add(gate(`print-lint-supports-${sup}-M`, `ws-print-lint --source kit --supports ${sup} --size M --roles ${SUP_ROLES} --fill-roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section; D2: PAGEFILL on review/test)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'M', '--roles', SUP_ROLES, '--fill-roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
             }
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
         // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
         // kit grid). div_facts' forms run on the probe in the divForm gates above (fact-probe is in DF_ROLES).
         if (factKeys.length) {
-            for (const sz of ['S', 'M', 'L']) {
+            for (const sz of ['M', 'L']) {
                 add(gate(`print-lint-probe-${sz}`, `ws-print-lint --source kit --roles fact-probe --size ${sz} --lints L-DENSITY (critic r2 R2-3: one cell width per probe grid)`, `${factKeys.join(', ')} × fact-probe × ${sz}`, 'browser', 'ws-print-lint',
                     ['--source', 'kit', '--roles', 'fact-probe', '--size', sz, '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint }));
             }
@@ -1008,9 +1145,15 @@ function buildPlan(ctx) {
         // the In sections counts (MIXFACTS), a fallback that is exactly the In sections print (FALLBACK), drawn row rules of
         // one weight (ROWRULES), the sign-to-number gap and the digits' room in the cell (SIGNGAP), footers in words (FOOTER)
         if (factKeys.length) {
-            add(gate('simple-print-facts', 'ws-simple-print --facts-print (MIXFACTS, FALLBACK, ROWRULES, SIGNGAP, FOOTER on the owner fact set at S/M/L)', `${factKeys.join(', ')} × simple print × S/M/L`, 'browser', 'ws-simple-print',
+            add(gate('simple-print-facts', 'ws-simple-print --facts-print (MIXFACTS, FALLBACK, ROWRULES, SIGNGAP, FOOTER on the owner fact set at M/L)', `${factKeys.join(', ')} × simple print × M/L`, 'browser', 'ws-simple-print',
                 ['--facts-print'], { needFlags: ['facts-print'] }));
         }
+        // owner 2026-11-13 (size S dropped, fact sheets keep everything): 9- and 10-column fact sheets print at M with the
+        // picked columns at the 16 pt rung, on the teacher print and the simple print (ws-fact-cols-m: FCM-COLS, FCM-PT, FCM-FIT)
+        if (factKeys.length) add(gate('fact-cols-m', 'ws-fact-cols-m (9 / 10 picked columns at M: FCM-COLS, FCM-PT, FCM-FIT)', 'the four fact skills × 9 / 10 columns × M × teacher + simple print', 'browser', 'ws-fact-cols-m', [], { missingMsg: 'ws-fact-cols-m is not in this tree' }));
+        // owner 2026-11-14 (lf-ops mixfacts): the Mixed facts print keeps ÷ in the shared rows (MIXED-ALL-OPS), and a bracket fact on
+        // fact rows keeps a writing row over its bar (LDIV-FACT-ROOM)
+        if (factKeys.length) add(gate('fact-mix', 'ws-fact-mix (MIXED-ALL-OPS: ÷ in the + − × rows; LDIV-FACT-ROOM: Hw over the bracket bar)', 'Mixed facts simple print × M/L × Columns 6/8/Auto; div_facts Long / Mix / Long + − × fact rows × M/L', 'browser', 'ws-fact-mix', [], { missingMsg: 'ws-fact-mix is not in this tree' }));
         // Visual-quality critic r1 (root cause of F3 / F4): ws-grade-render MEASURED a lesson cell overflowing its pad and a
         // 41 x 44 px phone-card input, but no --skill gate failed on either (print-lint's L-OVERFLOW reads rectangles past the
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a
@@ -1025,28 +1168,49 @@ function buildPlan(ctx) {
         const plans = cardPlans(keys);
         const carded = keys.filter((k) => plans[k] && plans[k].cards.length);
         // (every skill keeps the lesson / test / independent gate; a carded skill's other offered roles render in a gate of its own)
-        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; answer boxes >= 48 px on the practice card, online worksheet and quiz at 820 / 1024)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at M, L: no overflow; answer boxes >= 48 px on the practice card, online worksheet and quiz at 820 / 1024)', `${scope} × lesson, test, independent × M/L + screen hosts`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         const BASE_ROLES = ['lesson', 'test', 'independent'];
         // LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3: the npr Scripted Model's Say band ran 6 mm past
         // its frame, clean on screen and in emulated print, cut in half in the printed PDF): the lane skills' tall-state roles
         // - Scripted Model and Guided, the pages that run nearest full - printed to a real PDF at S, M and L and rasterised
         // (RR-PAGES the plan's page count, RR-EDGE no ink at the paper's edge, RR-CLIP no clipped or covered text). Only
         // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
-        add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at S, M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × S/M/L`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'S,M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × M/L`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // ROLE COVER (lf-ops critic cbt r2 root cause, lead 2026-11-14): print-lint, empty-band and raster-fit on EVERY role the
+        // signed card offers (no card: every buildSheet role) at M and L, AND under every option value that changes the drawing
+        // (tests/lib/ws-drawing-variants.mjs: another drawing vocabulary or size class, or a page option; one value a drawing).
+        // E3 / E5 / E6 sat red in plain print-lint on roles no row rendered. ws-role-cover leaves out the units the rows above
+        // already render (lint independent / lesson, band the card's roles, raster scripted-model / guided, all at defaults),
+        // and is sharded (each shard one browser slot through the runner; the tools inside run in that slot).
+        const rc = roleCoverPlan(keys);
+        ctx.roleCover = rc;
+        if (rc && rc.error) add(synthetic('role-cover', 'ws-role-cover (every offered role x M/L x drawing option values: lint, band, raster)', scope, { result: 'FAIL', findings: `cannot plan: ${rc.error}` }));
+        else if (rc) {
+            const ebArgs = emptyBandDefaults(keys).join(' ');
+            for (let i = 1; i <= rc.n; i++) {
+                const sh = rc.plan.shards[i - 1];
+                add(gate(`role-cover-${i}`, `ws-role-cover shard ${i}/${rc.n} (every offered role x M/L x drawing option values: print-lint ${sh.units.lint}, empty-band ${sh.units.band}, raster-fit ${sh.units.raster} unit(s), est ${sh.estMin} min)`, `${scope} × ${rc.plan.skills.map((x) => `${x.roles} roles + ${x.variants.length} drawing variant(s)`).join('; ')} × M/L`, 'browser', 'ws-role-cover',
+                    ['--skill', keys.join(','), '--shard', `${i}/${rc.n}`, '--out', path.join(ctx.logs, `role-cover-${i}`), ...(ebArgs ? ['--eb-args', ebArgs] : [])], { missingMsg: 'ws-role-cover is not in this tree' }));
+            }
+        }
         // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
         // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
-        if (carded.length >= 2) for (const sz of ['S', 'L']) {
+        if (carded.length >= 2) for (const sz of ['M', 'L']) {
             add(gate(`print-lint-sections-${sz}`, `ws-print-lint --source kit --kind sections --pages 2 --size ${sz} --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)`, `${carded.join(' + ')} × sections × 2 pages × ${sz}`, 'browser', 'ws-print-lint',
                 ['--source', 'kit', '--kind', 'sections', '--pages', '2', '--size', sz, '--lints', 'L-DENSITY', '--skills', carded.join(',')], { parse: PARSE.printLint }));
         }
         for (const k of carded) {
             const pl = plans[k], sid = k.split(':')[1];
             const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
-            if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × S/M/L`, 'browser', 'ws-grade-render',
-                ['--skills', k, '--roles', more.join(','), '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
-            add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × S/M/L`, 'browser', 'ws-cell-checks',
+            if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', more.join(','), '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            // (critic divarray r2 D6: the Scripted Model with a support DRAWN - div_facts' landscape array on the 10s band, tables 2-5 -
+            // ran its trace jots onto the cell rule at L; the card-role gate above renders the default, support-free page only)
+            if (k === 'division:div_facts') add(gate('render-gate-div_facts-sm-array', 'ws-grade-render --gate on the Scripted Model with the array support (10s band, tables 2-5) at M, L (critic divarray r2 D6: overflow)', `${k} × scripted-model × array × M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', 'scripted-model', '--size', 'M,L', '--supports', 'array', '--opts', JSON.stringify({ band: 100, constant: [2, 3, 4, 5] }), '--gate', '--no-screen', '--out', path.join(ctx.logs, 'render-gate-div_facts-sm-array')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × M/L`, 'browser', 'ws-cell-checks',
                 ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
         }
         const ssFile = scriptPath('ws-screen-slots');
@@ -1062,7 +1226,14 @@ function buildPlan(ctx) {
         add(gate('screen-slots', `ws-screen-slots --skills${ss.includes('--screen-digit') ? ' --screen-digit' : ''}`, scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
-        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE, ARRAY-ORIENT, ARRAY-DOT-MIN, ARRAY-CAPTION, SCREEN-ANSWER-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        // (lf-hosts 2026-11-13) the screen grades a word-work story's letter equation / estimate exactly as its paper key does
+        if (skills.some((sk) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(sk.key))) {
+            const ww = keys.filter((k) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(k));
+            // (and the screen-support-eq row agrees with its tool's own verdict line on them: ws-gate-agree)
+            add(gate('gate-agree', 'ws-gate-agree screen-support-eq (the precritic row = the tool\'s own verdict line)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'node', 'ws-gate-agree', ['--gate', 'screen-support-eq', '--skills', ww.join(',')], { missingMsg: 'no tests/scripts/ws-gate-agree.mjs' }));
+            add(gate('screen-grade', 'ws-screen-grade (screen verdict = paper key verdict: right, wrong, equivalent, every graded part)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'browser', 'ws-screen-grade', ['--skills', ww.join(','), '--n', '20'], { expect: { mention: ww }, missingMsg: 'no tests/scripts/ws-screen-grade.cjs' }));
+        }
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];
@@ -1079,14 +1250,39 @@ function buildPlan(ctx) {
         if (matrix.missing && !sc.missing) sc.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(sc);
         const clJson = path.join(ctx.logs, 'slot-clip.json');
-        const cl = gate('slot-clip', 'ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap)', `${scope} × matrix rows × S/M/L + extras at S`, 'node', 'ws-slot-clip', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--slots', '2', '--json', clJson], { parse: PARSE.slotClip, jsonOut: clJson, keys });
+        const cl = gate('slot-clip', 'ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap)', `${scope} × matrix rows × M/L + extras at M`, 'node', 'ws-slot-clip', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--slots', '2', '--json', clJson], { parse: PARSE.slotClip, jsonOut: clJson, keys });
         cl.after = 'sibling-compare';
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
-        add(gate('phone-card', 'ws-phone-card (the tablet card check: practice card at 820 / 1024 px: clip, first-box focus, 48 px answer boxes)', `${scope} × 820x1180, 1024x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
+        // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
+        // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
+        add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        add(gate('phone-card', 'ws-phone-card (the screen card check: practice card, worksheet and quiz at 820 / 1024 / 1280 / 1366 px: clip, first-box focus, 48 px answer boxes, real taps, focus ring, cell read)', `${scope} × 820x1180, 1024x768, 1280x900, 1366x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
+        // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280, 1366, 1024 and 820 px, the lane's skills
+        // only (≈ 2 s a skill a width; one browser, inside this row's slot). A skill with no options panel is skipped by
+        // name (--skip-no-panel); a scope with none is N/A. The full 725 x 2 sweep is ws-deploy-gates session 4.
+        add(gate('options-shots', 'ws-options-shots (Options panel sample at 1280 / 1366 / 1024 / 820 / 1280x720 px and after an option change: inside its frame and unclipped, whole across its parts, inked, HTML and SVG text >= 9 px, answer choices one lettered part, no sentence twice, panel controls and summary reachable, no page error)', `${scope} × 1280, 1366, 1024, 820 px`, 'browser', 'ws-options-shots', ['--skill', keys.join(','), '--skip-no-panel', '--workers', '1'], { needFlags: ['skip-no-panel'], parse: PARSE.optionsShots, keys, expect: { skills: keys.length, widths: [1280, 1366, 1024, 820] } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
+        // ---- lead ruling 2026-11-13 (chart_120): an option value a card hides ON A ROLE (§7a `roles`) is never dealt there
+        // (ws-role-hidden: the role's page with the value is byte-identical to its page with the default), and a misconception
+        // a card re-scopes to TEXT (`textOnly`) reaches the screen card and Reason It and never sits in a chart square
+        // (ws-text-misconception). No card decision for the scope: N/A.
+        add(gate('role-hidden', 'ws-role-hidden (an option value the card hides on a role is never dealt on that role)', `${scope} × hidden roles × L`, 'browser', 'ws-role-hidden', ['--skills', keys.join(',')], { missingMsg: 'ws-role-hidden is not in this tree', parse: (g, out, code) => {
+            const m = /^ws-role-hidden: (OK|FAIL|INCOMPLETE|NO-DECISIONS)\b ?-? ?(.*)$/m.exec(out);
+            if (!m) return unparsed('no "ws-role-hidden: OK|FAIL|INCOMPLETE|NO-DECISIONS" line', out);
+            const det = out.split('\n').filter((l) => /^ {2}(FAIL|INCOMPLETE)/.test(l)).slice(0, 10).map((l) => l.trim());
+            if (m[1] === 'NO-DECISIONS' && code === 4) return { result: 'N/A', findings: m[2].slice(0, 200), detail: [], explainsExit: true };
+            if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].slice(0, 200), detail: [], explainsExit: false };
+            return { result: m[1] === 'INCOMPLETE' ? 'INCOMPLETE' : 'FAIL', findings: m[2].slice(0, 200), detail: det, explainsExit: true };
+        } }));
+        add(gate('text-misconception', 'ws-text-misconception (a text-only misconception reaches the screen card and Reason It; no chart square holds more digits than its window)', `${scope} × reason-it, error-analysis, true-false × M/L`, 'browser', 'ws-text-misconception', ['--skills', keys.join(',')], { missingMsg: 'ws-text-misconception is not in this tree' }));
+        // ---- lf-roles critic r8b on chart_120 (D5, n5): no Guided try shows the Model's own picture (GUIDED-MODEL-ECHO), and
+        // a page's Score equals the answer places of its scored cells (SCORE-SLOTS; chartwindow, the template that scores slots)
+        // (chart_120 critic r1, 2026-11-13: + TF-FALSE, EA-PATTERN, STRIP-NUMBERS, SCORE-SLOTS on every scored role, and
+        // CROSS-GIVEAWAY over the chart's band x grid values - `--variants`)
+        add(gate('guided-echo', 'ws-guided-echo (GUIDED-MODEL-ECHO: no try repeats the Model; SCORE-SLOTS: Score = answer places on every scored role; TF-FALSE; EA-PATTERN; CROSS-GIVEAWAY incl. the screen worksheet / quiz deals; STRIP-NUMBERS; MODEL-STATE-MARKS; SAY-AGREE)', `${scope} × guided + scored roles + scripted model × M/L × 6 seeds + band x grid values + 20 screen deals`, 'browser', 'ws-guided-echo', ['--skills', keys.join(','), '--seeds', '6', '--variants'], { missingMsg: 'ws-guided-echo is not in this tree' }));
         // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
         add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
         // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,
@@ -1100,7 +1296,7 @@ function buildPlan(ctx) {
             add(gate('vocab-unit', 'ws-vocab-unit (picture vocabulary: every word drawn, one right answer, no word twice on a page, sets split into trios)', scope, 'node', 'ws-vocab-unit', []));
             // (lf-vocab r5, critic r3: the checks only a browser measures - the per-word Score on every offered role (V11R), the
             // 1 picture, 3 words Guided rows equal at S, M and L (V18), and one fixed worksheet-1280 tile layout per template (V19))
-            add(gate('vocab-unit-browser', 'ws-vocab-unit --browser (Score per word on every role, Guided rows equal at S/M/L, worksheet tiles one layout, EA cell at S <= 0.9 x L)', scope, 'browser', 'ws-vocab-unit', ['--browser']));
+            add(gate('vocab-unit-browser', 'ws-vocab-unit --browser (Score per word on every role, Guided rows equal at M/L, worksheet tiles one layout, EA cell at S <= 0.9 x L)', scope, 'browser', 'ws-vocab-unit', ['--browser']));
             // (lf-vocab r8, owner O-1: the next answer box is the switch's blue ring on the card, the worksheet and the quiz; the
             // switch flips it back to yellow; a wrong box stays red; reduced motion is static)
             add(gate('next-box', 'ws-next-box (O-1: the next box is the --mq-next-color ring on card / worksheet / quiz, one switch, wrong stays red)', 'card-820, worksheet-1280, quiz-1280', 'browser', 'ws-next-box', [], { missingMsg: 'ws-next-box is not in this tree' }));
@@ -1113,8 +1309,8 @@ function buildPlan(ctx) {
             // the card's OTHER offered roles at S / M / L (lf-vocab critic-r3 render: Match 3 GUIDED at S overflowed while the
             // render gate above drew only lesson / test / independent; LESSONS_LEARNED lf-vocab last row)
             const vk = keys.filter((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k));
-            add(gate('vocab-roles-render', 'ws-grade-render --gate on the card\'s other offered roles (guided, more-practice, error-analysis) at S, M, L', scope, 'browser', 'ws-grade-render',
-                ['--skills', vk.join(','), '--roles', 'guided,more-practice,error-analysis', '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, 'vocab-roles-render')]));
+            add(gate('vocab-roles-render', 'ws-grade-render --gate on the card\'s other offered roles (guided, more-practice, error-analysis) at M, L', scope, 'browser', 'ws-grade-render',
+                ['--skills', vk.join(','), '--roles', 'guided,more-practice,error-analysis', '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, 'vocab-roles-render')]));
         }
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
         add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
@@ -1138,7 +1334,7 @@ function buildPlan(ctx) {
         // B7: every offered APPEARANCE value of the touched skills printed at S and L through ws-print-lint, against the
         // skill's default page (pilot-su-c critic r2 N4: "Across" kept its promise and broke the page). A browser gate:
         // print-lint runs inside the slot this row holds.
-        add(gate('options-render', 'ws-options-verify --render (each offered appearance value at S / L vs the default page)', `${scope} × S/L`, 'browser', 'ws-options-verify', ['--render', '--skill', keys.join(',')], { needFlags: ['render'], parse: (g, out, code) => {
+        add(gate('options-render', 'ws-options-verify --render (each offered appearance value at M / L vs the default page)', `${scope} × M/L`, 'browser', 'ws-options-verify', ['--render', '--skill', keys.join(',')], { needFlags: ['render'], parse: (g, out, code) => {
             const m = /^ws-options-verify --render: (OK|FAIL) \((.*)\)\s*$/m.exec(out);
             if (!m) return unparsed('no "ws-options-verify --render: OK|FAIL" line', out);
             if (m[1] === 'OK') return { result: /^nothing to render/.test(m[2]) ? 'N/A' : 'PASS', findings: m[2].slice(0, 220), detail: [], explainsExit: false };
@@ -1178,10 +1374,11 @@ function buildPlan(ctx) {
         const pinnedR = pinnedIds(PRINT_BASE);
         const unpinned = sample.filter((k) => !pinnedR.has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
-        // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at S too, against
-        // the S pin (print-lint.S.json); a role page that pin does not hold must be clean
-        const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'S', '--skills', sample.join(',')];
-        const baseS = sizeBase('S');
+        // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at the small size
+        // too - M since the owner dropped S (2026-11-13) - against the M pin (print-lint.M.json); a role page that pin does
+        // not hold must be clean
+        const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'M', '--skills', sample.join(',')];
+        const baseS = sizeBase('M');
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
         // ws-empty-band on the role page (critic eb-r3 D4): the lane's skills (else the sample) x S/M/L on this role only; the
@@ -1190,7 +1387,7 @@ function buildPlan(ctx) {
             const ebKeys = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
             const f = scriptPath('ws-empty-band');
             const extra = ctx.role === 'scripted-model' && f && srcHas(f, 'model-states') ? ['--model-states'] : [];
-            add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (S/M/L: EB-BAND, EB-SIDE, EB-EDGE, EB-READ${ctx.role === 'guided' ? ', EB-GDPCAP' : ''}${extra.length ? ', MOD-*, EB-GAP' : ''})`, `role ${ctx.role} × ${ebKeys.length} skill(s)`, 'browser', 'ws-empty-band',
+            add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (M/L: EB-BAND, EB-SIDE, EB-EDGE, EB-READ${ctx.role === 'guided' ? ', EB-GDPCAP' : ''}${extra.length ? ', MOD-*, EB-GAP' : ''})`, `role ${ctx.role} × ${ebKeys.length} skill(s)`, 'browser', 'ws-empty-band',
                 ['--skill', ebKeys.join(','), '--roles', ctx.role, '--hosts', 'none', ...emptyBandDefaults(ebKeys), ...extra], { missingMsg: 'ws-empty-band is not in this tree' }));
         }
         // the role page's cell checks and capacity pin (lf-checks 2026-11-13: rows roles-ri-signmatch / capacity-no-drop ran
@@ -1198,9 +1395,19 @@ function buildPlan(ctx) {
         {
             const rk = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
             add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
+            if (ctx.role === 'error-analysis') add(gate('ea-stem-fixture', 'ws-ea-stem --fixture (EA-STEM guard: a correct story sentence is true of its numbers)', 'planted key', 'node', 'ws-ea-stem', ['--fixture', 'tests/fixtures/precritic/ea-stem.pass.html'], { missingMsg: 'ws-ea-stem is not in this tree' }));
+            if (ctx.role === 'true-false') add(gate('tof-stem-role', 'ws-tof-stem (TOF-STEM) on the role sample', `role true-false × ${rk.length} skill(s)`, 'browser', 'ws-tof-stem', ['--skills', rk.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }
-        add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        add(gate(`print-lint-role-${ctx.role}-M`, `ws-print-lint --source kit --roles ${ctx.role} --size M`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // (lf-ops divarray r2, owner rule 2026-11-13 "every finding a check on precritic's path": a lane that touches role R
+        // runs the empty-band check and the capacity pin on ITS skills' R pages - the Review stack side band, the Test
+        // support band (EB-SUPBAND) and a ruled Review capacity were backtested but off this path)
+        if (ctx.skills.length) {
+            const lk = ctx.skills.map((s) => s.key).join(',');
+            add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (the lane skills' ${ctx.role} pages at M / L)`, `${lk} × ${ctx.role}`, 'browser', 'ws-empty-band', ['--skill', lk, '--roles', ctx.role], { missingMsg: 'ws-empty-band is not in this tree' }));
+            add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role} (the lane skills' ${ctx.role} pages never fall; ruled option pages)`, `${lk} × ${ctx.role}`, 'browser', 'ws-capacity-pin', ['--check', '--skills', lk, '--roles', ctx.role], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
+        }
         // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
         // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
         // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
@@ -1212,14 +1419,19 @@ function buildPlan(ctx) {
         // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
         // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
         if (ctx.role === 'lesson') {
-            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, CHART-HEAD on the anchor chart, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / M + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             // (live-pm r2, lead items 6 / 7: the page-use rules over every lesson ws-lesson-baseline --all-lessons proves)
-            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used)', 'every lessons/prereqs.js lesson × L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used)', 'every lessons/prereqs.js lesson × L / M', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            // (lf-engine chart-name, owner 2026-11-14: every lesson's ANCHOR CHART, pupil and key, prints frame.js pageHeader's
+            // Name / Date line - no Score unless scored, the key's line at the pupil page's places, no overflow, one page)
+            add(gate('lesson-samples-chart', 'ws-lesson-samples --check --all-lessons --rules CHART-HEAD (every anchor chart, pupil + key: the pageHeader Name / Date line, no Score unless scored, no overflow, fits its page)', 'every lessons/prereqs.js lesson × M / L', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'CHART-HEAD', '--sizes', 'M,L'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            // (lead ruling 2026-11-14: EVERY anchor chart - the detailed lessons' too, each pack's P2 and chunk charts, pupil + key)
+            add(gate('lesson-samples-chart-detailed', 'ws-lesson-samples --check --detailed all --rules CHART-HEAD (every detailed lesson\'s anchor charts, pupil + key: the pageHeader Name / Date line, no Score unless scored, no overflow, fits its page)', 'every detailed lesson (lessons/detailed) × its charts', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--detailed', 'all', '--rules', 'CHART-HEAD'], { parse: PARSE.lessonSamples, needFlags: ['check', 'detailed'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
             const SAMPLES = 'addition:add_facts,subtraction:sub_100_regroup,number_sense:nearest_10';
-            for (const sz of ['L', 'S']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
+            for (const sz of ['L', 'M']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
         }
         if (ctx.role === 'lesson' && !ctx.teacher) add(gate('lesson-link-uses', 'ws-lesson-link-uses (a pupil plays every use of a detailed lesson link, each with its own options)', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
         if (ctx.role === 'lesson') addPartOpts(add, ctx);
@@ -1246,11 +1458,26 @@ function buildPlan(ctx) {
         // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
         add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
+        // (lf-roles 2026-11-13: the page title travels with the simple print's share code; old codes decode unchanged)
+        add(gate('title-code', 'ws-title-code (TITLE-CODE-RT / -OLD / -REQ: the page title in the quick-print share code)', 'quick-print codes', 'browser', 'ws-title-code', [], { missingMsg: 'no tests/scripts/ws-title-code.cjs' }));
+        // (critic title r1 T1 / T4 / T5: the title boxes driven by real keystrokes - the cursor survives the redraw; Title off
+        // disables its controls; the simple print box is wide enough)
+        add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
         addPartOpts(add, ctx);
     }
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
     // a tracked file holding one (node, < 1 s)
     add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
+    // lf-hosts critic r2 F2: every screen gate of the plan (phone-card, screen-slots --screen-digit, screen-ink-size, worksheet-reflow)
+    // renders at exactly the owner's set, read from tests/lib/ws-screen-widths.cjs (node, a few seconds)
+    add(gate('screen-widths-plan', 'ws-screen-widths-plan (every screen gate at 820 / 1024 / 1280 / 1366, the one table)', 'screen gates', 'node', 'ws-screen-widths-plan', [], { missingMsg: 'ws-screen-widths-plan is not in this tree' }));
+    // owner 2026-11-13 (CLAUDE.md plan item 9: two print sizes, M and L; S dropped): no size picker offers S, no gate's default
+    // run includes S, and the kit reads a stored S as M (node, < 1 s)
+    add(gate('no-size-s', 'ws-no-size-s (no picker offers size S, no gate default runs S, S decodes as M)', 'js/modules, index.html, tests/scripts, tests/lib, live instruction docs', 'node', 'ws-no-size-s', ['--docs-advisory'], { needFlags: ['docs-advisory'] }));
+    // critic nos r1 F1/F2: the pattern guard missed a saved set / &set= link restoring S; the behavioural gate seeds S in every
+    // restore path (stored defaults, sheet, simple print, saved set, &set= link, tray snapshot, quick print), opens every Size
+    // control and asserts M, and checks the one compact layout's single label (browser, ~15 s)
+    add(gate('no-size-s-browser', 'ws-no-size-s --browser (S seeded in every restore path reads M; every Size control M / L with M checked)', 'teacher Print, worksheet sheet, simple print, Settings, Library, &set= links', 'browser', 'ws-no-size-s', ['--browser'], { needFlags: ['browser'] }));
     // (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" 7) no screen gate default, critic brief or RUBRIC host
     // holds the phone width 390 px: the screens are 1280 / 1366 and the tablets 820 / 1024 - on EVERY precritic run (node, < 1 s)
     add(gate('no-phone-width', 'ws-no-phone-width (no 390 px default in a screen gate, brief or RUBRIC host; owner 2026-11-13)', 'screen gates + RUBRIC + brief template', 'node', 'ws-no-phone-width', [], { missingMsg: 'ws-no-phone-width is not in this tree' }));
@@ -1379,8 +1606,8 @@ async function pool(items, n, fn) {
 }
 
 /* ============================================================== flags */
-const VALUE_FLAGS = new Set(['skill', 'batch', 'sample-cap', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
-const REPEATABLE = new Set(['skill', 'lesson', 'unit']);
+const VALUE_FLAGS = new Set(['only', 'skill', 'batch', 'sample-cap', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
+const REPEATABLE = new Set(['skill', 'lesson', 'unit', 'only']);
 const BOOL_FLAGS = new Set(['teacher', 'copy-light', 'dry-run', 'write-role-sample', 'list-live', 'strict', 'allow-not-built', 'report-only', 'help', 'h']);
 /** Every problem with the command line, as messages (empty when it is good). */
 function checkArgs(argv) {
@@ -1405,6 +1632,7 @@ function checkArgs(argv) {
     num('node-jobs', (x) => Number.isInteger(x) && x >= 1, 'give a whole number >= 1');
     num('browser-jobs', (x) => Number.isInteger(x) && x >= 1, 'give a whole number >= 1');
     if (seen.has('grade') && !seen.has('teacher')) errs.push('--grade goes with --teacher');
+    if (seen.has('only') && seen.has('strict')) errs.push('--only runs part of the plan: never with --strict');
     // --lesson without --teacher is the detailed-lesson scope (a lesson id); with --teacher it is a WRM site lesson (3:D4:2)
     if (seen.has('teacher') && argAll('lesson').length > 1) errs.push('--teacher takes one --lesson');
     // an explicit pin that does not exist would silently run unpinned: refuse it
@@ -1520,7 +1748,17 @@ async function main() {
         ctx.roleSample = JSON.parse(fs.readFileSync(ROLE_SAMPLE, 'utf8')).skills;
     }
 
-    const rows = buildPlan(ctx);
+    const fullPlan = buildPlan(ctx);
+    const only = argAll('only');
+    let rows = fullPlan;
+    if (only.length) {
+        const unknown = only.filter((id) => !fullPlan.some((g) => g.id === id));
+        if (unknown.length) usage(`--only ${unknown.join(',')}: not a gate of this plan (ids: ${fullPlan.map((g) => g.id).join(', ')})`);
+        rows = fullPlan.filter((g) => only.includes(g.id));
+        const needs = rows.filter((g) => g.after && !only.includes(g.after)).map((g) => `${g.id} needs ${g.after}`);
+        if (needs.length) usage(`--only: ${needs.join('; ')} (list it too)`);
+    }
+    const onlyNote = only.length ? `; --only: ${rows.length} of ${fullPlan.length} gates` : '';
     const commit = git(['rev-parse', '--short=10', 'HEAD']) || 'unknown';
     const branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
     // tracked changes anywhere, plus untracked files under the trees a lane works in
@@ -1530,10 +1768,16 @@ async function main() {
     const scopeLine = [ctx.skills.length && !template ? `--skill ${ctx.skills.map((s) => s.key).join(',')}` : '', template ? `--template ${template} (${ctx.skills.length} skills${scanNote})` : '', template && wantSkills.length ? `--skill ${wantSkills.join(',')}` : '', lessons.length || unitIds.length ? `${unitIds.map((u) => `--unit ${u}`).join(' ')}${lessonScope.length ? ` --lesson ${lessonScope.join(',')}` : ''} (${lessons.length} long lesson(s))` : '', role ? `--role ${role}` : '', teacher ? `--teacher${ctx.grade ? ` --grade ${ctx.grade}` : ''}${ctx.lesson ? ` --lesson ${ctx.lesson}` : ''}` : ''].filter(Boolean).join(' ');
 
     if (dry) {
-        say(`${TOOL} plan: ${scopeLine} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (${copyLight ? 'created for the copy-light sample only' : 'not created'})`);
+        say(`${TOOL} plan: ${scopeLine}${onlyNote} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (${copyLight ? 'created for the copy-light sample only' : 'not created'})`);
         for (const g of rows) {
             if (g.synthetic) { say(`  [self] ${g.name} — ${g.synthetic.result}: ${g.synthetic.findings}`); continue; }
             say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : shownCmd(g)}`);
+        }
+        // the role cover's size and minutes, on EVERY dry run (critic roles r1 D3: a --copy-light dry run returned before it)
+        if (ctx.roleCover && ctx.roleCover.plan) {
+            const P = ctx.roleCover.plan;
+            say(`${TOOL} role cover: ${P.skills.map((x) => `${x.skill} ${x.roles} roles (${x.rolesFrom}; roles=${(x.roleList || []).join(',')}) + ${x.variants.length} drawing variant(s) of ${x.candidates} offered value(s)${x.variants.length ? ` [${x.variants.join(', ')}]` : ''}`).join('; ')}`);
+            say(`${TOOL} role cover size: ${P.units.lint} print-lint + ${P.units.band} empty-band + ${P.units.raster} raster-fit unit(s) in ${ctx.roleCover.n} shard(s); est ${P.estMin} min of slot time, ~${P.wallMin} min wall on two slots`);
         }
         if (copyLight) {
             // the copy-light verdict is quick (node, no browser): a dry run gives it, and writes the sample, so a lane knows its
@@ -1664,7 +1908,8 @@ async function main() {
     let verdict, exit;
     if (failed.length) { verdict = `FAIL: ${counts} (${named})`; exit = 1; }
     else if ((notBuilt.length || noData.length) && has('strict')) { verdict = `FAIL (incomplete, --strict): ${counts} (${named})`; exit = 3; }
-    else { verdict = `OK: ${counts}${named ? ` (${named})` : ''}`; exit = 0; }
+    else { verdict = `OK: ${counts}${named ? ` (${named})` : ''}${onlyNote}`; exit = 0; }
+    if (exit && onlyNote) verdict += onlyNote;
     table.push('');
     table.push(`${TOOL}: ${verdict}`);
     say('\n' + table.join('\n'));

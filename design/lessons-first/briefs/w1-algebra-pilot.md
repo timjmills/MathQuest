@@ -44,7 +44,7 @@ the lead moves it here.
    compiler reads them; every option lessons 5 and 7 deal must be a skill option (DETAILED_MAKER "Skill coverage rule");
    Highest number obeyed.
 4. **Clean before critic** on the branch merged with the integration tip; one independent family critic (every page type,
-   S / M / L, keys, the three screen hosts, the option panel). PASS → `redesign-passed.js` in the same commit.
+   M / L (size S dropped, owner 2026-11-13), keys, the three screen hosts, the option panel). PASS → `redesign-passed.js` in the same commit.
 
 ## Gates
 `ws-spec-card --check-signed`, `ws-precritic --skill <scope> --strict`, `ws-content-audit --skill` each, `ws-visual-quality
