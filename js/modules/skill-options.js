@@ -1392,10 +1392,11 @@ const P11_K2_OPTIONS = {
             values: [{ v: null, l: '5 (default)', hidden: true }, { v: 1, l: '1 number', hidden: true },
                 ...[2, 3, 4, 5, 6, 7, 8].map(n => ({ v: n, l: n === 5 ? '5 numbers (default)' : `${n} numbers`, ...(n === 7 ? { hidden: true } : {}) }))],
             // (critic blanks n2: the cap sentence on the visible line too - a tablet has no hover)
-            helpShort: 'How many numbers the pupil writes in each window. A small window holds fewer: never more than half its squares.',
+            helpShort: 'How many numbers the pupil writes in each window. A small window holds fewer: never more than half its squares. A lesson on the chart to 120 holds 3.',
             help: 'How many numbers the pupil writes in each window. A window too small to hold them all (the row 1 to 10, '
                 + 'or more than half its squares) holds as many as it can: never more than half the squares, never a whole row, '
-                + 'and every empty box keeps a printed number beside it.',
+                + 'and every empty box keeps a printed number beside it. A lesson on the chart to 120 holds 3 in each window: '
+                + 'its worked example prints five of the ten columns, so the pupil fills the columns beside it.',
         },
         ..._gridOptions(),
     ],

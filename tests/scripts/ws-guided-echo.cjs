@@ -392,9 +392,10 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
         const add = (r) => { res.out.push(...r.out); res.pages += r.pages; };
         for (const key of keys) {
             const sk = key.split(':')[1];
-            if (variants && (!only || only.includes('CROSS-GIVEAWAY')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(sk)) {
-                const bands = sk === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : ['all'];
-                if (sk !== 'number_chart_fill') add(await call({ keys: [key], vBand: 'tiles', seedFrom: 1, seedTo: 0 }).then((r) => r, (e) => ({ out: [`${key} tiles: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
+            if (variants && (!only || ['CROSS-GIVEAWAY', 'OPTION-ITEMS', 'BLANK-COUNT'].some((x) => only.includes(x))) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(sk)) {
+                const bands = !only || only.includes('CROSS-GIVEAWAY') ? (sk === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : ['all']) : [];
+                // (OPTION-ITEMS - critic blanks B3 - runs on its own under --only OPTION-ITEMS: a backtest row proves it alone)
+                if (sk !== 'number_chart_fill' && (!only || only.includes('OPTION-ITEMS') || only.includes('BLANK-COUNT'))) add(await call({ keys: [key], vBand: 'tiles', seedFrom: 1, seedTo: 0 }).then((r) => r, (e) => ({ out: [`${key} tiles: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
                 for (const b of bands) add(await call({ keys: [key], vBand: b, seedFrom: 1, seedTo: 0, tilesOpt }).then((r) => r, (e) => ({ out: [`${key} band ${b}: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
             }
         }
