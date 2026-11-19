@@ -816,3 +816,4 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   crash / protocol timeout (protocolTimeout 120 s, new H.open option, same edit as the tof branch), retry the skill once,
   a skill lost twice is a finding; a `sweep:` line names restarts and retries, each retry names its skill.
 - Backtest `key-json-retry` (MQ_KEYJSON_CRASH_AT): FAIL d38308824 -> OK a9051bb03 (ws-backtest PASS). CHECKS_FROM_CRITICS row added.
+- Full sweep (fixed tree, through /tmp/mq-browser-run.sh, 2026-11-19): `ws-key-json: OK (734 skills, 9343 sheets)`, 3683 s in the gate (71 min wall incl. ~10 min slot wait), 18 planned restarts, 0 retries: no skill crashed the page this run; the unfixed d38308824 sweep also ran 24 min without crashing before it was stopped, so the crash is intermittent (browser / renderer death), not one skill.
