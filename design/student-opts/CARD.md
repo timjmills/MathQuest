@@ -94,4 +94,11 @@ New gate `tests/scripts/ws-student-opts.cjs` (browser), on precritic under a new
 Builder (MEDIUM, new screen): checks first, then the sheet, `pupilOptionsFor`, the chip ✕, the counts. Then a narrow critic
 (MEDIUM) at the four widths. Lane stop: $150 above this week's start ($397.46).
 
-Signed: ____________________ (lead), date: __________
+### Answers (lead, under delegated owner approval, 2026-11-19)
+
+1. Yes: tapping a selected Quick Start card opens the sheet; the ✕ deselects.
+2. Yes: teacher-fixed link options are locked for the pupil (shown, greyed, with "Set by your teacher").
+3. Yes: difficulty group + range only. Supports and level stay the teacher's choice.
+4. Yes: Explorer stays a fast multi-pick.
+
+Signed: owner, 2026-11-19
