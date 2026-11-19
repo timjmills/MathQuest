@@ -98,6 +98,50 @@ export function showSkipReturnIntro(n, host, onGo) {
         + `<button type="button" class="btn btn-primary mq-skipret-go" id="skipReturnGo">Let's go ▶</button></div>`;
     document.body.appendChild(el);
     const go = el.querySelector('#skipReturnGo');
-    go.addEventListener('click', () => { el.remove(); onGo(); });
+    // The Enter that finished the last item (the card auto-checks as the pupil types, so the intro is already up and
+    // focused when that keystroke's default action lands) must not dismiss the message unread: a keyboard click
+    // (detail 0) counts only when its key went down on this button.
+    let keyArmed = false;
+    go.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') keyArmed = true; });
+    go.addEventListener('click', (e) => {
+        if (e && e.detail === 0 && !keyArmed) return;
+        // a stale intro (the run ended under it: timer, goal) must not start a pass on a finished run (critic r1 F3)
+        if (!el.isConnected) return;
+        el.remove();
+        onGo();
+    });
     try { go.focus(); } catch (_) { /* non-fatal */ }
+}
+
+/** Remove the return-pass intro and banners from every host (endGame, submitQuiz, timer expiry: critic r1 F3). */
+export function clearSkipReturnUI() {
+    if (typeof document === 'undefined') return;
+    const el = document.getElementById('skipReturnIntro');
+    if (el) el.remove();
+    const b = document.getElementById('skipReturnBanner');
+    if (b) b.style.display = 'none';
+}
+
+/**
+ * The practice card's run is ending (normal finish, timer expiry, goal reached, Home): the return pass, if any, is over.
+ * Items still skipped stay "skipped" (not answered, never wrong) and are marked finalSkip (critic r1 F3).
+ */
+export function endCardSkipReturn() {
+    clearSkipReturnUI();
+    const sr = state.skipReturn;
+    if (sr && !sr.done) {
+        sr.active = false;
+        sr.done = true;
+        sr.ended = true;
+        for (const idx of sr.queue || []) {
+            const e = (state.questionHistory || [])[idx];
+            if (e && typeof e === 'object' && e.status === 'skipped') e.finalSkip = true;
+        }
+    }
+    state._skipReturnIdx = -1;
+}
+
+/** The card's end-of-run gate is shut while a return pass exists and has not finished (critic r1 F1). */
+export function cardSkipReturnOpen() {
+    return !!(state.skipReturn && !state.skipReturn.done);
 }

@@ -815,7 +815,8 @@ export function recordMapAnswer(result) {
     if (q._isMapReview) {
         const idx = q._mapReviewIndex;
         const prev = (typeof idx === 'number') ? state.mapHistory[idx] : null;
-        if (prev && !prev.correct) {
+        // A skipped item is not redone from its dot: it stays "skipped" and the return pass scores it (ruling R4).
+        if (prev && !prev.correct && !prev.skipped) {
             const correct = !!(result && result.correct);
             if (correct) {
                 _celebrateMapCorrect();   // redo-win deserves the same party
@@ -1115,9 +1116,32 @@ function _hideMapSkipReturnBanner() {
     if (b && b.parentNode) b.parentNode.removeChild(b);
 }
 
+// ---- MAP: an item still unanswered after the return pass (lead ruling 2026-11-19) ----
+// It scores as INCORRECT for RIT - it counts against the pupil, as in an adaptive test - and the results still
+// label it "skipped". This ONE constant is the switch: false = a twice-skipped item never costs RIT.
+// (Outside MAP a twice-skipped item is "not answered / skipped" and never marked wrong.)
+export const MAP_STILL_SKIPPED_SCORES_WRONG = true;
+
+/** Score every still-skipped row as a wrong answer for RIT (state.mapCurrentRit); the row keeps skipped: true. */
+function _scoreStillSkippedForRit() {
+    if (!MAP_STILL_SKIPPED_SCORES_WRONG) return;
+    for (const h of state.mapHistory) {
+        if (!h || !h.skipped || h.ritScoredWrong) continue;
+        const ritBefore = state.mapCurrentRit;
+        const step = 3 + Math.min(state.mapIncorrectStreak || 0, 5);
+        state.mapCurrentRit = Math.max(120, state.mapCurrentRit - step);
+        state.mapIncorrectStreak = (state.mapIncorrectStreak || 0) + 1;
+        state.mapCorrectStreak = 0;
+        h.ritScoredWrong = true;
+        h.ritBefore = ritBefore;
+        h.ritAfter = state.mapCurrentRit;
+    }
+}
+
 export function finalizeMapSession() {
     if (!state.mapMode && !state.mapStartedAt) return;
     state.mapEndedAt = Date.now();
+    _scoreStillSkippedForRit();
 
     // Skipped items (still skipped after the return pass) are not answered: out of the percent.
     const itemsTaken = state.mapHistory.filter((h) => h && !h.skipped).length;
@@ -1152,6 +1176,7 @@ export function finalizeMapSession() {
         correct: totalCorrect,
         answered: itemsTaken,
         skipped: state.mapHistory.filter((h) => h && h.skipped).length,
+        rit: state.mapCurrentRit,
         perDomain,
         items: itemsTaken,
         durationMs: state.mapEndedAt - (state.mapStartedAt || state.mapEndedAt),

@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { SKILLS, DOMAINS } from './data.js';
-import { isSkipAvailable, calcAllowedFor, updateSkipButton, showSkipReturnIntro } from './skip-rule.js';
+import { isSkipAvailable, calcAllowedFor, updateSkipButton, showSkipReturnIntro, endCardSkipReturn } from './skip-rule.js';
 import { isTeacherLaunch, syncPlayChrome, syncBoard } from './launch-chrome.js';
 
 let _fullscreenHandler = null;
@@ -143,6 +143,8 @@ export function recordQuestionStatus(status, opts) {
     if (status === 'incorrect' || prevStatus === 'incorrect' || prevWasWrong) {
         entry.wasWrong = true;
     }
+    // A skip after a wrong try keeps the wrong try visible to the teacher: "incorrect, then skipped" (critic r1 F6).
+    if (status === 'skipped' && entry.wasWrong) entry.wrongThenSkipped = true;
     state.questionHistory[idx] = entry;
     // Skipped count: increment ONLY on first-time skip (not re-skip via review).
     if (status === 'skipped' && !wasSkipped) {
@@ -345,7 +347,7 @@ export function renderQuestionDots() {
         if (status === 'correct' && wasWrong) cls += ' wrong-then-right';
         else if (status === 'correct') cls += ' correct';
         else if (status === 'incorrect') cls += ' incorrect';
-        else if (status === 'skipped') cls += ' skipped';
+        else if (status === 'skipped') cls += wasWrong ? ' skipped wrong-then-skipped' : ' skipped';
         else cls += ' unanswered';
         if (isCurrent) cls += ' current';
         // Build a status label that explains what each color means on hover.
@@ -356,6 +358,7 @@ export function renderQuestionDots() {
         else if (status === 'correct' && wasWrong) statusLabel = 'Got it right after a wrong try';
         else if (status === 'correct') statusLabel = 'Correct';
         else if (status === 'incorrect') statusLabel = 'Wrong';
+        else if (status === 'skipped' && wasWrong) statusLabel = 'Incorrect, then skipped';
         else if (status === 'skipped') statusLabel = 'Skipped';
         else statusLabel = 'Not yet answered';
         // Clickable when this index has an answered entry with a stored
@@ -448,24 +451,43 @@ function _startSkipReturn(finish) {
     if (state.skipReturn) return false;            // one return pass per run
     const queue = _skippedIndexes();
     if (!queue.length) return false;
-    state.skipReturn = { queue, pos: -1, active: false, done: false, finish };
+    const sr = { queue, pos: -1, active: false, done: false, finish };
+    state.skipReturn = sr;
     state.hasAnswered = true;
     state.lastAnswerCorrect = true;
     showSkipReturnIntro(queue.length, 'card', () => {
-        state.skipReturn.active = true;
+        // the run may have ended under the intro (timer, goal, Home): never start a pass on a finished run (F3)
+        if (state.skipReturn !== sr || sr.done) return;
+        sr.active = true;
         _nextSkipReturn();
     });
     return true;
+}
+// ONE gate for the end of a practice-card run (critic r1 F1): the end screen and the session-history row are written
+// only here, once, and only after the return pass (if there is one) is done. A stray advance from an earlier item's
+// timer cannot finish the run early: nextQuestion is a no-op while state.skipReturn exists (see there).
+function _endRun(finish) {
+    if (state._runEnded) return;
+    if (_startSkipReturn(finish)) return;
+    if (state.skipReturn && !state.skipReturn.done) return;
+    state._runEnded = true;
+    finish();
+}
+/** Infinite practice: the round modal's Finish runs the return pass first, then the end screen (ruling R2). */
+export function finishPracticeRun() {
+    const ov = document.getElementById('roundOverlay');
+    if (ov) ov.remove();
+    _endRun(() => endGame());
 }
 function _nextSkipReturn() {
     const sr = state.skipReturn;
     if (!sr) return;
     sr.pos++;
     if (sr.pos >= sr.queue.length) {
-        sr.active = false;
-        sr.done = true;
-        state._skipReturnIdx = -1;
+        endCardSkipReturn();
         _hideSkipReturnBanner();
+        if (state._runEnded) return;
+        state._runEnded = true;
         sr.finish();
         return;
     }
@@ -484,6 +506,7 @@ function _nextSkipReturn() {
     const qNum = document.getElementById('qNum');
     if (qNum) qNum.textContent = `Q${idx + 1}`;
     _showSkipReturnBanner(sr.pos + 1, sr.queue.length);
+    if (typeof window.updateGoalProgress === 'function') window.updateGoalProgress();   // "Fixing k of n" (R3)
     updateSkipButton();
     renderQuestionDots();
     syncPlayChrome();
@@ -604,6 +627,7 @@ export function startGame() {
     state._liveQSnapshot = null;
     state._skipReturnIdx = -1;
     state.skipReturn = null;
+    state._runEnded = false;
     const _staleIntro = document.getElementById('skipReturnIntro');
     if (_staleIntro) _staleIntro.remove();
     _hideSkipReturnBanner();
@@ -790,11 +814,13 @@ export function nextQuestion() {
         return;
     }
     // The return pass: the item just answered (or skipped again) gives way to the next skipped one.
-    if (state.skipReturn && state.skipReturn.active) {
-        if (state.currentQ && !state.lastAnswerCorrect) return;
-        _nextSkipReturn();
+    // Once a pass exists nextQuestion only walks it: under the intro, or after it, a stray advance from an
+    // earlier item's timer is a no-op, so it can neither deal a new item nor finish the run (critic r1 F1).
+    if (state.skipReturn) {
+        if (state.skipReturn.active && !(state.currentQ && !state.lastAnswerCorrect)) _nextSkipReturn();
         return;
     }
+    if (state._runEnded) return;
 
     // Auto-mark unfinished INTERACTIVE COORDINATE problems wrong before
     // advancing. The student clicked Next without submitting → treat as
@@ -863,9 +889,9 @@ export function nextQuestion() {
                 }
             };
             // Before the end screen, every skipped problem comes back (owner request, lf-hosts skip).
-            state.qCount = settings.totalProblems + 1;
-            if (_startSkipReturn(finish)) return;
-            finish();
+            // The run's total is the problems dealt, never one more (critic r1 F2: 4 right of 4 read "4/5").
+            state.qCount = settings.totalProblems;
+            _endRun(finish);
             return;
         }
     }

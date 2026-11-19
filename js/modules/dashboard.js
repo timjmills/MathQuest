@@ -249,7 +249,7 @@ export function renderSessionHistory() {
                 <td style="padding:8px; color:var(--accent-green);">${entry.duration || ''}</td>
                 <td style="padding:8px; color:var(--accent-cyan); font-weight:600;">${entry.challenge}</td>
                 <td style="padding:8px; font-weight:600;">${entry.mode}</td>
-                <td style="padding:8px; font-weight:800; color:${scoreColor};">${entry.score} <span style="font-size:0.75rem;opacity:0.7;">(${entry.percentage}%)</span>${entry.skipped > 0 ? ` <span class="mq-hist-skipped">${entry.skipped} skipped</span>` : ''}</td>
+                <td style="padding:8px; font-weight:800; color:${scoreColor};">${entry.score} <span style="font-size:0.75rem;opacity:0.7;">(${entry.percentage}%)</span>${entry.skipped > 0 ? ` <span class="mq-hist-skipped">${entry.skipped} skipped${entry.skippedAfterWrong > 0 ? ` (${entry.skippedAfterWrong} incorrect, then skipped)` : ''}</span>` : ''}</td>
                 <td style="padding:8px; font-weight:700;">${entry.result}</td>
             </tr>
         `;

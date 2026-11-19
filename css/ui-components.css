@@ -8501,3 +8501,8 @@ html.dark .mq-skipret-banner { background: #0d2a47; color: #bbdefb; }
 .mq-ws-return-bar { display: flex; gap: 12px; justify-content: center; align-items: center; margin: 12px auto; flex-wrap: wrap; }
 .mq-ws-return-bar .btn { min-height: 48px; min-width: 48px; }
 .tvq-tag.is-skipped, .mq-hist-skipped { border: 2px solid #1e88e5; color: #0d47a1; background: #e3f2fd; border-radius: 8px; padding: 0 6px; font-weight: 800; }
+
+/* lf-hosts skip critic r1 F6: skipped after a wrong try - the hollow blue ring with a red centre, so the
+   wrong try stays visible (title "Incorrect, then skipped"). Additive. */
+.q-dot.skipped.wrong-then-skipped { background: radial-gradient(circle, #f44336 0 35%, transparent 38%); }
+.dark .q-dot.skipped.wrong-then-skipped { background: radial-gradient(circle, #ef5350 0 35%, transparent 38%); }

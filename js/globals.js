@@ -42,7 +42,7 @@ import { selectMode, startMode } from "./modules/mode-selection.js";
 import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/variant-cycler.js';
 
 // Layer 4: Game Logic
-import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion } from './modules/game-control.js';
+import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion, finishPracticeRun } from './modules/game-control.js';
 import { generateQuestion, generateQuestionFor } from './modules/generate-question.js';
 import { skoPlayOpen, skoMoreOpen, skoNlineOpen, mqRows, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
 import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions } from './modules/skill-option-store.js';
@@ -262,7 +262,7 @@ Object.assign(window, {
     startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer,
     nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
     shouldShowNextButton, showNextButton, hideNextButton,
-    skipCurrentQuestion, recordQuestionStatus, renderQuestionDots,
+    skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, finishPracticeRun,
     recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion,
     promptFullscreen, acceptFullscreen, declineFullscreen,
     toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection,

@@ -18,7 +18,7 @@ import {
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
-import { showSkipReturnIntro } from './skip-rule.js';
+import { showSkipReturnIntro, clearSkipReturnUI } from './skip-rule.js';
 
 let quizTimerInterval = null;
 let quizStartTime = 0;
@@ -952,7 +952,7 @@ export function skipQuizQuestion(flatIdx) {
 
 /** The return pass: the next flagged / unanswered question, or the review once they are all back. */
 export function quizReturnNext(skipping) {
-    if (!quizReturn || !quizReturn.active) return;
+    if (!quizReturn || !quizReturn.active || quizPhase !== 'active') return;
     if (!skipping) {
         const flatIdx = state.quizOrder[state.quizQuestionIndex];
         const input = document.getElementById('qtAnswerInput');
@@ -981,11 +981,19 @@ export function showQuizReview() {
         recordAnswer(flatIdx, input.value.trim());
     }
     // Before the review: the skipped (flagged) and unanswered questions come back, once per run.
+    // The pass is exactly the skipped questions still unanswered - the same n as the "Skipped: n" pill. A flagged
+    // question with an answer stays in the normal flag review; a blank never skipped is not in it (critic r1 F4).
     if (quizSkipOn() && !quizReturn && quizPhase === 'active') {
-        const queue = state.quizOrder.map((fIdx, d) => (quizFlags[fIdx] || !isAnswered(quizAnswers[fIdx]) ? d : -1)).filter((d) => d >= 0);
+        const queue = state.quizOrder.map((fIdx, d) => (quizSkipped[fIdx] && !isAnswered(quizAnswers[fIdx]) ? d : -1)).filter((d) => d >= 0);
         if (queue.length) {
-            quizReturn = { queue, pos: -1, active: false, done: false };
-            showSkipReturnIntro(queue.length, 'quiz', () => { quizReturn.active = true; quizReturnNext(true); });
+            const qr = { queue, pos: -1, active: false, done: false };
+            quizReturn = qr;
+            showSkipReturnIntro(queue.length, 'quiz', () => {
+                // the quiz may have been submitted under the intro (timer expiry): no pass on a finished quiz (F3)
+                if (quizReturn !== qr || quizPhase !== 'active') return;
+                qr.active = true;
+                quizReturnNext(true);
+            });
             return;
         }
     }
@@ -1100,6 +1108,8 @@ export async function submitQuiz() {
     }
 
     quizPhase = 'results';
+    // Timer expiry under the return-pass intro or mid-pass: the intro goes, still-skipped questions are "skipped" (F3)
+    clearSkipReturnUI();
     if (quizTimerInterval) {
         clearInterval(quizTimerInterval);
         quizTimerInterval = null;

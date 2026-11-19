@@ -2559,6 +2559,7 @@ export function wsSkipCard(idx) {
     if (_wsReturn && _wsReturn.active && _wsReturn.queue[_wsReturn.pos] === idx) {
         q._skipped = true;
         q._finalSkip = true;
+        q._wsReturnOpen = false;
         card.classList.add('ws-skipped');
         card.querySelectorAll('input').forEach(el => { el.disabled = true; });
         wsReturnNext();
@@ -2798,6 +2799,18 @@ export function wsReturnNext() {
     const prevIdx = r.queue[r.pos];
     const prev = prevIdx != null && document.getElementById(`ws_card_${prevIdx}`);
     if (prev) prev.classList.remove('mq-ws-return-now');
+    // The card just left: Next on a blank card is a second skip - it ends "skipped" (not answered), never Wrong
+    // (critic r1 F5); a card with work in it is answered, and only now leaves the "Skipped: n" count (F6).
+    const prevQ = prevIdx != null && state.worksheetQs[prevIdx];
+    if (prevQ && prevQ._wsReturnOpen) {
+        prevQ._wsReturnOpen = false;
+        if (prev && !wsPre(prev).touched) {
+            prevQ._skipped = true;
+            prevQ._finalSkip = true;
+            prev.classList.add('ws-skipped');
+            prev.querySelectorAll('input').forEach(el => { el.disabled = true; });
+        }
+    }
     r.pos++;
     if (r.pos >= r.queue.length) {
         r.active = false;
@@ -2813,6 +2826,7 @@ export function wsReturnNext() {
     const card = document.getElementById(`ws_card_${idx}`);
     if (q && card) {
         q._skipped = false;
+        q._wsReturnOpen = true;   // still counted "Skipped" until it is answered (critic r1 F6)
         card.classList.remove('ws-skipped');
         card.classList.add('mq-ws-return-now');
         card.querySelectorAll('input').forEach(el => { el.disabled = false; });
@@ -2829,7 +2843,7 @@ export function wsReturnNext() {
 }
 /** How many cards are skipped right now (the "Skipped: n" count on the sheet header). */
 function _wsSkipCountNow() {
-    return (state.worksheetQs || []).filter((q) => q && q._skipped).length;
+    return (state.worksheetQs || []).filter((q) => q && (q._skipped || q._wsReturnOpen)).length;
 }
 function _wsUpdateSkipCount() {
     const pill = document.getElementById('worksheetSkipCount');
