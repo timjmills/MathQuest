@@ -102,3 +102,12 @@ Builder (MEDIUM, new screen): checks first, then the sheet, `pupilOptionsFor`, t
 4. Yes: Explorer stays a fast multi-pick.
 
 Signed: owner, 2026-11-19
+
+### Decisions table (§4 overrides and readings, added by the builder 2026-11-19 for the lead to confirm)
+
+| # | Decision | Why |
+|---|---|---|
+| D1 | The `'facts'` group (the × / ÷ "Multiply by" / "Divide by" tick list) counts as difficulty for the pupil | It was the difficulty group's `constant` until lane lf-ops t15 moved it under its own heading for display order only (skill-options-ui.js OPTION_GROUPS) |
+| D2 | `type: 'rows'` (the count-by rows editor) is never a pupil option | A teacher's multi-row editor (step / start / direction per row), not a single "how hard" choice |
+| D3 | No `pupil: true / false` override is set on any option yet | — |
+| D4 | The pupil subset is pinned: `tests/fixtures/student-opts/pupil-counts.json` (742 live skills, 690 with pupil options: difficulty 1,241, facts 5); a change moves the pin only after review (`ws-student-opts --unit --write-pin`) | §6 Unit "stable" |

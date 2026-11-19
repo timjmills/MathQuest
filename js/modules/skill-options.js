@@ -4081,6 +4081,38 @@ export function offeredOptionsFor(categoryId, skillId) {
     return out;
 }
 
+// The panel's three headings (skill-options-ui.js OPTION_GROUPS): an option names its group itself (`group`); options that
+// predate the field are placed by id. Read here too by the pupil subset below.
+const GROUP_BY_ID = {
+    band: 'difficulty', range: 'difficulty', decimals: 'difficulty', constant: 'difficulty', regroup: 'difficulty',
+    unknown: 'difficulty', place: 'difficulty', places: 'difficulty', step: 'difficulty', dir: 'difficulty',
+    op: 'difficulty', power: 'difficulty', zeroPlace: 'difficulty', midpoint: 'difficulty', order: 'difficulty',
+    wordform: 'difficulty', simplestForm: 'difficulty',
+    level: 'support', pictures: 'support', support: 'support',
+    notation: 'layout', orientation: 'layout', response: 'layout', task: 'layout', tiles: 'layout',
+};
+export function optionGroup(def) {
+    return (def && (def.group || GROUP_BY_ID[def.id])) || 'difficulty';
+}
+
+// ---- The pupil's options (design/student-opts/CARD.md §4, signed 2026-11-19) ----
+// A pupil changes only how hard the problems are: the "Harder / easier" group (and "Which facts", the same group drawn
+// last for the x / ÷ tick lists - card decision D1) and Max Number. Layout, appearance, More, the number line, pupil
+// play, supports and the support level stay the teacher's; so do hidden options, options a page role or print size
+// gates, and the count-by rows editor (card decision D2). `pupil: true | false` on a def moves it across the rule.
+export const PUPIL_GROUPS = Object.freeze(['difficulty', 'facts']);
+export function isPupilOption(def) {
+    if (!def || def.hidden) return false;
+    if (def.pupil === true || def.pupil === false) return def.pupil;
+    if (def.id === 'level' || def.type === 'rows' || def.hiddenOnRoles || def.offeredAtSize) return false;
+    if (def.id === 'range') return true;
+    return PUPIL_GROUPS.includes(optionGroup(def));
+}
+/** The options a pupil may change on a skill: the curated subset of offeredOptionsFor (never a teacher or print option). */
+export function pupilOptionsFor(categoryId, skillId) {
+    return offeredOptionsFor(categoryId, skillId).filter(isPupilOption);
+}
+
 /** The defaults for a skill: what it generates when the teacher chooses nothing. */
 /**
  * The option values a page ROLE must not deal (an option def's `hiddenOnRoles: {role: [values]}`): {optionId: [values]}.

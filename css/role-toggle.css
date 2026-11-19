@@ -399,3 +399,44 @@ body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-onl
 .quick-skill-card .skill-name .qs-name-text.qs-has-tail { -webkit-line-clamp: 3; }
 .quick-skill-card .skill-name .qs-name-tail { display: block; margin-top: 3px; font-size: max(13px, 0.8125rem); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
 .quick-skill-card:has(.qs-star) { padding-bottom: 18px; }   /* a pupil's own card: the star sits below the name, never on it */
+
+/* ---- The pupil's options sheet (design/student-opts/CARD.md, 2026-11-19; js/modules/student-options.js). Additive. ---- */
+/* the selected chip: its body opens the sheet, its ✕ is a 48 x 48 target (card O-4, O-7) */
+#studentSkillsList .sel-chip-open { display: inline-flex; align-items: center; gap: 4px; min-height: 48px; min-width: 0; padding: 4px 2px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 6px; }
+#studentSkillsList .sel-chip-open:focus-visible, #studentSkillsList .sel-chip-x:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+#studentSkillsList .sel-chip-x { flex: none; width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-left: 1px solid rgba(255,255,255,0.35); background: transparent; color: #fff; font-size: 1.1rem; font-weight: 800; cursor: pointer; border-radius: 0 6px 6px 0; }
+#studentSkillsList .sel-chip-x:hover { background: rgba(255,255,255,0.2); }
+/* "You will play N skills" beside the game style cards and the bottom Play (card O-3) */
+.student-play-count { margin: 0; font-weight: 800; font-size: 1rem; color: var(--text, #1a1a2e); }
+.student-play-count[hidden] { display: none; }
+.mode-cards > .student-start-wrap:has(> #studentStartCount:not([hidden])) { flex-direction: column; gap: 10px; }
+#studentStartCount { text-align: center; }
+.student-sel-btns > #studentPlayCount { align-self: center; }
+/* the sheet: a popover at >= 1024 px, a bottom sheet below (place() in student-options.js sets which) */
+.so-sheet { position: fixed; z-index: 10060; box-sizing: border-box; overflow-y: auto; padding: 14px 16px 16px; background: var(--bg-card, #fff); color: var(--text, #1a1a2e); border: 2px solid var(--mq-purple-l, #c4b5fd); border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.28); font-size: 1rem; }
+.so-sheet.so-bottom { left: 0; right: 0; bottom: 0; top: auto; width: auto; max-height: 85vh; border-radius: 18px 18px 0 0; border-bottom: 0; }
+.so-sheet[hidden] { display: none; }
+.so-sheet .so-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.so-sheet .so-name { flex: 1; min-width: 0; font-size: 1.15rem; font-weight: 800; overflow-wrap: anywhere; }
+.so-sheet .so-x { flex: none; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border, #ddd); background: transparent; color: inherit; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+.so-sheet details.so-more { border: 2px solid var(--border, #e5e7eb); border-radius: 12px; padding: 0 12px; }
+.so-sheet details.so-more > summary { list-style: none; min-height: 48px; display: flex; flex-direction: column; justify-content: center; gap: 2px; cursor: pointer; padding: 6px 0; }
+.so-sheet details.so-more > summary::-webkit-details-marker { display: none; }
+.so-sheet .so-more-title { font-weight: 800; font-size: 1rem; }
+.so-sheet .so-more-vals { font-weight: 500; font-size: 0.9rem; color: var(--text-dim, #555); overflow-wrap: anywhere; }
+.so-sheet .so-row { padding: 8px 0; border-top: 1px solid var(--border, #e5e7eb); }
+.so-sheet .so-row label, .so-sheet .so-row .sko-locked { font-size: 1rem !important; }
+.so-sheet .so-row select { min-height: 48px; font-size: 1rem !important; padding: 8px !important; }
+.so-sheet .so-row input[type="number"] { min-height: 48px; min-width: 96px; font-size: 1rem !important; }
+.so-sheet .so-row label:has(> input[type="checkbox"]) { min-height: 48px; }
+.so-sheet .so-row .sko-set-row { min-height: 48px; min-width: 48px; box-sizing: border-box; }
+.so-sheet .so-row .sko-set-head button { min-height: 48px; min-width: 56px; padding: 0 14px !important; font-size: 0.95rem !important; }
+.so-sheet .so-row input[type="checkbox"] { width: 22px !important; height: 22px !important; }
+.so-sheet .so-row .sko-locked select { background: var(--bg-card-light, #f1f1f4) !important; color: var(--text-dim, #666) !important; }
+.so-sheet .so-row[data-so-locked] { opacity: 0.75; }
+.so-sheet .so-reset { min-height: 48px; margin: 8px 0 12px; padding: 0 16px; border: 2px solid var(--border, #ddd); border-radius: 10px; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+.so-sheet .so-none { margin: 4px 0 8px; color: var(--text-dim, #555); }
+.so-sheet .so-count { margin: 12px 0 8px; font-weight: 800; }
+.so-sheet .so-play { display: flex; flex-direction: column; gap: 8px; }
+.so-sheet .so-btn { min-height: 48px; width: 100%; border-radius: 12px; border: 2px solid var(--mq-purple, #6d28d9); background: transparent; color: var(--mq-purple, #6d28d9); font: inherit; font-weight: 800; cursor: pointer; }
+.so-sheet .so-btn-main { background: var(--mq-purple, #6d28d9); color: #fff; }

@@ -72,6 +72,15 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
     const domain = DOMAINS[domainId];
     const domainColor = domain ? domain.color : '#4CAF50';
 
+    // student-opts card O-1 (signed 2026-11-19): a pupil's tap selects the skill and opens its options sheet; a tap on a
+    // selected card opens the sheet too (the chip's ✕ deselects). The teacher's tap still toggles.
+    const pupil = document.body.classList.contains('student-mode');
+    const anchor = pupil ? _tappedCard(categoryId, skillId) : null;
+    if (pupil && UnifiedSkills.has(skillId, categoryId)) {
+        if (typeof window.openStudentOptions === 'function') window.openStudentOptions(categoryId, skillId, anchor);
+        return;
+    }
+
     // Check if skill is already in queue - if so, remove it (toggle behavior)
     if (UnifiedSkills.has(skillId, categoryId)) {
         // Remove the skill using UnifiedSkills
@@ -98,7 +107,19 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
         showNotification(`✓ Added ${_toastName(categoryId, skillId, skillLabel)}!`, 'success');
         // Update quick skill card visual
         updateQuickSkillCards();
+        if (pupil && typeof window.openStudentOptions === 'function') window.openStudentOptions(categoryId, skillId, anchor);
     }
+}
+
+// the Quick Start card a pupil just tapped (its rect anchors the options sheet; focus returns to it)
+function _tappedCard(categoryId, skillId) {
+    return typeof document === 'undefined' ? null : document.querySelector(`#quickSkillsGrid [data-so-key="${categoryId}:${skillId}"]`);
+}
+
+/** A pupil's tap on a selected chip's body: that skill's options sheet, beside the chip. */
+export function openChipOptions(index, el) {
+    const s = UnifiedSkills.skills[index];
+    if (s && typeof window.openStudentOptions === 'function') window.openStudentOptions(s.categoryId, s.skillId, el && el.closest ? (el.closest('.sel-chip') || el) : el);
 }
 
 export function updateQuickSkillCards() {
@@ -212,14 +233,17 @@ export function updateStudentSkillsDisplay() {
         const icon = skill.categoryIcon || '📚';
         const gradeHTML = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
 
+        const summary = describeOptions && skill && window.describeSetOptions && window.describeSetOptions(skill.categoryId, skill.skillId);
+        // student-opts card O-4: the chip body opens the skill's options sheet; the ✕ (48 x 48) deselects it
         html += `
-            <div class="sel-chip" title="${escHTML(fullName)}" style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
+            <div class="sel-chip" title="${escHTML(fullName)}" style="display:inline-flex;align-items:center;gap:4px;padding:0 0 0 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
+                <button type="button" class="sel-chip-open" data-so-key="${escHTML(skill.categoryId + ':' + skill.skillId)}" onclick="openChipOptions(${index}, this)" aria-label="Change ${escHTML(fullName)}">
                 ${gradeHTML}
                 <span aria-hidden="true">${icon}</span>
-                <span class="sel-chip-text"><span class="sel-chip-name">${escHTML(fullName)}</span>${describeOptions && skill && window.describeSetOptions && window.describeSetOptions(skill.categoryId, skill.skillId) ? `<span class="sko-chip-summary" style="display:block;font-size:0.68rem;font-weight:600;opacity:0.9;">${escHTML(window.describeSetOptions(skill.categoryId, skill.skillId))}</span>` : ''}</span>
-                <button onclick="event.stopPropagation(); UnifiedSkills.removeByIndex(${index})"
-                    style="background:rgba(255,255,255,0.3);border:none;color:white;width:18px;height:18px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:2px;"
-                    title="Remove" aria-label="Remove ${escHTML(fullName)}">×</button>
+                <span class="sel-chip-text"><span class="sel-chip-name">${escHTML(fullName)}</span>${summary ? `<span class="sko-chip-summary" style="display:block;font-size:0.68rem;font-weight:600;opacity:0.9;">${escHTML(summary)}</span>` : ''}</span>
+                </button>
+                <button type="button" class="sel-chip-x" onclick="event.stopPropagation(); UnifiedSkills.removeByIndex(${index})"
+                    title="Remove" aria-label="Remove ${escHTML(fullName)}"><span aria-hidden="true">&#10005;</span></button>
             </div>
         `;
     });
@@ -274,6 +298,8 @@ function _renderQuickSkillsGridNow() {
         const gradeColor = grade !== null && GRADE_COLORS[grade] ? GRADE_COLORS[grade] : null;
         const gradeBadge = gradeColor ? `<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:${gradeColor.bg};color:${gradeColor.text};font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:5;">${grade}</span>` : '';
         const source = skill.source || 'teacher';
+        // student-opts: the sheet anchors to the card and gives focus back to it (a pupil card is a keyboard target too)
+        const soAttrs = ` data-so-key="${escHTML(skill.categoryId + ':' + skill.skillId)}"` + (isStudentMode ? ` tabindex="0" role="button" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();this.click();}"` : '');
         // owner 2026-11-03: every Quick Start card prints (pupils too); the print loads on the press only
         // owner 2026-11-04: no per-skill print on the pupil home (Print sits with the selection buttons by MAP)
         const printBtn = isStudentMode ? '' : `<button type="button" class="qs-print-btn" onclick="event.stopPropagation(); printQuickSkill(${index})" aria-label="Print ${escHTML(baseName.replace(/<[^>]*>/g, ''))}" title="Print">${QS_PRINT_ICON}</button>`;
@@ -308,7 +334,7 @@ function _renderQuickSkillsGridNow() {
         } else if (isStudentMode && source === 'student' && !quickSkillsEditMode && !isLocked) {
             // Student mode with student-added skill - show small X
             return `
-                <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}" style="position:relative;"
+                <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}" style="position:relative;"${soAttrs}
                      onclick="addQuickSkill('${skill.categoryId}', '${skill.skillId}', '${skill.skillLabel.replace(/'/g, "\\'")}', '${skill.categoryIcon}', '${skill.categoryName.replace(/'/g, "\\'")}')">
                     ${gradeBadge}
                     <button onclick="event.stopPropagation(); removeStudentQuickSkill(${index})"
@@ -322,7 +348,7 @@ function _renderQuickSkillsGridNow() {
         } else {
             // Normal mode - just clickable
             return `
-                <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}"
+                <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}"${soAttrs}
                      onclick="addQuickSkill('${skill.categoryId}', '${skill.skillId}', '${skill.skillLabel.replace(/'/g, "\\'")}', '${skill.categoryIcon}', '${skill.categoryName.replace(/'/g, "\\'")}')">
                     ${gradeBadge}
                     <span class="skill-icon">${skill.categoryIcon}</span>

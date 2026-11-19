@@ -139,17 +139,19 @@ async function tap(page, sel, touch, what, wait = 250) {
         const r = el.getBoundingClientRect();
         const x = r.left + r.width / 2, y = r.top + r.height / 2;
         const top = document.elementFromPoint(x, y);
-        return { x, y, w: r.width, h: r.height, hit: !!top && (top === el || el.contains(top) || (top.closest && top.closest('label') && top.closest('label').contains(el))) };
+        const on = top ? `${top.tagName.toLowerCase()}${top.id ? '#' + top.id : ''}${top.className && typeof top.className === 'string' ? '.' + top.className.trim().split(/\s+/).join('.') : ''}` : 'nothing';
+        return { x, y, w: r.width, h: r.height, on, hit: !!top && (top === el || el.contains(top) || (top.closest && top.closest('label') && top.closest('label').contains(el))) };
     }, sel);
     if (pt.err) return { ok: false, why: `${what}: not found (${sel})` };
-    if (!pt.hit) return { ok: false, why: `${what}: a tap at its centre lands on something else` };
+    if (!pt.hit) return { ok: false, why: `${what}: a tap at its centre lands on ${pt.on}` };
     if (touch) await page.touchscreen.tap(pt.x, pt.y); else await page.mouse.click(pt.x, pt.y);
     if (wait) await sleep(wait);
     return { ok: true, ...pt };
 }
 
 const cardSel = (i) => `#quickSkillsGrid > .quick-skill-card:nth-child(${i + 1})`;
-const sheetOpen = (page) => page.evaluate(() => { const s = document.getElementById('studentOptsSheet'); return !!s && !s.hidden && s.offsetParent !== null; });
+// (the sheet is position: fixed, so its offsetParent is always null: visibility is read from its client rects)
+const sheetOpen = (page) => page.evaluate(() => { const s = document.getElementById('studentOptsSheet'); return !!s && !s.hidden && s.getClientRects().length > 0; });
 
 /** Deal 12 questions the way the game would and read the options in force at each generate. */
 async function deal(page, n = 12) {
@@ -226,8 +228,6 @@ async function chooseInSheet(page, optId, touch, w) {
     if (!info) return false;
     const t = await tap(page, '#studentOptsSheet select[data-so-pick]', touch, `@${w} the ${optId} control`);
     if (!t.ok) F(`PUPIL ${t.why}`);
-    await page.keyboard.press('Escape').catch(() => {});   // close a native drop-down opened by the tap (the sheet keeps it closed only on a second Esc)
-    await sleep(100);
     if (!(await sheetOpen(page))) return 'closed';
     await page.select('#studentOptsSheet select[data-so-pick]', info.idx);
     await sleep(300);
@@ -236,13 +236,14 @@ async function chooseInSheet(page, optId, touch, w) {
 
 async function readCounts(page) {
     return page.evaluate(() => {
-        const t = (sel) => { const e = document.querySelector(sel); return e && e.offsetParent !== null ? e.textContent.trim() : null; };
+        const vis = (e) => !!e && !e.hidden && e.getClientRects().length > 0;
+        const t = (sel) => { const e = document.querySelector(sel); return vis(e) ? e.textContent.trim() : null; };
         const all = document.querySelector('#studentOptsSheet [data-so-play="all"]');
         return {
             sheet: t('#studentOptsSheet [data-so-count]'),
             start: t('#studentStartCount'),
             bottom: t('#studentPlayCount'),
-            allBtn: all && all.offsetParent !== null ? all.textContent.trim() : null,
+            allBtn: vis(all) ? all.textContent.trim() : null,
             selected: (window.skillQueue || []).length,
         };
     });
@@ -385,7 +386,7 @@ async function atWidth(page, w, touch) {
         });
         if (lk.err) F(`PUPIL ${at} the teacher-link sheet has ${lk.err}`);
         else if (!/Set by your teacher/.test(lk.text) || !lk.disabled || !lk.locked) F(`PUPIL ${at} the teacher-link option is not locked with "Set by your teacher" (disabled ${lk.disabled})`);
-        if (SHOTS) { await sleep(150); await page.screenshot({ path: path.join(SHOTS, `locked-${w}.png`) }); }
+        if (SHOTS) { await page.evaluate(() => { const r = document.querySelector('#studentOptsSheet [data-so-locked]'); if (r) r.scrollIntoView({ block: 'center' }); }); await sleep(150); await page.screenshot({ path: path.join(SHOTS, `locked-${w}.png`) }); }
         await page.keyboard.press('Escape');
         await sleep(250);
         const back = await page.evaluate(() => ({ open: !document.getElementById('studentOptsSheet') || !document.getElementById('studentOptsSheet').hidden, focus: !!(document.activeElement && document.activeElement.closest && document.activeElement.closest('.quick-skill-card')) }));
@@ -424,6 +425,8 @@ async function pupilChecks(page, w, touch, k) {
     // open the fold and measure every target; tap each button-like control's centre
     await page.evaluate(() => { const d = document.querySelector('#studentOptsSheet details.so-more'); if (d) d.open = true; });
     await sleep(150);
+    const R2 = await page.evaluate(() => { const r = document.getElementById('studentOptsSheet').getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; });
+    if (R2.l < -0.5 || R2.t < -0.5 || R2.r > first.vw + 0.5 || R2.b > first.vh + 0.5) F(`PUPIL ${at} the opened sheet leaves the window (${Math.round(R2.l)},${Math.round(R2.t)})-(${Math.round(R2.r)},${Math.round(R2.b)}) in ${first.vw}x${first.vh}`);
     const targets = await page.evaluate(() => {
         const s = document.getElementById('studentOptsSheet');
         const els = [...s.querySelectorAll('button, summary, select, input[type="number"], label')].filter((e) => e.offsetParent !== null && !(e.tagName === 'LABEL' && !e.querySelector('input')) && !e.closest('label:not(:scope)') );
