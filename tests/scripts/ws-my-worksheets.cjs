@@ -430,7 +430,7 @@ const CASES = [
                     if (got && got.length) break;
                     await sleep(250);
                 }
-                if (cid === 'tp-independent-M') await shot('interactive-1280');
+                if (cid === 'tp-independent-M') { await sleep(1500); await shot('interactive-1280'); }
                 if (!page1.length) finding('INTERACTIVE-SAME', `${cid}: page 1 has no items to compare`);
                 else if (!got) finding('INTERACTIVE-SAME', `${cid}: Play did not open the online worksheet`);
                 else if (JSON.stringify(got) !== JSON.stringify(page1)) finding('INTERACTIVE-SAME', `${cid}: the worksheet deals other questions (${got.length} vs ${page1.length}: ${got.slice(0, 2).join(' | ')} vs ${page1.slice(0, 2).join(' | ')})`);
