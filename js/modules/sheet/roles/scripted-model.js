@@ -20,6 +20,7 @@ import {
 import { isWideRow } from '../cells/count-row.js';
 import { stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueRow } from './guided.js';
+import { rowCapMm, koMm } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -99,7 +100,53 @@ function statesOf(it) {
     return t && typeof t.statePayload === 'function' ? t : null;
 }
 
+/** A state's step text: "(n) text" (the outlined circle marker). */
+const stepTextHtml = (steps, i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+
+/**
+ * What a full-width state draws for step i besides its cell (plan's stateItem): the 1 picture, 3 words state drawn wide, a trace
+ * template's marks of steps 1..i, the last state answered in trace grey.
+ */
+function stateOpts(it, o, i, steps, marks, ans) {
+    const payload = Object.assign({}, o && o.payload, it.template === 'vocab-pick3' ? { wideState: true } : {});
+    if (marks) return Object.keys(marks[i]).length ? Object.assign({}, o, { payload: Object.assign(payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) }) : Object.assign({}, o, { payload });
+    return Object.assign({}, o, { payload }, i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {});
+}
+
+/**
+ * MEASURED STATES (lf-engine vocabfix item 3, 2026-11-20): the host measures a full-width (1-column) state AS DRAWN - each
+ * state with its step text over it, every state stacked in ONE grid cell so the box is the tallest of them - and the plan sizes
+ * the row from that measure. It reserved two step-text lines (textH2) on a one-line step (vocab_grade_pictures Model p1 36 % /
+ * 32 % empty, 3 states on 2 pages) and measured a count row without the marks its states trace (count_by_tables L: the row cut
+ * to 47 mm under a second line of boxes). Beside (2 columns) and across layouts measure the state alone, as before. `stateRender`
+ * is the item's own drawing, which the page uses.
+ */
+function measuredStates(it) {
+    const steps = stepsFor(it);
+    if (!steps.length || typeof it.render !== 'function') return it;
+    const marks = marksFor(it, steps);
+    const ans = answerOf(it);
+    const base = it.render;
+    const drawn = !!drawnSteps(it);
+    const render = (c, o = {}) => {
+        // (beside / across: the state alone, every state stacked - the step text is its own cell or a fixed band over it. A fact
+        // model's items - drawn steps - keep their own measure: factModel adds its text and jots itself)
+        if (!o || o.cols !== 1) {
+            if (drawn) return base(c, o);
+            return `<div style="display:grid">${steps.map((_, i) => `<div style="grid-area:1/1;min-width:0">${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`).join('')}</div>`;
+        }
+        const one = (i) => `<div style="grid-area:1/1;min-width:0"><div class="mq-steptop">${stepTextHtml(steps, i)}</div>${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`;
+        return `<div style="display:grid">${steps.map((_, i) => one(i)).join('')}</div>`;
+    };
+    return Object.assign({}, it, { render, stateRender: base, statesMeasured: true, measured: null });
+}
+
 export function prepare(it, info = {}) {
+    const p = prepareOwn(it, info);
+    return p ? measuredStates(p) : p;
+}
+
+function prepareOwn(it, info = {}) {
     // (lf-placevalue compare r2, critic r1 F4: an item its generator marks `noModel` - the compare "=" item, which decides
     // nothing - is never the worked example; the host deals the next one)
     if (it && it.q && it.q.noModel && !(info && info.index)) return null;
@@ -235,6 +282,9 @@ function exampleCells(ex, e, across, textMm, stepsOf, rowsEx, row = false) {
 }
 
 function factModel(input, ctx, frame, m) {
+    // (ROW-STRETCH CAP stage 2: hMinAt is the measure + 2 mm, and the measure holds a number tab's keep-out a Model state does not
+    // draw (CL-14), so a state draws about hMinAt - 2 - koMm; its row is capped on that, layout.rowCapMm)
+    const drawnOff = 2 + koMm(ctx.size);
     const pool = poolItems(input, 'main');
     const cand = pool.filter((it) => drawnSteps(it) && modelOk(it));
     if (!cand.length) return null;
@@ -282,9 +332,14 @@ function factModel(input, ctx, frame, m) {
             // the jots in the state's body under its 5 mm top pad and 1.5 mm gaps, which natural() does not count: at L the 10s band's
             // third jot ran onto the cell rule with 25 % of the page free. Those rows take the pad and gaps into their need.)
             const padOf = (it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; return pl && (pl.op === '/' || pl.op === '÷') && it.supportsBox && it.supportsBox.plan ? 5 + 2 * 1.5 : 0; };
-            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(natural(1) + Math.max(...exs.slice(0, 2).map(padOf)), ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx));
+            // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: never past what the state draws + its writing room, layout.rowCapMm)
+            const need1 = natural(1) + Math.max(...exs.slice(0, 2).map(padOf));
+            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(need1, ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx), Math.max(need1 - drawnOff, rowCapMm(need1 - drawnOff, exs.slice(0, 2))));
             const pages = exs.slice(0, 2).map((ex, e) => {
-                const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });
+                // FACT-MODEL-FILL (lead ruling 2026-11-20, mult_facts Scripted Model L): ONE example a page - its rows fill the page to
+                // FACT_FILL, past drawn + room. EB-PAGE wins over EB-STRETCH here (held to the cap, page 1 is ~47 % empty); the grid
+                // says so (mq-factmodel-fill) and ws-empty-band exempts exactly these cells from EB-STRETCH, by name.
+                const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none', cls: 'mq-factmodel-fill' });
                 const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }];
                 // (the Say band closes the last page and reads the example on it)
                 if (e === 1) sections.push({ kind: 'say', frame: oralFrameOf(ex, { fill: true }) });
@@ -300,7 +355,8 @@ function factModel(input, ctx, frame, m) {
         const R = k * rowsEx;
         const H0 = natural(k);
         if (R * H0 > room) continue;
-        const H = Math.min(room / R, H0 * FACT_GROW);
+        // (ROW-STRETCH CAP stage 2: never past what the states draw + their writing room, layout.rowCapMm)
+        const H = Math.min(room / R, H0 * FACT_GROW, Math.max(H0 - drawnOff, rowCapMm(H0 - drawnOff, exs.slice(0, k))));
         const used = exs.slice(0, k);
         const cells = [];
         used.forEach((ex, e) => cells.push(...exampleCells(ex, e, across, textMm, stepsOf, rowsEx)));
@@ -338,7 +394,14 @@ export function plan(input = {}) {
     // A state too wide for the half-width state column (a word problem, a wide picture) takes the
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
     const h1 = hMinAt([it], 1, ctx);
-    let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : h1 + textH2;
+    // (MEASURED STATES: a full-width state's measure holds its step text - prepare/measuredStates; else the two-line estimate)
+    const textOn = it.statesMeasured ? 0 : textH2;
+    // (and the pages are dealt at the height the row is laid out at: the measure less what the ROW-STRETCH CAP below takes off -
+    // dealt at the measure, a count row that fits one page at its capped 50 mm took two, or merged its steps)
+    const offMm = 2 + koMm(ctx.size);
+    const laidH = (h) => (it.statesMeasured && cols === 1 ? Math.min(h, rowCapMm(h - offMm, [it])) : h);
+    let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : laidH(h1 + textOn);
+    let laid = !!it.statesMeasured && cols === 1;   // (H is already the laid-out height: the cap below is not taken twice)
     // (a sentence story prints its story once over the frames: its lines come off the first page's room)
     const story = isSentenceStory(it) && Array.isArray(it.storyLines) ? it.storyLines : null;
     const storyMm = story ? story.length * (m.pitch + 1.6) + 5 : 0;
@@ -363,14 +426,15 @@ export function plan(input = {}) {
         if (steps.length >= 4 && parallel(steps[1]) && parallel(steps[2])) {
             variants.push({ steps: [steps[0], `${steps[1]} ${steps[2]}`, ...steps.slice(3)], marks: [marks[0], marks[2], ...marks.slice(3)], merged: 1 });
         }
-        const texts = [{ tH: textH2, one: 0 }];
-        if (steps.every((t) => t.length <= 48)) texts.push({ tH: textH1, one: 1 });
+        // (MEASURED STATES: the measure holds each state's own text - one candidate; a merged step's text may wrap to two lines)
+        const texts = it.statesMeasured ? [{ tH: 0, one: 0, measured: true }] : [{ tH: textH2, one: 0 }];
+        if (!it.statesMeasured && steps.every((t) => t.length <= 48)) texts.push({ tH: textH1, one: 1 });
         // (critic cbt r3 m3, P-1: at L the 4 one-line states missed one page by 3 mm, so the plan MERGED steps 2 and 3 - 3 states at L
         // against 4 at M. The step band is drawn two lines tall (.mq-steptop) even for one-line text; drawn ONE line tall - its
         // text's line plus the 4 mm the band keeps - the four states fit. Ranked after the one-line plan, so a size whose states
         // already fit keeps its page; chosen before a merge. ws-cell-checks SM-STATE-PARITY.)
         const oneTopMm = m.textPt * 1.3 * (25.4 / 72) + 4;
-        if (steps.every((t) => t.length <= 48)) texts.push({ tH: oneTopMm, one: 2, tight: true });
+        if (!it.statesMeasured && steps.every((t) => t.length <= 48)) texts.push({ tH: oneTopMm, one: 2, tight: true });
         const exactDeal = (n, Hs) => {
             // the fewest pages P whose pages hold n states with the Say band on page P only, each page >= 2 when that can be
             const capAt = (k, P) => Math.floor(((k ? mCont.budget : m.budget) - m.strip - (k === P - 1 ? m.say : 0)) / Hs);
@@ -387,7 +451,8 @@ export function plan(input = {}) {
         for (const v of variants) for (const t of texts) {
             // (critic cbt r2 E3: a drawn count-row state stands ~2 mm taller than h1 + its text - at L the fourth state ran into the
             // Say band, L-OVERLAP SECTION - so each state is planned with STATE_SLACK_MM more)
-            const Hs = h1 + t.tH + STATE_SLACK_MM;
+            // (MEASURED STATES: the measure is the drawn state, laid at the height the row is drawn - no slack estimate)
+            const Hs = t.measured ? laidH(h1) + (v.merged && !v.steps.every((x) => x.length <= 48) && steps.every((x) => x.length <= 48) ? textH2 - textH1 : 0) : h1 + t.tH + STATE_SLACK_MM;
             for (const d of [dealOf(v.steps.length, Math.max(1, Math.floor(room1 / Hs)), Math.max(1, Math.floor(roomC / Hs))), exactDeal(v.steps.length, Hs)]) {
                 if (!d) continue;
                 // the merged text is long: two lines (textH2) even when the unmerged steps are one line each
@@ -435,13 +500,19 @@ export function plan(input = {}) {
         textMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
         H = hMinAt([it], across, ctx) + textMm;
         deal = [steps.length];
+        laid = false;
     }
     const acrossRows = across ? Math.ceil(steps.length / across) : 0;
+    // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4, layout.rowCapMm): a state row is held to what it draws + its writing
+    // room - hMinAt is the measure + 2 mm and the measure holds a tab keep-out a Model state does not draw (CL-14)
+    // (a MEASURED beside state - measuredStates draws every state for the host - is drawn at its measure: only hMinAt's 2 mm come off,
+    // not the tab keep-out; taken off too, the word-work state's ink ran 0.8 mm past its rule at L and covered the frame's foot in print)
+    if (!laid) { const off = 2 + (it.statesMeasured && cols === 2 && !across ? 0 : koMm(ctx.size)); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
     if (story) providerWorkedSteps(it, 6).forEach((st, g) => (st.marks || []).forEach((mk) => { if (mk && mk.slot && !writtenAt.has(mk.slot)) writtenAt.set(mk.slot, g); }));
-    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+    const stepText = (i) => stepTextHtml(steps, i);
     // (a template that draws its step states: state i's payload and, on the step that writes it, the traced answer)
     const stT = !marks && !story ? statesOf(it) : null;
     const stWs = stT ? providerWorkedSteps(it, 6) : [];
@@ -449,10 +520,12 @@ export function plan(input = {}) {
     const smState = (x) => Object.assign(x, { cls: [x.cls || '', 'mq-smstate'].filter(Boolean).join(' ') });
     // (lead ruling 2026-11-14, cbt r3: a state cell is the teacher's worked model, blank by design - `mq-smstate` marks it, so the
     // key lint's AK-2 skips its slots and judges every other key slot)
+    // (the item's own drawing: prepare's measuring render stacks every state - MEASURED STATES)
+    const itRender = it.stateRender || it.render;
     const stateItem = (i) => smState(planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop"${tightTop ? ' style="height:calc(1.3em + 4mm)"' : ''}>${stepText(i)}</div>` : '')
-            + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
+            + (story ? sentenceFrameAt(itRender(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : itRender(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : stAt(i) ? Object.assign({ payload: Object.assign({}, o && o.payload, stAt(i).payload) }, stAt(i).answer && ans ? { shown: ans, ink: 'trace' } : {})
                         : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
@@ -470,7 +543,13 @@ export function plan(input = {}) {
         const cells = [];
         for (const k of take) { cells.push(stateItem(k)); if (cols === 2 && !across) cells.push(textItem(k)); }
         const split = across && take.length % across !== 0;
-        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        // NO-LONE-STATE (lead ruling 2026-11-20): a page before the last that holds FEWER states than fit it, because the deal split the
+        // states evenly so no page holds a lone one (critic r2 D8: 4 states, 3 fit -> 2 + 2), says so on its grid; ws-empty-band
+        // exempts exactly that page shape from EB-PAGE, by name
+        const fitsHere = Math.max(1, Math.floor((pages.length ? roomC : room1) / H));
+        const evenTwo = caps.length === 2 && caps[0] === 2 && caps[1] === 2;   // (the honest 2 + 2 split: four states, two a page)
+        const noLone = !across && i + take.length < steps.length && (take.length < fitsHere || evenTwo) && steps.length - i - take.length >= 2 ? 'mq-model-nolone' : '';
+        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none', cls: noLone });
         // (3 + 2: the full rows in `across` columns, the rest in a grid of their own count, same row height)
         const grids = split ? [gridPart(cells.slice(0, across * Math.floor(take.length / across)), { cols: across, rows: Math.floor(take.length / across), cellH: H, labels: 'none' }),
             gridPart(cells.slice(across * Math.floor(take.length / across)), { cols: take.length % across, rows: 1, cellH: H, labels: 'none' })] : null;

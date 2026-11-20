@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { applyVoice } from './voice-picker.js';
+import { hintFor } from './support-ladder.js';
 
 // ===== Hint popup modal =====
 // Builds (or replaces) a centered modal that shows hint text. Closes via:
@@ -237,8 +238,10 @@ function _genericHintFor(q) {
 
 export function showHint() {
     const q = state.currentQ;
-    const hintBody = (q && q.hint && String(q.hint).trim().length)
-        ? q.hint
+    // HINT-NO-BLANK r3: the skill's own screen hint (provider screenHelp.hint, S8-clean) before q.hint
+    const shown = q ? hintFor(q) : '';
+    const hintBody = (shown && String(shown).trim().length)
+        ? shown
         : _genericHintFor(q);
     _renderHintModal('💡 Hint', hintBody);
 

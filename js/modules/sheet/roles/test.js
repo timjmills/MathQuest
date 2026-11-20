@@ -17,7 +17,7 @@ import {
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
     hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, measuredH, capRowsToInk, isStoryWork } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, capRowsToInk, isStoryWork, rowCapMm, measuredH } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
 import { scorePoints } from '../paginate.js';
 
@@ -83,12 +83,48 @@ function fillToCeiling(L, size, columns, opts = {}) {
         const capH = Math.round(Math.min(even, Math.max(L.hMin, Math.min(L.cellH, L.hMin * FACT_TEST_ROOM))) * 1000) / 1000;
         return Object.assign({}, L, { rows, perPage, cellH: capH, fill: capH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
     }
-    const cellH = Math.round(Math.min(even, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
+    // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: never past what the row draws + its writing room, layout.rowCapMm)
+    const capRow = Math.max(L.cellH, rowCapMm(L.hMin, opts.items || []));
+    const cellH = Math.round(Math.min(even, capRow, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
     if (rows === L.rows && cellH <= L.cellH + 0.01) return L;
     return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
 }
 
+/**
+ * ROW-STRETCH CAP reshape (critic lf-engine-rowcap-s2 F5): a Test at its 12.1 ceiling whose rows, held to their cap, leave more than
+ * one row of white under the grid takes FEWER columns and more rows of the same count where they fit - the same problems, the page
+ * filled by rows (add_facts Test L: 4 x 3 at 45.6 mm left 94.7 mm white; 3 x 4 leaves about 49). The ceiling is never raised.
+ */
+function reshape(L, items, input) {
+    if (!L || L.split || !(L.perPage > 0) || !(L.cols > 2) || !(L.cellH > 0) || (input.columns && input.columns !== 'auto')) return L;
+    const ctx = ctxOf(input);
+    const G = L.gridH;
+    const white = (rows, h) => G - SAFETY_H_MM - rows * h;
+    if (!(white(L.rows, L.cellH) > L.cellH)) return L;
+    let best = null;
+    for (let c = L.cols - 1; c >= 2; c--) {
+        if (L.perPage % c) continue;
+        const r = L.perPage / c;
+        const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
+        const Lc = resolveSectionLayout({ role: 'test', columns: c, count: L.perPage, target: { cols: c, rows: r }, ceiling: { S: L.perPage, M: L.perPage, L: L.perPage }, floor: (input.floors || {}).main },
+            items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+        if (!Lc || Lc.cols !== c || Lc.clamped || !(Lc.hMin > 0)) continue;
+        const h = Math.min((G - SAFETY_H_MM) / r, Math.max(Lc.hMin, rowCapMm(Lc.hMin, items)));
+        if (r * Lc.hMin > G - SAFETY_H_MM) continue;
+        const w = white(r, h);
+        if (!best || w < best.w) best = { c, r, h, w, Lc };
+        if (w <= h) break;
+    }
+    if (!best || !(best.w < white(L.rows, L.cellH))) return L;
+    return Object.assign({}, L, { cols: best.c, rows: best.r, cellH: Math.round(best.h * 1000) / 1000, hMin: best.Lc.hMin, fill: false, filledTest: true,
+        note: [L.note, `Test: ${L.perPage} problems as ${best.c} x ${best.r}, the rows filling the page (row cap).`].filter(Boolean).join(' ') });
+}
+
 function layout(items, input, count) {
+    return reshape(layoutBase(items, input, count), items, input);
+}
+
+function layoutBase(items, input, count) {
     const ctx = ctxOf(input);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
     // 12.1: "12; procedures 4" - a long algorithm tests on the 2 x 2 grid of its practice page.
@@ -112,7 +148,7 @@ function layout(items, input, count) {
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns,
-        { footprintRows: divFact,
+        { footprintRows: divFact, items,
             // (R6-1's full page: the one-line across fact only - div_facts' Long division and Fraction forms keep 12.1's ceiling)
             fullPage: acrossFact });
         if (divFact && acrossFact && (!input.columns || input.columns === 'auto')) {
@@ -241,9 +277,10 @@ function planSplit(input, sp, items) {
     // The page's spare height goes INTO the rows, each up to its fill limit (layout.rowGapFor's one
     // rule: never between rows); what is left stays under the grids.
     const k = Math.max(1, Math.min(FILL_CAP, (sp.G - GRID_BORDERS_MM) / Math.max(1, used)));
-    const grow = (h) => Math.round(Math.max(h, Math.min(k * h, fillLimit(h))) * 10) / 10;
-    const hsN = rowHs.map(grow);
-    const hsW = wideHs.map(grow);
+    // (ROW-STRETCH CAP stage 2: never past what the row draws + its writing room; hMinAt is the measure + 2 mm, layout.rowCapMm)
+    const grow = (h, its) => Math.round(Math.max(h, Math.min(k * h, fillLimit(h), Math.max(h - 2, rowCapMm(h - 2, its)))) * 10) / 10;
+    const hsN = rowHs.map((h, r) => grow(h, nar.slice(r * sp.cols, (r + 1) * sp.cols)));
+    const hsW = wideHs.map((h, r) => grow(h, [wid[r]]));
     const sum = (a) => Math.round(a.reduce((x, y) => x + y, 0) * 100) / 100;
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: scorePoints(all) });
@@ -315,7 +352,9 @@ export function plan(input = {}) {
     // 184 mm cell, 32 %; two_step_estimate_check L: two 83 mm stories in 114 mm rows, 31 %).
     if (rows === 1 || (!sections[1].rowGap && items.every(isStoryWork))) {
         const drawn = sections[1].height ? parseFloat(sections[1].height) : L.gridH;
-        const held = capRowsToInk(items, L.cols, rows, drawn, rows === 1 ? '' : sections[1].rowsTpl || '');
+        // (ROW-STRETCH CAP stage 2: a one-row grid the row cap already holds under its page is the same ruled one-row grid)
+        const held = capRowsToInk(items, L.cols, rows, drawn, rows === 1 ? '' : sections[1].rowsTpl || '')
+            || (rows === 1 && !sections[1].rowGap && drawn < L.gridH - 1 ? { heightMm: Math.round(drawn * 100) / 100, rowsTpl: '' } : null);
         if (held) Object.assign(sections[1], { height: `${held.heightMm}mm`, rowsTpl: held.rowsTpl, rowGap: 0, cls: `${sections[1].cls || 'fixed'} ${rows === 1 ? 'mq-onerow' : 'mq-inkrows'}` });
     }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {

@@ -54,6 +54,7 @@
 //                DRAWS room for, not the rows its frame reserve leaves (lf-roles r10 item 1: the reserve held the one-line instruction
 //                to two lines, the Steps band 2.4 mm and the body 3 mm over what prints; count_by_tables Guided M dealt 4 rows where
 //                5 fit, EB-REFILL on lf-ops-props). M and L: the Model and 6 tries, never past the drawn room or the L ceiling.
+//   GUIDED-INK-FLOOR (critic rowcap-s2 F2) every Guided row is at least its measured ink + 1 mm (a continuation page of 93 mm tries)
 //   GUIDED-LONE-STORY a one-column Guided page holding ONE two-step story (the Model, 135 mm measured) sizes the cell to the story
 //                it draws (its work, writing room, tab clearance), never stretched to content / 0.7: a lone cell <= its measure / 0.9
 //                (lf-roles r10 item 2, live deploy-7 algebra:two_step_add_then_div Guided M seed 694812: the lone story ~25-31 %
@@ -578,6 +579,31 @@ if (on('GUIDED-LONE-STORY')) {
             for (const f of lone) if (f.cellH > (135 + 1) / 0.9) findings.push(`GUIDED-LONE-STORY ${size}: a lone 135 mm story in a ${f.cellH.toFixed(1)} mm cell (${Math.round((1 - 136 / f.cellH) * 100)} % of it empty under the work; want <= ${((135 + 1) / 0.9).toFixed(1)} mm)`);
             if (!fits.some((f) => f.rows === 2)) findings.push(`GUIDED-LONE-STORY ${size} control: no page of two plain tries (${fits.map((f) => f.rows).join(' + ')})`);
         } catch (e) { findings.push(`GUIDED-LONE-STORY ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-INK-FLOOR')) {
+    // critic lf-engine-rowcap-s2 F2 (add_wp_10_plain Guided L p2 clipped, the frame's foot cut): the ROW-STRETCH CAP took a tab keep-out
+    // off rows measured at their drawn level, which draw none, so the rows fell under their ink. Every Guided row is at least its
+    // measured ink + 1 mm: a continuation page of plain tries (level 1, 93 mm) holds rows of at least 94 mm.
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 8 }, (_, i) => twoStep(i, { h3: 100, h1: 93 })) });
+            let seen = 0;
+            (pl.pages || []).forEach((pg, pi) => {
+                if (!pi) return;
+                for (const sec of pg.sections || []) {
+                    const g = sec && sec.kind === 'band' ? sec.content : null;
+                    if (!g || !g.rows) continue;
+                    const H = g.height ? parseFloat(g.height) : g.rows * g.cellH;
+                    const fr = g.rowsTpl ? g.rowsTpl.split(/\s+/).map(parseFloat) : Array(g.rows).fill(1);
+                    const tot = fr.reduce((a, b) => a + b, 0);
+                    fr.forEach((f, r) => { seen++; const h = (H * f) / tot; if (h < 93 + 1 - 0.01) findings.push(`GUIDED-INK-FLOOR ${size} p${pi + 1} row ${r + 1}: ${h.toFixed(1)} mm for a try that draws 93 mm (at least 94 mm: its measured ink + 1)`); });
+                }
+            });
+            if (!seen) findings.push(`GUIDED-INK-FLOOR ${size}: no continuation page planted (${(pl.meta.fits || []).map((f) => f.rows).join(' + ')}) - the fixture moved`);
+        } catch (e) { findings.push(`GUIDED-INK-FLOOR ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 

@@ -32,6 +32,7 @@
 //                its old 44 px; --touch-self-test checks the rule on planted measures, no browser); last line
 //                `ws-grade-render: OK|FAIL`. ws-precritic --skill runs it on the lane skills' lesson, test and independent
 //                pages at S, M and L (visual-quality critic r1: F3 and F4 were measured here and failed nothing)
+// --raster-pdf <file>  RR-* on one printed PDF (no browser; the RR-BOX backtest fixture)
 // --raster-fit  LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3, a Scripted Model whose Say band ran
 //                6 mm past its frame and showed ONLY in the printed PDF): every role sheet and key printed to a real PDF is
 //                rasterised and read by tests/lib/ws-role-raster.cjs - RR-PAGES (PDF pages = the plan's pageCount /
@@ -135,6 +136,9 @@ const hashOf = (html, file) => { if (process.env.MQ_GOLDEN_DUMP && file) fs.writ
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = k => process.argv.includes('--' + k);
 const RR = require('../lib/ws-role-raster.cjs');
+// --raster-pdf <file> (critic lf-engine-rowcap-s2: the RR-BOX backtest's fixture): RR-EDGE / RR-CLIP / RR-BOX on one printed PDF, no browser
+{ const i = process.argv.indexOf('--raster-pdf'); if (i > -1) { const res = RR.roleRaster(path.resolve(process.argv[i + 1]));
+    for (const f of res.findings) console.log(`  FAIL ${f.rule} ${f.msg}`); console.log(`ws-grade-render: ${res.pass ? 'OK' : `FAIL - ${res.findings.length} raster finding(s)`} (--raster-pdf)`); process.exit(res.pass ? 0 : 1); } }
 const SW = require('../lib/ws-screen-widths.cjs');
 const RASTER_FIT = has('raster-fit');
 if (has('raster-self-test')) {
