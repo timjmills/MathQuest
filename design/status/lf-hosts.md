@@ -9,6 +9,13 @@ Builder profile: mq-opus-medium
 Critic rounds: 3, PASS r3 (8/8/8/8 card, worksheet, quiz)
 
 ## Now
+- 2026-11-20 (made by lf-algebra on the lead's ruling, lf-hosts away; owner lf-hosts) TWIN-FIT-RESET: ws-worksheet-reflow WS-DIGIT
+  number_patterns_rule@1024 26.2 -> 22.9 px. fitTwinRows only ever lowered --mq-k2, and layoutWorksheetGrid's column try lays the cards
+  out at 3 columns first at 1024, where count-row twins shrink; the 2-up card that follows holds them at full size but nothing refit them.
+  Fix (branch claude/sweet-newton-c8wrv1-lf-algebra-fitk2): fitTwinRows resets to the twin's base --mq-k2 on a new fit key, then shrinks
+  only if needed; layoutWorksheetGrid refits the grid's twins once its columns settle. Check ws-twin-fit-reset (new, on precritic's path;
+  backtest twin-fit-reset FAIL 8caa04f3b -> OK 958abe1e6). Reflow re-pinned for number_patterns_rule only (slot x / heights: master's
+  own drift). ws-screen-answer and ws-skip identical with and without. Next week (lead): the twin digit floor >= 29 px (option b).
 - Items 1-3 PASSED critic r3 (8/8/8/8 on card, worksheet, quiz at 820/1024/1280/1366). Deploy head sent to the lead (see Log).
 - Item 4 (two-step) done on claude/sweet-newton-c8wrv1-lf-hosts-twostep @ 5719fe9b6 (on lf-algebra, no master); lead routed it to lf-algebra (merge master, then take the branch).
 - Lane folds into lf-checks (owner fast plan). Remainder handed to lf-checks: see "Hand-over".

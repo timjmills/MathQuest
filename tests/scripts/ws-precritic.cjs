@@ -1280,6 +1280,8 @@ function buildPlan(ctx) {
         // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
         // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
         add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: a twin fitted narrow and then wide returns to its own --mq-k2)
+        add(gate('twin-fit-reset', 'ws-twin-fit-reset (TWIN-FIT-RESET: a worksheet twin narrowed and widened again is not left shrunk)', 'number_patterns_rule worksheet @1024', 'browser', 'ws-twin-fit-reset', [], { missingMsg: 'ws-twin-fit-reset is not in this tree' }));
         // lf-hosts skip (owner request 2026-11-19): Skip on the practice card, online worksheet, quiz and MAP test - the button,
         // the count, never wrong, the end-of-run return pass (same item, scored once), "skipped" in the teacher's results, the
         // teacher's off; a fixed mult_facts run, planned once per --skill run, at the widths of tests/lib/ws-screen-widths.cjs
