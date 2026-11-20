@@ -812,7 +812,22 @@ export function hintOf(it) {
         return first.replace(/,(?=\d{3}\b)/g, '').replace(/\d+/g, '___').replace(/___(\s+)(thousand|hundred|ten|one)\b(?!s)/gi, '___$1$2s');
     }
     const steps = all.filter((t) => !hintGivesAnswer(t, it));
-    if (steps.length) return steps.find(own) || steps[0];
+    // GUIDED-HINT-LEAK (box numbers) (lf-roles r17, lead W2 ruling 2026-11-20; critic r15 W2: two_step_add_then_div Guided L
+    // printed "Step 1: circle +. 22 + 14 = 36." over the try's own Step 1 boxes): every number a box of the SAME try expects
+    // (answerTokens: the answer, the key's slots) is a gap; the "Step N:" label and the circled sign stay (the designed sign
+    // trace). A hint left with only its label and gaps is dropped. When the steps that do not give the answer hold none of the
+    // problem's own working, its own step is used masked ("Step 1: circle +. ___ + ___ = ___."), so a family's first tries
+    // carry one hint kind (HINT-UNIFORM). ws-guided-cellfit GUIDED-HINT-LEAK / HINT-UNIFORM.
+    const boxToks = new Set(answerTokens(it).filter((a) => /\d/.test(a)));
+    // (a story's step boxes - operands and result of each step - are its payload's steps; the key writes them, the slots do not)
+    if (it.template === 'word-work') for (const n of JSON.stringify(wp.steps || []).match(/\d+(?:\.\d+)?/g) || []) { boxToks.add(n); boxToks.add(String(Number(n))); }
+    const maskBoxes = (t) => {
+        const lab = (/^\s*Step\s+\d+\s*:/.exec(t) || [''])[0];
+        return lab + t.slice(lab.length).replace(/,(?=\d{3}\b)/g, '').replace(/\d+(?:\.\d+)?/g, (n) => (boxToks.has(n) || boxToks.has(String(Number(n))) ? '___' : n));
+    };
+    const keep = (t) => { const m = maskBoxes(t); return m.slice((/^\s*Step\s+\d+\s*:/.exec(m) || [''])[0].length).replace(/___|[\s.,:;=+\-−×÷()]/g, '') ? m : ''; };
+    const pick = steps.find(own) || (all.find(own) && keep(all.find(own)) ? all.find(own) : '') || steps[0];
+    if (pick) return keep(pick);
     // Every step names part of the answer (a clock's first step gives its hour): the first step
     // becomes a frame, its answer numbers left as gaps ("The short hand has passed ___."), so the
     // first try still has its grey scaffold (critic guided-r1: no hints at L) without the answer.
