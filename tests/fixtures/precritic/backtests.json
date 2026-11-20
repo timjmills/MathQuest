@@ -12521,6 +12521,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-sheet-reask",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo SHEET-REASK",
+   "check": "an Independent window re-asks at most 1 answer a Guided window on the same lesson teaching sheet asked (critic blanks r6 H1)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1 --only SHEET-REASK",
+   "fail": {
+    "commit": "fa3c427ba",
+    "state": "band-100 slot list put Independent 21-45 / 61-85 on Guided 41-65's rows: 4 of 10 answers re-asked at seed 1"
+   },
+   "pass": {
+    "commit": "4bf14d937",
+    "state": "band-100 four-window layout with no shared square between Guided and Independent"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-grid-blank-floor",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo GRID-BLANK-FLOOR",
+   "check": "every rows-of-ten grid on a lesson practice page holds at least 5 blanks (critic blanks r6 H2)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 4242 --only GRID-BLANK-FLOOR",
+   "fail": {
+    "commit": "fa3c427ba",
+    "state": "the 31-60 grid at seed 4242 had 1 blank: the band was chosen before its fresh squares"
+   },
+   "pass": {
+    "commit": "4bf14d937",
+    "state": "practice bands chosen by fresh squares, floor 5, gaps spread over live rows"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
