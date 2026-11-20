@@ -815,3 +815,23 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   empty; L 10 vs M 16 items) -> OK 3038af154 test / true-false / reason-it / error-analysis (re-point the pass side to the F1 fix).
 - master 448bc5e74: count_by_tables has no pre-skill-check role on its card; both rules PASS on every role. **add_facts FAILS
   EB-LASTPAGE**: pre-skill-check M and L 78 % empty (4 items, 42.6 mm rows) - a real defect for the role's owner, not exempted.
+
+## 2026-11-19 — EB-LASTPAGE + CAP-PARITY r2 (critic eblast r1 FAIL: F1-F7), rebuild at Opus medium
+- **F1** "another row fits" is now `white >= row + the ROW GAP as rendered` (median gap between row tops' rows; else the grid's
+  computed row-gap). placevalue:value mixed-practice L (39.8 mm white, 37.2 mm row) is no longer a false red when the gap does not fit.
+- **F2** CAP-PARITY judges only roles that fill their own page (`counts()` export in `sheet/roles/<role>.js`); a role with no
+  `counts()` (independent, more-practice) or a teacher `--columns` run is the teacher's count: noted "not judged", never failed.
+- **F3** a MULTI-page fixed role's last page is judged by PG-23 (fewer than one third of a full page's rows = missed rebalance;
+  a rebalanced last page is legal however white). pre-skill-check stays one page (PT-PRE-1): its spilled page keeps the 30 % rule.
+- **F4** new fixture pairs (`tests/fixtures/precritic/page-fill/`, `--html --page-fill`, `<meta name="eb-role">`, pages tagged
+  `data-eb-size`): `eb-lastpage-fixture-pre-skill-check`, `cap-parity-fixture-row-gap`, `eb-lastpage-fixture-test-pg23`. No fix has
+  landed, so each pass side is a PLANTED page that meets the rule. The two cbt rows' pass sides are relabelled INTERIM stand-ins.
+- **F7** notes: banded / fixed-layout roles read "not a fixed-capacity role (PT-ENG-3 ...)", teacher-count roles "PG-23 ...".
+- Self-test: + 18 r2 cases (gap 6, who-sets-count 6, PG-23 4, notes 2).
+- **REAL reds, kept red and routed** (CHECKS_FROM_CRITICS 2026-11-19): add_facts pre-skill-check M and L (78 %) and sub_facts
+  pre-skill-check M and L (78 %) -> **lf-ops**; placevalue:value pre-skill-check L p2 (45 %, spills past PT-PRE-1) and its
+  CAP-PARITY (L 3 vs M 6), and placevalue:value mixed-practice CAP-PARITY (L 10 vs M 21) -> **lf-placevalue**. The last is NOT the
+  false red r1 suspected: measured with the gap, every L shelf is 37.2 mm, the rendered gap 0.5 mm, the white 39.8 mm - a shelf fits.
+- The row now measured is the page's TALLEST row (a row = its tallest cell), so "another row fits" is claimed only when any drawn
+  row fits again. Verify: self-test OK; fixtures flip FAIL -> OK (3 pairs); `ws-empty-band --page-fill` on add_facts, sub_facts,
+  placevalue:value FAIL (7, all listed above); `ws-precritic-plan --checks-from-critics` OK (346 pass, 90 exempt, 0 fail). Lanes touching these skills see them under precritic's default `--page-fill`.
