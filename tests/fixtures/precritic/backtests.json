@@ -14907,7 +14907,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "every case byte-identical, the dialog pre-filled (name, unit folder), pupils see no Save, 455 warns, 500 stops"
    }
   },
@@ -14927,7 +14927,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "merge-by-id import, migrate() fills v / tags / cls and reads S as M"
    }
   },
@@ -14947,7 +14947,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "SH1.<base64url {v,n,h,req}>; init.js routes ?sheet= to openSheetCode"
    }
   },
@@ -14967,7 +14967,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "state.worksheetPreset: the online worksheet deals the plan's page-1 items"
    }
   },
@@ -14987,7 +14987,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "every change written to the sheets store and its sheetFolders record"
    }
   },
@@ -15007,7 +15007,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "quiz-storage DB_VERSION 2 only adds the sheets store"
    }
   },
@@ -15027,7 +15027,7 @@
     "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
    },
    "pass": {
-    "commit": "95444ab19",
+    "commit": "c7bbb5a9c",
     "state": "48 px controls (#teacherApp .mws .mws-b), the 900 px fold"
    }
   }
