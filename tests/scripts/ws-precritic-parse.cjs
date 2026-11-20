@@ -22,6 +22,8 @@
 // Cases (lf-studentopts, 2026-11-19; PARSE.studentOpts):
 //   ws-student-opts: OK with every asked width checked -> PASS; a width missing -> FAIL naming it; FAIL -> FAIL with findings;
 //   --unit OK with its unit line -> PASS; OK with no unit line -> FAIL
+// Cases (lf-partopts My Worksheets, 2026-11-20; PARSE.myWorksheets): every check OK at every width -> PASS; a check line
+//   missing -> FAIL naming it; a width missing -> FAIL naming it; FAIL -> FAIL with the failing check and its finding
 // Last line `ws-precritic-parse: OK (...)` or `ws-precritic-parse: FAIL - ...`.
 'use strict';
 const path = require('path');
@@ -122,6 +124,25 @@ if (PARSE.studentOpts) {
     const s5 = PARSE.studentOpts(unitGate, 'ws-student-opts: OK', 0);
     t(s5.result === 'FAIL', `student-opts with no unit line: FAIL (got ${s5.result} ${s5.findings})`);
     N += 5;
+}
+// ---- lane lf-partopts, My Worksheets (PARSE.myWorksheets, 2026-11-20)
+if (PARSE.myWorksheets) {
+    const C = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME'];
+    const W = [1280, 1366, 1024, 820];
+    const g = { id: 'my-worksheets', expect: { checks: C, widths: W } };
+    const green = [...C.map((c) => `${c}: OK`), ...W.map((w) => `  @${w}: checked`), '(12 sheets saved; widths 1280,1366,1024,820; 300 s)', 'ws-my-worksheets: OK'].join('\n');
+    const m1 = PARSE.myWorksheets(g, green, 0);
+    t(m1.result === 'PASS', `my-worksheets, every check OK at every width: PASS (got ${m1.result} ${m1.findings})`);
+    const noTouch = [...C.filter((c) => c !== 'TOUCH-WIDTH').map((c) => `${c}: OK`), 'ws-my-worksheets: OK'].join('\n');
+    const m2 = PARSE.myWorksheets(g, noTouch, 0);
+    t(m2.result === 'FAIL' && /TOUCH-WIDTH/.test(m2.findings), `my-worksheets, a check line missing: FAIL naming it (got ${m2.result} ${m2.findings})`);
+    const threeW = [...C.map((c) => `${c}: OK`), ...W.slice(0, 3).map((w) => `  @${w}: checked`), 'ws-my-worksheets: OK'].join('\n');
+    const m3 = PARSE.myWorksheets(g, threeW, 0);
+    t(m3.result === 'FAIL' && /820/.test(m3.findings), `my-worksheets, a width missing: FAIL naming it (got ${m3.result} ${m3.findings})`);
+    const red = ['SAVE-REPRODUCE: FAIL 1', '  - tp-lesson-M: the reprinted key differs from the print before saving', ...C.slice(1).map((c) => `${c}: OK`), 'ws-my-worksheets: FAIL (1)'].join('\n');
+    const m4 = PARSE.myWorksheets(g, red, 1);
+    t(m4.result === 'FAIL' && m4.explainsExit && /SAVE-REPRODUCE/.test(m4.findings) && /reprinted key/.test(m4.findings), `my-worksheets, FAIL: the failing check and finding (got ${m4.result} ${m4.findings})`);
+    N += 4;
 }
 if (fails.length) { for (const f of fails) console.log(`  FAIL ${f}`); console.log(`ws-precritic-parse: FAIL - ${fails.length} of ${N} case(s)`); process.exit(1); }
 console.log(`ws-precritic-parse: OK (${N} cases)`);
