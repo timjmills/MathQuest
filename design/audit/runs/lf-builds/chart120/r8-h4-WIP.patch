@@ -1,0 +1,106 @@
+diff --git a/js/modules/gen-counting.js b/js/modules/gen-counting.js
+index fd067124e..313f900d7 100644
+--- a/js/modules/gen-counting.js
++++ b/js/modules/gen-counting.js
+@@ -369,12 +369,15 @@ function _kPageDeal(key, n) {
+  * place (its first chart row and column, '-' for none): `row col` digit pairs. Searched offline (chart blanks r7) over every set
+  * of four windows: each window's own squares - held by no other window nor the Model - take its 5 gaps spread 2/2/1; then the
+  * best three practice rows-of-ten bands each hold 6 blanks or more spread evenly over the squares the sheet leaves fresh; then
+- * the least overlap, then the most practice blanks. */
+-const HCF100_LAYOUT = Object.fromEntries(('-:01144065 00:31346174 01:14306174 02:31346174 03:31346174 04:11356174 05:31346174 10:34416471 ' +
+-    '11:04356174 12:41447174 13:41447174 14:01306174 15:31446174 20:02427174 21:04345174 22:00406471 23:01456174 24:01315471 25:03437174 ' +
+-    '30:01146174 31:00346174 32:01046174 33:01046174 34:00316174 35:04116174 40:01146471 41:00346471 42:01147174 43:01147174 44:00316174 ' +
+-    '45:01146174 50:01043272 51:01043474 52:01143070 53:04113571 54:01043171 55:01043373 60:01043144 61:01143074 62:01043134 63:01043134 ' +
+-    '64:01143071 65:01043441 70:01043144 71:01143064 72:01043144 73:01043144 74:01143061 75:01043144').split(' ').map((e) => e.split(':')));
++ * the least overlap, then the most practice blanks.
++ * (chart blanks r8, critic r7 H4: the practice blanks are counted with the page's edge-column gaps (columns 1 and 10) at most half,
++ * and a layout with a window on columns 1-5 and one on 6-10 is preferred, so the middle columns stay fresh. A Model on chart
++ * rows 11-40 or 61-90 leaves no layout that meets both; those 12 places keep the r7 layout and the deal's soft caps.) */
++const HCF100_LAYOUT = Object.fromEntries(('-:00225375 00:24305175 01:25315074 02:20245175 03:20245175 04:20345275 05:21355370 10:34416471 11:04356174 12:41447174 13:41447174 14:01306174 ' +
++    '15:31446174 20:04345275 21:05355370 22:05405470 23:00415571 24:00305175 25:01315074 30:00245175 31:01255074 32:01255370 33:04205275 34:04205275 ' +
++    '35:05215370 40:05215470 41:00235571 42:00245571 43:01255074 44:01255074 45:00235175 50:01253174 51:00234575 52:00243075 53:01253170 54:05213570 ' +
++    '55:00234171 60:01043144 61:01143074 62:01043134 63:01043134 64:01143071 65:01043441 70:05214054 71:00234155 72:00234155 73:00245155 74:01253150 ' +
++    '75:00234551').split(' ').map((e) => e.split(':')));
+ function hcf100Layout(key) {
+     const s = HCF100_LAYOUT[key];
+     return s ? [0, 1, 2, 3].map((i) => [Number(s[2 * i]), Number(s[2 * i + 1])]) : null;
+@@ -1090,6 +1093,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
+         let runLast = null;
+         // (critic blanks r6 H2: a band-100 lesson rows-of-ten grid holds at least 5 blanks - never fewer, silently)
+         const _wantMin = _lessonRows && band === 100 ? 5 : 1;
++        // (chart blanks r8, critic r7 H4: a band-100 practice grid is first dealt under the page caps - EDGE-SHARE, PAGE-COL-RUN,
++        // SKELETON-TWIN - and only when no grid meets them, without)
++        const _want0 = want;
++        let _caps100 = false;
++        for (let _cp = 0; _cp < 2 && !pickIdx.length; _cp++) {
++        _caps100 = _lessonRows && band === 100 && _cp === 0; want = _want0;
++        if (_cp && !(_lessonRows && band === 100)) break;
+         for (; want >= _wantMin && !pickIdx.length; want--) {
+         for (let w = 0; w < (kept.length ? 24 : keptRun.length ? 150 : 1) && !pickIdx.length; w++) {
+             const win = pickWin();
+@@ -1186,6 +1196,21 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
+                 if (_lessonRows && _to120 && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                 // (critic blanks r6 H3, COL-RUN: at most one column of a rows-of-ten grid blank all the way down)
+                 if (_lessonRows && Array.from({ length: C }, (_, c) => c).filter((c) => Array.from({ length: R }, (_, r) => r).every((r) => set.has(r * C + c))).length > 1) continue;
++                // (chart blanks r8, critic r7 H4: edge-column gaps at most half the grid's and two a column; no column blank in more
++                // than 4 of the page's rows; no two grids of the page with 4 gap places alike)
++                if (_caps100) {
++                    const gN = cand.map(atW);
++                    const c10 = gN.filter((n) => n % 10 === 0).length, c1 = gN.filter((n) => n % 10 === 1).length;
++                    if ((c10 + c1) * 2 > gN.length || c10 > 2 || c1 > 2) continue;
++                    const prev = kept.filter((k) => !k.ext && !k.shows && k.cols.length === 10 && k.rows.length === 3);
++                    if (prev.length) {
++                        const inCol = (ns, c) => ns.filter((n) => (n - 1) % 10 === c).length;
++                        if (Array.from({ length: 10 }, (_, c) => c).some((c) => prev.reduce((t, k) => t + inCol(k.gaps, c), 0) + inCol(gN, c) > 4)) continue;
++                        const skel = (rs, ns) => new Set(ns.map((n) => `${Math.floor((n - 1) / 10) - Math.min(...rs)}:${(n - 1) % 10}`));
++                        const me = skel(rows, gN);
++                        if (prev.some((k) => { const o = skel(k.rows, k.gaps); return [...me].filter((x) => o.has(x)).length >= 4; })) continue;
++                    }
++                }
+                 // (critic blanks r4 F1 / F2: in a lesson packet no pupil window repeats a kept one's answer set, nor shares 60 % of
+                 // the larger one's squares with the same gaps there - NEAR-TWIN, SHEET-ANSWER-SET)
+                 if (chartLesson()) {
+@@ -1204,10 +1229,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
+         }
+             if (!_lessonRows || pickIdx.length) break;
+         }
++        }
+         // (no run fitted the sheet: the first one drawn - the dealer passes it over, it prints another window's gap)
+         if (!pickIdx.length && runLast) { rows = runLast.rows; cols = runLast.cols; at = runLast.at; pickIdx = runLast.idx; }
+         // (critic blanks r6 H2: no band leaves the floor of 5 fresh blanks - fail loudly, never print a grid with fewer)
+-        if (!pickIdx.length && _lessonRows && band === 100) { const m = `hundreds chart lesson: rows-of-ten grid ${rows ? rows[0] * 10 + 1 : '?'}-${rows ? rows[2] * 10 + 10 : '?'} cannot hold 5 fresh blanks (critic blanks r6 H2)`; console.error(m); throw new Error(m); }
++        if (!pickIdx.length && _lessonRows && band === 100) { const m = `hundreds chart lesson: rows-of-ten grid ${rows ? rows[0] * 10 + 1 : '?'}-${rows ? rows[2] * 10 + 10 : '?'} cannot hold 5 fresh blanks (critic blanks r6 H2)`; throw new Error(m); }
+         // Fallback (never expected): alternate squares of each row honour every rule, up to the cap.
+         if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, Math.max(1, want));
+         const blanks = pickIdx.sort((x, y) => x - y).map(at);
+diff --git a/js/modules/print-sheet.js b/js/modules/print-sheet.js
+index 7028a6af4..625455710 100644
+--- a/js/modules/print-sheet.js
++++ b/js/modules/print-sheet.js
+@@ -1023,6 +1023,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
+         // solved facts, the last row only its edge facts - the sheet's FIRST page, the one the set was solved for (a probe's longer deal past it
+         // deals as before); absent on every other ref: skH is sk)
+         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
++        // (chart blanks r8 N1: a band-100 practice grid's search throws quietly; only an item no try could deal logs it)
++        let _rowsErr = null;
+         const pass = (rotate, relaxLast, soft, words = true) => {
+             let got = null, altCw = null;
+             for (let k = 0; k <= tries; k++) {
+@@ -1045,7 +1047,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
+                 // window the sheet deals after it keeps its gaps off the example's squares; pickExample takes the pinned item)
+                 if (_cwForceFirst && i === 0 && _cwPart === 'sheet' && key === _cwForceFirst.key) return Object.assign({}, _cwForceFirst.q, { cwExample: true });
+                 setChartSheet(_cwAll(seen));
+-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && (_cwRoleTiles || (_cwEdge && _cw120(sk))) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles || 3 }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
++                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && (_cwRoleTiles || (_cwEdge && _cw120(sk))) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles || 3 }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; if (e && /rows-of-ten grid/.test(String(e.message))) _rowsErr = String(e.message); } finally { if (pin) setDealPin(null); setChartSheet(null); }
+                 if (!cand) continue;
+                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
+                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
+@@ -1093,7 +1095,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
+         const wordsOff = () => (sk.lr6 ? (sk.lr6Names ? pass(true, false, true, 'names') : null) || pass(true, false, true, false) || pass(true, false, true, 'none') : null);
+         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
+             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
+-        if (!q) return;
++        if (!q) { if (_rowsErr) console.error(_rowsErr); return; }
+         // (CROSS-GIVEAWAY: every try drew a window of squares already on the sheet - a one-window chart, or more items than the
+         // chart has windows - so this item is not dealt)
+         if (!q.cwExample && chartGivesAway(q, _cwAll(seen))) return;

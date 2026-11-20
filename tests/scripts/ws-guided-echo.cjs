@@ -62,6 +62,9 @@
 //   SHEET-REASK        an Independent window re-asks at most 1 answer a Guided window on the same lesson teaching sheet asked (r6 H1).
 //   GRID-BLANK-FLOOR   every rows-of-ten grid on a lesson practice page holds at least 5 blanks (r6 H2).
 //   COL-RUN            at most one column of a lesson rows-of-ten grid is blank in every row (r6 H3).
+//   EDGE-SHARE         a lesson practice page's rows-of-ten gaps on edge columns (1, 10) are at most half its gaps (r7 H4).
+//   PAGE-COL-RUN       no column of a lesson practice page's rows-of-ten grids is blank in more than 4 of its rows (r7 H4).
+//   SKELETON-TWIN      no two rows-of-ten grids of a lesson practice page share 4+ gap places (row in grid, column) (r7 H4).
 //   LESSON-SECTIONS    a chart lesson teaching sheet prints at least 1 Guided and, at M, 2 Independent windows (critic blanks r5 G1).
 //   BLANK-COUNT        the band-120 lesson's practice page prints three rows of ten (the ruled fallback): its count is what the
 //                      packet leaves free, judged by the other blank rules, not the 3 of the windows.
@@ -100,7 +103,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN', 'EDGE-SHARE', 'PAGE-COL-RUN', 'SKELETON-TWIN'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -449,6 +452,20 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                 if (on('COL-RUN') && full.length > 1) out.push(`COL-RUN ${key} lesson ${size} seed ${s} p${pi + 1}: rows-of-ten grid ${wi + 1} (${lo}-${hi}) has ${full.length} columns blank all the way down (at most 1)`);
                             });
                         });
+                        // EDGE-SHARE / PAGE-COL-RUN / SKELETON-TWIN (critic blanks r7 H4): the practice page's rows-of-ten grids, read as one page
+                        if (pkParts && skillId === 'hundreds_chart_fill' && (on('EDGE-SHARE') || on('PAGE-COL-RUN') || on('SKELETON-TWIN'))) pkParts.forEach((pg, pi) => {
+                            if (pg.part !== 'practice') return;
+                            const gs = pupilWins(pg.items).filter((w) => w.rows.length === 3 && w.cols.length === 10);
+                            if (!gs.length) return;
+                            const all = gs.flatMap((w) => w.gaps);
+                            const edge = all.filter((n) => (n - 1) % 10 === 0 || n % 10 === 0).length;
+                            if (on('EDGE-SHARE') && edge * 2 > all.length) out.push(`EDGE-SHARE ${key} lesson ${size} seed ${s} p${pi + 1}: ${edge} of ${all.length} gaps on edge columns (at most half)`);
+                            if (on('PAGE-COL-RUN')) for (let c = 0; c < 10; c++) { const k = gs.reduce((t, w) => t + w.rows.filter((rr) => w.gaps.includes(rr * 10 + c + 1)).length, 0); if (k > 4) out.push(`PAGE-COL-RUN ${key} lesson ${size} seed ${s} p${pi + 1}: column ${c + 1} blank in ${k} of ${gs.length * 3} rows (at most 4)`); }
+                            if (on('SKELETON-TWIN')) {
+                                const sk = (w) => new Set(w.gaps.map((n) => `${Math.floor((n - 1) / 10) - Math.min(...w.rows)}:${(n - 1) % 10}`));
+                                for (let i = 0; i < gs.length; i++) for (let j = i + 1; j < gs.length; j++) { const A = sk(gs[i]), B = sk(gs[j]); const sh = [...A].filter((x) => B.has(x)).length; if (sh >= 4) out.push(`SKELETON-TWIN ${key} lesson ${size} seed ${s} p${pi + 1}: grids ${i + 1} and ${j + 1} share ${sh} gap places (at most 3)`); }
+                            }
+                        });
                         // LESSON-SECTIONS (critic blanks r5 G1): the chart lesson teaching sheet prints Guided (>= 1 window) and
                         // Independent (>= 2 windows) - a placement that drops a section fails here, never silently.
                         if (packet && on('LESSON-SECTIONS') && /chart/.test(skillId)) {
@@ -556,7 +573,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN|EDGE-SHARE|PAGE-COL-RUN|SKELETON-TWIN) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
