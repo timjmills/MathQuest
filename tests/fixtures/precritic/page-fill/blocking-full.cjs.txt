@@ -1,0 +1,6 @@
+// EBLAST-BLOCKING-BEGIN
+const EBLAST_BLOCKING_ROLES = [
+    'independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'mixed-practice', 'true-false', 'reason-it',
+    'word-problems', 'stretch', 'scripted-model', 'opener', 'lesson', 'fact-probe', 'fact-rows',
+];
+// EBLAST-BLOCKING-END
