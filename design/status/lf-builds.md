@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20: chart blanks r4 fix, step 1: SHEET-ANSWER-SET, ANSWER-REUSE, NEAR-TWIN, PRACTICE-FILL in ws-guided-echo (ANSWER-VARIETY now half or more); all fail on 1ab2801ef as the critic found (c120 M seeds 1/4242/777 p2; hcf M 4242 p3 13/15, near-twins, 3 of 6). Log blanks-r6/logs/checks-before-1ab2801ef.log. Next: the lesson deal redesign.
 - 2026-11-20 12:56Z: RESUMED (lead: the owner added budget; stop at cost_usd $715.37 = $665.37 + $50). Per the resume plan: checks SHEET-ANSWER-SET / ANSWER-REUSE / NEAR-TWIN / practice fill floor first, then the lesson deal redesign, then one narrow re-grade. Park at the stop.
 - 2026-11-20 06:10Z: PARKED at the budget/round stop (lead: "Park at your stop"). Narrow critic r4 FAILED (critic-blanks-r4.md, 982fd7fc4). This was the one round after the round-cap stop.
   - Passed:

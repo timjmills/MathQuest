@@ -52,9 +52,13 @@
 //                      than the 14 mm writing floor (F10: band 100 Reason It L squeezed A | B beside the response to 10.4 mm squares).
 //   (chart blanks critic r2, 2026-11-20:)
 //   LESSON-TWIN        no two pupil windows of one lesson packet hold the same squares and gaps (worked example left out; R2-1).
-//   ANSWER-VARIETY     on a page of 4+ pupil windows no one answer set covers more than half of them (R2-1).
+//   ANSWER-VARIETY     on a page of 4+ pupil windows no one answer set covers half of them or more (R2-1; r4 F1: was more than half).
 //   CROSSING-IN-PLAY   a chart_to_120 lesson packet leaves a pupil gap at 100, 101, 110 or 111 (R2-1).
 //   STEP-COVER         on a page with a Steps band every gap is solved by a printed step from a printed neighbour (R2-2).
+//   SHEET-ANSWER-SET   no two pupil windows on one lesson page share their sorted answer set (r4 F1).
+//   ANSWER-REUSE       at most a third of a lesson practice page's answers were asked on an earlier page of the packet (r4 F2).
+//   NEAR-TWIN          no two pupil windows of a lesson packet share 60 % of the larger's squares with the same gaps there (r4 F2).
+//   PRACTICE-FILL      a lesson practice page prints at least its capacity minus 1 items, or rows-of-ten grids (r4 F2).
 //   BLANK-COUNT        the band-120 lesson's practice page prints three rows of ten (the ruled fallback): its count is what the
 //                      packet leaves free, judged by the other blank rules, not the 3 of the windows.
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
@@ -92,7 +96,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -346,7 +350,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             const ws = pupilWins(pg.items); if (ws.length < 4) return;
                             const cnt = new Map(); ws.forEach((w) => { const k = w.gaps.slice().sort((a, b) => a - b).join(', '); cnt.set(k, (cnt.get(k) || 0) + 1); });
                             const [topSet, topN] = [...cnt].sort((a, b) => b[1] - a[1])[0];
-                            if (topN * 2 > ws.length) out.push(`ANSWER-VARIETY ${key} ${role} ${size} seed ${s} p${pi + 1}: ${topN} of ${ws.length} windows answer ${topSet}`);
+                            if (topN * 2 >= ws.length) out.push(`ANSWER-VARIETY ${key} ${role} ${size} seed ${s} p${pi + 1}: ${topN} of ${ws.length} windows answer ${topSet}`);
                         });
                         if (packet && on('CROSSING-IN-PLAY') && skillId === 'chart_to_120') {
                             const all = packet.flatMap((pg) => pupilWins(pg.items)).flatMap((w) => w.gaps);
@@ -367,6 +371,53 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                 });
                                 if (bad.length) out.push(`STEP-COVER ${key} ${role} ${size} seed ${s} p${pi + 1} window ${wi + 1}: no printed step solves ${bad.join(', ')} from a printed neighbour (steps: ${Object.keys(has).filter((k) => has[k]).join('')})`);
                             });
+                        });
+                        // (chart blanks critic r4, 2026-11-20 - F1 / F2:)
+                        // SHEET-ANSWER-SET: no two pupil windows on one lesson page share their sorted answer set. ANSWER-REUSE: at most a
+                        // third of a lesson practice page's answers were already answers of a pupil window on an earlier page. NEAR-TWIN:
+                        // no two pupil windows of the packet share 60 % or more of the larger one's squares with the same gaps in the shared
+                        // squares (and at least one gap there). PRACTICE-FILL: the lesson practice page prints at least its capacity minus
+                        // 1 items, or is filled with rows-of-ten grids (3 x 10).
+                        const pkParts = packet && /chart/.test(skillId) ? (r.partPlans || []).flatMap((x) => (x.plans || []).flatMap((pl) => planPages(pl).map((pg) => ({ part: x.part, items: pg.items, plan: pl })))) : null;
+                        if (pkParts && on('SHEET-ANSWER-SET')) pkParts.forEach((pg, pi) => {
+                            const seenS = new Map();
+                            pupilWins(pg.items).forEach((w, wi) => {
+                                const k = w.gaps.slice().sort((a, b) => a - b).join(', ');
+                                if (!k) return;
+                                if (seenS.has(k)) out.push(`SHEET-ANSWER-SET ${key} lesson ${size} seed ${s} p${pi + 1}: window ${wi + 1} answers ${k}, as window ${seenS.get(k)} on the same page`);
+                                else seenS.set(k, wi + 1);
+                            });
+                        });
+                        if (pkParts && on('ANSWER-REUSE')) {
+                            const earlier = new Set();
+                            pkParts.forEach((pg, pi) => {
+                                const gs = pupilWins(pg.items).flatMap((w) => w.gaps);
+                                if (pg.part === 'practice' && gs.length) {
+                                    const re = gs.filter((n) => earlier.has(n)).length;
+                                    if (re * 3 > gs.length) out.push(`ANSWER-REUSE ${key} lesson ${size} seed ${s} p${pi + 1}: ${re} of ${gs.length} practice answers were asked on an earlier page (at most a third)`);
+                                }
+                                gs.forEach((n) => earlier.add(n));
+                            });
+                        }
+                        if (pkParts && on('NEAR-TWIN')) {
+                            const all = pkParts.flatMap((pg, pi) => pupilWins(pg.items).map((w, wi) => ({ w, at: `p${pi + 1} window ${wi + 1}` })));
+                            const sq = (w) => { const z = new Set(); for (const rr of w.rows) for (const c of w.cols) z.add(rr * 10 + c + 1); return z; };
+                            for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
+                                const A = sq(all[i].w), B = sq(all[j].w);
+                                const sh = [...A].filter((n) => B.has(n));
+                                if (sh.length * 10 < Math.max(A.size, B.size) * 6) continue;
+                                const gA = sh.filter((n) => all[i].w.gaps.includes(n)).sort((a, b) => a - b).join('.'), gB = sh.filter((n) => all[j].w.gaps.includes(n)).sort((a, b) => a - b).join('.');
+                                if (gA && gA === gB) out.push(`NEAR-TWIN ${key} lesson ${size} seed ${s}: ${all[j].at} shares ${sh.length} of ${Math.max(A.size, B.size)} squares with ${all[i].at}, the same gaps (${gA.replace(/\./g, ', ')}) in them`);
+                            }
+                        }
+                        if (pkParts && on('PRACTICE-FILL')) pkParts.forEach((pg, pi) => {
+                            if (pg.part !== 'practice') return;
+                            const f0 = pg.plan && pg.plan.meta && Array.isArray(pg.plan.meta.fits) && pg.plan.meta.fits[0];
+                            const cap = f0 && Number(f0.perPage);
+                            const its = pg.items.filter((it) => it && it.q && !it.anchor && !it.model);
+                            const ws = its.map((it) => winOf(it.q)).filter(Boolean);
+                            const rowsGrids = ws.length && ws.every((w) => w.rows.length === 3 && w.cols.length === 10);
+                            if (cap && its.length < cap - 1 && !rowsGrids) out.push(`PRACTICE-FILL ${key} lesson ${size} seed ${s} p${pi + 1}: ${its.length} item(s) on a practice page that holds ${cap} (at least ${cap - 1}, or rows-of-ten grids)`);
                         });
                         // LESSON-EMPTY-PAGE (critic blanks B1): no page of a lesson packet past its first is printed empty, and the key
                         // prints as many pages as the pupil copy
@@ -462,7 +513,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
