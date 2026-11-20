@@ -25,17 +25,27 @@
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import * as D from './dealer-v1.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import * as PROTO from './dealer-v1.mjs';
 import { deriveSeed } from '../../../../js/modules/sheet/rng.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../../..');
-const FIX = join(HERE, 'fixtures');
+// The dealer and the fixtures this file checks: the prototype by default; `configure()` points them at the PRODUCT dealer
+// (js/modules/mixed-review.js) and tests/fixtures/mix-review/ for tests/scripts/ws-mix-review.mjs (card §9b step 1: the
+// product checks' Node cores ARE these properties). Pools live in FIX (proto) or FIX/pools (product).
+let D = PROTO;
+let FIX = join(HERE, 'fixtures');
+let POOLS = FIX;
 const CARD = join(HERE, '..', 'mixed-review.md');
 const readJ = (f) => JSON.parse(readFileSync(join(FIX, f), 'utf8'));
-const pools = {};
-const poolOf = (ref) => (Array.isArray(ref) ? ref : ref === 'v1-registry' ? readJ('v1-registry.json').rows : (pools[ref] ||= readJ(`${ref}.json`)));
+let pools = {};
+const poolOf = (ref) => (Array.isArray(ref) ? ref : ref === 'v1-registry' ? readJ('v1-registry.json').rows : (pools[ref] ||= JSON.parse(readFileSync(join(POOLS, `${ref}.json`), 'utf8'))));
+/** Point the properties at another dealer module and fixture folder (ws-mix-review: the product). */
+export function configure({ dealer, fixDir, poolDir, frozenFiles }) {
+    D = dealer; FIX = fixDir; POOLS = poolDir || fixDir; pools = {};
+    if (frozenFiles) Object.assign(FROZEN_FILES, frozenFiles);
+}
 const J = (x) => JSON.stringify(x);
 
 /* ---------------------------------------------------- this check's OWN copy of the tables (never the dealer's) */
@@ -308,7 +318,7 @@ function propN(input, out) {
     for (const sh of sheetsOf(out)) for (const it of sh.items) if (!ids.has(it.skill)) { v.push(`day ${sh.day}: ${it.skill} is not in the filtered pool`); break; }
     return v;
 }
-const PROPS = { a: propA, b: propB, c: propC, d: propD, e: propE, f: propF, g: propG, h: propH, i: propI, j: propJ, j2: propJ2, k: propK, l: propL, m: propM, n: propN };
+export const PROPS = { a: propA, b: propB, c: propC, d: propD, e: propE, f: propF, g: propG, h: propH, i: propI, j: propJ, j2: propJ2, k: propK, l: propL, m: propM, n: propN };
 const NEEDS_OUT = new Set(['n', 'b', 'c', 'd', 'e', 'f', 'g', 'j', 'j2', 'k', 'l', 'm']);
 
 /* ------------------------------------------------------------------------------------------------- the trace */
@@ -327,20 +337,31 @@ function unitsOf(md) {
     if ([s2, s3, s4, s7a, s8, s9a, s9b].some((x) => x < 0)) return { error: 'a section heading (## 2. / ## 3. / ## 4. / ### 7a. / ## 8. / ### 9a. / ### 9b.) is missing' };
     spans.push(['§2', s2 + 1, s3], ['§3', s3 + 1, s4], ['§7a', s7a + 1, s8], ['PT-MXR', s9a + 1, s9b]);
     const units = [];
+    const cellsOf = (l) => l.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map((c) => c.trim());
     for (const [sec, a, b] of spans) {
-        let fence = false; let cur = null;
+        let fence = false; let cur = null; let decCol = -1;
         const flush = () => { if (cur) units.push(cur); cur = null; };
         for (let i = a; i < b; i++) {
             let l = lines[i];
             if (sec === 'PT-MXR') { if (!l.startsWith('+')) { flush(); continue; } l = l.slice(1); }
             if (/^\s*```/.test(l)) { fence = !fence; flush(); continue; }
-            if (fence || /^\s*#/.test(l)) { flush(); continue; }
-            if (!l.trim() || /^\s*\|[-: |]+\|\s*$/.test(l)) { flush(); continue; }
-            const item = /^\s*(?:[-*]|\d+\.)\s/.test(l) || /^\s*\|/.test(l);
+            if (fence || /^\s*#/.test(l)) { flush(); decCol = -1; continue; }
+            if (!l.trim()) { flush(); decCol = -1; continue; }
+            if (/^\s*\|[-: |]+\|\s*$/.test(l)) { flush(); continue; }
+            const row = /^\s*\|/.test(l);
+            if (row && /^\s*\|[-: |]+\|\s*$/.test(lines[i + 1] || '')) {       // a table header: find its Decision column
+                flush(); decCol = cellsOf(l).findIndex((c) => /^Decision$/i.test(c)); continue;
+            }
+            const bullet = /^\s*(?:[-*]|\d+\.)\s/.test(l);
+            const item = bullet || row;
             const numbered = (sec === '§2' && /^\s*\d+\.\s/.test(l)) || (sec === 'PT-MXR' && /^- \*\*PT-MXR-\d/.test(l));
             const mxr = sec === 'PT-MXR' && /^- \*\*PT-MXR-\d/.test(l);
             if (sec === 'PT-MXR' && !mxr && !(cur && cur.mxr && /^\s{2}\S/.test(l))) { flush(); continue; }   // only the PT-MXR bullets
-            if (item || !cur) { flush(); cur = { sec, line: i + 1, text: l.trim(), numbered, mxr }; }
+            // card §10 L3 (critic r4 D4): the trace INVERTS its default. Every sentence of a §2 / §3 / §7a bullet and of a §7a
+            // Decision cell is normative unless it is marked [I]; other units (paragraphs, other table rows) by keyword.
+            const force = sec !== 'PT-MXR' && bullet;
+            if (row && sec === '§7a' && decCol >= 0) { flush(); units.push({ sec, line: i + 1, text: cellsOf(l)[decCol] || '', numbered: false, mxr: false, force: true }); continue; }
+            if (item || !cur) { flush(); cur = { sec, line: i + 1, text: l.trim(), numbered, mxr, force }; }
             else cur.text += ' ' + l.trim();
         }
         flush();
@@ -349,7 +370,8 @@ function unitsOf(md) {
 }
 function sentencesOf(text) {
     const protect = text.replace(/^(?:[-*]|\d+\.)\s+/, '').replace(/(PT-MXR-\d+)\./g, '$1\u2024').replace(/\b(e\.g|i\.e|vs|cf|etc)\./g, '$1․');
-    const parts = protect.split(/(?<=[.!?])\s+(?=[A-Z`*[(])/);
+    // split before a capital, a code span, bold, a tag or a bracket; and (card §10 L3) before ANY word after a tag's "]. "
+    const parts = protect.split(/(?<=[.!?])\s+(?=[A-Z`*[(])|(?<=\]\.)\s+(?=[a-z0-9])/);
     const out = [];
     for (const p0 of parts) {
         const m = /^((?:\[[PX]:[^\]]+\]\s*)+)(.*)$/.exec(p0);
@@ -369,7 +391,8 @@ export function trace(md) {
             if (t.k === 'X' && !xIds.has(id)) bad.push(`${unit.sec} line ${unit.line}: [X:${id}] names no §8 check or gate: "${s.slice(0, 90)}"`);
             if (t.k === 'P') cited.add(id);
         }
-        const norm = unit.numbered || NORM.test(s.replace(TAG, ''));
+        if (/\[I\]/.test(s)) continue;                 // marked informational
+        const norm = unit.numbered || unit.force || NORM.test(s.replace(TAG, ''));
         if (!norm) continue;
         n++;
         const hasP = tags.some((t) => t.k === 'P'); const hasX = tags.some((t) => t.k === 'X');
@@ -404,13 +427,16 @@ function expand(fx) {
     for (const pool of fx.pools || [base.pool]) for (const N of sw.N || [base.N]) for (const size of sw.size || [base.size]) for (const order of sw.order || [base.order]) for (const seed of sw.seed || [base.seed]) out.push({ ...base, pool, N, size, order, seed });
     return out;
 }
-function runFixture(fx) {
+/** One fixture's violations. `hooks.tamper(out, input)` (ws-mix-review) edits the plan after the deal, for FAIL states
+ *  no `_mutate` seam of the frozen dealer can produce (a 2-up half misnumbered, a lying comeback ...). */
+export function runFixture(fx, hooks = {}) {
     const mut = { ...(fx.mutate || {}) };
     if (mut.cap) mut.cap = Object.fromEntries(['m', 'l'].map((k) => [k, { ...D.CAP[k], ...(mut.cap[k] || {}) }]));
     const viol = [];
     for (const input of expand(fx)) {
         const inp = { ...input, pool: poolOf(input.pool) };
         const out = fx.props.some((p) => NEEDS_OUT.has(p) || p === 'h') && !input.tableOnly ? run(inp, mut) : null;
+        if (out && !out.error && hooks.tamper) hooks.tamper(out, inp);
         if (out && out.error && !input.expectRefusal) { viol.push(`refused: ${out.error}`); continue; }
         if (input.expectRefusal) { for (const r of propN(input, out)) viol.push(`(n) N=${input.N}: ${r}`); continue; }
         for (const p of fx.props) {
@@ -422,13 +448,16 @@ function runFixture(fx) {
     return viol;
 }
 
+const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+if (IS_MAIN) await main();
+async function main() {
 const args = process.argv.slice(2);
 if (args[0] === '--table') {
     const t = D.capacityTable();
     const cell = (s, c, N) => { const x = t[`${s}:${c}:${N}`]; return x.twoUp ? '1 (2-up: 5 and 5)' : `${x.pages.length} (${x.pages.join(' + ')})`; };
     console.log('| N | M compact / typical (12) | M wide (4) | L compact (10) | L typical (8) | L wide (3) |\n|--:|---|---|---|---|---|');
     for (const N of D.COUNTS) console.log(`| ${N} | ${cell('m', 'typical', N)} | ${cell('m', 'wide', N)} | ${cell('l', 'compact', N)} | ${cell('l', 'typical', N)} | ${cell('l', 'wide', N)} |`);
-    process.exit(0);
+    return void process.exit(0);
 }
 if (args[0] === '--fill') {      // props k, l, j2 over every pool x N x size x order x 300 seeds (+ 40 weeks a cell)
     const mut = args.includes('--separate-pages') ? { separatePages: true } : args.includes('--no-lone-guard') ? { noLoneGuard: true, flatOne: true } : {};
@@ -452,7 +481,7 @@ if (args[0] === '--fill') {      // props k, l, j2 over every pool x N x size x 
         console.log(`  ${ref}: of ${pages} pages, ${notLast} non-last under half full, ${lone} with one item, ${flat1} flat skills with one item (${lastUnder} last pages under half, allowed)`);
     }
     console.log(badAll ? `check-v1 --fill: FAIL (${badAll} pages break k, l or j2)` : 'check-v1 --fill: OK (0 non-last pages under half full, 0 one-item pages, 0 one-item flat skills)');
-    process.exit(badAll ? 1 : 0);
+    return void process.exit(badAll ? 1 : 0);
 }
 if (args[0] === '--pin') {       // re-take the pins and regenerate the golden codes (only while V1 is unreleased: card stage)
     const sha256 = Object.fromEntries(Object.keys(FROZEN_FILES).map((k) => [k, shaOf(k)]));
@@ -463,24 +492,24 @@ if (args[0] === '--pin') {       // re-take the pins and regenerate the golden c
         const o = input.week ? D.week({ ...input, day: undefined }) : D.deal(input);
         const code = D.encode(sp, o);
         const want = goldenOf(sp.day ? o.days[sp.day - 1] : o);
-        if (J(goldenOf(replayCode(code, table))) !== J(want)) { console.log(`check-v1 --pin: FAIL (${code} does not replay to its own deal)`); process.exit(1); }
+        if (J(goldenOf(replayCode(code, table))) !== J(want)) { console.log(`check-v1 --pin: FAIL (${code} does not replay to its own deal)`); return void process.exit(1); }
         return { code, ...want };
     });
     writeFileSync(join(FIX, 'golden-v1.json'), JSON.stringify(g, null, 1) + '\n');
     console.log(`check-v1 --pin: ${J(Object.fromEntries(Object.entries(sha256).map(([k, v]) => [k, v.slice(0, 12)])))}; ${g.codes.length} golden codes`);
-    process.exit(0);
+    return void process.exit(0);
 }
 if (args[0] === '--trace') {
     const t = runTrace(console.log);
     const bad = [...t.bad, ...t.fails];
     console.log(bad.length ? `check-v1 --trace: FAIL (${bad.length})\n  ${bad.join('\n  ')}` : `check-v1 --trace: OK (${t.n} normative sentences: ${t.p} by a property, ${t.x} by a product check; ${t.cited.size} of ${Object.keys(PROPS).length} properties cited)`);
-    process.exit(bad.length ? 1 : 0);
+    return void process.exit(bad.length ? 1 : 0);
 }
 const files = readdirSync(FIX).filter((f) => /^case-.*\.json$/.test(f)).sort();
 if (args[0] === '--show') {
     const fx = readJ(`case-${args[1]}.json`); const inp = { ...expand(fx)[0] }; inp.pool = poolOf(inp.pool);
     console.log(JSON.stringify(run(inp, fx.mutate || {}), (k, v) => (k === 'chosen' ? undefined : v), 1));
-    process.exit(0);
+    return void process.exit(0);
 }
 const bad = []; const props = new Set(); const tally = {};
 for (const f of files) {
@@ -495,5 +524,6 @@ for (const f of files) {
 for (const p of Object.keys(PROPS)) if (!tally[p] || !tally[p].pass || !tally[p].fail) bad.push(`property ${p} lacks a PASS or a FAIL fixture (${J(tally[p] || {})})`);
 const t = runTrace(console.log);
 bad.push(...t.bad.map((b) => `trace: ${b}`), ...t.fails.map((b) => `trace: ${b}`));
-if (bad.length) { console.log(`check-v1: FAIL (${bad.length})\n  ${bad.join('\n  ')}`); process.exit(1); }
+if (bad.length) { console.log(`check-v1: FAIL (${bad.length})\n  ${bad.join('\n  ')}`); return void process.exit(1); }
 console.log(`check-v1: OK (${props.size} props, ${files.length} fixtures; trace ${t.n} normative sentences, ${t.p} by a property, ${t.x} by a product check)`);
+}
