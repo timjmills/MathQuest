@@ -100,6 +100,13 @@ export const chartPageGrid = () => PAGE_GRID;
 let LESSON = false;
 export const setChartLesson = (v) => { LESSON = !!v; };
 export const chartLesson = () => LESSON;
+/* Which part of a LESSON packet is being dealt - 'teach' (the teaching sheet) or 'practice' - else null (lead ruling 2026-11-20,
+ * critic blanks r4 F1 / F2): band 120's Independent windows review 1-25 in disjoint columns (every 3 x 5 window on 91-120 beside
+ * the example holds the same 3 gaps - a proof); band 100's teaching windows keep to rows 3-6 (21-70) so two bands of three rows
+ * (1-30, 71-100) stay fresh for the practice page's rows of ten. */
+let PART = null;
+export const setChartPart = (v) => { PART = v || null; };
+export const chartPart = () => PART;
 
 /**
  * "Numbers to fill in" (lead ruling 2026-11-14): the most empty squares a window of R rows and C columns can legally hold -

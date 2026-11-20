@@ -24,7 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
-import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet, setChartEdge, setChartPageGrid, setChartLesson } from './chart-giveaway.js';
+import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet, setChartEdge, setChartPageGrid, setChartLesson, setChartPart } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -5142,11 +5142,12 @@ async function buildLesson(n, metaOf) {
     _cwForceFirst = chartEx[0] && chartOfQ(chartEx[0]) && CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) ? { key: `${sk.categoryId}:${sk.skillId}`, q: chartEx[0] } : null;
     _cwEdge = !!_cwForceFirst && _cw120(sk); setChartEdge(_cwEdge);
     let teach;
+    setChartPart('teach');
     try {
         teach = await buildRoleSheet(Object.assign({}, nz, {
             role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
         }), metaOf);
-    } finally { _cwForceFirst = null; }
+    } finally { _cwForceFirst = null; setChartPart(null); }
     // (critic blanks B2: the teaching sheet's worked examples are SHOWN windows too, registered before the practice pages deal)
     { const ex = ((teach.plan && teach.plan.meta && teach.plan.meta.exampleQs) || []).map(chartOfQ).filter(Boolean); if (ex.length) _cwSheet.set('lesson-examples-sheet', new Set(ex.map((c) => cwKey(c, true)))); }
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
@@ -5319,7 +5320,10 @@ async function buildLesson(n, metaOf) {
         // (lead ruling 2026-11-14 fallback, taken 2026-11-20 - critic blanks r2 R2-1: the band-120 lesson's practice page prints
         // the three rows of ten as one grid, its gaps every square the packet's other windows leave free; an internal page form,
         // not the pupil's `grid` value)
-        if (_cwEdge && _cw120(sk)) {
+        // (critic blanks r4 F2: the band-100 lesson's practice page prints rows of ten too - 1-30, 71-100 and one more - on the
+        // bands its teaching windows leave fresh)
+        const cw100 = (CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && !_cw120(sk) && (!sk.opts || !sk.opts.band || Number(sk.opts.band) === 100));
+        if ((_cwEdge && _cw120(sk)) || cw100) {
             setChartPageGrid('rows');
             // (the grid is dealt against the windows the packet PRINTS - the worked examples, shown, and the pupil windows on its
             // pages - not a run's probe deals that never reached the paper, which barred every free square)
@@ -5332,7 +5336,8 @@ async function buildLesson(n, metaOf) {
             _cwSheet.clear(); _cwSheet.set('lesson-printed', printedKeys);
         }
         let res;
-        try { res = await buildPractice(lessonPartSeed(n.seed, 'practice'), section); } finally { setChartPageGrid(null); }
+        setChartPart('practice');
+        try { res = await buildPractice(lessonPartSeed(n.seed, 'practice'), section); } finally { setChartPageGrid(null); setChartPart(null); }
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
         for (const it of res.items || []) practiceTexts.push(refText(it));
         if (packNums) packNums.push(...planKeys(res));
@@ -6452,7 +6457,7 @@ export function buildSheet(req = {}) {
     _cwShowFirst = !!(req && ['guided', 'scripted-model'].includes(req.role));
     _cwRoleTiles = req && req.role === 'guided' ? 3 : null;
     _cwForceFirst = null;
-    _cwEdge = false; setChartEdge(false); setChartPageGrid(null); setChartLesson(!!(req && req.role === 'lesson'));
+    _cwEdge = false; setChartEdge(false); setChartPageGrid(null); setChartPart(null); setChartLesson(!!(req && req.role === 'lesson'));
     _cwSheet.clear();
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
     // queue: it builds its pages through buildSheet itself).

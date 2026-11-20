@@ -433,9 +433,10 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             if (tries < 2) out.push(`GUIDED-TRY-COUNT ${key} guided ${size} seed ${s}: ${tries} try window(s) after the Model (want 2 or more)`);
                         }
                         // (BLANK-COUNT: the whole sheet's windows; Score /N equals their blanks is SCORE-SLOTS, judged above)
-                        // (lead ruling (a) 2026-11-14: Guided 3; a band-120 LESSON's pupil windows 3 - its whole packet is judged, B2)
+                        // (lead ruling (a) 2026-11-14: Guided 3; a band-120 LESSON's pupil windows 3 - its whole packet is judged, B2; a lesson's
+                        // rows-of-ten practice grid - band 120, and band 100 since critic blanks r4 F2 - holds the gaps the packet leaves free)
                         const lesson120 = role === 'lesson' && skillId === 'chart_to_120';
-                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, packet ? packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model) : pp.flatMap((pg) => pg.items), role === 'guided' ? 3 : lesson120 ? (w, b) => (w.rows.length === 3 && w.cols.length === 10 ? b.length : 3) : tilesWant);
+                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, packet ? packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model) : pp.flatMap((pg) => pg.items), role === 'guided' ? 3 : lesson120 ? (w, b) => (w.rows.length === 3 && w.cols.length === 10 ? b.length : 3) : role === 'lesson' && /chart/.test(skillId) ? (w, b) => (w.rows.length === 3 && w.cols.length === 10 ? b.length : tilesWant) : tilesWant);
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
                         if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {

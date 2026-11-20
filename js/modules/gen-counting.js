@@ -39,7 +39,7 @@ import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
 import { onNewPage } from './page-deal.js';
-import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge, chartPageGrid, chartLesson } from './chart-giveaway.js';
+import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge, chartPageGrid, chartLesson, chartPart } from './chart-giveaway.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -922,7 +922,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // Wave 1 lane C: grid size (a small piece / three whole rows of ten / the whole chart) and
         // which squares are empty. The defaults draw exactly the random numbers they drew before.
         // (the band-120 lesson practice page: three rows of ten as its own form, chart-giveaway.js chartPageGrid)
-        const _lessonRows = !big && band === 120 && chartPageGrid() === 'rows' && chartEdge();
+        // (and the band-100 lesson practice page: rows of ten on the bands the teaching sheet leaves fresh - critic blanks r4 F2)
+        const _lessonRows = !big && chartPageGrid() === 'rows' && (band === 120 ? chartEdge() : band === 100 && chartLesson());
+        const _lp = !big && chartLesson() ? chartPart() : null;
         const _grid = big ? 'window' : _lessonRows ? 'rows' : (_kOpt('grid') || 'window');
         // (lead ruling 2026-11-20: no run along a row at band 120 - not offered there; an old code's value deals Scattered)
         const _gaps = _to120 && _kOpt('gaps') === 'row' ? 'scatter' : (_kOpt('gaps') || 'scatter');
@@ -933,18 +935,36 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // (not in a band-120 lesson packet: its windows keep to the example's edge columns, and its practice page's rows grid holds the
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
+        let _pw = 0;   // (pickWin's calls: band 100's rows grid tries the least-reused band, then either band)
         const pickWin = () => {
             // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
             // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
             const k10 = _lessonRows ? kept.filter((k) => !k.shows && !k.ext && k.cols.length === 10) : [];
             if (k10.length) {
                 // (none left: the first grid's own squares - a twin, which the dealer refuses, so the page holds the grids it has)
-                const free = [6, 3].filter((a) => !k10.some((k) => k.rows.some((r) => r >= a && r <= a + 2)));
-                const r1 = free.length ? free[rng(0, free.length - 1)] : k10[0].rows[0];
+                const free = (band === 120 ? [6, 3] : [7, 3, 4]).filter((a) => !k10.some((k) => k.rows.some((r) => r >= a && r <= a + 2)));
+                // (band 100: of the bands left, the one whose squares the teaching windows blanked least - ANSWER-REUSE, critic blanks r4 F2)
+                const reused = (a) => kept.filter((k) => !k.shows && k.cols.length !== 10).reduce((t, k) => t + k.gaps.filter((n) => Math.floor((n - 1) / 10) >= a && Math.floor((n - 1) / 10) <= a + 2).length, 0);
+                const fr2 = band === 100 && free.length > 1 && (_pw++ % 2 === 0) ? free.filter((a) => reused(a) === Math.min(...free.map(reused))) : free;
+                const r1 = fr2.length ? fr2[rng(0, fr2.length - 1)] : k10[0].rows[0];
                 return { rows: [r1, r1 + 1, r1 + 2], cols: Array.from({ length: C }, (_, k) => k) };
             }
-            const r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
-            const c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
+            let r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
+            let c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
+            // (the band-100 lesson practice page's first rows of ten: 1-30, the band the teaching sheet leaves fresh)
+            if (_lessonRows && band === 100) r0 = 0;
+            if (_lp === 'teach' && R === 3 && C === 5) {
+                // (lead ruling 2026-11-20, critic blanks r4 F1: Guided crosses 100 on 91-120; each Independent window reviews 1-25,
+                // in columns no earlier window there holds - 1-25 or 6-30)
+                if (_to120 && kept.some((k) => !k.shows)) {
+                    r0 = 0;
+                    const used = kept.filter((k) => !k.shows && k.rows[0] === 0).map((k) => k.cols[0]);
+                    const fr = [0, 5].filter((x) => !used.includes(x));
+                    c0 = fr.length ? fr[rng(0, fr.length - 1)] : 0;
+                }
+                // (critic blanks r4 F2: band 100's teaching windows keep to rows 3-6, so rows 1-30 and 71-100 stay fresh for practice)
+                if (band === 100) r0 = rng(2, 4);
+            }
             return { rows: Array.from({ length: R }, (_, k) => r0 + k), cols: Array.from({ length: C }, (_, k) => c0 + k) };
         };
         const N = R * C;
@@ -1014,7 +1034,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n) && !k.gaps.includes(n)) barred.add(idxOf(n)); }
             }
             // (a band-120 lesson packet - chart-giveaway.js chartEdge: only the columns either side of the shown example's are left empty)
-            if (_to120 && R === 3 && C === 5 && chartEdge() && kept.some((k) => k.shows)) {
+            if (_to120 && R === 3 && C === 5 && chartEdge() && kept.some((k) => k.shows && k.rows.some((x) => rows.includes(x)))) {
                 const sc = kept.filter((k) => k.shows).flatMap((k) => k.cols);
                 const ok = new Set([Math.min(...sc) - 1, Math.max(...sc) + 1]);
                 for (let i = 0; i < N; i++) if (!ok.has(cols[i % C])) barred.add(i);
@@ -1071,7 +1091,20 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 // printed neighbour - left +1, up +10, top row: down -10; the Steps band names no "look right")
                 if ((chartLesson() || (_to120 && chartEdge())) && !cand.every((i) => (i % C > 0 && !set.has(i - 1)) || (i >= C && !set.has(i - C)) || (i < C && i + C < N && !set.has(i + C)))) continue;
                 // (the rows grid: the crossing squares in play when the packet leaves one free - R2-1 CROSSING-IN-PLAY)
-                if (_lessonRows && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                if (_lessonRows && _to120 && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                // (critic blanks r4 F1 / F2: in a lesson packet no pupil window repeats a kept one's answer set, nor shares 60 % of
+                // the larger one's squares with the same gaps there - NEAR-TWIN, SHEET-ANSWER-SET)
+                if (chartLesson()) {
+                    const gs = cand.map(atW).sort((a, b) => a - b);
+                    const mine = new Set(); for (const r of rows) for (const c of cols) mine.add(r * 10 + c + 1);
+                    if (kept.some((k) => {
+                        if (k.shows) return false;
+                        if (k.gaps.slice().sort((a, b) => a - b).join() === gs.join()) return true;
+                        const ks = []; for (const r of k.rows) for (const c of k.cols) ks.push(r * 10 + c + 1);
+                        const sh = ks.filter((n) => mine.has(n));
+                        return sh.length * 10 >= Math.max(ks.length, mine.size) * 6 && sh.some((n) => gs.includes(n));
+                    })) continue;
+                }
                 pickIdx = cand;
             }
         }

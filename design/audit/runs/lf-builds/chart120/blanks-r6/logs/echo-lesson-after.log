@@ -1,0 +1,3 @@
+  ANSWER-REUSE composing:hundreds_chart_fill lesson M seed 777 p3: 9 of 25 practice answers were asked on an earlier page (at most a third)
+  OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 0/0 False; EA multi-gap Correct 0 / Fix it 0
+ws-guided-echo: FAIL - 1 finding(s) (12 pages, composing:chart_to_120, composing:hundreds_chart_fill, sizes M/L, 8 seeds)
