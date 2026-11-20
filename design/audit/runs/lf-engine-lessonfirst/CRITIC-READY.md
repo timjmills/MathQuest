@@ -116,10 +116,15 @@ Y4.B4 tables: `Y4.B4.S2` … `Y4.B4.S6` (S6 is the 3/6/9 chart lesson, unchanged
 (c): `algebra_two_step_letter_equation-<before|after>-<M|L>-<pupil|key>-p1.png` (before = 0983c6791).
 Name pattern: `<id>-<before|after>-<M|L>-<pupil|key>-p1.png` (80 files).
 
-## Gates (merged tree)
+## Gates (head 9d9551f95 = the fix merged with master a98297951 by ws-merge-master)
 
-- `node --input-type=module --check`: every changed JS file OK.
-- ws-boot-smoke OK · ws-roles-unit OK (113) · ws-precritic-plan OK (398 rows on path; checks-from-critics 348 pass, 90 exempt, 0 fail).
-- ws-layout-unit: **crashes on master 65c28ccdf and on the base 0983c6791 the same way** (`ws-layout-unit.mjs:918 reading 'inkMm'`,
-  the fact-rows mixed-facts block). It is not this lane's code, so the known Guided fail is not reached.
-- ws-precritic --role lesson --strict: see the lane status `design/status/lf-engine-lessonfirst.md`.
+- `node --input-type=module --check`: every changed JS file OK. `ws-lesson-pages --self-test` OK (13), `ws-lesson-cellfits --self-test` OK (5).
+- ws-boot-smoke OK · ws-roles-unit OK (113) · ws-precritic-plan OK (414 rows on path; checks-from-critics 372 pass, 91 exempt, 0 fail).
+- ws-backtest `--row lesson-empty-first,lesson-opener-same,lesson-cell-fits` (unwrapped): 3 PASS (FAIL → OK each).
+- ws-lesson-baseline `--all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check`: OK, 2614 identical (re-pinned for
+  two_step_letter_equation only).
+- ws-lesson-pages --grade 3: EMPTY-FIRST 0; OPENER-SAME 6 (the table above).
+- ws-lesson-cellfits (every library lesson × M/L): 28 pages, the base's 30 minus two_step_letter_equation M and L (the list above).
+- ws-layout-unit: **crashes on master and on the base 0983c6791 the same way** (`ws-layout-unit.mjs:918 reading 'inkMm'`, the
+  fact-rows mixed-facts block). It is not this lane's code, so the known Guided fail is not reached.
+- ws-precritic --role lesson --strict: see `design/status/lf-engine-lessonfirst.md` (each red named and compared with master).

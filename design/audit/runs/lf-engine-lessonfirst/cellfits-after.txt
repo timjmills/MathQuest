@@ -1,4 +1,4 @@
-  FAIL CELL-FITS skill:placevalue:identify L lesson-mixed p5: 2 ink piece(s) outside their panel (worst 1.8 mm; e.g. "1" bottom 1.8 mm in pv.ws-cell.mqt--pv.mqa--number)
+  FAIL CELL-FITS skill:placevalue:identify L lesson-mixed p4: 2 ink piece(s) outside their panel (worst 1.8 mm; e.g. "1" bottom 1.8 mm in pv.ws-cell.mqt--pv.mqa--number)
   FAIL CELL-FITS skill:placevalue:value L lesson-mixed p4: 4 ink piece(s) outside their panel (worst 1.8 mm; e.g. "1" bottom 1.8 mm in pv.ws-cell.mqt--pv.mqa--number)
   FAIL CELL-FITS skill:placevalue:expand L lesson-mixed p4: 14 ink piece(s) outside their panel (worst 1.8 mm; e.g. "174" bottom 1.8 mm in pv.ws-cell.mqt--pv.mqa--inline-blanks)
   FAIL CELL-FITS skill:placevalue:combine L lesson-mixed p4: 22 ink piece(s) outside their panel (worst 1.8 mm; e.g. "100" bottom 1.8 mm in pv.ws-cell.mqt--pv.mqa--number)
