@@ -310,7 +310,10 @@ register('long-multiplication', {
         const f = lmFootprint(p, ctx);
         // three to a row when the grid is narrow enough (short multiplication, a 3-digit grid with no
         // row names): two would leave a third of each cell empty (H13)
-        return Object.assign(f, { measure: true, factLike: false, maxCols: f.wMm <= 58 ? 3 : 2 });
+        // (`noStretch`, lane lf-ops sizes fix 2026-11-20: the grid is answered in place, top-started; a Guided page trimmed to the
+        // §12.1 ceiling left ONE row of tries that stretched 1.3 x to 130 mm, 44 mm white under its ink - EB-BAND. The row keeps its
+        // measured height; the spare stays under the grid, as the arrays and count rows do)
+        return Object.assign(f, { measure: true, factLike: false, maxCols: f.wMm <= 58 ? 3 : 2, noStretch: true });
     },
     inputs(p) {
         const { n } = lmKey(p);

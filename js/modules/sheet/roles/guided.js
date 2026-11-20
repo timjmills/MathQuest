@@ -659,7 +659,10 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     // ceiling): trimming its last row to the ceiling left a page 2 one row tall and half blank
     // (round-4 re-grade), so the sheet may run up to one row past the ceiling there.
     // `limit`: the items there are (a pool cut to the Model's kind); never a page of empty cells.
-    const slack = pages.length > 1 ? cols - 1 : 0;
+    // (lane lf-ops sizes fix 2026-11-20, EB-GDPCAP: the continuation page's whole rows used to run up to one row past the ceiling -
+    // mult_2by2_standard Guided L printed 8 tries against §12.1's 6. The ceiling now holds on every page set: the last page keeps
+    // the whole rows that stay within it. A sheet already within the ceiling is unchanged.)
+    const slack = 0;
     const most = () => Math.min(ceil + (pages.length > 1 ? slack : 0), limit);
     let over = total - most();
     while (over > 0 && pages.length) {
