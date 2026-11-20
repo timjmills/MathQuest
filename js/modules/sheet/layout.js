@@ -702,7 +702,9 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         if (tallMix || nearMix) {
             // (a div_facts Mix section keeps its dealt order - groupByHeight - so its rows are
             // the rows it will print, not the tall-first ones)
-            const keepOrder = nearMix || (items || []).every((it) => it && it.q && it.q.divMix);
+            // (fractions:mixed_numbers_intro, lane lf-algebra 2026-11-20: `q.keepDealOrder` - the bar model is a hint on the page's
+            // FIRST items and fades after them, so the rows print in the dealt order)
+            const keepOrder = nearMix || (items || []).every((it) => it && it.q && (it.q.divMix || it.q.keepDealOrder));
             mixKeep = keepOrder && !nearMix;
             const sorted = keepOrder ? [] : hs.slice().sort((a, b) => b - a);
             if (keepOrder) for (let i = 0; i < hs.length; i += cols) sorted.push(Math.max(...hs.slice(i, i + cols)), ...Array(Math.max(0, Math.min(cols, hs.length - i) - 1)).fill(0));
@@ -1007,6 +1009,8 @@ export function groupByHeight(items, cols) {
     // Fraction, one third each in every block of three. Tall-first would sort the brackets and
     // fractions to the top and every Standard fact to the foot - or onto a page of its own.
     if (items.every((it) => it && it.q && it.q.divMix)) return items;
+    // A hint that fades down the page (q.keepDealOrder: mixed_numbers_intro's bar model on its first two items) keeps the deal order.
+    if (items.every((it) => it && it.q && it.q.keepDealOrder)) return items;
     // Height CLASSES, tallest class first; within a class the dealt order stands (critic
     // guided-r1, L10: a fine sort by height put a count page's answers in falling order,
     // 20, 16, 19, 18, 15 ... 3, 5, 2). A class spans a 1.35 x height ratio.

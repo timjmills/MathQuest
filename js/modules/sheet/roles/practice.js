@@ -1006,6 +1006,17 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         // The narrow part keeps the section's floor: print-sheet.js measures it over the skill's
         // narrow problems only (floorOf), so the columns the page was counted for are the columns
         // it prints, whichever of the skill's problems this page happens to hold (PT-ENG-9).
+        // (lane lf-algebra 2026-11-20, owner ruling above "at the top or the bottom": a section whose hint fades down the page -
+        // `q.keepDealOrder`, mixed_numbers_intro's bar model on its first items - and whose full-width problems ARE its first
+        // ones prints them at the TOP, in the dealt order; the narrow part follows and shares the instruction)
+        const firstNarrow = its.findIndex((it) => !one(it));
+        if (its.every((it) => it && it.q && it.q.keepDealOrder) && its.slice(firstNarrow).every((it) => !one(it))) {
+            sections.push(Object.assign({}, sec, { columns: 1, floor: null, srcIndex: si }));
+            items.push(wide);
+            sections.push(Object.assign({}, sec, { srcIndex: si, splitOf: sections.length - 1, wideFirst: true }));
+            items.push(narrow);
+            return;
+        }
         sections.push(Object.assign({}, sec, { srcIndex: si }));
         items.push(narrow);
         sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1, srcIndex: si }));
@@ -1418,10 +1429,12 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         requested: L.requested, clamped: L.clamped,
         // The dialog's line tells the truth about a split-off group (splitWide).
         note: norm.sections[si].fineSplit ? [`${sheetItems[si].length} column problems in ${L.cols} columns.`, L.note].filter(Boolean).join(' ')
+            : norm.sections[si].wideFirst ? [`${sheetItems[si].length} problem${sheetItems[si].length === 1 ? '' : 's'} in ${L.cols} columns under the full-width ones.`, L.note].filter(Boolean).join(' ')
             : norm.sections[si].splitOf !== undefined
             ? [`${sheetItems[si].length} problem${sheetItems[si].length === 1 ? ' is' : 's are'} too wide for ${layouts[norm.sections[si].splitOf].cols} columns: full width, at the bottom.`, L.note].filter(Boolean).join(' ')
             : L.note,
         line: norm.sections[si].fineSplit ? `${fitsLine(L)} ${sheetItems[si].length} column problems in ${L.cols} columns.`
+            : norm.sections[si].wideFirst ? `${fitsLine(L)} ${sheetItems[si].length} problem${sheetItems[si].length === 1 ? '' : 's'} under the full-width ones.`
             : norm.sections[si].splitOf !== undefined
             ? `${fitsLine(L)} ${sheetItems[si].length} full-width problem${sheetItems[si].length === 1 ? '' : 's'} at the bottom.` : fitsLine(L),
         cls: L.cls, digitPt: L.digitPt,

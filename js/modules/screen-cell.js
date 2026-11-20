@@ -2260,7 +2260,14 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // with the paper key (wordWorkVerdict); a saved value's parts are not the answer's
     const partEls = Array.from(cellEl.querySelectorAll('[data-mq-part]'));
     const baseValue = partEls.length ? String(input.value || '').split(/\s*\|\s*(?=[\w-]+:)/)[0] : String(input.value || '');
-    let saved = mixed ? splitMixed(baseValue) : baseValue.split(join.trim() || ',').map((t) => t.trim());
+    // A part-whole of a mixed number (frac-model.js task 'partition', data-mq-join="parts"): the boxes in reading order, a
+    // numerator box (data-mq-pk="n") and the denominator box after it written "n/d", the terms joined by data-mq-sep
+    // ("2 + 3/4", "1 + 1 + 3/4", or "2 3/4" for the whole box); an empty box reads "?", so a part never reads as right
+    const parts = join === 'parts';
+    const sepOf = parts ? (joinEl.getAttribute('data-mq-sep') || ' + ') : '';
+    const splitParts = (v) => String(v || '').split(sepOf.trim() ? sepOf.trim() : /\s+/).map((t) => t.trim()).filter(Boolean)
+        .flatMap((t) => t.split('/')).map((t) => (t === '?' ? '' : t));
+    let saved = mixed ? splitMixed(baseValue) : parts ? splitParts(baseValue) : baseValue.split(join.trim() || ',').map((t) => t.trim());
     // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
     // digits in the rightmost boxes (the row's spare boxes stand on the left) - small fixes item 4, "[816|_|_|_]" on going back.
     if (!mixed && join === '' && slots.length > 1) {
@@ -2299,6 +2306,15 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     const compose = () => withParts(composeAnswer());
     const composeAnswer = () => {
         const v = boxes.map((b) => (b.value || '').trim());
+        if (parts) {
+            if (v.every((x) => !x)) return '';
+            const terms = [];
+            for (let k = 0; k < v.length; k++) {
+                const pk = slots[k].getAttribute('data-mq-pk');
+                if (pk === 'n' && k + 1 < v.length) { terms.push(`${v[k] || '?'}/${v[k + 1] || '?'}`); k++; } else terms.push(v[k] || '?');
+            }
+            return terms.join(sepOf);
+        }
         if (!mixed) return v.join(join);
         const [w, n, d] = v;
         return `${w}${w && (n || d) ? ' ' : ''}${n || d ? `${n}/${d}` : ''}`;

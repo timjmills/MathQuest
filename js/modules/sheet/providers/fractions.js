@@ -563,3 +563,121 @@ registerFractionSentence('fraction_operations:mult_frac_whole', 'x');
 registerFractionSentence('fraction_operations:mult_frac_frac', 'x', { iCan: 'I Can multiply two fractions',
     steps: ['Draw rows for the first fraction.', 'Take the columns of the second fraction.', 'Count the cells inside both. Count all the cells.'], say: '__ times __ is __.' });
 registerFractionSentence('fraction_operations:div_unit_fraction', '÷');
+
+/* ================================================================ partition a mixed number */
+// fractions:mixed_numbers_intro (lane lf-algebra 2026-11-20, card design/cards/mixed-partition; WRM Y4.B7.S3): the
+// frac-model task 'partition'. The misconceptions are the card's M-MP1..M-MP4: concatenating the digits, counting every
+// part across the bars as the denominator, counting the shaded parts as wholes, swapping the wholes and the numerator.
+
+const partitionOf = (q) => { const p = payloadOf(q); return p && p.task === 'partition' ? p : null; };
+const MN_SAY = '__ is __ wholes and __.';
+const MN_BY_FORM = {
+    two: { iCan: 'I Can split a mixed number into wholes and a fraction', instructionKey: 'mixed-partition',
+        steps: ['Read the mixed number.', 'Write the whole number in the wholes box.', 'Write the fraction in the fraction box.', 'Say it.'] },
+    ones: { iCan: 'I Can split a mixed number into ones and a fraction', instructionKey: 'mixed-ones',
+        steps: ['Read the mixed number.', 'Write 1 in a box for each whole.', 'Write the fraction in the fraction box.', 'Say it.'] },
+    compose: { iCan: 'I Can write a mixed number from wholes and a fraction', instructionKey: 'mixed-compose',
+        steps: ['Read the wholes and the fraction.', 'Write the wholes first.', 'Write the fraction beside them.', 'Say it.'] },
+    eq: { iCan: 'I Can split a mixed number into wholes and a fraction', instructionKey: 'mixed-eq',
+        steps: ['Read the mixed number.', 'Write the whole number after the equals sign.', 'Write the fraction after the plus sign.', 'Say it.'] },
+};
+const mnSayValues = (q) => {
+    const p = partitionOf(q);
+    if (!p) return null;
+    const mixed = mixedText(p.w, p.n, p.d), frac = fr(p.n, p.d);
+    if (p.form === 'compose') return `${p.w} and ${frac} make ${mixed}.`;
+    if (p.form === 'ones' || p.ones) return `${mixed} is ${Array.from({ length: p.w }, () => '1').join(' + ')} + ${frac}.`;
+    return [mixed, p.w, frac];
+};
+const MN_STRINGS = Object.fromEntries(Object.entries(MN_BY_FORM).map(([k, d]) => [k, strings({ ...d, say: MN_SAY, sayValues: mnSayValues,
+    vocabulary: ['mixed number', 'wholes', 'fraction', 'part-whole'], remember: 'Wholes first. Then the part.', lessonRule: 'Wholes first. Then the part.' })]));
+const mnFormOf = (p, opts) => {
+    if (p) return p.form === 'eq' ? 'eq' : MN_BY_FORM[p.form] ? p.form : 'two';
+    const o = opts || {};
+    return o.mnForm === 'eq' && o.mnTask !== 'compose' ? 'eq' : o.mnTask === 'ones' ? 'ones' : o.mnTask === 'compose' ? 'compose' : 'two';
+};
+function mnStrings(ref = {}) {
+    return MN_STRINGS[mnFormOf(partitionOf(ref && ref.q), ref && ref.opts)](ref);
+}
+mnStrings.def = MN_STRINGS.two.def;
+
+function mnSteps(q) {
+    const p = partitionOf(q);
+    if (!p) return [];
+    const mixed = mixedText(p.w, p.n, p.d), frac = fr(p.n, p.d);
+    const fracMarks = [{ slot: 'n', value: String(p.n) }, { slot: 'd', value: String(p.d) }];
+    const bars = p.model === 'bar';
+    if (p.form === 'compose') {
+        return clampSteps([
+            step(`Read the parts: ${p.w} wholes and ${frac}.`),
+            step(`Write the wholes: ${p.w}.`, [{ slot: 'w', value: String(p.w) }]),
+            step(`Write the fraction ${frac} beside the ${p.w}: ${mixed}.`, fracMarks),
+            step(`Say: ${p.w} and ${frac} make ${mixed}.`),
+        ]);
+    }
+    const ones = p.form === 'ones' || !!p.ones;
+    const wholeMarks = ones ? Array.from({ length: p.w }, (_, i) => ({ slot: `w${i + 1}`, value: '1' })) : [{ slot: 'w', value: String(p.w) }];
+    return clampSteps([
+        step(`Read the mixed number: ${mixed}.`),
+        step(bars ? `Count the full bars: ${p.w}. ${ones ? `Write 1 for each whole.` : `Write ${p.w} in the wholes box.`}`
+            : `The whole number is ${p.w}. ${ones ? `Write 1 for each whole.` : `Write ${p.w} in the wholes box.`}`, wholeMarks),
+        step(bars ? `Look at the last bar: ${p.n} of ${p.d} parts are shaded. Write ${frac}.` : `The fraction is ${frac}. Write ${frac}.`, fracMarks),
+        step(ones ? `Say: ${mixed} is ${Array.from({ length: p.w }, () => '1').join(' + ')} + ${frac}.` : `Say: ${mixed} is ${p.w} wholes and ${frac}.`),
+    ]);
+}
+
+/** Every misconception's wrong answer for one item (never the right one). */
+function mnWrongs(q) {
+    const p = partitionOf(q);
+    if (!p) return [];
+    const { w, n, d } = p;
+    const c = [];
+    if (p.form === 'compose') {
+        if (n !== w && w < d) c.push({ value: `${n} ${w}/${d}`, misconception: 'swapped-parts', slot: 'w', slots: { w: String(n), n: String(w), d: String(d) },
+            explain: `Swapped the wholes and the top number: ${n} ${w}/${d}, not ${w} ${n}/${d}. The wholes come first.` });
+        c.push({ value: `${w} ${n}/${d * (w + 1)}`, misconception: 'all-parts-denominator', slot: 'd', slots: { w: String(w), n: String(n), d: String(d * (w + 1)) },
+            explain: `Counted every part of every bar (${d * (w + 1)}) as the denominator. One whole has ${d} parts.` });
+        c.push({ value: `${w}${n}/${d}`, misconception: 'concat-digits', slot: 'n', slots: { w: '', n: `${w}${n}`, d: String(d) },
+            explain: `Wrote the digits side by side: ${w}${n}/${d}. ${w} is the wholes; ${n}/${d} is the fraction.` });
+        return c;
+    }
+    const ones = p.form === 'ones' || !!p.ones;
+    const wholeSlots = (v) => (ones ? Object.fromEntries(Array.from({ length: w }, (_, i) => [`w${i + 1}`, '1'])) : { w: String(v) });
+    const text = (wv, nv, dv) => (ones ? [...Array.from({ length: w }, () => '1'), `${nv}/${dv}`].join(' + ') : `${wv} + ${nv}/${dv}`);
+    c.push({ value: text(w, n, d * (w + 1)), misconception: 'all-parts-denominator', slot: 'd', slots: { ...wholeSlots(w), n: String(n), d: String(d * (w + 1)) },
+        explain: `Counted every part of every bar (${d * (w + 1)}) as the denominator. The fraction is part of ONE whole: ${d} parts.` });
+    if (!ones) {
+        if (n !== w && w < d) c.push({ value: `${n} + ${w}/${d}`, misconception: 'swapped-parts', slot: 'w', slots: { w: String(n), n: String(w), d: String(d) },
+            explain: `Swapped the parts: ${n} wholes and ${w}/${d}. The big number is the wholes: ${w}.` });
+        c.push({ value: `${w * d + n} + ${n}/${d}`, misconception: 'shaded-as-wholes', slot: 'w', slots: { w: String(w * d + n), n: String(n), d: String(d) },
+            explain: `Counted the shaded parts (${w * d + n}) as wholes. Count the FULL bars: ${w}.` });
+        c.push({ value: `${w}${n} + ${n}/${d}`, misconception: 'concat-digits', slot: 'w', slots: { w: `${w}${n}`, n: String(n), d: String(d) },
+            explain: `Wrote the digits side by side in the wholes box (${w}${n}). The wholes are ${w}.` });
+    } else if (n !== 1) {
+        c.push({ value: text(1, 1, d), misconception: 'shaded-as-wholes', slot: 'n', slots: { ...wholeSlots(1), n: '1', d: String(d) },
+            explain: `Wrote 1/${d} for the part bar. ${n} of its ${d} parts are shaded: ${n}/${d}.` });
+    }
+    return c;
+}
+const mnWrong = (q) => chooseWrong(q, mnWrongs(q));
+
+registerSkill('fractions:mixed_numbers_intro', {
+    strings: mnStrings,
+    misconceptions: ['concat-digits', 'all-parts-denominator', 'shaded-as-wholes', 'swapped-parts'],
+    workedSteps: mnSteps,
+    wrongAnswer: mnWrong,
+    wrongAnswers: (q) => mnWrongs(q).map((c) => chooseWrong(q, [c], { rotate: false })).filter(Boolean),
+    // capacity (card Q9, measured by ws-empty-band): a model row is a full-width row (M 3 / L 2 a page), a model-off
+    // diagram half a row (M 6 / L 4); the template's footprint sizes each item from its own payload
+    footprint: { kind: 'frac-model', factLike: false, maxCols: 2, measure: true },
+    // the Test is unaided: no bar model (card 7a role:test)
+    roleOpts: (role, opts) => (/^test/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : opts),
+    // the Pre-skill check: the fraction and whole-number skills this one stands on (data.js order would give the presets
+    // appended before it); nearest first
+    preSkills: () => [
+        { categoryId: 'fractions', skillId: 'write_fraction', opts: {} },
+        { categoryId: 'fractions', skillId: 'shade_fraction', opts: {} },
+        { categoryId: 'composing', skillId: 'whole_as_fraction', opts: {} },
+        { categoryId: 'composing', skillId: 'compose_whole', opts: {} },
+    ],
+});

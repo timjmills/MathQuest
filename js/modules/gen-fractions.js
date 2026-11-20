@@ -5,6 +5,7 @@ import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
+import { freshDeal } from './page-deal.js';
 import { fracModelSVG, fracModelSizedHTML, fracStackHTML, fracTwin, tickLabelSet, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
 
 // ---- O6 APPEARANCE (lane AP3, 2026-09-25) --------------------------------------------------
@@ -120,6 +121,65 @@ function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack
     if (area && !_fPicturesOff()) payload.area = area;
     _fKit(q, payload);
     q.fractionModel = k;
+}
+
+/* ---- fractions:mixed_numbers_intro (lane lf-algebra 2026-11-20, card design/cards/mixed-partition) ---------------------- */
+const _MN_DENOMS = Object.freeze({ 'halves-quarters': [2, 4], 'to-8': [2, 3, 4, 5, 6, 8] });
+/** The option values of a mixed_numbers_intro item, its defaults filled in. */
+function _mnOpts() {
+    const o = state.skillOptions || {};
+    const task = ['partition', 'ones', 'compose'].includes(o.mnTask) ? o.mnTask : 'partition';
+    const denoms = _MN_DENOMS[o.mnDenoms] ? o.mnDenoms : 'halves-quarters';
+    const wholes = [1, 2, 3, 5].includes(Number(o.mnWholes)) ? Number(o.mnWholes) : 2;
+    const model = o.model === 'none' ? 'none' : 'bar';
+    const form = o.mnForm === 'eq' && task !== 'compose' ? 'eq' : 'diagram';
+    return { task, denoms, wholes, model, form };
+}
+/**
+ * One item: (w, n, d) dealt fresh on the page (no repeat, L10), each attribute its own seeded draw: w 1..mnWholes,
+ * d from the denominator set, n 1..d-1 (never 0: a whole number; never d: w + 1). The bar model (a hint) is drawn on
+ * the first two items of a printed page (then the cells stand two across), on every live screen item, and never past
+ * 3 wholes (four bars is the most a cell holds) or in the equation form.
+ */
+function _mnItem(q) {
+    const o = _mnOpts();
+    const dens = _MN_DENOMS[o.denoms];
+    const [w, n, d] = freshDeal(`mn:${o.denoms}:${o.wholes}`, () => {
+        const ww = randInt(1, o.wholes);
+        const dd = dens[Math.floor(Math.random() * dens.length)];
+        return [ww, randInt(1, dd - 1), dd];
+    }, { sig: (v) => v.join(':'), window: 12 });
+    const onPage = Number.isFinite(state.itemIndex);
+    const model = o.model === 'bar' && o.form !== 'eq' && w <= 3 && (!onPage || state.itemIndex < 2) ? 'bar' : 'none';
+    const form = o.form === 'eq' ? 'eq' : o.task === 'ones' ? 'ones' : o.task === 'compose' ? 'compose' : 'two';
+    const payload = { task: 'partition', w, n, d, form, model, answer: { w, n, d } };
+    if (o.form === 'eq' && o.task === 'ones') payload.ones = true;
+    const ones = o.task === 'ones';
+    const frac = `${n}/${d}`;
+    q.skillLabel = 'Partition a Mixed Number';
+    q.answerType = 'text';
+    q.options = [];
+    // the boxes compose the answer exactly as written (screen-cell.js wireCellSlots, data-mq-join="parts"): an equivalent
+    // fraction or the improper fraction is not the partition asked for
+    q.noSimplify = true;
+    if (o.task === 'compose') {
+        q.text = 'Write the mixed number.';
+        q.screenInstr = 'Type the mixed number.';
+        q.ans = `${w} ${frac}`;
+        q.hint = `${w} wholes and ${frac} make ${w} ${frac}. Write the wholes, then the fraction.`;
+    } else {
+        // the instruction library's strings (contract.js mixed-*): every instruction starts with a print verb (PEDAGOGY 10.2)
+        q.text = o.form === 'eq' ? 'Write the wholes and the fraction.' : ones ? 'Write the mixed number as ones and a fraction.' : 'Write the mixed number as wholes and a fraction.';
+        q.screenInstr = q.text.replace(/^Write/, 'Type');
+        q.ans = ones ? [...Array.from({ length: w }, () => '1'), frac].join(' + ') : `${w} + ${frac}`;
+        q.hint = ones ? `${w} ${frac} is ${Array.from({ length: w }, () => '1').join(' + ')} + ${frac}. Each whole is 1.`
+            : `${w} ${frac} is ${w} wholes and ${frac}. The whole number is the wholes; the fraction is the part.`;
+    }
+    q.mixedParts = { w, n, d };
+    // the bar model fades down a page: the rows print in the dealt order (sheet/layout.js groupByHeight)
+    q.keepDealOrder = true;
+    _fKit(q, payload);
+    q.fractionModel = model === 'bar' ? 'bar' : null;
 }
 
 // P12: a SET option the teacher changed from its default (skill-options.js), else null.
@@ -3706,6 +3766,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     _nlKit(q);
                     q.skillLabel = 'Fractions on a Number Line';
                 }
+                return;
+
+            } else if (fracSkill === "mixed_numbers_intro") {
+                // WRM Y4.B7.S3 "Partition a mixed number" (4.NF.B.3b; school grade 3; lane lf-algebra 2026-11-20, card
+                // design/cards/mixed-partition): the mixed number printed in the whole box of a part-whole diagram, the pupil
+                // writes the wholes and the fraction in the part boxes (the kit's frac-model task 'partition'). Options
+                // (skill-options.js): mnTask partition / ones / compose, mnDenoms, mnWholes, model bar / none, mnForm diagram / eq.
+                _mnItem(q);
                 return;
 
             } else if (fracSkill === "whole_as_fraction") {

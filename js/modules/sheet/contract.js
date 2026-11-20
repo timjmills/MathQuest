@@ -298,6 +298,12 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'line-mark-each': 'Mark each number on the line.',
     // Wave 1 lane D (2026-10-02): whole_as_fraction and fraction_number_line move to the kit.
     'whole-as-fraction': 'Write the whole number as a fraction.',
+    // lane lf-algebra (2026-11-20, mixed-partition card Q11): fractions:mixed_numbers_intro (frac-model task 'partition'). The card's
+    // "Split ..." wording is reworded to start with a print verb (PEDAGOGY 10.2: Split is not one).
+    'mixed-partition': 'Write the mixed number as wholes and a fraction.',
+    'mixed-ones': 'Write the mixed number as ones and a fraction.',
+    'mixed-compose': 'Write the mixed number.',
+    'mixed-eq': 'Write the wholes and the fraction.',
     'circle-line': 'Circle the number line that shows the fraction.',
     'multiply-array': 'Multiply the rows by the columns. Write the answer.',
     // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.

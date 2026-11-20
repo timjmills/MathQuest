@@ -47,7 +47,8 @@
 import { register, renderCell } from '../registry.js';
 import { esc } from '../cell.js';
 import { INK, HATCH } from '../tokens.js';
-import { L, P, B, isTwin, sizeOf, digitPt, textPt, inkOf, KEY_FEATURES, GREY, inlineBoxMm } from './k2kit.js';
+import { L, P, B, D, S as SZ, isTwin, sizeOf, digitPt, textPt, zonePt, inkOf, KEY_FEATURES, GREY, inlineBoxMm } from './k2kit.js';
+import { blankWidth, SLOT } from '../tokens.js';
 
 const PT_MM = 25.4 / 72;
 const HEAVY = (1.5 * PT_MM).toFixed(3);   // 1.5 pt outline
@@ -582,14 +583,222 @@ function rowSize(p, ctx) {
     return { w, h };
 }
 
+
+/* ============================================================ task 'partition' (mixed numbers)
+ * fractions:mixed_numbers_intro (card design/cards/mixed-partition, WRM Y4.B7.S3; lane lf-algebra 2026-11-20).
+ * A mixed number in the WHOLE box of a part-whole diagram (RP-60): the whole box printed (1.5 pt, square: not a
+ * writing place), the part boxes under it (0.75 pt, rounded SL-11: writing places, card Q4), 0.75 pt joins, the
+ * printed labels "wholes" / "fraction" under the part boxes (structural: they never fade, RP-71). The fraction part
+ * box holds a 1.5 pt fraction bar B(2) wide with a writing zone Hw above and below it (WDS 6). On the model steps the
+ * mixed number's bar model stands LEFT of the diagram: one fully shaded bar per whole and one part-shaded bar,
+ * STACKED with 3 mm gaps (WRM R50; RP-90 grey from the left), the diagram centred in the width after the bars
+ * (card Q10, EB-SIDE). payload:
+ *   {task: 'partition', w, n, d, form: 'two' | 'ones' | 'compose' | 'eq', model: 'bar' | 'none', answer: {w, n, d}}
+ *   two      write the wholes and the fraction in the two part boxes (default)
+ *   ones     one part box per whole (each 1) and the fraction box (2 3/4 = 1 + 1 + 3/4)
+ *   compose  the parts printed; the pupil writes the mixed number in the whole box (the reverse)
+ *   eq       no diagram: "2 3/4 = [ ] + [ ]/[ ]" (and "= [ ] + [ ] + [ ]/[ ]" with `ones: true`)
+ * Slots: w (or w1 .. wk for 'ones'), n, d: ONE graded answer (all boxes right). The twin's boxes carry
+ * data-mq-cell and data-mq-pk (w / n / d); their wrapper data-mq-join="parts" and data-mq-sep, so the host composes
+ * "2 + 3/4" ("1 + 1 + 3/4", or "2 3/4" for compose) - screen-cell.js wireCellSlots.
+ */
+const PW = Object.freeze({
+    // whole box, part drop, part gap (mm); the bars of the model (WDS 11.2 minimums)
+    M: { topW: 34, topH: 22, drop: 12, gap: 22, onesGap: 8, barW: 52, barH: 16 },
+    L: { topW: 40, topH: 26, drop: 12, gap: 22, onesGap: 8, barW: 56, barH: 18 },
+});
+const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
+/** The part boxes' geometry at the ctx size (mm). */
+function pwGeom(p, ctx) {
+    const k = pwSize(ctx), G = PW[k];
+    const hw = SZ(ctx).writeMm;
+    const wholeW = blankWidth(1, k) + 6, fracBar = blankWidth(2, k), fracW = fracBar + 6;
+    const partH = 2 * hw + 8;
+    const ones = p.form === 'ones' ? Math.max(1, Math.round(Number(p.w) || 1)) : 1;
+    const gap = ones > 1 ? G.onesGap : G.gap;
+    const parts = [...Array.from({ length: ones }, () => wholeW), fracW];
+    const rowW = parts.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+    // compose: the whole box is the writing place - a wholes zone beside the fraction slot
+    const topW = p.form === 'compose' ? Math.max(G.topW, wholeW + 2 + fracW) : G.topW;
+    const topH = p.form === 'compose' ? partH : G.topH;
+    const lab = zonePt(ctx) * PT_MM * 1.35;
+    const W = Math.max(topW, rowW);
+    return { k, G, hw, wholeW, fracBar, fracW, partH, parts, gap, rowW, topW, topH, lab, W, H: topH + G.drop + partH + 1.5 + lab };
+}
+/** A value as the slot shows it in this state ('' on the pupil page). */
+function pwVal(p, ctx, id) {
+    if (ctx.state === 'blank') return '';
+    const a = p.answer || {};
+    const key = /^w\d+$/.test(id) ? '1' : id === 'w' ? a.w : id === 'n' ? a.n : id === 'd' ? a.d : '';
+    if (ctx.state === 'wrong') {
+        const wr = ctx.wrong || {};
+        if (wr.slots && wr.slots[id] !== undefined && wr.slots[id] !== null) return String(wr.slots[id]);
+        return '';
+    }
+    return key === undefined || key === null ? '' : String(key);
+}
+/** One writing place: a rounded box (or, `zone`, a fraction-bar writing zone) holding a written value. */
+function pwSlot(ctx, id, v, { w, h, zone = false, pt }) {
+    const ink = v !== '' ? inkOf(ctx) : null;
+    const twin = isTwin(ctx);
+    const hook = twin ? ` data-mq-cell="1" data-mq-w="2" data-mq-pk="${id.replace(/\d+$/, '')}" data-mq-label="${id === 'n' ? 'numerator' : id === 'd' ? 'denominator' : 'wholes'}"` : '';
+    // a zone is a writing place on the bar (no outline on paper); on screen it is a 48 px touch target with a hairline
+    const border = zone && !twin ? 'border:0;' : `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[pwSize(ctx)])};`;
+    const height = twin ? `max(48px, ${L(ctx, h)})` : L(ctx, h);
+    return `<span class="fm-pw-slot" data-ws-slot="${id}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${hook} `
+        + `style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${height};${border}`
+        + `background:#fff;font-size:${twin ? D(ctx, pt) : P(ctx, pt)};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK.ink};flex:none;${KEY_FEATURES}">`
+        + `${ink ? esc(v) : ''}</span>`;
+}
+/** The fraction writing place: a zone over a 1.5 pt bar over a zone (n / d slots). */
+function pwFracSlot(p, ctx, g) {
+    const pt = SZ(ctx).fracPt;
+    const z = (id) => pwSlot(ctx, id, pwVal(p, ctx, id), { w: g.fracBar, h: g.hw, zone: true, pt });
+    return `<span style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${z('n')}`
+        + `<span aria-hidden="true" style="display:block;width:${L(ctx, g.fracBar)};border-top:${B(ctx, 1.5)} solid ${INK.ink};margin:${L(ctx, 1)} 0;"></span>${z('d')}</span>`;
+}
+/** A printed mixed number (or whole number, or fraction): the whole at the digit size, the fraction at the fraction size (TY-7). */
+function pwMixed(ctx, w, n, d) {
+    const twin = isTwin(ctx);
+    const dig = twin ? D(ctx, digitPt(ctx)) : P(ctx, digitPt(ctx));
+    const fpt = SZ(ctx).fracPt;
+    const fs = twin ? `max(calc(var(--mq-digit, 40px) * 0.72), ${L(ctx, fpt * PT_MM)})` : P(ctx, fpt);
+    const whole = Number(w) ? `<span style="font-size:${dig};font-weight:700;line-height:1;">${esc(w)}</span>` : '';
+    const frac = Number(n) ? `<span style="display:inline-flex;flex-direction:column;align-items:center;font-size:${fs};font-weight:700;line-height:1.1;">`
+        + `<span>${esc(n)}</span><span aria-hidden="true" style="display:block;align-self:stretch;min-width:0.8em;border-top:${B(ctx, 1.5)} solid ${INK.ink};margin:${L(ctx, 0.6)} 0;"></span><span>${esc(d)}</span></span>` : '';
+    return `<span class="fm-mixed" style="display:inline-flex;align-items:center;gap:${L(ctx, 1.2)};${KEY_FEATURES}">${whole}${frac}</span>`;
+}
+/** The mixed number's bar model: one bar per whole and the part bar, stacked 3 mm apart (WRM R50). */
+function pwBars(p, ctx) {
+    const g = PW[pwSize(ctx)];
+    const geom = fracModelGeom({ kind: 'bar', n: p.n, d: p.d, w: p.w, size: pwSize(ctx), wholeMm: null, perRow: 1, hatch: !!ctx.photocopySafe });
+    return `<svg class="fm-svg fm-pw-bars" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(geom.wMm)} ${f2(geom.hMm)}" role="img" aria-label="${esc(geom.aria)}" `
+        + `data-frac-model="bar" style="display:block;width:${L(ctx, Math.max(g.barW, geom.wMm))};height:auto;max-width:100%;overflow:visible;flex:none;">${geom.body}</svg>`;
+}
+/** The part-whole diagram (RP-60). */
+function pwDiagram(p, ctx) {
+    const g = pwGeom(p, ctx);
+    const twin = isTwin(ctx);
+    const compose = p.form === 'compose';
+    const ones = p.form === 'ones';
+    const a = p.answer || {};
+    // the whole box: the printed mixed number, or (compose) the writing place for it
+    let top;
+    if (compose) {
+        const wv = pwVal(p, ctx, 'w');
+        top = `<span class="fm-pw-whole" data-ws-slot-group="answer" style="display:inline-flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};box-sizing:border-box;`
+            + `width:${L(ctx, g.topW)};min-height:${L(ctx, g.topH)};padding:${L(ctx, 1)};border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[g.k])};background:#fff;">`
+            + `${pwSlot(ctx, 'w', wv, { w: g.wholeW - 6, h: 2 * g.hw + 2, zone: true, pt: digitPt(ctx) })}${pwFracSlot(p, ctx, g)}</span>`;
+    } else {
+        top = `<span class="fm-pw-whole" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, g.topW)};`
+            + `height:${L(ctx, g.topH)};border:${B(ctx, 1.5)} solid ${INK.ink};background:#fff;">${pwMixed(ctx, p.w, p.n, p.d)}</span>`;
+    }
+    // the joins: from the whole box's foot to each part box's top (0.75 pt), drawn across the part row
+    let x = 0;
+    const centres = g.parts.map((pw) => { const c = x + pw / 2; x += pw + g.gap; return c; });
+    const joins = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(g.rowW)} ${f2(g.G.drop)}" preserveAspectRatio="none" `
+        + `style="display:block;width:${L(ctx, g.rowW)};height:${L(ctx, g.G.drop)};overflow:visible;">`
+        + centres.map((c) => `<line x1="${f2(g.rowW / 2)}" y1="0" x2="${f2(c)}" y2="${f2(g.G.drop)}" stroke="${INK.ink}" stroke-width="${HAIR}"/>`).join('')
+        + `</svg>`;
+    // the part boxes and their labels
+    const lab = (t) => `<span class="fm-pw-label" style="display:block;font-size:${P(ctx, zonePt(ctx))};line-height:1.3;margin-top:${L(ctx, 1)};white-space:nowrap;">${t}</span>`;
+    const partBox = (inner, w, printed) => `<span class="fm-pw-part" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};`
+        + `min-height:${L(ctx, g.partH)};border:${B(ctx, 0.75)} solid ${INK.ink};${printed ? '' : `border-radius:${L(ctx, SLOT.slotRadiusMm[g.k])};`}background:#fff;">${inner}</span>`;
+    const cols = [];
+    if (compose) {
+        // the parts are printed (square boxes: not writing places)
+        cols.push(`${partBox(pwMixed(ctx, a.w, 0, 1), g.wholeW, true)}${lab('wholes')}`);
+        cols.push(`${partBox(pwMixed(ctx, 0, a.n, a.d), g.fracW, true)}${lab('fraction')}`);
+    } else {
+        const nW = g.parts.length - 1;
+        for (let i = 0; i < nW; i++) {
+            const id = ones ? `w${i + 1}` : 'w';
+            cols.push(`${partBox(pwSlot(ctx, id, pwVal(p, ctx, id), { w: g.wholeW - 2, h: g.partH - 2, zone: true, pt: digitPt(ctx) }), g.wholeW, false)}${lab(ones ? 'one' : 'wholes')}`);
+        }
+        cols.push(`${partBox(pwFracSlot(p, ctx, g), g.fracW, false)}${lab('fraction')}`);
+    }
+    const row = `<span style="display:flex;align-items:flex-start;justify-content:space-between;width:${L(ctx, g.rowW)};">`
+        + cols.map((c, i) => `<span style="display:flex;flex-direction:column;align-items:center;width:${L(ctx, g.parts[i])};">${c}</span>`).join('') + `</span>`;
+    const join = twin ? ` data-mq-join="parts" data-mq-sep="${compose ? ' ' : ' + '}"` : '';
+    return `<span class="fm-pw" data-ws-slot-group="answer"${join} style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${top}${joins}${row}</span>`;
+}
+/** The equation form: "2 3/4 = [ ] + [ ]/[ ]" (the faded form, no diagram). */
+function pwEquation(p, ctx) {
+    const g = pwGeom(Object.assign({}, p, { form: 'two' }), ctx);
+    const twin = isTwin(ctx);
+    const sign = (t) => `<span style="font-size:${twin ? D(ctx, digitPt(ctx)) : P(ctx, digitPt(ctx))};font-weight:700;line-height:1;flex:none;">${t}</span>`;
+    const k = p.ones ? Math.max(1, Math.round(Number(p.w) || 1)) : 1;
+    const parts = [];
+    for (let i = 0; i < k; i++) {
+        const id = p.ones ? `w${i + 1}` : 'w';
+        parts.push(pwSlot(ctx, id, pwVal(p, ctx, id), { w: g.wholeW - 6, h: 2 * g.hw + 2, pt: digitPt(ctx) }));
+    }
+    parts.push(pwFracSlot(p, ctx, g));
+    const join = twin ? ` data-mq-join="parts" data-mq-sep=" + "` : '';
+    return `<span class="fm-pw-eq" data-ws-slot-group="answer"${join} style="display:inline-flex;align-items:center;gap:${L(ctx, 3)};flex:none;">`
+        + `${pwMixed(ctx, p.w, p.n, p.d)}${sign('=')}${parts.join(sign('+'))}</span>`;
+}
+/** The whole partition row: bars beside the diagram (model on), the diagram alone, or the equation. */
+function partitionRow(p, ctx) {
+    if (p.form === 'eq') {
+        return `<div class="fm-row fm-pw-row"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:center;justify-content:center;">${pwEquation(p, ctx)}</div>`;
+    }
+    const diagram = pwDiagram(p, ctx);
+    if (p.model !== 'bar') {
+        return `<div class="fm-row fm-pw-row" style="display:flex;align-items:flex-start;justify-content:center;">${diagram}</div>`;
+    }
+    // model on: the bars at the left, the diagram centred in the width after them (card Q10, EB-SIDE); on a narrow
+    // screen card the bars stand above the diagram (flex-wrap)
+    return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:${isTwin(ctx) ? 'wrap' : 'nowrap'};align-items:center;justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
+        // the tab keep-out (CL-31) on paper: the bars start after the item's tab
+        + `${isTwin(ctx) ? '' : `padding-left:${L(ctx, SZ(ctx).tabMm + 3)};`}">`
+        + `${pwBars(p, ctx)}<span style="flex:1 1 auto;display:flex;justify-content:center;">${diagram}</span></div>`;
+}
+/** Natural size (mm) of a partition row at the ctx size. */
+function partitionSize(p, ctx) {
+    if (p.form === 'eq') {
+        const g = pwGeom(Object.assign({}, p, { form: 'two' }), ctx);
+        const dig = digitPt(ctx) * PT_MM;
+        const k = p.ones ? Math.max(1, Math.round(Number(p.w) || 1)) : 1;
+        // the printed mixed number, '=', k wholes boxes each with its '+', the fraction slot (2 Hw and the bar)
+        return { w: dig * 1.8 + 3 + dig * 0.7 + 3 + k * (g.wholeW - 6 + 3 + dig * 0.7 + 3) + g.fracBar, h: 2 * g.hw + 4 };
+    }
+    const g = pwGeom(p, ctx);
+    if (p.model !== 'bar') return { w: g.W, h: g.H };
+    const G = PW[pwSize(ctx)];
+    const bars = (Math.round(Number(p.w) || 0) + 1);
+    const barsH = bars * G.barH + (bars - 1) * GAP_MM + 1;
+    // a model row takes the full width (bars left, the diagram centred in the rest)
+    return { w: Math.max(G.barW + 1 + 6 + g.W, 150), h: Math.max(barsH, g.H), full: true };
+}
+/** The key and inputs of a partition cell. */
+function partitionSlots(p) {
+    const a = p.answer || {};
+    const ids = p.form === 'ones' || (p.form === 'eq' && p.ones)
+        ? [...Array.from({ length: Math.max(1, Math.round(Number(p.w) || 1)) }, (_, i) => `w${i + 1}`), 'n', 'd']
+        : ['w', 'n', 'd'];
+    const vals = { w: String(a.w), n: String(a.n), d: String(a.d) };
+    const slots = {};
+    for (const id of ids) slots[id] = { value: /^w\d+$/.test(id) ? '1' : vals[id], graded: true };
+    const frac = `${a.n}/${a.d}`;
+    const display = p.form === 'compose' ? `${a.w} ${frac}`
+        : ids[0] === 'w1' ? [...ids.filter((i) => /^w\d+$/.test(i)).map(() => '1'), frac].join(' + ') : `${a.w} + ${frac}`;
+    return { ids, slots, display };
+}
+
 register('frac-model', {
     render(p, ctx) {
         const twin = isTwin(ctx);
-        return `<div class="k2-cell fm-cell" data-fm-task="${esc(p.task || '')}"${twin ? ' data-mq-k2="1"' : ''} `
-            + `style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;">${renderRow(p, ctx)}</div>`;
+        const row = p.task === 'partition' ? partitionRow(p, ctx) : renderRow(p, ctx);
+        return `<div class="k2-cell fm-cell" data-fm-task="${esc(p.task || '')}"${p.task === 'partition' ? ` data-fm-form="${esc(p.form || 'two')}"` : ''}${twin ? ' data-mq-k2="1"' : ''} `
+            + `style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;${p.task === 'partition' && p.model === 'bar' ? 'width:100%;align-self:stretch;' : ''}">${row}</div>`;
     },
     answerKey(p) {
         const a = p.answer || {};
+        if (p.task === 'partition') {
+            const k = partitionSlots(p);
+            return { value: k.display, display: k.display, slots: k.slots };
+        }
         if (p.task === 'shade') return { value: String(a.shade), display: `${a.shade} parts shaded`, slots: { answer: { value: String(a.shade), graded: true } } };
         if (p.task === 'pick') return { value: a.letter, display: a.letter, slots: { answer: { value: a.letter, graded: true } } };
         if (p.task === 'sign') return { value: a.sign, display: a.sign, slots: { sign: { value: a.sign, graded: true } } };
@@ -606,6 +815,11 @@ register('frac-model', {
         return { value: t.frac === 'n' ? Number(a.n) : t.frac === 'd' ? Number(a.d) : t.frac === 'w' ? Number(a.w || 0) : display, display, slots };
     },
     footprint(p, ctx) {
+        if (p.task === 'partition') {
+            const z = partitionSize(p, ctx);
+            const wMm = Math.ceil(z.w + 8), hMm = Math.ceil(z.h + 8);
+            return { wMm, hMm, measure: true, factLike: false, maxCols: z.full ? 1 : wMm <= 88 ? 2 : 1 };
+        }
         const { w, h } = rowSize(p, ctx);
         const wMm = Math.ceil(w + 8), hMm = Math.ceil(h + 8);
         // `oneCol` (whole_as_fraction, wave 1 lane D): every item of the page in one column, so a short
@@ -613,6 +827,9 @@ register('frac-model', {
         return { wMm, hMm, measure: true, factLike: false, maxCols: p.oneCol ? 1 : wMm <= 56 ? 3 : wMm <= 88 ? 2 : 1 };
     },
     inputs(p) {
+        if (p.task === 'partition') {
+            return partitionSlots(p).ids.map((id, k) => ({ id, kind: 'number', shape: 'box', graded: true, order: k, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));
+        }
         if (p.task === 'shade') return [{ id: 'answer', kind: 'number', shape: 'draw', graded: true, order: 0, scopes: ['full'] }];
         if (p.task === 'pick') return [{ id: 'answer', kind: 'choice', shape: 'choice', graded: true, order: 0, scopes: ['full'] }];
         if (p.task === 'sign') return [{ id: 'sign', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }];

@@ -1344,6 +1344,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `turn-look` | Look at the turned array. Write the new fact. | the turned array is drawn; write its fact (added 2026-10-17, detailed lesson 3a) |
 | `turn-fact` | Turn the fact. Write the new fact. | a fact with no picture; write its turn (added 2026-10-17, detailed lesson 3a) |
 | `array-total` | Write the rows, the number in each row and the total. | read an array: rows, columns, total (added 2026-10-17, detailed lesson 3a prerequisite) |
+| `mixed-partition` | Write the mixed number as wholes and a fraction. | a mixed number in a part-whole diagram: write the wholes and the fraction in the part boxes (added 2026-11-20, lane lf-algebra, fractions:mixed_numbers_intro) |
+| `mixed-ones` | Write the mixed number as ones and a fraction. | the same, one part box per whole (2 3/4 = 1 + 1 + 3/4) (added 2026-11-20) |
+| `mixed-compose` | Write the mixed number. | the wholes and the fraction printed; write the mixed number in the whole box (added 2026-11-20) |
+| `mixed-eq` | Write the wholes and the fraction. | the equation form: 2 3/4 = [ ] + [ ]/[ ] (added 2026-11-20) |
 
 | Id | Rule |
 |---|---|
