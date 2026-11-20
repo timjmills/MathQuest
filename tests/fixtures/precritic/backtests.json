@@ -12234,6 +12234,45 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-hint-uniform",
+   "check": "ws-guided-cellfit HINT-UNIFORM: the two-step presets' first tries carry one hint kind; a first try with no hint passes only as the ruled GUIDED-HINT-DROP-P1 note (Model + 1 try on page 1)",
+   "kind": "fixture",
+   "rule": "ws-guided-cellfit HINT-UNIFORM (lead F4, GUIDED-HINT-DROP-P1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/guided-hint/uniform-fail.json",
+    "state": "planted: the hint dropped with no ruled note"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/guided-hint/uniform-pass.json",
+    "state": "the drop carries the ruled note"
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-hint-box-leak",
+   "check": "ws-guided-cellfit GUIDED-HINT-LEAK (box numbers): no Guided hint prints a number a box of the same try expects (two-step presets, M / L, seeds 1, 2, 591220)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-cellfit GUIDED-HINT-LEAK (lead W2, critic r15 W2)",
+   "fail": {
+    "commit": "8533a8b48",
+    "state": "two_step_add_then_div L p2: \"Step 1: circle +. 22 + 14 = 36.\" over its Step 1 boxes"
+   },
+   "pass": {
+    "commit": "174348717",
+    "state": "\"Step 1: circle +. ___ + ___ = ___.\""
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only HINT-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
