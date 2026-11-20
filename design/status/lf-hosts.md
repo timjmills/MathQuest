@@ -9,6 +9,8 @@ Builder profile: mq-opus-medium
 Critic rounds: 3, PASS r3 (8/8/8/8 card, worksheet, quiz)
 
 ## Now
+- 2026-11-20 (resumed, +$50): host fit digit floor + fit reset (lf-algebra fitk2 ported) - deploy head 35f9fc8ae sent, lead deploying after lf-engine; new ws-fit-floor, rows fit-floor / twin-fit-reset. Lesson player card SIGNED with D11 (any part, any order) and D12 (any sheet -> interactive; itemsFor(req) stays a clean public function for My Worksheets) on claude/sweet-newton-c8wrv1-lf-hosts-player. Parked after the deploy.
+- NEXT WEEK, first item: lesson player slice 1 (I do, board, add-within-10, part bar jumps) at medium, full critic.
 - 2026-11-20: Skip button (every student mode), keyboard end-of-run fix, infinite-Finish count and card/add_wp_20 48 px touch targets are LIVE on master 398bb4902. Lane stopped for the week (lead).
 - Next week (lead): (1) DIGIT FLOOR in the screen-cell.js host fit pass - never shrink a drawn twin's digits below the 29 px worksheet floor; wrap first, else one column (with lf-algebra, count-row twin to >= 29 px). (2) Interactive lesson player mock (card first).
 - Routed, open: ws-worksheet-reflow FAILS on master (placevalue:expand 2 -> 1 columns at 1024; number_patterns_rule numerals 26.2 -> 22.9 px); not re-pinned; owners asked via the lead; proposed for deploy session 1.
