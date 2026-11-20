@@ -1,0 +1,9 @@
+  ok   composing:chart_to_120             mixed-practice         10      L falls back to band=120 (identical page and key)
+  ok   composing:chart_to_120             test                   10      L falls back to band=120 (identical page and key)
+ws-role-hidden: OK (30 role x value x size page(s) fall back, 8 control(s) draw the value; 2 skill(s))
+  OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 0/0 False; EA multi-gap Correct 0 / Fix it 0
+ws-guided-echo: OK (104 pages, composing:chart_to_120, sizes M/L, 4 seeds)
+2 skills, 32 host renders, 0 doubled answer area(s), 0 paper verb(s) on screen, 0 screen-digit miss(es)
+ws-screen-slots: OK
+  OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 0/0 False; EA multi-gap Correct 0 / Fix it 0
+ws-guided-echo: OK (150 pages, composing:hundreds_chart_fill, sizes L, 2 seeds)

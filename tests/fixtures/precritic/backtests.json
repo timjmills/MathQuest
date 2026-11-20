@@ -10598,8 +10598,8 @@
     "state": "grid=rows / whole drawn on lesson, guided, test of hundreds_chart_fill and chart_to_120"
    },
    "pass": {
-    "commit": "25e62c6d6",
-    "state": "skill-options hiddenOnRoles + print-sheet optsForRole: the roles fall back to the window"
+    "commit": "03a646117",
+    "state": "skill-options hiddenOnRoles + print-sheet optsForRole: the roles fall back to the window (pass state moved from 25e62c6d6 to 03a646117, 2026-11-20: the checks tightened since, and the old pass commit fails them; verified OK on 03a646117)"
    },
    "command": "node tests/scripts/ws-role-hidden.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120",
    "expect": {
@@ -10658,8 +10658,8 @@
     "state": "every scored chart page counted one point a window (guided /3 vs 5-7 squares, independent /6 vs 11-13)"
    },
    "pass": {
-    "commit": "280161c7e",
-    "state": "chartwindow footprint points = its blanks (slotPoints); error-analysis.js keeps 1 a cell"
+    "commit": "03a646117",
+    "state": "chartwindow footprint points = its blanks (slotPoints); error-analysis.js keeps 1 a cell (pass state moved from 280161c7e to 03a646117, 2026-11-20: the checks tightened since, and the old pass commit fails them; verified OK on 03a646117)"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 4 --only SCORE-SLOTS",
    "expect": {
@@ -10697,8 +10697,8 @@
     "state": "card@1280 34 px, quiz@820 28.9 px, worksheet@1024 24.7 px"
    },
    "pass": {
-    "commit": "4b464e322",
-    "state": "squares sized from the digits on the card / quiz (48 / 56 px) and the worksheet (30 px), scoped to the window"
+    "commit": "03a646117",
+    "state": "squares sized from the digits on the card / quiz (48 / 56 px) and the worksheet (30 px), scoped to the window (pass state moved from 4b464e322 to 03a646117, 2026-11-20: the checks tightened since, and the old pass commit fails them; verified OK on 03a646117)"
    },
    "command": "node tests/scripts/ws-screen-slots.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --screen-digit",
    "expect": {
@@ -10853,8 +10853,8 @@
     "state": "band 120 rows and band 10 pages give answers away item to item"
    },
    "pass": {
-    "commit": "de7225b14",
-    "state": "the dealer never deals a window of squares already on the sheet (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2)"
+    "commit": "03a646117",
+    "state": "the dealer never deals a window of squares already on the sheet (pass state moved to de7225b14, 2026-11-14: the check now also judges the unfilled frame / the screen deals, which ee8c6c287 still failed - r2 N3 / N2) (pass state moved from de7225b14 to 03a646117, 2026-11-20: the checks tightened since, and the old pass commit fails them; verified OK on 03a646117)"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
    "expect": {
