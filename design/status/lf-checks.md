@@ -833,5 +833,5 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   CAP-PARITY (L 3 vs M 6), and placevalue:value mixed-practice CAP-PARITY (L 10 vs M 21) -> **lf-placevalue**. The last is NOT the
   false red r1 suspected: measured with the gap, every L shelf is 37.2 mm, the rendered gap 0.5 mm, the white 39.8 mm - a shelf fits.
 - The row now measured is the page's TALLEST row (a row = its tallest cell), so "another row fits" is claimed only when any drawn
-  row fits again. Verify: self-test OK; fixtures flip FAIL -> OK (3 pairs); `ws-empty-band --page-fill` on add_facts, sub_facts,
+  row fits again. Verify: self-test OK; fixtures flip FAIL -> OK (3 pairs); `ws-backtest --row` on the 3 new + 2 cbt rows: 5 PASS; `ws-empty-band --page-fill` on add_facts, sub_facts,
   placevalue:value FAIL (7, all listed above); `ws-precritic-plan --checks-from-critics` OK (346 pass, 90 exempt, 0 fail). Lanes touching these skills see them under precritic's default `--page-fill`.
