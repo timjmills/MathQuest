@@ -36,7 +36,8 @@ import {
     instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed, stripExtraMm,
 } from './compose.js';
 import { slotScore } from '../paginate.js';
-import { rowCapMm } from '../layout.js';
+import { rowCapMm, cellWidthMm, LIVE_W_MM } from '../layout.js';
+import { hasCell } from '../registry.js';
 import { roleCapacity } from '../role-capacity.js';
 
 export const ROLE_ID = 'pre-skill-check';
@@ -44,7 +45,23 @@ const PER_QUAD = 4;
 /** The characters a strip keeps between its instruction and a shared strip's scores (the gap, the blanks' width, a margin). */
 export const STRIP_SCORE_PAD = 8;
 
-export function sources(skills, { earlier }) {
+/** PSC-REVIEW (card design/cards/psc-review): the Quick review's domain rotation, its instruction and the pool id of one candidate. */
+export const REVIEW_DOMAINS = Object.freeze(['CC', 'OA', 'NBT', 'NF', 'MD-m', 'MD-d', 'G']);
+export const REVIEW_INSTRUCTION_KEY = 'quick-review';
+const REVIEW_POOL = /^rv\|/;
+export function sources(skills, { earlier, review } = {}) {
+    const checks = checkSources(skills, { earlier });
+    // (the Quick review: one pool of one item per candidate skill, per domain - the bridge's `review` lists them, passed skills
+    // first, never the lesson skill nor a prerequisite; a lesson's routed check takes none)
+    if (typeof review !== 'function' || skills.length !== 1) return checks;
+    const cand = review(skills[0], checks.flatMap((p) => p.skills)) || {};
+    const out = checks.slice();
+    for (const d of REVIEW_DOMAINS) for (const [k, c] of (cand[d] || []).entries()) {
+        out.push({ id: `rv|${d}|${k}`, skills: [{ categoryId: c.categoryId, skillId: c.skillId }], probe: 1, review: { domain: d, k, tag: c.tag, skill: `${c.categoryId}:${c.skillId}`, allowed: REVIEW_DOMAINS.filter((x) => cand[x]) } });
+    }
+    return out;
+}
+function checkSources(skills, { earlier }) {
     let list;
     if (skills.length >= 2) list = skills.slice(0, 4);
     else {
@@ -174,7 +191,7 @@ const routedCheck = (input) => !!(input && input.perQuestion && Array.isArray(in
 // to twice its share of the ceiling (one prerequisite: the whole ceiling), plus a row's spare for items passed over. `plan` keeps only what each page holds.
 export const ceilingOf = (ctx) => { const c = roleCapacity(ROLE_ID); return (c && (c[ctx.size] || c.M)) || PER_QUAD * 4; };
 const fillDeal = (input, n) => { const cap = ceilingOf(ctxOf(input)); return Math.max(PER_QUAD, Math.min(cap, Math.ceil((2 * cap) / Math.max(1, n)))) + PER_QUAD; };
-export const counts = (pools, input) => { const ids = Object.keys(pools); return Object.fromEntries(ids.map((id) => [id, routedCheck(input) ? PER_QUAD : input && input.perQuestion ? perQuad(input, Number(String(id).replace(/\D/g, '')) || 0) : fillDeal(input, ids.length)])); };
+export const counts = (pools, input) => { const all = Object.keys(pools); const ids = all.filter((id) => !REVIEW_POOL.test(id)); const rv = Object.fromEntries(all.filter((id) => REVIEW_POOL.test(id)).map((id) => [id, 1])); return Object.assign(rv,  Object.fromEntries(ids.map((id) => [id, routedCheck(input) ? PER_QUAD : input && input.perQuestion ? perQuad(input, Number(String(id).replace(/\D/g, '')) || 0) : fillDeal(input, ids.length)]))); };
 
 export function plan(input = {}) {
     if (!(Array.isArray(input.routes) && input.routes.some(Boolean))) return planCheck(input, 1);
@@ -452,6 +469,9 @@ function planCheck(input, cut) {
     };
     const pages = [];
     let kept = 0;
+    let reviewMeta = null;
+    let reviewN = 0;
+    let reviewFit = null;
     let routedFoot = null;
     let routedUnits = null;
     let routedFits = true;
@@ -568,6 +588,23 @@ function planCheck(input, cut) {
                 }
                 pg.sections = secs;
             }
+            // PSC-REVIEW (card design/cards/psc-review): the Quick review band under the check, on the LAST page, whole rows only
+            if (!routed && pgs.length) {
+                const lastPg = pgs[pgs.length - 1];
+                const fitOut = {};
+                const rv = reviewRows(Object.assign({}, input, { reviewFitOut: fitOut }), ctx, m, m.budget - (lastPg.used || 0));
+                reviewFit = fitOut.fit || null;
+                if (rv) {
+                    const grids = rv.rows.map((r) => { const g = gridPart(r.its.map((it) => planItem(Object.assign({}, it, { keyTag: it.reviewTag }), { cols: r.cols, level: 0 })), { cols: r.cols, rows: 1, cellH: r.h, labels, start }); start += r.its.length; return g; });
+                    reviewMeta = rv.items.map((it) => ({ skill: it.reviewSkill, domain: it.reviewDomain, n: slotScore([it]), tag: it.reviewTag }));
+                    reviewN = slotScore(rv.items);
+                    lastPg.sections.push({ kind: 'band', label: '', instr: instructionText(REVIEW_INSTRUCTION_KEY, rv.items), instructionKey: REVIEW_INSTRUCTION_KEY, cls: 'mq-pscreview', reviewBand: true, extra: `<span class="mq-quadscore">Review __/${reviewN}</span>`, contents: grids });
+                    lastPg.used = (lastPg.used || 0) + rv.used;
+                    // (the check's own score names it, "Check __/n", when the check prints under one strip - PSC-SCORES S1)
+                    const checkBands = pgs.flatMap((pg) => pg.sections).filter((x) => x.kind === 'band' && x.cls !== 'mq-pscreview');
+                    if (checkBands.length === 1) checkBands[0].extra = `<span class="mq-quadscore">Check __/${kept}</span>`;
+                }
+            }
             pages.push(...pgs);
         }
         if (cur.sections.length) pages.push(cur);
@@ -590,15 +627,111 @@ function planCheck(input, cut) {
         for (const b of bs) delete b.pscParts;
     }
     const n = kept || slotScore(all);
-    const finalFrame = n === slotScore(all) ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
-        tabId: `Check ${form}`, title: titleOf(), score: n, twoLine: false });
+    // (with a Quick review the header's Score is the whole page: the check and the review - PSC-SCORES)
+    const finalFrame = n === slotScore(all) && !reviewN ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
+        tabId: `Check ${form}`, title: titleOf(), score: n + reviewN, twoLine: false });
     const rp = routed ? routePlan(input, routeRows) : null;
     // (lead ruling R13: a check that runs to a second page prints the FULL header on every page - name, date, score, title)
     return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p, i) => (p.fullHeader && i > 0 ? { header: finalFrame.header, sections: p.sections } : { sections: p.sections })), {
         scaffoldLevel: 0,
-        meta: Object.assign({ bands: pscBands, foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
+        meta: Object.assign({ bands: pscBands, foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n + reviewN, form,
+            prereqs: [...new Set(quads.flat().map((it) => it.skill).filter(Boolean))], ...(reviewMeta ? { review: reviewMeta, reviewItems: reviewN } : {}), ...(reviewFit ? { reviewFit } : {}), quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
             rp ? { routePlan: rp, routes: routeRows } : {}),
     });
+}
+
+/**
+ * PSC-REVIEW (card design/cards/psc-review, signed 2026-11-20): the Quick review's rows in `room` mm, or null. Items come from the
+ * review pools (one item a candidate skill, `input.pools[].review`), at most ONE per domain (REVIEW_DOMAINS, the grade's allowed
+ * ones), so no domain repeats before every allowed domain has appeared. A row is whole: 4 or 2 cells of like height (within
+ * REVIEW_ROW_SPREAD), each fitting its column width with ink across most of it (REVIEW_INK_MIN, EB-SIDE), at its measured height
+ * - never stretched, never shrunk. A cell too tall for the room is passed over. The rows chosen hold the most items, then fill
+ * the most room, then use the earliest candidates (8/10-passed skills first). The rows print in domain order. Pure, so seeded
+ * and reproducible.
+ */
+export const REVIEW_ROW_SPREAD = 1.25;
+/** A review row's room over its measure (hMinAt is the measure + 2 mm): 1 mm more keeps the ink off the row's rule (EB-CLIP) and
+ *  stays within the row-stretch cap (drawn + 3 mm). */
+export const REVIEW_ROW_PAD_MM = 1;
+/** A review cell's ink fills at least this share of its cell's inner width at the band's columns (EB-SIDE: no side band of 30 %). */
+export const REVIEW_INK_MIN = 0.72;
+// (templates the review passes over: a legacy cell is no kit cell (card: each item its own kit cell); word-work at L draws its
+// number tab 1.6 mm from the story (TAB-CLEAR, also red on sub_wp_20's own L check on master - a template defect, not this band's)
+// (a review label is two digits - 9 to 20 - and these cells draw into a two-digit tab's gutter: fraction_number_line's line
+// touches tab "14" at M, TAB-CLEAR; a template fix, not this band's)
+const REVIEW_SKIP_TEMPLATES = { M: new Set(['legacy']), L: new Set(['legacy', 'word-work']) };
+const REVIEW_SKIP_SKILLS = new Set(['composing:fraction_number_line']);
+const REVIEW_KEEP_PER_SET = 3;
+export function reviewRows(input, ctx, m, room) {
+    const pools = (input.pools || []).filter((p) => p && p.review && REVIEW_POOL.test(p.id));
+    if (!pools.length || !(room > m.strip)) return null;
+    const allowed = (pools[0].review.allowed || REVIEW_DOMAINS).filter((d) => REVIEW_DOMAINS.includes(d));
+    const cands = [];
+    for (const p of pools.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.review.domain) - REVIEW_DOMAINS.indexOf(b.review.domain) || a.review.k - b.review.k)) {
+        const it = poolItems(input, p.id)[0];
+        if (it && allowed.includes(p.review.domain)) cands.push(Object.assign({}, it, { reviewSkill: p.review.skill, reviewDomain: p.review.domain, reviewTag: p.review.tag, reviewRank: p.review.k }));
+    }
+    const space = room - m.strip;
+    const skipT = REVIEW_SKIP_TEMPLATES[ctx.size] || REVIEW_SKIP_TEMPLATES.M;
+    const tplOf = (it) => { const c = it && it.q && it.q.cell; return c && c.template && hasCell(c.template) ? c.template : 'legacy'; };
+    const fit = { room: +room.toFixed(1), strip: +m.strip.toFixed(1), cands: cands.map((it) => ({ skill: it.reviewSkill, d: it.reviewDomain, tpl: tplOf(it),
+        h4: fitsAt([it], 4, ctx) ? +hMinAt([it], 4, ctx).toFixed(1) : null, h2: fitsAt([it], 2, ctx) ? +hMinAt([it], 2, ctx).toFixed(1) : null,
+        ink2: it.measured && it.measured[2] && it.measured[2].inkMm ? +it.measured[2].inkMm.toFixed(1) : null })) };
+    if (input.reviewFitOut) input.reviewFitOut.fit = fit;
+    // 1. the rows that can be drawn: per set of domains, the few earliest-ranked rows of distinct height
+    const rowsBySet = new Map();
+    for (const cols of [4, 2]) {
+        const inner = cellWidthMm(cols, LIVE_W_MM, ctx.look).inner;
+        const hOf = (it) => hMinAt([it], cols, ctx) + REVIEW_ROW_PAD_MM;
+        const ok = cands.filter((it) => {
+            if (skipT.has(tplOf(it)) || REVIEW_SKIP_SKILLS.has(it.reviewSkill) || !fitsAt([it], cols, ctx) || hOf(it) > space) return false;
+            const w = it.measured && it.measured[cols] && it.measured[cols].inkMm;
+            return !(w > 0) || w >= REVIEW_INK_MIN * inner;
+        });
+        const pick = (from, k, acc) => {
+            if (acc.length === k) {
+                const hs = acc.map(hOf);
+                if (Math.max(...hs) > Math.min(...hs) * REVIEW_ROW_SPREAD) return;
+                const h = hMinAt(acc, cols, ctx) + REVIEW_ROW_PAD_MM;
+                if (h > space) return;
+                const key = acc.map((it) => it.reviewDomain).join('+');
+                const list = rowsBySet.get(key) || [];
+                list.push({ its: acc.slice(), cols, h, domains: acc.map((it) => it.reviewDomain), rank: acc.reduce((t, it) => t + it.reviewRank, 0) });
+                rowsBySet.set(key, list);
+                return;
+            }
+            for (let i = from; i < ok.length; i++) {
+                if (acc.some((x) => x.reviewDomain === ok[i].reviewDomain || REVIEW_DOMAINS.indexOf(x.reviewDomain) > REVIEW_DOMAINS.indexOf(ok[i].reviewDomain))) continue;
+                acc.push(ok[i]); pick(i + 1, k, acc); acc.pop();
+            }
+        };
+        pick(0, cols, []);
+    }
+    const rows = [];
+    for (const list of rowsBySet.values()) {
+        list.sort((a, b) => a.rank - b.rank || a.h - b.h);
+        const kept = [];
+        for (const r of list) if (kept.length < REVIEW_KEEP_PER_SET && !kept.some((k) => Math.abs(k.h - r.h) < 2)) kept.push(r);
+        rows.push(...kept);
+    }
+    // 2. the best set of rows with no domain twice: most items, then the most room filled, then the earliest candidates
+    let best = null;
+    const better = (a, b) => (!b || a.n > b.n || (a.n === b.n && (a.used > b.used + 0.05 || (Math.abs(a.used - b.used) <= 0.05 && a.rank < b.rank))));
+    const dfs = (from, chosen, used, n, rank, seen) => {
+        const cur = { rows: chosen.slice(), n, used, rank };
+        if (n && better(cur, best)) best = cur;
+        for (let i = from; i < rows.length; i++) {
+            const r = rows[i];
+            if (used + r.h > space || r.domains.some((d) => seen.has(d))) continue;
+            r.domains.forEach((d) => seen.add(d)); chosen.push(r);
+            dfs(i + 1, chosen, used + r.h, n + r.its.length, rank + r.rank, seen);
+            chosen.pop(); r.domains.forEach((d) => seen.delete(d));
+        }
+    };
+    dfs(0, [], 0, 0, 0, new Set());
+    if (!best) return null;
+    const ordered = best.rows.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.domains[0]) - REVIEW_DOMAINS.indexOf(b.domains[0]));
+    return { rows: ordered, n: best.n, used: best.used + m.strip, items: ordered.flatMap((r) => r.its) };
 }
 
 /**

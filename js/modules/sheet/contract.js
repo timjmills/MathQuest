@@ -319,6 +319,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'default-circle-all': 'Circle all the correct answers.',
     'default-order': 'Write the numbers in order.',
     'default-solve': 'Solve.',
+    // (PSC-REVIEW, card design/cards/psc-review: the Pre-skill Check's Quick review band of mixed earlier items)
+    'quick-review': 'Quick review. Solve each one.',
 });
 
 /**

@@ -340,6 +340,10 @@ function itemHtml(item, ctx, report) {
             });
             inner += keyStamp(words, ctx);
         }
+        // (PSC-REVIEW, card design/cards/psc-review: a Quick review answer names its domain and skill on the key, in the one grey;
+        // drawn over the cell's top-right corner so no cell moves between the pupil page and its key - AK-1)
+        if (item.keyTag) inner += `<span class="ws-revlabel" data-review-label style="position:absolute;right:1.5mm;top:0.8mm;`
+            + `font-size:${ctx.metrics.letterPt}pt;line-height:1;color:var(--ws-grey);white-space:nowrap">${esc(item.keyTag)}</span>`;
     }
 
     if (item.work) inner += workBox(item, ctx);
@@ -429,7 +433,9 @@ function partHtml(part, ctx, report) {
             const inner = contentHtml(part, ctx, report);
             report.inModel = was;
             const html = band(part.label || '', part.instr || '', inner, { grow: !!part.grow, extra: part.extra || '' });
-            return part.style ? html.replace('<div class="ws-band', `<div style="${part.style}" class="ws-band`) : html;
+            // (`reviewBand`: a Pre-skill Check's Quick review, marked for the checks - PSC-REVIEW)
+            const marked = part.reviewBand ? html.replace('<div class="ws-band', '<div data-psc-review class="ws-band') : html;
+            return part.style ? marked.replace('<div class="ws-band', `<div style="${part.style}" class="ws-band`) : marked;
         }
         case 'day': return dayBand(part.day, part.score, contentHtml(part, ctx, report));
         case 'row': {

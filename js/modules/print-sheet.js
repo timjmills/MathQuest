@@ -33,6 +33,8 @@ import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMax
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
+import { SKILL_STANDARDS } from './standards.js';
+import { REDESIGN_PASSED } from './redesign-passed.js';
 import { kitCellSpec } from './print-generate.js';
 import { applySheetTags, ebItemOf } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, roleOptions, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
@@ -4568,6 +4570,62 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     return out;
 }
 
+/**
+ * PSC-REVIEW (card design/cards/psc-review, signed 2026-11-20): the Quick review's candidate skills for a Pre-skill Check of `sk`,
+ * per CCSS domain - {domain: [{categoryId, skillId, domain, tag}]}, each list in pool order: the 8/10-passed skills
+ * (redesign-passed.js) first, then the earlier grades nearest first, then the pupil's own grade. A skill is a candidate when it
+ * is live, tagged (SKILL_STANDARDS, its primary CCSS code gives the domain), at or below the pupil's grade, and is neither the
+ * lesson skill nor one of `exclude` (its prerequisites: they are the check). Pure over the app's tables, so reproducible.
+ */
+const REVIEW_DOMAIN_NAMES = Object.freeze({ CC: 'Counting', OA: 'Operations', NBT: 'Base Ten', NF: 'Fractions', 'MD-m': 'Measurement', 'MD-d': 'Data', G: 'Geometry' });
+// (the CCSS Measurement & Data clusters that are DATA, by grade: K.MD.B classify, 1.MD.C, 2.MD.D, 3-5.MD.B represent and interpret)
+const MD_DATA_CLUSTER = Object.freeze({ K: 'B', 1: 'C', 2: 'D', 3: 'B', 4: 'B', 5: 'B' });
+export function reviewDomainOf(categoryId, skillId) {
+    const e = SKILL_STANDARDS[`${categoryId}:${skillId}`];
+    const code = e && !e.approx && !e.pool && Array.isArray(e.ccss) ? e.ccss[0] : '';
+    const m = /^(K|\d)\.([A-Z]+)\.([A-Z])?/.exec(String(code || '').toUpperCase());
+    if (!m) return '';
+    const [, g, d, c] = m;
+    if (d === 'MD') return MD_DATA_CLUSTER[g] && c === MD_DATA_CLUSTER[g] ? 'MD-d' : 'MD-m';
+    if (d === 'SP') return 'MD-d';
+    return REVIEW_DOMAIN_NAMES[d] ? d : '';
+}
+function reviewCandidates(sk, exclude = [], perDomain = 6) {
+    const own = (() => { try { return GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { return null; } })();
+    if (own === null) return {};
+    const out = Object.fromEntries(Object.keys(REVIEW_DOMAIN_NAMES).map((d) => [d, []]));
+    // (K has no Fractions; Fractions from grade 3 - card)
+    if (own < 3) delete out.NF;
+    const skip = new Set([`${sk.categoryId}:${sk.skillId}`, ...exclude.map((x) => `${x.categoryId}:${x.skillId}`)]);
+    // (a prerequisite named by a provider may carry a preset or host id only: its id is passed over in every category)
+    const skipIds = new Set([sk.skillId, ...exclude.flatMap((x) => [x.skillId, x.presetId]).filter(Boolean)]);
+    const all = [];
+    let order = 0;
+    for (const [cat, list] of Object.entries(SKILLS)) {
+        if (!Array.isArray(list) || /mixed/.test(cat)) continue;
+        for (const s of list) {
+            order++;
+            if (!s || !s.v || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) continue;
+            const key = `${cat}:${s.v}`;
+            if (skip.has(key) || skipIds.has(s.v)) continue;
+            try { if (isMixedMetaSkill(s.v)) continue; } catch (e) { /* keep */ }
+            let g = null;
+            try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
+            if (g === null || g > own) continue;
+            const domain = reviewDomainOf(cat, s.v);
+            if (!domain || !out[domain]) continue;
+            all.push({ categoryId: cat, skillId: s.v, domain, rank: [REDESIGN_PASSED.has(key) ? 0 : 1, g < own ? own - g : 99, order],
+                tag: `${REVIEW_DOMAIN_NAMES[domain]} \u00b7 ${String(SKILL_FULL_LABELS[s.v] || s.t || s.v).replace(/\s*\([^)]*\)/g, "").trim()}` });
+        }
+    }
+    all.sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.rank[2] - b.rank[2]);
+    // (card: each review item keeps its own KIT cell - a skill still drawn by the legacy print path is passed over - and is never a
+    // preset dealt by a prerequisite's host (sub_2d_1d under sub_100_no_regroup, PSC-TWIN-MIX); one seeded question tells, unmeasured)
+    const kit = (c) => { try { const q = generateQuestionFor({ category: c.categoryId, skill: c.skillId, seed: 1 }); return !!kitCellSpec(q) && !(q && (skipIds.has(q.skillId) || skipIds.has(q.presetId)));  } catch (e) { return false; } };
+    for (const c of all) if (out[c.domain].length < perDomain && kit(c)) out[c.domain].push({ categoryId: c.categoryId, skillId: c.skillId, domain: c.domain, tag: c.tag });
+    return out;
+}
+
 /** Roles whose cells show a finished answer in the skill's own slot (they need `canShow`). */
 const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 
@@ -4585,7 +4643,7 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
-    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
+    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, review: n.perQuestion || n.routes ? null : reviewCandidates, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     // (the skills a role sources for itself - a pre-skill check's earlier skills, a review's - take the role's option values
     // too: provider roleOpts, identify's place heads off on the unaided roles, lead ruling PEDAGOGY 4.1a 2026-11-13)
@@ -4621,7 +4679,7 @@ async function buildRoleSheet(n, metaOf) {
     const needsShow = SHOWS_WORK.has(n.role);
     const strictShow = n.role === 'error-analysis';
     const input = {
-        items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
+        items: [], skills: allSkills, pools: pools.map((p) => Object.assign({ id: p.id, weight: p.weight || 1 }, p.review ? { review: p.review } : {})),
         ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
         // (lf-roles: the title's MEASURED lines, for a role whose title it composes itself - review.js "Review: <topic>")
         titleLinesOf: (text, size) => measureTitleLines(text, size || n.size),
@@ -4869,7 +4927,8 @@ async function buildRoleSheet(n, metaOf) {
     const PROBE = mod.PROBE || { 'scripted-model': 1, stretch: 2, 'word-problems': 4, 'reason-it': 4, 'fact-probe': 20 }[n.role] || 8;
     const probe = {};
     pools.forEach((p, pi) => {
-        probe[p.id] = dealPool(p, pi, PROBE);
+        // (a pool may ask a smaller probe - the Pre-skill Check's Quick review pools deal one item each, PSC-REVIEW)
+        probe[p.id] = dealPool(p, pi, p.probe || PROBE);
         measure(probe[p.id]);
         input.floors[p.id] = floorOf(probe[p.id]);
     });

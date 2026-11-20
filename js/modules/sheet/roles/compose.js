@@ -246,6 +246,7 @@ export function planItem(it, { cols, level = 1, render, key, model = false, nola
         cls: [it.cellCls || '', hookClasses(it, level)].filter(Boolean).join(' '),
         style: it.cellStyle || '',
         model, nolabel,
+        ...(it.keyTag ? { keyTag: it.keyTag } : {}),
     };
 }
 

@@ -253,6 +253,8 @@ function capacityCheck() {
     return { ids, roles: [...roles], gaps: CAPK ? [...CAPK.capacityGaps([...roles]), ...capacityDrift(CAPK.ROLE_CAPACITY, roleSrcFile)] : ['js/modules/sheet/role-capacity.js: no declared capacity table'] };
 }
 // the page-fill measure of every page in scope (browser side): {pct, whiteMm, rowMm, gapMm, rows, items, size}
+// (`checkItems`: the cells outside a Pre-skill Check's Quick review band, [data-psc-review] - EB-PSCCAP counts the CHECK against its
+// ceiling; the review's earlier-skill rows are not check items, card design/cards/psc-review)
 const measurePageFill = (scope) => [...document.querySelectorAll(scope)].map((pg) => {
     const MM = 96 / 25.4; const size = pg.getAttribute('data-eb-size') || null;
     const gapOf = (el) => { const g = el ? parseFloat(getComputedStyle(el).rowGap) : NaN; return Number.isFinite(g) ? g / MM : 0; };
@@ -273,7 +275,7 @@ const measurePageFill = (scope) => [...document.querySelectorAll(scope)].map((pg
     // (the next row is a ROW - as tall as its tallest cell - not the median cell: on a mixed page the two differ, critic eblast r1 F1;
     // the TALLEST row drawn, so "another row fits" is claimed only when any row of the page would fit again - no false red)
     const rh = rows.map((r) => r.bottom - r.top).sort((a, b) => a - b);
-    return { pct: Math.round(Math.max(0, br.bottom - last) / br.height * 100), whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: rh.length ? rh[rh.length - 1] / MM : hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN, gapMm, rows: rows.length, items: tops.length, size };
+    return { pct: Math.round(Math.max(0, br.bottom - last) / br.height * 100), whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: rh.length ? rh[rh.length - 1] / MM : hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN, gapMm, rows: rows.length, items: tops.length, checkItems: tops.filter((c) => !c.closest('[data-psc-review]')).length, size };
 });
 // EB-GRIDFOOT (opt-in --grid-foot): the verdict on one Test / Review render (null = fine). pages: its page count; whiteMm: the white
 // under the grid on its page; rowMm: one row's height (the median cell); cols / indCols: its columns and the Independent page's.
@@ -1437,7 +1439,7 @@ async function main() {
                         const shapes = await sh.evaluate((sel) => [...document.querySelectorAll(sel)].map((pg) => (pg.querySelector('.ws-grid.mq-model-nolone') ? 'NO-LONE-STATE' : pg.querySelector('.ws-grid.mq-factmodel-fill') ? 'FACT_MODEL_FILL' : '')), 'body > section.ws-page, body > .ws-page');
                         pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30 && j.role === 'scripted-model' && EB_PAGE_EXEMPT[shapes[i]]) console.log(`  note: EB-PAGE ${shapes[i]} (not a finding) ${key} ${j.tag} p${i + 1}: ${v.pct} % empty - ${EB_PAGE_EXEMPT[shapes[i]]}`); });
                         pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30 && !(j.role === 'scripted-model' && EB_PAGE_EXEMPT[shapes[i]])) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
-                        pf.forEach((v, i) => { const cap = pscCapBad(j.role, j.size, v.items, CAPK && CAPK.ROLE_CAPACITY); if (cap) F('EB-PSCCAP', `${key} ${j.tag} p${i + 1}`, `${v.items} items on the page, above its declared ${j.size} ceiling of ${cap} (role-capacity.js)`); });
+                        pf.forEach((v, i) => { const nCk = v.checkItems === undefined ? v.items : v.checkItems; const cap = pscCapBad(j.role, j.size, nCk, CAPK && CAPK.ROLE_CAPACITY); if (cap) F('EB-PSCCAP', `${key} ${j.tag} p${i + 1}`, `${nCk} check items on the page, above its declared ${j.size} ceiling of ${cap} (role-capacity.js)`); });
                         if (pf.length && pageAllBad(j.role, pf[pf.length - 1].pct)) F('EB-PAGE', `${key} ${j.tag} p${pf.length}`, `${pf[pf.length - 1].pct} % of the last page body is empty under its last block (a Pre-skill Check is one short page: every page judged, at its ceiling too; limit 30 %)`);
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
