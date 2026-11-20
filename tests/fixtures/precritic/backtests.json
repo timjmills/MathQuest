@@ -14117,6 +14117,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "content-audit-module-load",
+   "check": "lead 2026-11-20: ws-content-audit (a CLAUDE.md gate) crashed on master with ERR_MODULE_NOT_FOUND: skill-options.js now imports pupil-option-words.js and the audit's temp copy listed modules by hand",
+   "kind": "commit-pair",
+   "rule": "ws-content-audit loads skill-options.js from a copy of the whole js/modules tree (+ --self-test loads it)",
+   "browser": true,
+   "fail": {
+    "commit": "398bb4902",
+    "state": "--skill add_facts crashes (ERR_MODULE_NOT_FOUND pupil-option-words.js)"
+   },
+   "pass": {
+    "commit": "4f9ee85ad",
+    "state": "--skill add_facts: ws-content-audit: OK"
+   },
+   "command": "node {root}/tests/scripts/ws-content-audit.cjs --skill add_facts > /tmp/mq-audit-load.$$ 2>&1; grep -q '^ws-content-audit: OK' /tmp/mq-audit-load.$$ && echo 'audit-load: OK' || echo 'audit-load: FAIL'; rm -f /tmp/mq-audit-load.$$",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
