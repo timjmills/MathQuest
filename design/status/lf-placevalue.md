@@ -508,3 +508,40 @@ These replace the r2 tables. Every list is shrink-only from here (tests/scripts/
 | lf-ops | `addition:add`, `addition:add_10_mixed`, `addition:add_10_no_regroup`, `addition:add_10_regroup`, `addition:add_20_mixed`, `addition:add_20_regroup`, `addition:add_sub_fact_family`, `integers:abs_value`, `integers:add_int`, `integers:number_line_int`, `integers:order_negatives`, `integers:ordering_rationals`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:mult_chart_headers`, `multiplication:mult_div_fact_family`, `number_ops_mixed:which_sign`, `number_theory:sort_prime_composite`, `subtraction:mixed_subtraction`, `subtraction:sub_100_no_regroup`, `subtraction:sub_100k_mixed`, `subtraction:sub_100k_regroup`, `subtraction:sub_10_no_regroup`, `subtraction:sub_10_regroup`, `subtraction:sub_10k_mixed`, `subtraction:sub_10k_regroup`, `subtraction:sub_1k_mixed`, `subtraction:sub_1k_regroup`, `subtraction:sub_1m_mixed`, `subtraction:sub_1m_regroup`, `subtraction:sub_20_regroup`, `subtraction:sub_2d_1d`, `subtraction:sub_50_mixed`, `subtraction:sub_50_no_regroup`, `subtraction:sub_across_zeros`, `subtraction:sub_check_by_adding`, `subtraction:sub_missing_digit`, `subtraction:subtract` |
 | lf-vocab | `vocabulary:vocab_grade_3_fractions`, `vocabulary:vocab_grade_6_data`, `vocabulary:vocab_grade_6_measurement` |
 | time-money / measurement lane | `measurement:bar_graph_intro`, `measurement:clock_hands`, `measurement:count_notes`, `measurement:count_notes_and_coins`, `measurement:elapsed_find_start`, `measurement:elapsed_mixed`, `measurement:elapsed_visual_easy`, `measurement:elapsed_visual_hard`, `measurement:elapsed_visual_medium`, `measurement:make_change_least_coins`, `measurement:money`, `measurement:money_change`, `measurement:money_compare`, `measurement:money_count`, `measurement:order_clocks_analog_asc`, `measurement:order_clocks_analog_desc`, `measurement:order_notes`, `measurement:pictograph_intro`, `measurement:reading_ruler`, `measurement:temperature`, `measurement:time_1min`, `measurement:time_5min`, `measurement:time_analog_digital`, `measurement:time_half_hour`, `measurement:time_hour`, `measurement:time_quarter` |
+
+### 2026-11-20 — HINT-NO-BLANK r3 + lead ruling A12 (guard)
+
+Head `claude/lf-placevalue-hint-r3` (r3 b5e2205e6 + guard df3899387). The r3 choice rule (own steps if only the final answer
+sentence is cut, else screenHelp, else a clean hint, else no box) applies only to skills WITH screenHelp and to placevalue;
+every other skill keeps master's r2 help (`workedStepsR2`, verbatim). Pins: EMPTY 25, HELP-THIN 5, HINT-LEAK 159, SAYLESS 115;
+the r3 checks on the kept r2 help are pinned as their baseline (STEPS-LEAK 43, BARE-STEP 4, DANGLING-HEAD 6, ORPHAN 145,
+HELP-GENERIC 82), shrink-only. Check R2-KEEP (`hint-no-blank-a12-r2-keep`, FAIL b5e2205e6 -> OK df3899387).
+
+**Routed next week (owner: each family lane, lead A12): write `screenHelp` for these 107 skills** - under the r3 rule
+they would show no box; once a family has screenHelp the r3 rule covers it (and the skill drops off the pins).
+
+- `addition` (3): add_5_pictures, comparison_word, number_families_add
+- `algebra` (6): combine_like_terms, distributive_expr, factor_out_gcf, two_step_add_then_div, two_step_estimate_check, two_step_mult_div_first
+- `algebra_mixed` (1): number_theory_all
+- `all_mixed` (2): grade_5_mixed, grade_k_mixed
+- `angles_lines` (6): additive_angles, angles_around_point, angles_in_right_angle, angles_on_straight_line, identify_lines, measure_angles
+- `area_perimeter` (10): area, area_distributive_visual, area_missing_side, area_polygon_decompose, area_unit_squares, mixed_area_perimeter, perimeter_grid, volume, volume_composite, volume_missing_edge
+- `comparing` (2): compare_groups, mixed_comparing
+- `composing` (3): mixed_composing, odd_even, whole_as_fraction
+- `conversions` (2): d_to_p, f_to_d
+- `coordinates` (3): coord_distance_q1, coord_polygon, mixed_coordinates
+- `data_analysis` (2): mad, mixed_data_analysis
+- `decimals` (2): mixed_decimals, round_decimals
+- `division` (6): div_2by1_long, div_3by1_long, div_3by2_long, div_4by1_long, div_fix_estimate, mixed_division
+- `frac_dec_mixed` (3): conversions_all, decimals_all, fdp_all
+- `fraction_operations` (24): add_frac_like_nv, add_frac_unlike, add_frac_unlike_nv, add_fractions_like, add_mixed_like_nv, add_mixed_unlike_nv, decompose_frac_nv, decompose_fractions, div_unit_fraction, frac_10_100, frac_10_100_nv, frac_as_div_nv, frac_as_div_word, frac_as_division, frac_word_mixed, frac_word_problems, frac_word_problems_plain, mult_frac_frac, mult_frac_frac_nv, mult_scaling_nv, sub_frac_like_nv, sub_frac_unlike, sub_mixed_like, sub_mixed_like_nv
+- `fractions` (9): equiv_frac_visual, fraction_nl_drag, fraction_of_set, fraction_of_set_hard, fraction_of_set_hard_nv, fraction_of_set_nv, graph_fractions, mixed_fractions, shade_fraction
+- `geo_mixed` (2): geo_meas_all, geometry_all
+- `graphs` (1): pictograph_how_many_more
+- `measurement` (4): pictograph_intro, time_half_hour, time_hour, time_quarter
+- `multiplication` (8): equal_or_unequal_groups, mult_by_hundred, mult_by_ten, mult_chart_shade, mult_facts, mult_facts_15, mult_zeros, number_families_mult
+- `number_theory` (3): list_multiples, missing_multiples, multiples
+- `patterns` (1): notice_patterns
+- `shapes_early` (2): mixed_shapes_early, name_3d_shapes
+- `subtraction` (1): sub_5_pictures
+- `vocabulary` (1): vocab_pick3_words

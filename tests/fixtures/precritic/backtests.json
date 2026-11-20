@@ -14677,6 +14677,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "hint-no-blank-a12-r2-keep",
+   "check": "ws-hint-no-blank R2-KEEP: a skill with no screenHelp keeps master's r2 'Here is how' box (add_facts / sub_facts keep their own steps, not a one-line hint)",
+   "kind": "commit-pair",
+   "rule": "lead ruling A12 (2026-11-20): the r3 choice rule applies only to skills with screenHelp plus this lane's; pins only shrink",
+   "browser": true,
+   "fail": {
+    "commit": "b5e2205e6",
+    "state": "r3 app-wide: add_facts shows 1 step (its hint)"
+   },
+   "pass": {
+    "commit": "df3899387",
+    "state": "guard: r2 steps kept"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,subtraction:sub_facts --only R2-KEEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
