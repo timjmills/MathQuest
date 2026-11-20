@@ -6,6 +6,7 @@
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --seed 4242 --out <dir>      # elsewhere
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check                      # GATE
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check --copy               # + copy for the owner
+//   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check --rows E42,E43       # only those rows decide (backtests)
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --repeats                    # GATE: repeats only (S2), no PDF
 //     (R-ANSWER / R-TURN / R-CELL, see repeatsCheck; prints `ws-detailed-lesson --repeats: OK` / `FAIL (n)`;
 //      with --check as well, the repeats join the self-check's verdict)
@@ -968,7 +969,10 @@ else (async () => {
             const rows = evaluate(R, rast, LIB, built.kitLib);
             fs.writeFileSync(path.join(OUT, 'SELF-CHECK.md'), selfCheckMd(rows, R.pages, { lesson: LESSON, seed: SEED, notes: built.notes || [] }));
             for (const r of rows) console.log(`${r.id.padEnd(5)} ${r.pass ? 'PASS' : 'FAIL'} ${String(r.measured).slice(0, 260)}`);
-            failed = failed || rows.some((r) => !r.pass);
+            // (--rows E42,E43: only those self-check rows decide the verdict - a backtest row proves one E-check on a commit where
+            // another, fixed later, still fails)
+            const only = String(arg('rows', '')).split(',').map((x) => x.trim()).filter(Boolean);
+            failed = failed || rows.some((r) => !r.pass && (!only.length || only.includes(r.id)));
             if (has('debug')) fs.writeFileSync(path.join(OUT, 'measure.json'), JSON.stringify(R, null, 1));
         }
         if (has('copy')) {
