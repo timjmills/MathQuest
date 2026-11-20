@@ -1,0 +1,15 @@
+ws-print-lint: source kit, 2 skill(s)
+  composing:chart_to_120#lesson: 6+3 pages, 0 finding(s)
+  composing:hundreds_chart_fill#lesson: 6+3 pages, 1 finding(s)
+
+document                                pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+composing:chart_to_120#lesson             6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+composing:hundreds_chart_fill#lesson      6+3k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                             .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .
+
+composing:chart_to_120#lesson (Count to 120 on the Chart (lesson))
+
+composing:hundreds_chart_fill#lesson (Hundreds Chart - Find the Missing Number (Visual) (lesson))
+  [L-DENSITY PAGEFILL major] (p3) page 3: an empty strip 82 mm tall under the problems (35% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+ws-print-lint: FAIL - 2 document(s), source kit; 1 finding(s) in 1 document(s)
