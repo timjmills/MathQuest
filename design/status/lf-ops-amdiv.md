@@ -20,3 +20,19 @@ measured cells 76.5 mm for 52 mm of ink: 3 rows where 4 would fit), lesson M p2 
 Reason It L-TOPSTART (the roles centre the work, CL-4b owner 2026-11-12, vs the lint); Reason It L CL40-INK, LONE-PAGE;
 pre-skill-check L DN-2; TOUCH-HIT x48 (the probe ran clean: real); options H13 long / fraction 6 vs 8 (capacity not fitted,
 card capacity line not changed, no re-sign asked). 3by1 (live) shows the same template classes (EB-BAND independent M x18).
+
+## Template round 2 (Opus medium, 2026-11-20) - stopped at the $40 cap, NOT clean
+- H13 / EB-BAND long + fraction @M: footprint `denseRoom: 1` for the long and fraction forms and print gaps 0.1 / 0.3 em
+  (screen unchanged): 4 rows at M, 8 a page like the sign form; options-verify --render OK (was 6 vs 8). L stays 6 for every
+  form. Backtest `amdiv-long-rows` (FAIL 86f63e822 -> OK 91ee8eaa8). No card change, so no re-sign.
+- L-TOPSTART on Error Analysis / Reason It: ws-print-lint CENTRED_ROLES exemption (CL-4b owner 2026-11-12, lead ruling
+  2026-11-20), self-tests both ways; ledger row exempt-with-reason (a lint-side change cannot be a commit pair).
+- NOT done: TOUCH-HIT (the q-0 / q-1 inputs are already 113 x 68 px: elementFromPoint owns them, but a real tap 1 px inside
+  focuses body - not a size problem; the total box is fine; cause not found), Reason It L LONE-PAGE (A over B at L is ~2 x 55
+  mm plus the response: one a page is the measured capacity - needs a lead ruling in design/audit/baselines/capacity.json),
+  pre-skill-check L DN-2 (role paging of the prerequisite sections, not the template).
+- New after round 2 (branch precritic, cut at the 2 h limit, /tmp/mq-precritic run in r2-branch-4by2.txt): lesson M p3
+  L-DENSITY PAGEFILL (59 mm strip, 27 %) and lesson EB-BAND M p2 / p3, L p2 - the tighter print gaps changed the lesson
+  Practice page; next round must re-fit it. ws-no-size-s GATE-TOKEN and ws-chromebook-fit (aborted module requests) look
+  master / environment-side: unverified.
+- 3by1 / 2by1 precritic and the master comparison were not run this round (slot contention: the 4by2 run alone hit 2 h).
