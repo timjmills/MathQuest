@@ -14597,6 +14597,26 @@
     "state": "GROWCAP 0 for every count row (roles/opener.js)"
    },
    "browser": true
+  },
+  {
+   "id": "psc-twin-pools",
+   "kind": "commit-pair",
+   "check": "lead A10: a Pre-skill Check never prints two bands dealt from one skill (twin pools merge)",
+   "rule": "ws-psc-lint PSC-TWIN",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills division:div_facts_long,subtraction:sub_2d_1d,vocabulary:vocab_pick3_words --only PSC-TWIN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "e41e5ecc8",
+    "state": "div_word_problems / sub_word_problems / vocab_grade_pictures dealt by two pools, two bands with one instruction"
+   },
+   "pass": {
+    "commit": "a6fc9407a",
+    "state": "planCheck merges pools of one skill into one band (pre-skill-check.js)"
+   },
+   "browser": true
   }
  ]
 }
