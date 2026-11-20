@@ -375,7 +375,9 @@ export function optionsReadOnlyHTML(categoryId, skillId, opts) {
         if (d.type === 'bool') text = v ? 'Yes' : 'No';
         else if (d.type === 'rows') text = typeof d.summary === 'function' ? d.summary(v) : String(Array.isArray(v) ? v.length : 0);
         else if (d.type === 'set') {
-            const all = d.values || [];
+            // hotfix t15fix: a tick the band hides (13-15 under 10 x 10 / 12 x 12, `valueHide`) is not named (ws-tables15 T15-HIDDEN)
+            const hide = typeof d.valueHide === 'function' ? new Set(d.valueHide(cur) || []) : null;
+            const all = (d.values || []).filter((x) => !(hide && hide.has(x.v)));
             const picked = all.filter((x) => Array.isArray(v) && v.includes(x.v)).map((x) => x.l);
             text = !picked.length ? 'Any' : (picked.length === all.length && d.allLabel) ? d.allLabel : picked.join(', ');
         } else {

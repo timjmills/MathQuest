@@ -17,6 +17,11 @@
 //               digits print at the same size as on the default 12 x 12 page (3-digit products such as 225 fit the boxes).
 //   T15-PRESET  mult_facts_15 / div_facts_15 are live skills, presets of their host that open it with band 225, with a share
 //               code, standards, WRM tags and search terms.
+//   T15-HIDDEN  at "Tables to 12 x 12" (144) and "10 x 10" (100) the hidden 13, 14 and 15 ticks are never dealt and never named,
+//               whatever the ticks: all ticked, some unticked (the complement of 7 and 8 over 0-15), only 13-15 ticked, or decoded
+//               from a share code that carries the D / E / F tokens. No dealt fact has a factor, divisor or quotient past the
+//               band's top, and the option summary (describeOptions: the Sets screen, the Quick Start card), the fact-set title
+//               and the I Can line name no 13, 14 or 15 (hotfix t15fix, 2026-11-20: ws-share-options read "Times: 0 ... 6, 9 ... 15").
 //   FORM-FIRST  in the rendered Options panel, "How it is written" (divForm / notation) and the Support choices stand ABOVE the
 //               long "Multiply by" / "Divide by" tick list.
 import { createRequire } from 'node:module';
@@ -36,7 +41,7 @@ const HOSTS = [
 const only = String(arg('--skill', arg('--skills', ''))).split(',').map((s) => s.trim()).filter(Boolean);
 const mine = only.length ? HOSTS.filter((h) => only.some((k) => [h.id, h.preset, `${h.cat}:${h.id}`, `${h.cat}:${h.preset}`].includes(k))) : HOSTS;
 if (!mine.length) { console.log(`${TOOL}: OK (n/a: no x / ÷ fact drill in scope)`); process.exit(0); }
-const RULES = ['T15-BAND', 'T15-DEAL', 'T15-TICKS', 'T15-FIT', 'T15-PRESET', 'FORM-FIRST'];
+const RULES = ['T15-BAND', 'T15-DEAL', 'T15-TICKS', 'T15-FIT', 'T15-PRESET', 'T15-HIDDEN', 'FORM-FIRST'];
 const want = new Set(String(arg('--rules', RULES.join(','))).split(',').map((s) => s.trim()).filter(Boolean));
 const VERBOSE = args.includes('--verbose');
 
@@ -47,7 +52,7 @@ try {
     await app.page.waitForFunction(() => typeof window.buildSheet === 'function' && typeof window.generateQuestionFor === 'function', { timeout: 90000 });
     for (const h of mine) {
         const r = await app.page.evaluate(async (a) => {
-            const out = { band: [], deal: [], ticks: [], preset: [], order: [], info: {} };
+            const out = { band: [], deal: [], ticks: [], preset: [], hidden: [], order: [], info: {} };
             const so = await import('/js/modules/skill-options.js');
             const ui = await import('/js/modules/skill-options-ui.js');
             const data = await import('/js/modules/data.js');
@@ -109,6 +114,47 @@ try {
             } else out.deal.push(`${a.id}: band 225 is not offered, so no 13-15 fact can be dealt`);
             const d144 = deal({}, 150, 'b144');
             for (const t of [13, 14, 15]) if (d144.seen.has(t)) out.deal.push(`${a.id} default (12 x 12): a ${t} fact was dealt`);
+            // ---- T15-HIDDEN (bands 144 and 100: the hidden 13-15 ticks are never dealt, never named)
+            {
+                const codec = await import('/js/modules/skill-option-codec.js');
+                const ALL = Array.from({ length: 16 }, (_, i) => i);
+                const NOT78 = ALL.filter((v) => v !== 7 && v !== 8);
+                for (const b of [144, 100]) {
+                    const top = b === 100 ? 10 : 12;
+                    const cases = [
+                        ['default', b === 144 ? {} : { band: b }],
+                        ['all ticked', { band: b, constant: ALL }],
+                        ['7, 8 unticked', { band: b, constant: NOT78 }],
+                        ['only 13-15 ticked', { band: b, constant: [13, 14, 15] }],
+                        ['7, 8 and 13-15 ticked', { band: b, constant: [7, 8, 13, 14, 15] }],
+                    ];
+                    // decoded from share codes: the round trip of each case, and a hand-made code with the D / E / F tokens
+                    for (const [tag, o] of cases.slice(1)) {
+                        const pay = codec.encodeOptionPayload(a.cat, a.id, o);
+                        if (pay) cases.push([`code ${pay}`, codec.decodeOptionPayload(a.cat, a.id, pay)]);
+                    }
+                    for (const [tag, o] of cases) {
+                        const opts = { ...o };
+                        if (b !== 144) opts.band = b; else delete opts.band;
+                        for (let i = 0; i < 48; i++) {
+                            let q;
+                            try { q = window.generateQuestionFor({ category: a.cat, skill: a.id, opts, seed: (fnv(`${a.id}:hid:${b}:${tag}`) ^ Math.imul(i + 1, 2654435761)) >>> 0, itemIndex: i % 12 }); } catch (e) { out.hidden.push(`${a.id} band ${b} ${tag}: item ${i} threw ${e.message}`); break; }
+                            const f = factOf(q);
+                            const nums = a.cat === 'multiplication' ? [f.A, f.B] : [f.B, f.ans];
+                            if (nums.some((x) => Number.isFinite(x) && x > top)) { out.hidden.push(`${a.id} band ${b} ${tag}: dealt ${f.A} ${a.cat === 'multiplication' ? 'x' : '÷'} ${f.B} (past ${top})`); break; }
+                        }
+                        const words = [
+                            ['summary', so.describeOptions(a.cat, a.id, opts)],
+                            ['title', so.factSetTitle(a.cat, a.id, opts)],
+                            ['I Can', so.optionICan ? so.optionICan(a.cat, a.id, opts, 'I Can multiply') : ''],
+                        ];
+                        for (const [w, t] of words) {
+                            const m = String(t || '').match(/(?:[^\d]|^)(1[3-5])(?!\d)/);
+                            if (m) out.hidden.push(`${a.id} band ${b} ${tag}: the ${w} names ${m[1]} ("${String(t).slice(0, 90)}")`);
+                        }
+                    }
+                }
+            }
             // ---- T15-TICKS
             const cdef = defs.find((d) => d.id === 'constant');
             const h = { set: () => '', toggle: () => '', all: () => '' };
@@ -183,7 +229,7 @@ try {
             return out;
         }, h);
         found['T15-BAND'].push(...r.band); found['T15-DEAL'].push(...r.deal); found['T15-TICKS'].push(...r.ticks);
-        found['T15-PRESET'].push(...r.preset); found['FORM-FIRST'].push(...r.order);
+        found['T15-PRESET'].push(...r.preset); found['T15-HIDDEN'].push(...r.hidden); found['FORM-FIRST'].push(...r.order);
         if (VERBOSE) console.log(`  ${h.id}: dealt at 225 ${r.info.dealt225 || '-'}; panel ${r.info.order}; search ${r.info.search || '-'}`);
         // ---- T15-FIT (independent page at M and L)
         if (want.has('T15-FIT')) {

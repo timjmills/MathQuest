@@ -893,6 +893,8 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 "ws-empty-band --pin-check" ws-empty-band.cjs --pin-check   # critic eblast r4 P1: the blocking-role list may only grow (merge-base pin, fails closed)
+  node_gate 1 "ws-empty-band --capacity-check" ws-empty-band.cjs --capacity-check   # every role used by a passed skill declares its ceiling, no drift
   node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
   node_gate 1 ws-codec-registry ws-codec-registry.mjs
   node_gate 1 ws-standards ws-standards.cjs
