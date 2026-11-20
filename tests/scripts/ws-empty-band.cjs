@@ -150,7 +150,8 @@ const ONE_PAGE_ROLES = new Set(['pre-skill-check']);
 // 10). Each role's DESIGNED ceiling is declared once in the kit (js/modules/sheet/role-capacity.js, WDS §12.1); the rules read it.
 // EBLAST-BLOCKING (lead 2026-11-20, after critic eblast r3): the rules stay ADVISORY globally, but are FINDINGS on these roles.
 // The list is PINNED: it may only GROW (`--pin-check` fails when an entry of the merge-base copy is gone, as no-dropped-row does for
-// backtests). Seeded with every role green on all passed skills (sweep 2026-11-20); pre-skill-check is out until its owner fixes it.
+// backtests). Seeded with every role green on all passed skills (sweep 2026-11-20); pre-skill-check joined 2026-11-20 (lf-roles PSC fill,
+// lead request: its owner's fill commit follows this check commit).
 // Which listed roles each rule can actually judge (critic eblast r4 P3): EB-LASTPAGE judges only FIXED_CAP_ROLES (pre-skill-check,
 // true-false, reason-it, error-analysis, test); CAP-PARITY only roles whose count the role sets (guided, error-analysis, review, test,
 // pre-skill-check, mixed-practice, true-false, reason-it, word-problems). independent, more-practice, stretch, scripted-model,
@@ -158,7 +159,7 @@ const ONE_PAGE_ROLES = new Set(['pre-skill-check']);
 // EBLAST-BLOCKING-BEGIN
 const EBLAST_BLOCKING_ROLES = [
     'independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'mixed-practice', 'true-false', 'reason-it',
-    'word-problems', 'stretch', 'scripted-model', 'opener', 'lesson', 'fact-probe', 'fact-rows',
+    'word-problems', 'stretch', 'scripted-model', 'opener', 'lesson', 'fact-probe', 'fact-rows', 'pre-skill-check',
 ];
 // EBLAST-BLOCKING-END
 const BLOCKING = new Set(EBLAST_BLOCKING_ROLES);
@@ -609,10 +610,10 @@ if (argv.includes('--self-test')) {
             ['r4 Object.freeze constant read', JSON.stringify(roleConstOf('const MAX_SHELVES = Object.freeze({ S: 9, M: 7, L: 5 });', 'MAX_SHELVES')), '{"S":9,"M":7,"L":5}'],
             // EBLAST-BLOCKING: per-role findings, pinned list
             ['blocking: an allow-listed role red is a finding', eblastMode('test', false), 'finding'],
-            ['blocking: pre-skill-check (not listed) red is advisory', eblastMode('pre-skill-check', false), 'advisory'],
-            ['blocking: --eblast-block makes every red a finding', eblastMode('pre-skill-check', true), 'finding'],
+            ['blocking: an unlisted role red is advisory', eblastMode('not-a-role', false), 'advisory'],
+            ['blocking: --eblast-block makes every red a finding', eblastMode('not-a-role', true), 'finding'],
             ['blocking: a role key with columns reads its role', eblastMode('review cols 3', false), 'finding'],
-            ['blocking: pre-skill-check is not seeded', BLOCKING.has('pre-skill-check'), false],
+            ['blocking: pre-skill-check is listed (lf-roles PSC fill)', BLOCKING.has('pre-skill-check'), true],
             ['pin: the list reads from its markers', JSON.stringify(blockingOf("// EBLAST-BLOCKING-BEGIN\nconst X = ['test', 'review'];\n// EBLAST-BLOCKING-END")), '["test","review"]'],
             ['pin: removing an entry FAILs', pinLost(['test', 'review'], ['test']).join(), 'review'],
             ['pin: growing is OK', pinLost(['test'], ['test', 'pre-skill-check']).length, 0],

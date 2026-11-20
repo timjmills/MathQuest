@@ -1038,6 +1038,19 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
 
+### lf-ops-props (2026-11-07 .. 11-13): rounds r1, r2, r3b and the r4 probe - the empty-band class stopped under rule 7
+
+Process rule (from this lane): **never wrap ws-backtest or ws-precritic in mq-browser-run.sh** - they take the browser slots
+themselves; wrapped, the outer call holds a slot while its rows queue for one, and the queue deadlocks (LESSONS_LEARNED 8a).
+
+| Lost round / hour | Cause | Rule, check or tool that prevents it |
+|---|---|---|
+| r2 attempts 1-2 (`dealtFloor`) changed no number | WIP that could not reach the code path: the page count was set by the column probe, not the floor the attempts changed; nobody traced the path first | trace the call path in node before editing (status "Step 1 - the call path"); a 40-line buildSheet probe (scratchpad tools/probe.cjs) settles a WIP in one run |
+| r3: every grid page failed L-TOPSTART after the band fix | centring the cells (lead ruling (b)) contradicted owner rule CL-4b (top start); print-lint was not run after a cell-alignment CSS change | run ws-print-lint kit after any cell-alignment change; a design that moves ink is checked against the signed CL rules before it is built |
+| r3b: EB-BAND rose after the centring was dropped | the bands were only HIDDEN by centring; their cause (rows taller than their content) was never measured | measure the row: per cell needed height vs row height (scratchpad tools/rowprobe.cjs + rows.js) before choosing a fix |
+| r4: ruling (a) (group by height) proved by a node model to move nothing (16 -> 16 cells >= 30 %) | the root cause was taken as "mixed-height rows"; the larger cause is the practice SPREAD stretching rows of one height (1.28-1.47 x their tallest), which skips the footprint's `noStretch` | model a proposed fix on measured rows before a ruling (scratchpad tools/model.js: A now / B regrouped / C, D row cap) - one probe run, ~10 min |
+| r3b / r4: EB-FOOT findings on every grid page of arrays_groups | ws-empty-band pairs cells with buildSheet's items in DEAL order; groupByHeight prints them in another order (the drawn heights are a permutation of the footprints) | pair by the plan's printed order (or return items in printed order); until then EB-FOOT on a height-grouped page is not evidence |
+
 ### lf-algebra critic r2 (2026-11-13): precritic's "clean" list was not an evidence list
 **Lost:** critic r2 failed every skill on pages precritic r9 had listed "clean for the critic". Three of its five failure classes sat
 there: (1) pages with an OPEN critic finding - F2, the npr / fgr screen count-row train, was known and handed to lf-ops, yet the npr /
@@ -1082,3 +1095,16 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 - r2 (FAIL): TOUCH-HIT (real clicks; elementFromPoint missed a covering wrapper), ws-screen-widths-plan (tablet checks never ran on precritic's path), CELL-READ needs a mark/slot and card kind = quiz kind. Speed-up: a real-tap probe found the regression in 2 min - fold probes the critic writes into the tool the same round.
 - r3 (PASS): TOUCH-HIT timing flake on untouched cells handed to lf-checks (re-tap after 2 rAF, 3-run backtest). Speed-up: owner scope changes (no 390, M/L) mid-lane cost one re-scope message per agent; brief agents to read the width/size table, not hard-coded widths.
 - 2026-11-13 lf-placevalue compare: a defect fixed in ONE string recurs in its siblings (the wrap: the "differ" step joined, the "Write" step not), and a check built on the default option misses the wide bands. Rule: fix the class at one helper, and run every layout check on the widest offered option value.
+
+### lf-placevalue HINT-NO-BLANK critic r1 FAIL -> r2 (2026-11-20)
+| Finding | What would have caught it before the critic | Rule / tool fix |
+|---|---|---|
+| F1, F2 worked gap left on screen | a backtest of the gate's OWN exemption on the state it exempts (the rawSteps clause passed a gap S8 then hides) | WORKED-GAP reads shown steps only. Rule: every exemption in a gate gets a backtest row that shows it does not pass the defect it exempts |
+| F3 hints state the answer | S8 run on EVERY help path (STEPS, Say, hint, Show Solution), not the one the change touched | HINT-LEAK / SAY-LEAK; 168 pre-existing skills pinned shrink-only by lane |
+| F4, F13, F14 list / word / sort answers leak | answer tokens read by the GATE, not borrowed from the code under test (answerTokens skipped tokens over 12 chars and never split a list) | STEPS-LEAK with gate-owned tokens. Rule: a leak check never reuses the fix's tokenizer |
+| F7 one-word unit cut | a unit test of the cutter on the real unit strings ("square units", "cubic cm") before the pin was written | UNIT-CUT; a pin entry must say why it cannot be fixed - a cutter bug is not "nothing to teach" (EMPTY_PIN 28 -> 25) |
+| F8 status line points at a hidden box | asserting the whole card (box AND message) when a box is hidden | HELP-EMPTY-HIDDEN checks the status line |
+| F5, F6, F9-F11 help that does not teach | content lints of the shown text: bare expression, repeat, last step has an instruction, Say numbers are whole given tokens, Say gap is not given, box has Listen | BARE-STEP, HELP-THIN, SAY-FILL, SAY-GAP-GIVEN, LISTEN |
+- Speed-up: --only <CHECK> on ws-hint-no-blank lets one backtest row prove one check on the same skill list in ~15 s.
+- Lost time this round: a "given value" rule widened to the picture's numbers made every clock hour "given" (ws-support-ladder
+  time_quarter caught it); a widening of what counts as given needs the time and money skills in its first run.

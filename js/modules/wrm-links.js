@@ -335,6 +335,20 @@ export function gradeSections(gradeId) {
 }
 
 export function allLessons() { unpack(); return LESSONS.slice(); }
+
+// LESSON-OPENER-SAME (lf-engine, owner's grade-3 review 2026-11-19): a standard lesson of this screen is built per LESSON, not
+// per skill. Two steps that share a skill and its options (Y4.B2.S3 / S4 "one exchange" / "more than one exchange") built
+// with one seed printed the same packet; two times-table steps opened on the same model. The request carries the lesson's
+// variant (its WRM step number; a lesson with no step: a number read from its key) and a seed made from it.
+export const WRM_LESSON_SEED = 4242;
+export function wrmLessonVariant(l) {
+    const m = /\.S(\d+)$/.exec(String((l && l.step) || ''));
+    if (m) return Number(m[1]);
+    let h = 0;
+    for (const ch of String((l && l.key) || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return h % 997;
+}
+export const wrmLessonSeed = (l) => (WRM_LESSON_SEED + 7919 * wrmLessonVariant(l)) >>> 0;
 export function lessonByKey(key) { unpack(); return BY_KEY.get(String(key || '')) || null; }
 export function weekInfo(gradeId, week) {
     const g = WRM_SEQUENCE.find((x) => x.id === gradeId);

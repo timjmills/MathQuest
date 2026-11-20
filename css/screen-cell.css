@@ -1843,6 +1843,11 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
     .k2-countrow-keys .k2-keys-type { display: none; }
     .k2-countrow-keys .k2-keys-touch { display: inline; }
 }
+/* (lane lf-ops critic r1 D-CB-9, BD-11: a phone-width screen is a touch screen - the tap wording, not the Space key) */
+@media (max-width: 480px) {
+    .k2-countrow-keys .k2-keys-type { display: none; }
+    .k2-countrow-keys .k2-keys-touch { display: inline; }
+}
 
 /* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
    dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
@@ -1915,6 +1920,12 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
    rule above squares every input's corners) */
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
 
+/* lf-ops-props r4b (lf-algebra critic r2 G1; SCREEN-DIGIT 40 / 48 / 56 px): a worksheet card that holds a count-row box train
+   (number_patterns_rule; count_by_tables' arcs train, lead ruling (a) 2026-11-13) keeps the host's own digit size, not the grid
+   cell's 29 px - its train wraps to the card's width. A train that still swipes (a number line under it: no k2-countrow-wrap) is excluded. */
+.mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 40px; }
+@media (min-width: 600px) { .mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 48px; } }
+@media (min-width: 1200px) { .mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 56px; } }
 /* lf-checks eb-r4 D1 (lead ruling 2026-11-13, (b)): a kit LINE slot taken by the host's input. Its DRAWN box is the digit
    height (1.15em) and the underline under it; the 48 px touch target stays, as transparent padding around the drawn box,
    pulled out of the layout by an equal negative margin, so no blank box shows above the digits. The underline is a
@@ -2118,6 +2129,12 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
 
+/* critic cbt r1 D2 (lf-ops-props r5): an online-worksheet card that holds a wrapping count row takes the whole grid row - in a
+   third of the 1280 grid (about 250 px) the row stacked ONE number a line under arrows pointing at nothing; paper prints two lines
+   of six. ADDITIVE. ws-screen-slots TRAIN-FIT counts the numbers a line (>= 3). */
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-countrow-wrap),
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard:has(.k2-countrow-wrap) { grid-column: 1 / -1; }
+
 /* lf-ops divarray r2 (lead 2026-11-13, lf-checks' tablet-width sweep; ws-screen-slots --screen-digit --digit-widths): a div_facts
    online-worksheet cell takes the host's digit floor for its width - the card's own 40 / 48 / 56 px at its 600 / 1200 px
    breakpoints (48 at 820 / 1024, 56 at 1280 / 1366) - above the 40 px touch floor. ADDITIVE; worksheet.js sets the marker. */
@@ -2208,6 +2225,13 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
     padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
 }
+
+/* critic cbt r2 E9 (lead ruling 2026-11-14): the count-row span is PER CARD. Only a card whose train is wider than a column of a
+   2-column grid takes the whole row (worksheet.js _wsTrainSpans sets mq-train-span); every other count-row card stays in the
+   grid - number_patterns_rule's 4 + 4 train stood in the middle third of a full-row card at 1024 / 1280. ADDITIVE: it overrides
+   the D2 rule above by specificity. ws-worksheet-reflow FULLROW-SPAN / FULLROW-USE. */
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-countrow-wrap):not(.mq-train-span):not(.mq-span-row),
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard:has(.k2-countrow-wrap):not(.mq-train-span):not(.mq-span-row) { grid-column: auto; }
 /* lf-builds chart_120 r2 (ws-phone-card TOUCH-HIT, lf-checks 2026-11-13): in a chart window sized from its digits the collapsed
    borders let a NEIGHBOUR square's number (an absolute span over its own square) lie 1 px over an empty square's input, so a
    tap on the input's edge or corner landed on "62" and focused nothing. The empty square's writing place stands above its
@@ -2236,3 +2260,25 @@ html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-c
 .mq-placebank .mq-placetile { min-width: 96px; min-height: 48px; padding: 0 12px; font: inherit; font-size: 1.4rem; font-weight: 700;
     background: #fff; color: #000; border: 1px solid #000; border-radius: 6px; cursor: pointer; }
 .mq-placebank .mq-placetile[aria-pressed="true"] { box-shadow: inset 0 0 0 3px #000; }
+
+/* lf-placevalue critic (lead-routed, lf-hosts 2026-11-20; owner 2026-11-13: 48 px touch targets on a tablet). (1) The practice
+   card's tool buttons - Hint, Read, Skip, Calculator, Solution and Check in the tool row, and the open hint's Listen, close and
+   Got it! - drew 44 px tall (46 px in the short-screen compact bar at 1024 x 768): they are 48 px now, on every width. The row
+   keeps its one line at 820 (the buttons only grow 4 px taller; Check was already 52 px). (2) The sentence frame's sign circle
+   (add_wp_20's working sign) drew 46 x 46 on the online worksheet's grid at 820 / 1024: its box is at least 48 px, its centre
+   held, and an equal negative margin keeps every neighbour where it was (the sentence does not reflow). ADDITIVE.
+   ws-phone-card TOUCH-TARGET (the TOOLS rule and the tablet working-box floor) is the check. */
+html body :is(#gameView, #mapSessionView) #questionCard#questionCard > .mq-qactions.mq-qactions > :is(.btn, button),
+html body.student-mode :is(#gameView, #mapSessionView) #questionCard#questionCard > .next-btn-container.next-btn-container > .btn { min-height: 48px !important; min-width: 48px !important; }
+@media screen and (max-height: 860px) and (min-width: 700px) {
+    html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn,
+    html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .next-btn-container > #nextBtn { height: 48px !important; }
+}
+html body #questionCard .mq-hint-inline :is(.mq-hint-inline-btn, .mq-hint-inline-got, .hint-speak-btn),
+html body #questionCard button.mq-lw-speak { min-height: 48px !important; min-width: 48px !important; box-sizing: border-box; }
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-gl-sentence > input.mq-gl-sign {
+    --mq-sd: max(44px, calc(var(--mq-k2, 3.4px) * 11));
+    --mq-sg: max(48px, var(--mq-sd));
+    width: var(--mq-sg) !important; height: var(--mq-sg) !important; min-width: 48px !important; min-height: 48px !important;
+    margin: calc((var(--mq-sd) - var(--mq-sg)) / 2) !important;
+}

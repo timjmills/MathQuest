@@ -1701,7 +1701,7 @@ function showRoundModal() {
         '<span class="round-total">out of ' + state.qCount + ' attempted</span></div>' +
         '<div class="round-buttons">' +
         '<button class="btn btn-primary" onclick="continueNextRound()">Continue</button>' +
-        '<button class="btn btn-secondary" onclick="endGame()">Finish</button>' +
+        '<button class="btn btn-secondary" onclick="finishPracticeRun()">Finish</button>' +
         '</div></div>';
     document.body.appendChild(overlay);
 }

@@ -3761,10 +3761,13 @@ export const calculatorOption = () => ({
 // `skipAfter` (Wave 1 item 1.3): wrong tries on one question before the pupil's Skip button
 // appears. Per skill, default 5; 0 turns Skip off for the skill.
 export const skipAfterOption = () => ({
-    id: 'skipAfter', label: 'Skip appears after', type: 'int', default: 5, min: 0, max: 20, step: 1,
-    help: 'Wrong tries on one question before the pupil sees a Skip button. 0 turns Skip off for this skill.',
-    tip: 'Skip: how many wrong tries before the pupil may skip a question (0 = never).',
-    group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
+    // lf-hosts skip R1 (2026-11-19): on the practice card and online worksheet Skip shows from the start, so the
+    // value there is on (> 0) / off (0); boss and race still read it as the wrong tries before Skip appears.
+    // The stored values and the share-code key are unchanged.
+    id: 'skipAfter', label: 'Skip button (0 = off)', type: 'int', default: 5, min: 0, max: 20, step: 1,
+    help: 'Practice card and online worksheet: any number above 0 shows Skip from the start; 0 turns Skip off for this skill (the MAP test has its own Pupils can skip switch). Boss and race: the wrong tries on one question before Skip appears.',
+    tip: 'Skip button: 0 = off. Above 0 = on (boss / race: after that many wrong tries).',
+    group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip on (boss / race after ${Number(v)})` : 'Skip off'),
 });
 export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
 
@@ -4452,4 +4455,29 @@ export function optionICan(categoryId, skillId, opts, baseICan) {
     const tok = (v) => (v === 144 ? '12' : v === 225 && bandDef.default === 144 ? '15' : v === 100 && bandDef.default === 144 ? '10' : String(v));
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
+}
+
+// ============================ lane lf-ops (2026-11-07): mult_properties, ops-tables card ====================
+// Appended (skill-options is append-only for lanes): the card's "one frame per section" (P11, SCC-T10) - an
+// untouched page deals ONE property, the order property of lesson 3a (3.OA.B.5); ticking more mixes them. The
+// task help named "3 × 4" in a way the panel read as a value (node-lint OPTION-HELP); it now names no number.
+{
+    const _mp = SKILL_OPTIONS['multiplication:mult_properties'] || [];
+    const _mpForms = _mp.find((o) => o.id === 'forms');
+    if (_mpForms) {
+        _mpForms.default = [0];
+        _mpForms.help = 'One property to a page: the order property (an array and its turn) comes first. Tick more to mix them.';
+    }
+    const _mpTask = _mp.find((o) => o.id === 'task');
+    if (_mpTask) _mpTask.help = 'Order items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.';
+}
+// lf-ops-props (2026-11-13, lead ruling on the ops-tables card): mult_properties band=36 is NOT offered - it failed the
+// post-fix re-measure at S (EB-BAND 10, EB-SIDE 2 on a384a0b4). The value is dropped from the panel, as the ranged
+// add/sub ids drop a band: normalizeOptions keeps only listed values, so an old code carrying 36 decodes to 25.
+{
+    const _mpBand = (SKILL_OPTIONS['multiplication:mult_properties'] || []).find((o) => o.id === 'band');
+    if (_mpBand) {
+        _mpBand.values = (_mpBand.values || []).filter((v) => v.v !== 36);
+        _mpBand.help = 'The largest factor of an Order item: the product is at most 25 or 81. The arrays stay at 5 × 5; 9 reaches the facts-only items.';
+    }
 }

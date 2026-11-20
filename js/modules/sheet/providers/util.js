@@ -133,6 +133,8 @@ export function chooseWrong(q, candidates, { rotate = true } = {}) {
             // The pupil's written working behind the wrong answer ("7 − 4 = 3" for a story), when
             // the candidate names it: Error analysis shows it to be checked (critic round 2).
             ...(c.work ? { work: String(c.work).replace(/\{v\}/g, answerText(v)) } : {}),
+            // (lane lf-ops critic r1: the True or False? frame for the box this wrong answer changed - {stem, value})
+            ...(c.frame ? { frame: c.frame } : {}),
         };
     }
     return null;

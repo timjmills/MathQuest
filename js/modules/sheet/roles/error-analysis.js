@@ -38,16 +38,20 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer, equationStemOf,
 } from './compose.js';
-import { gridHeightMm, SAFETY_H_MM, rowCapMm } from '../layout.js';
+import { gridHeightMm, SAFETY_H_MM, rowCapMm, capRowsToInk } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
 
+/** Templates whose fix-it letters stand outside the answer box (critic lf-ops r1 D-MP-5 / D-AG-3). */
+const TAG_OUTSIDE = new Set(['arrays', 'arrays-turn']);
+
 export const ROLE_ID = 'error-analysis';
 // The item and its judgement centre in a cell the page's row stretches (the cell's height is the page's, not the item's): the
 // white splits above and below, never one band under short work (critic r2 N3: unit_form S/M 32-33 %, value S 40 %; owner CL-4b)
 const CENTRE = 'flex:0 0 auto;margin-top:auto;margin-bottom:auto';
+const TOP = 'flex:0 0 auto;margin-top:0;margin-bottom:auto';
 // The work's first element keeps no top margin (a stack's 5 mm): the "<Name> wrote:" label sits over the work's INK, not over an
 // empty margin (critic r4 n1, lead 2026-11-13: PUPILTAG measured on ink, 1.5-4 mm; the label floated 6-9 mm over stacks)
 const noLeadMargin = (html) => String(html).replace(/^(\s*<(?!svg)[a-z][a-z0-9]*\b)([^>]*)>/i, (m, tag, attrs) => (/\sstyle="/.test(attrs)
@@ -688,7 +692,10 @@ export function prepare(it, info = {}) {
         if (tagged) {
             tagged.forEach((id, i) => {
                 const re = new RegExp(`(<[a-z][a-z0-9]*\\b[^>]*\\sdata-ws-slot="${id}"[^>]*)>`, 'i');
-                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag">${'ABCDEF'[i]}</i>`);
+                // (lane lf-ops critic r1 D-MP-5 / D-AG-3: in an array's small answer boxes the letter printed over the grey
+                // made-up number; there it stands OUTSIDE the box, left of it, in room the box keeps for it)
+                const out = TAG_OUTSIDE.has(it.template) ? ' mq-tagout' : '';
+                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag${out}">${'ABCDEF'[i]}</i>`);
             });
         }
         // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),
@@ -702,7 +709,12 @@ export function prepare(it, info = {}) {
         // (a REDO item - a count row, a strip - is written again in a zone under it that starts at the cell's left: its work starts
         // there too, never centred over it - lf-algebra critic r2 G2, the copy train 60 px left of the original)
         const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:${kind === 'redo' ? 'flex-start' : 'center'}` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? ` style="margin-left:${TAB_CLEAR_LEFT}"` : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:${TAB_CLEAR_LEFT}"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        // (cbt r3, CL-40: a top-started REDO count row - E6, CL-4b - puts its "<Name> wrote:" in the cell's top-left corner; with
+        // Lines at L its ink entered the label keep-out at 6.5 mm across, 2.3 mm down. The tag is set in past --ws-koin, as the
+        // arrays-turn and Reason It fixes are; the work and the cell height do not move.)
+        const tagLeft = kind === 'redo' && it.template === 'count-row' ? 'max(0mm, calc(var(--ws-koin, 0mm) + 0.5mm))' : '0';
+        // (rowcap-s2 F3: every tag starts past the number tab, TAB_CLEAR_LEFT; master's REDO count-row inset kept - the larger wins)
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? ` style="margin-left:${TAB_CLEAR_LEFT}"` : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:max(${TAB_CLEAR_LEFT}, ${tagLeft})"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -795,7 +807,10 @@ export function prepare(it, info = {}) {
         // judgement against the cell's right padding: the judgement column GREW into the free width (flex-grow 1) and its boxes
         // started right after the work, 69.5 vs 131.5 mm beside a 4- and an 8-term train; ws-cell-checks EA-ROWX, root cause r16)
         const judgeAt = !story && !widen && kind === 'redo' ? judge.replace('<div class="mq-judge-row ', '<div style="flex:0 0 auto;margin-left:auto" class="mq-judge-row ') : judge;
-        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}${spread}">`
+        // (critic cbt r2 E6, CL-4b: a REDO item - a count row and its fix line - starts at the top of its box; centred, the row stood
+        // ~16 mm under the cell's top at M (L-TOPSTART). Other kinds stay centred.)
+        const vAt = kind === 'redo' ? TOP : CENTRE;
+        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${vAt}${spread}">`
             + shownWork
             + judgeAt
             + (below ? fix : '')
@@ -1091,6 +1106,14 @@ export function plan(input = {}) {
             grid.rowsTpl = rowH.map((h) => `${h}fr`).join(' ');
             grid.height = `${Math.round(sum * 100) / 100}mm`;
         }
+    }
+    // ONE-ROW (layout.capRowsToInk, as Test / Review / Practice; lf-ops cbt r3): a page of REDO items - a count row and its
+    // fix line, top-started since critic cbt r2 E6 (CL-4b) - holds each row to its ink / 0.72; the spare goes to the page foot.
+    // Top-started, the white of a stretched row fell under the work (count_by_tables M: 34 mm, 29.6 % of a 114.8 mm cell, EB-BAND).
+    if (items.length && items.every((it) => it.thinking && it.thinking.kind === 'redo')) {
+        const drawn = grid.height ? parseFloat(grid.height) : L.gridH;
+        const held = capRowsToInk(items, L.cols, rows, drawn, grid.rowsTpl || '');
+        if (held) Object.assign(grid, { height: `${held.heightMm}mm`, rowsTpl: held.rowsTpl, cls: `${grid.cls || 'fixed'} mq-inkrows` });
     }
     const wrongShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
     const fit = Object.assign({}, L, { items: undefined });

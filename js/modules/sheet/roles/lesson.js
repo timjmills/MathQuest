@@ -143,9 +143,13 @@ export function fitLessonData(data, example) {
  * the Steps). Authored lesson data decides chartWide itself and is returned unchanged.
  */
 function chartDataOf(data, example) {
-    if (data || !example) return data;
+    if (!example) return data;
     const fp = example.footprint || {};
-    return fp.maxCols === 1 || Number(fp.wMm) > 93 ? { chartWide: true, chartRow: false } : data;
+    const full = fp.maxCols === 1 || Number(fp.wMm) > 93;
+    if (!data) return full ? { chartWide: true, chartRow: false } : data;
+    // (an authored record decides chartWide itself; a drawing too wide for a half panel is chart.js chartPage's to see -
+    // chartFull - CELL-FITS 2026-11-20)
+    return data;
 }
 
 /**
@@ -157,7 +161,7 @@ export function extras(input = {}) {
     const lesson = input.lesson || {};
     const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const ex = pickExample(main, data0);
+    const ex = pickExample(main, data0, { variant: lesson.variant });
     const data = chartDataOf(fitLessonData(data0, ex), ex);
     // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
     const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
@@ -351,7 +355,7 @@ function planOnce(input = {}) {
     const lesson = input.lesson || {};
     const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const example = pickExample(main, data0);
+    const example = pickExample(main, data0, { variant: lesson.variant });
     const data = chartDataOf(fitLessonData(data0, example), example);
     const exSteps = example ? stripStepsFor(example, workedStepsOf(example), data) : [];
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
@@ -470,7 +474,7 @@ function planOnce(input = {}) {
     let chartSizing = null;
     let chartDesigned = 0, chartMin = 0;
     if (states.length && part !== 'sheet') {
-        const chartOf = (sec, fin) => chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, sec, extrasList.find((x) => x.lessonTail), fin, extrasList.find((x) => x.lessonTailPanel));
+        const chartOf = (sec, fin) => chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, sec, extrasList.find((x) => x.lessonTail), fin, extrasList.find((x) => x.lessonTailPanel), extrasList.find((x) => x.lessonHead));
         // (lf-partopts: `lesson.partN.chart` - n worked examples, 1 .. the chart's own design; the design is the chart laid
         // out uncapped, so the Parts table's range never moves with the teacher's choice)
         const cN = lesson.partN && Number.isFinite(lesson.partN.chart) ? Math.max(1, lesson.partN.chart) : null;
@@ -486,6 +490,9 @@ function planOnce(input = {}) {
         secondShown = chart.second;
         chartSizing = chart.sizing;
         out.push({ header: chart.header, sections: chart.sections });
+        // (CELL-FITS: the panels that run on - each further chart page a wall-chart page of its own, under the chart's full
+        // header: lf-engine chart-name, every anchor chart page prints frame.js pageHeader's Name / Date line and title)
+        for (const secs of chart.more || []) out.push({ header: chart.header, sections: secs });
     }
     if (part !== 'chart') pages.forEach((pg, i) => out.push({
         header: i === 0 ? frame.header : undefined,

@@ -1,0 +1,1484 @@
+{
+ "about": "ws-lesson-pages page summaries MEASURED on the lf-engine fix 601667535 merged with master (ba67851f2): the same 46 built grade-3 WRM lessons as fail.json; role lesson, every direct skill, mixed, size M, each lesson its own seed and lessonVariant (wrm-links.js wrmLessonSeed / wrmLessonVariant, as teacher-wrm.js printLesson sends them). No header-only page; Y4.B4 times-table openers are n x table with n moving by step.",
+ "lessons": [
+  {
+   "id": "Y4.B4.S1",
+   "step": "Y4.B4.S1",
+   "block": "Y4.B4",
+   "title": "Multiples of 3",
+   "skill": "multiplication:count_by_tables+multiplication:mult_chart",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 254
+    },
+    {
+     "cells": 5,
+     "ink": 448
+    },
+    {
+     "cells": 4,
+     "ink": 171
+    },
+    {
+     "cells": 2,
+     "ink": 108
+    },
+    {
+     "cells": 5,
+     "ink": 458
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Count by 3: each jump adds 3.336921242736"
+   }
+  },
+  {
+   "id": "Y4.B4.S2",
+   "step": "Y4.B4.S2",
+   "block": "Y4.B4",
+   "title": "Multiply and divide by 6",
+   "skill": "multiplication:mult_facts+division:div_facts+multiplication:count_by_tables",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 117
+    },
+    {
+     "cells": 9,
+     "ink": 209
+    },
+    {
+     "cells": 9,
+     "ink": 167
+    },
+    {
+     "cells": 9,
+     "ink": 179
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "15 \u00d7 6 is 5 groups of 6.5\u00d76"
+   }
+  },
+  {
+   "id": "Y4.B4.S3",
+   "step": "Y4.B4.S3",
+   "block": "Y4.B4",
+   "title": "6 times-table and division facts",
+   "skill": "multiplication:mult_facts+division:div_facts",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 126
+    },
+    {
+     "cells": 9,
+     "ink": 203
+    },
+    {
+     "cells": 16,
+     "ink": 189
+    },
+    {
+     "cells": 30,
+     "ink": 260
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "18 \u00d7 6 is 8 groups of 6.8\u00d76"
+   }
+  },
+  {
+   "id": "Y4.B4.S4",
+   "step": "Y4.B4.S4",
+   "block": "Y4.B4",
+   "title": "Multiply and divide by 9",
+   "skill": "multiplication:mult_facts+division:div_facts+multiplication:count_by_tables",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 123
+    },
+    {
+     "cells": 6,
+     "ink": 197
+    },
+    {
+     "cells": 8,
+     "ink": 161
+    },
+    {
+     "cells": 8,
+     "ink": 175
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "17 \u00d7 9 is 7 groups of 9.7\u00d79"
+   }
+  },
+  {
+   "id": "Y4.B4.S5",
+   "step": "Y4.B4.S5",
+   "block": "Y4.B4",
+   "title": "9 times-table and division facts",
+   "skill": "multiplication:mult_facts+division:div_facts",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 126
+    },
+    {
+     "cells": 9,
+     "ink": 202
+    },
+    {
+     "cells": 16,
+     "ink": 187
+    },
+    {
+     "cells": 30,
+     "ink": 262
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "18 \u00d7 9 is 8 groups of 9.8\u00d79"
+   }
+  },
+  {
+   "id": "Y4.B4.S7",
+   "step": "Y4.B4.S7",
+   "block": "Y4.B4",
+   "title": "Multiply and divide by 7",
+   "skill": "multiplication:mult_facts+division:div_facts+multiplication:count_by_tables",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 114
+    },
+    {
+     "cells": 9,
+     "ink": 209
+    },
+    {
+     "cells": 8,
+     "ink": 164
+    },
+    {
+     "cells": 8,
+     "ink": 172
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "14 \u00d7 7 is 4 groups of 7.4\u00d77"
+   }
+  },
+  {
+   "id": "Y4.B4.S8",
+   "step": "Y4.B4.S8",
+   "block": "Y4.B4",
+   "title": "7 times-table and division facts",
+   "skill": "multiplication:mult_facts+division:div_facts",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 120
+    },
+    {
+     "cells": 9,
+     "ink": 204
+    },
+    {
+     "cells": 16,
+     "ink": 188
+    },
+    {
+     "cells": 30,
+     "ink": 257
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "16 \u00d7 7 is 6 groups of 7.6\u00d77"
+   }
+  },
+  {
+   "id": "Y4.B4.S9",
+   "step": "Y4.B4.S9",
+   "block": "Y4.B4",
+   "title": "11 times-table and division facts",
+   "skill": "multiplication:mult_facts+division:div_facts+multiplication:count_by_tables",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 127
+    },
+    {
+     "cells": 9,
+     "ink": 211
+    },
+    {
+     "cells": 16,
+     "ink": 205
+    },
+    {
+     "cells": 30,
+     "ink": 294
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "15 \u00d7 11 is 5 groups of 11.5\u00d711"
+   }
+  },
+  {
+   "id": "Y4.B4.S10",
+   "step": "Y4.B4.S10",
+   "block": "Y4.B4",
+   "title": "12 times-table and division facts",
+   "skill": "multiplication:mult_facts+division:div_facts+multiplication:count_by_tables+multiplication:mult_facts_15+division:div_facts_15",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 133
+    },
+    {
+     "cells": 9,
+     "ink": 214
+    },
+    {
+     "cells": 16,
+     "ink": 205
+    },
+    {
+     "cells": 30,
+     "ink": 286
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "17 \u00d7 12 is 7 groups of 12.7\u00d712"
+   }
+  },
+  {
+   "id": "Y4.B4.S11",
+   "step": "Y4.B4.S11",
+   "block": "Y4.B4",
+   "title": "Multiply by 1 and 0",
+   "skill": "multiplication:mult_properties+multiplication:mult_facts",
+   "pages": [
+    {
+     "cells": 5,
+     "ink": 299
+    },
+    {
+     "cells": 6,
+     "ink": 163
+    },
+    {
+     "cells": 8,
+     "ink": 310
+    }
+   ],
+   "opener": {
+    "template": "arrays",
+    "text": "7 rows \u00d7 5 columns7 \u00d7 5 ="
+   }
+  },
+  {
+   "id": "Y4.B5.S1",
+   "step": "Y4.B5.S1",
+   "block": "Y4.B5",
+   "title": "Factor pairs",
+   "skill": "number_theory:factors_identify+number_theory:factor_tchart_easy",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 305
+    },
+    {
+     "cells": 4,
+     "ink": 199
+    },
+    {
+     "cells": 2,
+     "ink": 98
+    },
+    {
+     "cells": 3,
+     "ink": 149
+    },
+    {
+     "cells": 2,
+     "ink": 211
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Sort each number into Prime or Composite. 139732221 Prime Composite Answer:"
+   }
+  },
+  {
+   "id": "Y4.B5.S5",
+   "step": "Y4.B5.S5",
+   "block": "Y4.B5",
+   "title": "Divide by 10",
+   "skill": "placevalue:place_value_10x",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 203
+    },
+    {
+     "cells": 5,
+     "ink": 565
+    },
+    {
+     "cells": 6,
+     "ink": 276
+    },
+    {
+     "cells": 7,
+     "ink": 569
+    },
+    {
+     "cells": 5,
+     "ink": 617
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "110 has 1 zero.3,950 \u00f7 10 =ThHTO3950\u2193 \u00f7 10"
+   }
+  },
+  {
+   "id": "Y4.B5.S6",
+   "step": "Y4.B5.S6",
+   "block": "Y4.B5",
+   "title": "Divide by 100",
+   "skill": "placevalue:place_value_10x",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 212
+    },
+    {
+     "cells": 5,
+     "ink": 551
+    },
+    {
+     "cells": 6,
+     "ink": 294
+    },
+    {
+     "cells": 7,
+     "ink": 651
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1100 has 2 zeros.4,800 \u00f7 100 =ThHTO4800\u2193 \u00f7 100"
+   }
+  },
+  {
+   "id": "Y4.B5.S13",
+   "step": "Y4.B5.S13",
+   "block": "Y4.B5",
+   "title": "Divide a 3-digit number by a 1-digit number",
+   "skill": "division:divide+division:box_division_hard+division:area_model_div_3by1",
+   "pages": [
+    {
+     "cells": 8,
+     "ink": 139
+    },
+    {
+     "cells": 6,
+     "ink": 67
+    },
+    {
+     "cells": 12,
+     "ink": 129
+    }
+   ],
+   "opener": {
+    "template": "equation",
+    "text": "14\u00f77="
+   }
+  },
+  {
+   "id": "Y4.B5.S3",
+   "step": "Y4.B5.S3",
+   "block": "Y4.B5",
+   "title": "Multiply by 10",
+   "skill": "multiplication:mult_zeros+placevalue:place_value_10x",
+   "pages": [
+    {
+     "cells": 10,
+     "ink": 336
+    },
+    {
+     "cells": 6,
+     "ink": 39
+    },
+    {
+     "cells": 6,
+     "ink": 389
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Write multiply if the groups are equal. If not, write add. Multiply only when every group is the same.I can multiplyI must addSay: Each group has . Answer:"
+   }
+  },
+  {
+   "id": "Y4.B5.S4",
+   "step": "Y4.B5.S4",
+   "block": "Y4.B5",
+   "title": "Multiply by 100",
+   "skill": "multiplication:mult_zeros+placevalue:place_value_10x",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 385
+    },
+    {
+     "cells": 6,
+     "ink": 45
+    },
+    {
+     "cells": 5,
+     "ink": 384
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Write multiply if the groups are equal. If not, write add. Multiply only when every group is the same.I can multiplyI must addSay: Each group has . Answer:"
+   }
+  },
+  {
+   "id": "Y4.B5.S10",
+   "step": "Y4.B5.S10",
+   "block": "Y4.B5",
+   "title": "Multiply a 3-digit number by a 1-digit number",
+   "skill": "multiplication:multiply+multiplication:area_model_mult",
+   "pages": [
+    {
+     "cells": 11,
+     "ink": 147
+    },
+    {
+     "cells": 6,
+     "ink": 45
+    },
+    {
+     "cells": 15,
+     "ink": 121
+    }
+   ],
+   "opener": {
+    "template": "fact",
+    "text": "12\u00d79"
+   }
+  },
+  {
+   "id": "Y4.B5.S9",
+   "step": "Y4.B5.S9",
+   "block": "Y4.B5",
+   "title": "Multiply a 2-digit number by a 1-digit number",
+   "skill": "multiplication:multiply+multiplication:area_model_mult",
+   "pages": [
+    {
+     "cells": 12,
+     "ink": 145
+    },
+    {
+     "cells": 6,
+     "ink": 39
+    },
+    {
+     "cells": 15,
+     "ink": 113
+    }
+   ],
+   "opener": {
+    "template": "fact",
+    "text": "9\u00d77"
+   }
+  },
+  {
+   "id": "Y4.B1.S1",
+   "step": "Y4.B1.S1",
+   "block": "Y4.B1",
+   "title": "Represent numbers to 1,000",
+   "skill": "composing:base10_build_hundreds+placevalue:place_value_disks+placevalue:pv_disks_build",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 399
+    },
+    {
+     "cells": 3,
+     "ink": 142
+    },
+    {
+     "cells": 2,
+     "ink": 357
+    },
+    {
+     "cells": 2,
+     "ink": 178
+    },
+    {
+     "cells": 2,
+     "ink": 178
+    },
+    {
+     "cells": 2,
+     "ink": 178
+    },
+    {
+     "cells": 2,
+     "ink": 353
+    },
+    {
+     "cells": 4,
+     "ink": 276
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Draw 5 hundreds. Draw 569 with flats, rods and units. = 1 hundred = 1 ten = 1 one"
+   }
+  },
+  {
+   "id": "Y4.B1.S2",
+   "step": "Y4.B1.S2",
+   "block": "Y4.B1",
+   "title": "Partition numbers to 1,000",
+   "skill": "placevalue:expand+placevalue:unit_form+placevalue:combine",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 261
+    },
+    {
+     "cells": 10,
+     "ink": 456
+    },
+    {
+     "cells": 8,
+     "ink": 195
+    },
+    {
+     "cells": 11,
+     "ink": 336
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Hundreds digit: its value.363=++The 3 is in the hundreds place: 300."
+   }
+  },
+  {
+   "id": "Y4.B1.S5",
+   "step": "Y4.B1.S5",
+   "block": "Y4.B1",
+   "title": "Represent numbers to 10,000",
+   "skill": "placevalue:place_value_disks+placevalue:pv_digit_drag+placevalue:unit_form",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 341
+    },
+    {
+     "cells": 4,
+     "ink": 327
+    },
+    {
+     "cells": 3,
+     "ink": 233
+    },
+    {
+     "cells": 3,
+     "ink": 165
+    },
+    {
+     "cells": 8,
+     "ink": 439
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1thousands: 3 disks, so the digit is 3.2hundreds: 5 disks, so the digit is 5.Th1,0001,0001,000H100100100100100TO11"
+   }
+  },
+  {
+   "id": "Y4.B1.S6",
+   "step": "Y4.B1.S6",
+   "block": "Y4.B1",
+   "title": "Partition numbers to 10,000",
+   "skill": "placevalue:expand+placevalue:combine+placevalue:unit_form",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 270
+    },
+    {
+     "cells": 10,
+     "ink": 523
+    },
+    {
+     "cells": 6,
+     "ink": 107
+    },
+    {
+     "cells": 11,
+     "ink": 409
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1The 3 is in the thousands place: 3,000.2The 5 is in the hundreds place: 500.3,522=+++"
+   }
+  },
+  {
+   "id": "Y4.B1.S11",
+   "step": "Y4.B1.S11",
+   "block": "Y4.B1",
+   "title": "Compare numbers to 10,000",
+   "skill": "placevalue:compare",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 272
+    },
+    {
+     "cells": 13,
+     "ink": 530
+    },
+    {
+     "cells": 6,
+     "ink": 89
+    },
+    {
+     "cells": 14,
+     "ink": 182
+    },
+    {
+     "cells": 14,
+     "ink": 417
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "4 digits3,2454 digits6,8521Count the digits.Both have four digits."
+   }
+  },
+  {
+   "id": "Y4.B1.S12",
+   "step": "Y4.B1.S12",
+   "block": "Y4.B1",
+   "title": "Order numbers to 10,000",
+   "skill": "placevalue:order_least_to_greatest+placevalue:order_greatest_to_least",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 192
+    },
+    {
+     "cells": 7,
+     "ink": 400
+    },
+    {
+     "cells": 4,
+     "ink": 121
+    },
+    {
+     "cells": 2,
+     "ink": 81
+    },
+    {
+     "cells": 8,
+     "ink": 363
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Least: 2,527.5,7472,5277,119,,"
+   }
+  },
+  {
+   "id": "Y4.B1.S14",
+   "step": "Y4.B1.S14",
+   "block": "Y4.B1",
+   "title": "Round to the nearest 10",
+   "skill": "number_sense:rounding_visual+number_sense:nearest_10",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 198
+    },
+    {
+     "cells": 4,
+     "ink": 342
+    },
+    {
+     "cells": 4,
+     "ink": 264
+    },
+    {
+     "cells": 4,
+     "ink": 277
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1197 is between 190 and 200.HTO197\u2192190200"
+   }
+  },
+  {
+   "id": "Y4.B1.S15",
+   "step": "Y4.B1.S15",
+   "block": "Y4.B1",
+   "title": "Round to the nearest 100",
+   "skill": "number_sense:nearest_100+number_sense:round_sort_100+number_sense:rounding_visual",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 200
+    },
+    {
+     "cells": 10,
+     "ink": 363
+    },
+    {
+     "cells": 10,
+     "ink": 220
+    },
+    {
+     "cells": 11,
+     "ink": 352
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1637 is between 600 and 700.HTO637\u2192600700"
+   }
+  },
+  {
+   "id": "Y4.B1.S16",
+   "step": "Y4.B1.S16",
+   "block": "Y4.B1",
+   "title": "Round to the nearest 1,000",
+   "skill": "number_sense:nearest_1000+number_sense:round_nl_thousands+number_sense:round_sort_1000",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 243
+    },
+    {
+     "cells": 9,
+     "ink": 356
+    },
+    {
+     "cells": 8,
+     "ink": 238
+    },
+    {
+     "cells": 15,
+     "ink": 362
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "14,507 is between 4,000 and 5,000.ThHTO4,507\u219240005000"
+   }
+  },
+  {
+   "id": "Y4.B1.S17",
+   "step": "Y4.B1.S17",
+   "block": "Y4.B1",
+   "title": "Round to the nearest 10, 100 or 1,000",
+   "skill": "number_sense:rounding_table",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 629
+    },
+    {
+     "cells": 4,
+     "ink": 422
+    },
+    {
+     "cells": 3,
+     "ink": 346
+    },
+    {
+     "cells": 3,
+     "ink": 346
+    },
+    {
+     "cells": 5,
+     "ink": 390
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Start from 4,743 each time. Find the tens digit.24,743 to the nearest 10 is 4,740.NumberNearest 10Nearest 100Nearest 1,0004,7431,0451,0501,0001,0002,8652,8702,9003,0004,8734,8704,9005,000"
+   }
+  },
+  {
+   "id": "Y4.B2.S2",
+   "step": "Y4.B2.S2",
+   "block": "Y4.B2",
+   "title": "Add up to two 4-digit numbers - no exchange",
+   "skill": "addition:add_10k_no_regroup",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 222
+    },
+    {
+     "cells": 12,
+     "ink": 277
+    },
+    {
+     "cells": 6,
+     "ink": 158
+    },
+    {
+     "cells": 9,
+     "ink": 213
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Ones: 2 + 1 = 3. Write 3.2Tens: 1 + 7 = 8. Write 8."
+   }
+  },
+  {
+   "id": "Y4.B2.S5",
+   "step": "Y4.B2.S5",
+   "block": "Y4.B2",
+   "title": "Subtract two 4-digit numbers - no exchange",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 262
+    },
+    {
+     "cells": 10,
+     "ink": 357
+    },
+    {
+     "cells": 6,
+     "ink": 178
+    },
+    {
+     "cells": 12,
+     "ink": 257
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Subtract the ones.Ones: 8 \u2212 1 = 7. Write 7."
+   }
+  },
+  {
+   "id": "Y4.B7.S6",
+   "step": "Y4.B7.S6",
+   "block": "Y4.B7",
+   "title": "Understand improper fractions",
+   "skill": "fractions:mixed_improper_visual+fractions:improper_mixed",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 244
+    },
+    {
+     "cells": 3,
+     "ink": 224
+    },
+    {
+     "cells": 3,
+     "ink": 230
+    },
+    {
+     "cells": 3,
+     "ink": 240
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "4 24 = 4 Answer:"
+   }
+  },
+  {
+   "id": "Y4.B7.S10",
+   "step": "Y4.B7.S10",
+   "block": "Y4.B7",
+   "title": "Equivalent fraction families",
+   "skill": "fractions:equiv_frac_nv+fractions:equivalent+fractions:select_equiv_frac",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 218
+    },
+    {
+     "cells": 2,
+     "ink": 136
+    },
+    {
+     "cells": 2,
+     "ink": 130
+    },
+    {
+     "cells": 2,
+     "ink": 133
+    },
+    {
+     "cells": 4,
+     "ink": 297
+    },
+    {
+     "cells": 3,
+     "ink": 39
+    }
+   ],
+   "opener": {
+    "template": "frac-model",
+    "text": "24="
+   }
+  },
+  {
+   "id": "Y3.B6.S7",
+   "step": "Y3.B6.S7",
+   "block": "Y3.B6",
+   "title": "Fractions on a number line",
+   "skill": "composing:fraction_number_line+fractions:graph_fractions",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 154
+    },
+    {
+     "cells": 9,
+     "ink": 337
+    },
+    {
+     "cells": 6,
+     "ink": 190
+    },
+    {
+     "cells": 12,
+     "ink": 350
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Count the equal parts from 0 to 1: 4. That is the denominator.01"
+   }
+  },
+  {
+   "id": "Y4.B6.S3",
+   "step": "Y4.B6.S3",
+   "block": "Y4.B6",
+   "title": "Perimeter on a grid",
+   "skill": "area_perimeter:perimeter_grid",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 275
+    },
+    {
+     "cells": 1,
+     "ink": 216
+    },
+    {
+     "cells": 1,
+     "ink": 208
+    },
+    {
+     "cells": 1,
+     "ink": 195
+    },
+    {
+     "cells": 1,
+     "ink": 195
+    },
+    {
+     "cells": 1,
+     "ink": 195
+    },
+    {
+     "cells": 1,
+     "ink": 195
+    },
+    {
+     "cells": 1,
+     "ink": 195
+    },
+    {
+     "cells": 1,
+     "ink": 216
+    },
+    {
+     "cells": 3,
+     "ink": 273
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Count the unit squares. What is the area? Area = the amount of space inside a flat shape. Multiply the sides (length \u00d7 width) to find it. Area = ? square units Area = sq units Answer:"
+   }
+  },
+  {
+   "id": "Y4.B6.S4",
+   "step": "Y4.B6.S4",
+   "block": "Y4.B6",
+   "title": "Perimeter of a rectangle",
+   "skill": "area_perimeter:perimeter",
+   "pages": [
+    {
+     "cells": 2,
+     "ink": 356
+    },
+    {
+     "cells": 4,
+     "ink": 364
+    },
+    {
+     "cells": 6,
+     "ink": 446
+    },
+    {
+     "cells": 3,
+     "ink": 377
+    },
+    {
+     "cells": 1,
+     "ink": 191
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Find the perimeter of this composite shape. Perimeter = the total distance around the outside of a shape. Add up all the side lengths. 541266 Perimeter = ? units Perimeter = units Answer:"
+   }
+  },
+  {
+   "id": "Y4.B10.S1",
+   "step": "Y4.B10.S1",
+   "block": "Y4.B10",
+   "title": "Pounds, tens, ones and pence (US: dollars & cents)",
+   "skill": "measurement:money_notation",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 177
+    },
+    {
+     "cells": 3,
+     "ink": 169
+    },
+    {
+     "cells": 2,
+     "ink": 208
+    },
+    {
+     "cells": 2,
+     "ink": 70
+    },
+    {
+     "cells": 4,
+     "ink": 107
+    },
+    {
+     "cells": 4,
+     "ink": 227
+    },
+    {
+     "cells": 4,
+     "ink": 216
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1The whole units make 4.1111111111112525"
+   }
+  },
+  {
+   "id": "Y4.B10.S1",
+   "step": "Y4.B10.S1",
+   "block": "Y4.B10",
+   "title": "Write money using decimals",
+   "skill": "measurement:money_notation",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 177
+    },
+    {
+     "cells": 3,
+     "ink": 169
+    },
+    {
+     "cells": 2,
+     "ink": 208
+    },
+    {
+     "cells": 2,
+     "ink": 70
+    },
+    {
+     "cells": 4,
+     "ink": 107
+    },
+    {
+     "cells": 4,
+     "ink": 227
+    },
+    {
+     "cells": 4,
+     "ink": 216
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1The whole units make 4.1111111111112525"
+   }
+  },
+  {
+   "id": "Y4.B10.S5",
+   "step": "Y4.B10.S5",
+   "block": "Y4.B10",
+   "title": "Calculate with money (US: dollars & cents)",
+   "skill": "measurement:money+measurement:money_change",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 265
+    },
+    {
+     "cells": 5,
+     "ink": 340
+    },
+    {
+     "cells": 6,
+     "ink": 305
+    },
+    {
+     "cells": 6,
+     "ink": 381
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Line up the points.Price$13.70Price+3.80Total."
+   }
+  },
+  {
+   "id": "Y4.B11.S3",
+   "step": "Y4.B11.S3",
+   "block": "Y4.B11",
+   "title": "Convert between analogue and digital times",
+   "skill": "measurement:time_analog_digital",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 242
+    },
+    {
+     "cells": 3,
+     "ink": 227
+    },
+    {
+     "cells": 6,
+     "ink": 133
+    },
+    {
+     "cells": 6,
+     "ink": 240
+    },
+    {
+     "cells": 9,
+     "ink": 252
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "12345678910111251015202530354045505501The short hand has passed 1. The hour is 1."
+   }
+  },
+  {
+   "id": "Y3.B12.S1",
+   "step": "Y3.B12.S1",
+   "block": "Y3.B12",
+   "title": "Interpret pictograms",
+   "skill": "graphs:pictograph",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 521
+    },
+    {
+     "cells": 3,
+     "ink": 475
+    },
+    {
+     "cells": 2,
+     "ink": 422
+    },
+    {
+     "cells": 2,
+     "ink": 254
+    },
+    {
+     "cells": 2,
+     "ink": 247
+    },
+    {
+     "cells": 2,
+     "ink": 276
+    },
+    {
+     "cells": 2,
+     "ink": 338
+    },
+    {
+     "cells": 3,
+     "ink": 561
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Look at all the rows.MonthNumber of booksJanuaryFebruaryMarchAprilMayKey:= 10Books We ReadIn which month were the fewest books read?Check one box."
+   }
+  },
+  {
+   "id": "Y3.B12.S4",
+   "step": "Y3.B12.S4",
+   "block": "Y3.B12",
+   "title": "Draw bar charts",
+   "skill": "graphs:build_bar_graph",
+   "pages": [
+    {
+     "cells": 2,
+     "ink": 376
+    },
+    {
+     "cells": 4,
+     "ink": 681
+    },
+    {
+     "cells": 2,
+     "ink": 296
+    },
+    {
+     "cells": 3,
+     "ink": 473
+    }
+   ],
+   "opener": {
+    "template": "bar-graph",
+    "text": "0246810121416182022MondayTuesdayWednesdayThursdayNumber of carsDayCars We CountedHow many cars were counted on Tuesday?"
+   }
+  },
+  {
+   "id": "Y4.B13.S1",
+   "step": "Y4.B13.S1",
+   "block": "Y4.B13",
+   "title": "Interpret charts",
+   "skill": "graphs:bar_graph+graphs:pictograph+graphs:tally_chart",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 536
+    },
+    {
+     "cells": 2,
+     "ink": 419
+    },
+    {
+     "cells": 2,
+     "ink": 269
+    },
+    {
+     "cells": 2,
+     "ink": 316
+    },
+    {
+     "cells": 2,
+     "ink": 307
+    },
+    {
+     "cells": 2,
+     "ink": 325
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Look at all the bars.02468101214161820JanuaryFebruaryMarchAprilMayNumber of booksMonthBooks We ReadIn which month were the fewest books read?Check one box."
+   }
+  },
+  {
+   "id": "Y4.B13.S2",
+   "step": "Y4.B13.S2",
+   "block": "Y4.B13",
+   "title": "Comparison, sum and difference",
+   "skill": "graphs:bar_graph+graphs:pictograph",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 455
+    },
+    {
+     "cells": 2,
+     "ink": 410
+    },
+    {
+     "cells": 2,
+     "ink": 264
+    },
+    {
+     "cells": 2,
+     "ink": 257
+    },
+    {
+     "cells": 2,
+     "ink": 232
+    },
+    {
+     "cells": 2,
+     "ink": 358
+    }
+   ],
+   "opener": {
+    "template": "",
+    "text": "1Mangoes has 14. Grapes has 6.024681012141618ApplesPearsGrapesPlumsMangoesNumber of childrenFruitFavorite FruitsHow many more children chose mangoes than grapes?"
+   }
+  },
+  {
+   "id": "Y4.B12.S2",
+   "step": "Y4.B12.S2",
+   "block": "Y4.B12",
+   "title": "Identify angles",
+   "skill": "angles_lines:identify_angles",
+   "pages": [
+    {
+     "cells": 2,
+     "ink": 225
+    },
+    {
+     "cells": 4,
+     "ink": 210
+    },
+    {
+     "cells": 2,
+     "ink": 67
+    },
+    {
+     "cells": 4,
+     "ink": 168
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Circle ALL the acute angles in this shape. ABCD"
+   }
+  },
+  {
+   "id": "Y4.B12.S4",
+   "step": "Y4.B12.S4",
+   "block": "Y4.B12",
+   "title": "Triangles",
+   "skill": "shapes_classify:classify_triangles",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 194
+    },
+    {
+     "cells": 6,
+     "ink": 261
+    },
+    {
+     "cells": 8,
+     "ink": 310
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Classify this triangle by its sides: Equilateral Isosceles Scalene Answer:"
+   }
+  },
+  {
+   "id": "Y4.B12.S5",
+   "step": "Y4.B12.S5",
+   "block": "Y4.B12",
+   "title": "Quadrilaterals",
+   "skill": "shapes_classify:classify_quads+shapes_classify:hotspot_quads",
+   "pages": [
+    {
+     "cells": 4,
+     "ink": 410
+    },
+    {
+     "cells": 3,
+     "ink": 304
+    },
+    {
+     "cells": 3,
+     "ink": 270
+    },
+    {
+     "cells": 4,
+     "ink": 288
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Classify this triangle by its sides: Equilateral Isosceles Scalene Answer:"
+   }
+  },
+  {
+   "id": "Y4.B12.S7",
+   "step": "Y4.B12.S7",
+   "block": "Y4.B12",
+   "title": "Lines of symmetry",
+   "skill": "angles_lines:symmetry+angles_lines:place_symmetry_lines",
+   "pages": [
+    {
+     "cells": 3,
+     "ink": 261
+    },
+    {
+     "cells": 3,
+     "ink": 293
+    },
+    {
+     "cells": 3,
+     "ink": 265
+    },
+    {
+     "cells": 6,
+     "ink": 514
+    },
+    {
+     "cells": 4,
+     "ink": 275
+    }
+   ],
+   "opener": {
+    "template": "legacy",
+    "text": "Circle the two lines that are parallel. a b c d Circle each correct region with a pencil. Answer:"
+   }
+  }
+ ]
+}

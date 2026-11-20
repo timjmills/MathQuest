@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf, rowCapMm } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf, rowCapMm, NO_STRETCH_ROOM } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -534,7 +534,7 @@ function sheetFit(items, cols, ctx, input, limit = Infinity) {
     // plain tries draw (level 1, MEASURE_LO); taken when it holds more on fewer or as many pages. Every other page is unchanged.
     if (cols === 1 && a.pages.length > 1 && a.pages.slice(1).some((p) => p.cap === 1) && items.some((it) => it.measured && it.measured[1] && it.measured[1].atLevel)) {
         const d = sheetFitWith(items, cols, ctx, input, !a.span, !a.hint, limit, !!a.noLines, 0, true);
-        if (d.total > a.total || (d.total === a.total && d.pages.length < a.pages.length)) return d;
+        if (d.total > a.total || (d.total === a.total && d.pages.length < a.pages.length)) return a.hintDrop ? Object.assign(d, { hintDrop: a.hintDrop }) : d;
     }
     // GUIDED-MODEL-SPAN (lead ruling (e), 2026-11-13; ws-capacity-pin SIZE-ORDER): the ceiling trims a grid whose Model takes one
     // cell to whole rows (S, 4 columns: Model + 10 tries is 11 cells, so the last part-row went and S printed 8 < M 9). Where
@@ -568,7 +568,8 @@ function sheetFitPlain(items, cols, ctx, input, limit = Infinity) {
     // the Model alone): tall problems drop the hint rather than the try.
     if (a.hint && a.pages[0].cap < 2) {
         const c = sheetFitWith(items, cols, ctx, input, !a.span, true, limit);
-        if (c.pages[0].cap > a.pages[0].cap) a = c;
+        // (GUIDED-HINT-DROP-P1, lead ruling F4 (a) 2026-11-20: the ruled case is recorded, ws-guided-cellfit HINT-UNIFORM reads it)
+        if (c.pages[0].cap > a.pages[0].cap) a = Object.assign(c, { hintDrop: { hintedCap: a.pages[0].cap, cap: c.pages[0].cap } });
     }
     // Round-4 re-grade: a spanning Model that pushed the tries onto a second page (Model + 2 on
     // page 1, a quarter-empty page 2) gives way to the Model in a cell of its own when that keeps
@@ -583,7 +584,7 @@ function sheetFitPlain(items, cols, ctx, input, limit = Infinity) {
     if (a.pages[0].cap < 2 && items.length > 1 && workLinesOf(items[0]).length) {
         for (const noHint of [false, true]) {
             const d = sheetFitWith(items, cols, ctx, input, true, noHint, limit, true);
-            if (d.pages[0].cap >= 2) return d;
+            if (d.pages[0].cap >= 2) return noHint && a.hint ? Object.assign(d, { hintDrop: { hintedCap: a.pages[0].cap, cap: d.pages[0].cap } }) : d;
         }
     }
     return a;
@@ -794,8 +795,12 @@ function givenNumbers(it) {
  * one in B."). Never a step holding the answer (critic guided-r1: "387 to the nearest 100 is 400",
  * "The hour is 1" on a 1:00 clock). A stack traces its first column instead; a fact its dot cue.
  */
-export function hintOf(it) {
+export function hintOf(it, { raw = false } = {}) {
     if (!it || it.template === 'stack' || countCueOf(it) || thinkCueOf(it)) return '';
+    // (GUIDED-HINT-STEP, lead 2026-11-20: a provider step may carry its own Guided hint - the two-step stories' "Step 1: circle +.
+    // Add." - when its text, shown in full on the Model and the chart, would give the try's boxes away)
+    const own0 = providerWorkedSteps(it, 6).find((st) => st.hint);
+    if (own0) return own0.hint;
     const q = it.q || {};
     const src = `${q.text || ''} ${JSON.stringify((q.cell && q.cell.payload) || {})}`;
     const own = (t) => /\d/.test(t) || (t.match(/\b[A-Z][a-z]{2,}\b/g) || []).slice(1).some((w) => src.includes(w));
@@ -811,7 +816,35 @@ export function hintOf(it) {
         return first.replace(/,(?=\d{3}\b)/g, '').replace(/\d+/g, '___').replace(/___(\s+)(thousand|hundred|ten|one)\b(?!s)/gi, '___$1$2s');
     }
     const steps = all.filter((t) => !hintGivesAnswer(t, it));
-    if (steps.length) return steps.find(own) || steps[0];
+    // GUIDED-HINT-LEAK (box numbers) (lf-roles r17, lead W2 ruling 2026-11-20; critic r15 W2: two_step_add_then_div Guided L
+    // printed "Step 1: circle +. 22 + 14 = 36." over the try's own Step 1 boxes): every number a box of the SAME try expects
+    // (answerTokens: the answer, the key's slots) is a gap; the "Step N:" label and the circled sign stay (the designed sign
+    // trace). A hint left with only its label and gaps is dropped. When the steps that do not give the answer hold none of the
+    // problem's own working, its own step is used masked ("Step 1: circle +. ___ + ___ = ___."), so a family's first tries
+    // carry one hint kind (HINT-UNIFORM). ws-guided-cellfit GUIDED-HINT-LEAK / HINT-UNIFORM.
+    const boxToks = new Set(answerTokens(it).filter((a) => /\d/.test(a)));
+    // (a story's step boxes - operands and result of each step - are its payload's steps; the key writes them, the slots do not)
+    if (it.template === 'word-work') for (const n of JSON.stringify(wp.steps || []).match(/\d+(?:\.\d+)?/g) || []) { boxToks.add(n); boxToks.add(String(Number(n))); }
+    // (lf-roles r18, lead ruling 2026-11-20: a number the try's own question prints is GIVEN, not a secret - its story numbers,
+    // a place-value cell's drawn numeral and its digits - so it stays; only the others are gaps. "The numbers are 4 and 9."
+    // stays whole; "22 + 14 = 36." keeps 22 and 14 and gaps the Step 1 result. ws-guided-cellfit HINT-OVERMASK.)
+    const pn = wp.n;
+    const asked = new Set([...(String(q.text || '').replace(/,(?=\d{3}\b)/g, '').match(/\d+(?:\.\d+)?/g) || []),
+        ...(pn != null && pn !== '' && Number.isFinite(Number(pn)) ? [String(pn), ...String(pn).replace(/\D/g, '').split('')] : [])]
+        .flatMap((n) => [n, String(Number(n))]));
+    for (const n of asked) boxToks.delete(n);
+    const maskBoxes = (t) => {
+        const lab = (/^\s*Step\s+\d+\s*:/.exec(t) || [''])[0];
+        return lab + t.slice(lab.length).replace(/,(?=\d{3}\b)/g, '').replace(/\d+(?:\.\d+)?/g, (n) => (boxToks.has(n) || boxToks.has(String(Number(n))) ? '___' : n));
+    };
+    // ({raw: true}: the same pick, unmasked - the source ws-guided-cellfit HINT-OVERMASK compares the printed hint against)
+    const keep = (t) => { const m = maskBoxes(t); return m.slice((/^\s*Step\s+\d+\s*:/.exec(m) || [''])[0].length).replace(/___|[\s.,:;=+\-−×÷()]/g, '') ? (raw ? t.replace(/,(?=\d{3}\b)/g, '') : m) : ''; };
+    // (outside a story, the own step used masked is never one whose kept text still gives the answer: a place-value "Find the
+    // underlined digit: 7." shows a given digit that is its answer - pre-W2 the plain first step stood there, and stands there
+    // again. A story's Step 1 keeps its given operands and gaps its result, so HINT-UNIFORM holds there.)
+    const ownAll = all.find(own);
+    const pick = steps.find(own) || (ownAll && keep(ownAll) && (it.template === 'word-work' || !hintGivesAnswer(keep(ownAll), it)) ? ownAll : '') || steps[0];
+    if (pick) return keep(pick);
     // Every step names part of the answer (a clock's first step gives its hour): the first step
     // becomes a frame, its answer numbers left as gaps ("The short hand has passed ___."), so the
     // first try still has its grey scaffold (critic guided-r1: no hints at L) without the answer.
@@ -1307,7 +1340,12 @@ export function plan(input = {}) {
         const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; const ink = Number((it.footprint || {}).inkHMm); const h = mm && mm.atLevel && Number.isFinite(mm.hMm) ? drawnMm(it, cols, use.indexOf(it) < nModels ? 3 : use.indexOf(it) < Math.max(partialEnd, nModels + 1) ? 2 : 1) : mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; return ink > 0 && tightRows([it]) ? Math.min(h, ink + CELL_PAD_MM) : h; });
         // (an ink-sized row - every item named its inkHMm and is tight - already holds no keep-out: lf-roles' koMm is not taken twice)
         const inkRow = (r) => rowItems(r).length > 0 && rowItems(r).every((it) => Number((it.footprint || {}).inkHMm) > 0 && tightRows([it]));
-        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels, span2Here ? fit.span2 : 0) : -1;
+        // (GUIDED-CONT-HINT, lf-roles r16 F3: a hinted try that runs on to a later page - a two-step story Guided L, one try a page -
+        // draws its grey hint line there too; that row takes the hint's height as page 1's does, or the line overflows the cell and
+        // its bottom rule does not print. ws-roles-unit-free browser check CELL-FITS)
+        const hintedHere = (r) => rowItems(r).some((it) => { const i = use.indexOf(it); return i >= nModels && i < partialEnd; });
+        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels, span2Here ? fit.span2 : 0)
+            : fit.hint ? Array.from({ length: rows }, (_, r) => r).find(hintedHere) ?? -1 : -1;
         // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
         // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
         // line, side by side in one row; the sum left compare's Model row 38 mm at M for 10 mm of ink, EB-BAND)
@@ -1365,6 +1403,13 @@ export function plan(input = {}) {
             // content needs about 90 mm; lf-vocab r6, critic r4 #2, ws-vocab-unit V18 measures the rendered rows)
             Hr = Hr.map(() => (even * rows <= pg.avail + 0.5 ? even : Math.max(Hr.reduce((a, b) => a + b, 0), pg.avail) / rows));
         }
+        // (lf-ops-props, lead ruling 2026-11-12 (b): a row of templates answered in place - footprint `noStretch`: an array and
+        // its turn, an array and its sentence, a count row - is at most NO_STRETCH_ROOM x the row's SHORTEST problem, as
+        // layout.js rowShape, never below its tallest; the spare height stays under the grid. D-MP-1 / D-AG-1 / D-CB-4, r4b)
+        // (critic cbt r1 D4: the Guided ROLE page's rows still stood 1.33-1.6 x their ink - the measured height already carries the
+        // row's slack, so 1.25 x it over-reached ruling (b). A row of noStretch cells keeps its MEASURED height; the spare stays
+        // under the grid. ws-print-lint ROW-STRETCH now reads the ink.)
+        if (host.length > 0 && host.every((it) => it && it.footprint && it.footprint.noStretch)) Hr = Hr.map((h, r) => Math.max(w[r], Math.min(h, w[r])));
         // ONE-ROW (layout.oneRowCapOf, lf-roles r9 item 4 on Guided): a page of ONE row - a two-step story's Model or hinted try
         // alone, 136 mm in a 197-200 mm row at M (31-32 %) - stops where the band under its work stays under 30 %; the white under
         // the grid is the Guided page's accepted white (PT-GDP / PAGE_TYPES 12.1). Only a one-column page of word-work stories
@@ -1426,7 +1471,8 @@ export function plan(input = {}) {
         meta: {
             items: use.length, scoreOutOf: scored, steps: fit.steps.length,
             fits: fitsOut.map((f, i) => Object.assign(f, { line: `Fits: ${cols} columns x ${f.rows} rows${n > 1 ? ` (page ${i + 1} of ${n})` : ''}, ${use.length} guided cells.` })),
-            notes: fit.steps.length ? [] : ['No Steps band: this skill supplies no steps of its own yet (strings.steps / workedSteps).'],
+            notes: [...(fit.steps.length ? [] : ['No Steps band: this skill supplies no steps of its own yet (strings.steps / workedSteps).']),
+                ...(fit.hintDrop ? [`GUIDED-HINT-DROP-P1 (ruled): page 1 holds the Model and ${fit.hintDrop.cap - 1} try; with its hint it would hold ${fit.hintDrop.hintedCap - 1}, so the first try prints without its grey hint.`] : [])],
         },
     });
 }
