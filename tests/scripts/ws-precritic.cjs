@@ -1267,6 +1267,9 @@ function buildPlan(ctx) {
             if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].slice(0, 200), detail: [], explainsExit: false };
             return { result: m[1] === 'INCOMPLETE' ? 'INCOMPLETE' : 'FAIL', findings: m[2].slice(0, 200), detail: det, explainsExit: true };
         } }));
+        // ---- lead ruling 2026-11-20 (lf-builds chart blanks): at band 120 the gaps value "A run along one row" is not offered
+        // (ws-chart-offer: OFFER + the host's honest help NOTE). Node only; on the path whenever a chart skill is in scope.
+        if (keys.some((k) => /^composing:(hundreds_chart_fill|chart_to_120)$/.test(k))) add(gate('chart-offer', 'ws-chart-offer (band 120 offers no gaps="row"; the host help says so)', 'composing:chart_to_120 + host help', 'node', 'ws-chart-offer', [], { missingMsg: 'ws-chart-offer is not in this tree' }));
         add(gate('text-misconception', 'ws-text-misconception (a text-only misconception reaches the screen card and Reason It; no chart square holds more digits than its window)', `${scope} × reason-it, error-analysis, true-false × M/L`, 'browser', 'ws-text-misconception', ['--skills', keys.join(',')], { missingMsg: 'ws-text-misconception is not in this tree' }));
         // ---- lf-roles critic r8b on chart_120 (D5, n5): no Guided try shows the Model's own picture (GUIDED-MODEL-ECHO), and
         // a page's Score equals the answer places of its scored cells (SCORE-SLOTS; chartwindow, the template that scores slots)

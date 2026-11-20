@@ -9,6 +9,23 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20 06:10Z: PARKED at the budget/round stop (lead: "Park at your stop"). Narrow critic r4 FAILED (critic-blanks-r4.md, 982fd7fc4). This was the one round after the round-cap stop.
+  - Passed:
+    - c120 lesson at L;
+    - the new band-120 practice page (three rows-of-ten grids) at M and L;
+    - all keys;
+    - R2-1 (practice page), R2-2 and the crossing, now closed.
+  - F1: on the c120 teaching sheet at M (C2 7), Guided and both Independent windows answer the same set (96/106/116), because the example prints columns 0-4.
+  - F2: on the hcf band-100 lesson p3 (C2 6, C3 7), a near-twin of Guided window 1 appears, 13 of 15 answers repeat earlier ones, and the page is about 35 % empty.
+  - Both are the R2-1 answer-repetition class again. They need a root-cause design (deal teaching and practice windows from disjoint columns or squares; fill short pages with rows-of-ten), not another patch. The checks to build first:
+    - SHEET-ANSWER-SET (no two pupil windows on a lesson sheet share a sorted answer set; variety at half or more);
+    - ANSWER-REUSE (at most 1/3 of a practice page's answers asked earlier);
+    - NEAR-TWIN (60 % of squares or more shared with the same gaps);
+    - a practice-page fill floor.
+  - Still open, not scored: FOOTER-SEED (the practice page footer seed differs); n1 numeral baseline; n3 step wording "From 91 to 100" over a window starting at 95; chart order of the 61-90 / 31-60 grids; a one-line Steps strip on the c120 practice page.
+  - Gate wiring: ws-chart-offer added to ws-precritic (for chart skills in scope).
+  - NOT for deploy. The deployed chart_120 (969306c1e) is unaffected. Resume: build the 4 checks (FAIL on 1ab2801ef), redesign the lesson deal, then a narrow re-grade of the c120 teaching sheet at M (seeds 1, 4242, 777) and the hcf band-100 lesson (seeds 1, 4242).
+  - Cost about $665 of the $776 stop.
 - 2026-11-20 r4 fix (medium, round-cap rebuild): checks first - ws-guided-echo LESSON-TWIN, ANSWER-VARIETY, CROSSING-IN-PLAY, STEP-COVER (20 findings on 09c4c80fe, c120 lesson M/L seeds 1 and 4242). Fix = the ruled fallback (lead 2026-11-20, rows grid first): the band-120 lesson practice page prints three rows of ten - 91-120 (the crossing) then 61-90 and 31-60, 3 grids a page at M and L, dealt against the windows the packet prints (chart-giveaway chartPageGrid; an internal form, not the pupil's grid value - role-hidden OK). Lesson deals on every band are step-safe (no gap whose only printed neighbour is on its right) and twin-free (chartLesson), so no "Look right" step was needed. gaps="row" hidden on chart_to_120 with a help note (ruling (b), ws-chart-offer). Gates: guided-echo both skills --seeds 4 --variants OK (616 pages), lesson 1/4242/777 OK, role-hidden OK, options-verify (and --render c120) OK, print-lint lesson M/L OK, empty-band lesson 1 (the same L p2 cell 3 as 09c4c80fe), boot-smoke OK, code-snapshot OK. Backtests c120b-lesson-twin / -answer-variety / -crossing-in-play / -step-cover / -gaps-row-hidden PASS. PNGs chart120/blanks-r4/. Open: the practice page prints no Steps strip now; ws-chart-offer not on precritic's path. Next: narrow critic r4, lesson packet only.
 - 2026-11-20 04:50Z: narrow critic r2 FAILED (critic-blanks-r2.md, d440b6fe3). The c120 lesson packet scores 6 on C2 at M and L; every other page and host scores 8 or more. B1, B2 and B4 are closed.
   - R2-1: practice windows copy earlier pupil items, and one answer column fills most windows (the no-giveaway rule plus the example's 5 columns).
