@@ -330,7 +330,10 @@ function factModel(input, ctx, frame, m) {
             const need1 = natural(1) + Math.max(...exs.slice(0, 2).map(padOf));
             const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(need1, ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx), Math.max(need1 - drawnOff, rowCapMm(need1 - drawnOff, exs.slice(0, 2))));
             const pages = exs.slice(0, 2).map((ex, e) => {
-                const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });
+                // FACT-MODEL-FILL (lead ruling 2026-11-20, mult_facts Scripted Model L): ONE example a page - its rows fill the page to
+                // FACT_FILL, past drawn + room. EB-PAGE wins over EB-STRETCH here (held to the cap, page 1 is ~47 % empty); the grid
+                // says so (mq-factmodel-fill) and ws-empty-band exempts exactly these cells from EB-STRETCH, by name.
+                const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none', cls: 'mq-factmodel-fill' });
                 const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }];
                 // (the Say band closes the last page and reads the example on it)
                 if (e === 1) sections.push({ kind: 'say', frame: oralFrameOf(ex, { fill: true }) });

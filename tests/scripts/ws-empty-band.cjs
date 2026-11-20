@@ -416,6 +416,8 @@ const STATIC_TOL_MM = 3;
 let ROW_ROOM = null;
 const STRETCH_ROLES = new Set(['independent', 'more-practice', 'mixed-practice', 'test', 'review', 'lesson', 'opener', 'guided', 'scripted-model', 'error-analysis', 'pre-skill-check']);
 const STRETCH_NOTES = [];
+// EB-STRETCH's named exemptions (each a lead ruling, its reason here and at the composer)
+const STRETCH_EXEMPT = Object.freeze({ FACT_MODEL_FILL: 'lead 2026-11-20: the one-example-a-page fact Scripted Model fills its page (EB-PAGE wins); roles/scripted-model.js factModel' });
 if (argv.includes('--pin-check')) {
     // the merge-base with the main branch (or --base <rev>); a base with no list yet has nothing to lose
     const i = argv.indexOf('--base'); let base = i > -1 ? argv[i + 1] : null; let src = null;
@@ -668,6 +670,11 @@ if (argv.includes('--self-test')) {
             ['TAB-CLEAR text 0.4 mm', ct({ inkFootMm: 3, tabGapMm: 0.4, tabNeed: 2, tabOnText: true }) === 'TAB-CLEAR' ? 1 : 0, 1], ['TAB-CLEAR text 1.6 mm', ct({ inkFootMm: 3, tabGapMm: 1.6, tabNeed: 2, tabOnText: true }) === 'TAB-CLEAR' ? 1 : 0, 1],
             ['TAB-CLEAR text 2.5 mm', ct({ inkFootMm: 3, tabGapMm: 2.5, tabNeed: 2, tabOnText: true }) ? 1 : 0, 0], ['TAB-CLEAR across fact 1.2 mm', ct({ inkFootMm: 3, tabGapMm: 1.2, tabNeed: 1, tabOnText: true }) ? 1 : 0, 0],
             ['TAB-CLEAR a box 1.3 mm (CL-40)', ct({ inkFootMm: 3, tabGapMm: 1.3, tabNeed: 2 }) ? 1 : 0, 0], ['TAB-CLEAR a box touching', ct({ inkFootMm: 3, tabGapMm: 0, tabNeed: 2 }) === 'TAB-CLEAR' ? 1 : 0, 1]);
+        // FACT_MODEL_FILL is named and narrow: the one-example fact Model's cells pass, any other Scripted Model state over the cap fails
+        { const fm = (x) => Object.assign(sc(73.4, 56, { tmpl: 'fact', oneHeight: true }), x || {});
+            st.push(['fact Model, one example a page (FACT_MODEL_FILL)', stretchFindings([fm({ factModelFill: true }), fm({ factModelFill: true, cell: 2 })], RT).length, 0],
+                ['fact Model state NOT in the fill grid, 73.4 mm row, 56 drawn', stretchFindings([fm(), fm({ cell: 2 })], RT).length, 2],
+                ['full-width Scripted Model state over the cap (count-row, 70 mm row, 50 drawn)', stretchFindings([sc(70, 50, { tmpl: 'count-row', oneHeight: true })], RT).length, 1]); }
         const sbad = st.filter(([, got, want]) => got !== want);
         for (const [nm, got, want] of sbad) console.log(`self-test FAIL: EB-STRETCH ${nm}: ${got} finding(s), want ${want}`);
         const n = bad.length + kbad.length + cbad.length + sbad.length;
@@ -859,7 +866,7 @@ function measureCells(scope) {
                 }
                 if (Number.isFinite(best)) { tabGapMm = +best.toFixed(2); tabNeed = c.querySelector(':scope > .ws-eq[data-ws-across]') ? 1 : 2; }
             }
-            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, factGrid: !!c.closest('.ws-grid.facts'), inkFootMm, tabGapMm, tabWhat, tabNeed, tabOnText: tabText2, tabText: tabEl ? tabEl.textContent.trim() : '', hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, factGrid: !!c.closest('.ws-grid.facts'), factModelFill: !!c.closest('.ws-grid.mq-factmodel-fill'), inkFootMm, tabGapMm, tabWhat, tabNeed, tabOnText: tabText2, tabText: tabEl ? tabEl.textContent.trim() : '', hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
@@ -1181,6 +1188,10 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
         // pre-skill-check routedLayout), so its natural height is not what the composer sized: noted by judge(), not judged)
         // (a cell of the fact-row engine's grid - .ws-grid.facts, layout.js ROW_STRETCH_EXEMPT_LAYOUTS - is sized by its own FULLPAGE rule)
         // (and a cell with no template - a lesson panel, the I-do box - is no template's row)
+        // (STRETCH_EXEMPT.FACT_MODEL_FILL, lead ruling 2026-11-20: a Scripted Model fact page of ONE example a page - its grid
+        // .mq-factmodel-fill, roles/scripted-model.js factModel - fills the page to FACT_FILL; EB-PAGE wins over EB-STRETCH there.
+        // Named and narrow: every other Scripted Model row is still judged)
+        if (c.factModelFill && STRETCH_EXEMPT.FACT_MODEL_FILL) continue;
         if (rm === null || !c.tmpl || c.beside || c.workSpace || c.tmpl === 'legacy' || c.factGrid) continue;
         // (a Scripted Model's states are ONE drawing at successive steps, laid at one height (MOD-GRID; PT-MOD-3 keeps the room a
         // later mark needs): its "row" is every state cell of the page, the tallest state the drawn height - c.oneHeight)

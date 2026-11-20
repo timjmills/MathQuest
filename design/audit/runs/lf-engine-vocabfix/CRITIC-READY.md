@@ -67,9 +67,15 @@ ws-backtest: mix-drop, mix-pages, lesson-fill, model-measured-states, vocab-mode
   - count_by_tables L: −1.28 mm → +2.02 mm, rows 47 → 50.3 mm.
   - number_patterns_rule L: −2.68 → +0.72 mm.
   - vocab M / L: 1.64 / 0.70 mm.
-- **mult_facts Scripted Model L is NOT cleared.** It is the fact model (factModel, 2 examples one a page). Its 73.4 mm rows
-  are the FACT_FILL page fill. Holding them to drawn + room (59 mm) leaves page 1 about 47 % empty (EB-PAGE; 34 % today). It
-  needs a page ruling, not a measurement. The ledger row is now owner lf-engine, still open.
+- **mult_facts Scripted Model L: ruled (lead 2026-11-20), EB-PAGE wins.** It is the fact model with ONE example a page; its
+  73.4 mm rows fill the page to FACT_FILL (held to drawn + room, 59 mm, page 1 would be about 47 % empty). The rows are
+  unchanged. EB-STRETCH exempts exactly these cells by name: `FACT_MODEL_FILL` (the grid carries `mq-factmodel-fill` in
+  roles/scripted-model.js factModel; `STRETCH_EXEMPT` in ws-empty-band, reason in both). It is not a blanket exemption:
+  - `ws-empty-band --self-test` (EB-STRETCH 24 cases): the fill-grid fact Model passes; the same fact cells outside the fill
+    grid FAIL (2); a full-width count-row Model state over its cap FAILS (1).
+  - Rendered, head tool: `--only EB-STRETCH` on mult_facts, count_by_tables, vocab_pick3_words Scripted Model M/L: OK. The
+    same head tool on 414a0e108 (no fill grid, rows estimated): FAIL 14 - mult_facts L 8 and vocab_pick3_words M/L 6 (15.5 -
+    16.4 mm over), so an over-stretched Scripted Model still fails.
 - **Residual for the critic / EB-CLIP.** count_by_tables L, print PNG (grade-render seed): the top of the Say band text is
   hidden. The screen DOM has the Model band ending at 248.0 mm and the Say band at 247.4–256.7 mm. The meta overflow check
   finds no problems (before: 4 cells overflowed and there was no Say band). Suspect: a count-row layer painting below its
@@ -77,6 +83,28 @@ ws-backtest: mix-drop, mix-pages, lesson-fill, model-measured-states, vocab-mode
 - **Observation, not changed.** two_step_letter_equation M Mixed p6 has 57 mm of white in the DOM, and the next shelf is
   52.7 mm. The packing budget is about 12 mm more conservative than the drawn page. Seen only with `ws-lesson-fill --parts
   mixed`.
+
+## Mixed item count changes (lead ruling 2026-11-20)
+Accepted: one full Mixed page with fewer items beats a half-empty second page. Every lesson whose Mixed (or Practice) part
+changed, before = 414a0e108, after = this head (buildSheet role lesson, practicePages 1, mixed).
+
+| Lesson | Size | Seed | Mixed before → after (items, pages) | Lesson pages |
+|---|---|---|---|---|
+| add (sample: add_facts band 10, +1/+2/+3) | L | 1, 4242 | 10, 1 → 12, 1 | 4 → 4 |
+| addition:add_facts | L | 1, 4242 | 10, 1 → 12, 1 | 4 → 4 |
+| division:div_facts | L | 1, 4242 | 14, 1 → 17, 1 | 4 → 4 |
+| addition:add_wp_10 | L | 4242 | 12, 2 → 10, 1 | 5 → 4 |
+| addition:fact_family_sort | L | 1, 4242 | 16, 2 → 10, 1 | 5 → 4 |
+| algebra:function_table_easy | L | 1, 4242 | 21, 2 → 15, 1 | 6 → 5 |
+| algebra:two_step_add_then_div | L | 4242 | 4, 2 → 5, 2 | 11 → 11 |
+| algebra:two_step_letter_equation | M | 1, 4242 | 5, 2 → 6, 2 | 7 → 7 |
+| vocabulary:vocab_pick3_words | L | 1, 4242 | 13, 2 → 9, 1 | 7 → 6 |
+| patterns:number_patterns_rule | L | 1 | 9, 1 → 10, 1 | 4 → 4 |
+| patterns:number_patterns_rule | L | 4242 | 9, 1 → 10, 1 (Practice 2 → 1 page, item 2) | 5 → 4 |
+| patterns:number_patterns_rule | M | 4242 | 10, 1 → 10, 1 (Practice 2 → 1 page, item 2) | 5 → 4 |
+| patterns:follow_given_rule | L | 4242 | 10, 1 → 10, 1 (Practice 2 → 1 page, item 2) | 5 → 4 |
+| patterns:follow_given_rule | M | 4242 | 11, 1 → 11, 1 (Practice 2 → 1 page, item 2) | 5 → 4 |
+| vocabulary:vocab_grade_pictures | M / L | 1, 4242 | 10, 2 → 10, 2 (unchanged by this lane; 7d2bdfc2f printed 3 Mixed pages at L) | 7 → 7 |
 
 ## Hash proof
 - I ran the lesson baseline `--check` against the 7d2bdfc2f pin: FAIL, 152 of 2590 differ. I then re-pinned in
