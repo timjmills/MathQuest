@@ -445,3 +445,17 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - Hash proof (rolehash, guided + scripted-model 192 pages, lesson 96): HEAD vs HEAD with guided.js from 8533a8b48 (pre-W2; it is
   the only file W2 touched since) - 192 / 192 and 96 / 96 identical. origin/master is not a usable base: the branch's 42 unmerged
   commits change 172 of those pages (grid heights etc.) on their own.
+
+## For lf-ops: stack-cell EB-BAND on PSC
+
+Ruling (lead, 2026-11-20, item 3): the stack template's footprint and measure (`js/modules/sheet/cells/stack.js`) belong to
+lf-ops. The 3-column Pre-skill Check choice (`measureCols` 3) goes into next week's lf-roles build.
+
+Measured on the PSC, seed 7, master 9ae9ccd5d, ws-empty-band --only EB-BAND,EB-SIDE. "Ink" is the cell height minus the band.
+Drawn height vs hMinAt: the stacked bands (L, and M page 2) draw every cell AT its measured minimum height (`hMinAt`, no growth),
+so drawn = hMinAt and the band is inside the measure itself - the measure asks about 34-40 % more height than the stack draws.
+The M page-1 quadrant cells (45.8-53.8 mm) are additionally grown by the quadrant layout ((quadH - strip) / 2): role-side.
+EB-SIDE at 92.3 mm is the 2-column band (no 3-column choice yet): role-side, next week.
+
+| Page | Rule | Cells | Cell mm | Ink mm (EB-BAND) | Band / side % |
+|---|---|---|---|---|---|
