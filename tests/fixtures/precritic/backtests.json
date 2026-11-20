@@ -12158,6 +12158,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-worklines-measured",
+   "check": "ws-empty-band EB-STRETCH on mult_facts Guided L: the Model row held to its drawn worked lines + writing room",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH (lf-roles r13, WORK-LINES-MEASURED)",
+   "fail": {
+    "commit": "661965d43",
+    "state": "mult_facts Guided L Model row 69.4 mm over a 60.8 mm cell, 5.6 mm over (worked line reckoned 3 lines, draws 2)"
+   },
+   "pass": {
+    "commit": "15b738cb3",
+    "state": "row within drawn + 3 mm room"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles guided --sizes L --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
