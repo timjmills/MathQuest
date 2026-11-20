@@ -935,7 +935,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // (not in a band-120 lesson packet: its windows keep to the example's edge columns, and its practice page's rows grid holds the
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
-        let _tw100 = 0;
+        let _tw100 = 0, _tri100 = null, _rank100 = null;
         const pickWin = () => {
             // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
             // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
@@ -946,13 +946,28 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 // (band 100: of the bands left, always the one whose squares the teaching windows blanked least - ANSWER-REUSE, critic blanks r4 F2)
                 const reused = (a) => kept.filter((k) => !k.shows && k.cols.length !== 10).reduce((t, k) => t + k.gaps.filter((n) => Math.floor((n - 1) / 10) >= a && Math.floor((n - 1) / 10) <= a + 2).length, 0);
                 const fr2 = band === 100 && free.length > 1 ? free.filter((a) => reused(a) === Math.min(...free.map(reused))) : free;
-                const r1 = fr2.length ? fr2[rng(0, fr2.length - 1)] : k10[0].rows[0];
+                let r1 = fr2.length ? fr2[rng(0, fr2.length - 1)] : k10[0].rows[0];
+                // (critic blanks r6 H2: band 100 takes the next band of the triple chosen with the first grid - by fresh squares)
+                if (band === 100 && _tri100) { const nx = _tri100.find((a) => !k10.some((k) => k.rows.includes(a))); if (nx !== undefined) r1 = nx; }
                 return { rows: [r1, r1 + 1, r1 + 2], cols: Array.from({ length: C }, (_, k) => k) };
             }
             let r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
             let c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
             // (the band-100 lesson practice page's first rows of ten: 1-30, the band the teaching sheet leaves fresh)
             if (_lessonRows && band === 100) r0 = 0;
+            // (critic blanks r6 H2: band 100's three rows-of-ten grids are the three disjoint bands with the most FRESH squares - squares
+            // no earlier page printed or asked (A13 givens are printed, so not fresh); the weakest band decides, then the total)
+            if (_lessonRows && band === 100) {
+                if (!_tri100) {
+                    const used = new Set();
+                    for (const k of kept) if (!(k.cols.length === 10 && !k.ext)) for (const r of k.rows) for (const c of k.cols) used.add(r * 10 + c + 1);
+                    const fresh = (a) => { let t = 0; for (let n = a * 10 + 1; n <= a * 10 + 30; n++) if (!used.has(n)) t++; return t; };
+                    const tris = [[0, 3, 6], [0, 3, 7], [0, 4, 7], [1, 4, 7]].map((tr) => ({ tr, lo: Math.min(...tr.map(fresh)), sum: tr.reduce((t, a) => t + fresh(a), 0) }));
+                    tris.sort((x, y) => y.lo - x.lo || y.sum - x.sum);
+                    _tri100 = tris[0].tr;
+                }
+                r0 = _tri100[0];
+            }
             if (_lp === 'teach' && R === 3 && C === 5) {
                 // (lead ruling 2026-11-20, critic blanks r4 F1: Guided crosses 100 on 91-120; each Independent window reviews 1-25,
                 // in columns no earlier window there holds - 1-25 or 6-30)
@@ -969,7 +984,29 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (band === 100) {
                     // (each call takes the next slot no earlier teaching window holds, so a refused deal moves on and never drops a section)
                     const slots = [[4, 0], [4, 5], [6, 0], [6, 5], [5, 0], [5, 5], [2, 0], [2, 5], [7, 0], [7, 5], [0, 0], [0, 5], [3, 0], [3, 5], [1, 0], [1, 5]];
-                    const free100 = slots.filter(([a, b]) => !kept.some((k) => !k.shows && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5));
+                    // (critic blanks r6 H1 / H2: slots ranked once per deal. An Independent window shares no square with a Guided window
+                    // (a window of another section of the sheet - 'x' - or, on one run, the sheet's first two: Guided is dealt first), so it re-asks none of its answers; it shares at most one row with
+                    // a window of its own section; and each chart row keeps one half free of teaching windows, outside at most one of
+                    // rows 1-10 / 31-40 / 61-70 / 91-100 (the row the practice grids can skip), so every practice grid keeps fresh squares)
+                    if (!_rank100) {
+                        const tw = kept.filter((k) => !k.shows && k.cols.length === 5);
+                        const sq = (a, b) => { const z = []; for (let r = a; r < a + 3; r++) for (let c = b; c < b + 5; c++) z.push(r * 10 + c + 1); return z; };
+                        const inK = (k, n) => k.rows.includes(Math.floor((n - 1) / 10)) && k.cols.includes((n - 1) % 10);
+                        const score = ([a, b]) => {
+                            const z = sq(a, b);
+                            const ext = (tw.some((k) => k.ext) ? tw.filter((k) => k.ext) : tw.slice(0, 2)).reduce((t, k) => t + z.filter((n) => inK(k, n)).length, 0);
+                            const twin = tw.filter((k) => k.cols[0] === b && k.rows.filter((r) => r >= a && r <= a + 2).length >= 2).length;
+                            let dead = 0, deadBad = 0;
+                            for (let r = 0; r < 10; r++) {
+                                const half = (h) => (r >= a && r <= a + 2 && b === h * 5) || tw.some((k) => k.rows.includes(r) && k.cols[0] === h * 5);
+                                if (half(0) && half(1)) { dead++; if (![0, 3, 6, 9].includes(r)) deadBad++; }
+                            }
+                            return ext * 1000 + twin * 500 + deadBad * 100 + Math.max(0, dead - 1) * 100;
+                        };
+                        const order = shuffle(slots.slice());
+                        _rank100 = order.map((x) => ({ x, v: score(x) })).sort((p, q) => p.v - q.v).map((o) => o.x);
+                    }
+                    const free100 = _rank100.filter(([a, b]) => !kept.some((k) => !k.shows && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5));
                     [r0, c0] = free100.length ? free100[(_tw100++) % free100.length] : slots[0];
                 }
             }
@@ -1018,7 +1055,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const colFits = (nums) => !k0Run || nums.every((n) => k0Run.gaps.some((g) => resOf(g) === resOf(n)));
         let rows, cols, at, pickIdx = [];
         let runLast = null;
-        for (; want >= 1 && !pickIdx.length; want--) {
+        // (critic blanks r6 H2: a band-100 lesson rows-of-ten grid holds at least 5 blanks - never fewer, silently)
+        const _wantMin = _lessonRows && band === 100 ? 5 : 1;
+        for (; want >= _wantMin && !pickIdx.length; want--) {
         for (let w = 0; w < (kept.length ? 24 : keptRun.length ? 150 : 1) && !pickIdx.length; w++) {
             const win = pickWin();
             rows = win.rows; cols = win.cols;
@@ -1103,6 +1142,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if ((chartLesson() || (_to120 && chartEdge())) && !cand.every((i) => (i % C > 0 && !set.has(i - 1)) || (i >= C && !set.has(i - C)) || (i < C && i + C < N && !set.has(i + C)))) continue;
                 // (the rows grid: the crossing squares in play when the packet leaves one free - R2-1 CROSSING-IN-PLAY)
                 if (_lessonRows && _to120 && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                // (critic blanks r6 H3, COL-RUN: at most one column of a rows-of-ten grid blank all the way down)
+                if (_lessonRows && Array.from({ length: C }, (_, c) => c).filter((c) => Array.from({ length: R }, (_, r) => r).every((r) => set.has(r * C + c))).length > 1) continue;
                 // (critic blanks r4 F1 / F2: in a lesson packet no pupil window repeats a kept one's answer set, nor shares 60 % of
                 // the larger one's squares with the same gaps there - NEAR-TWIN, SHEET-ANSWER-SET)
                 if (chartLesson()) {
@@ -1123,6 +1164,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         }
         // (no run fitted the sheet: the first one drawn - the dealer passes it over, it prints another window's gap)
         if (!pickIdx.length && runLast) { rows = runLast.rows; cols = runLast.cols; at = runLast.at; pickIdx = runLast.idx; }
+        // (critic blanks r6 H2: no band leaves the floor of 5 fresh blanks - fail loudly, never print a grid with fewer)
+        if (!pickIdx.length && _lessonRows && band === 100) { const m = `hundreds chart lesson: rows-of-ten grid ${rows ? rows[0] * 10 + 1 : '?'}-${rows ? rows[2] * 10 + 10 : '?'} cannot hold 5 fresh blanks (critic blanks r6 H2)`; console.error(m); throw new Error(m); }
         // Fallback (never expected): alternate squares of each row honour every rule, up to the cap.
         if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, Math.max(1, want));
         const blanks = pickIdx.sort((x, y) => x - y).map(at);
