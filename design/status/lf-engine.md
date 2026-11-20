@@ -29,6 +29,10 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
     - Check: the lesson page body must not overflow. It must FAIL on master.
   - **follow_given_rule lesson M p3 / p4**: about 28.3 % of each page is left empty. The fixed `mq-spread` grid (4 × 1fr in 122.5 mm) causes it.
     - Check: EB-BAND / LESSON-FILL on those pages. It must FAIL on master.
+- **function_table_easy lesson VOCAB picture gives the match away** (from lf-algebra's patterns critic r3, via the lead, 2026-11-20).
+  - The picture shows "In: 3 / Out: 10", which is a value the pupil has to match. A vocab picture must never show it.
+  - Check first: VOCAB-GIVEAWAY. It fails when a lesson vocab picture's text contains a number or answer the vocab item asks the pupil to supply. It must FAIL on master.
+  - Then the fix: draw the picture without the matched value, or with a value that isn't asked.
 - **Next week's lesson-content list, per lane** (from the lessonfirst critic r1; already on master, exposed once the blank page was dropped):
   - **Lesson / curriculum lane (WRM records):**
     - Lessons with no library record open with no model ("I do") and an empty Steps column: Y4.B4.S11, Y4.B5.S1, Y4.B6.S3, Y3.B12.S4, Y4.B12.S2 and the other recordless WRM steps. Planned check: LESSON-NO-MODEL (0 chart states, or a Steps zone with no ink).
