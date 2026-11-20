@@ -12261,6 +12261,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "hint-no-blank-r2-say-order",
+   "check": "ws-hint-no-blank SAY-ORDER: a Say line whose last word is the gap right after a number stands for a number; with a word or sign answer the given values were put in the answer's place (R2-5 fractions:compare)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md R2-5); lead ruling 2026-11-20 smaller head",
+   "browser": true,
+   "fail": {
+    "commit": "566880762",
+    "state": "critic r2 head: fractions:compare \"1/2 is 3/4 ___.\""
+   },
+   "pass": {
+    "commit": "dd0bcc356",
+    "state": "in-order fallback only for a one-number answer; compare has no Say line (SAYLESS pin)"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill fractions:compare,fractions:compare_to_half --only SAY-ORDER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
