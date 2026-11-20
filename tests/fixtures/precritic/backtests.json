@@ -13353,6 +13353,126 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ft-guided-tight-band",
+   "check": "ws-empty-band EB-BAND: no function_table_easy Guided cell at M / L keeps a band of 28 % or more under its table",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (patterns precritic 2026-11-20, A3a)",
+   "browser": true,
+   "fail": {
+    "commit": "7f5377d94",
+    "state": "the Guided rows stretched to 108.8 mm (M) / 156.4 mm (L) for ~72 / ~85 mm of table: EB-BAND 31-46 %, 4 findings"
+   },
+   "pass": {
+    "commit": "4053829a3",
+    "state": "footprint guidedTight: the rows keep their measure, 0 findings"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill algebra:function_table_easy --roles guided --sizes M,L --hosts none --vocab-ink --page-fill --margin 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-twin-label-size",
+   "check": "ws-screen-ink-size TEXT-SIZE: the function table's In / Out labels on the online worksheet are at least their print size",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE label (patterns precritic 2026-11-20, A3b)",
+   "browser": true,
+   "fail": {
+    "commit": "4053829a3",
+    "state": "\"In\" 15.5 px against 16.5 at every worksheet width, 16 findings"
+   },
+   "pass": {
+    "commit": "c8be8e4eb",
+    "state": "twin text runs max(em, print pt): 0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill algebra:function_table_easy",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-twin-slot-target",
+   "check": "ws-grade-render TARGET: every function_table_easy answer box on the online worksheet at 820 / 1024 is at least 48 x 48 px",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TARGET H6 (patterns precritic 2026-11-20, A3b)",
+   "browser": true,
+   "fail": {
+    "commit": "4053829a3",
+    "state": "inputs 48 x 42 px at worksheet 820 / 1024, 22 findings"
+   },
+   "pass": {
+    "commit": "c8be8e4eb",
+    "state": "twin slots max(em, 48 px + border): 0 findings"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills algebra:function_table_easy --gate",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-ea-pupiltag",
+   "check": "ws-cell-checks PUPILTAG: on function_table_easy Error analysis at L the \"<Name> wrote:\" tag sits 2-4 mm over the table",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG (PT-ERR-4; patterns precritic 2026-11-20, A7)",
+   "browser": true,
+   "fail": {
+    "commit": "c8be8e4eb",
+    "state": "the CL-40 tab pad pushed the table 5 mm under the tag, x8"
+   },
+   "pass": {
+    "commit": "86b529460",
+    "state": "no tab pad in fix mode: 0 findings"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy --roles error-analysis --size L --rules PUPILTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grow-psc-type-verb",
+   "check": "ws-print-lint L-VERBS BD-12: growing_shape_patterns' pre-skill-check (the shape_pattern prerequisite) prints no screen verb on paper",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-VERBS BD-12 (patterns precritic 2026-11-20, A8a)",
+   "browser": true,
+   "fail": {
+    "commit": "86b529460",
+    "state": "\"Type missing shapes separated by commas\" printed at L, x2"
+   },
+   "pass": {
+    "commit": "1260f10b3",
+    "state": "\"Write the missing shapes, ...\": no L-VERBS finding (the page's DN-2 is lf-roles')"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --roles pre-skill-check --skills patterns:growing_shape_patterns 2>&1 | grep -q 'L-VERBS BD-12' && echo 'verbs: FAIL' || echo 'verbs: OK'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-lesson-wrap-op",
+   "check": "ws-print-lint L-WRAP WRAP-OP: the function_table_easy lesson (ftTask rule-check) never wraps a step's line after an operator",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-WRAP WRAP-OP (patterns precritic 2026-11-20, A8c)",
+   "browser": true,
+   "fail": {
+    "commit": "1260f10b3",
+    "state": "chart panel 4 wrapped \"Write the rule n −\" / \"2.\", x4 at M"
+   },
+   "pass": {
+    "commit": "9e8545f21",
+    "state": "the provider's steps join an operator to the number after it: no L-WRAP finding (the lesson's OVERFLOW / TOPSTART are lf-engine's)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --roles lesson --opts '{\"ftTask\":\"rule-check\"}' --skills algebra:function_table_easy 2>&1 | grep -q 'L-WRAP WRAP-OP' && echo 'wrap: FAIL' || echo 'wrap: OK'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
