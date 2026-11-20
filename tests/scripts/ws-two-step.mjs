@@ -45,6 +45,8 @@
 //              on the online worksheet and the practice card at 820 / 1024 / 1280 / 1366
 //   GUIDED-MODEL-ALONE (--guided, browser; lf-roles critic r8b / lead 2026-11-14, PAGE_TYPES 2.3: a Guided page holds the Model AND
 //              tries) the first Guided page of a two-step skill holds the Model and at least one try, at M / L
+//   GUIDED-NO-MID (--guided, browser; lead 2026-11-20, card decision 6 amended) no Guided cell - Model or try - prints the hidden middle
+//              question (.mq-wwmid): it stays on the Opener, Scripted Model and lesson chart; its two lines held the Model alone on page 1
 //   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
 //              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
 //   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
@@ -622,7 +624,7 @@ async function guidedMode() {
                 const pages = [...d.querySelectorAll('.ws-page')];
                 const mm = (el) => (el ? Math.round(el.getBoundingClientRect().height * 25.4 / 96) : 0);
                 const c1 = top(pages[0]), c2 = top(pages[1]);
-                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')) };
+                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')), mids: d.querySelectorAll('.mq-wwmid').length };
                 d.remove();
                 return r;
             }, { sk, size, seed });
@@ -633,7 +635,10 @@ async function guidedMode() {
             // keeps its bar - it is the skill's point; _plain's column work is taller). Reported with the measured heights.
             // (lead ruling 2026-11-14 (ii), LEAD_DECISIONS: a Model whose step is a NON-fact column / long-division step (STEP-FORM keeps
             // its frame) is exempt at M too - it cannot share the page; lf-roles' Guided role is to promote a fact-pair Model (post-reset))
-            const exempt = size === 'L' || /^multi_step_word(_plain)?$/.test(sk) || r.colModel;
+            // (lead 2026-11-20, GUIDED-NO-MID: with the middle question off the Guided page, _plain and the column-step Models share page 1
+            // at M - their exemptions end; (Visual) keeps its ruled bar at M, and L stays exempt)
+            const exempt = size === 'L' || sk === 'multi_step_word';
+            if (r.mids) out.push(`GUIDED-NO-MID ${sk} ${size} seed ${seed}: the Guided page prints the hidden middle question in ${r.mids} place(s) (Opener / Scripted Model / chart only, card decision 6 amended)`);
             if (r.cells < 2) {
                 const msg = `${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (${r.colModel ? 'column-step Model, ' : ''}Model ${r.model} mm, first try ${r.firstTry} mm; ${r.pages} pages)`;
                 if (exempt) exempts.push(msg); else out.push(`GUIDED-MODEL-ALONE ${msg}`);
