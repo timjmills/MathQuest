@@ -9,6 +9,22 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20 15:00Z: PARKED (cost $680 of the $715.37 stop). Not for deploy; the deployed chart_120 (969306c1e) is unaffected.
+  - Narrow critic r5 (critic-blanks-r5.md, b5a97830e): r4 F1 and F2 CLOSED. c120 teaching sheet and practice page, the hcf practice page and all keys pass.
+  - G1 FAILS: the hcf band-100 teaching sheet at M lost its Independent section (Score /2, 22 % empty), a regression from f5bfb58dc pinning teaching windows to rows 41-70.
+  - Check LESSON-SECTIONS is built (4ddf73b62, 239fac994): Guided >= 1, and Independent >= 2 at M only (L never fit one, r4 included). It FAILS on the current js/ for hcf M seeds 1 and 4242; c120 M passes. Backtest row not yet added (it needs a pass commit).
+  - The fix attempt, a slot list (Guided 41-65, Independent 46-70 / 61-85), is saved uncommitted as design/audit/runs/lf-builds/chart120/g1-slots-WIP.patch. It passes LESSON-SECTIONS, but ANSWER-REUSE fails on hcf M p3 (seed 1: 7/18; seed 777: 7/17; limit 1/3).
+  - Root cause: the three practice rows-of-ten grids cover 90 of the 100 squares, and teaching gaps are forced into them.
+  - LEAD RULING NEEDED: (a) practice grids print the teaching gaps, which relaxes the sheet-consistency rule across lesson parts; (b) exempt rows-of-ten practice from ANSWER-REUSE, or loosen the limit; (c) accept 2 teaching windows and lower the Independent minimum.
+- NEXT WEEK (lead ruling A11, 2026-11-20):
+  1. ITEM 1: the "+ mixed" Mixed practice page (mixed:true) is broken.
+     - Evidence: seed 4242; c120 at M and L, hcf at M; p4 (critic-blanks-r5.md; PNGs blanks-r8/*-mixedopt-*).
+     - c120 deals 6 identical windows 95-119, each blanking 95/105/115. No step solves 95, and all 18 answers are re-asks.
+     - hcf item 3 repeats p3 grid 1's gaps, and 28 of 30 answers are re-asks.
+     - New check LESSON-MIXED: the lesson checks (SHEET-ANSWER-SET, NEAR-TWIN, ANSWER-REUSE, STEP-COVER, blank counts) also run with mixed:true on every chart lesson that offers "+ mixed". Owner: lf-builds.
+  2. A11 (2): NEAR-TWIN is measured against the SMALLER window. A rows-of-ten grid containing the Guided window with the same gaps is a twin and fails. Tighten the check, make the deal refuse such a grid, add backtest row c120b-near-twin-small.
+  3. G1 per the lead's ruling above, then the one-page re-grade (hcf lesson M p2 and its key, seeds 1 and 4242), then DEPLOY with the head.
+  - Not scored, still open: FOOTER-SEED, numeral baseline, step range wording, Independent 1-25 label ("Review numbers to 30") and window order, crossing asked thinly.
 - 2026-11-20: band-100 lesson PAGEFILL + ANSWER-REUSE fixed (teaching windows fixed on rows 41-70; practice third rows grid always the least-reused band, 31-60). echo lesson + variants: hundreds_chart_fill clean; 3 ANSWER-VARIETY on chart_to_120 review/true-false seed 4242 are pre-existing at 6449ae672. print-lint lesson M/L OK, boot OK, backtest c120b-answer-reuse PASS.
 - 2026-11-20: chart blanks r4 fix BUILT (lead ruling option 1), commit c29d324f8; cap reached, partly proven.
   - Band 120: both Independent windows review 1-25 in disjoint columns, and lesson deals refuse a repeated answer set or a near-twin. Guided and the practice grids keep the crossing of 100.
