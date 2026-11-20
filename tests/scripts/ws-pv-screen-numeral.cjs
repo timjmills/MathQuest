@@ -16,7 +16,11 @@
 // WS-ONE-LINE  (critic live1 N4) at 820 px and wider, a sentence of 4 or fewer parts keeps every answer box on ONE line (r1 split
 //              '+ [ ]' onto a second line in every card at 1280 / 1024 / 820 when the grid went to 3 columns).
 // WS-SLOT-SIZE (critic live1 N4, a ratchet) each answer box is at least the size the digit fit drew before the twin: 100 x 76 px
-//              at 820 px and wider (BEFORE ffcba24b at 1280: 103 x 76; r1 shrank them to 62 x 46).
+//              at 820 px and wider (BEFORE ffcba24b at 1280: 103 x 76; r1 shrank them to 62 x 46). At a 1024 tablet (960-1279 px) the
+//              lead's expand-2col rule narrows the box to 80 px so 2 columns hold: there the ratchet is 76 x 76, and every box's
+//              input (its hit area) is at least 48 x 48 px at every width.
+// WS-COLS      (lead, expand-2col 2026-11-20) placevalue:expand's online worksheet at 1024 px lays out in at least 2 columns (live1 r2
+//              put the sentence on one line with 101 px boxes and the grid fell to 1 column there, the sheet ~2.5x taller).
 // Prints `ws-pv-screen-numeral: OK` / `FAIL (n)` last; exits 1 on FAIL.
 const H = require('../lib/ws-harness.cjs');
 
@@ -26,6 +30,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
 const SKILLS = list(arg('skills', 'placevalue:expand'));
 const WIDTHS = list(arg('widths', '1280,1366,1024,820')).map(Number);
 const SLOT_MIN = { w: 100, h: 76 };   // the ratchet (see WS-SLOT-SIZE)
+const SLOT_MIN_TAB = { w: 76, h: 76 }; // 960-1279 px (expand-2col)
+const COLS_MIN = { 'placevalue:expand@1024': 2 };   // WS-COLS floors
 const N = Number(arg('n', 4));
 const FLOOR = 29;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -82,6 +88,19 @@ function readCard(sel) {
             }, c, k, N);
             if (ok !== true) { bad.push(`BUILD ${key} worksheet@${w}: ${ok}`); continue; }
             await sleep(1200);
+            const colFloor = COLS_MIN[`${key}@${w}`];
+            const geo = await page.evaluate((n) => {
+                const lefts = new Set(); const ins = [];
+                for (let i = 0; i < n; i++) {
+                    const el = document.querySelector(`#ws_card_${i}`); if (!el) continue;
+                    lefts.add(Math.round(el.getBoundingClientRect().left));
+                    for (const x of el.querySelectorAll('.mq-ibline.mq-ibnum input')) { const b = x.getBoundingClientRect(); ins.push([b.width, b.height]); }
+                }
+                return { cols: lefts.size, ins };
+            }, N);
+            if (colFloor && geo.cols < colFloor) bad.push(`WS-COLS ${key} worksheet@${w}: columns ${geo.cols} (want >= ${colFloor})`);
+            const tiny = geo.ins.find(([a, b]) => a < 47.5 || b < 47.5);
+            if (tiny) bad.push(`WS-SLOT-SIZE ${key} worksheet@${w}: an answer input is ${Math.round(tiny[0])} x ${Math.round(tiny[1])} px (touch target >= 48 x 48)`);
             for (let i = 0; i < N; i++) {
                 const r = await page.evaluate(readCard, `#ws_card_${i}`);
                 if (!r) continue;
@@ -100,8 +119,9 @@ function readCard(sel) {
                 if (w >= 820 && r.boxes.length && r.boxes.length <= 4) {
                     const tops = r.boxes.map((b) => b.top);
                     if (Math.max(...tops) - Math.min(...tops) > 4) bad.push(`WS-ONE-LINE ${at}: its ${r.boxes.length} boxes sit on more than one line`);
-                    const small = r.boxes.find((b) => b.w < SLOT_MIN.w - 0.5 || b.h < SLOT_MIN.h - 0.5);
-                    if (small) bad.push(`WS-SLOT-SIZE ${at}: a box is ${Math.round(small.w)} x ${Math.round(small.h)} px (the ratchet: >= ${SLOT_MIN.w} x ${SLOT_MIN.h})`);
+                    const sm = w >= 960 && w < 1280 ? SLOT_MIN_TAB : SLOT_MIN;
+                    const small = r.boxes.find((b) => b.w < sm.w - 0.5 || b.h < sm.h - 0.5);
+                    if (small) bad.push(`WS-SLOT-SIZE ${at}: a box is ${Math.round(small.w)} x ${Math.round(small.h)} px (the ratchet: >= ${sm.w} x ${sm.h})`);
                 }
             }
         }
