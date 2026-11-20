@@ -1404,7 +1404,9 @@ function twoStepBarFor(p, ctx) {
  * a practice page) and never on the screen; marked `data-ws-hint="fade"` so a host that hides hints drops it.
  */
 function midQuestion(p, ctx, wMm = 50, k = 0, minLines = 0) {
-    if (!p || !p.mid || isTwin(ctx) || !(Number(ctx.scaffoldLevel) >= 2)) return '';
+    // (GUIDED-NO-MID, lead 2026-11-20: the Guided page - its Model and its tries, `ctx.guided` - drops it with the bar, so the Model
+    // and its first try share page 1 at M; it stays on the Opener, the Scripted Model and the lesson chart)
+    if (!p || !p.mid || isTwin(ctx) || ctx.guided || !(Number(ctx.scaffoldLevel) >= 2)) return '';
     // (Step 2's line is the story's own question, so both step columns carry a question line and stand level, P-WP-11)
     const t = k === 0 ? p.mid : String(p.lines[p.lines.length - 1] || '');
     return `<div class="mq-wwmid" data-ws-hint="fade" style="max-width:${L(ctx, Math.max(56, wMm))};font-size:${P(ctx, zonePt(ctx))};font-weight:400;line-height:1.25;${minLines ? `min-height:${minLines * 1.25}em;` : ''}">${esc(t)}</div>`;
