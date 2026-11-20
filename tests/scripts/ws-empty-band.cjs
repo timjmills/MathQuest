@@ -159,6 +159,11 @@ const EBLAST_BLOCKING_ROLES = [
 ];
 // EBLAST-BLOCKING-END
 const BLOCKING = new Set(EBLAST_BLOCKING_ROLES);
+// EB-PAGE-LAST (lf-roles PSC layout, lead 2026-11-20 item 1): a Pre-skill Check is ONE short page (PT-PRE-1), so its last / only
+// page is held to EB-PAGE's 30 % too - EB-LASTPAGE excuses a page AT its ceiling (add_facts M: 12 items, 3 rows of 4, ~40 % white),
+// but a short check at its ceiling must still lay its items over the page. Roles listed here: EB-PAGE judges every page. Pure.
+const EBPAGE_ALL_PAGES_ROLES = new Set(['pre-skill-check']);
+const pageAllBad = (role, pct) => EBPAGE_ALL_PAGES_ROLES.has(String(role || '').split(' ')[0]) && Number(pct) >= 30;
 /** 'finding' or 'advisory': an EB-LASTPAGE / CAP-PARITY red on `role` (blockAll: --eblast-block). Pure. */
 const eblastMode = (role, blockAll, list = BLOCKING) => (blockAll || list.has(String(role || '').split(' ')[0]) ? 'finding' : 'advisory');
 /** The allow-list read from a source text (between the markers), or null. Pure. */
@@ -601,6 +606,9 @@ if (argv.includes('--self-test')) {
             ['blocking: an unlisted role red is advisory', eblastMode('not-a-role', false), 'advisory'],
             ['blocking: --eblast-block makes every red a finding', eblastMode('not-a-role', true), 'finding'],
             ['blocking: a role key with columns reads its role', eblastMode('review cols 3', false), 'finding'],
+            ['EB-PAGE-LAST: PSC last page 40 % (add_facts M at its 12 ceiling): FAIL', pageAllBad('pre-skill-check', 40), true],
+            ['EB-PAGE-LAST: PSC last page 25 %: OK', pageAllBad('pre-skill-check', 25), false],
+            ['EB-PAGE-LAST: independent last page 60 % (teacher count): not judged', pageAllBad('independent', 60), false],
             ['blocking: pre-skill-check is listed (lf-roles PSC fill)', BLOCKING.has('pre-skill-check'), true],
             ['pin: the list reads from its markers', JSON.stringify(blockingOf("// EBLAST-BLOCKING-BEGIN\nconst X = ['test', 'review'];\n// EBLAST-BLOCKING-END")), '["test","review"]'],
             ['pin: removing an entry FAILs', pinLost(['test', 'review'], ['test']).join(), 'review'],
@@ -1207,6 +1215,7 @@ async function main() {
                     if (has('page-fill') && j.role !== 'guided') {
                         const pf = await sh.evaluate(measurePageFill, 'body > section.ws-page, body > .ws-page');
                         pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                        if (pf.length && pageAllBad(j.role, pf[pf.length - 1].pct)) F('EB-PAGE', `${key} ${j.tag} p${pf.length}`, `${pf[pf.length - 1].pct} % of the last page body is empty under its last block (a Pre-skill Check is one short page: every page judged, at its ceiling too; limit 30 %)`);
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
                             const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp, pf.length, pf[0].rows, j.size);
