@@ -158,3 +158,12 @@ One fix round did not fit the $1,618.37 stop (≈ $58 left against 15 findings, 
 11. **A9c item 1:** area-model Reason It + word-problems at M, 2 a page (measurements above).
 
 **Carry-over (lead, 2026-11-20):** with the first next-week commit, add to design/audit/LESSONS_LEARNED.md "Process rules": "a precritic red on a page type master never drew (new*) is the branch's own red; it is never parked as master's". This is adopted after sizes r1 F1. The lead does the F1 master check, so this lane spends nothing on it.
+
+**F1 master check (lead, 2026-11-20, master f8164ca5d).**
+- F1 is not live on master. mult_2by1_column and mult_3by1_column print no Model page there. The empty step marks come from this branch's new multiply workedSteps / stepState.
+- A related master defect is live: the lesson page for mult_2by1_column M (seed 506061) prints an EMPTY "Steps:" panel beside Guided Practice, and the bottom ~25 % of p1 is blank.
+
+Next-week item 1 now covers both:
+1. Step marks on every Model state.
+2. A filled Steps panel on the lesson.
+3. New check STEPS-PANEL-EMPTY: it FAILs when a lesson Steps panel draws no step text. Backtest it on master f8164ca5d (FAIL) and on the fix (OK).
