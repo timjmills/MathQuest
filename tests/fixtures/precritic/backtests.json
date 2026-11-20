@@ -12401,6 +12401,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-sheet-answer-set",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo SHEET-ANSWER-SET",
+   "check": "no two pupil windows on one lesson page share a sorted answer set (critic blanks r4 F1)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,4242,777 --only SHEET-ANSWER-SET",
+   "fail": {
+    "commit": "1ab2801ef",
+    "state": "the teaching sheet dealt Guided and both Independent windows 96, 106, 116 (94, 104, 114 at seed 1)"
+   },
+   "pass": {
+    "commit": "c29d324f8",
+    "state": "Independent windows review 1-25 in disjoint columns (lead ruling 2026-11-20 option 1); lesson deals refuse a kept window's answer set"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-answer-reuse",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo ANSWER-REUSE",
+   "check": "at most a third of a lesson practice page's answers were asked on an earlier page of the packet (critic blanks r4 F2)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 4242 --only ANSWER-REUSE",
+   "fail": {
+    "commit": "1ab2801ef",
+    "state": "practice p3 re-asked 13 of its 15 answers"
+   },
+   "pass": {
+    "commit": "c29d324f8",
+    "state": "band-100 teaching windows keep to the middle rows; practice prints rows of ten on the bands they leave fresh"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-near-twin",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo NEAR-TWIN",
+   "check": "no two pupil windows of a lesson packet share 60 % of the larger's squares with the same gaps there (critic blanks r4 F2)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 4242 --only NEAR-TWIN",
+   "fail": {
+    "commit": "1ab2801ef",
+    "state": "practice item 3 was Guided 1 shifted one column (12 of 15 squares, same gaps)"
+   },
+   "pass": {
+    "commit": "c29d324f8",
+    "state": "lesson deals refuse a window sharing 60 % of a kept window's squares with a gap there"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-practice-fill",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo PRACTICE-FILL",
+   "check": "a lesson practice page prints at least its capacity minus 1 items, or rows-of-ten grids (critic blanks r4 F2)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 4242 --only PRACTICE-FILL",
+   "fail": {
+    "commit": "1ab2801ef",
+    "state": "3 windows on a page that holds 6"
+   },
+   "pass": {
+    "commit": "c29d324f8",
+    "state": "band-100 practice prints rows of ten"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

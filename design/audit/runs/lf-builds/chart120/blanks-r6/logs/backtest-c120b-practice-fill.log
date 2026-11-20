@@ -1,0 +1,8 @@
+ws-backtest row c120b-practice-fill: PASS  fail state FAIL 8.4s, pass state OK 29.0s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-practice-fill         commit-pair  FAIL 8.4s           OK 29.0s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 55.0 s
+ws-backtest: OK

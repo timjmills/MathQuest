@@ -9,6 +9,18 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20: chart blanks r4 fix BUILT (lead ruling option 1), commit c29d324f8; cap reached, partly proven.
+  - Band 120: both Independent windows review 1-25 in disjoint columns, and lesson deals refuse a repeated answer set or a near-twin. Guided and the practice grids keep the crossing of 100.
+  - Band 100: teaching windows on rows 3-7 (r0 2-4). Practice prints rows of ten on the least-touched bands (1-30, 71-100, then one more).
+  - Proven:
+    - ws-guided-echo, every check, lesson role, M and L, seeds 1/4242/777, both skills: 0 findings except hcf M 777 ANSWER-REUSE 9/25 (run before the final band-choice tweak; not re-run).
+    - backtests c120b-sheet-answer-set / -answer-reuse / -near-twin / -practice-fill: OK.
+    - print-lint lesson L OK.
+    - boot-smoke OK; code-snapshot OK.
+  - Open:
+    - print-lint lesson M: hcf p3 PAGEFILL at the lint seed (only 2 grids dealt; the third band 3-5 / 4-6 is crowded by the teaching windows; not re-run after the band-choice tweak).
+    - Not run: --variants, empty-band, role-hidden.
+    - The chartwindow card (§3 amended) is unsigned until the lead re-signs.
 - 2026-11-20: chart blanks r4 fix STOPPED after step 1 (budget rule: the redesign is bigger than the ~$30 cap, and band 120 needs a lead ruling). Checks committed 9a065b833, fail on 1ab2801ef as the critic found. Rows added to CHECKS_FROM_CRITICS (pass pending); no backtests.json rows yet (no pass commit).
   - Band 120, proof that F1's "different free columns" cannot exist: the shown example prints cols 0-4 of rows 91-120, so every gap lies in cols 5-9. Every 3 x 5 window on those rows starts at col 1-5 and holds cols 5..s+4 of the free columns, so its gap count f(s) only grows with s. Two windows with 3 gaps each (BLANK-COUNT, lead ruling (a)) and consistent blanking (CROSS-GIVEAWAY) then hold the SAME 3 gaps. This holds for any row spread, and for "fewer windows" too: Guided + 1 Independent still match.
   - Ways through, each needs the lead: (i) Independent windows off rows 91-120 (rows 1-25: both Independent windows in that band, disjoint columns, so the practice grids 91-120 / 61-90 / 31-60 stay as passed; the card's "every band-120 item crosses 100" is relaxed for Independent only); (ii) Independent as ONE rows-of-ten grid of 91-120 (the brief's fallback; its gaps are G = Guided's 3 plus 3-6 more), with practice grids moving to 61-90 / 31-60 / 1-30 - needs teaching-sheet layout work for a full-width grid; (iii) Guided + Independent with N other than 3.

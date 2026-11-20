@@ -1,0 +1,8 @@
+ws-backtest row c120b-sheet-answer-set: PASS  fail state FAIL 24.4s, pass state OK 60.5s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-sheet-answer-set      commit-pair  FAIL 24.4s          OK 60.5s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 115.7 s
+ws-backtest: OK
