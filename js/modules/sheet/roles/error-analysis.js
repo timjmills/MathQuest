@@ -38,7 +38,7 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer, equationStemOf,
 } from './compose.js';
-import { gridHeightMm, SAFETY_H_MM, capRowsToInk } from '../layout.js';
+import { gridHeightMm, SAFETY_H_MM, rowCapMm, capRowsToInk } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
@@ -266,6 +266,10 @@ const REDO = new Set(['seqstrip', 'count-row', 'cloze-bank']);
 // A template whose ink starts flush with its box (a count row's tiles) lifts the "<Name> wrote:" label a little more,
 // so the label's foot stays 2-4 mm over the ink (PT-ERR-4; ws-cell-checks PUPILTAG; lead order 5, 2026-11-13)
 const TAG_LIFT = { 'count-row': 0.5, 'function-table': 0.5 };
+// TAB-CLEAR (critic lf-engine-rowcap-s2 F3): the "<Name> wrote:" tag over the work starts 2 mm right of the cell's number tab. A row held to
+// its drawing (ROW-STRETCH CAP) no longer centres the work low enough to clear the tab by chance (fact_family_sort M: the tab covered
+// "Sam chose:"); moving the tag ACROSS, not the work down, keeps every row's height (a margin over the work cost Error Analysis L an item).
+const TAB_CLEAR_LEFT = 'calc(var(--ws-tab, 5mm) + 2mm)';
 
 /**
  * What names each part when the parts are a plain list inside a picture (critic round 3: "1st
@@ -709,7 +713,8 @@ export function prepare(it, info = {}) {
         // Lines at L its ink entered the label keep-out at 6.5 mm across, 2.3 mm down. The tag is set in past --ws-koin, as the
         // arrays-turn and Reason It fixes are; the work and the cell height do not move.)
         const tagLeft = kind === 'redo' && it.template === 'count-row' ? 'max(0mm, calc(var(--ws-koin, 0mm) + 0.5mm))' : '0';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:${tagLeft}"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        // (rowcap-s2 F3: every tag starts past the number tab, TAB_CLEAR_LEFT; master's REDO count-row inset kept - the larger wins)
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? ` style="margin-left:${TAB_CLEAR_LEFT}"` : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:max(${TAB_CLEAR_LEFT}, ${tagLeft})"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -929,13 +934,19 @@ export function varied(items) {
 export function rowHeights(items, cols, G, mode) {
     const rows = Math.max(1, Math.ceil(items.length / cols));
     const need = [];
+    // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a row grows at most to what it
+    // draws (its tallest item's measure at the judge mode) + its templates' writing room; the spare stays under the grid
+    const cap = [];
     for (let r = 0; r < rows; r++) {
-        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => heightAt(it, cols, mode)).filter(Number.isFinite);
+        const its = items.slice(r * cols, (r + 1) * cols);
+        const hs = its.map((it) => heightAt(it, cols, mode)).filter(Number.isFinite);
         need.push(hs.length ? Math.min(G / rows, Math.max(...hs) * 1.1) : G / rows);
+        // (heightAt is the measure + 4 mm for the grid's rules; the cell draws its measure, so the cap is reckoned on that)
+        cap.push(hs.length ? rowCapMm(Math.max(...hs) - 4, its) : Infinity);
     }
     const sum = need.reduce((a, b) => a + b, 0);
     const grow = sum > 0 ? Math.max(1, Math.min((G - SAFETY_H_MM) / sum, 1.4)) : 1;
-    return need.map((x) => Math.round(Math.min(G / rows, x * grow) * 100) / 100);
+    return need.map((x, r) => Math.round(Math.min(G / rows, x * grow, cap[r]) * 100) / 100);
 }
 
 /**

@@ -2491,7 +2491,25 @@ function lintKitGeometry(dom, pdf, info, F) {
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
                 const body = p.footRect[1] - p.gridTop;
                 const strip = p.footRect[1] - p.gridBottom;
-                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+                // (critic lf-engine-rowcap-s2 ruling on F4 / F5: on the row-capped roles that are not practice pages - Review, Test, Error
+                // Analysis, Opener - a strip is the page's MAJOR only while the count is under the role's §12.1 ceiling; at the ceiling (or
+                // on a role whose count is its own design, the Opener) the role caps the count and the strip is reported, minor)
+                const capRole = /^(review|test|error-analysis|opener|lesson-opener)\b/.test(p.role || '');
+                const cl = capRole ? ceilingFor(p.role, p.size, false) : null;   // (the role's own §12.1 base: test.js holds a one-symbol Test to it too)
+                const roleCapped = capRole && (!cl || p.items >= cl.n);
+                // (at the ceiling a strip over 30 % is still MAJOR: the same count in fewer columns and more rows would fill it - F5, the
+                // add_facts Test L 4 x 3 at its ceiling of 12 left 39 %; 3 x 4 leaves 23 %)
+                // ROLE-CAPPED REVIEW / ERROR-ANALYSIS (lead rulings 2026-11-20): a Review or an Error Analysis at its §12.1 ceiling is role-capped like a Test - its length is the
+                // teacher's choice, not a fill target - so its strip over 30 % is NOT reshaped into a finding; it is reported, named, on every
+                // page it applies to (never a silent pass). Test / Opener keep the F5 rule below.
+                // (an Error Analysis page's count is the role's own - how many worked errors a page teaches - so every EA page over 20 % is
+                // the named note, whatever its count; ROLE-CAPPED ERROR-ANALYSIS, lead 2026-11-20)
+                const eaCapped = capRole && /^error-analysis\b/.test(p.role || '');
+                if (body > 0 && strip > 0.2 * body && eaCapped) console.log(`  note: PAGEFILL ROLE-CAPPED ERROR-ANALYSIS (lead 2026-11-20; not a finding) ${p.role} ${p.size} page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area), ${p.items} item(s) (ceiling ${cl ? cl.n : '-'}) - its length is a teaching choice`);
+                else if (body > 0 && strip > 0.3 * body && roleCapped && cl && /^review\b/.test(p.role || '')) console.log(`  note: PAGEFILL ROLE-CAPPED REVIEW (lead 2026-11-20; not a finding) ${p.role} ${p.size} page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) at the ${p.role} ceiling ${cl.n} - its length is the teacher's choice`);
+                else if (body > 0 && strip > 0.3 * body && roleCapped && cl) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) at the ${p.role} ceiling ${cl.n}: over 30 % - reshape the grid (fewer columns, more rows) to fill it (critic rowcap-s2 F5)`, 'empty strip under a capped page');
+                else if (body > 0 && strip > 0.2 * body && roleCapped) console.log(`  note: PAGEFILL (not a finding) ${p.role} ${p.size} `+`page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) - the ${p.role} count ${p.items} is at its ceiling${cl ? ` ${cl.n}` : ' (the role sets its own count)'}: a lead call, not a fill defect`);
+                else if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
             }
             // L-SUPPORT NOT-SLOT (critic divarray r1 D1): a support draws no empty closed box the size/shape of the answer
             // slot, and a frame drawn on only some cells of an array band (the × zero empty frame, the lone framed support)
