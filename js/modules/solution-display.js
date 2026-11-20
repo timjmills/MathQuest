@@ -46,8 +46,58 @@ export function closeSolutionPopup() {
     if (modal) modal.remove();
 }
 
-// Generate solution steps for on-screen display
+// The answer as readable text (R3-3, ws-solution-text SOL-OBJECT): an object answer is never "[object Object]".
+// A sort mapping (tile id -> bin id) reads "70: 73, 74 · 80: 78, 75"; a list of points reads "A (8, 5), B (10, 3)".
+function ansText(q) {
+    const show = (v) => {
+        if (v == null) return '';
+        if (Array.isArray(v)) return v.map(show).join(', ');
+        if (typeof v === 'object') {
+            if ('x' in v && 'y' in v) return `${v.label != null ? v.label + ' ' : ''}(${v.x}, ${v.y})`;
+            return Object.entries(v).map(([k, x]) => `${k}: ${show(x)}`).join(' · ');
+        }
+        return String(v);
+    };
+    const a = q && q.ans;
+    if (a && typeof a === 'object' && !Array.isArray(a) && Array.isArray(q.bins) && Array.isArray(q.tiles)) {
+        const name = (o) => (o.label != null ? o.label : o.ariaLabel != null ? o.ariaLabel : o.value);
+        const tile = new Map(q.tiles.map((t) => [t.id, name(t)]));
+        const inBin = (b) => Object.keys(a).filter((t) => a[t] === b.id).map((t) => tile.get(t)).join(', ');
+        // bins drawn as pictures have no text label: list the tiles in bin order
+        if (q.bins.some((b) => name(b) == null)) return q.bins.map(inBin).join(', ');
+        return q.bins.map((b) => `${name(b)}: ${inBin(b)}`).join(' · ');
+    }
+    return show(a);
+}
+
+// Generate solution steps for on-screen display. (R3-3 / R3-4, ws-solution-text) The branches below build their lines from
+// generator fields; a line that came out broken is never shown: a "Problem:" line that lost the question (a gap "?", a
+// "__" blank, a lost "=", an "undefined") becomes the question as asked, and any other line printing "[object",
+// "undefined" or "NaN" is left out.
 export function generateSolutionSteps(q) {
+    const steps = buildSolutionSteps(q);
+    const plain = (h) => String(h == null ? '' : h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+    const BROKEN = /\[object|\bundefined\b|\bNaN\b/;
+    const qText = String((q && q.text) || '');
+    const out = [];
+    for (const st of steps) {
+        const t = plain(st);
+        if (/^Problem\s*:/.test(t)) {
+            const body = t.replace(/^Problem\s*:\s*/, '');
+            const qt = plain(qText);
+            const same = body.replace(/\s/g, '') === qt.replace(/\s/g, '');
+            const lostEq = /=/.test(qt.replace(/=\s*(_+|\?|[□☐▢])\s*[.?]?\s*$/, '')) && !/=/.test(body);
+            if (!same && (!body || BROKEN.test(body) || /_{2,}/.test(body) || /(^|[\s(=+\-−×÷*/:,<>])\?/.test(body) || lostEq)) {
+                if (qt) out.push(`<strong>Problem:</strong> ${qText}`);
+                continue;
+            }
+        } else if (BROKEN.test(t)) continue;
+        out.push(st);
+    }
+    return out;
+}
+
+function buildSolutionSteps(q) {
     const steps = [];
     
     // ========================================
@@ -134,7 +184,7 @@ export function generateSolutionSteps(q) {
                 steps.push(`&nbsp;&nbsp;Step ${i + 1}: ${step}`);
             });
         }
-        steps.push(`<strong>Answer: ${q.ans}</strong>`);
+        steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
     }
     // ========================================
     // FRACTIONS
@@ -155,7 +205,7 @@ export function generateSolutionSteps(q) {
             steps.push(`&nbsp;&nbsp;${fd.num2}/${fd.denom2} = ${fd.convertedNum2}/${fd.lcd}`);
             steps.push(`<strong>Step 4:</strong> ${fd.op === '+' ? 'Add' : 'Subtract'} numerators (keep denominator)`);
             steps.push(`&nbsp;&nbsp;${fd.convertedNum1} ${fd.op || '+'} ${fd.convertedNum2} = ${fd.op === '+' ? fd.convertedNum1 + fd.convertedNum2 : fd.convertedNum1 - fd.convertedNum2}`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
         // Same denominator
         else if (fd.num1 !== undefined && fd.num2 !== undefined && fd.denom) {
@@ -192,7 +242,7 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 1:</strong> Multiply numerators: ${fd.num1} × ${fd.num2} = ${fd.num1 * fd.num2}`);
             steps.push(`<strong>Step 2:</strong> Multiply denominators: ${fd.denom1} × ${fd.denom2} = ${fd.denom1 * fd.denom2}`);
             steps.push(`<strong>Step 3:</strong> Simplify if possible`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
         // Divide fractions
         else if (fd.op === '÷') {
@@ -202,7 +252,7 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 3:</strong> Flip the second fraction (reciprocal)`);
             steps.push(`&nbsp;&nbsp;${fd.num1}/${fd.denom1} × ${fd.denom2}/${fd.num2}`);
             steps.push(`<strong>Step 4:</strong> Multiply across`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
         // Compare fractions
         else if (fd.symbol) {
@@ -217,7 +267,7 @@ export function generateSolutionSteps(q) {
         else if (fd.factor) {
             steps.push(`<strong>Problem:</strong> Find equivalent fraction`);
             steps.push(`<strong>Step 1:</strong> Multiply/divide both numerator and denominator by same number`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
         // Simplify fractions
         else if (fd.gcd) {
@@ -227,11 +277,11 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 2:</strong> Divide both by GCD`);
             steps.push(`&nbsp;&nbsp;${fd.originalNum} ÷ ${fd.gcd} = ${fd.originalNum / fd.gcd}`);
             steps.push(`&nbsp;&nbsp;${fd.originalDen} ÷ ${fd.gcd} = ${fd.originalDen / fd.gcd}`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
         else {
             steps.push(`<strong>Problem:</strong> ${q.text.replace(' = ___', '')}`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -245,14 +295,14 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 2:</strong> Add zeros as placeholders if needed`);
             steps.push(`<strong>Step 3:</strong> Add each column from right to left`);
             steps.push(`<strong>Step 4:</strong> Bring down the decimal point`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         } else if (dd.op === '-' || dd.op === '−') {
             steps.push(`<strong>Problem:</strong> ${dd.a} - ${dd.b}`);
             steps.push(`<strong>Step 1:</strong> Line up the decimal points vertically`);
             steps.push(`<strong>Step 2:</strong> Add zeros as placeholders if needed`);
             steps.push(`<strong>Step 3:</strong> Subtract each column from right to left`);
             steps.push(`<strong>Step 4:</strong> Bring down the decimal point`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         } else if (dd.op === '×' || dd.op === '*') {
             const totalPlaces = dd.aPlaces + dd.bPlaces;
             steps.push(`<strong>Problem:</strong> ${dd.a} × ${dd.b}`);
@@ -262,7 +312,7 @@ export function generateSolutionSteps(q) {
             steps.push(`&nbsp;&nbsp;${dd.b} has ${dd.bPlaces || 0} decimal places`);
             steps.push(`&nbsp;&nbsp;Total = ${totalPlaces} places`);
             steps.push(`<strong>Step 3:</strong> Place decimal ${totalPlaces} places from right`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         } else if (dd.dividend !== undefined) {
             steps.push(`<strong>Problem:</strong> ${dd.dividend} ÷ ${dd.divisor}`);
             steps.push(`<strong>Step 1:</strong> Set up long division`);
@@ -289,7 +339,7 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Answer: ${dd.target}</strong>`);
         } else {
             steps.push(`<strong>Problem:</strong> ${q.text.replace(' = ___', '')}`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -425,7 +475,7 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Answer: ${ad.isTrue ? 'TRUE' : 'FALSE'}</strong>`);
         } else {
             steps.push(`<strong>Problem:</strong> ${q.text.replace(' = ___', '')}`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -531,7 +581,7 @@ export function generateSolutionSteps(q) {
             steps.push(`&nbsp;&nbsp;Trapezoid: exactly 1 pair parallel sides`);
             steps.push(`<strong>Answer: ${gd.quadType}</strong>`);
         } else {
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -581,7 +631,7 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Answer: ${md.answer} ${md.to}</strong>`);
         } else {
             steps.push(`<strong>Problem:</strong> ${q.text.replace(' = ___', '')}`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -646,9 +696,9 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 1:</strong> Read the title and axis labels`);
             steps.push(`<strong>Step 2:</strong> Find the data point asked about`);
             steps.push(`<strong>Step 3:</strong> Read the value`);
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         } else {
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -668,7 +718,7 @@ export function generateSolutionSteps(q) {
             steps.push(`&nbsp;&nbsp;Each number ${pd.step > 0 ? 'increases' : 'decreases'} by ${Math.abs(pd.step)}`);
         }
         steps.push(`<strong>Step 2:</strong> Apply the rule to find the answer`);
-        steps.push(`<strong>Answer: ${q.ans}</strong>`);
+        steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
     }
     // ========================================
     // ROUNDING
@@ -716,7 +766,7 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 2:</strong> Value = digit × place value`);
             steps.push(`<strong>Answer: ${pv.value}</strong>`);
         } else {
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
@@ -884,19 +934,23 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Answer: ${nt.isEven ? 'EVEN' : 'ODD'}</strong>`);
         }
         else {
-            steps.push(`<strong>Answer: ${q.ans}</strong>`);
+            steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
         }
     }
     // ========================================
     // DEFAULT FALLBACK
     // ========================================
     else {
-        const problemText = q.text ? q.text.replace(' = ___', '').replace('___', '?') : 'Problem';
-        steps.push(`<strong>Problem:</strong> ${problemText}`);
+        // (R3-4, ws-solution-text SOL-PROBLEM) restate the question faithfully: drop only a trailing "= ___"; when a blank is
+        // left anywhere else, show the question as asked (never a built-up "675 + ? + ___")
+        const qText = String(q.text || '');
+        const stripped = qText.replace(/\s*=\s*_{2,}\s*$/, '');
+        const problemText = /_{2,}/.test(stripped) ? qText : stripped;
+        if (problemText.trim()) steps.push(`<strong>Problem:</strong> ${problemText}`);
         if (q.hint) {
             steps.push(`<strong>Hint:</strong> ${q.hint}`);
         }
-        steps.push(`<strong>Answer: ${q.ans}</strong>`);
+        steps.push(`<strong>Answer: ${ansText(q)}</strong>`);
     }
     
     return steps;

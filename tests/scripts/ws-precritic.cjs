@@ -1333,6 +1333,9 @@ function buildPlan(ctx) {
         // ---- HINT-NO-BLANK (lf-placevalue 2026-11-20; first found on placevalue:digit_value_unit_form, ws-unit-form-bank check 5):
         // the screen help - "Here is how" steps, the Say line, the hint, the Show Solution steps - never shows an unfilled blank
         add(gate('hint-no-blank', 'ws-hint-no-blank (HINT-NO-BLANK: no "___" / {n} / gap "?" in the screen help: worked steps, Say line, hint, solution; HELP-EMPTY pinned)', `${scope} × 4 seeds`, 'browser', 'ws-hint-no-blank', ['--skill', keys.join(',')], { missingMsg: 'ws-hint-no-blank is not in this tree' }));
+        // ---- SOL-TEXT (lf-placevalue 2026-11-20; HINT-NO-BLANK r3 R3-3 / R3-4): the Show Solution popup prints readable text:
+        // no "[object" / undefined / NaN (SOL-OBJECT), and its "Problem:" line restates the question (SOL-PROBLEM)
+        add(gate('solution-text', 'ws-solution-text (SOL-OBJECT: no [object / undefined / NaN in Show Solution; SOL-PROBLEM: the Problem line restates the question, no "? + ___")', `${scope} × 4 seeds`, 'browser', 'ws-solution-text', ['--skill', keys.join(',')], { missingMsg: 'ws-solution-text is not in this tree' }));
         // ---- lane lf-vocab (2026-11-07; design/cards/vocabulary): the picture vocabulary rules V1-V7 (every word drawn, one
         // right answer an item, no word twice on a page, every lesson set splits into two clash-free trios) whenever a picture
         // vocabulary skill is in scope. Default parse: its last "ws-vocab-unit: OK|FAIL" line and its exit code.
