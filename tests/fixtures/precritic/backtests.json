@@ -12657,6 +12657,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-area4-L-overflow",
+   "check": "area_model_4by1 fits its one-column cell at L on independent, more-practice, test and guided (cell-checks OVERFLOW; lead fix r1 item 1)",
+   "kind": "commit-pair",
+   "browser": false,
+   "rule": "ws-cell-checks OVERFLOW",
+   "fail": {
+    "commit": "e0bbe27a5",
+    "state": "four parts at L: label row 185 mm and one-line work row 207 mm in a one-column cell (OVERFLOW 12 on independent L)"
+   },
+   "pass": {
+    "commit": "16719cbf3",
+    "state": "2 mm column margin, two-line work row, partials at most 4 digits"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:area_model_4by1 --roles independent,more-practice,test,guided --size L 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sizes-longmult-keyfit",
+   "check": "error analysis on the long-multiplication cell never writes a wrong product into one digit box (cell-checks KEYFIT; lead fix r1 item 3)",
+   "kind": "commit-pair",
+   "browser": false,
+   "rule": "ws-cell-checks KEYFIT",
+   "fail": {
+    "commit": "e0bbe27a5",
+    "state": "the key writes 723 / 34 past a digit slot (strip digits listed as graded parts)"
+   },
+   "pass": {
+    "commit": "16719cbf3",
+    "state": "one graded answer slot; the template splits the wrong value"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_3by2_standard,multiplication:mult_2by2_standard --roles error-analysis --size M,L --rules KEYFIT 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sizes-longmult-touch",
+   "check": "every long-multiplication work place and carry box is a >= 48 px target on the practice card, worksheet and quiz at 820 / 1024 (render-gate TARGET, H6; lead fix r1 item 2)",
+   "kind": "commit-pair",
+   "browser": false,
+   "rule": "ws-grade-render --gate TARGET",
+   "fail": {
+    "commit": "e0bbe27a5",
+    "state": "mq-opswork inputs 22 x 29 and 38 x 51 px on the 820 card"
+   },
+   "pass": {
+    "commit": "16719cbf3",
+    "state": "62 px digit floor, 48 px work inputs and carry touch inputs"
+   },
+   "command": "cd {root} && node tests/scripts/ws-grade-render.cjs --skills multiplication:mult_2by2_standard,multiplication:mult_3by2_standard --roles independent --size M --gate --out /tmp/mq-bt-sizes-touch 2>&1 | grep -E '^ws-grade-render: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
