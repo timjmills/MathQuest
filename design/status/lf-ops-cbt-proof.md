@@ -144,3 +144,15 @@ algebra:two_step_add_then_mult 16, algebra:two_step_letter_equation 16, patterns
 the same keys its pin moved since 0e80c26e4. 2,714 hashes, 55 lessons. Reason: lint marker classes `mq-tofblank` /
 `mq-smstate` (and `mq-pagecap`), CSS-less, plus the 3 additive engine rules that match no lesson page; class-only proof above;
 the 8 real lessons listed; the 3 new lessons pinned.
+
+## Narrow critic on the 2 passed subtraction lessons (2026-11-20, lead option (a)): PASS
+Independent critic (Opus medium), comparing 68565d00b with master eb2e26972, 64 lesson pages per tree. Classes and the engine style were stripped before hashing.
+- **8 pages changed, all at L, all page 2** (pupil and key): sub_2d_1d and sub_50_no_regroup at seeds 4242 and 1. Nothing changed at M.
+- **What moved:** the Warm-up row went from 47.45 to 43.1 mm, and the Guided Practice Steps box went from 61.05 to 65.40 mm. The Scripted Model page (p1) is identical to master.
+  - **Correction to the wording above:** these pages move through the Guided Steps box and the Warm-up row height, not the "Scripted Model step band".
+- **Grading:**
+  - 4 steps on 4 lines, none merged (P-1 holds);
+  - the Say band is intact;
+  - no new empty band and no overflow;
+  - the key is correct.
+  - Scores: fidelity 9, teaching 9, key 10, space 8–9. Master scored 8 for space; nothing regressed.
