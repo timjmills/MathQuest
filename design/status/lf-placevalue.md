@@ -408,3 +408,7 @@ Every list may only shrink: a skill joining FAILs, and on a full sweep a pinned 
   the fallback keeps the question as asked unless only a trailing "= ___" drops; generateSolutionSteps wraps the branches:
   a broken Problem line becomes the question text, any other "[object" / undefined / NaN line is left out.
 - Backtests sol-object, sol-problem (FAIL 2c42746aa → OK a55a7aaaa): PASS. Ledger rows in CHECKS_FROM_CRITICS.md.
+- Merged origin/master 688f755a6. Gates: ws-solution-text OK, boot-smoke OK, code-snapshot OK, redesign-passed OK, precritic-plan OK,
+  support-ladder OK, role-sweep (print uses solutionSteps via sheet/adapters.js) 528 identical. ws-hint-no-blank: HINT-LEAK pin shrunk
+  (mult_break_apart, mult_properties no longer fail); still FAIL on SAYLESS multiplication:mult_break_apart, the same on master
+  2c42746aa and 688f755a6 before this change (lf-ops: its provider has a Say frame the screen does not show). Not pinned (pins only shrink).
