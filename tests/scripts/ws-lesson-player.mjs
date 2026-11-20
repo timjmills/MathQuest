@@ -20,6 +20,14 @@
 //   --leave      (critic r1 F1, F6-F8) Leave >= 64 / 48 px on every part stage and on the 'No such lesson' stage (no live
 //                pills there), Leave closes as Esc does; the unknown name shown literally; mode=pupil -> Board; the I do tick
 //                only after its last step
+//   --stage-fill (lf-hosts player critic r2 F1 / F2, root cause under the round cap; lead ruling A22 2026-11-20) - in --render
+//                and --reveal, at every width and step: the cell's top == the Steps' top +-4 px (Steps beside the cell) or the
+//                cell directly under the chip row +-4 px; < 30 % of the stage (inside its padding) outside the cell and the
+//                Steps; .mq-lp-say >= 95 % of the cell's inner width, below the drawing; the Say band's frame and "Say:"
+//                label from step 1, its line text only after the last step; digits >= the signed size and <= 1.25 x it; the
+//                cell inside the stage on every side; no orphan mode pill on the "No such lesson" screen. ON by default on
+//                this tree; a backtest checkout (MQ_ROOT set) runs it only with --stage-fill, so the rows pinned before A22
+//                (ink-still, dot-card, stage-h13-digits) keep judging the contract their commits were built to.
 //   --hints / --exit / --sheet-to-play / packet page ids: later slices (2, 3, 5 / 4) - reported NOT IN SLICE 1, never passed
 //
 //   --widths 1280,1920   override the widths (default SCREEN_WIDTHS + 1920)   --shots <dir>  write PNGs (dsf 2)
@@ -47,6 +55,8 @@ let modes = MODES.filter((m) => argv.includes(`--${m}`));
 const later = Object.keys(LATER).filter((m) => argv.includes(`--${m}`));
 if (!modes.length && !later.length) modes = MODES.slice();
 const LESSON = arg('--lesson', 'add-within-10');
+// A22 (lead ruling 2026-11-20): the stage-fill / Say-band contract; see --stage-fill above
+const A22 = argv.includes('--stage-fill') || !process.env.MQ_ROOT;
 const BOARD_W = 1920;
 const WIDTHS = SW.widthsArg(process.argv, [...SW.SCREEN_WIDTHS, BOARD_W]);
 const HEIGHT = (w) => (w === BOARD_W ? 1080 : SW.heightOf(w));
@@ -250,7 +260,40 @@ function measureInPage() {
     }
     out.digitPx = dpx;
     out.k = parseFloat(getComputedStyle(r).getPropertyValue('--lp-k')) || 1;
-    out.say = (r.querySelector('.mq-lp-say') || {}).textContent || '';
+    // the Say band: its frame, its label and its line (A22: the frame and label from step 1, the line after the last step)
+    const sayEl = r.querySelector('.mq-lp-say');
+    const sayLineEl = sayEl && sayEl.querySelector('.mq-lp-say-line');
+    const sayAll = sayEl ? sayEl.textContent.replace(/\s+/g, ' ').trim() : '';
+    const sayLine = sayLineEl ? sayLineEl.textContent.trim() : sayAll.replace(/^Say:\s*/, '');
+    out.say = sayLine ? sayAll : '';
+    out.sayLine = sayLine;
+    if (sayEl) {
+        const sq = sayEl.getBoundingClientRect();
+        const cs = getComputedStyle(sayEl);
+        const lab = sayEl.querySelector('b');
+        const dq = (r.querySelector('.mq-lp-draw') || cell).getBoundingClientRect();
+        const innerW = cell.clientWidth;
+        out.sayBand = { w: sq.width, innerW, ratio: innerW ? sq.width / innerW : 0, top: sq.top, drawBottom: dq.bottom, visible: cs.display !== 'none' && cs.visibility !== 'hidden' && sq.height > 1,
+            frame: parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== 'none', label: !!lab && /^Say:$/.test(lab.textContent.trim()) && lab.getBoundingClientRect().height > 1 };
+    } else out.sayBand = null;
+    // the stage around the cell (A22): the cell's top against the Steps', and how much of the stage neither covers
+    {
+        const stEl = r.querySelector('.mq-lp-stage');
+        const sq = stEl.getBoundingClientRect();
+        const scs = getComputedStyle(stEl);
+        const L = sq.left + parseFloat(scs.paddingLeft), R = sq.right - parseFloat(scs.paddingRight);
+        const T = sq.top + parseFloat(scs.paddingTop), B = sq.bottom - parseFloat(scs.paddingBottom);
+        const area = (q) => Math.max(0, Math.min(q.right, R) - Math.max(q.left, L)) * Math.max(0, Math.min(q.bottom, B) - Math.max(q.top, T));
+        const stp = r.querySelector('.mq-lp-steps');
+        const pq = stp ? stp.getBoundingClientRect() : null;
+        out.stageEmpty = 1 - (area(cr) + (pq ? area(pq) : 0)) / Math.max(1, (R - L) * (B - T));
+        out.cellOut = Math.max(0, sq.left - cr.left, cr.right - sq.right, sq.top - cr.top, cr.bottom - sq.bottom);
+        if (pq) {
+            const beside = pq.right <= cr.left + 1;
+            const gapY = parseFloat(getComputedStyle(stEl).rowGap) || 0;
+            out.align = beside ? { beside: true, d: cr.top - pq.top } : { beside: false, d: cr.top - (pq.bottom + gapY), gapY };
+        }
+    }
     out.draw = (r.querySelector('.mq-lp-draw') || {}).innerHTML || '';
     out.grey = !!r.querySelector('.mq-lp-draw :is([data-ws-ink="trace"], [data-ws-mark="trace"])') || [...r.querySelectorAll('.mq-lp-draw *')].some((e) => { const c = getComputedStyle(e); return c.color === 'rgb(148, 148, 148)' || (parseFloat(c.borderTopWidth) > 0 && c.borderTopColor === 'rgb(148, 148, 148)') || c.fill === 'rgb(148, 148, 148)' || c.stroke === 'rgb(148, 148, 148)' || /#949494/i.test(e.getAttribute('fill') || '') || /#949494/i.test(e.getAttribute('stroke') || ''); });
     return out;
@@ -391,6 +434,35 @@ async function stillAndChart(w) {
     } finally { await h.close(); }
 }
 
+/** A22 (lf-hosts player critic r2 F1 / F2, root cause): the stage around the cell, the Say band, the digit window. */
+function stageFill(tag, m, target) {
+    const mode = 'render';
+    if (!m.align) fail(mode, `${tag}: A22 no Steps strip to align the cell with`);
+    else if (Math.abs(m.align.d) > 4) fail(mode, `${tag}: A22 F1 the cell top is ${m.align.d.toFixed(0)} px from ${m.align.beside ? "the Steps' top" : 'directly under the chip row'} (+-4)`);
+    if (m.stageEmpty >= 0.30) fail(mode, `${tag}: A22 F1 ${(m.stageEmpty * 100).toFixed(1)} % of the stage is outside the cell and the Steps (< 30 %)`);
+    if (m.cellOut > 1) fail(mode, `${tag}: A22 the cell runs ${m.cellOut.toFixed(0)} px past the stage`);
+    if (m.mode === 'board' && m.digitPx > target * 1.25 + 1) fail(mode, `${tag}: A22 digits ${m.digitPx.toFixed(0)} px over 1.25 x the signed ${target} px`);
+    if (m.mode === 'board' && m.digitPx < target - 1) fail(mode, `${tag}: A22 digits ${m.digitPx.toFixed(0)} px under the signed ${target} px`);
+    const sb = m.sayBand;
+    if (!sb || !sb.visible) fail(mode, `${tag}: A22 F2 no Say band (its frame and "Say:" label show from step 1)`);
+    else {
+        if (!sb.frame || !sb.label) fail(mode, `${tag}: A22 F2 the Say band lacks its ${!sb.frame ? 'frame (rule)' : '"Say:" label'}`);
+        if (sb.ratio < 0.95) fail(mode, `${tag}: A22 F2 the Say band is ${(sb.ratio * 100).toFixed(1)} % of the cell's inner width (full width: >= 95 %)`);
+        if (sb.top < sb.drawBottom - 1) fail(mode, `${tag}: A22 F2 the Say band starts ${(sb.drawBottom - sb.top).toFixed(0)} px above the drawing's foot (it sits below the drawing)`);
+    }
+}
+
+/** A22 minor 2: the "No such lesson" screen shows no orphan mode pill. */
+async function unknownLessonPill() {
+    const h = await H.open({ viewport: { width: 1280, height: 900 }, pagePath: `/index.html?lesson=${encodeURIComponent('no-such-lesson-x')}&mode=board`, lock: TOOL });
+    try {
+        try { await H.waitFor(h.page, () => !!document.querySelector('#mqLessonPlayer .mq-lp-stage-msg'), 15000, 'message stage'); } catch (e) { fail('render', 'A22 unknown lesson: no message stage'); return; }
+        const pill = await h.page.evaluate(() => { const e = document.querySelector('#mqLessonPlayer .mq-lp-mode'); if (!e) return ''; const cs = getComputedStyle(e); return e.offsetParent !== null && cs.visibility !== 'hidden' && cs.display !== 'none' ? e.textContent.trim() : ''; });
+        if (pill) fail('render', `A22 minor 2: the "No such lesson" screen shows an orphan "${pill}" mode pill`);
+        else ok('render', 'A22: the "No such lesson" screen shows no mode pill');
+    } finally { await h.close(); }
+}
+
 async function render() {
     for (const w of WIDTHS) {
         let h;
@@ -422,13 +494,16 @@ async function render() {
                 else if (m.leave.w < min - 0.5 || m.leave.h < min - 0.5) fail('render', `${tag}: F1 Leave ${Math.round(m.leave.w)}x${Math.round(m.leave.h)} under ${min} px`);
                 if (m.stageBandY >= 0.30 || m.stageBandX >= 0.30) fail('render', `${tag}: F4 stage H13 empty band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} % of the stage (rows ${(m.stageBandY * 100).toFixed(1)} %, columns ${(m.stageBandX * 100).toFixed(1)} %)`);
                 if (k > 0 && ms[0] && Math.abs(ms[0].cellH - m.cellH) > 1) fail('render', `${tag}: F4 the cell is ${m.cellH} px tall, ${ms[0].cellH} px at step 1 (the cell grows: fix it at its largest state)`);
-                console.log(`       ${tag}: band ${(m.band * 100).toFixed(1)} %, stage band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} %, steps foot ${Math.round(m.stepsFoot || 0)} px, cell ${m.cellH} px, digits ${m.digitPx.toFixed(0)} px (target ${target})`);
+                if (A22) stageFill(tag, m, target);
+                console.log(`       ${tag}: band ${(m.band * 100).toFixed(1)} %, stage band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} %, steps foot ${Math.round(m.stepsFoot || 0)} px, cell ${m.cellH} px, digits ${m.digitPx.toFixed(0)} px (target ${target})${A22 ? `, stage empty ${(m.stageEmpty * 100).toFixed(1)} %, cell top ${m.align ? `${m.align.beside ? 'vs Steps top' : 'under chips'} ${m.align.d.toFixed(1)}` : '-'} px, Say ${m.sayBand ? `${(m.sayBand.ratio * 100).toFixed(1)} % wide` : 'none'}` : ''}`);
                 if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await h.page.screenshot({ path: join(SHOTS, `ido-board-${w}-step${k + 1}.png`) }); }
                 if (k < st.steps - 1) await press(h.page, 'ArrowRight');
             }
             // H13, with PT-MOD-3 (lead ruling 2026-11-12, as ws-empty-band reads a Scripted Model): a state that is not the last
             // is excused when its band is <= 35 % AND a later state draws ink in that band (the room kept for a later mark: the
             // cell is top-aligned at one zoom, so a later mark lands where the band is). The last state is never excused.
+            // PT-MOD-3 + A22 (lead 2026-11-20): the full-width Say band shows its frame and "Say:" label from step 1 with its line
+            // empty; that line's room, inked after the last step, is reserved room a later step inks - not an empty band.
             for (const { k, tag, m } of bands) {
                 const later = ms.slice(k + 1);
                 const [a, b] = m.bandAt;
@@ -449,6 +524,8 @@ async function render() {
             ok('render', `${w}: ${st.steps} steps measured`);
         } finally { await h.close(); }
     }
+    if (A22) notes.push('PT-MOD-3 (A22, lead 2026-11-20): the Say band (full width under the cell) shows its frame and "Say:" label from step 1; its empty line is reserved room the last step inks, not an empty band');
+    if (A22) await unknownLessonPill();
 }
 
 async function reveal() {
@@ -467,6 +544,11 @@ async function reveal() {
             const last = k === n - 1;
             if (!last && m.say) fail('reveal', `step ${k + 1}: the Say band shows before the last step`);
             if (last && m.say.replace(/\s+/g, ' ').trim() !== `Say: ${st0.say}`) fail('reveal', `last step: Say band "${m.say.trim()}" != "Say: ${st0.say}"`);
+            if (A22) {
+                const sb = m.sayBand;
+                if (!sb || !sb.visible || !sb.frame || !sb.label) fail('reveal', `step ${k + 1}: A22 F2 the Say band's frame and "Say:" label are not shown (they show from step 1)`);
+                if (!last && m.sayLine) fail('reveal', `step ${k + 1}: A22 the Say line "${m.sayLine}" shows before the last step`);
+            }
             await press(page, 'r');
             const s = await state(page);
             const words = await page.evaluate(() => (document.querySelector('.mq-lp-words') || {}).textContent || '');
@@ -476,7 +558,7 @@ async function reveal() {
             if (!last) await press(page, nextKeys[k % nextKeys.length]);
         }
         if (new Set(draws).size !== n) fail('reveal', `${n} reveals drew ${new Set(draws).size} distinct states`);
-        else ok('reveal', `${n} reveals = ${n} distinct cell states, each with its grey newest mark; Say only after the last`);
+        else ok('reveal', `${n} reveals = ${n} distinct cell states, each with its grey newest mark; Say only after the last${A22 ? ' (A22: its frame and label from step 1)' : ''}`);
         // Back restores (Left, then PageUp)
         const backKeys = ['ArrowLeft', 'PageUp'];
         for (let k = n - 1; k > 0; k--) {

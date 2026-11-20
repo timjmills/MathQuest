@@ -344,11 +344,11 @@ const kit = (html) => `<div class="mq-lp-zoom"><div class="ws-sheet ws-L ws-ican
 const wordsHtml = (st) => (st ? `<p class="mq-lp-words">${esc(st.words)}</p>${st.note ? `<p class="mq-lp-note">${esc(st.note)}</p>` : ''}` : '');
 
 /**
- * The Say band (P-17): filled after the last step, absent before it - its room kept (blank, no stub) so nothing moves. It
- * closes the words column (critic r1 F4: a full-width strip under the drawing kept a 42 % empty band on step 1 - the answer
- * row's room AND the strip's room in one band).
+ * The Say band (P-17, BD-8): the FULL-WIDTH strip under the drawing that closes the cell, as on the card and the printed
+ * chart (lead ruling A22, 2026-11-20). Its frame and "Say:" label show from step 1 with the line empty; the line fills after
+ * the last step. Its height is the filled line's from step 1 (fitDrawing), so nothing moves when it fills.
  */
-const sayHtml = (p, last) => (!p.say ? '' : last ? `<div class="mq-lp-say"><b>Say:</b> <span>${esc(p.say)}</span></div>` : '<div class="mq-lp-sayroom" aria-hidden="true"></div>');
+const sayHtml = (p, last) => (!p.say ? '' : `<div class="mq-lp-say"><b>Say:</b> <span class="mq-lp-say-line"${last ? '' : ' aria-hidden="true"'}>${last ? esc(p.say) : ''}</span></div>`);
 
 function renderIdo(r) {
     const st = r.querySelector('.mq-lp-stage');
@@ -375,9 +375,10 @@ function renderIdo(r) {
     <div class="mq-lp-work" data-variant="${pc.variant}">
       <div class="mq-lp-group">
         <div class="mq-lp-draw">${kit(pc.draw)}</div>
-        <div class="mq-lp-side"><div class="mq-lp-wordsbox">${wordsHtml(cur)}</div>${pc.variant === 'row' ? `<div class="mq-lp-hops">${pc.hops ? kit(pc.hops) : ''}</div>` : ''}${sayHtml(p, last)}</div>
+        <div class="mq-lp-side"><div class="mq-lp-wordsbox">${wordsHtml(cur)}</div>${pc.variant === 'row' ? `<div class="mq-lp-hops">${pc.hops ? kit(pc.hops) : ''}</div>` : ''}</div>
       </div>
     </div>
+    ${sayHtml(p, last)}
   </div>
 </section>`;
     setBar(n ? `Step ${k + 1} of ${n}${last && p.say ? ' <span class="mq-lp-together">· Say it together</span>' : ''}` : 'Worked example');
@@ -465,15 +466,9 @@ function measureStates(r) {
     const p2 = idoPart();
     const sb = document.createElement('div');
     sb.className = 'mq-lp-say';
-    sb.innerHTML = p2.say ? `<b>Say:</b> <span>${esc(p2.say)}</span>` : '';
-    // (measured inside a words column, where its own rules apply)
-    const sideBox = document.createElement('div');
-    sideBox.className = 'mq-lp-side';
-    sideBox.style.width = 'max-content';
-    sideBox.appendChild(sb);
-    sizer.appendChild(sideBox);
-    sb.style.width = 'max-content';
-    const sayNat = p2.say ? sb.getBoundingClientRect().width : 0;
+    sb.innerHTML = p2.say ? `<b>Say:</b> <span class="mq-lp-say-line">${esc(p2.say)}</span>` : '';
+    // (the filled band, full width at the cell's inner width - A22)
+    sizer.appendChild(sb);
     const sayCache = {};
     const sayH = (w) => {
         if (!p2.say) return 0;
@@ -481,7 +476,7 @@ function measureStates(r) {
         if (sayCache[kw] === undefined) { sb.style.width = `${kw}px`; sayCache[kw] = sb.getBoundingClientRect().height; }
         return sayCache[kw];
     };
-    return { wD, hD, wH, hH, natW: Math.ceil(Math.max(natW, sayNat)) + 2, minW: Math.ceil(minW) + 2, wordsH, sayH, done: () => sizer.remove() };
+    return { wD, hD, wH, hH, natW: Math.ceil(natW) + 2, minW: Math.ceil(minW) + 2, wordsH, sayH, done: () => sizer.remove() };
 }
 
 function setLayout(r, { chips, stack }) {
@@ -500,10 +495,10 @@ function solveFit(r) {
     const work = r.querySelector('.mq-lp-work');
     let sayH = 0;
     const row = work.dataset.variant === 'row';
-    const gap = 48 * k, gapS = 10 * k;
+    const gap = 32 * k, gapS = 10 * k;
     const tablet = window.matchMedia('(max-width: 1199px)').matches;
-    // (a tablet's tall stage: the drawing may grow past the tablet scale, up to the board's own 104 px, to fill it - H13)
-    const cap = tablet ? want * 1.25 : want;
+    // (A22: the zoom may grow ABOVE the signed size by up to +25 %, only to fill free stage room; never below it)
+    const cap = want * 1.25;
     const layouts = tablet ? [{ chips: 1, stack: 0 }, { chips: 1, stack: 1 }]
         : [{ chips: 0, stack: 0 }, { chips: 1, stack: 0 }, { chips: 0, stack: 1 }, { chips: 1, stack: 1 }];
     const sizeAt = (lay, availW, availH) => {
@@ -513,39 +508,45 @@ function solveFit(r) {
                 const sideW = Math.max(m.wH * z, Math.min(m.natW, availW - gap - m.wD * z));
                 if (m.wD * z + gap + sideW > availW + 0.5 || sideW < m.minW) continue;
                 const wh = m.wordsH(sideW);
-                const sh = m.sayH(sideW) ? gapS + m.sayH(sideW) : 0;
-                const h = Math.max(m.hD * z, wh + hops + sh);
+                const h = Math.max(m.hD * z, wh + hops);
                 if (h > availH + 0.5) continue;
-                return { z, sideW, wordsH: wh, sayH: m.sayH(sideW), groupW: m.wD * z + gap + sideW, groupH: h };
+                return { z, sideW, wordsH: wh, groupW: m.wD * z + gap + sideW, groupH: h };
             }
             const sideW = Math.min(availW, Math.max(m.wH * z, m.natW, m.wD * z));
             if (Math.max(m.wD, m.wH) * z > availW + 0.5) continue;
             const wh = m.wordsH(sideW);
-            const sh = m.sayH(sideW) ? gapS + m.sayH(sideW) : 0;
-            const h = m.hD * z + gapS * 1.4 + wh + hops + sh;
+            const h = m.hD * z + gapS * 1.4 + wh + hops;
             if (h > availH + 0.5) continue;
-            return { z, sideW, wordsH: wh, sayH: m.sayH(sideW), groupW: Math.max(m.wD * z, sideW), groupH: h };
+            return { z, sideW, wordsH: wh, groupW: Math.max(m.wD * z, sideW), groupH: h };
         }
         return null;
     };
     let best = null;
+    let atSigned = null;
+    const say = cell.querySelector('.mq-lp-say');
     for (const lay of layouts) {
         setLayout(r, lay);
         cell.style.height = `${wrap.clientHeight}px`;
+        // the Say band's room: the filled line's height at the cell's inner width (A22: full width, from step 1)
+        sayH = say ? m.sayH(cell.clientWidth) : 0;
+        if (say) say.style.height = `${Math.ceil(sayH)}px`;
         const wcs = getComputedStyle(work);
         const availW = work.clientWidth - parseFloat(wcs.paddingLeft) - parseFloat(wcs.paddingRight);
         const availH = work.clientHeight - parseFloat(wcs.paddingTop) - parseFloat(wcs.paddingBottom);
         const f = sizeAt(lay, availW, availH);
         if (!f) continue;
-        const cand = Object.assign({ lay, stageH: wrap.clientHeight, chromeH: cell.offsetHeight - availH }, f);
+        const cand = Object.assign({ lay, sayH, stageH: wrap.clientHeight, chromeH: cell.offsetHeight - availH }, f);
         if (!best || f.z > best.z + 1e-4) best = cand;
-        if (f.z >= cap - 1e-4) break;
+        // (the Steps stay beside the cell while a layout with them there holds the signed size; among those, the one whose
+        // zoom grows furthest into the free room, up to the cap, wins - A22)
+        if (f.z >= want - 1e-4 && (!lay.chips || tablet) && (!atSigned || f.z > atSigned.z + 1e-4)) atSigned = cand;
     }
+    if (atSigned) best = atSigned;
     m.done();
     if (!best) best = { lay: layouts[layouts.length - 1], z: 0.2, sideW: 0, wordsH: 0, groupW: 0, groupH: 0, sayH, stageH: wrap.clientHeight, chromeH: 0 };
     best.wD = m.wD; best.hD = m.hD; best.wH = m.wH; best.hH = m.hH;
-    // The cell: its content's height (its largest state), centred in the stage column, so the stage's spare room is split
-    // above and below it (stage H13) and none of it adds to the step-1 band inside the cell (cell H13); at most the stage.
+    // The cell: its content's height (its largest state), top-aligned with the Steps (A22), so none of the stage's spare
+    // room adds to the step-1 band inside the cell (cell H13); at most the stage.
     const c = best.chromeH + best.groupH;
     best.cellH = Math.min(best.stageH, Math.ceil(c) + 2);
     return best;
@@ -569,7 +570,7 @@ function applyFit(r, f) {
         hops.style.height = `${Math.ceil(f.hH * f.z)}px`;
         hops.style.display = f.hH ? '' : 'none';
     }
-    const room = r.querySelector('.mq-lp-sayroom, .mq-lp-say');
+    const room = r.querySelector('.mq-lp-cell .mq-lp-say');
     if (room) room.style.height = `${Math.ceil(f.sayH)}px`;
     r.dataset.digitPx = String(Math.round(basePxOf() * f.z));
     r.dataset.digitTarget = String(Math.round(digitTarget(r)));

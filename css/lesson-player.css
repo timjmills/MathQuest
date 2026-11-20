@@ -63,6 +63,8 @@ body.mq-lp-open { overflow: hidden; }
     border: 2px solid #fff; background: transparent; color: #fff; cursor: pointer;
 }
 .mq-lp[data-idle] .mq-lp-rail { visibility: hidden; }
+/* A22 minor 2: no part to show, so no mode pill either (a lone "Board" pill read as a dead control) */
+.mq-lp[data-idle] .mq-lp-mode { visibility: hidden; }
 .mq-lp-leave:focus-visible, .mq-lp-pill:focus-visible, .mq-lp-btn:focus-visible { outline: 4px solid #ffd166; outline-offset: 2px; }
 
 /* ---- the stage ---- */
@@ -71,7 +73,7 @@ body.mq-lp-open { overflow: hidden; }
     padding: calc(20px * var(--lp-k)) calc(24px * var(--lp-k)) calc(12px * var(--lp-k));
 }
 .mq-lp-stage-ido {
-    display: grid; grid-template-columns: calc(340px * var(--lp-k)) minmax(0, 1fr); gap: calc(20px * var(--lp-k));
+    display: grid; grid-template-columns: calc(260px * var(--lp-k)) minmax(0, 1fr); gap: calc(20px * var(--lp-k));
 }
 
 /* The Steps strip: content-sized (H13: never stretched below its last row); numerals in the lesson accent */
@@ -98,9 +100,9 @@ body.mq-lp-open { overflow: hidden; }
 .mq-lp-chant { margin: calc(12px * var(--lp-k)) 0 0; font-size: var(--lp-steps); line-height: 1.25; }
 
 /* The cell: the B&W Andika screen cell at board size. Critic r1 F3 / F4: the cell keeps ONE height from step 1 (its largest
-   state, set by player.js fitDrawing, centred in the stage column with the spare room shared inside and around it), and
-   every box in it (drawing, words, hops, the Say band's room) keeps its largest state's size, so no mark ever moves. */
-.mq-lp-cellwrap { display: flex; flex-direction: column; justify-content: center; min-height: 0; min-width: 0; }
+   state, set by player.js fitDrawing), and every box in it (drawing, words, hops, the Say band) keeps its largest state's
+   size, so no mark ever moves. A22 (lead 2026-11-20): the cell's top is the Steps' top (or directly under the chip row). */
+.mq-lp-cellwrap { display: flex; flex-direction: column; justify-content: flex-start; min-height: 0; min-width: 0; }
 .mq-scell.mq-lp-cell {
     --mq-digit: var(--lp-digit); --mq-text: var(--lp-text);
     flex: none; display: flex; flex-direction: column; min-height: 0;
@@ -108,15 +110,19 @@ body.mq-lp-open { overflow: hidden; }
 }
 .mq-lp-instr { flex: none; font-size: var(--lp-text); line-height: 1.25; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k)); border-bottom: 2px solid #000; }
 .mq-lp-work {
-    flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center;
+    flex: 1 1 auto; min-height: 0; display: flex; align-items: flex-start; justify-content: center;
     padding: calc(12px * var(--lp-k)) calc(16px * var(--lp-k)) calc(8px * var(--lp-k));
 }
 .mq-lp-group { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(14px * var(--lp-k)); }
-.mq-lp-work[data-variant="row"]:not([data-stack]) .mq-lp-group { flex-direction: row; align-items: flex-start; gap: calc(48px * var(--lp-k)); }
+.mq-lp-work[data-variant="row"]:not([data-stack]) .mq-lp-group { flex-direction: row; align-items: flex-start; gap: calc(32px * var(--lp-k)); }
 .mq-lp-draw { flex: none; display: block; }
 .mq-lp-draw > .mq-lp-zoom, .mq-lp-hops > .mq-lp-zoom { display: block; width: max-content; }
-.mq-lp-side { flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: calc(10px * var(--lp-k)); min-width: 0; }
+.mq-lp-side { flex: none; align-self: flex-start; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: calc(10px * var(--lp-k)); min-width: 0; }
 .mq-lp-wordsbox { flex: none; }
+/* A22 minor 1: words stacked with the drawing go FIRST, top-aligned under the cell's top edge, not after the drawing's
+   reserved answer room (where they floated mid-cell at 820 step 1); the hops' room follows them and the drawing's
+   answer room sits at the foot, above the Say band (two bands, each under H13's 30 %, not one 43 % band) */
+.mq-lp-work[data-stack] .mq-lp-side, .mq-lp-work:not([data-variant="row"]) .mq-lp-side { order: -1; }
 .mq-lp-hops { flex: none; display: block; }
 .mq-lp-work:not([data-variant="row"]) .mq-lp-wordsbox, .mq-lp-work[data-stack] .mq-lp-wordsbox { text-align: center; width: 100%; }
 .mq-lp-zoom { display: inline-block; }
@@ -126,12 +132,11 @@ body.mq-lp-open { overflow: hidden; }
 .mq-lp-words { margin: 0; font-size: calc(34px * var(--lp-k)); line-height: 1.25; color: #000; }
 /* a step's note, bold under its words, as the chart prints it (critic r1 F5) */
 .mq-lp-note { margin: calc(6px * var(--lp-k)) 0 0; font-size: calc(30px * var(--lp-k)); line-height: 1.25; font-weight: 700; color: #000; }
-.mq-lp-sayroom { flex: none; }
-/* the Say band closes the words column (P-17): a rule above it, the column's width */
-.mq-lp-side .mq-lp-say { align-self: stretch; padding: calc(8px * var(--lp-k)) 0 0; flex-wrap: wrap; column-gap: 0.35em; row-gap: 0; }
+/* The Say band (P-17, BD-8; lead ruling A22): the full-width strip under the drawing that closes the cell, as on the card and
+   the printed chart - its rule and "Say:" label from step 1, its line after the last step (its height kept from step 1) */
 .mq-lp-say {
-    flex: none; box-sizing: border-box; border-top: 2px solid #000; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k));
-    font-size: calc(34px * var(--lp-k)); line-height: 1.25; color: #000; display: flex; gap: 0.35em; align-items: baseline;
+    flex: none; box-sizing: border-box; width: 100%; border-top: 2px solid #000; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k));
+    font-size: calc(34px * var(--lp-k)); line-height: 1.25; color: #000; display: flex; flex-wrap: wrap; column-gap: 0.35em; align-items: baseline;
 }
 
 /* A part this slice does not play: a clear, navigable "coming soon" (D11), chrome only - no cell */
