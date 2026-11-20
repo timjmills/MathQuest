@@ -20,7 +20,7 @@ export const ROLE_CAPACITY = Object.freeze({
     'error-analysis': { by: 'role', unit: 'items', M: 4, L: 4, cite: 'WDS §12.1 Error analysis 4 / 2-4; error-analysis.js CEILING' },
     'review': { by: 'role', unit: 'items', M: 12, L: 12, cite: 'WDS §12.1 Review 12 / 8-12; review.js CEILING' },
     'test': { by: 'role', unit: 'items', M: 16, L: 12, cite: 'WDS §12.1 Test A / B 16 / 12 (procedures 4); test.js CEILING' },
-    'pre-skill-check': { by: 'role', unit: 'items', M: 20, L: 16, cite: 'WDS §12.1 Pre-skill check up to 20 / up to 16; PAGE_TYPES PT-PRE-1 four quadrants on one page' },
+    'pre-skill-check': { by: 'role', unit: 'items', M: 12, L: 8, cite: 'Lead ruling 2026-11-20 (lf-roles PSC fill, ruling 1c): a Pre-skill Check is a SHORT check - one page, about 10-12 items at M and 8-10 at L (measured: 3 rows of 4 at M, 2 rows of 4 at L on a one-prerequisite fact page; at most 2 pages, R13 2 + 2); WDS §12.1 up to 20 / 16 is the outer bound' },
     'mixed-practice': { by: 'role', unit: 'rows', M: 7, L: 5, cite: 'WDS §12.1 Mixed practice 7 rows / 5 rows (unit-packed); mixed-practice.js MAX_SHELVES' },
     'true-false': { by: 'role', unit: 'items', M: 6, L: 4, cite: 'WDS §12.1 True or False? 6 / 4; true-false.js CEILING' },
     'reason-it': { by: 'role', unit: 'items', M: 3, L: 2, cite: 'WDS §12.1 Reason It 3 / 2; reason-it.js ROWS' },

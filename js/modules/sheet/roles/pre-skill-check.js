@@ -36,7 +36,6 @@ import {
     instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed,
 } from './compose.js';
 import { slotScore } from '../paginate.js';
-import { roleCapacity } from '../role-capacity.js';
 
 export const ROLE_ID = 'pre-skill-check';
 const PER_QUAD = 4;
@@ -166,12 +165,7 @@ export function routePlan(input, rows) {
 
 // (a lesson's routed check is dealt a whole row's worth - up to PER_QUAD - and `plan` keeps what one page holds)
 const routedCheck = (input) => !!(input && input.perQuestion && Array.isArray(input.routes) && input.routes.some(Boolean));
-// (lf-roles PSC fill, lead request 2026-11-20): a stacked check fills each page to its declared ceiling (role-capacity.js,
-// WDS §12.1: up to 20 at M / 16 at L) while the next row fits, so each prerequisite deals more than its base PER_QUAD - up
-// to twice its share of the ceiling (one prerequisite: the whole ceiling). `plan` keeps only what each page holds.
-export const ceilingOf = (ctx) => { const c = roleCapacity(ROLE_ID); return (c && (c[ctx.size] || c.M)) || PER_QUAD * 4; };
-const fillDeal = (input, n) => { const cap = ceilingOf(ctxOf(input)); return Math.max(PER_QUAD, Math.min(cap, Math.ceil((2 * cap) / Math.max(1, n)))); };
-export const counts = (pools, input) => { const ids = Object.keys(pools); return Object.fromEntries(ids.map((id) => [id, routedCheck(input) ? PER_QUAD : input && input.perQuestion ? perQuad(input, Number(String(id).replace(/\D/g, '')) || 0) : fillDeal(input, ids.length)])); };
+export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, routedCheck(input) ? PER_QUAD : perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
 
 export function plan(input = {}) {
     if (!(Array.isArray(input.routes) && input.routes.some(Boolean))) return planCheck(input, 1);
@@ -256,52 +250,12 @@ export function paginateBands(bands, budget, gap = 0) {
     return out;
 }
 
-/**
- * The stacked check's fill (lf-roles PSC fill, lead request 2026-11-20), in place: on each page of `pgs` (the bands' indexes
- * into `bands`, as paginateBands left them - R13's split is kept), the band with the fewest rows takes its next row of items
- * (from `more`, its deal past the base) while the page holds the new row (every cell at its measured size, never shrunk) and
- * the page stays within its ceiling `cap` (items). Pure.
- */
-export function fillBands(pgs, bands, m, tag, ctx, cap) {
-    const heightOf = (b) => m.strip + tag + Math.ceil(b.its.length / b.cols) * b.rowH;
-    for (const pg of pgs) {
-        const on = pg.sections.map((j) => bands[j]);
-        const done = new Set();
-        let used = on.reduce((t, b) => t + b.h, 0);
-        let items = on.reduce((t, b) => t + b.its.length, 0);
-        for (let guard = 0; guard < 200; guard++) {
-            // (an item too wide for the band's columns is passed over, never squeezed: the band keeps its columns)
-            for (const b of on) if (b.more.length && !b.fitted) { b.more = b.more.filter((it) => fitsAt([it], b.cols, ctx)); b.fitted = true; }
-            const cand = on.filter((b) => !done.has(b) && b.more.length).sort((a, b) => Math.ceil(a.its.length / a.cols) - Math.ceil(b.its.length / b.cols))[0];
-            if (!cand) break;
-            const k = Math.min(cand.cols - (cand.its.length % cand.cols || cand.cols) || cand.cols, cand.more.length, cap - items);
-            if (k < 1) break;
-            const its = cand.its.concat(cand.more.slice(0, k));
-            const rowH = Math.max(cand.rowH, hMinAt(its, cand.cols, ctx));
-            const h = m.strip + tag + Math.ceil(its.length / cand.cols) * rowH;
-            const rest = on.filter((b) => b !== cand).reduce((t, b) => t + b.h, 0);
-            if (!fitsAt(its, cand.cols, ctx) || rest + h > m.budget) { done.add(cand); continue; }
-            cand.its = its; cand.more = cand.more.slice(k); cand.rowH = rowH; cand.h = heightOf(cand);
-            used = rest + h; items += k;
-        }
-        pg.used = used;
-    }
-    return pgs;
-}
-
 function planCheck(input, cut) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
-    // (the base items a prerequisite starts from, as before; `extra0` the rest of its deal, which the stacked page's fill
-    // takes row by row while the next row fits - lf-roles PSC fill; a lesson's check, perQuestion, takes none)
-    const extra0 = [];
     const quads0 = [0, 1, 2, 3].map((i) => {
-        const pool = poolItems(input, `q${i}`);
-        let its = pool.slice(0, perQuad(input, i));
-        let more = input.perQuestion ? [] : pool.slice(PER_QUAD);
+        let its = poolItems(input, `q${i}`).slice(0, perQuad(input, i));
         if (form === 'B') its = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'B', i)), its);
-        if (form === 'B' && more.length) more = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'B+', i)), more);
-        extra0.push(more);
         return its;
     });
     const quads = quads0.filter((q) => q.length);
@@ -403,7 +357,7 @@ function planCheck(input, cut) {
             routedFoot = lay.foot;
             routedFits = lay.fits;
             routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
-        } else for (const [j, q0] of quads.entries()) {
+        } else for (const q0 of quads) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
             const h = hMinAt(q0, cols, ctx) * grow;
             const share = (m.budget / quads.length - m.strip - TAG) * cut;
@@ -411,7 +365,7 @@ function planCheck(input, cut) {
             kept += slotScore(q);
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + TAG + rows * h;
-            if (!input.perQuestion) { kept -= slotScore(q); stacked.push({ h: bandH, n: q.length, sec: j, its: q, cols, rowH: h, more: q0.slice(q.length).concat(extra0[qIndex[j]] || []) }); continue; }
+            if (!input.perQuestion) { stacked.push({ h: bandH, n: q.length, sec: band(q, cols, rows, h, cols) }); continue; }
             if (cur.sections.length && cur.used + bandH > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
             // (the detailed lesson's check never lays a band out in more columns than it has items: one item in a two-up
             // band left an empty bordered half - lesson 4 critic r2 D9; the item keeps its measured size, centred)
@@ -419,13 +373,7 @@ function planCheck(input, cut) {
             cur.used += bandH;
         }
         // (gap 0: the bands stand edge to edge, as the one-page sum always counted them)
-        if (stacked.length) {
-            const pgs = paginateBands(stacked, m.budget, 0);
-            fillBands(pgs, stacked, m, TAG, ctx, ceilingOf(ctx));
-            // (the bands are drawn only now, in order, at their filled counts: numbering runs on across the pages)
-            for (const pg of pgs) pg.sections = pg.sections.map((j) => { const b = stacked[j]; kept += slotScore(b.its); return band(b.its, b.cols, Math.ceil(b.its.length / b.cols), b.rowH, b.cols); });
-            pages.push(...pgs);
-        }
+        if (stacked.length) pages.push(...paginateBands(stacked, m.budget, 0));
         if (cur.sections.length) pages.push(cur);
         // The detailed lesson's check: the last band takes the page's spare height (one unruled
         // trailing area inside the frame, V22 §8.12.4), so the body is not blank at its foot.
