@@ -24,6 +24,11 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
     2. The detailed-lesson defects (1c): g2-nbt3 seed 17, g3-oa9 seed 25 placeholder, g1-oa1 P6 overflow; a 25-seed sweep gate goes in first.
     3. -roles: the F1 WRAP check plus a full-width Model at M; SPILL-P1 reserve read from the constant plus a boundary backtest; lf-placevalue's mixed_placevalue Opener (a) placed-items sizing and (b) the iMax cap; critic on ≥ 20 Openers.
     4. -pc r6.
+- **Next week, lesson-pages engine items from lf-algebra (lead, 2026-11-20). Check first for each.**
+  - **number_patterns_rule lesson L p3** (places [1], pattern = [all]): the body overflows by 1.9 mm with 6 count-row cells on one page. Every cell fits its content, so the fault is the page's packing.
+    - Check: the lesson page body must not overflow. It must FAIL on master.
+  - **follow_given_rule lesson M p3 / p4**: about 28.3 % of each page is left empty. The fixed `mq-spread` grid (4 × 1fr in 122.5 mm) causes it.
+    - Check: EB-BAND / LESSON-FILL on those pages. It must FAIL on master.
 - **Next week's lesson-content list, per lane** (from the lessonfirst critic r1; already on master, exposed once the blank page was dropped):
   - **Lesson / curriculum lane (WRM records):**
     - Lessons with no library record open with no model ("I do") and an empty Steps column: Y4.B4.S11, Y4.B5.S1, Y4.B6.S3, Y3.B12.S4, Y4.B12.S2 and the other recordless WRM steps. Planned check: LESSON-NO-MODEL (0 chart states, or a Steps zone with no ink).
