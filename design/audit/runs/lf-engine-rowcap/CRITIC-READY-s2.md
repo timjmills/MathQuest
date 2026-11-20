@@ -100,3 +100,63 @@ against PAGEFILL.
 2. **fact-rows** is a named layout exception (owner FULLPAGE); a lead decision whether it joins the rule.
 3. ws-layout-unit: the known "Guided, 110 mm cells" fail, plus 30 "owner 2026-10-31 mixed facts ... S" fails that come from
    master (factRowsLayout at size S; they crashed the script on master - a guard now lets it run). S is dropped.
+
+
+## Round 2 (critic lf-engine-rowcap-s2 FAIL: F2-F5; F1 is scripted-model.js, the vocabfix builder's file - not touched)
+
+### Checks first (each FAILS on 661965d43 and PASSES on the fix; ws-backtest unwrapped, all PASS)
+
+| Check | Where it runs | Backtest row |
+|---|---|---|
+| **EB-CLIP** (ws-empty-band): every print cell's ink ends >= 0.5 mm above its row's rule; legacy and template-less cells judged too (ruling b) | precritic --skill, every card role x M/L, pupil page AND key | `eb-clip-guided` (F2) |
+| **TAB-CLEAR** (ws-empty-band): the number tab >= 2 mm from text; CL-40's 1 mm from a one-line fact / equation or a box | same, pupil + key | `tab-clear-ea` (F3) |
+| **GUIDED-INK-FLOOR** (ws-roles-unit): every Guided row >= its measured ink + 1 mm | precritic --role guided | `guided-ink-floor` (F2) |
+| **RR-BOX** (ws-role-raster, `--raster-fit`): every dark frame edge inked over >= 70 % of its length in the printed PDF | precritic raster-fit, now on scripted-model, guided, error-analysis, pre-skill-check, review, test, independent, mixed-practice, opener x M/L | `rr-box-frame` (fixture pair: the 661965d43 count_by_tables Scripted Model L PDF fails - Model frame covered by the Say band, F1; a clean Guided L PDF passes) |
+| **PAGEFILL** `--fill-roles review,test,error-analysis,opener` at M and L: major over 20 % under the role's ceiling, over 30 % at it (a reshape fills it); 20-30 % at the ceiling is a note | precritic print-lint-fill-M / -L | `pagefill-capped-roles` (F5) |
+| **WHITE-ROW** (ws-capacity-pin): a one-page Review / Test / EA under its ceiling, where one more row would stay under it, leaves no room for that row (1.15 x its height + 3 mm) | precritic capacity-pin, deploy gate | `white-row-review` (F4) |
+
+### Fixes
+
+- **F2** (guided.js): the tab keep-out comes off the CAP only; every row stays >= its measured ink + 1 mm. add_wp_10_plain Guided L p2 rows 87.6 -> 89.6 mm; EB-CLIP clean.
+- **F3** (error-analysis.js): the "<Name> wrote / chose:" tag moves ACROSS past the tab (`left: tab + 2 mm`), not the work down - a margin
+  over the work cost Error Analysis L an item (add_wp_10 3 -> 2, identify / unit_form 4 -> 3), so it was replaced. TAB-CLEAR clean
+  on fact_family_sort, add_wp_10, identify, unit_form, count_by_tables EA M/L, pupil + key; ws-cell-checks PUPILTAG / TAGINK / EA-PAD OK.
+- **F4** (review.js): under its ceiling a Review tries one more main column, and (where the earlier rows are no taller than the main
+  ones) lets the earlier share's 20 % floor give way. add_facts Review M and L 10 -> 12 (the ceiling); sub_facts L 8 -> 10,
+  sub_2d_1d M 8 -> 10, fact_family_sort M 8 -> 10, div_facts_long M 8 -> 10, number_word_form L 10 -> 11.
+- **F5** (test.js `reshape`): a Test at its ceiling whose capped rows leave more than a row of white takes fewer columns and more rows.
+  add_facts Test L 4 x 3 -> 3 x 4: white 94.7 -> 52.6 mm (78 % of the page used). The ceiling is not raised.
+
+### Hash proof
+
+- **Lesson baseline:** `--check` against the round-1 pin: all 2590 hashes identical (no lesson page changes; no re-pin).
+- **ws-capacity-pin --check: OK** - 0 falls, 49 rises (the Review / Test rises above + round 1's).
+- **WHITE-ROW known (reported, not failed; lead calls):** div_facts_long Review M (69.5 mm: its 84-94 mm long-division earlier row and
+  the Mixed Review share cap the count) and two_step_mult_div_first Test L (pre-existing on master: one story a page).
+
+### PNGs (proof-s2r2/; pupil + key, before = 661965d43, after = this head; seed 1)
+
+| Role | Skill | Size / page | Cells | Row mm | % of page used | White foot mm |
+|---|---|---|---|---|---|---|
+| guided | addition:add_wp_10_plain | M p1 | 4 → 4 | 108.8 → 108.8 | 90 % → **90 %** | 24.4 → 23.4 |
+| guided | addition:add_wp_10_plain | L p1 | 2 → 2 | 125.1 → 125.1 | 70 % → **70 %** | 72.3 → 72.3 |
+| guided | addition:add_wp_10_plain | L p2 | 4 → 4 | 87.6 → 89.6 | 88 % → **89 %** | 31.2 → 27.2 |
+| error-analysis | addition:fact_family_sort | M p1 | 4 → 4 | 64.8 → 64.8 | 57 % → **57 %** | 103 → 103 |
+| error-analysis | addition:fact_family_sort | L p1 | 4 → 4 | 92.3 → 92.3 | 81 % → **81 %** | 47 → 47 |
+| review | addition:add_facts | M p1 | 10 → 12 | 45.7 → 45.7 | 60 % → **60 %** | 97 → 97 |
+| review | addition:add_facts | L p1 | 10 → 12 | 45.7 → 45.7 | 62 % → **62 %** | 91 → 91 |
+| test | addition:add_facts | M p1 | 16 → 16 | 45.6 → 45.6 | 79 % → **79 %** | 49.6 → 49.6 |
+| test | addition:add_facts | L p1 | 12 → 12 | 45.6 → 44.6 | 61 % → **78 %** | 94.7 → 52.6 |
+
+**For the critic:** Review add_facts M / L now print 12 (the ceiling) but keep about 91-97 mm of white: the count is at the 12.1 ceiling.
+Raising it is the lead's call, as for F5.
+
+### Open (not this lane)
+
+- **F1** Scripted Model count_by_tables L clipped (scripted-model.js, the vocabfix builder). RR-BOX / EB-CLIP / RR-CLIP fire on it, and also
+  on Scripted Model add_wp_10_plain L and fact_family_sort L (the Model frame's foot covered by the Say band).
+- **TAB-CLEAR debt outside this change** (seen in the sweep, judged at CL-40's 1 mm for boxes): count-row L on the grid roles 2.0 mm from the
+  hexagon, fact-probe equation 1.3-1.4 mm, legacy Pre-skill check cells 1.0-1.9 mm, a chartwindow `td` at 0.0 mm. A precritic run on those
+  skills will show them.
+- EB-STRETCH, from before this round (on 661965d43 too): add_wp_10_plain Guided Model row 8-15 mm over (the planner's worked-line reserve)
+  and Review L 2.4-3.2 mm over.
