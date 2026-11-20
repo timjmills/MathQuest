@@ -3557,6 +3557,22 @@
   "algebra:multi_step_word test L": {
    "items": 1,
    "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "multiplication:mult_2by2_standard reason-it L": {
+   "items": 1,
+   "reason": "L 2-digit multiplier grid + response column > A/B panel; UNDER chosen (lead ruling A9, 2026-11-20)"
+  },
+  "multiplication:mult_3by2_standard reason-it L": {
+   "items": 1,
+   "reason": "L 2-digit multiplier grid + response column > A/B panel; UNDER chosen (lead ruling A9, 2026-11-20)"
+  },
+  "multiplication:area_model_4by1 word-problems L": {
+   "items": 1,
+   "reason": "a 4-part area model + its story is 119 mm at L, the body 227 mm: one a page (lead ruling A9, 2026-11-20)"
+  },
+  "multiplication:area_model_4by1 true-false L": {
+   "items": 1,
+   "reason": "a 4-part area model + its judgement is 117 mm at L, the body 210 mm: one a page (lead ruling A9, 2026-11-20)"
   }
  },
  "sizeOrderOpts": [

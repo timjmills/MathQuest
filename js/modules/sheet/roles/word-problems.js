@@ -182,7 +182,11 @@ export function prepare(it, info = {}) {
         const labelPart = kLevel
             ? `<span class="mq-ansslot"><span class="mq-klabel">${esc(nounOf(st))}</span></span>`
             : `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: { S: 40, M: 46, L: 52 }[c.size] || 52 }, c, slotOnly(key, 'wp-label'))}<small>label</small></span>`;
-        return `<div class="mq-wp mq-wp2${kLevel ? ' mq-wpk' : ''}${model && WIDE_MODELS.has(it.template) ? ' mq-wpunder' : ''}">`
+        // (lead ruling A9 (2), 2026-11-20: a 4-part area model - 4-digit x 1-digit - is 150 mm at L, wider than the 117 mm work
+        // space beside the answer column: it ran 7.6 mm out of the cell. It takes the UNDER layout, the answer row under it.)
+        const pl = (it.q && it.q.cell && it.q.cell.payload) || {};
+        const wideModel = WIDE_MODELS.has(it.template) || (it.template === 'area-model' && c.size === 'L' && Array.isArray(pl.parts) && pl.parts.length >= 4);
+        return `<div class="mq-wp mq-wp2${kLevel ? ' mq-wpk' : ''}${model && wideModel ? ' mq-wpunder' : ''}">`
             + `<div class="ws-story mq-wpstory">${st.lines.slice(0, 6).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
             + space
             + `<div class="mq-wpanswer">`

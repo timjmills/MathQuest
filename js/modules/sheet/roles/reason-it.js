@@ -92,7 +92,11 @@ export function prepare(it, info = {}) {
     // `footprint.inkWMm` is a template's true work width (pv supplies it); equation / stack / word-work footprints are their
     // true width already, other templates' wMm carries slack (a pv item at 70 mm fits a 62 mm panel)
     const fp = it.footprint || {};
-    const workW = Number(fp.inkWMm) || (TRUE_W.has(it.template) ? Number(fp.wMm) || 0 : 0);
+    // (lead ruling A9 (1), 2026-11-20, mult_3by2_standard Reason It L OVERFLOW: a long-multiplication grid's footprint wMm is its
+    // true width, but BESIDE it the response column is wider than its 52 mm floor - "The answer is" and a 5-6 box strip, ~78 mm at
+    // L - so the 52.8 mm grid ran 3.7 mm out of each 45 mm panel. It counts the panel pads and that wider column: at L the grid takes
+    // the UNDER layout (one a page, ruled capacity); at M its narrower grid still fits beside, two a page.)
+    const workW = Number(fp.inkWMm) || (TRUE_W.has(it.template) ? Number(fp.wMm) || 0 : it.template === 'long-multiplication' ? (Number(fp.wMm) || 0) + 12 : 0);
     // Three layouts (critic r6c D1 / D3): beside (A | B | response) when the work fits half of the room left of the response
     // column; UNDER (A | B side by side at half the cell each, the response a full-width row under them) when it fits half the
     // cell; STACKED (A over B, the response beside, top start) only when it does not. The sentence story and the across
