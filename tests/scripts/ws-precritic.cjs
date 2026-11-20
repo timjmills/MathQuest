@@ -939,7 +939,7 @@ function applyOptIn(rows, keys) {
  * Every finding of critic rounds A r1-r3 is backtested on these commands (tests/fixtures/precritic/backtests.json,
  * rows partopts-*); design/lessons-first/CHECKS_FROM_CRITICS.md names each row's check, backtest id and precritic row.
  */
-const MY_WORKSHEETS_CHECKS = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH'];
+const MY_WORKSHEETS_CHECKS = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME'];
 const PARTOPTS_LESSONS = 'number_sense:nearest_10,addition:add_wp_10,placevalue:identify,division:div_facts,addition:fact_family_sort';
 /**
  * --student (lane lf-studentopts, 2026-11-19): the pupil home. The options sheet (ws-student-opts: CARRY, COUNT, PUPIL at the
@@ -1548,7 +1548,7 @@ function buildPlan(ctx) {
         // (lane lf-partopts, My Worksheets 2026-11-20, card design/my-worksheets/CARD.md §8: save → reprint byte-identical, the
         // library round trip, ?sheet= codes, Open interactive = page 1, organise, no loss of quizzes / My sets, 48 px at the four
         // widths; ~5 min)
-        add(gate('my-worksheets', 'ws-my-worksheets (SAVE-REPRODUCE, LIBRARY-ROUNDTRIP, SHEET-CODE, INTERACTIVE-SAME, ORGANISE, NO-LOSS, TOUCH-WIDTH at 1280 / 1366 / 1024 / 820)', 'My Worksheets + the three Save hosts', 'browser', 'ws-my-worksheets', [],
+        add(gate('my-worksheets', 'ws-my-worksheets (SAVE-REPRODUCE, LIBRARY-ROUNDTRIP, SHEET-CODE, INTERACTIVE-SAME, ORGANISE, NO-LOSS, THEME, TOUCH-WIDTH at 1280 / 1366 / 1024 / 820)', 'My Worksheets + the three Save hosts', 'browser', 'ws-my-worksheets', [],
             { parse: PARSE.myWorksheets, expect: { checks: MY_WORKSHEETS_CHECKS, widths: [1280, 1366, 1024, 820] }, missingMsg: 'no tests/scripts/ws-my-worksheets.cjs' }));
     }
     if (ctx.student) addStudent(add);

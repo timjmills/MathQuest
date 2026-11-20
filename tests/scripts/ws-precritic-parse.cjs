@@ -127,7 +127,7 @@ if (PARSE.studentOpts) {
 }
 // ---- lane lf-partopts, My Worksheets (PARSE.myWorksheets, 2026-11-20)
 if (PARSE.myWorksheets) {
-    const C = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH'];
+    const C = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME'];
     const W = [1280, 1366, 1024, 820];
     const g = { id: 'my-worksheets', expect: { checks: C, widths: W } };
     const green = [...C.map((c) => `${c}: OK`), ...W.map((w) => `  @${w}: checked`), '(12 sheets saved; widths 1280,1366,1024,820; 300 s)', 'ws-my-worksheets: OK'].join('\n');

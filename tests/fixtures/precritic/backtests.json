@@ -15030,6 +15030,26 @@
     "commit": "c7bbb5a9c",
     "state": "48 px controls (#teacherApp .mws .mws-b), the 900 px fold"
    }
+  },
+  {
+   "id": "mws-theme",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "My Worksheets in the current app look (lead ruling A19, owner 2026-11-20: \"the purple theme looks like the old website\"): css/my-worksheets.css and the screen markup write no colour literal outside var(--…) tokens; the screen primary buttons compute the same colours, font and corners as the Print worksheets primary",
+   "rule": "ws-my-worksheets THEME (lane lf-partopts, My Worksheets, ruling A19)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only THEME --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "c7bbb5a9c",
+    "state": "the first build: hex / rgba fallbacks in css/my-worksheets.css (#fff, #c2410c, #fafafa, rgba shadows), own purple accent tint"
+   },
+   "pass": {
+    "commit": "5d028d66b",
+    "state": "teacher classes (.tv-card, .tv-chip, .tv-menu, .tv-input, .tv-select) and --tv-* / token variables only"
+   }
   }
  ]
 }
