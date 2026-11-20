@@ -379,3 +379,42 @@ addition:add_facts, placevalue:value and subtraction:sub_50_no_regroup are **ide
 
 **Critic r13 verdict: mult_facts Guided L PASS.** add_wp_20 and sub_wp_10 L still score ≥ 8 on all four criteria, but
 EB-STRETCH (Y1) is still red on them, so they are not clean until it closes. No other passed page changed.
+
+## Critic r14 (narrow)
+
+Critic: independent (mq-opus-medium), 2026-11-20. Branch `claude/sweet-newton-c8wrv1-lf-roles-stretch` at d26a81978, compared
+with aad74cb32. Both were checked out in private worktrees. I rendered every page myself at seed 7, pupil page and key.
+Renders are in `<scratchpad>/critic-r14/`.
+
+| Page | C1 / C2 / C3 / C4 | Verdict |
+|---|---|---|
+| vocabulary:vocab_pick3_words Guided L | 9 / 8 / 8 / 9 | PASS |
+| composing:hundreds_chart_fill Guided L | 9 / 8 / 8 / 9 | PASS |
+| addition:add_wp_10 Guided M | 9 / 8 / 8 / 9 | PASS |
+| subtraction:sub_wp_20 Guided L | 9 / 8 / 8 / 9 | PASS |
+
+**What I checked:**
+- **Clipping:** in the DOM, pupil page and key, page by page, no element passes the body bottom, and no cell or page
+  overflows.
+- **The try's hint line in row 0:**
+  - It fits whole in every page: "Its word starts with "f"." / "The number before is 26." / "The numbers are 3 and 2." / "The numbers are 6 and 1."
+  - Each hint sits under the try's slots, which keep their full writing room.
+- **The Model's worked lines:**
+  - They are not clipped: 3 lines on hundreds_chart_fill, 3 on add_wp_10 M, and 5 on sub_wp_20 L.
+  - On sub_wp_20 L the last line ends about 7 mm above the border.
+- **Keys:** each key has the same plan as its pupil page, and every answer is right: factor / column / commutative; the chart
+  cells 4, 11, 22, 27, 57, 59, 27, 33; 3 + 2 = 5, 2 + 2 = 4, 5 + 2 = 7; 6 − 1 = 5.
+- **Pages that should not move:** sub_wp_20 M is byte-identical to the base.
+- **`ws-empty-band --seed 7`** on vocab_pick3_words, hundreds_chart_fill, add_wp_10, sub_wp_20, add_wp_20 and sub_wp_10
+  (guided, M and L): **OK**.
+  - EB-STRETCH is clean on **add_wp_20 L and sub_wp_10 L**, so r13's Y1 is closed.
+  - EB-BAND is clean on all six.
+
+**Findings:**
+- **z1 (pre-existing on a passed page, outside r14's change; not counted here) · vocab_pick3_words: the hint gives the answer
+  away.** The hint "Its word starts with "f"." leaves exactly one word of the bank (factor / product / rule). On a pick-3 item
+  that is the answer, which goes against PT §2.3's rule that the hint "holds none of its answer".
+  *Check:* proposed GUIDED-HINT-LEAK extended to banks: fail when a try's hint, applied to its bank, leaves one option.
+- **y2 (nit, carried over)** · "cookies." sits alone on a line in the sub_wp_20 Model's working (LINE-ORPHAN).
+
+**Critic r14 verdict: PASS.** All four graded pages are ≥ 8. Y1 is closed: EB-STRETCH is OK on add_wp_20 and sub_wp_10 L.
