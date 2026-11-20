@@ -1,0 +1,8 @@
+ws-backtest row c120b-step-cover: PASS  fail state FAIL 8.3s, pass state OK 11.8s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-step-cover            commit-pair  FAIL 8.3s           OK 11.8s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 38.6 s
+ws-backtest: OK

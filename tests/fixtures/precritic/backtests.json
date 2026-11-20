@@ -12301,6 +12301,106 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-lesson-twin",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo LESSON-TWIN",
+   "check": "no two pupil windows of one lesson packet hold the same squares and the same gaps; the worked example is left out (critic blanks r2 R2-1)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1 --only LESSON-TWIN",
+   "fail": {
+    "commit": "09c4c80fe",
+    "state": "practice items 1, 2 and 4 copied the teaching sheet's windows verbatim"
+   },
+   "pass": {
+    "commit": "01a74586b",
+    "state": "the practice page prints three rows of ten per chart stretch (91-120, 61-90, 31-60); lesson deals refuse a twin on any page (chart-giveaway chartLesson)"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-answer-variety",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo ANSWER-VARIETY",
+   "check": "on a page of 4 or more pupil windows no one answer set covers more than half of them (critic blanks r2 R2-1)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --score-roles lesson --seed-list 4242 --only ANSWER-VARIETY",
+   "fail": {
+    "commit": "09c4c80fe",
+    "state": "4 of the 5 practice windows answered 94, 104, 114"
+   },
+   "pass": {
+    "commit": "01a74586b",
+    "state": "the practice page holds 3 grids, each its own answers"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-crossing-in-play",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo CROSSING-IN-PLAY",
+   "check": "a chart_to_120 lesson packet leaves a pupil gap at 100, 101, 110 or 111 (critic blanks r2 R2-1)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1 --only CROSSING-IN-PLAY",
+   "fail": {
+    "commit": "09c4c80fe",
+    "state": "seed 1: every pupil gap was 96, 106 or 116"
+   },
+   "pass": {
+    "commit": "01a74586b",
+    "state": "pupil windows keep off the crossing squares the example does not show, and the 91-120 grid leaves one empty"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-step-cover",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo STEP-COVER",
+   "check": "on a page with a Steps band every gap is solved by a printed step (left +1, up +10, top row down -10, right -1 only when printed) from a printed neighbour (critic blanks r2 R2-2)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --sizes M --screen-seeds 0 --score-roles lesson --seed-list 4242 --only STEP-COVER",
+   "fail": {
+    "commit": "09c4c80fe",
+    "state": "a blank left-edge column (94, 104, 114) had only a right neighbour"
+   },
+   "pass": {
+    "commit": "01a74586b",
+    "state": "lesson deals never blank a square whose only printed neighbour is on its right (gen-counting, chartLesson)"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-gaps-row-hidden",
+   "kind": "commit-pair",
+   "browser": false,
+   "rule": "ws-chart-offer OFFER / NOTE",
+   "check": "at band 120 'A run along one row' is not offered, and the host's panel help says why (lead ruling 2026-11-20 (b))",
+   "command": "node tests/scripts/ws-chart-offer.mjs",
+   "fail": {
+    "commit": "09c4c80fe",
+    "state": "chart_to_120 offered gaps=row: options-verify --render printed half-empty pages"
+   },
+   "pass": {
+    "commit": "01a74586b",
+    "state": "PRESET_HIDE_VALUES hides it on chart_to_120; the help names it; the generator deals Scattered at band 120"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

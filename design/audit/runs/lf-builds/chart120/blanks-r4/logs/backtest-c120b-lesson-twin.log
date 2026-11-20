@@ -1,0 +1,8 @@
+ws-backtest row c120b-lesson-twin: PASS  fail state FAIL 7.6s, pass state OK 11.6s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-lesson-twin           commit-pair  FAIL 7.6s           OK 11.6s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 34.6 s
+ws-backtest: OK
