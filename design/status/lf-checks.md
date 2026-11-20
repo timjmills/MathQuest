@@ -888,3 +888,26 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   L p2 45 % + CAP-PARITY 3 vs 6. The mixed-practice 10 vs 21 is FALSE (5-row ceiling).
 - Next: a fresh builder — machine check first that every role used by a passed skill declares its ceiling; the rules read
   it; critic r3; blocking again only after r3 passes.
+
+## 2026-11-20 — EBLAST r3 build: declared role ceilings (fresh builder, Opus medium; round cap fired on EB-LASTPAGE / CAP-PARITY)
+
+- **Root cause (verified):** the rules INFERRED capacity from white space ("another row fits", `full = !rowFits(pg)`) and never
+  read a role's DESIGNED ceiling, so a page full by design read as a defect: Mixed practice L at its WDS §12.1 5-row ceiling
+  (`mixed-practice.js` MAX_SHELVES) gave CAP-PARITY 10 vs 21; Scripted Model's fixed frames (§12.1 "1 problem, 3-6 frames, same")
+  gave 6 vs 10 / 4 vs 8 because `counts()` presence was the only test.
+- **Machine check first:** `js/modules/sheet/role-capacity.js` (pure kit table, exported from `sheet/index.js`) declares every
+  role's ceiling per size, its unit (items / rows), who sets the count (`role` / `teacher` / `fixed` / `table`) and its §12.1
+  citation. `ws-empty-band --capacity-check` fails when a role rendered by any `redesign-passed.js` skill (its card's offered
+  roles, else the default list) declares nothing: 17 roles / 32 skills OK. Backtest row `eblast-role-capacity-declared`
+  (FAIL a55ce281f, OK 7fb4a0659): PASS.
+- **Rules read it:** EB-LASTPAGE judges "a row fits" only BELOW the declared ceiling at that size; CAP-PARITY judges only `role`
+  roles, passes an L page at its declared L ceiling, and caps the need at the L ceiling. Not judged, with a note: teacher-count
+  roles (independent, more-practice: PG-23, the teacher's count), fixed layouts (scripted-model, opener, lesson, stretch,
+  fact-probe: their count is a layout, not a capacity), fact-rows (ladder table, no single ceiling). Self-test +13 cases
+  (mixed L 5 rows OK; pre-skill-check M 4 of 20 FAIL; scripted-model not judged; true-false 4 vs 6 OK; value 3 vs 6 FAIL).
+- **Sweep (advisory lines, 5 passed skills: add_facts, sub_facts, value, count_by_tables, div_facts):** 8 reds, all real by
+  the declared ceiling, all pre-skill-check (below its 20 / 16 items): add_facts M/L 78 %, sub_facts M/L 78 %, div_facts M 82 % /
+  L 79 % (4 items a page), value L p2 45 % + CAP-PARITY 3 vs 6. Mixed practice 10 vs 21 is gone (L at 5 rows). count_by_tables
+  clean. One route: the pre-skill-check composer (critic r2 G4: systemic, PT-PRE-1), not per skill.
+- Still ADVISORY (`--eblast-block` for findings); the lead flips to blocking after critic r3. The 6 eblast rows PASS;
+  `ws-precritic-plan --checks-from-critics` OK (351 pass, 90 exempt, 0 fail).

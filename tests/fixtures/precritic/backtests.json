@@ -12186,5 +12186,24 @@
     "pass": "OK"
    }
   }
+  ,{
+   "id": "eblast-role-capacity-declared",
+   "check": "lead EBLAST-ADVISORY root cause (critic eblast r2 G1/G2, round cap): EB-LASTPAGE / CAP-PARITY inferred capacity from white space, so pages full by design (Mixed practice L at its 5-row WDS §12.1 ceiling; Scripted Model frames) read red; every page role a passed skill renders must DECLARE its ceiling per size (js/modules/sheet/role-capacity.js) and the rules read it",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --capacity-check: every role used by a skill in redesign-passed.js declares its capacity ceiling (EB-LASTPAGE / CAP-PARITY read it)",
+   "fail": {
+    "commit": "a55ce281f",
+    "state": "no declared capacity table; the check does not exist -> role-capacity: FAIL"
+   },
+   "pass": {
+    "commit": "7fb4a0659",
+    "state": "17 roles used by 32 passed skills all declare a ceiling -> role-capacity: OK"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --capacity-check 2>/dev/null | tail -1 | grep -q '^ws-empty-band --capacity-check: OK' && echo 'role-capacity: OK' || echo 'role-capacity: FAIL (a role used by a passed skill declares no ceiling)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
  ]
 }
