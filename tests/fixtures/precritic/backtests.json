@@ -12637,6 +12637,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "notice-feature-onecol-h13",
+   "check": "ws-print-lint L-DENSITY H13: no pattern_features (notice patTask=feature) cell at M keeps a row taller than its ink by 30 % (Independent page)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (patterns precritic on master 2026-11-20, A2; ws-empty-band EB-BAND 29.8 % on the same rows)",
+   "browser": true,
+   "fail": {
+    "commit": "ddee858cc",
+    "state": "the measured 92 mm fit widened maxCols 1 to two across: one 2-across row (56 mm ink) over 1-across rows (43 mm), both grids spread - 25 mm band in 82.1 mm cells, x8"
+   },
+   "pass": {
+    "commit": "ee2191d25",
+    "state": "footprint hardCap: four 1-across rows of 53 mm for 43 mm of ink, 0 findings"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --skills patterns:pattern_features",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "notice-twin-digit-size",
+   "check": "ws-screen-ink-size TEXT-SIZE: the notice parity fact's digits on the practice card and quiz are at least the host digit size (56 px at 1280 / 1366, 48 px at 820 / 1024)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE (patterns precritic on master 2026-11-20, A5)",
+   "browser": true,
+   "fail": {
+    "commit": "ee2191d25",
+    "state": "parityCell sized the twin's digits with P (paper scale): '5' 52.8 px against 56 at 1280, 44.1 against 48 at 820; 16 findings"
+   },
+   "pass": {
+    "commit": "1e74b45fe",
+    "state": "the digits and sign in D (max(--mq-digit, paper scale)): 0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:notice_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
