@@ -14617,6 +14617,26 @@
     "state": "planCheck merges pools of one skill into one band (pre-skill-check.js)"
    },
    "browser": true
+  },
+  {
+   "id": "psc-sign-floor",
+   "kind": "commit-pair",
+   "check": "lead A10: a Pre-skill Check compare band shows at least 2 signs and never one sign 3 times in a row",
+   "rule": "ws-psc-lint PSC-DEAL",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills placevalue:expand,placevalue:unit_form --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "c2a50c33c",
+    "state": "expand band 4 and unit_form band 2: '>' three times in a row"
+   },
+   "pass": {
+    "commit": "0c1790e77",
+    "state": "dedupeDeal() sign floor, seeded order"
+   },
+   "browser": true
   }
  ]
 }
