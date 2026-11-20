@@ -964,3 +964,18 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Guided page drops the hidden middle question with the bar (86 % of M sheets Model + try on page 1); two_step_add_then_mult never states the Step 1 answer; provider `hint` field: "Step 1: circle +. Add." (no number in a Guided hint).
 - Backtest two-step-guided-no-mid pass side re-pointed to ddabf985a (the later hint check tightened --guided). ws-no-size-s allow-lists the eblast roleConstOf self-test string.
 - Known red: ws-worksheet-reflow on patterns:number_patterns_rule (pre-existing on master; lf-algebra bisecting).
+
+## 2026-11-20 — Deploy SKIP button (owner request; lf-hosts critic r2 8+ on every host) + end-run / touch-target bug fixes + Guided hint W2 mask (lf-roles critic PASS) + HINT-NO-BLANK smaller head (lf-placevalue; strictly better than master)
+- Skip on card / worksheet / quiz / MAP: skipped items return at the end ("Fixing k of n"); never wrong, never break a streak; MAP twice-skipped scores incorrect for RIT (lead ruling), results say Skipped. A run ends once (END-ONCE); infinite Finish counts answered only. Card tools and add_wp_20 sign >= 48 px.
+- Guided hints never print a number a box of the same try expects unless the question prints it (HINT-LEAK / HINT-OVERMASK / HINT-UNIFORM); vocab pick-3 hint leaves 2 words; continuation hint rows fit (CELL-FITS).
+- Screen help never shows a blank (675 -> 0 skills); the Say fallback only for one-number answers; remaining leaks pinned shrink-only to their lanes.
+- Gates: boot-smoke, code-snapshot, no-size-s, no-phone-width, roles-unit, skip, end-run, guided-cellfit, hint-no-blank, support-ladder, unit-form-bank, screen-answer, simple-print, key-json (sample), self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy Pre-skill Check fill (lf-roles; narrow critic PASS 9/8/8/8): PSC ceilings 12 (M) / 8 (L); pre-skill-check joins EBLAST_BLOCKING_ROLES
+- One-prerequisite fact sheets 4 -> 12 (M) / 8 (L) on one page; multi-prerequisite sheets at most 2 pages (R13 2+2); EB-LASTPAGE / CAP-PARITY block on pre-skill-check. Next week: trim over-ceiling bases, stack-cell bands, D1-D4.
+- Gates: boot-smoke, code-snapshot, no-size-s, roles-unit, empty-band self-test / capacity / pin, backtest psc-fill-eblast, key-json (sample), simple-print, self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy lesson first-page fix (lf-engine; shared narrow critic: strict improvement, the three target defects fixed)
+- No WRM lesson prints a blank first page (empty anchor chart dropped; LESSON-EMPTY-FIRST 59 -> 0); times-table lessons model their own table (per-step seed); OPENER-SAME 22 -> 6; CELL-FITS on lesson pages with 28 known pages pinned shrink-only (cellfits-known.json); two_step_letter_equation chart re-pinned (4 full-width pages, lead ruling). Exposed first-page content defects listed per lane for next week.
+- Gates: boot-smoke, code-snapshot, no-size-s, roles-unit, lesson-pages, backtests lesson-empty-first / opener-same / cell-fits, simple-print, self-tests, precritic-plan, capacity-pin, lesson baseline.
+- Known red (lead-accepted): LESSON-OPENER-SAME 6 pairs = 5 confirmed check misfires (lf-checks fixes the signature next week) + Y4.B14.S4/S5 geo_rotate (identical skills, content item); 22 on master before.

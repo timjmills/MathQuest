@@ -1756,7 +1756,7 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     const base = rng(2, maxForDouble);
                     q.text = `Double ${base.toLocaleString()}`;
                     q.ans = base * 2;
-                    q.hint = `Double means \u00d72. Think: ${base.toLocaleString()} + ${base.toLocaleString()} = ?`;
+                    q.hint = `Double means \u00d72. Think: add ${base.toLocaleString()} + ${base.toLocaleString()}.`;
                     q.visual = createDoubleBarGraph(base);
                 } else {
                     // If decimals are enabled, allow odd numbers (result will be .5)
@@ -2524,7 +2524,7 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     q.text = `Write the numeral: ${wordForm}`;
                     q.ans = num;
                     q.answerType = "number";
-                    q.hint = `Read each part of the word form and combine: "${wordForm}" = ?`;
+                    q.hint = `Read each part of the word form "${wordForm}" and put the parts together.`;
                     q.options = buildNumericOptions(num);
                 }
                 q.skillLabel = 'Word Form';

@@ -195,6 +195,21 @@ function renderItemSlider() {
       <input type="range" min="5" max="45" step="5" value="${state.mapItemCountTarget}" id="mapItemSlider" class="map-item-slider" oninput="window.setMapItemCount(this.value)" style="width:100%;">
     `;
     startSection.insertBefore(wrap, startBtn);
+    // Skip (lf-hosts, owner request 2026-11-19): the teacher can turn the pupil's Skip off for this test.
+    // Default on; kept in the share link (-S0 when off, so older links read "on").
+    if (!document.getElementById('mapSkipToggle')) {
+        const sk = document.createElement('label');
+        sk.className = 'map-skip-toggle';
+        sk.style.cssText = 'display:flex;align-items:center;gap:12px;min-height:48px;margin-bottom:14px;background:var(--mq-paper);border:2px solid var(--mq-rule);border-radius:var(--mq-r-md);padding:8px 16px;font-weight:800;color:var(--mq-ink-2);cursor:pointer;';
+        sk.innerHTML = `<input type="checkbox" id="mapSkipToggle" style="width:28px;height:28px;" ${state.mapSetupSkip === false ? '' : 'checked'} onchange="window.setMapSkipAllowed(this.checked)">`
+            + '<span>Pupils can skip (skipped items come back at the end)</span>';
+        startSection.insertBefore(sk, startBtn);
+    }
+}
+
+/** The MAP setup's Skip setting (default on). */
+export function setMapSkipAllowed(on) {
+    state.mapSetupSkip = !!on;
 }
 
 function updateStartButton() {
@@ -284,6 +299,7 @@ export function startMapFromUI() {
         bands: state.mapSelectedBands,
         domains: state.mapSelectedDomains,
         itemCount: state.mapItemCountTarget,
+        allowSkip: state.mapSetupSkip !== false,
     });
 }
 
@@ -351,7 +367,9 @@ export function generateMapShareLink() {
     // Optional 6th positional segment: A1 (adaptive ON) or A0 (adaptive OFF).
     // Omit entirely when default (false) so old 5-segment links remain valid.
     const adaptiveSeg = state.adaptiveModeEnabled === true ? '-A1' : '';
-    return `${base}?map=${tier}-${mode}-${bands}-${domains}-${count}${adaptiveSeg}`;
+    // Skip off travels as -S0 (omitted when on, the default, so old links stay valid).
+    const skipSeg = state.mapSetupSkip === false ? '-S0' : '';
+    return `${base}?map=${tier}-${mode}-${bands}-${domains}-${count}${adaptiveSeg}${skipSeg}`;
 }
 
 /**
@@ -447,7 +465,10 @@ export function parseMapShareLink(s) {
     if (parts.length >= 6 && typeof parts[5] === 'string' && parts[5].length > 0 && parts[5][0] === 'A') {
         adaptive = parts[5].slice(1) === '1';
     }
-    return { tier, mode, bands, domains, itemCount: count, adaptive };
+    // Optional skip segment (-S0 = Skip off) after the adaptive one; absent = on.
+    let allowSkip = true;
+    for (const seg of parts.slice(5)) if (seg === 'S0') allowSkip = false;
+    return { tier, mode, bands, domains, itemCount: count, adaptive, allowSkip };
 }
 
 /**
@@ -463,6 +484,7 @@ export function loadMapShareLink(parsed) {
     state.mapSelectedBands = parsed.bands.slice();
     state.mapSelectedDomains = parsed.domains.slice();
     state.mapItemCountTarget = parsed.itemCount || 20;
+    state.mapSetupSkip = parsed.allowSkip !== false;
     // Apply optional adaptive flag from share-link before launching the session
     // so the engine sees the correct toggle state during the first question.
     if (typeof parsed.adaptive === 'boolean') {
@@ -478,6 +500,7 @@ export function loadMapShareLink(parsed) {
         bands: parsed.bands.slice(),
         domains: parsed.domains.slice(),
         itemCount: parsed.itemCount || 20,
+        allowSkip: parsed.allowSkip !== false,
     });
     return true;
 }
