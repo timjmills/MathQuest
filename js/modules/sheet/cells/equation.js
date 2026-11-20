@@ -367,7 +367,7 @@ function chainRender(p, ctx, marks = null) {
     const op = (v) => `<span class="o" style="width:0.4em">${v}</span>`;
     const expr = (bits) => `<span class="ws-mt-expr" style="display:inline-flex;align-items:flex-end;gap:0.14em;white-space:nowrap">${bits.join('')}</span>`;
     const row = (eq, bits) => `<span class="ws-mt-eq" style="text-align:center">${eq ? '<span class="o">=</span>' : ''}</span>${expr(bits)}`;
-    const grid = (rows, extra = '') => `<div class="ws-eq ws-mt-chain" data-ws-chain="${esc(p.form || 'solve')}"${extra} style="display:inline-grid;grid-template-columns:1em auto;column-gap:0.28em;row-gap:0.3em;align-items:end;justify-items:start">${rows.join('')}</div>`;
+    const grid = (rows, extra = '') => `<div class="ws-eq ws-mt-chain" data-ws-chain="${esc(p.form || 'solve')}"${extra} style="margin-top:auto;margin-bottom:auto;display:inline-grid;grid-template-columns:1em auto;column-gap:0.28em;row-gap:0.3em;align-items:end;justify-items:start">${rows.join('')}</div>`;
     const grouped = (L, bracket) => (L
         ? [...(bracket ? [op('(')] : []), n(a), X, n(b), ...(bracket ? [op(')')] : []), X, n(c)]
         : [n(a), X, ...(bracket ? [op('(')] : []), n(b), X, n(c), ...(bracket ? [op(')')] : [])]);
@@ -378,7 +378,7 @@ function chainRender(p, ctx, marks = null) {
         const bits = L
             ? [...(br ? [op('(')] : []), fs[0], X, fs[1], ...(br ? [op(')')] : []), X, fs[2]]
             : [fs[0], X, ...(br ? [op('(')] : []), fs[1], X, fs[2], ...(br ? [op(')')] : [])];
-        return `<div class="ws-eq ws-mt-missing" data-ws-chain="missing" style="gap:0.14em;white-space:nowrap">${bits.join('')}<span class="o">=</span>${n(chainProduct(p))}</div>`;
+        return `<div class="ws-eq ws-mt-missing" data-ws-chain="missing" style="margin-top:auto;margin-bottom:auto;gap:0.14em;white-space:nowrap">${bits.join('')}<span class="o">=</span>${n(chainProduct(p))}</div>`;
     }
     if (p.form === 'both') {
         const one = (L, inner, ans) => grid([
@@ -386,7 +386,8 @@ function chainRender(p, ctx, marks = null) {
             row(true, L ? [inner, X, n(c)] : [n(a), X, inner]),
             row(true, [ans]),
         ]);
-        return `<div class="ws-mt-both" data-ws-chain="both" style="display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:1.2em;row-gap:0.6em">${one(true, S.inner, S.answer)}${one(false, S.inner2, S.answer2)}</div>`;
+        // (the two chains stacked: side by side they overran a lesson cell - ws-cell-checks OVERFLOW)
+        return `<div class="ws-mt-both" data-ws-chain="both" style="margin-top:auto;margin-bottom:auto;display:flex;flex-direction:column;align-items:flex-start;row-gap:0.6em">${one(true, S.inner, S.answer)}${one(false, S.inner2, S.answer2)}</div>`;
     }
     const pr = chainPair(p);
     const rows = [];
@@ -399,7 +400,10 @@ function chainRender(p, ctx, marks = null) {
         rows.push(row(true, [op('('), n(a), X, n(c), op(')'), X, n(b)]));
         rows.push(row(true, [S.inner, X, n(pr.rest)]));
     } else {
-        rows.push(row(false, grouped(pr.left, true)));
+        // (every bracketed chain is four lines - the factors, then the bracket - so a page's cells are one height beside the
+        // turned chains: ws-empty-band EB-BAND)
+        rows.push(row(false, [n(a), X, n(b), X, n(c)]));
+        rows.push(row(true, grouped(pr.left, true)));
         rows.push(row(true, pr.left ? [S.inner, X, n(c)] : [n(a), X, S.inner]));
     }
     rows.push(row(true, [S.answer]));
@@ -411,12 +415,12 @@ function chainFootprint(p, ctx) {
     const d = chainDigits(p);
     const B = blankWidth(d, ctx.size);
     if (p.form === 'missing') {
-        return { wMm: Math.ceil(em * (0.58 * (2 + String(chainProduct(p)).length) + 3 * 1 + 0.8 + 6 * 0.14) + blankWidth(1, ctx.size) + 6), hMm: Math.ceil(em * 1.15 + 4), factLike: false, maxCols: 2, stretchCap: STRETCH_CAP.equation };
+        return { wMm: Math.ceil(em * (0.62 * (2 + String(chainProduct(p)).length) + 3 * 1 + 0.8 + 8 * 0.14) + blankWidth(1, ctx.size) + 12), hMm: Math.ceil(em * 1.15 + 4), factLike: false, maxCols: 2, stretchCap: STRETCH_CAP.equation };
     }
-    const lines = (p.form === 'choose' || p.bracket === false) ? 3 : p.turn ? 4 : 3;
+    const lines = p.form === 'both' ? 6 : (p.form === 'choose' || p.bracket === false) ? 3 : 4;
     // the widest line: '(a × b) × c' (3 digits, two × tracks, two brackets), or '= [ ] × [ ]' (two boxes)
     const chainW = 1.28 * em + Math.max(em * (3 * 0.58 + 2 + 0.8 + 6 * 0.14), B + blankWidth(1, ctx.size) + em * (1 + 2 * 0.14) + 2);
-    const wMm = p.form === 'both' ? 2 * chainW + 1.2 * em + 6 : chainW + 6;
-    const hMm = lines * em * 1.15 + (lines - 1) * 0.3 * em + 4;
-    return { wMm: Math.ceil(wMm), hMm: Math.ceil(hMm), factLike: false, maxCols: p.form === 'both' ? 1 : 2, stretchCap: STRETCH_CAP.equation };
+    const wMm = chainW + 6;
+    const hMm = lines * em * 1.15 + (lines - 1) * 0.3 * em + (p.form === 'both' ? 0.3 * em : 0) + 4;
+    return { wMm: Math.ceil(wMm), hMm: Math.ceil(hMm), factLike: false, maxCols: 2, stretchCap: STRETCH_CAP.equation };
 }

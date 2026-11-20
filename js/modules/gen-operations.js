@@ -2967,7 +2967,7 @@ function _genMultiplyThree(q, helpers) {
     q.cell = { template: 'equation', v: 1, payload };
     q.visual = _kitTwin('equation', payload);
     q.selfAnswering = true;
-    q.a = f[0]; q.b = f[1]; q.c = f[2]; q.op = '×';
+    // (no q.a / q.b: three factors are not a two-operand fact - ws-dealer-uniform read the first two as one)
     q.factors = f.slice();
     q.skillLabel = 'Multiply Three Numbers';
     const fx = `${f[0]} × ${f[1]} × ${f[2]}`;

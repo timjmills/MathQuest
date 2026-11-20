@@ -526,7 +526,7 @@ const mtOf = (q) => {
 const MT_STEPS = ['Find the easy pair.', 'Multiply the pair.', 'Multiply by the last number.', 'Say it.'];
 const MT_STRINGS = {
     solve: strings({
-        iCan: 'I can multiply three numbers.',
+        iCan: 'I Can multiply three numbers',
         instructionKey: 'mult3',
         steps: MT_STEPS,
         say: '__ times __ is __. __ times __ is __.',
@@ -534,7 +534,7 @@ const MT_STRINGS = {
         vocabulary: ['factor', 'product', 'pair'],
     }),
     choose: strings({
-        iCan: 'I can multiply three numbers.',
+        iCan: 'I Can multiply three numbers',
         instructionKey: 'mult3-choose',
         steps: MT_STEPS,
         say: '__ times __ is __. __ times __ is __.',
@@ -542,7 +542,7 @@ const MT_STRINGS = {
         vocabulary: ['factor', 'product', 'pair'],
     }),
     both: strings({
-        iCan: 'I can multiply three numbers both ways.',
+        iCan: 'I Can multiply three numbers both ways',
         instructionKey: 'mult3-both',
         steps: ['Multiply the first pair, then the last number.', 'Multiply the last pair, then the first number.', 'Check: the same product.'],
         say: 'Both ways make __.',
@@ -550,7 +550,7 @@ const MT_STRINGS = {
         vocabulary: ['factor', 'product', 'grouping'],
     }),
     missing: strings({
-        iCan: 'I can find a missing factor.',
+        iCan: 'I Can find a missing factor',
         instructionKey: 'mult3-missing',
         steps: ['Multiply the two numbers you know.', 'Think: what times that makes the product?', 'Write the missing factor.'],
         say: 'The missing factor is __.',
