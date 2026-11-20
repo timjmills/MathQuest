@@ -15350,6 +15350,46 @@
     "state": "twin pools interleave round robin"
    },
    "browser": true
+  },
+  {
+   "id": "psc-review-band",
+   "kind": "commit-pair",
+   "check": "card design/cards/psc-review (owner ruling 2026-11-20): a Pre-skill Check with room under its check prints a Quick review band of earlier skills, one per CCSS domain in turn (the grade's), never the lesson skill or a prerequisite, seeded; two scores Check __/n and Review __/m; the key labels each review answer <domain> · <skill>",
+   "rule": "ws-psc-review PSC-REVIEW-DOMAINS / PSC-SCORES",
+   "command": "node tests/scripts/ws-psc-review.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "e4b28d588",
+    "state": "no Quick review band, one Score: 12 findings on add_facts M/L, div_facts M (R1, S1, S2, S3)"
+   },
+   "pass": {
+    "commit": "edfa8cd7a",
+    "state": "pre-skill-check.js reviewRows + print-sheet.js reviewCandidates: add_facts M 4 / L 2, div_facts M 4 review items, both scores, key labels"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-review-ebpage",
+   "kind": "commit-pair",
+   "check": "EB-PAGE on every Pre-skill Check page (6e130f36f, lead 2026-11-20 item 1): the at-ceiling fact check page is filled by the Quick review band (card design/cards/psc-review), not left 42-61 % white",
+   "rule": "ws-empty-band EB-PAGE (pre-skill-check, every page)",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts --roles pre-skill-check --sizes M --hosts none --page-fill --only EB-PAGE && node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts --roles pre-skill-check --sizes L --hosts none --page-fill --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "e4b28d588",
+    "state": "add/sub/mult_facts M 42 %, div_facts M 53 %, add/sub_facts L 60 % white"
+   },
+   "pass": {
+    "commit": "edfa8cd7a",
+    "state": "the Quick review rows fill the last page (M 4 items, add/sub L 2 items); mult/div_facts L (31 / 33 %) and sub_wp_20 L p1 (51 %, not the last page) stay red, for a ruling"
+   },
+   "browser": true
   }
  ]
 }
