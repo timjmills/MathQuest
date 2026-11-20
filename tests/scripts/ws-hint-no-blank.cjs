@@ -363,6 +363,11 @@ function exitAfterFlush(code) {
                         const st = paths.filter((x) => x[0] === 'STEPS').map((x) => x[2]);
                         const ACT = /\b(add|subtract|take|count|find|write|type|read|look|put|start|make|use|say|tap|choose|round|keep|work|think|point|circle|compare|move|check|split|multiply|divide|halve|double|fill|mark|jump|go|now|then|drag|sort|tick|pick)\b/i;
                         if (hasSH && st.length && !ACT.test(st[st.length - 1].split(/(?<=[.!?])\s+/).pop())) F('ENDS-WITH-ACTION', key, i, `last step "${st[st.length - 1]}" says nothing to do`);
+                        // PREFER-SH (R3-2): when the skill's own steps had to be cut, the box is its screenHelp, never the cut steps
+                        if (hasSH && st.length && rawSteps && st.join(' | ') !== rawSteps) {
+                            const shs = shOwn.screenHelp(q).steps.map(String);
+                            if (st.join(' | ') !== shs.join(' | ') && !q.fullWorked) F('PREFER-SH', key, i, `cut own steps shown ("${st.join(' / ').slice(0, 120)}") instead of screenHelp`);
+                        }
                     } catch (e) { /* no provider */ }
                     // SAYLESS: the skill's provider has a Say frame, but the screen shows no Say line for this item
                     try {
@@ -548,7 +553,7 @@ function exitAfterFlush(code) {
         const FULL = !SKILL && !CATEGORY;
         const byCheck = {};
         for (const f of res.findings) (byCheck[f.check] = byCheck[f.check] || new Map()).set(f.key, f);
-        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'R2-KEEP', 'ENDS-WITH-ACTION', 'HELP-THIN', 'LISTEN',
+        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'R2-KEEP', 'ENDS-WITH-ACTION', 'PREFER-SH', 'HELP-THIN', 'LISTEN',
             'DANGLING-HEAD', 'ORPHAN', 'HELP-GENERIC'];
         const lists = {};
         for (const c of CHECKS) {
