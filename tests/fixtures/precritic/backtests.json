@@ -14137,6 +14137,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "psc-instr-adjacent",
+   "kind": "commit-pair",
+   "check": "lf-roles critic D3: no two adjacent Pre-skill Check bands print the same instruction",
+   "rule": "ws-psc-lint PSC-INSTR",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_wp_20,addition:add_wp_20 --only PSC-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "9b475efe6",
+    "state": "sub_wp_20 M bands 1-2 'Subtract.' twice, bands 3-4 the story line twice"
+   },
+   "pass": {
+    "commit": "42310a2a3",
+    "state": "distinctInstrs(): each names its prerequisite ('Subtract within 20 (with regrouping).')"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-deal-dupes",
+   "kind": "commit-pair",
+   "check": "lf-roles critic D4: in a Pre-skill Check band at most 2 items share an answer and no turnaround pair",
+   "rule": "ws-psc-lint PSC-DEAL",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills addition:add_facts,subtraction:sub_50_no_regroup,addition:add_wp_10 --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "9b475efe6",
+    "state": "add_facts M seed 7: three 12s and 8 + 4 / 4 + 8 in one band"
+   },
+   "pass": {
+    "commit": "42310a2a3",
+    "state": "dedupeDeal() per prerequisite, seeded order"
+   },
+   "browser": true
   }
  ]
 }
