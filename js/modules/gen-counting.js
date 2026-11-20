@@ -39,7 +39,7 @@ import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
 import { onNewPage } from './page-deal.js';
-import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge } from './chart-giveaway.js';
+import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge, chartPageGrid } from './chart-giveaway.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -921,13 +921,18 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const _to120 = !big && band === 120;
         // Wave 1 lane C: grid size (a small piece / three whole rows of ten / the whole chart) and
         // which squares are empty. The defaults draw exactly the random numbers they drew before.
-        const _grid = big ? 'window' : (_kOpt('grid') || 'window');
-        const _gaps = _kOpt('gaps') || 'scatter';
+        // (the band-120 lesson practice page: three rows of ten as its own form, chart-giveaway.js chartPageGrid)
+        const _lessonRows = !big && band === 120 && chartPageGrid() === 'rows' && chartEdge();
+        const _grid = big ? 'window' : _lessonRows ? 'rows' : (_kOpt('grid') || 'window');
+        // (lead ruling 2026-11-20: no run along a row at band 120 - not offered there; an old code's value deals Scattered)
+        const _gaps = _to120 && _kOpt('gaps') === 'row' ? 'scatter' : (_kOpt('gaps') || 'scatter');
         const R = _grid === 'whole' ? rowHi - rowLo + 1 : Math.min(3, rowHi - rowLo + 1);
         // The big chart's numbers need wider boxes (three to five digits at the working size), so
         // its window is four columns wide: two windows still share a row at size L.
         const C = big ? 4 : (band === 10 || _grid !== 'window') ? 10 : 5;
-        const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0;
+        // (not in a band-120 lesson packet: its windows keep to the example's edge columns, and its practice page's rows grid holds the
+        // crossing - critic blanks r2 R2-1)
+        const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
         const pickWin = () => {
             const r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
             const c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
@@ -943,7 +948,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // band's rows: six windows side by side, so the sheet's gaps repeat every five columns - chart blanks r3, ws-empty-band
         // on hundreds_chart_fill {band: 30}: without the shared pattern four windows were dealt and stretched to the page)
         const _sameRows = !big && _grid === 'window' && C === 5 && R === 3 && (_to120 || rowHi - rowLo + 1 === R);
-        const want = Math.min(chartGapCap(R, C, _sameRows && _gaps === 'scatter'), _hcWant);
+        let want = Math.min(chartGapCap(R, C, _sameRows && _gaps === 'scatter'), _hcWant);
+        // (the lesson's rows grid: as many gaps as the packet leaves free, up to 9 - three a row - tried from the most down)
+        if (_lessonRows) want = 9;
         const neighbours = (i) => {
             const r = Math.floor(i / C), c = i % C, out = [];
             if (c > 0) out.push(i - 1);
@@ -974,6 +981,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const colFits = (nums) => !k0Run || nums.every((n) => k0Run.gaps.some((g) => resOf(g) === resOf(n)));
         let rows, cols, at, pickIdx = [];
         let runLast = null;
+        for (; want >= 1 && !pickIdx.length; want--) {
         for (let w = 0; w < (kept.length ? 24 : keptRun.length ? 150 : 1) && !pickIdx.length; w++) {
             const win = pickWin();
             rows = win.rows; cols = win.cols;
@@ -1001,6 +1009,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 const sc = kept.filter((k) => k.shows).flatMap((k) => k.cols);
                 const ok = new Set([Math.min(...sc) - 1, Math.max(...sc) + 1]);
                 for (let i = 0; i < N; i++) if (!ok.has(cols[i % C])) barred.add(i);
+                // (critic blanks r2: R2-2 - the blank column is never the window's first, where only a right neighbour is
+                // printed; R2-1 - while tries remain, a pupil window prints no crossing square (100 / 110, 101 / 111) the example
+                // does not show, so the practice page's rows grid can leave one empty)
+                if (ok.has(cols[0])) continue;
+                const shownN = (n) => kept.some((k) => k.shows && k.rows.includes(Math.floor((n - 1) / 10)) && k.cols.includes((n - 1) % 10));
+                const freeX = [[100, 110], [101, 111]].filter((g) => !g.some(shownN));
+                if (w < 16 && freeX.flat().some((n) => inWin(n) && !ok.has((n - 1) % 10))) continue;
             }
             // Band 120's windows all lie on rows 91-120 (six of them, side by side), so a sheet's gaps repeat every five columns: a
             // later window blanks exactly the squares of the first kept window's pattern (row, column mod 5) - every window then
@@ -1043,13 +1058,20 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 const shown = kept.filter((k) => k.shows);
                 if (shown.length && shown.length === kept.length && t < 40 && w < 16 && !cand.every((i) => shown.some((k) => Math.min(...k.cols.map((c) => Math.abs(c - cols[i % C]))) <= 3))) continue;
                 if (_cross && t < (kept.length ? 40 : 200) && w < 12 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
+                // (critic blanks r2 R2-2, STEP-COVER: every gap of a band-120 lesson window is solved by a printed Step from a
+                // printed neighbour - left +1, up +10, top row: down -10; the Steps band names no "look right")
+                if (_to120 && chartEdge() && !cand.every((i) => (i % C > 0 && !set.has(i - 1)) || (i >= C && !set.has(i - C)) || (i < C && i + C < N && !set.has(i + C)))) continue;
+                // (the rows grid: the crossing squares in play when the packet leaves one free - R2-1 CROSSING-IN-PLAY)
+                if (_lessonRows && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
                 pickIdx = cand;
             }
+        }
+            if (!_lessonRows || pickIdx.length) break;
         }
         // (no run fitted the sheet: the first one drawn - the dealer passes it over, it prints another window's gap)
         if (!pickIdx.length && runLast) { rows = runLast.rows; cols = runLast.cols; at = runLast.at; pickIdx = runLast.idx; }
         // Fallback (never expected): alternate squares of each row honour every rule, up to the cap.
-        if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, want);
+        if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, Math.max(1, want));
         const blanks = pickIdx.sort((x, y) => x - y).map(at);
         const top = (rowHi + 1) * 10;
         q.chartWindow = { rows, cols };

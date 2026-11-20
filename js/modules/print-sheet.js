@@ -24,7 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
-import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet, setChartEdge } from './chart-giveaway.js';
+import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet, setChartEdge, setChartPageGrid } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -5316,7 +5316,23 @@ async function buildLesson(n, metaOf) {
         return res;
     };
     if (!(Array.isArray(n.practiceSheets) && n.practiceSheets.length) && built.includes('practice')) {
-        const res = await buildPractice(lessonPartSeed(n.seed, 'practice'), section);
+        // (lead ruling 2026-11-14 fallback, taken 2026-11-20 - critic blanks r2 R2-1: the band-120 lesson's practice page prints
+        // the three rows of ten as one grid, its gaps every square the packet's other windows leave free; an internal page form,
+        // not the pupil's `grid` value)
+        if (_cwEdge && _cw120(sk)) {
+            setChartPageGrid('rows');
+            // (the grid is dealt against the windows the packet PRINTS - the worked examples, shown, and the pupil windows on its
+            // pages - not a run's probe deals that never reached the paper, which barred every free square)
+            const printedKeys = new Set();
+            for (const res0 of [chart, teach]) for (const pl of res0.keyPlans || [res0.plan]) for (const pg of (pl && pl.pages) || []) {
+                const walk = (x) => { if (!x || typeof x !== 'object') return; if (Array.isArray(x)) { x.forEach(walk); return; } if (x.kind === 'grid') (x.items || []).forEach((it) => { const c = it && it.q ? chartOfQ(it.q) : null; if (c) printedKeys.add(cwKey(c, !!(it.anchor || it.model))); }); for (const k of ['sections', 'parts', 'content', 'contents']) if (x[k]) walk(x[k]); };
+                walk(pg);
+            }
+            for (const q of [...((chart.plan && chart.plan.meta && chart.plan.meta.exampleQs) || []), ...((teach.plan && teach.plan.meta && teach.plan.meta.exampleQs) || [])]) { const c = chartOfQ(q); if (c) printedKeys.add(cwKey(c, true)); }
+            _cwSheet.clear(); _cwSheet.set('lesson-printed', printedKeys);
+        }
+        let res;
+        try { res = await buildPractice(lessonPartSeed(n.seed, 'practice'), section); } finally { setChartPageGrid(null); }
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
         for (const it of res.items || []) practiceTexts.push(refText(it));
         if (packNums) packNums.push(...planKeys(res));
@@ -6436,7 +6452,7 @@ export function buildSheet(req = {}) {
     _cwShowFirst = !!(req && ['guided', 'scripted-model'].includes(req.role));
     _cwRoleTiles = req && req.role === 'guided' ? 3 : null;
     _cwForceFirst = null;
-    _cwEdge = false; setChartEdge(false);
+    _cwEdge = false; setChartEdge(false); setChartPageGrid(null);
     _cwSheet.clear();
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
     // queue: it builds its pages through buildSheet itself).

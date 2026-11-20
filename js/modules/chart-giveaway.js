@@ -87,6 +87,13 @@ export const chartSheet = () => SHEET;
 let EDGE = false;
 export const setChartEdge = (v) => { EDGE = !!v; };
 export const chartEdge = () => EDGE;
+/* The band-120 LESSON practice page's own form (lead ruling 2026-11-14 fallback, taken 2026-11-20 after critic blanks r2 R2-1):
+ * N=3 windows beside the shown example left one answer column for the whole packet, so the practice page prints the three rows
+ * of ten (91-120) as ONE grid, its gaps every square no other packet window prints. An internal page form set by the lesson
+ * dealer around the practice part - never the pupil-chosen `grid` value, which the lesson role still hides - `null` elsewhere. */
+let PAGE_GRID = null;
+export const setChartPageGrid = (v) => { PAGE_GRID = v || null; };
+export const chartPageGrid = () => PAGE_GRID;
 
 /**
  * "Numbers to fill in" (lead ruling 2026-11-14): the most empty squares a window of R rows and C columns can legally hold -

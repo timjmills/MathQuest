@@ -1283,7 +1283,7 @@ function _gridOptions() {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
             values: [{ v: 'scatter', l: 'Scattered anywhere (default)' }, { v: 'row', l: 'A run along one row (count on by 1)' },
                 { v: 'column', l: 'A run down one column (count on by 10)' }, { v: 'pattern', l: 'Every other square in a row' }],
-            help: '"Numbers to fill in" says how many (in each row, on three rows or the whole chart). A run stays one square in from the edge, so a printed number stands at each end to count from: a run along a row is two or more boxes, a run down a column needs three rows. The whole chart with every other square varies from page to page. Every other square needs a row of at least four.',
+            help: '"Numbers to fill in" says how many (in each row, on three rows or the whole chart). A run stays one square in from the edge, so a printed number stands at each end to count from: a run along a row is two or more boxes, a run down a column needs three rows. The whole chart with every other square varies from page to page. Every other square needs a row of at least four. On the chart to 120 a run along a row is not offered: its windows all sit on the same three rows, so only three row runs fit a page without one window giving another\'s answer away - those pages get scattered squares.',
         },
     ];
 }
@@ -2392,6 +2392,10 @@ export const PRESET_HIDE_VALUES = {
     // under the BAND-BITES 10 % bar, so it is hidden the same way.
     'algebra:two_step_mult_div_first': { band: [50] },
     'algebra:two_step_add_then_mult': { band: [50] },
+    // Lead ruling 2026-11-20 (option b): at band 120 "A run along one row" is not offered - the six windows on rows 91-120
+    // hold at most three row runs that give no answer away, so its page printed half empty. The host's panel note says so,
+    // and the generator deals Scattered there (ws-chart-offer is the gate).
+    'composing:chart_to_120': { gaps: ['row'] },
 };
 // A PRESET skill (skill-presets.js) shows its HOST's controls with the preset values as their
 // defaults: "preset values under any explicit opts", and a share code packs only the changes.

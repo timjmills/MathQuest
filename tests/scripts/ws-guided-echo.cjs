@@ -55,6 +55,8 @@
 //   ANSWER-VARIETY     on a page of 4+ pupil windows no one answer set covers more than half of them (R2-1).
 //   CROSSING-IN-PLAY   a chart_to_120 lesson packet leaves a pupil gap at 100, 101, 110 or 111 (R2-1).
 //   STEP-COVER         on a page with a Steps band every gap is solved by a printed step from a printed neighbour (R2-2).
+//   BLANK-COUNT        the band-120 lesson's practice page prints three rows of ten (the ruled fallback): its count is what the
+//                      packet leaves free, judged by the other blank rules, not the 3 of the windows.
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
 //                      cell on its page (F5: "The number before is 109 ... Write 110." beside windows with no 109 or 110).
 //
@@ -195,9 +197,11 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     const cp = q.cell && q.cell.template === 'chartwindow' && q.cell.payload;
                     const blanks = cp && Array.isArray(cp.blanks) ? cp.blanks.map(Number) : w.gaps;
                     const R = w.rows.length, C = w.cols.length;
-                    const exp = Math.min(capOf(R, C, w.rows), want);
+                    // (want may be a function of the window: the band-120 lesson's practice rows grid holds what the packet leaves free)
+                    const wantW = typeof want === 'function' ? want(w, blanks) : want;
+                    const exp = Math.min(capOf(R, C, w.rows), wantW);
                     const f = [];
-                    if (blanks.length !== exp) f.push(`${blanks.length} blank(s), want ${exp}${exp < want ? ` (${want} capped)` : ''}`);
+                    if (blanks.length !== exp) f.push(`${blanks.length} blank(s), want ${exp}${exp < wantW ? ` (${wantW} capped)` : ''}`);
                     if (w.gaps.length !== blanks.length) f.push(`key holds ${w.gaps.length} answer(s) for ${blanks.length} blank(s)`);
                     if (blanks.length * 2 > R * C) f.push(`${blanks.length} of ${R * C} squares blank (more than half)`);
                     const per = w.rows.map((r) => blanks.filter((n) => Math.floor((n - 1) / 10) === r).length);
@@ -379,7 +383,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         // (BLANK-COUNT: the whole sheet's windows; Score /N equals their blanks is SCORE-SLOTS, judged above)
                         // (lead ruling (a) 2026-11-14: Guided 3; a band-120 LESSON's pupil windows 3 - its whole packet is judged, B2)
                         const lesson120 = role === 'lesson' && skillId === 'chart_to_120';
-                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, packet ? packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model) : pp.flatMap((pg) => pg.items), role === 'guided' || lesson120 ? 3 : tilesWant);
+                        if (on('BLANK-COUNT')) judgeBlanks(`${key} ${role} ${size} seed ${s}`, packet ? packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model) : pp.flatMap((pg) => pg.items), role === 'guided' ? 3 : lesson120 ? (w, b) => (w.rows.length === 3 && w.cols.length === 10 ? b.length : 3) : tilesWant);
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
                         if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {
