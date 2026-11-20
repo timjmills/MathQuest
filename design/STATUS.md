@@ -959,3 +959,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-20 — Deploy STUDENT OPTIONS (owner request; lf-partopts critic r2: 8 on every criterion at 1280 / 1366 / 1024 / 820)
 - Pupil taps a skill: its options open folded with "Play this skill" / "Play all selected (N)"; "You will play N skills"; chip x deselects (48 px); teacher-fixed options greyed "Set by your teacher"; pupil wording layer (pupil-option-words.js, WORDS lint 0); every pupil start goes through playSelectedSkills. Explorer NODUP fix at plate S.
 - Gates: boot-smoke, code-snapshot, no-size-s, no-phone-width, student-opts (4 widths), student-explorer, share-options, simple-print, screen-answer, self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy two-step GUIDED-NO-MID + STORY-WORK + V-AMBIG + Guided hint field (lf-algebra; narrow critic r2 8/8/8/8); two-step card decision 6 re-signed; expand reflow re-pin (lf-placevalue, intended)
+- Guided page drops the hidden middle question with the bar (86 % of M sheets Model + try on page 1); two_step_add_then_mult never states the Step 1 answer; provider `hint` field: "Step 1: circle +. Add." (no number in a Guided hint).
+- Backtest two-step-guided-no-mid pass side re-pointed to ddabf985a (the later hint check tightened --guided). ws-no-size-s allow-lists the eblast roleConstOf self-test string.
+- Known red: ws-worksheet-reflow on patterns:number_patterns_rule (pre-existing on master; lf-algebra bisecting).
