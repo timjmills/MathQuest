@@ -3582,6 +3582,10 @@
    "items": 1,
    "reason": "4-part model under-layout; A9b (lead ruling A9b, 2026-11-20)"
   },
+  "multiplication:area_model_2by2 true-false L": {
+   "items": 1,
+   "reason": "4-part model under-layout; A9b (lead ruling A9c item 2, 2026-11-20)"
+  },
   "multiplication:area_model_3by2 reason-it L": {
    "items": 1,
    "reason": "4-part model under-layout; A9b (lead ruling A9b, 2026-11-20)"
