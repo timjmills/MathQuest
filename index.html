@@ -966,7 +966,8 @@
                     <button class="btn btn-sm btn-secondary" id="ttsBtn" onclick="speakQuestion()">🔊 Read</button>
                     <button class="btn btn-sm btn-secondary" id="calcBtn" onclick="toggleCalculator()" style="display:none;">🧮 Calculator</button>
                     <button class="btn btn-sm btn-secondary" id="solutionBtn" onclick="showSolution()" style="display:none;">📚 Show Solution</button>
-                    <button class="btn btn-sm skip-question-btn" id="skipQuestionBtn" type="button" onclick="skipCurrentQuestion()" title="Skip this problem (no penalty)">⏭ Skip</button>
+                    <button class="btn btn-sm skip-question-btn" id="skipQuestionBtn" type="button" onclick="skipCurrentQuestion()" title="Skip this problem (no penalty)" aria-label="Skip this problem">Skip ⏭</button>
+                    <span class="mq-skip-count" id="skipCountPill" role="status" aria-live="polite" style="display:none;"></span>
                     <button class="btn btn-primary" id="qcCheckBtn" type="button" onclick="submitAnswer()">Check</button>
                 </div>
 
@@ -982,6 +983,7 @@
                     <button class="btn btn-sm btn-secondary" onclick="exitGame()">🏠 Back</button>
                     <span style="font-weight:800;">Worksheet</span>
                     <span class="mq-skill-pill" id="worksheetSkillPill"></span>
+                    <span class="mq-skip-count" id="worksheetSkipCount" role="status" aria-live="polite" style="display:none;"></span>
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn btn-sm btn-primary" onclick="checkAllWorksheet()">✓ Check All</button>

@@ -1278,6 +1278,13 @@ function buildPlan(ctx) {
         // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
         // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
         add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        // lf-hosts skip (owner request 2026-11-19): Skip on the practice card, online worksheet, quiz and MAP test - the button,
+        // the count, never wrong, the end-of-run return pass (same item, scored once), "skipped" in the teacher's results, the
+        // teacher's off; a fixed mult_facts run, planned once per --skill run, at the widths of tests/lib/ws-screen-widths.cjs
+        add(gate('skip', 'ws-skip (SKIP-RETURN / SKIP-NOT-WRONG / SKIP-BTN / SKIP-COUNT / SKIP-RESULTS / SKIP-OFF: card, worksheet, quiz, MAP)', 'card, worksheet, quiz, MAP × 820 / 1024 / 1280 / 1366', 'browser', 'ws-skip', [], { missingMsg: 'ws-skip is not in this tree' }));
+        // lf-hosts skip critic r2 F3/F4 (lead-routed): a keyboard-finished practice run ends ONCE (one end screen, one session
+        // row, score = correct / total) and infinite-practice Finish counts only answered items; a fixed run at 1280
+        add(gate('end-run', 'ws-end-run (END-ONCE / END-INF: typed + Enter practice run of mult_facts and sub_word_problems ends once; Finish counts answered items)', 'practice card × 1280', 'browser', 'ws-end-run', [], { missingMsg: 'ws-end-run is not in this tree' }));
         add(gate('phone-card', 'ws-phone-card (the screen card check: practice card, worksheet and quiz at 820 / 1024 / 1280 / 1366 px: clip, first-box focus, 48 px answer boxes, real taps, focus ring, cell read)', `${scope} × 820x1180, 1024x768, 1280x900, 1366x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
         // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280, 1366, 1024 and 820 px, the lane's skills
         // only (≈ 2 s a skill a width; one browser, inside this row's slot). A skill with no options panel is skipped by

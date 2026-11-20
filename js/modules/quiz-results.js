@@ -265,7 +265,7 @@ export async function showStudentQuizDetail(resultId, testId) {
     const ansText = (qd, v) => (qd && qd.answerType === 'multi-select-check' && Array.isArray(qd.options)) ? multiSelectAnswerText(qd, v) : String(v);
     const qRow = (i, q) => {
         const a = result.answers && result.answers[i];
-        const tag = a ? (a.correct ? '<span class="tvq-tag is-strong">Right</span>' : '<span class="tvq-tag is-weak">Wrong</span>') : '<span class="tvq-tag">Skipped</span>';
+        const tag = a && !a.skipped ? (a.correct ? '<span class="tvq-tag is-strong">Right</span>' : '<span class="tvq-tag is-weak">Wrong</span>') : '<span class="tvq-tag is-skipped">Skipped</span>';
         const label = escHtml(getSkillLabel(q.skillId));
         return `<tr>
           <td data-label="Question">Q${i + 1}</td>
