@@ -146,17 +146,9 @@ function chartDataOf(data, example) {
     const fp = example.footprint || {};
     const full = fp.maxCols === 1 || Number(fp.wMm) > 93;
     if (!data) return full ? { chartWide: true, chartRow: false } : data;
-    // (an authored record: the example as MEASURED - it fits one across only, half a page is not enough - or its footprint)
-    const m2 = example.measured && example.measured[2];
-    const fullM = full || !!(m2 && m2.fits === false && example.measured[1] && example.measured[1].fits !== false);
-    // CELL-FITS (lead via lf-engine 2026-11-20): authored lesson data that does not decide `chartWide` itself was laid out by
-    // state count alone - four states, a 2 x 2 grid - so a full-width drawing (two_step_letter_equation's story, bars and
-    // "= n" equation) was squeezed into a half-width panel and ran past the page edge. A cell that needs full width gets a
-    // full-width panel: such a record takes the full-width rows. A record that sets chartWide (true or false) is unchanged.
-    // (`chartFull`, a CHART-only flag: one panel a row, the panel's variant still the one its state count gives - chartLayout -
-    // so the panels the host measured before the example was measured are the panels drawn; `chartWide` would also change
-    // the Guided band - we-do.js - and the panel variant, and the two-step siblings' sheets ran off the page)
-    return fullM && data.chartWide === undefined ? Object.assign({}, data, { chartFull: true }) : data;
+    // (an authored record decides chartWide itself; a drawing too wide for a half panel is chart.js chartPage's to see -
+    // chartFull - CELL-FITS 2026-11-20)
+    return data;
 }
 
 /**

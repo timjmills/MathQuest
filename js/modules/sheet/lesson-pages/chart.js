@@ -393,7 +393,16 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const header = f.header;
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n, data);
+    // CELL-FITS (lead via lf-engine 2026-11-20): the 2 x 2 chart whose panels do not fit the page even at zoom 1, and whose
+    // drawings the host measured to fit one across but not two (two_step_letter_equation: story, bars and "= n" equation), was
+    // drawn at zoom 1 anyway - squeezed into half-width panels, past the page edge into the Say band and the footer, while its
+    // sizing said ok. It takes `chartFull`, one full-width panel a row (the panels run onto further chart pages below when
+    // needed). A 2 x 2 chart that fits is unchanged, whatever its drawings measure.
+    const lay0 = chartLayout(n, data);
+    const halfTooNarrow = (d) => !!(d && d.measured && d.measured[2] && d.measured[2].fits === false && d.measured[1] && d.measured[1].fits !== false);
+    const room0 = m.body - m.say - (data && data.chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0) - 2 - (tailItem ? Math.max(12, hOf(tailItem, 1)) + 4 * lay0.rows : 0);
+    const overfull2 = lay0.cols === 2 && lay0.rows * Math.max(...states.map((st) => hOf(st, 2) + 1)) > room0;
+    const lay = overfull2 && draws.some(halfTooNarrow) ? chartLayout(n, Object.assign({}, data || {}, { chartFull: true })) : lay0;
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
