@@ -13,6 +13,8 @@
 //   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes M,L (S dropped 2026-11-13); seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
 //   WHITE-ROW (critic lf-engine-rowcap-s2 F4/F5): a one-page Review / Test / Error Analysis under its ceiling leaves at most one row of
 //     white under its last row (rows count at the cap); --no-white-row turns it off.
+//     ROLE-CAPPED REVIEW (lead ruling 2026-11-20): a one-page Review AT its ceiling is role-capped (its length is the teacher's
+//     choice); its white is reported by name (`role-capped ...`), never failed and never passed silently.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -129,7 +131,7 @@ const ALLOW = new Set(list(arg('allow', '')));
         for (const [role, file] of [['review', 'review.js'], ['test', 'test.js'], ['error-analysis', 'error-analysis.js']]) {
             try { const m = /const CEILING = \{([^}]*)\}/.exec(fs.readFileSync(path.join(H.ROOT, 'js/modules/sheet/roles', file), 'utf8')); if (m) ceilOf[role] = Object.fromEntries([...m[1].matchAll(/([SML])\s*:\s*(\d+)/g)].map((x) => [x[1], Number(x[2])])); } catch (e) { /* no ceiling: not judged */ }
         }
-        const keys = Object.keys(now).filter((k) => { const [sk, role, size] = k.split(' '); const v = now[k]; return !v.na && !v.opts && !v.optProbe && inFilter(sk) && ceilOf[role] && Number(v.pages) === 1 && v.items < (ceilOf[role][size] || Infinity); });
+        const keys = Object.keys(now).filter((k) => { const [sk, role, size] = k.split(' '); const v = now[k]; return !v.na && !v.opts && !v.optProbe && inFilter(sk) && ceilOf[role] && Number(v.pages) === 1 && (v.items < (ceilOf[role][size] || Infinity) || role === 'review'); });   // (a Review AT its ceiling: ROLE-CAPPED REVIEW, reported below)
         if (keys.length) {
             const app2 = await H.open({});
             const sh = await app2.browser.newPage();
@@ -164,6 +166,9 @@ const ALLOW = new Set(list(arg('allow', '')));
                 // (one more row FITS when the white holds it with the roles' own room - 1.15 x its height, the Error Analysis / Guided need -
                 // plus the grid's rules; a story row of 112 mm under 120 mm of white does not)
                 const more = w && w.whiteMm > 1.15 * w.rowMm + 3;
+                // ROLE-CAPPED REVIEW (lead ruling 2026-11-20): a Review AT its ceiling with a row of white left is accepted - its length is
+                // the teacher's choice - and reported by name, never passed silently
+                if (more && role === 'review' && now[k].items + Math.max(1, w.perRow) > ceilOf[role][size]) console.log(`  role-capped ${k}: WHITE-ROW ${w.whiteMm} mm at the review ceiling ${ceilOf[role][size]} (ROLE-CAPPED REVIEW, lead 2026-11-20: a review's length is the teacher's choice)`);
                 if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size] && known) console.log(`  known ${k}: WHITE-ROW ${w.whiteMm} mm (${known})`);
                 else if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size]) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
             }
