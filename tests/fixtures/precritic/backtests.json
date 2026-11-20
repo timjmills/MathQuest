@@ -12238,6 +12238,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-fill",
+   "check": "ws-lesson-fill LESSON-FILL: a lesson's Practice over two pages never leaves a page more white than the next page's first item needs (+ 2 mm). lf-placevalue vocab deploy blocker 2: follow_given_rule / number_patterns_rule lesson p3-p4 at M and L - the [6, 2] shape clamped to 1 column took the 1-column target of 4 rows and was never filled (PAGE FILL skipped a clamped section and a grid under the step strip): p3 82-121 mm white, p4 2 more items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-fill LESSON-FILL (precritic gate lesson-fill)",
+   "browser": true,
+   "fail": {
+    "commit": "414a0e108",
+    "state": "Practice 2 pages at seed 4242 (M / L, both lessons): 4 FAIL"
+   },
+   "pass": {
+    "commit": "d79fb5d7d",
+    "state": "fillClamped: Practice 1 page of 6 under its step strip"
+   },
+   "command": "node tests/scripts/ws-lesson-fill.cjs --lessons patterns:follow_given_rule,patterns:number_patterns_rule --sizes M,L --seeds 4242",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
