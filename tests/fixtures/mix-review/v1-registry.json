@@ -6,7 +6,7 @@
    "code": "AA",
    "grade": "K",
    "area": "CC",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "counting:count_sequence",
@@ -20,7 +20,7 @@
    "code": "AC",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "counting:mixed_counting",
@@ -34,7 +34,7 @@
    "code": "AD",
    "grade": "K",
    "area": "CC",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "comparing:compare_objects",
@@ -48,14 +48,14 @@
    "code": "AF",
    "grade": "K",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:number_bonds",
    "code": "AG",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:make_ten",
@@ -69,28 +69,28 @@
    "code": "AJ",
    "grade": "K",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:tens_foundation_visual",
    "code": "AK",
    "grade": "K",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:hundreds_chart_fill",
    "code": "AL",
    "grade": "1",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "composing:ten_frame_build",
    "code": "AM",
    "grade": "K",
    "area": "CC",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:ten_frame_build_teen",
@@ -104,7 +104,7 @@
    "code": "AP",
    "grade": "1",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:base10_regroup",
@@ -125,42 +125,42 @@
    "code": "AS",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:select_even_odd",
    "code": "AT",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:number_word_form",
    "code": "AU",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "composing:fraction_number_line",
    "code": "AV",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:whole_as_fraction",
    "code": "AW",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "composing:compose_whole",
    "code": "AX",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "composing:mixed_composing",
@@ -174,84 +174,84 @@
    "code": "U9",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "composing:write_numbers_in_words",
    "code": "Y5",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "composing:chart_to_120",
    "code": "ZG",
    "grade": "1",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "addition:add_facts",
    "code": "AY",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "addition:add_sub_10s",
    "code": "AZ",
    "grade": "1",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "addition:add_sub_100s",
    "code": "A2",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "addition:add",
    "code": "A3",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "addition:add_word_problems",
    "code": "A4",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_word_problems_plain",
    "code": "A5",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_sub_fact_family",
    "code": "A6",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "text"
   },
   {
    "id": "addition:number_families_add",
    "code": "A7",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "text"
   },
   {
    "id": "addition:add_three",
    "code": "BA",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:comparison_word",
@@ -272,7 +272,7 @@
    "code": "BD",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "addition:add_10_no_regroup",
@@ -321,280 +321,280 @@
    "code": "BL",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_50_regroup",
    "code": "BM",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_50_mixed",
    "code": "BN",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_100_no_regroup",
    "code": "BP",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_100_regroup",
    "code": "BQ",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_100_mixed",
    "code": "BR",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_1k_no_regroup",
    "code": "BS",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_1k_regroup",
    "code": "BT",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_1k_mixed",
    "code": "BU",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_10k_no_regroup",
    "code": "BV",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_10k_regroup",
    "code": "BW",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_10k_mixed",
    "code": "BX",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_100k_no_regroup",
    "code": "BY",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_100k_regroup",
    "code": "BZ",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_100k_mixed",
    "code": "B2",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_1m_no_regroup",
    "code": "B3",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_1m_regroup",
    "code": "B4",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_1m_mixed",
    "code": "B5",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_wp_10",
    "code": "B6",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_10_plain",
    "code": "B7",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_20",
    "code": "B8",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_20_plain",
    "code": "B9",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_50",
    "code": "CA",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_50_plain",
    "code": "CB",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_100",
    "code": "CC",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_100_plain",
    "code": "CD",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_1k",
    "code": "CE",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_1k_plain",
    "code": "CF",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_10k",
    "code": "CG",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_10k_plain",
    "code": "CH",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_100k",
    "code": "CJ",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_100k_plain",
    "code": "CK",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_1m",
    "code": "CL",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:add_wp_1m_plain",
    "code": "CM",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:nl_add",
    "code": "CN",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "addition:number_line_add",
    "code": "CP",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "addition:cloze_addition",
    "code": "CQ",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "addition:mixed_addition",
    "code": "SF",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_column_multi",
    "code": "T6",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:add_missing_digit",
    "code": "T7",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "addition:fact_family_sort",
@@ -608,42 +608,42 @@
    "code": "CR",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "subtraction:subtract",
    "code": "CS",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "subtraction:sub_word_problems",
    "code": "CT",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_word_problems_plain",
    "code": "CU",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:missing_add_sub",
    "code": "CV",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "subtraction:sub_5_pictures",
    "code": "CW",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "subtraction:unknown_start_wp",
@@ -699,252 +699,252 @@
    "code": "C6",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_50_regroup",
    "code": "C7",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_50_mixed",
    "code": "C8",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_100_no_regroup",
    "code": "C9",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_100_regroup",
    "code": "DA",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_100_mixed",
    "code": "DB",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_1k_no_regroup",
    "code": "DC",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_1k_regroup",
    "code": "DD",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_1k_mixed",
    "code": "DE",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_10k_no_regroup",
    "code": "DF",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_10k_regroup",
    "code": "DG",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_10k_mixed",
    "code": "DH",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_100k_no_regroup",
    "code": "DJ",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_100k_regroup",
    "code": "DK",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_100k_mixed",
    "code": "DL",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_1m_no_regroup",
    "code": "DM",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_1m_regroup",
    "code": "DN",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_1m_mixed",
    "code": "DP",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_wp_10",
    "code": "DQ",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_10_plain",
    "code": "DR",
    "grade": "K",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_20",
    "code": "DS",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_20_plain",
    "code": "DT",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_50",
    "code": "DU",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_50_plain",
    "code": "DV",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_100",
    "code": "DW",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_100_plain",
    "code": "DX",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_1k",
    "code": "DY",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_1k_plain",
    "code": "DZ",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_10k",
    "code": "D2",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_10k_plain",
    "code": "D3",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_100k",
    "code": "D4",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_100k_plain",
    "code": "D5",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_1m",
    "code": "D6",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_1m_plain",
    "code": "D7",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:nl_sub",
    "code": "D8",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "subtraction:number_line_sub",
    "code": "D9",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "subtraction:mixed_add_sub",
@@ -958,7 +958,7 @@
    "code": "SH",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_across_zeros",
@@ -972,7 +972,7 @@
    "code": "UA",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "subtraction:sub_check_by_adding",
@@ -986,140 +986,140 @@
    "code": "VT",
    "grade": "1",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_wp_start_unknown",
    "code": "VU",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "subtraction:sub_2d_1d",
    "code": "Y6",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "multiplication:mult_facts",
    "code": "EA",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "multiplication:multiply",
    "code": "EB",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "multiplication:arrays_groups",
    "code": "EC",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:dot_array_mult",
    "code": "ED",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_properties",
    "code": "EE",
    "grade": "3",
    "area": "OA",
-   "kind": "arrays-turn"
+   "kind": "legacy"
   },
   {
    "id": "multiplication:mult_word_problems",
    "code": "EF",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "multiplication:mult_word_problems_plain",
    "code": "EG",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "multiplication:mult_comparison",
    "code": "EH",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "multiplication:mult_comparison_plain",
    "code": "EJ",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "multiplication:area_model_mult",
    "code": "EK",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:area_model_mult_hard",
    "code": "EL",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_div_fact_family",
    "code": "EM",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "text"
   },
   {
    "id": "multiplication:number_families_mult",
    "code": "EN",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "text"
   },
   {
    "id": "multiplication:mult_chart",
    "code": "ER",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_chart_easy",
    "code": "ES",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:nl_mult",
    "code": "EV",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "multiplication:mixed_multiplication",
    "code": "SJ",
    "grade": "M",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "text"
   },
   {
    "id": "multiplication:repeated_add_to_mult",
@@ -1154,56 +1154,56 @@
    "code": "UG",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "multiplication:count_by_tables",
    "code": "UU",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:mult_2by1_column",
    "code": "VA",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "multiplication:mult_3by1_column",
    "code": "VB",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "multiplication:mult_2by2_standard",
    "code": "VC",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "multiplication:mult_chart_shade",
    "code": "VD",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_chart_pattern",
    "code": "VE",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_chart_headers",
    "code": "VF",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_multiples_of_ten",
@@ -1217,35 +1217,35 @@
    "code": "VV",
    "grade": "3",
    "area": "OA",
-   "kind": "arrays-turn"
+   "kind": "legacy"
   },
   {
    "id": "multiplication:area_model_2by1",
    "code": "VW",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:area_model_3by1",
    "code": "VX",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_arrays",
    "code": "V2",
    "grade": "2",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_equal_groups",
    "code": "V3",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "multiplication:mult_by_ten",
@@ -1266,91 +1266,91 @@
    "code": "V6",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_3s",
    "code": "V7",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_4s",
    "code": "V8",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_5s",
    "code": "V9",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_6s",
    "code": "WA",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_7s",
    "code": "WB",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_8s",
    "code": "WC",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_9s",
    "code": "WD",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_10s",
    "code": "WE",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_11s",
    "code": "WF",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:count_by_12s",
    "code": "WG",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "multiplication:mult_facts_15",
    "code": "ZH",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "division:div_facts",
    "code": "EW",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "division:divide",
@@ -1364,35 +1364,35 @@
    "code": "EY",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "division:div_word_problems",
    "code": "EZ",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "division:div_word_problems_plain",
    "code": "E2",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "division:remainder_interpret",
    "code": "E3",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "division:remainder_contexts",
    "code": "E4",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "division:box_division_easy",
@@ -1413,56 +1413,56 @@
    "code": "E7",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "division:area_model_div_3by1",
    "code": "E8",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "division:long_div_2digit",
    "code": "E9",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "division"
   },
   {
    "id": "division:missing_mult_div",
    "code": "FA",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "division:nl_div",
    "code": "FB",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "division:mixed_mult_div",
    "code": "SK",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "fact"
   },
   {
    "id": "division:mixed_division",
    "code": "SL",
    "grade": "M",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "division:share_into_groups",
    "code": "UH",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "division:div_equation_parts",
@@ -1476,7 +1476,7 @@
    "code": "UK",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "division:remainder_too_big",
@@ -1504,56 +1504,56 @@
    "code": "VJ",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "division"
   },
   {
    "id": "division:div_3by1_long",
    "code": "VK",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "division"
   },
   {
    "id": "division:div_4by1_long",
    "code": "VL",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "division"
   },
   {
    "id": "division:div_3by2_long",
    "code": "VM",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "division"
   },
   {
    "id": "division:div_sharing_word_problems",
    "code": "WJ",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "division:div_grouping_word_problems",
    "code": "WK",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "division:div_facts_long",
    "code": "ZF",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "division"
   },
   {
    "id": "division:div_facts_15",
    "code": "ZJ",
    "grade": "5",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "integers:number_line_int",
@@ -1574,14 +1574,14 @@
    "code": "FE",
    "grade": "6",
    "area": "RPNS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "integers:sub_int",
    "code": "FF",
    "grade": "6",
    "area": "RPNS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "integers:order_negatives",
@@ -1595,7 +1595,7 @@
    "code": "FH",
    "grade": "6",
    "area": "RPNS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "integers:mixed_integers",
@@ -1630,14 +1630,14 @@
    "code": "WM",
    "grade": "6",
    "area": "RPNS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "integers:sub_negative",
    "code": "WN",
    "grade": "6",
    "area": "RPNS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "number_ops_mixed:mixed",
@@ -1651,14 +1651,14 @@
    "code": "FM",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "number_ops_mixed:word_problems_mixed_plain",
    "code": "FN",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "number_ops_mixed:number_families_mixed",
@@ -1679,42 +1679,42 @@
    "code": "UP",
    "grade": "M",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "number_ops_mixed:missing_factor_or_addend",
    "code": "UQ",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "equation"
   },
   {
    "id": "fractions:identify",
    "code": "FS",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:write_fraction",
    "code": "FT",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:shade_fraction",
    "code": "FU",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:equiv_frac_visual",
    "code": "FV",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:equiv_frac_nv",
@@ -1756,7 +1756,7 @@
    "code": "F3",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:simplify",
@@ -1868,42 +1868,42 @@
    "code": "GH",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "fractions:mixed_nl_drag",
    "code": "SS",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "fractions:compare_to_half",
    "code": "VN",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:identify_fraction_nl",
    "code": "WP",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:write_fraction_nl",
    "code": "WQ",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:compare_fractions_nl",
    "code": "WR",
    "grade": "3",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fractions:equivalent_or_not",
@@ -1924,35 +1924,35 @@
    "code": "GJ",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:sub_fractions_like",
    "code": "GK",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:add_mixed_like",
    "code": "GL",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:sub_mixed_like",
    "code": "GM",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:mult_frac_whole",
    "code": "GN",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:decompose_fractions",
@@ -1987,28 +1987,28 @@
    "code": "GT",
    "grade": "5",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:sub_frac_unlike",
    "code": "GU",
    "grade": "5",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:add_mixed_unlike",
    "code": "GV",
    "grade": "5",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:sub_mixed_unlike",
    "code": "GW",
    "grade": "5",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:add_frac_like_nv",
@@ -2127,14 +2127,14 @@
    "code": "HF",
    "grade": "5",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:div_unit_fraction",
    "code": "HG",
    "grade": "5",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "fraction_operations:frac_as_division",
@@ -2274,7 +2274,7 @@
    "code": "HZ",
    "grade": "4",
    "area": "NF",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "decimals:mixed_decimals",
@@ -2568,7 +2568,7 @@
    "code": "JZ",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "area_perimeter:area_unit_squares",
@@ -2960,133 +2960,133 @@
    "code": "KY",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_half_hour",
    "code": "KZ",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_quarter",
    "code": "K2",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_5min",
    "code": "K3",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_1min",
    "code": "K4",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_analog_digital",
    "code": "K5",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_match_clock",
    "code": "K6",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:order_clocks_analog_asc",
    "code": "K7",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:order_clocks_analog_desc",
    "code": "K8",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:order_clocks_digital_asc",
    "code": "K9",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:order_clocks_digital_desc",
    "code": "LA",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:elapsed_30min",
    "code": "LB",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_hour",
    "code": "LC",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_15min",
    "code": "LD",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_mixed",
    "code": "LE",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_find_duration",
    "code": "LF",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_visual_easy",
    "code": "LG",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_visual_medium",
    "code": "LH",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:elapsed_visual_hard",
    "code": "LJ",
    "grade": "4",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:heavier_lighter_visual",
@@ -3100,70 +3100,70 @@
    "code": "LL",
    "grade": "1",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:bar_graph_intro",
    "code": "LM",
    "grade": "K",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:reading_ruler",
    "code": "LN",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:reading_ruler_hard",
    "code": "LP",
    "grade": "3",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:money_count",
    "code": "LQ",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:money",
    "code": "LR",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "measurement:equiv_coin_sets",
    "code": "LS",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:enough_money",
    "code": "LT",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:make_change_least_coins",
    "code": "LU",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:temperature",
    "code": "LV",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:capacity",
@@ -3219,84 +3219,84 @@
    "code": "S8",
    "grade": "M",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:mixed_time",
    "code": "S9",
    "grade": "M",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:clock_parts",
    "code": "UW",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_fives_ring",
    "code": "UX",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:time_sense",
    "code": "UY",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:elapsed_find_start",
    "code": "UZ",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:coin_value",
    "code": "U2",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:money_notation",
    "code": "U3",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:money_change",
    "code": "U4",
    "grade": "3",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "stack"
   },
   {
    "id": "measurement:money_compare",
    "code": "U5",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:count_notes",
    "code": "XQ",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:count_notes_and_coins",
    "code": "XR",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:convert_feet_to_inches",
@@ -3359,35 +3359,35 @@
    "code": "X2",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:minutes_by_fives_all",
    "code": "Y4",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "measurement:order_notes",
    "code": "X3",
    "grade": "1",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "measurement:money_amount_in_words",
    "code": "X4",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "graphs:bar_graph",
    "code": "L5",
    "grade": "3",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "graphs:build_bar_graph",
@@ -3401,7 +3401,7 @@
    "code": "L7",
    "grade": "3",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "graphs:build_pictograph",
@@ -3415,7 +3415,7 @@
    "code": "L9",
    "grade": "2",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "graphs:line_plot",
@@ -3457,21 +3457,21 @@
    "code": "X5",
    "grade": "3",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "graphs:bar_graph_how_many_more",
    "code": "X6",
    "grade": "3",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "graphs:tally_how_many_more",
    "code": "X7",
    "grade": "2",
    "area": "DATA",
-   "kind": "legacy"
+   "kind": "visual-full"
   },
   {
    "id": "data_analysis:mean",
@@ -3667,35 +3667,35 @@
    "code": "UV",
    "grade": "3",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "patterns:notice_patterns",
    "code": "ZW",
    "grade": "3",
    "area": "OA",
-   "kind": "choice"
+   "kind": "text"
   },
   {
    "id": "patterns:growing_shape_patterns",
    "code": "ZX",
    "grade": "4",
    "area": "OA",
-   "kind": "picture"
+   "kind": "visual-full"
   },
   {
    "id": "patterns:pattern_features",
    "code": "ZY",
    "grade": "4",
    "area": "OA",
-   "kind": "choice"
+   "kind": "text"
   },
   {
    "id": "patterns:follow_given_rule",
    "code": "ZZ",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "count-row"
   },
   {
    "id": "algebra:tape_diagram",
@@ -3800,7 +3800,7 @@
    "code": "NK",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "algebra:algebra_word_mixed_plain",
@@ -4080,154 +4080,154 @@
    "code": "N6",
    "grade": "1",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:more_less_100",
    "code": "N7",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:place_value_disks",
    "code": "N8",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:pv_disks_build",
    "code": "N9",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:pv_digit_drag",
    "code": "PA",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:number_word_names",
    "code": "PB",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:place_value_10x",
    "code": "PC",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:identify",
    "code": "PD",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:value",
    "code": "PE",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:compare",
    "code": "PF",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:expand",
    "code": "PG",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:combine",
    "code": "PH",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:order_least_to_greatest",
    "code": "PJ",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:order_greatest_to_least",
    "code": "PK",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:mixed_placevalue",
    "code": "TL",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:unit_form",
    "code": "UR",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:expanded_notation",
    "code": "VP",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:digit_value_unit_form",
    "code": "YP",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:digit_value_notation",
    "code": "YQ",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:count_pv_disks",
    "code": "YR",
    "grade": "2",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:ten_times_value",
    "code": "Y7",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:one_tenth_value",
    "code": "Y8",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "placevalue:ten_times_story",
@@ -4241,147 +4241,147 @@
    "code": "PL",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:nearest_10",
    "code": "PM",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:nearest_100",
    "code": "PN",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:nearest_1000",
    "code": "PP",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:nearest_10000",
    "code": "PQ",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:nearest_100000",
    "code": "PR",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:nearest_million",
    "code": "PS",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_10",
    "code": "PT",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_100",
    "code": "PU",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_1000",
    "code": "PV",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_10000",
    "code": "PW",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_100000",
    "code": "PX",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_million",
    "code": "PY",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_tenths",
    "code": "PZ",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_sort_hundredths",
    "code": "P2",
    "grade": "5",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:estimate_sum",
    "code": "P3",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:estimate_diff",
    "code": "P4",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:estimate_sums_diffs",
    "code": "P5",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:estimate_products",
    "code": "P6",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:estimate_quotient",
    "code": "P7",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:rounding_table",
    "code": "P8",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:make_a_ten",
@@ -4409,42 +4409,42 @@
    "code": "TM",
    "grade": "M",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:between_tens",
    "code": "US",
    "grade": "3",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:place_on_number_line",
    "code": "UT",
    "grade": "2",
    "area": "MEAS",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_nl_thousands",
    "code": "U6",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_nl_ten_thousands",
    "code": "U7",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:round_nl_hundred_thousands",
    "code": "U8",
    "grade": "4",
    "area": "NBT",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_sense:near_doubles",
@@ -4458,7 +4458,7 @@
    "code": "YU",
    "grade": "4",
    "area": "OA",
-   "kind": "legacy"
+   "kind": "visual-half"
   },
   {
    "id": "number_theory:prime_composite",
@@ -4948,14 +4948,14 @@
    "code": "VS",
    "grade": "M",
    "area": "WORDS",
-   "kind": "legacy"
+   "kind": "word-work"
   },
   {
    "id": "vocabulary:vocab_pick3_words",
    "code": "VZ",
    "grade": "M",
    "area": "WORDS",
-   "kind": "legacy"
+   "kind": "word-work"
   }
  ]
 }

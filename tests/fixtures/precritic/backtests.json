@@ -12333,6 +12333,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mix-review-kinds",
+   "check": "lead ruling 2026-11-20 (footprint kinds): a pool row's kind is the kind of the template its skill DRAWS (js/modules/mixed-review-templates.js through V1's frozen TEMPLATE_KIND), never the provider footprint while a drawn template is recorded; every live row is recorded and every drawn template has a TEMPLATE_KIND row",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check pool",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/pool/fail/pool-kind-footprint.json",
+    "state": "the 95f13b7b rows: kinds from the provider footprint (689 of 708 legacy)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/pool/pass",
+    "state": "rows from the drawn templates (373 legacy of 708; typical 616, wide 73, compact 19)"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check pool --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

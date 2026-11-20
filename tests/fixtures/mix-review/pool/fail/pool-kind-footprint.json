@@ -1,0 +1,1 @@
+{"check":"pool","state":"pool-kind-footprint","module":"pool","expect":"fail","catchState":"pool-kind-footprint","rowsKindFrom":"footprint","note":"lead ruling 2026-11-20 (footprint kinds): the 95f13b7b rows took the PROVIDER footprint kind (689 of 708 legacy) where a drawn template exists"}

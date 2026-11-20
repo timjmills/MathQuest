@@ -11,6 +11,8 @@
 //   node tests/scripts/ws-mix-review.mjs --pin                    # build step 2 ONCE: generate the frozen V1 table from the live
 //                                                                 # registry (append-only after: an existing row never changes),
 //                                                                 # pin the four V1 files by sha256, regenerate the golden codes
+//   node tests/scripts/ws-mix-review.mjs --pin --reclass          # the same, letting an existing row change ONLY its kind (lead
+//                                                                 # ruling 2026-11-20: allowed while no V1 code has shipped)
 //
 // The Node cores ARE check-v1's properties (design/cards/mixed-review/proto/check-v1.mjs), run on the PRODUCT dealer
 // js/modules/mixed-review.js through check-v1's `configure()` (card §9b step 1, §10 L8):
@@ -111,6 +113,19 @@ async function statePool(fx) {
     for (const r of rows) {
         if ('fc' in r) { v.push(`pool-row-fc: ${r.id} carries fc ${r.fc} (a class), not its footprint kind`); break; }
         if (!KIND_OK(D, r.kind)) { v.push(`pool-row-fc: ${r.id} kind ${J(r.kind)} is not a footprint kind`); break; }
+    }
+    // lead ruling 2026-11-20 ("footprint kinds"): a row's kind is the kind of the template its skill DRAWS, never the provider
+    // footprint while a drawn template is recorded; every live row is recorded; every drawn template has a frozen TEMPLATE_KIND row
+    const T = await mod('js/modules/mixed-review-templates.js');
+    if (!T || T.__error || !D.TEMPLATE_KIND) v.push('pool-kind-footprint: js/modules/mixed-review-templates.js or V1 TEMPLATE_KIND is missing');
+    else {
+        const drawn = T.DRAWN_TEMPLATES;
+        if (fx.rowsKindFrom === 'footprint') rows = rows.map((r) => ({ ...r, kind: P.footprintKind(...r.id.split(':')) }));
+        for (const t of new Set(Object.values(drawn))) if (!(t in D.TEMPLATE_KIND)) { v.push(`pool-kind-footprint: drawn template ${t} has no frozen TEMPLATE_KIND row`); break; }
+        for (const r of rows) {
+            if (!(r.id in drawn)) { v.push(`pool-kind-footprint: ${r.id} has no drawn template recorded (run node tests/scripts/ws-mix-review-templates.cjs)`); break; }
+            if (r.kind !== D.kindOfTemplate(drawn[r.id])) { v.push(`pool-kind-footprint: ${r.id} kind ${r.kind} is not the kind of its drawn template ${drawn[r.id]} (${D.kindOfTemplate(drawn[r.id])})`); break; }
+        }
     }
     // L5: every row's code is its frozen share code
     for (const r of rows) if (r.code !== FROZEN[r.id]) { v.push(`pool-code-unfrozen: ${r.id} code ${r.code} != FROZEN_SKILL_CODES ${FROZEN[r.id]}`); break; }
@@ -262,6 +277,9 @@ async function pin() {
     const old = existsSync(tf) ? JSON.parse(readFileSync(tf, 'utf8')).rows : [];
     const live = c.P.poolRows().map((r) => ({ id: r.id, code: r.code, grade: r.grade, area: r.area, kind: r.kind }));
     const byId = new Map(old.map((r) => [r.id, r]));
+    const reclass = args.includes('--reclass');       // lead ruling 2026-11-20: kinds re-derived BEFORE any V1 code ships
+    if (reclass) for (const r of live) { const o = byId.get(r.id); if (o && J({ ...o, kind: r.kind }) === J(r)) byId.set(r.id, r); }
+    if (reclass) for (let i = 0; i < old.length; i++) old[i] = byId.get(old[i].id);
     for (const r of live) { const o = byId.get(r.id); if (o && J(o) !== J(r)) { console.log(`${TOOL}: FAIL (--pin: frozen row ${r.id} would change ${J(o)} -> ${J(r)}; append-only, a change ships as V2)`); return 1; } }
     const rows = [...old, ...live.filter((r) => !byId.has(r.id))];
     writeFileSync(tf, JSON.stringify({ note: 'FROZEN V1 TABLE (card §9b step 2, §10 L4 / L5): code -> {id, kind, grade, area} of every live skill outside MIXED / NOSTD, generated ONCE by `node tests/scripts/ws-mix-review.mjs --pin` from mixed-review-pool.js poolRows (code = FROZEN_SKILL_CODES[id]; kind = the provider footprint kind as is; grade = data.js getSkillGrade, M when none). A V1 code replays through this table only, never the live registry. Append-only: a new skill appends a row; no row changes. Pinned by sha256 in frozen.json.', rows }, null, 1) + '\n');

@@ -953,6 +953,9 @@ const POOL_ONE_LOOK = true;
 /** How many draws a pool slot passes over a legacy-look member before it keeps one. */
 const POOL_LEGACY_TRIES = 16;
 /** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
+/** The template a sheet DRAWS for a generated question, as hostItem resolves it (kitCellSpec, then a number family; else
+ *  legacy). The mixed-review pool classes a skill by it (lead ruling 2026-11-20; ws-mix-review-templates.cjs). */
+export function drawnTemplateOf(q) { const r = q && (kitCellSpec(q) || numberFamilySpec(q)); return (r && r.template) || 'legacy'; }
 const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
 
 /* CROSS-GIVEAWAY (chart_120 critic r1 F4 / F9; r2 N2): the window rule lives in chart-giveaway.js, shared with the screen deal
