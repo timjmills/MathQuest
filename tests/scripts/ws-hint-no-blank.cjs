@@ -38,6 +38,7 @@ const CATEGORY = arg('category', '');
 const N_SEEDS = Math.max(1, parseInt(arg('seeds', '4'), 10) || 4);
 const REPORT_ONLY = has('report-only');
 const VERBOSE = has('verbose');
+const SHOW_LISTS = has('lists');   // print the HELP-EMPTY and SAYLESS skill lists as JSON (to re-pin when they shrink)
 
 // The blank detector, shared with the page (serialised as source).
 const BLANK_SRC = String.raw`(_{2,})|(\{[A-Za-z][\w.]*\})|([□☐▢])|((?:^|[\s(=+\-−×÷*/:,])\?(?=\s*(?:$|[=+\-−×÷*/),.;]|\s(?:[=+\-−×÷]|and|or)\b)))`;
@@ -54,6 +55,52 @@ const EMPTY_PIN = ['algebra:build_expr_multdiv', 'angles_lines:identify_angles',
     'shapes_classify:classify_triangles', 'shapes_classify:cross_section_3d', 'shapes_classify:mixed_shapes',
     'shapes_classify:net_identify'];
 
+// (filled from the first run of the option-3 fix, 2026-11-20; owner lanes in design/status/lf-placevalue.md)
+const SAYLESS_PIN = ['addition:add_sub_fact_family', 'addition:cloze_addition', 'addition:fact_family_sort',
+    'addition:nl_add', 'algebra:function_table_easy', 'algebra:function_table_find_inputs',
+    'algebra:function_table_find_rule', 'algebra:function_table_hard', 'algebra:two_step_estimate_check',
+    'algebra:two_step_letter_equation', 'comparing:compare_groups', 'composing:base10_build',
+    'composing:base10_build_hundreds', 'composing:chart_to_120', 'composing:compose_whole',
+    'composing:fraction_number_line', 'composing:hundreds_chart_fill', 'composing:odd_even',
+    'composing:ten_frame_build_teen', 'composing:whole_as_fraction', 'decimals:decimal_nl_drag',
+    'division:div_remainders', 'fraction_operations:add_frac_unlike', 'fraction_operations:add_fractions_like',
+    'fraction_operations:add_mixed_like', 'fraction_operations:add_mixed_unlike',
+    'fraction_operations:div_unit_fraction', 'fraction_operations:mult_frac_frac',
+    'fraction_operations:mult_frac_whole', 'fraction_operations:sub_frac_unlike',
+    'fraction_operations:sub_fractions_like', 'fraction_operations:sub_mixed_like',
+    'fraction_operations:sub_mixed_unlike', 'fractions:compare', 'fractions:compare_fractions_nl',
+    'fractions:compare_to_half', 'fractions:equiv_frac_visual', 'fractions:fraction_nl_drag', 'fractions:identify',
+    'fractions:identify_fraction_nl', 'fractions:mixed_nl_drag', 'fractions:write_fraction',
+    'fractions:write_fraction_nl', 'integers:integer_nl_drag', 'measurement:clock_parts', 'measurement:coin_value',
+    'measurement:count_notes_and_coins', 'measurement:elapsed_15min', 'measurement:elapsed_30min',
+    'measurement:elapsed_find_duration', 'measurement:elapsed_find_start', 'measurement:elapsed_hour',
+    'measurement:elapsed_mixed', 'measurement:elapsed_visual_easy', 'measurement:elapsed_visual_hard',
+    'measurement:elapsed_visual_medium', 'measurement:enough_money', 'measurement:minutes_by_fives_all',
+    'measurement:money', 'measurement:money_change', 'measurement:money_compare', 'measurement:time_fives_ring',
+    'measurement:time_sense', 'multiplication:arrays_groups', 'multiplication:count_by_10s',
+    'multiplication:count_by_11s', 'multiplication:count_by_12s', 'multiplication:count_by_2s',
+    'multiplication:count_by_3s', 'multiplication:count_by_4s', 'multiplication:count_by_5s',
+    'multiplication:count_by_6s', 'multiplication:count_by_7s', 'multiplication:count_by_8s',
+    'multiplication:count_by_9s', 'multiplication:count_by_tables', 'multiplication:dot_array_mult',
+    'multiplication:mult_arrays', 'multiplication:mult_chart', 'multiplication:mult_chart_easy',
+    'multiplication:mult_chart_headers', 'multiplication:mult_chart_pattern', 'multiplication:mult_chart_shade',
+    'multiplication:mult_comparison', 'multiplication:mult_comparison_plain', 'multiplication:mult_equal_groups',
+    'multiplication:mult_properties', 'number_ops_mixed:word_problems_mixed',
+    'number_ops_mixed:word_problems_mixed_plain', 'number_sense:between_tens', 'number_sense:estimate_diff',
+    'number_sense:estimate_products', 'number_sense:estimate_quotient', 'number_sense:estimate_sum',
+    'number_sense:estimate_sums_diffs', 'number_sense:nearest_10', 'number_sense:nearest_100',
+    'number_sense:nearest_1000', 'number_sense:nearest_10000', 'number_sense:nearest_100000',
+    'number_sense:nearest_million', 'number_sense:reasonable_quotients', 'number_sense:round_nl_hundred_thousands',
+    'number_sense:round_nl_ten_thousands', 'number_sense:round_nl_thousands', 'number_sense:round_sort_10',
+    'number_sense:round_sort_100', 'number_sense:round_sort_1000', 'number_sense:round_sort_10000',
+    'number_sense:round_sort_100000', 'number_sense:round_sort_hundredths', 'number_sense:round_sort_million',
+    'number_sense:round_sort_tenths', 'number_sense:rounding_table', 'number_sense:rounding_visual',
+    'patterns:follow_given_rule', 'patterns:notice_patterns', 'patterns:number_patterns_rule',
+    'patterns:skip_count_grid', 'patterns:skip_count_line', 'placevalue:combine', 'placevalue:expanded_notation',
+    'placevalue:identify', 'placevalue:one_tenth_value', 'placevalue:place_value_10x', 'placevalue:place_value_disks',
+    'placevalue:pv_digit_drag', 'placevalue:ten_times_story', 'placevalue:ten_times_value',
+    'subtraction:sub_5_pictures', 'vocabulary:vocab_grade_pictures'];
+
 function exitAfterFlush(code) {
     // never process.exit straight after a long piped write (LESSONS_LEARNED 0c): the verdict line could be lost
     if (process.stdout.write('')) process.exit(code);
@@ -67,6 +114,7 @@ function exitAfterFlush(code) {
         app = await open({ seed: 1, lock: 'ws-hint-no-blank' });
         const res = await app.page.evaluate(async ({ SKILL, CATEGORY, N_SEEDS, BLANK_SRC }) => {
             const sl = await import('/js/modules/support-ladder.js');
+            const kit = await import('/js/modules/sheet/index.js');
             const gq = await import('/js/modules/generate-question.js');
             const BLANK = new RegExp(BLANK_SRC);
             const plain = (h) => String(h == null ? '' : h).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
@@ -96,7 +144,8 @@ function exitAfterFlush(code) {
                     list.push({ cat, skill: s.v });
                 }
             }
-            const offenders = []; const errors = []; const empty = new Set(); let items = 0;
+            const offenders = []; const errors = []; const empty = new Set(); const sayless = new Set(); const hiddenFail = []; let items = 0;
+            const firstEmpty = new Map();
             for (const { cat, skill } of list) {
                 const key = `${cat}:${skill}`;
                 for (let i = 0; i < N_SEEDS; i++) {
@@ -112,7 +161,13 @@ function exitAfterFlush(code) {
                     let rawSteps = '';
                     try { rawSteps = sl.workedStepsFor(Object.assign({}, q, { fullWorked: true }), ctx).join(' | '); } catch (e) { rawSteps = ''; }
                     // HELP-EMPTY: leaving the answer out must not leave "Here is how" with nothing in it
-                    if (rawSteps && !paths.some((x) => x[0] === 'STEPS')) empty.add(key);
+                    if (rawSteps && !paths.some((x) => x[0] === 'STEPS')) { empty.add(key); if (!firstEmpty.has(key)) firstEmpty.set(key, q); }
+                    // SAYLESS: the skill's provider has a Say frame, but the screen shows no Say line for this item
+                    try {
+                        const pv = kit.getProvider(cat, skill);
+                        const frame = pv && typeof pv.strings === 'function' ? String(pv.strings({ q }).say || '') : '';
+                        if (frame && !q.sayText && !sl.sayFor(q, ctx)) sayless.add(key);
+                    } catch (e) { /* no provider */ }
                     try { const s = sl.sayFor(q, ctx); if (s) paths.push(['SAY', 'say', s]); } catch (e) { errors.push(`${key} seed ${i}: sayFor threw ${e && e.message}`); }
                     if (q.hint) paths.push(['HINT', 'hint', plain(q.hint)]);
                     try {
@@ -140,7 +195,22 @@ function exitAfterFlush(code) {
                     }
                 }
             }
-            return { skills: list.length, items, offenders, errors, empty: [...empty].sort() };
+            // HELP-EMPTY-HIDDEN (lead ruling 2026-11-20): on the practice card, after three wrong answers, an item with no worked
+            // step shows NO "Here is how" box (never one holding only a Say line, never an empty one)
+            for (const [key, q] of firstEmpty) {
+                const [cat, skill] = key.split(':');
+                try {
+                    const st = window.state;
+                    st.category = cat; st.skill = skill; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+                    if (window.showView) window.showView('gameView');
+                    st.currentQ = q;
+                    window.renderQuestion();
+                    for (let k = 1; k <= 3; k++) sl.practiceLadderWrong(q, `zz${k}`);
+                    const box = document.querySelector('#questionCard .mq-ladder-worked, #visualAid .mq-ladder-worked');
+                    if (box) hiddenFail.push(`${key}: no worked step, yet a "Here is how" box is shown ("${(box.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 100)}")`);
+                } catch (e) { errors.push(`${key}: card render threw ${e && e.message}`); }
+            }
+            return { skills: list.length, items, offenders, errors, empty: [...empty].sort(), sayless: [...sayless].sort(), hiddenFail, hiddenN: firstEmpty.size };
         }, { SKILL, CATEGORY, N_SEEDS, BLANK_SRC });
 
         const byKey = new Map();
@@ -163,6 +233,15 @@ function exitAfterFlush(code) {
         res.empty.filter((k) => EMPTY_PIN.includes(k)).forEach((k) => console.log(`  pinned HELP-EMPTY ${k}: every worked step states the answer (no provider steps; owner lane to write them)`));
         newEmpty.forEach((k) => console.log(`  FAIL HELP-EMPTY ${k}: "Here is how" has no step left once the answer is left out`));
         if (newEmpty.length) code = 1;
+        // SAYLESS pin (lead ruling 2026-11-20): skills whose provider frame takes values the screen cannot fill (no sayValues,
+        // and the question's own numbers do not fit it). Shrink-only: a skill not on it that loses its Say line FAILs.
+        const newSayless = res.sayless.filter((k) => !SAYLESS_PIN.includes(k));
+        newSayless.forEach((k) => console.log(`  FAIL SAYLESS ${k}: the provider has a Say frame but the screen shows no Say line`));
+        if (newSayless.length) code = 1;
+        res.hiddenFail.forEach((f) => console.log(`  FAIL HELP-EMPTY-HIDDEN ${f}`));
+        if (res.hiddenFail.length) code = 1;
+        console.log(`ws-hint-no-blank: HELP-EMPTY ${res.empty.length} skills (pin ${EMPTY_PIN.length}), SAYLESS ${res.sayless.length} (pin ${SAYLESS_PIN.length}), HELP-EMPTY-HIDDEN ${res.hiddenN} cards checked, ${res.hiddenFail.length} showing a box`);
+        if (SHOW_LISTS) { console.log('EMPTY ' + JSON.stringify(res.empty)); console.log('SAYLESS ' + JSON.stringify(res.sayless)); }
         const kindCount = {};
         res.offenders.forEach((o) => { kindCount[o.kind] = (kindCount[o.kind] || 0) + 1; });
         console.log(`ws-hint-no-blank: ${res.skills} skills, ${res.items} items, ${keys.length} skills with a blank in their help`

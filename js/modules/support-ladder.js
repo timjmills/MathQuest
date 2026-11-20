@@ -866,6 +866,19 @@ export function workedStepsFor(q, ctx = {}) {
     return out;
 }
 
+/** The numbers the question itself shows: its operands, else the numbers of its text (q.pv.n for place value), in order. */
+function givenValues(q) {
+    if (!q) return [];
+    const bp = binaryParts(Object.assign({}, q, { options: [] }));
+    if (bp) return [String(bp.a), String(bp.b)];
+    if (Array.isArray(q.operands) && q.operands.length) return q.operands.map((v) => String(v).replace(/,/g, ''));
+    const out = [];
+    const add = (v) => { const t = String(v).replace(/,/g, ''); if (t && !out.includes(t)) out.push(t); };
+    if (q.pv && q.pv.n !== undefined) add(q.pv.n);
+    (plain(q.text || q.question).match(/\d[\d,]*(?:\.\d+)?/g) || []).forEach(add);
+    return out;
+}
+
 /** The filled Say line with the ONE value that is the answer put back as its gap; '' unless exactly one value is the answer. */
 function sayWithAnswerGap(frame, filled, q) {
     if (!filled || /_{2,}/.test(filled)) return '';
@@ -877,6 +890,10 @@ function sayWithAnswerGap(frame, filled, q) {
     const tokens = answerTokens(q, []);
     const isAns = vals.map((v) => tokens.includes(String(v).trim()) || tokens.includes(String(v).trim().replace(/,/g, '')));
     if (isAns.filter(Boolean).length !== 1) return '';
+    // (lead ruling 2026-11-20, option 3: only the numbers the question SHOWS are filled - never a part of the answer)
+    const shown = givenValues(q);
+    const qt = plain(q && (q.text || q.question)).toLowerCase();
+    if (vals.some((v, i) => !isAns[i] && !(shown.includes(String(v).trim().replace(/,/g, '')) || (!/\d/.test(v) && qt.includes(String(v).trim().toLowerCase()))))) return '';
     return parts.reduce((acc, lit, i) => acc + lit + (i < vals.length ? (isAns[i] ? '___' : vals[i]) : ''), '');
 }
 
@@ -906,11 +923,21 @@ export function sayFor(q, ctx = {}) {
         let k = 0;
         return frame.replace(/__/g, () => (k < 2 ? String(ops[k++]) : '___'));
     }
-    // HINT-NO-BLANK (2026-11-20): the frame's one gap is the answer, the pupil's to say. A frame whose other gaps are the
-    // item's GIVEN values ("___ divided by ___ equals ___" with no operands to fill) is no help on screen: not shown.
+    // HINT-NO-BLANK (2026-11-20): the frame's one gap is the answer, the pupil's to say.
     if (blanks === 1) return frame.replace(/__/g, '___');
+    // lead ruling 2026-11-20 (option 3): a provider with no sayValues - its frame takes the numbers the question SHOWS, in
+    // order, when they fill every gap but the last and the last gap closes the sentence (the answer, left for the pupil);
+    // never the answer itself. Otherwise the frame is not shown (SAYLESS, ws-hint-no-blank).
+    const shown = givenValues(q);
+    const ansT = answerTokens(q, []);
+    if (blanks > 1 && /__\s*[.!]?\s*$/.test(frame) && shown.length === blanks - 1 && !shown.some((v) => ansT.includes(v))) {
+        let k = 0;
+        return frame.replace(/__/g, () => (k < blanks - 1 ? fmtShown(shown[k++]) : '___'));
+    }
     return '';
 }
+
+const fmtShown = (v) => { const n = Number(v); return Number.isFinite(n) && Math.abs(n) >= 1000 && /^-?\d+$/.test(v) ? n.toLocaleString('en-US') : String(v); };
 
 // Listen reads the WHOLE box — every step, then the Say line — not the Say line alone (owner
 // 2026-10-04). Blanks are read as "blank" and signs as words, so speech says what the pupil sees.
@@ -932,7 +959,8 @@ function speechOfWorked(steps, say) {
 function workedHTML(q, ctx) {
     const steps = workedStepsFor(q, ctx);
     const say = sayFor(q, ctx);
-    if (!steps.length && !say) return '';
+    // lead ruling 2026-11-20 (HELP-EMPTY-HIDDEN): no worked step left, no "Here is how" box - never an empty one
+    if (!steps.length) return '';
     const voice = !!state.ttsEnabled && typeof window !== 'undefined' && 'speechSynthesis' in window;
     const spoken = speechOfWorked(steps, say);
     return `<div class="mq-ladder-worked" data-mq-ladder-on="worked" role="note" aria-label="How to do it">`
