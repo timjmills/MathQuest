@@ -3,17 +3,23 @@
 // offers a pre-skill-check page, at M and L (seed 7, the critic's), built through buildSheet and read from its PagePlan:
 //   PSC-TITLE    (D2) the page title carries no skill-id fragment: an underscore, or sub / add / mult / div followed by a digit
 //                ("Pre-skill check: subtracting sub 1k").
-//   PSC-INSTR    (D3) no two adjacent bands (in page order, across a page break too) print the same instruction ("Subtract." twice).
+//   PSC-INSTR    (D3) no two adjacent bands (in page order, across a page break too) print the same instruction ("Subtract." twice);
+//                (critic d2d5 r1 D-1) and no strip carries a parenthesised tag or a skill's label ("Write the answer: subtraction
+//                number line.", "(within 10, no pictures)"): two adjacent bands of one task kind SHARE one strip instead.
+//   PSC-STRIP1   (critic d2d5 r1 L1) every strip's instruction prints on ONE line at its width (the page's heights count one line).
+//   PSC-TWIN-MIX (critic d2d5 r1 M2) a band merged from twin pools holds items of both pools, when both have items.
 //   PSC-TWIN     (lead A10) no two bands of one plan are dealt from the same skill (twin pools merge into one band).
 //   PSC-DEAL     (D4) in one band, at most 2 items share an answer, and no turnaround pair (a + b and b + a, a x b and b x a).
 //
-//   node tests/scripts/ws-psc-lint.mjs [--skills a:b,c:d] [--sizes M,L] [--seed 7] [--only PSC-TITLE,PSC-INSTR,PSC-DEAL]
+//   Forms A and B both (critic d2d5 r1 M1: Form B's shuffle broke the sign floor).
+//
+//   node tests/scripts/ws-psc-lint.mjs [--skills a:b,c:d] [--sizes M,L] [--seeds 7,1] [--form A|B|A,B] [--only PSC-TITLE,...]
 //   node tests/scripts/ws-psc-lint.mjs --self-test          # the pure judges, no browser
 import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs';
 import { execFileSync } from 'child_process';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +33,23 @@ export const titleBad = (t) => { const m = /_|\b(?:sub|add|mult|div)\s*\d/i.exec
 export const twinSkills = (items) => { const by = new Map(); for (const it of items) { if (!it.skill) continue; const s = by.get(it.skill) || new Set(); s.add(it.pool); by.set(it.skill, s); } return [...by].filter(([, s]) => s.size > 1).map(([k]) => k); };
 /** D3: the indexes i where band i and band i + 1 print the same (non-empty) instruction. Pure. */
 export const instrRepeats = (instrs) => instrs.map((x, i) => (i && x && String(x).trim() === String(instrs[i - 1]).trim() ? i : -1)).filter((i) => i > -1);
+/** D-1: a strip's text that carries a parenthesised tag or one of `labels` (a skill label, its tag dropped), or null; a string
+ *  of the instruction library (`library`, its {n} slots filled by anything) is never a tail ("Count on (+) or back (−)."). Pure. */
+export function stripTagBad(text, labels = [], library = []) {
+    const t = String(text || '');
+    const reOf = (v) => new RegExp(`^${String(v).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\{\w+\\\}/g, '.+?')}$`);
+    if (library.some((v) => reOf(v).test(t.trim()))) return null;
+    const m = /\([^)]*\)/.exec(t);
+    if (m) return m[0];
+    const low = t.toLowerCase().replace(/\s+/g, ' ');
+    for (const l of labels) {
+        const core = String(l || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+        if (core.split(' ').length >= 2 && low.includes(core)) return core;
+    }
+    return null;
+}
+/** M2: a merged twin band's pools, from its items' pools and the pools its skill dealt; true when it mixes them. Pure. */
+export const twinMixed = (bandPools, skillPools) => skillPools.length < 2 || skillPools.every((p) => bandPools.includes(p));
 const factOf = (text) => { const m = /(\d+)\s*([+×x*])\s*(\d+)/.exec(String(text || '')); return m ? { a: +m[1], op: m[2] === '+' ? '+' : 'x', b: +m[3] } : null; };
 export const SIGN_ANS = /^"?(?:[<>=]|true|false|yes|no|True|False|Yes|No)"?$/;
 /** D4: the defects of one band's items [{text, ans}]: answers shared by 3+, turnaround pairs. Pure. */
@@ -57,6 +80,16 @@ function selfTest() {
         ['D2 clean', titleBad('Pre-skill check: subtracting within 1,000 (no regrouping)'), null],
         ['D2 "add 2-digit numbers" is a verb, not an id? (add + digit) flags', titleBad('Pre-skill check: add 2 numbers'), 'add 2'],
         ['D3 repeat', instrRepeats(['Subtract.', 'Subtract.', 'Add.']).join(), '1'],
+        ['D-1 label tail', stripTagBad('Draw the jumps on the line. Write the answer: subtraction number line.', ['Subtraction Number Line']), 'subtraction number line'],
+        ['D-1 option tag', stripTagBad('Solve: subtraction word problems (within 10, no pictures).', []), '(within 10, no pictures)'],
+        ['D-1 clean', stripTagBad('Draw the jumps on the line. Write the answer.', ['Subtraction Number Line', 'Number Line Subtraction (b&w)']), null],
+        ['D-1 one-word label is no tail', stripTagBad('Subtract.', ['Subtract']), null],
+        ['D-1 a library string with brackets is no tag', stripTagBad('Count on (+) or back (−). Write the missing numbers.', [], ['Count on (+) or back (−). Write the missing numbers.']), null],
+        ['D-1 a library string with a slot', stripTagBad('Count by 5. Write the missing numbers.', ['Count by 5s'], ['Count by {n}. Write the missing numbers.']), null],
+        ['D-1 a label-made line is no library string', stripTagBad('Subtract within 10.', ['Subtract within 10'], ['Subtract.']), 'subtract within 10'],
+        ['TWIN-MIX one pool only', twinMixed(['q2'], ['q2', 'q3']), false],
+        ['TWIN-MIX both', twinMixed(['q2', 'q3'], ['q2', 'q3']), true],
+        ['TWIN-MIX not a twin', twinMixed(['q0'], ['q0']), true],
         ['D3 none', instrRepeats(['Subtract.', 'Add.', 'Subtract.']).length, 0],
         ['TWIN two pools one skill', twinSkills([{ pool: 'q2', skill: 'a:b' }, { pool: 'q3', skill: 'a:b' }, { pool: 'q0', skill: 'a:c' }]).join(), 'a:b'],
         ['TWIN distinct', twinSkills([{ pool: 'q0', skill: 'a:b' }, { pool: 'q1', skill: 'a:c' }]).length, 0],
@@ -83,36 +116,61 @@ function pscSkills() {
 }
 
 async function main() {
+    const LIB = Object.values((await import(pathToFileURL(path.join(ROOT, 'js', 'modules', 'sheet', 'contract.js')).href)).INSTRUCTION_LIBRARY);
     const H = require(path.join(__dirname, '..', 'lib', 'ws-harness.cjs'));
     const skills = arg('skills', null) ? arg('skills').split(',') : pscSkills();
     const sizes = arg('sizes', 'M,L').split(',');
-    const seed = Number(arg('seed', '7'));
+    const seeds = String(arg('seeds', arg('seed', '7'))).split(',').map(Number);
+    const forms = String(arg('form', 'A,B')).toUpperCase().split(',');
     const only = arg('only', null) ? arg('only').split(',') : null;
     const app = await H.open({ seed: 1 });
+    // (PSC-STRIP1 measures the printed strips in a page of their own, the sheet's own document and styles)
+    const doc = await app.browser.newPage();
+    await doc.setViewport({ width: 900, height: 1200 });
+    await doc.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
     const fails = [];
-    for (const k of skills) for (const size of sizes) {
+    for (const k of skills) for (const size of sizes) for (const seed of seeds) for (const form of forms) {
         const [c, s] = k.split(':');
         const b = await app.page.evaluate(async (a) => {
-            const r = await window.buildSheet({ role: 'pre-skill-check', sections: [{ skills: [{ categoryId: a.c, skillId: a.s }] }], size: a.size, paper: 'A4', seed: a.seed, key: false });
+            const r = await window.buildSheet({ role: 'pre-skill-check', sections: [{ skills: [{ categoryId: a.c, skillId: a.s }] }], size: a.size, paper: 'A4', seed: a.seed, form: a.form, key: false });
             const bands = [];
             const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bands.push({ instr: sec.instr || '', n: Number((/__\/(\d+)/.exec(sec.extra || '') || [])[1]) || 0 }); for (const p of sec.parts || []) walk(p); };
             for (const pg of r.plan.pages) for (const sec of pg.sections) walk(sec);
-            return { title: (r.plan.header && r.plan.header.title) || '', bands, metaBands: (r.plan.meta && r.plan.meta.bands) || null, items: (r.items || []).map((it) => ({ pool: it.pool, skill: it.skill, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans })) };
-        }, { c, s, size, seed });
-        const F = (rule, msg) => { if (!only || only.includes(rule)) fails.push(`  FAIL ${rule} ${k} pre-skill-check ${size}: ${msg}`); };
+            const items = (r.items || []).map((it) => ({ pool: it.pool, skill: it.skill, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans }));
+            const labelOf = (key) => { const [cc, ss] = String(key || '').split(':'); const row = ((window.SKILLS || {})[cc] || []).find((x) => x.v === ss); return row ? row.l : ''; };
+            const labels = [...new Set(items.map((it) => it.skill).filter(Boolean))].map(labelOf).filter(Boolean);
+            return { title: (r.plan.header && r.plan.header.title) || '', bands, labels, html: window.sheetDocument(r.pupilHtml, 't', { paper: 'A4' }), metaBands: (r.plan.meta && r.plan.meta.bands) || null, items };
+        }, { c, s, size, seed, form });
+        const tagOf = `${k} pre-skill-check ${size} seed ${seed} Form ${form}`;
+        const F = (rule, msg) => { if (!only || only.includes(rule)) fails.push(`  FAIL ${rule} ${tagOf}: ${msg}`); };
         // (the bands as the role lists them, when it does; else the dealt pools)
-        const twinSrc = Array.isArray(b.metaBands) && b.metaBands.length && b.metaBands.every((x) => 'skill' in x) ? b.metaBands.map((x, i) => ({ pool: `b${i}`, skill: x.skill })) : b.items;
+        const metaOk = Array.isArray(b.metaBands) && b.metaBands.length && b.metaBands.every((x) => 'skill' in x);
+        const twinSrc = metaOk ? b.metaBands.map((x, i) => ({ pool: `b${i}`, skill: x.skill })) : b.items;
         for (const t of twinSkills(twinSrc)) F('PSC-TWIN', `${t} is dealt by two pools (two bands of one skill)`);
         const tb = titleBad(b.title); if (tb) F('PSC-TITLE', `the title "${b.title}" carries the id fragment "${tb}"`);
-        for (const i of instrRepeats(b.bands.map((x) => x.instr))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}"`);
-        // (the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
-        if (Array.isArray(b.metaBands) && b.metaBands.length === b.bands.length) { b.metaBands.forEach((bd, j) => { for (const why of dealBad(bd.items)) F('PSC-DEAL', `band ${j + 1}: ${why}`); }); }
-        const pools = [...new Set(b.items.map((it) => it.pool))];
-        if (!(Array.isArray(b.metaBands) && b.metaBands.length === b.bands.length)) b.bands.forEach((bd, j) => { const its = b.items.filter((it) => it.pool === pools[j]).slice(0, bd.n); for (const why of dealBad(its)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
+        // (PSC-INSTR: the printed strips in page order - a shared strip is one band section, so it is one strip here)
+        for (const i of instrRepeats(b.bands.map((x) => x.instr))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}" (two strips of one instruction: share one)`);
+        for (const [j, bd] of b.bands.entries()) { const bad = stripTagBad(bd.instr, b.labels, LIB); if (bad) F('PSC-INSTR', `strip ${j + 1} "${bd.instr}" carries "${bad}" (a tag or a skill label means nothing to a pupil)`); }
+        // (PSC-DEAL: the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
+        if (metaOk && b.metaBands.every((x) => Array.isArray(x.items))) b.metaBands.forEach((bd, j) => { for (const why of dealBad(bd.items)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
+        else { const pools = [...new Set(b.items.map((it) => it.pool))]; b.bands.forEach((bd, j) => { const its = b.items.filter((it) => it.pool === pools[j]).slice(0, bd.n); for (const why of dealBad(its)) F('PSC-DEAL', `band ${j + 1}: ${why}`); }); }
+        // (PSC-TWIN-MIX: a band whose skill two pools dealt holds items of both; an item's pool from the role, else by its text)
+        if (metaOk) for (const [j, bd] of b.metaBands.entries()) {
+            const skillPools = [...new Set(b.items.filter((it) => it.skill && it.skill === bd.skill).map((it) => it.pool))];
+            if (skillPools.length < 2) continue;
+            const bandPools = [...new Set((bd.items || []).map((x) => x.pool || (b.items.find((it) => it.skill === bd.skill && it.text === x.text) || {}).pool).filter(Boolean))];
+            if (!twinMixed(bandPools, skillPools)) F('PSC-TWIN-MIX', `band ${j + 1} (${bd.skill}) prints items of ${bandPools.join(', ') || 'no pool'} only, of the pools ${skillPools.join(', ')} that deal it`);
+        }
+        // (PSC-STRIP1: each strip's instruction on one line, measured)
+        await doc.setContent(b.html, { waitUntil: 'load' });
+        await doc.evaluate(() => document.fonts && document.fonts.ready);
+        const lines = await doc.evaluate(() => [...document.querySelectorAll('.ws-strip > span:not(.mq-quadscore)')].map((e) => ({ t: e.textContent, n: new Set([...e.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size })));
+        for (const l of lines) if (l.n > 1) F('PSC-STRIP1', `the strip "${l.t}" wraps to ${l.n} lines (the page counts one)`);
     }
+    await doc.close();
     await app.close();
     for (const f of fails) console.log(f);
-    console.log(`ws-psc-lint: ${fails.length ? `FAIL (${fails.length})` : 'OK'} (${skills.length} skill(s) x ${sizes.join('/')}, seed ${seed})`);
+    console.log(`ws-psc-lint: ${fails.length ? `FAIL (${fails.length})` : 'OK'} (${skills.length} skill(s) x ${sizes.join('/')} x seed ${seeds.join('/')} x Form ${forms.join('/')})`);
     process.exit(fails.length ? 1 : 0);
 }
 
