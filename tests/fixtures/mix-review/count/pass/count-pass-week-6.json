@@ -1,0 +1,26 @@
+{
+ "check": "count",
+ "state": "count-pass-week-6",
+ "proto": "case-pass-week-6",
+ "note": "a 6-skill pool, 3 a day: the comeback from Wednesday, no skill on consecutive days",
+ "expect": "pass",
+ "props": [
+  "j2",
+  "l"
+ ],
+ "input": {
+  "pool": "pool-6",
+  "N": 10,
+  "seed": 12,
+  "size": "m",
+  "order": "mixed",
+  "week": 3
+ },
+ "sweep": {
+  "seed": [
+   12,
+   13,
+   14
+  ]
+ }
+}

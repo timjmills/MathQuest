@@ -1,0 +1,7 @@
+{
+ "check": "hosts",
+ "state": "hosts-wrong-total",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "a host with more or fewer than N items"
+}

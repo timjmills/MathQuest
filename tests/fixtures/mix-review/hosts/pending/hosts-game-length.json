@@ -1,0 +1,7 @@
+{
+ "check": "hosts",
+ "state": "hosts-game-length",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "boss / race cycles or stops before item N"
+}

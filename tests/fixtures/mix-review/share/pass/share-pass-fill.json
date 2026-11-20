@@ -1,0 +1,60 @@
+{
+ "check": "share",
+ "state": "share-pass-fill",
+ "proto": "case-pass-fill",
+ "note": "lead ruling 2026-11-20: wide and flat share a page by fill; no non-last page under half full, every pool; r3: no page under 2 items (l), no flat skill with 1 item on a page (j2), every item seed the formula (m)",
+ "expect": "pass",
+ "props": [
+  "m"
+ ],
+ "input": {
+  "pool": "pool-2mix",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "order": [
+   "mixed",
+   "easyhard",
+   "area"
+  ]
+ },
+ "pools": [
+  "pool-large",
+  "pool-compact",
+  "pool-typical",
+  "pool-wide",
+  "pool-2mix",
+  "pool-3mix",
+  "pool-2",
+  "pool-6",
+  "pool-kinds",
+  "pool-legacy"
+ ]
+}

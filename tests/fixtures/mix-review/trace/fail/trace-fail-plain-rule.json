@@ -1,0 +1,12 @@
+{
+ "note": "card critic r4 D4 / §10 L3: a keyword-free rule bullet in §2 (\"No page holds more than 9 items.\") passed the keyword detector",
+ "insert": {
+  "after": "## 2. ",
+  "text": "- No page holds more than 9 items."
+ },
+ "catchText": "no [P:...] tag: \"No page holds more than 9 items",
+ "check": "trace",
+ "state": "trace-fail-plain-rule",
+ "module": "trace",
+ "expect": "fail"
+}

@@ -1,0 +1,44 @@
+[
+ {
+  "id": "wide:w0",
+  "code": "AA",
+  "grade": "1",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "wide:w1",
+  "code": "AB",
+  "grade": "2",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "wide:w2",
+  "code": "AC",
+  "grade": "3",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "wide:w3",
+  "code": "AD",
+  "grade": "4",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "wide:w4",
+  "code": "AE",
+  "grade": "5",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "wide:w5",
+  "code": "AF",
+  "grade": "1",
+  "area": "MEAS",
+  "fc": "wide"
+ }
+]

@@ -1,0 +1,21 @@
+{
+ "check": "count",
+ "state": "count-ignored",
+ "proto": "case-fail-e-ignores-n",
+ "note": "r1 D8: the count fills the page (total = capacity), N ignored",
+ "expect": "fail",
+ "catch": "e",
+ "props": [
+  "e"
+ ],
+ "mutate": {
+  "ignoreN": true
+ },
+ "input": {
+  "pool": "pool-typical",
+  "N": 10,
+  "seed": 1,
+  "size": "l",
+  "order": "mixed"
+ }
+}

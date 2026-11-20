@@ -1,0 +1,1 @@
+{"check":"week","state":"week-day-differs","module":"week-days","expect":"fail","catchState":"week-day-differs","tamper":"day-shift","note":"a day code that rebuilds another sheet (day d read as d + 1)"}

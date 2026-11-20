@@ -1,0 +1,1 @@
+{"check":"labels","state":"labels-pass","module":"labels","expect":"pass","note":"AREA_LABELS deep-equals the card §7a table; no file under js/ but teacher-areas.js holds all 11 strings"}

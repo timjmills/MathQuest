@@ -1,0 +1,45 @@
+{
+ "check": "count",
+ "state": "count-kind-class",
+ "proto": "case-fail-h-kind-class",
+ "note": "r3 D4: word problems read as typical (12 a page at M, 12.1 allows 3)",
+ "expect": "fail",
+ "catch": "h",
+ "props": [
+  "h"
+ ],
+ "mutate": {
+  "kindClass": {
+   "word-problem": "typical"
+  }
+ },
+ "input": {
+  "pool": "pool-kinds",
+  "N": 30,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "kindCheck": true
+ },
+ "sweep": {
+  "N": [
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ]
+ }
+}

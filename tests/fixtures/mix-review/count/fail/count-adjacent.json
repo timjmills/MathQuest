@@ -1,0 +1,29 @@
+{
+ "check": "count",
+ "state": "count-adjacent",
+ "proto": "case-fail-d-grouped-adjacent",
+ "note": "r1 D3 / r2 N1: shelves printed skill by skill (no seeded shelf order) on mixed-class pages",
+ "expect": "fail",
+ "catch": "d",
+ "props": [
+  "d"
+ ],
+ "mutate": {
+  "noShelfOrder": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 30,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "seed": [
+   1,
+   2,
+   3,
+   4
+  ]
+ }
+}

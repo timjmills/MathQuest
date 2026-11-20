@@ -1,0 +1,7 @@
+{
+ "check": "hosts",
+ "state": "hosts-own-items",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "a host generates its own items, so a forced duplicate retry differs from the key"
+}

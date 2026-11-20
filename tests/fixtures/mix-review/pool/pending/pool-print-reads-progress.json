@@ -1,0 +1,7 @@
+{
+ "check": "pool",
+ "state": "pool-print-reads-progress",
+ "expect": "fail",
+ "pending": "MR-A step 3 / MR-D step 5",
+ "note": "a print deal that changes with the progress fixture (dealReviewItems on the print path)"
+}

@@ -1,0 +1,17 @@
+{
+ "check": "count",
+ "state": "count-pass-2up-typical",
+ "proto": "case-pass-2up-typical",
+ "note": "N = 5 at L typical (8 a page): the 5 do not fit a half page, one page of 5",
+ "expect": "pass",
+ "props": [
+  "e"
+ ],
+ "input": {
+  "pool": "pool-typical",
+  "N": 5,
+  "seed": 4,
+  "size": "l",
+  "order": "mixed"
+ }
+}

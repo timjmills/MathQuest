@@ -1,0 +1,7 @@
+{
+ "check": "count",
+ "state": "count-shelf-k-differs",
+ "expect": "fail",
+ "pending": "MR-A step 3",
+ "note": "the drawn shelf k differs from V1 SHELF k for a class at M or L (browser)"
+}

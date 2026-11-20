@@ -1,0 +1,45 @@
+{
+ "check": "count",
+ "state": "count-pass-legacy",
+ "proto": "case-pass-legacy",
+ "note": "r3 D4: a pool of two legacy cells: GROUPED, never M1",
+ "expect": "pass",
+ "props": [
+  "b",
+  "c",
+  "d",
+  "e",
+  "h",
+  "j",
+  "j2",
+  "l"
+ ],
+ "input": {
+  "pool": "pool-legacy",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ }
+}

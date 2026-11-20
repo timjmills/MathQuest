@@ -12061,6 +12061,268 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mix-review-trace",
+   "check": "card trace (card §10 L3, critic r4 D4): every sentence of a §2 / §3 bullet and of a §7a bullet or Decision cell is normative unless marked [I]; a planted keyword-free rule, a rule after \"]. \" in lower case, \"should not\", \"refuses\" and an untagged Decision cell each FAIL",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check trace",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/trace/fail",
+    "state": "8 planted untagged / mis-tagged rule sentences (5 new forms of critic r4 D4 + 3 of r3)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/trace/pass",
+    "state": "the signed card (197 normative sentences, every one tagged)"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check trace --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-labels",
+   "check": "AREA_LABELS (card §7a, build step 1b): the export deep-equals the card table (11 keys, exact strings) and no file under js/ but teacher-areas.js holds all 11 strings",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check labels",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/labels/fail",
+    "state": "labels-changed (NF without its em dash), labels-second-map (a planted whole copy)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/labels/pass",
+    "state": "AREA_LABELS in teacher-areas.js only, equal to §7a"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check labels --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "build step 1b (MR-B): AREA_LABELS is not exported by js/modules/teacher-areas.js yet; re-arm (drop pending) when it lands"
+  },
+  {
+   "id": "mix-review-count",
+   "pending": true,
+   "pendingReason": "build step 2 (MR-B): js/modules/mixed-review.js (the V1 dealer moved) is not built yet; re-arm when it lands",
+   "check": "MIX-REVIEW-COUNT Node core (card §8; check-v1 props b c d e h j j2 k l on the PRODUCT dealer js/modules/mixed-review.js): exact N, ceil(N/2), 3 skills a page, no avoidable adjacency, the frozen size / kind tables, shelves, flat >= 2, fill, no lone item; one named fixture per FAIL state",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check count",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/count/fail",
+    "state": "17 FAIL states (count-ignored ... count-2up-numbers), each caught for its reason"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/count/pass",
+    "state": "the moved dealer on the pinned pools"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check count --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-pool",
+   "pending": true,
+   "pendingReason": "build step 2 (MR-B): js/modules/mixed-review.js and mixed-review-pool.js are not built yet; re-arm when they land",
+   "check": "MIX-REVIEW-POOL (card §8; check-v1 props g n + b c d on the product dealer, plus mixed-review-pool.js): rows carry kind never fc (L4), codes are FROZEN_SKILL_CODES (L5), passed = REDESIGN_PASSED, defaults off, 200 seeded filter sets, adapt only the listed skills, the weighting formula",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check pool",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/pool/fail",
+    "state": "pool-filter-leak, pool-one-dealt, pool-adapt-*, pool-row-fc, pool-code-unfrozen, pool-passed-leak, pool-default-on, pool-weights-formula"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/pool/pass",
+    "state": "the product pool module and dealer"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check pool --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-share",
+   "pending": true,
+   "pendingReason": "build step 2 (MR-B): the product dealer, its frozen table and pins and the skill-codes.js V1 tokens are not built yet; re-arm when they land",
+   "check": "MIX-REVIEW-SHARE (card §8; check-v1 props a i m on the product dealer): determinism and the code round trip, the V1 freeze (sha256 of the four files, golden codes), the seed formula, the V1 table codes = FROZEN_SKILL_CODES (L5), one codec (generateEnhancedSkillCode == D.encode byte for byte, parseEnhancedSkillCode reads it back)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check share",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/share/fail",
+    "state": "12 FAIL states (share-clock-seed ... share-two-codecs, share-table-code)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/share/pass",
+    "state": "the product dealer, its pins and skill-codes.js"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check share --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-week",
+   "pending": true,
+   "pendingReason": "build step 2 (MR-B): js/modules/mixed-review.js is not built yet; re-arm when it lands",
+   "check": "MIX-REVIEW-WEEK Node core (card §8; check-v1 prop f on the product dealer + every K<d> day code rebuilt alone equals that day, L24)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check week",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/week/fail",
+    "state": "week-one-seed, week-missing-skill, week-consecutive, week-day-differs"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/week/pass",
+    "state": "the product week"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check week --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-count-engine",
+   "pending": true,
+   "pendingReason": "build step 3 (MR-A): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/count/pending/ (moved to fail/ when built). Re-arm when it lands.",
+   "check": "MIX-REVIEW-COUNT browser states (engine): count-spill-redeal, count-key-cells, count-shelf-k-differs",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check count",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/count/pending",
+    "state": "the named pending FAIL fixtures"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/count/pass",
+    "state": "the built product"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check count --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-pool-screens",
+   "pending": true,
+   "pendingReason": "build steps 3-5 (MR-A / MR-C / MR-D): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/pool/pending/ (moved to fail/ when built). Re-arm when it lands.",
+   "check": "MIX-REVIEW-POOL screen states: pool-print-reads-progress, pool-stray-check, pool-toggle-count",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check pool",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/pool/pending",
+    "state": "the named pending FAIL fixtures"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/pool/pass",
+    "state": "the built product"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check pool --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-share-app",
+   "pending": true,
+   "pendingReason": "build steps 4-5 (MR-C / MR-D): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/share/pending/ (moved to fail/ when built). Re-arm when it lands.",
+   "check": "MIX-REVIEW-SHARE app states: share-moved-old-code, share-old-decoder-throws (commit pair on master d3830882), share-copy-panel-silent",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check share",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/share/pending",
+    "state": "the named pending FAIL fixtures"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/share/pass",
+    "state": "the built product"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check share --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-week-table",
+   "pending": true,
+   "pendingReason": "build step 3 (MR-A): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/week/pending/ (moved to fail/ when built). Re-arm when it lands.",
+   "check": "MIX-REVIEW-WEEK print state: week-table-missing (the weekly key table)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check week",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/week/pending",
+    "state": "the named pending FAIL fixtures"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/week/pass",
+    "state": "the built product"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check week --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-hosts",
+   "pending": true,
+   "pendingReason": "build step 5 (MR-D): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/hosts/pending/ (moved to fail/ when built). Re-arm when it lands.",
+   "check": "MIX-REVIEW-HOSTS (browser, every host plays dealReviewItems list): hosts-own-items, hosts-wrong-total, hosts-quiz-total, hosts-game-length, hosts-master",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check hosts",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/hosts/pending",
+    "state": "the named pending FAIL fixtures"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/hosts/pass",
+    "state": "the built product"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check hosts --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-breakdown",
+   "pending": true,
+   "pendingReason": "build steps 3 and 5 (MR-A / MR-D): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/breakdown/pending/ (moved to fail/ when built). Re-arm when it lands.",
+   "check": "MIX-REVIEW-BREAKDOWN (key summary and results): breakdown-dup-item, breakdown-wrong-area, breakdown-sum, breakdown-screen-differs",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check breakdown",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/breakdown/pending",
+    "state": "the named pending FAIL fixtures"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/breakdown/pass",
+    "state": "the built product"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check breakdown --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

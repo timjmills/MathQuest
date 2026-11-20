@@ -1,0 +1,21 @@
+{
+ "check": "share",
+ "state": "share-seed-formula",
+ "proto": "case-fail-m-seed-five-parts",
+ "note": "r3 D5: try 0 seeded with five parts (deriveSeed(..., i, 0)), which differs from item.seed",
+ "expect": "fail",
+ "catch": "m",
+ "props": [
+  "m"
+ ],
+ "mutate": {
+  "seedR0": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 3,
+  "size": "m",
+  "order": "mixed"
+ }
+}

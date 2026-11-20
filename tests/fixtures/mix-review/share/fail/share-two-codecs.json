@@ -1,0 +1,1 @@
+{"check":"share","state":"share-two-codecs","module":"share","expect":"fail","catchState":"share-two-codecs","replace":{"codec":"hand"},"note":"a second, hand-written codec (lower-case seed) instead of D.encode"}

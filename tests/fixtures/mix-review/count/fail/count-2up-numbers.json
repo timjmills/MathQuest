@@ -1,0 +1,19 @@
+{
+ "check": "count",
+ "state": "count-2up-numbers",
+ "note": "a 2-up half not numbered 1..5 (card §8 COUNT); the frozen dealer has no seam for it, so the plan is tampered after the deal",
+ "expect": "fail",
+ "catch": "e",
+ "catchText": "a 2-up half is not numbered 1-5",
+ "props": [
+  "e"
+ ],
+ "tamper": "halves-misnumbered",
+ "input": {
+  "pool": "pool-compact",
+  "N": 5,
+  "seed": 3,
+  "size": "m",
+  "order": "mixed"
+ }
+}

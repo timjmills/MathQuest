@@ -1,0 +1,12 @@
+{
+ "note": "card critic r4 D4 / §10 L3: \"The dealer refuses ...\" in a §7a bullet (refuses is not the keyword refused)",
+ "insert": {
+  "after": "**Weekly set**",
+  "text": "- The dealer refuses a week of one day."
+ },
+ "catchText": "\"The dealer refuses a week of one day",
+ "check": "trace",
+ "state": "trace-fail-refuses",
+ "module": "trace",
+ "expect": "fail"
+}

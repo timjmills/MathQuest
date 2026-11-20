@@ -1,0 +1,26 @@
+{
+ "check": "pool",
+ "state": "pool-pass-pool-one",
+ "proto": "case-pass-pool-one",
+ "note": "a pool under 2 skills is refused with its reason, never dealt (one ticked grade-6 skill)",
+ "expect": "pass",
+ "props": [
+  "n"
+ ],
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "filters": {
+   "grades": [
+    "6"
+   ],
+   "areas": [
+    "RPNS"
+   ]
+  },
+  "expectRefusal": true
+ }
+}

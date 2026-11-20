@@ -1,0 +1,46 @@
+{
+ "check": "count",
+ "state": "count-pass-week-large",
+ "proto": "case-pass-week-large",
+ "note": "a Mon-Fri week on the large pool, every order, two sizes",
+ "expect": "pass",
+ "props": [
+  "b",
+  "c",
+  "d",
+  "e",
+  "h",
+  "j",
+  "j2",
+  "l"
+ ],
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 12,
+  "size": "m",
+  "order": "mixed",
+  "week": 12
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   20,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "order": [
+   "mixed",
+   "easyhard",
+   "area"
+  ],
+  "seed": [
+   12,
+   31
+  ]
+ }
+}

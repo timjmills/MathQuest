@@ -1,0 +1,12 @@
+{
+ "note": "a deal rule in §2 tagged only by a product check (a dodge): §2 needs a property",
+ "insert": {
+  "after": "## 2. ",
+  "text": "- No skill is dealt twice in a row on the last page [X:MIX-REVIEW-COUNT]."
+ },
+ "catchText": "no [P:...] tag",
+ "check": "trace",
+ "state": "trace-fail-x-in-deal",
+ "module": "trace",
+ "expect": "fail"
+}

@@ -1,0 +1,29 @@
+{
+ "check": "week",
+ "state": "week-consecutive",
+ "proto": "case-fail-f-consecutive",
+ "note": "a week that ignores yesterday's sheet (a skill on two days running with a pool of 2 k)",
+ "expect": "fail",
+ "catch": "f",
+ "props": [
+  "f"
+ ],
+ "mutate": {
+  "allowConsecutive": true
+ },
+ "input": {
+  "pool": "pool-6",
+  "N": 10,
+  "seed": 12,
+  "size": "m",
+  "order": "mixed",
+  "week": 3
+ },
+ "sweep": {
+  "seed": [
+   12,
+   13,
+   14
+  ]
+ }
+}

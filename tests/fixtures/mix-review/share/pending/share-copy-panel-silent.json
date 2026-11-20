@@ -1,0 +1,7 @@
+{
+ "check": "share",
+ "state": "share-copy-panel-silent",
+ "expect": "fail",
+ "pending": "MR-C step 4",
+ "note": "the Copy-link panel does not state that an old app plays the skills, not the identical items (card §7a Compatibility)"
+}

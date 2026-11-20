@@ -1,0 +1,178 @@
+[
+ {
+  "id": "addition:within_10",
+  "code": "AA",
+  "grade": "K",
+  "area": "OA",
+  "fc": "compact",
+  "passed": true
+ },
+ {
+  "id": "addition:within_20",
+  "code": "AB",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact",
+  "passed": true
+ },
+ {
+  "id": "subtraction:within_10",
+  "code": "AC",
+  "grade": "K",
+  "area": "OA",
+  "fc": "compact",
+  "passed": true
+ },
+ {
+  "id": "subtraction:within_20",
+  "code": "AD",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "addition:two_digit_stack",
+  "code": "AE",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical",
+  "passed": true
+ },
+ {
+  "id": "subtraction:two_digit_stack",
+  "code": "AF",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "place_value:tens_ones",
+  "code": "AG",
+  "grade": "1",
+  "area": "NBT",
+  "fc": "typical",
+  "passed": true
+ },
+ {
+  "id": "place_value:hundreds",
+  "code": "AH",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "multiplication:facts_2_5_10",
+  "code": "AI",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact",
+  "passed": true,
+  "opts": "C78"
+ },
+ {
+  "id": "division:facts",
+  "code": "AJ",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "multiplication:multiply",
+  "code": "AK",
+  "grade": "4",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "decimals:compare",
+  "code": "AL",
+  "grade": "4",
+  "area": "NF",
+  "fc": "typical"
+ },
+ {
+  "id": "fractions:number_line",
+  "code": "AM",
+  "grade": "3",
+  "area": "NF",
+  "fc": "wide"
+ },
+ {
+  "id": "measurement:coins",
+  "code": "AN",
+  "grade": "2",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "measurement:clock_hour",
+  "code": "AO",
+  "grade": "1",
+  "area": "MEAS",
+  "fc": "typical"
+ },
+ {
+  "id": "graphs:bar_read",
+  "code": "AP",
+  "grade": "2",
+  "area": "DATA",
+  "fc": "wide"
+ },
+ {
+  "id": "shapes:name_2d",
+  "code": "AQ",
+  "grade": "K",
+  "area": "G",
+  "fc": "typical"
+ },
+ {
+  "id": "counting:count_to_20",
+  "code": "AR",
+  "grade": "K",
+  "area": "CC",
+  "fc": "compact"
+ },
+ {
+  "id": "number_sense:number_line_100",
+  "code": "AS",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "wide"
+ },
+ {
+  "id": "ratios:unit_rate",
+  "code": "AT",
+  "grade": "6",
+  "area": "RPNS",
+  "fc": "typical"
+ },
+ {
+  "id": "vocabulary:maths_words",
+  "code": "AU",
+  "grade": "M",
+  "area": "WORDS",
+  "fc": "compact",
+  "passed": true
+ },
+ {
+  "id": "angles:measure",
+  "code": "AV",
+  "grade": "4",
+  "area": "MEAS",
+  "fc": "wide"
+ },
+ {
+  "id": "rounding:nearest_10",
+  "code": "AW",
+  "grade": "3",
+  "area": "NBT",
+  "fc": "compact"
+ },
+ {
+  "id": "mixed:mixed_ops",
+  "code": "AX",
+  "grade": "2",
+  "area": "MIXED",
+  "fc": "typical"
+ }
+]

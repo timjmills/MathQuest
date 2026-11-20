@@ -1,0 +1,12 @@
+{
+ "note": "a tag that names a property check-v1 does not have",
+ "insert": {
+  "after": "## 3. ",
+  "text": "- No page holds more than 9 items [P:zz]."
+ },
+ "catchText": "[P:zz] names no check-v1 property",
+ "check": "trace",
+ "state": "trace-fail-unknown-prop",
+ "module": "trace",
+ "expect": "fail"
+}

@@ -1,0 +1,14 @@
+// FAIL fixture of ws-mix-review --check labels (labels-second-map): a planted second whole AREA_LABELS map.
+export const COPY = {
+ "CC": "Counting & Cardinality",
+ "OA": "Operations & Algebraic Thinking",
+ "NBT": "Number & Operations in Base Ten",
+ "NF": "Number & Operations—Fractions (decimals live here)",
+ "MEAS": "Measurement (Measurement & Data)",
+ "DATA": "Data (Measurement & Data)",
+ "G": "Geometry",
+ "RPNS": "Ratios & Proportional Relationships / The Number System (grade 6)",
+ "MIXED": "Mixed (several domains)",
+ "WORDS": "Words (maths vocabulary)",
+ "NOSTD": "No CCSS domain (proposed; the ruling did not name it — 1 grade-3 lesson)"
+};

@@ -1,0 +1,1 @@
+{"check":"labels","state":"labels-changed","module":"labels","expect":"fail","catchState":"labels-changed","override":{"NF":"Number & Operations - Fractions"},"note":"an AREA_LABELS entry that differs from §7a (the em dash dropped)"}

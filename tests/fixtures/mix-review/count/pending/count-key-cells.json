@@ -1,0 +1,7 @@
+{
+ "check": "count",
+ "state": "count-key-cells",
+ "expect": "fail",
+ "pending": "MR-A step 3",
+ "note": "a key whose cells differ from the pupil page (PT-KEY-1; browser)"
+}

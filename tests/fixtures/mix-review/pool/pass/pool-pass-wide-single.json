@@ -1,0 +1,32 @@
+{
+ "check": "pool",
+ "state": "pool-pass-wide-single",
+ "proto": "case-pass-wide-single",
+ "note": "r2 N1: all-wide at L, 3 items a page = one skill a page; adjacency exempt",
+ "expect": "pass",
+ "props": [
+  "c",
+  "d"
+ ],
+ "input": {
+  "pool": "pool-wide",
+  "N": 10,
+  "seed": 2,
+  "size": "l",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ]
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "check": "count",
+ "state": "count-pass-short-shelf",
+ "proto": "case-pass-short-shelf",
+ "note": "r2 N3: L typical k = 2, counts 3 + 3 + 2: a short last shelf of each skill",
+ "expect": "pass",
+ "props": [
+  "j",
+  "h"
+ ],
+ "input": {
+  "pool": "pool-typical",
+  "N": 15,
+  "seed": 6,
+  "size": "l",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "seed": [
+   6,
+   12
+  ]
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "check": "count",
+ "state": "count-legacy-m1",
+ "proto": "case-fail-j-legacy-m1",
+ "note": "r3 D4: two legacy skills of one class put in the M1 arrangement (mixedClass refuses M1 for legacy cells)",
+ "expect": "fail",
+ "catch": "j",
+ "catchText": "legacy",
+ "props": [
+  "j"
+ ],
+ "mutate": {
+  "legacyM1": true
+ },
+ "input": {
+  "pool": "pool-legacy",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ }
+}

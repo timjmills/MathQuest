@@ -1,0 +1,44 @@
+{
+ "check": "pool",
+ "state": "pool-pass-adapt",
+ "proto": "case-pass-adapt",
+ "note": "adapt weights favour 2 listed skills; a non-listed skill weighted 4 is never dealt; counts stay even",
+ "expect": "pass",
+ "props": [
+  "g"
+ ],
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 21,
+  "size": "m",
+  "order": "mixed",
+  "listed": [
+   "AA",
+   "AB",
+   "AE",
+   "AF",
+   "AI",
+   "AU"
+  ],
+  "adapt": {
+   "addition:within_20": 4,
+   "multiplication:facts_2_5_10": 3,
+   "counting:count_to_20": 4
+  }
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ]
+ }
+}

@@ -1,0 +1,86 @@
+[
+ {
+  "id": "stack:s0",
+  "code": "AA",
+  "grade": "1",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s1",
+  "code": "AB",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s2",
+  "code": "AC",
+  "grade": "3",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s3",
+  "code": "AD",
+  "grade": "4",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s4",
+  "code": "AE",
+  "grade": "1",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s5",
+  "code": "AF",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s6",
+  "code": "AG",
+  "grade": "3",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s7",
+  "code": "AH",
+  "grade": "4",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s8",
+  "code": "AI",
+  "grade": "1",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s9",
+  "code": "AJ",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s10",
+  "code": "AK",
+  "grade": "3",
+  "area": "NBT",
+  "fc": "typical"
+ },
+ {
+  "id": "stack:s11",
+  "code": "AL",
+  "grade": "4",
+  "area": "NBT",
+  "fc": "typical"
+ }
+]

@@ -1,0 +1,22 @@
+{
+ "check": "week",
+ "state": "week-missing-skill",
+ "proto": "case-fail-f-restart-cycle",
+ "note": "r2 N4: a week that takes the cycle from the top each day (repeats while skills are unseen)",
+ "expect": "fail",
+ "catch": "f",
+ "props": [
+  "f"
+ ],
+ "mutate": {
+  "noFresh": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 12,
+  "size": "m",
+  "order": "mixed",
+  "week": 12
+ }
+}

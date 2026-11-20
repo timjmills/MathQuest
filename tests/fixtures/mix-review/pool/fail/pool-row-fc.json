@@ -1,0 +1,1 @@
+{"check":"pool","state":"pool-row-fc","module":"pool","expect":"fail","catchState":"pool-row-fc","rowsDropKind":true,"note":"card §10 L4: rows carry fc (a class) instead of their footprint kind"}

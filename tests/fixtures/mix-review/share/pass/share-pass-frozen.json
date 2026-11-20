@@ -1,0 +1,17 @@
+{
+ "check": "share",
+ "state": "share-pass-frozen",
+ "proto": "case-pass-frozen",
+ "note": "r3 D1: the dealer, interleave.js, rng.js and the frozen V1 table equal their pins, and every golden code replays to its pinned items",
+ "expect": "pass",
+ "props": [
+  "i"
+ ],
+ "input": {
+  "pool": "pool-2",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "golden": true
+ }
+}

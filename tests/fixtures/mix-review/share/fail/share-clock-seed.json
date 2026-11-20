@@ -1,0 +1,21 @@
+{
+ "check": "share",
+ "state": "share-clock-seed",
+ "proto": "case-fail-a-clock-seed",
+ "note": "a dealer that reads a call counter (a clock) into the seed",
+ "expect": "fail",
+ "catch": "a",
+ "props": [
+  "a"
+ ],
+ "mutate": {
+  "clockSeed": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ }
+}

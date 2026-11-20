@@ -1,0 +1,7 @@
+{
+ "check": "share",
+ "state": "share-moved-old-code",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "a moved or changed old code (ws-code-snapshot / ws-share-options are the gate today; this state pins it on the V1 path)"
+}

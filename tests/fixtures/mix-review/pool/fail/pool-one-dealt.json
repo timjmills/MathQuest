@@ -1,0 +1,30 @@
+{
+ "check": "pool",
+ "state": "pool-one-dealt",
+ "proto": "case-fail-n-one-dealt",
+ "note": "a dealer that deals a 1-skill pool instead of refusing it",
+ "expect": "fail",
+ "catch": "n",
+ "props": [
+  "n"
+ ],
+ "mutate": {
+  "allowOne": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "filters": {
+   "grades": [
+    "6"
+   ],
+   "areas": [
+    "RPNS"
+   ]
+  },
+  "expectRefusal": true
+ }
+}

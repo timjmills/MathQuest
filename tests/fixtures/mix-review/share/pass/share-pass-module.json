@@ -1,0 +1,1 @@
+{"check":"share","state":"share-pass-module","module":"share","expect":"pass","note":"the V1 table codes are FROZEN_SKILL_CODES; generateEnhancedSkillCode == D.encode byte for byte over 100 mixes; parseEnhancedSkillCode reads them back"}

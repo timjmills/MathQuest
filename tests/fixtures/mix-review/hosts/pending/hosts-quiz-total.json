@@ -1,0 +1,7 @@
+{
+ "check": "hosts",
+ "state": "hosts-quiz-total",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "a quiz scored out of another total"
+}

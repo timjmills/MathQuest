@@ -1,0 +1,1 @@
+{"check":"pool","state":"pool-weights-formula","module":"pool","expect":"fail","catchState":"pool-weights-formula","replace":{"weightsFrom":"ones"},"note":"a weightsFrom that ignores due and weak (card §7a Weighting)"}

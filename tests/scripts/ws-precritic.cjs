@@ -188,6 +188,7 @@ const argAll = (f) => ARGV.flatMap((a, i) => (a === `--${f}` && i + 1 < ARGV.len
 const RUNNER = '/tmp/mq-browser-run.sh';
 const RUNNER_SRC = path.join(ROOT, 'tests', 'scripts', 'mq-browser-run.sh');
 const ROLE_SAMPLE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'role-sample.json');
+const MIX_SAMPLE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'mix-review-sample.json');
 const PRINT_BASE = path.resolve(ROOT, arg('print-lint-baseline', 'design/audit/baselines/print-lint.json'));
 const sizeBase = (sz) => PRINT_BASE.replace(/\.json$/, `.${sz}.json`);
 // (an overflow finding in a gate's output: ws-cell-checks / ws-grade-render "leaves the cell", print-lint OVERFLOW, a ws-cell-checks
@@ -1348,7 +1349,11 @@ function buildPlan(ctx) {
         for (const f of fx) add(gate(`fixture-${f}`, `template fixture ${f} (ws-node-lint --fixture, must ${/\.fail\.mjs$/.test(f) ? 'FAIL' : 'pass'})`, `template ${t}`, 'node', 'ws-node-lint', ['--fixture', `tests/fixtures/precritic/${f}`], { parse: PARSE.fixture, expectFail: /\.fail\.mjs$/.test(f) }));
         add(gate('grade-render-template', 'ws-grade-render --template --contact-sheet', `template ${t}`, 'browser', 'ws-grade-render', ['--template', t, '--contact-sheet', '--out', path.join(ctx.logs, 'grade-render-template')], { needFlags: ['template', 'contact-sheet'], parse: PARSE.gradeRender }));
     }
-    if (ctx.role) {
+    if (ctx.role === 'mixed-review') {
+        // a filter-driven page type (card design/cards/mixed-review §8): the MIX-REVIEW checks on what is built (pending states
+        // listed, never passed) and the pinned filter sample dealt through DEALER V1; the engine's own page is --role mixed-practice
+        add(gate('mix-review', 'ws-mix-review --built-only (MIX-REVIEW COUNT / POOL / SHARE / WEEK / HOSTS / BREAKDOWN, AREA_LABELS, card trace) + the pinned filter sample', 'role mixed-review × the filter sample', 'node', 'ws-mix-review', ['--built-only', '--sample', rel(MIX_SAMPLE)], { missingMsg: 'ws-mix-review is not in this tree' }));
+    } else if (ctx.role) {
         // --role R --skill X: the lane skills join the role's pinned sample (S1 critic r1 D2), so X's own R page is linted
         const sample = [...new Set([...ctx.roleSample, ...ctx.skills.map((s) => s.key)])];
         const sc = `role ${ctx.role} × ${sample.length} sample skills`;
@@ -1692,8 +1697,10 @@ async function main() {
     if (role) {
         const R = sheetRoles();
         const ok = new Set([...R.roles, ...Object.keys(R.aliases)]);
-        if (!ok.has(role)) usage(`--role ${role}: not a role buildSheet composes (js/modules/sheet/roles/index.js): ${R.roles.join(', ')}; aliases ${Object.entries(R.aliases).map(([a, b]) => `${a}=${b}`).join(', ')}`);
-        if (R.aliases[role]) { process.stderr.write(`${TOOL}: --role ${role} is an alias of ${R.aliases[role]}; running ${R.aliases[role]}\n`); role = R.aliases[role]; }
+        // mixed-review (card design/cards/mixed-review §8): a FILTER-driven role, run on the pinned filter sample
+        // tests/fixtures/precritic/mix-review-sample.json, never mapped to its mixed-practice alias
+        if (role !== 'mixed-review' && !ok.has(role)) usage(`--role ${role}: not a role buildSheet composes (js/modules/sheet/roles/index.js): ${R.roles.join(', ')}; aliases ${Object.entries(R.aliases).map(([a, b]) => `${a}=${b}`).join(', ')}`);
+        if (role !== 'mixed-review' && R.aliases[role]) { process.stderr.write(`${TOOL}: --role ${role} is an alias of ${R.aliases[role]}; running ${R.aliases[role]}\n`); role = R.aliases[role]; }
     }
 
     const dry = has('dry-run');
@@ -1733,7 +1740,9 @@ async function main() {
         const seen = new Set();
         ctx.skills = pick.filter((s) => (seen.has(s.key) ? false : seen.add(s.key)));
     }
-    if (role) {
+    if (role === 'mixed-review') {
+        if (!fs.existsSync(MIX_SAMPLE)) usage(`--role mixed-review needs ${rel(MIX_SAMPLE)} (card design/cards/mixed-review §8)`);
+    } else if (role) {
         if (!fs.existsSync(ROLE_SAMPLE)) usage(`--role needs ${rel(ROLE_SAMPLE)} (node tests/scripts/${TOOL}.cjs --write-role-sample)`);
         ctx.roleSample = JSON.parse(fs.readFileSync(ROLE_SAMPLE, 'utf8')).skills;
     }

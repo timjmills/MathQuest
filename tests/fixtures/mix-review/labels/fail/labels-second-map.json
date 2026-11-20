@@ -1,0 +1,1 @@
+{"check":"labels","state":"labels-second-map","module":"labels","expect":"fail","catchState":"labels-second-map","scanExtra":["tests/fixtures/mix-review/labels/second-map.js.txt"],"note":"a second whole label map in another file"}

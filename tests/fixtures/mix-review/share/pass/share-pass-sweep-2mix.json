@@ -1,0 +1,37 @@
+{
+ "check": "share",
+ "state": "share-pass-sweep-2mix",
+ "proto": "case-pass-sweep-2mix",
+ "note": "a 2-skill pool, one wide + one compact: the room rule keeps both at ceil(N/2)",
+ "expect": "pass",
+ "props": [
+  "a",
+  "m"
+ ],
+ "input": {
+  "pool": "pool-2mix",
+  "N": 10,
+  "seed": 3,
+  "size": "l",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   3,
+   9,
+   11
+  ]
+ }
+}

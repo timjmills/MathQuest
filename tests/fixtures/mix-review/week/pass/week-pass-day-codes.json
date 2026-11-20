@@ -1,0 +1,1 @@
+{"check":"week","state":"week-pass-day-codes","module":"week-days","expect":"pass","note":"each K<d> day code, rebuilt alone, equals day d of its week (L24)"}

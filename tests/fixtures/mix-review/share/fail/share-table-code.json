@@ -1,0 +1,1 @@
+{"check":"share","state":"share-table-code","module":"share","expect":"fail","catchState":"share-table-code","tablePatch":[{"index":0,"set":{"code":"Z9"}}],"note":"card §10 L5: a V1 table code that is not FROZEN_SKILL_CODES[id]"}

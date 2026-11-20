@@ -1,0 +1,27 @@
+{
+ "check": "share",
+ "state": "share-drop-opts",
+ "proto": "case-fail-a-drop-opts",
+ "note": "r3 D8 / lead ruling: a codec that drops the ~options suffix; the replayed items lose their options",
+ "expect": "fail",
+ "catch": "a",
+ "catchText": "options",
+ "props": [
+  "a"
+ ],
+ "mutate": {
+  "dropOpts": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 11,
+  "size": "m",
+  "order": "mixed",
+  "filters": {
+   "grades": [
+    "3"
+   ]
+  }
+ }
+}

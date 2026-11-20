@@ -1,0 +1,7 @@
+{
+ "check": "share",
+ "state": "share-old-decoder-throws",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "commit pair: master d3830882 parseEnhancedSkillCode on a V1 code throws or returns other skills"
+}

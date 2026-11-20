@@ -1,0 +1,7 @@
+{
+ "check": "hosts",
+ "state": "hosts-master",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "commit pair: a V1 code on master d3830882 opens as plain mixed play"
+}

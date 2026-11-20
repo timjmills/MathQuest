@@ -1,0 +1,7 @@
+{
+ "check": "week",
+ "state": "week-table-missing",
+ "expect": "fail",
+ "pending": "MR-A step 3",
+ "note": "a dealt item missing from the weekly key table"
+}

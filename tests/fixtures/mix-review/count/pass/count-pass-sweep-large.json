@@ -1,0 +1,48 @@
+{
+ "check": "count",
+ "state": "count-pass-sweep-large",
+ "proto": "case-pass-sweep-large",
+ "note": "every N x M, L x every order x 3 seeds on the 23-skill mixed-class pool (MIXED never enters)",
+ "expect": "pass",
+ "props": [
+  "b",
+  "c",
+  "d",
+  "e",
+  "h",
+  "j",
+  "j2",
+  "l"
+ ],
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "order": [
+   "mixed",
+   "easyhard",
+   "area"
+  ],
+  "seed": [
+   1,
+   424242,
+   987654
+  ]
+ }
+}

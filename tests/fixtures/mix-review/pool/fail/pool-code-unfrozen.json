@@ -1,0 +1,1 @@
+{"check":"pool","state":"pool-code-unfrozen","module":"pool","expect":"fail","catchState":"pool-code-unfrozen","rowsPatch":[{"index":0,"set":{"code":"Z9"}}],"note":"card §10 L5: a row code that is not FROZEN_SKILL_CODES[id]"}

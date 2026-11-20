@@ -1,0 +1,10 @@
+{
+ "note": "Pinned filter sample for ws-precritic --role mixed-review (card design/cards/mixed-review §8, §9b step 1). A mixed review is driven by FILTERS, not by a role sample of skills: each row is a teacher's panel (grades, areas, onlyPassed, N, seed, order, size) dealt through DEALER V1 over the live registry (js/modules/mixed-review-pool.js poolRows). Changed only with a status note.",
+ "sample": [
+  { "id": "g2-all-areas", "filters": { "grades": ["2"], "areas": [], "onlyPassed": false }, "N": 10, "seed": 424242, "order": "mixed", "size": "l" },
+  { "id": "g1-g2-oa-nbt", "filters": { "grades": ["1", "2"], "areas": ["OA", "NBT"], "onlyPassed": false }, "N": 20, "seed": 103, "order": "easyhard", "size": "m" },
+  { "id": "k-to-3-passed", "filters": { "grades": ["K", "1", "2", "3"], "areas": [], "onlyPassed": true }, "N": 15, "seed": 777, "order": "area", "size": "l" },
+  { "id": "g5-g6-n5", "filters": { "grades": ["5", "6"], "areas": [], "onlyPassed": false }, "N": 5, "seed": 31, "order": "mixed", "size": "m" },
+  { "id": "g4-meas-g-n30", "filters": { "grades": ["4"], "areas": ["MEAS", "G"], "onlyPassed": false }, "N": 30, "seed": 999999, "order": "mixed", "size": "l" }
+ ]
+}

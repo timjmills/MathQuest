@@ -1,0 +1,21 @@
+{
+ "check": "share",
+ "state": "share-kit-edited",
+ "proto": "case-fail-i-interleave-edited",
+ "note": "r3 D1: js/modules/sheet/interleave.js edited (lf-engine owns it); the V1 pin catches it",
+ "expect": "fail",
+ "catch": "i",
+ "catchText": "interleave.js",
+ "props": [
+  "i"
+ ],
+ "input": {
+  "pool": "pool-2",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "append": {
+   "interleave": "\n// an engine change\n"
+  }
+ }
+}

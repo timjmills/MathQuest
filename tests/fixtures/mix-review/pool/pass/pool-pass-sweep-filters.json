@@ -1,0 +1,52 @@
+{
+ "check": "pool",
+ "state": "pool-pass-sweep-filters",
+ "proto": "case-pass-sweep-filters",
+ "note": "teacher filters: grades 1-2, areas OA NBT MEAS, one skill unticked",
+ "expect": "pass",
+ "props": [
+  "b",
+  "c",
+  "d",
+  "n"
+ ],
+ "input": {
+  "pool": "pool-large",
+  "filters": {
+   "grades": [
+    "1",
+    "2"
+   ],
+   "areas": [
+    "OA",
+    "NBT",
+    "MEAS"
+   ],
+   "untick": [
+    "place_value:hundreds"
+   ]
+  },
+  "N": 10,
+  "seed": 5,
+  "size": "l",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   5,
+   77
+  ]
+ }
+}

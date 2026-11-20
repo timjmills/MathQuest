@@ -1,0 +1,7 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-wrong-area",
+ "expect": "fail",
+ "pending": "MR-A step 3",
+ "note": "an item under the wrong area"
+}

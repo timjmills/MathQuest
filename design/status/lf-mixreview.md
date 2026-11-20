@@ -3,8 +3,8 @@ Title: Mixed review page type: spec card (grades x areas mix, sendable, playable
 Session: session_01HVwpAE3g6EZH8idgErP6LP
 Branch: claude/lf-mixreview
 Owner of files: design/cards/mixed-review/ (card.json, mixed-review.md); this status file
-State: fix
-Updated: 2026-11-19
+State: build (steps 1, 1b, 2 of card §9b)
+Updated: 2026-11-20
 Builder profile: mq-opus-medium
 Critic rounds: 1, card critic r1 FAIL (min 6), fixed in the card (§9c)
 
@@ -45,3 +45,16 @@ step 3 seed wording; step 1 property map incomplete; 12.1 long word problems at 
 Proposed next (if the lead reopens): deal() returns the replay of its own code (deal -> encode -> replay, one pass, stable
 in every case checked) and assert deal(replay(code(x))) == deal(x) swept in --fill; every property recomputes; the trace
 inverts its default (every bullet sentence normative unless [I]). All fixes are local to the dealer, its check and the card text.
+
+## Build (signed card, 2026-11-20): steps 1, 1b and 2 (builder, mq-opus-medium: first build of a new engine-level screen)
+Card §10 deferrals done in these steps, with no re-sign (each is §10-deferred to the step named):
+- L3 (step 1): check-v1 `--trace` INVERTS its default. Every sentence of a §2 / §3 bullet, of a §7a bullet and of a §7a
+  Decision cell is normative unless it is marked `[I]`. The splitter also splits after a tag's "]. " before a lower-case word
+  or a digit. The 76 orphans the inverted trace found (the critic's 18 plus every Decision cell, Header, Key pages) are tagged
+  in the card: 75 tags, plus one §2 host sentence marked `[I]` (normative in §7a Order modes with its X tag). There are 5 new
+  trace FAIL fixtures for the planted forms (plain rule, after a tag, should, refuses, Decision cell). Trace now: 197
+  normative sentences, 114 by a property, 83 by a product check.
+- L8 (step 1): the card §9b step 1 map now copies the §8 V1-core column: SHARE a i m, COUNT b c d e h j j2 k l, POOL g n
+  (+ b c d), WEEK f (+ a). The same map is executable in tests/scripts/ws-mix-review.mjs `CHECKS`.
+- card.json is NOT re-synced for these text edits. The checks read only mixed-review.md, and card.json mirrors the §9b text.
+  This is noted so that the lead can re-sync it when it signs the next card change.

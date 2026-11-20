@@ -1,0 +1,7 @@
+{
+ "check": "pool",
+ "state": "pool-stray-check",
+ "expect": "fail",
+ "pending": "MR-C step 4",
+ "note": "a check mark on a non-passed skill, or a passed skill without it, in the picker"
+}

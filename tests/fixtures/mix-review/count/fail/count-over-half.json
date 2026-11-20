@@ -1,0 +1,28 @@
+{
+ "check": "count",
+ "state": "count-over-half",
+ "proto": "case-fail-b-no-ceiling",
+ "note": "r1 D1: a dealer with no ceil(N/2) room rule (wide + compact pool, L, N = 10 gives 3 + 7)",
+ "expect": "fail",
+ "catch": "b",
+ "props": [
+  "b"
+ ],
+ "mutate": {
+  "noCeil": true
+ },
+ "input": {
+  "pool": "pool-2mix",
+  "N": 10,
+  "seed": 3,
+  "size": "l",
+  "order": "mixed"
+ },
+ "sweep": {
+  "seed": [
+   3,
+   9,
+   11
+  ]
+ }
+}

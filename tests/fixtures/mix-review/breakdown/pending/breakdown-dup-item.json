@@ -1,0 +1,7 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-dup-item",
+ "expect": "fail",
+ "pending": "MR-A step 3",
+ "note": "an item missing from the key summary or listed twice"
+}

@@ -1,0 +1,86 @@
+[
+ {
+  "id": "facts:f0",
+  "code": "AA",
+  "grade": "0",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f1",
+  "code": "AB",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f2",
+  "code": "AC",
+  "grade": "2",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f3",
+  "code": "AD",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f4",
+  "code": "AE",
+  "grade": "0",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f5",
+  "code": "AF",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f6",
+  "code": "AG",
+  "grade": "2",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f7",
+  "code": "AH",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f8",
+  "code": "AI",
+  "grade": "0",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f9",
+  "code": "AJ",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f10",
+  "code": "AK",
+  "grade": "2",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:f11",
+  "code": "AL",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact"
+ }
+]

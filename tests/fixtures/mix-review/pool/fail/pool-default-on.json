@@ -1,0 +1,1 @@
+{"check":"pool","state":"pool-default-on","module":"pool","expect":"fail","catchState":"pool-default-on","defaultsPatch":{"onlyPassed":true},"note":"the old ON default of Only 8/10 (lead ruling §9.6)"}

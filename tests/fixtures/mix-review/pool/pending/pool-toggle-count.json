@@ -1,0 +1,7 @@
+{
+ "check": "pool",
+ "state": "pool-toggle-count",
+ "expect": "fail",
+ "pending": "MR-C step 4",
+ "note": "the Only 8/10 toggle count differs from the filtered pool intersected with REDESIGN_PASSED"
+}

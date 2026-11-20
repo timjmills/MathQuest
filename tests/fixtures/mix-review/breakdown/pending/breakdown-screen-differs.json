@@ -1,0 +1,7 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-screen-differs",
+ "expect": "fail",
+ "pending": "MR-D step 5",
+ "note": "a results screen whose numbers differ from the key"
+}
