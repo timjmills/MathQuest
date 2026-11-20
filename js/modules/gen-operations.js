@@ -6887,7 +6887,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     a = divisor * result;  // Dividend (up to 144)
                     b = divisor;
                     q.ans = result;
-                    q.hint = `How many times does ${b} go into ${a}? Think: ${b} × ? = ${a}. Use the multiplication fact: ${b} × ${result} = ${a}`;
+                    q.hint = `How many times does ${b} go into ${a}? Think: which number times ${b} makes ${a}?`;
                     // Add visual hint with grouping/array
                     if (a <= 60 && b <= 10) {
                         q.hintVisual = createDotArray(result, b, `${a} ÷ ${b} = ${result} groups`);
@@ -7086,7 +7086,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.ans = result;
                     q.hint = a === 0
                         ? `There is nothing to share. 0 shared into ${b} equal groups puts 0 in each group.`
-                        : `How many groups of ${b} can you make from ${a}? Think: ${b} × ? = ${a}. Use the multiplication fact: ${b} × ${result} = ${a}`;
+                        : `How many groups of ${b} can you make from ${a}? Think: which number times ${b} makes ${a}?`;
                     // Add visual hint with grouping/array. A zero dividend has no groups to draw.
                     if (result >= 1 && a <= 60 && b <= 10) {
                         q.hintVisual = createDotArray(result, b, `${a} ÷ ${b} = ${result} groups`);
@@ -7194,7 +7194,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
                     if (a < b) [a, b] = [b, a];
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a - b).toFixed(state.decimalPlaces)) : a - b;
-                    q.hint = `Start at ${a.toLocaleString()} and count back ${b.toLocaleString()}. Or think: ${q.ans.toLocaleString()} + ${b.toLocaleString()} = ${a.toLocaleString()}`;
+                    q.hint = `Start at ${a.toLocaleString()} and count back ${b.toLocaleString()}. Or think: which number plus ${b.toLocaleString()} makes ${a.toLocaleString()}?`;
                     q.visual = `<div style="font-weight:700;">${a.toLocaleString()} − ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count back ${b.toLocaleString()}</div>`;
                     // PRINT: a one-line item, written the way the teacher chose (CONTRACT 2).
                     // Decimals keep 'basic-sub', whose cell carries a decimal point and a wide

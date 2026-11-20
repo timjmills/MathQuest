@@ -21,6 +21,23 @@
 //     so it is read from the provider's steps as written (workedStepsFor with fullWorked).
 // The worked steps never state the answer either (S8, ws-support-ladder); a step leaves the answer sentence OUT.
 //
+// Round 2 (critic r1 FAIL, 2026-11-20; every check FAILS on fafc417d1, design/lessons-first/CHECKS_FROM_CRITICS.md):
+//   WORKED-GAP   the worked-gap exemption reads only steps the pupil SEES (never the hidden fullWorked steps): F1, F2
+//   HINT-LEAK    q.hint states the answer (a value the question gives is no leak): F3
+//   SAY-LEAK     the Say line states the answer: F3
+//   STEPS-LEAK   a shown step states an element of a list answer, a long word answer, a sort (bin label: its tiles), or
+//                prints "Answer:" / "[object": F4, F13, F14
+//   UNIT-CUT     withoutAnswer cuts "= 18 square units." / "cubic units" / "square cm" / "cm²" at the answer: F7
+//   HELP-EMPTY-HIDDEN also: the status line never says "Here is how" when no box is shown: F8
+//   SAY-FILL     every number filled into the Say line is a WHOLE token the question gives (never "1" of "1/4"): F10
+//   SAY-GAP-GIVEN the Say line's gap is never a value the question gives ("___ is here." for "Tap 55"): F11
+//   BARE-STEP    a shown step is never a bare expression ("10 + 5.") or a repeat of an earlier step: F9
+//   HELP-THIN    a provider skill whose shown steps lose at least half its steps ends on a step that says what to do: F5
+//   LISTEN       a shown "Here is how" box always has Listen (speech on): F6
+//   S8-EXCEPTION the ONE skill whose help states the answer (S8_EXCEPTIONS); a second entry, or q.fullWorked on any other
+//                skill, FAILs
+// Each has a shrink-only pin of pre-existing skills owned by another lane (PINS below; --lists prints the current sets).
+//
 // Sweep: every live skill in SKILLS (tombstones skipped), default options, SEEDS seeds each, dealt through
 // generateQuestionFor with a seed derived from "cat:skill" + the item index (the ws-content-audit rule), so
 // two runs of one tree print the same lines.
@@ -38,68 +55,75 @@ const CATEGORY = arg('category', '');
 const N_SEEDS = Math.max(1, parseInt(arg('seeds', '4'), 10) || 4);
 const REPORT_ONLY = has('report-only');
 const VERBOSE = has('verbose');
-const SHOW_LISTS = has('lists');   // print the HELP-EMPTY and SAYLESS skill lists as JSON (to re-pin when they shrink)
+const SHOW_LISTS = has('lists');
+const ONLY = arg('only', '');   // --only <CHECK>[,<CHECK>]: judge only these checks (BLANK, WORKED-GAP, HINT-LEAK, ..., HELP-EMPTY-HIDDEN)   // print the HELP-EMPTY and SAYLESS skill lists as JSON (to re-pin when they shrink)
 
 // The blank detector, shared with the page (serialised as source).
 const BLANK_SRC = String.raw`(_{2,})|(\{[A-Za-z][\w.]*\})|([□☐▢])|((?:^|[\s(=+\-−×÷*/:,])\?(?=\s*(?:$|[=+\-−×÷*/),.;]|\s(?:[=+\-−×÷]|and|or)\b)))`;
 
+// (r2 2026-11-20: 28 -> 25. Eight left (the multi-word unit cut, F7, and the clean hints); five joined that showed the answer
+// before - an "Answer: ..." fallback line (F13 class) - and now hide the box: mixed_fraction_ops, order_fractions, mult_missing_digit
+// and its pool mixed_multiplication, compose_rect_from_squares)
 const EMPTY_PIN = ['algebra:build_expr_multdiv', 'angles_lines:identify_angles', 'angles_lines:mixed_angles_lines',
-    'area_perimeter:area_distributive_visual', 'area_perimeter:area_polygon_decompose', 'area_perimeter:area_triangle',
-    'area_perimeter:area_unit_squares', 'area_perimeter:mixed_area_perimeter', 'conversions:find_whole_from_pct',
-    'conversions:mixed_conversions', 'coordinates:net_surface_area', 'fraction_operations:div_unit_frac_nv',
-    'fraction_operations:estimate_frac_ops', 'fraction_operations:frac_10_100_nv',
+    'conversions:find_whole_from_pct', 'conversions:mixed_conversions', 'coordinates:net_surface_area',
+    'fraction_operations:div_unit_frac_nv', 'fraction_operations:estimate_frac_ops',
     'fraction_operations:frac_mult_word', 'fraction_operations:frac_mult_word_plain',
-    'fraction_operations:frac_word_mixed_plain', 'fraction_operations:mult_frac_whole_nv',
-    'fraction_operations:unit_frac_div_whole', 'fraction_operations:whole_div_unit_frac',
-    'fractions:compose_target_frac', 'fractions:equiv_frac_nv', 'geo_mixed:geo_meas_all', 'measurement:capacity',
+    'fraction_operations:frac_word_mixed_plain', 'fraction_operations:mixed_fraction_ops',
+    'fraction_operations:mult_frac_whole_nv', 'fraction_operations:unit_frac_div_whole',
+    'fraction_operations:whole_div_unit_frac', 'fractions:equiv_frac_nv', 'fractions:order_fractions',
+    'measurement:capacity', 'multiplication:mixed_multiplication', 'multiplication:mult_missing_digit',
     'shapes_classify:classify_triangles', 'shapes_classify:cross_section_3d', 'shapes_classify:mixed_shapes',
-    'shapes_classify:net_identify'];
+    'shapes_classify:net_identify', 'shapes_early:compose_rect_from_squares'];
 
-// (filled from the first run of the option-3 fix, 2026-11-20; owner lanes in design/status/lf-placevalue.md)
-const SAYLESS_PIN = ['addition:add_sub_fact_family', 'addition:cloze_addition', 'addition:fact_family_sort',
-    'addition:nl_add', 'algebra:function_table_easy', 'algebra:function_table_find_inputs',
-    'algebra:function_table_find_rule', 'algebra:function_table_hard', 'algebra:two_step_estimate_check',
-    'algebra:two_step_letter_equation', 'comparing:compare_groups', 'composing:base10_build',
-    'composing:base10_build_hundreds', 'composing:chart_to_120', 'composing:compose_whole',
-    'composing:fraction_number_line', 'composing:hundreds_chart_fill', 'composing:odd_even',
+// (filled from the first run of the option-3 fix, 2026-11-20; owner lanes in design/status/lf-placevalue.md. r2 2026-11-20: 131 -> 126;
+// fractions:shade_fraction joined - its Say line filled the 3 of "2/3", which SAY-FILL forbids)
+const SAYLESS_PIN = ['addition:add_sub_fact_family', 'addition:cloze_addition', 'addition:fact_family_sort', 'addition:nl_add',
+    'algebra:function_table_easy', 'algebra:function_table_find_inputs', 'algebra:function_table_find_rule',
+    'algebra:function_table_hard', 'algebra:two_step_estimate_check', 'algebra:two_step_letter_equation',
+    'comparing:compare_groups', 'composing:base10_build', 'composing:base10_build_hundreds', 'composing:chart_to_120',
+    'composing:compose_whole', 'composing:fraction_number_line', 'composing:hundreds_chart_fill', 'composing:odd_even',
     'composing:ten_frame_build_teen', 'composing:whole_as_fraction', 'decimals:decimal_nl_drag',
     'division:div_remainders', 'fraction_operations:add_frac_unlike', 'fraction_operations:add_fractions_like',
-    'fraction_operations:add_mixed_like', 'fraction_operations:add_mixed_unlike',
-    'fraction_operations:div_unit_fraction', 'fraction_operations:mult_frac_frac',
-    'fraction_operations:mult_frac_whole', 'fraction_operations:sub_frac_unlike',
+    'fraction_operations:add_mixed_like', 'fraction_operations:add_mixed_unlike', 'fraction_operations:sub_frac_unlike',
     'fraction_operations:sub_fractions_like', 'fraction_operations:sub_mixed_like',
-    'fraction_operations:sub_mixed_unlike', 'fractions:compare', 'fractions:compare_fractions_nl',
-    'fractions:compare_to_half', 'fractions:equiv_frac_visual', 'fractions:fraction_nl_drag', 'fractions:identify',
-    'fractions:identify_fraction_nl', 'fractions:mixed_nl_drag', 'fractions:write_fraction',
-    'fractions:write_fraction_nl', 'integers:integer_nl_drag', 'measurement:clock_parts', 'measurement:coin_value',
-    'measurement:count_notes_and_coins', 'measurement:elapsed_15min', 'measurement:elapsed_30min',
-    'measurement:elapsed_find_duration', 'measurement:elapsed_find_start', 'measurement:elapsed_hour',
-    'measurement:elapsed_mixed', 'measurement:elapsed_visual_easy', 'measurement:elapsed_visual_hard',
-    'measurement:elapsed_visual_medium', 'measurement:enough_money', 'measurement:minutes_by_fives_all',
-    'measurement:money', 'measurement:money_change', 'measurement:money_compare', 'measurement:time_fives_ring',
-    'measurement:time_sense', 'multiplication:arrays_groups', 'multiplication:count_by_10s',
-    'multiplication:count_by_11s', 'multiplication:count_by_12s', 'multiplication:count_by_2s',
-    'multiplication:count_by_3s', 'multiplication:count_by_4s', 'multiplication:count_by_5s',
-    'multiplication:count_by_6s', 'multiplication:count_by_7s', 'multiplication:count_by_8s',
-    'multiplication:count_by_9s', 'multiplication:count_by_tables', 'multiplication:dot_array_mult',
-    'multiplication:mult_arrays', 'multiplication:mult_chart', 'multiplication:mult_chart_easy',
-    'multiplication:mult_chart_headers', 'multiplication:mult_chart_pattern', 'multiplication:mult_chart_shade',
-    'multiplication:mult_comparison', 'multiplication:mult_comparison_plain', 'multiplication:mult_equal_groups',
-    'multiplication:mult_properties', 'number_ops_mixed:word_problems_mixed',
-    'number_ops_mixed:word_problems_mixed_plain', 'number_sense:between_tens', 'number_sense:estimate_diff',
-    'number_sense:estimate_products', 'number_sense:estimate_quotient', 'number_sense:estimate_sum',
-    'number_sense:estimate_sums_diffs', 'number_sense:nearest_10', 'number_sense:nearest_100',
-    'number_sense:nearest_1000', 'number_sense:nearest_10000', 'number_sense:nearest_100000',
-    'number_sense:nearest_million', 'number_sense:reasonable_quotients', 'number_sense:round_nl_hundred_thousands',
-    'number_sense:round_nl_ten_thousands', 'number_sense:round_nl_thousands', 'number_sense:round_sort_10',
-    'number_sense:round_sort_100', 'number_sense:round_sort_1000', 'number_sense:round_sort_10000',
-    'number_sense:round_sort_100000', 'number_sense:round_sort_hundredths', 'number_sense:round_sort_million',
-    'number_sense:round_sort_tenths', 'number_sense:rounding_table', 'number_sense:rounding_visual',
-    'patterns:follow_given_rule', 'patterns:notice_patterns', 'patterns:number_patterns_rule',
-    'patterns:skip_count_grid', 'patterns:skip_count_line', 'placevalue:combine', 'placevalue:expanded_notation',
-    'placevalue:identify', 'placevalue:one_tenth_value', 'placevalue:place_value_10x', 'placevalue:place_value_disks',
-    'placevalue:pv_digit_drag', 'placevalue:ten_times_story', 'placevalue:ten_times_value',
-    'subtraction:sub_5_pictures', 'vocabulary:vocab_grade_pictures'];
+    'fraction_operations:sub_mixed_unlike', 'fractions:compare_fractions_nl', 'fractions:equiv_frac_visual',
+    'fractions:fraction_nl_drag', 'fractions:identify', 'fractions:identify_fraction_nl', 'fractions:mixed_nl_drag',
+    'fractions:shade_fraction', 'fractions:write_fraction', 'fractions:write_fraction_nl', 'integers:integer_nl_drag',
+    'measurement:clock_parts', 'measurement:coin_value', 'measurement:count_notes_and_coins',
+    'measurement:elapsed_15min', 'measurement:elapsed_30min', 'measurement:elapsed_find_duration',
+    'measurement:elapsed_find_start', 'measurement:elapsed_hour', 'measurement:elapsed_mixed',
+    'measurement:elapsed_visual_easy', 'measurement:elapsed_visual_hard', 'measurement:elapsed_visual_medium',
+    'measurement:enough_money', 'measurement:minutes_by_fives_all', 'measurement:money', 'measurement:money_change',
+    'measurement:money_compare', 'measurement:time_fives_ring', 'measurement:time_sense',
+    'multiplication:arrays_groups', 'multiplication:count_by_10s', 'multiplication:count_by_11s',
+    'multiplication:count_by_12s', 'multiplication:count_by_2s', 'multiplication:count_by_3s',
+    'multiplication:count_by_4s', 'multiplication:count_by_5s', 'multiplication:count_by_6s',
+    'multiplication:count_by_7s', 'multiplication:count_by_8s', 'multiplication:count_by_9s',
+    'multiplication:count_by_tables', 'multiplication:dot_array_mult', 'multiplication:mult_arrays',
+    'multiplication:mult_chart', 'multiplication:mult_chart_easy', 'multiplication:mult_chart_headers',
+    'multiplication:mult_chart_pattern', 'multiplication:mult_chart_shade', 'multiplication:mult_comparison',
+    'multiplication:mult_comparison_plain', 'multiplication:mult_equal_groups', 'multiplication:mult_properties',
+    'number_ops_mixed:word_problems_mixed', 'number_ops_mixed:word_problems_mixed_plain', 'number_sense:between_tens',
+    'number_sense:estimate_diff', 'number_sense:estimate_products', 'number_sense:estimate_quotient',
+    'number_sense:estimate_sum', 'number_sense:estimate_sums_diffs', 'number_sense:nearest_10',
+    'number_sense:nearest_100', 'number_sense:nearest_1000', 'number_sense:nearest_10000',
+    'number_sense:nearest_100000', 'number_sense:nearest_million', 'number_sense:reasonable_quotients',
+    'number_sense:round_nl_hundred_thousands', 'number_sense:round_nl_ten_thousands', 'number_sense:round_nl_thousands',
+    'number_sense:round_sort_10', 'number_sense:round_sort_100', 'number_sense:round_sort_1000',
+    'number_sense:round_sort_10000', 'number_sense:round_sort_100000', 'number_sense:round_sort_hundredths',
+    'number_sense:round_sort_million', 'number_sense:round_sort_tenths', 'number_sense:rounding_table',
+    'number_sense:rounding_visual', 'patterns:follow_given_rule', 'patterns:notice_patterns',
+    'patterns:number_patterns_rule', 'patterns:skip_count_grid', 'patterns:skip_count_line', 'placevalue:combine',
+    'placevalue:expanded_notation', 'placevalue:one_tenth_value', 'placevalue:place_value_10x',
+    'placevalue:place_value_disks', 'placevalue:pv_digit_drag', 'placevalue:ten_times_story',
+    'placevalue:ten_times_value', 'subtraction:sub_5_pictures', 'vocabulary:vocab_grade_pictures'];
+
+// S8 allow-list (lead, 2026-11-20): the ONE skill whose screen help states the answer. No other skill may join it.
+const S8_EXCEPTIONS = [{ skill: 'placevalue:digit_value_unit_form', source: 'owner request 2026-11-15, fixed by lead' }];
+
+// Round-2 pins (shrink-only): pre-existing skills of other lanes, filled from the r2 sweep (2026-11-20). Owner lanes in
+// design/status/lf-placevalue.md "HINT-NO-BLANK r2 hand-off".
+const PINS = require('../fixtures/hint-no-blank-pins.json');
 
 function exitAfterFlush(code) {
     // never process.exit straight after a long piped write (LESSONS_LEARNED 0c): the verdict line could be lost
@@ -112,7 +136,8 @@ function exitAfterFlush(code) {
     let code = 0;
     try {
         app = await open({ seed: 1, lock: 'ws-hint-no-blank' });
-        const res = await app.page.evaluate(async ({ SKILL, CATEGORY, N_SEEDS, BLANK_SRC }) => {
+        const failed = new Set();
+        const res = await app.page.evaluate(async ({ SKILL, CATEGORY, N_SEEDS, BLANK_SRC, S8_SKILLS }) => {
             const sl = await import('/js/modules/support-ladder.js');
             const kit = await import('/js/modules/sheet/index.js');
             const gq = await import('/js/modules/generate-question.js');
@@ -133,6 +158,63 @@ function exitAfterFlush(code) {
                 const re = new RegExp(`${sp(left)}\\s*\\d[\\d.,/]*\\s*${sp(right)}`);
                 return re.test(later);
             }
+            // ---- round 2: the gate's OWN reading of the answer (never the code under test's answerTokens)
+            const wholeNums = (t) => (String(t == null ? '' : t).match(/\d[\d,]*(?:\.\d+)?(?:\/\d+)?/g) || []).map((x) => x.replace(/,/g, ''));
+            // (a number the question's text or its operands show is given: no leak. Never the picture's numbers: a clock face
+            // shows every hour)
+            const givenOf = (q) => new Set([...wholeNums(plain(q.text || q.question)), ...(Array.isArray(q.operands) ? q.operands.map((v) => String(v).replace(/,/g, '')) : [])]);
+            const NOISE = /^(yes|no|true|false|t|f)$/i;
+            function gateTokens(q) {
+                const out = []; const g = givenOf(q);
+                const add = (v) => {
+                    const x = String(v == null ? '' : v).trim();
+                    if (!x || x === '0' || NOISE.test(x) || !/[A-Za-z\d]/.test(x)) return;
+                    if (!/[A-Za-z]/.test(x) && g.has(x.replace(/,/g, ''))) return;
+                    if (/[A-Za-z]/.test(x) && !/\d/.test(x) && x.length < 3) return;   // an option letter: too short to read
+                    out.push(x);
+                };
+                const a = q.ans;
+                if (typeof a === 'number') add(a);
+                else if (typeof a === 'string') {
+                    if (/;/.test(a)) a.split(';').forEach(add);
+                    else if (/^\s*-?[\d.\/]+(\s*,\s*-?[\d.\/]+)+\s*$/.test(a)) a.split(',').forEach(add);
+                    else add(a);
+                }
+                return out;
+            }
+            function statesG(text, tok) {
+                const t = String(text).replace(/(\d),(?=\d{3})/g, '$1');
+                const k = String(tok).replace(/(\d),(?=\d{3})/g, '$1');
+                if (/[A-Za-z]/.test(k)) return new RegExp(`(^|[^A-Za-z])${esc(k)}(?![A-Za-z])`, 'i').test(t);
+                return new RegExp(`(^|[^\\d.,:/])${esc(k)}(?![\\d/]|\\.\\d)`).test(t);
+            }
+            // a sort (bin map): a bin's label followed by a tile that goes in it ("Rounds to 60: 64, 61")
+            function statesSort(text, q) {
+                if (!q.ans || typeof q.ans !== 'object' || Array.isArray(q.ans) || !Array.isArray(q.bins) || !Array.isArray(q.tiles)) return '';
+                for (const b of q.bins) {
+                    if (!b || b.label == null) continue;
+                    const ls = q.tiles.filter((x) => x && q.ans[x.id] === b.id).map((x) => String(x.label));
+                    for (const l of ls) if (new RegExp(`${esc(String(b.label))}\\s*:[^.]*(^|[^\\d])${esc(l)}(?![\\d])`).test(text)) return `${b.label}: ${l}`;
+                }
+                return '';
+            }
+            const BARE = /^[\d\s().,/]*\d[\d\s().,/]*[+−×÷-][\d\s+−×÷().,/-]*\d\s*\.?$/;
+            const VERB = /^(find|count|add|subtract|take|multiply|divide|work|look|read|point|write|think|start|make|use|say|split|circle|match|put|move|check|draw|mark|join|share|compare|ask|now|then|so|next|tap|choose|halve|double|partition|round|fill|shade|trace|touch|jump|regroup|exchange|cross|colou?r|line|place|name|show|turn|go|skip|group|sort|plot|measure|label|build|break|change|try|remember|cut|fold|order|list|times|hop|drag|keep|line up)\b/i;
+            const findings = [];
+            const F = (check, key, seed, text) => findings.push({ check, key, seed, text: String(text).slice(0, 220) });
+            // UNIT-CUT (F7): a unit test of the cutter on the units the area / volume / measure steps use
+            const UNIT_CASES = [
+                ['Area of a triangle = (base × height) ÷ 2 = (9 × 4) ÷ 2 = 36 ÷ 2 = 18 square units.', ['18'], 'Area of a triangle = (base × height) ÷ 2 = (9 × 4) ÷ 2 = 36 ÷ 2.'],
+                ['Volume = 2 × 3 × 4 = 24 cubic units.', ['24'], 'Volume = 2 × 3 × 4.'],
+                ['Area = 5 × 6 = 30 square cm.', ['30'], 'Area = 5 × 6.'],
+                ['Area = 4 × 4 = 16 cm².', ['16'], 'Area = 4 × 4.'],
+                ['Area = 7 × 3 = 21 square feet.', ['21'], 'Area = 7 × 3.'],
+                ['Add the ones: 4 + 5 = 9.', ['9'], 'Add the ones: 4 + 5.'],
+            ];
+            for (const [inp, toks, want] of UNIT_CASES) {
+                const got = sl.withoutAnswer(inp, toks);
+                if (got !== want) F('UNIT-CUT', 'support-ladder:withoutAnswer', 0, `"${inp}" under ${toks} gave "${got}", want "${want}"`);
+            }
             const want = SKILL ? new Set(SKILL.split(',').map((s) => s.trim()).filter(Boolean)) : null;
             const list = [];
             for (const [cat, skills] of Object.entries(window.SKILLS)) {
@@ -145,7 +227,7 @@ function exitAfterFlush(code) {
                 }
             }
             const offenders = []; const errors = []; const empty = new Set(); const sayless = new Set(); const hiddenFail = []; let items = 0;
-            const firstEmpty = new Map();
+            const firstEmpty = new Map(); const firstSayless = new Map();
             for (const { cat, skill } of list) {
                 const key = `${cat}:${skill}`;
                 for (let i = 0; i < N_SEEDS; i++) {
@@ -169,11 +251,58 @@ function exitAfterFlush(code) {
                         if (frame && !q.sayText && !sl.sayFor(q, ctx)) sayless.add(key);
                     } catch (e) { /* no provider */ }
                     try { const s = sl.sayFor(q, ctx); if (s) paths.push(['SAY', 'say', s]); } catch (e) { errors.push(`${key} seed ${i}: sayFor threw ${e && e.message}`); }
+                    if (!firstSayless.has(key) && paths.some((x) => x[0] === 'STEPS') && !paths.some((x) => x[0] === 'SAY')) firstSayless.set(key, q);
                     if (q.hint) paths.push(['HINT', 'hint', plain(q.hint)]);
                     try {
                         const sol = typeof window.generateSolutionSteps === 'function' ? window.generateSolutionSteps(q) : [];
                         (Array.isArray(sol) ? sol : []).forEach((t, k) => paths.push(['SOL', `sol ${k + 1}`, plain(t)]));
                     } catch (e) { errors.push(`${key} seed ${i}: generateSolutionSteps threw ${e && e.message}`); }
+                    const exempt = S8_SKILLS.includes(key);
+                    if (q.fullWorked && !exempt) F('S8-EXCEPTION', key, i, 'q.fullWorked (help with the answer) on a skill that is not in S8_EXCEPTIONS');
+                    if (!exempt) {
+                        const toks = gateTokens(q);
+                        const steps = paths.filter((x) => x[0] === 'STEPS').map((x) => x[2]);
+                        const sayT = (paths.find((x) => x[0] === 'SAY') || [])[2] || '';
+                        const hintT = q.hint ? plain(q.hint) : '';
+                        // HINT-LEAK / SAY-LEAK (F3): the hint and the Say line are help: S8 holds on them too
+                        const hl = toks.find((tk) => statesG(hintT, tk));
+                        if (hintT && hl) F('HINT-LEAK', key, i, `hint states "${hl}": "${hintT}"`);
+                        const sl8 = toks.find((tk) => statesG(sayT, tk));
+                        if (sayT && sl8) F('SAY-LEAK', key, i, `Say states "${sl8}": "${sayT}"`);
+                        // STEPS-LEAK (F4, F13, F14)
+                        steps.forEach((t, k) => {
+                            const tl = toks.find((tk) => statesG(t, tk));
+                            const so = statesSort(t, q);
+                            if (tl) F('STEPS-LEAK', key, i, `step ${k + 1} states "${tl}": "${t}"`);
+                            else if (so) F('STEPS-LEAK', key, i, `step ${k + 1} states the sort "${so}": "${t}"`);
+                            else if (/(^|\s)Answer\s*:|\[object /.test(t)) F('STEPS-LEAK', key, i, `step ${k + 1} prints the answer line: "${t}"`);
+                        });
+                        // BARE-STEP (F9)
+                        steps.forEach((t, k) => {
+                            const nrm = (x) => x.replace(/\s+/g, '').replace(/\.$/, '').toLowerCase();
+                            if (BARE.test(t)) F('BARE-STEP', key, i, `step ${k + 1} is a bare expression: "${t}"`);
+                            else if (steps.slice(0, k).some((y) => nrm(y) === nrm(t))) F('BARE-STEP', key, i, `step ${k + 1} repeats an earlier step: "${t}"`);
+                        });
+                        // SAY-FILL (F10) and SAY-GAP-GIVEN (F11)
+                        if (sayT && !q.sayText) {
+                            const allowed = new Set([...givenOf(q), ...wholeNums(plain(q.visual)), ...(q.pv && typeof q.pv === 'object' ? Object.values(q.pv).filter((v) => typeof v === 'number' || typeof v === 'string').map((v) => String(v).replace(/,/g, '')) : [])]);
+                            const bad = wholeNums(sayT).filter((v) => !allowed.has(v));
+                            if (bad.length) F('SAY-FILL', key, i, `Say fills ${bad.join(', ')}, not a whole value of the question: "${sayT}"`);
+                            const a = q.ans != null && typeof q.ans !== 'object' ? String(q.ans).replace(/,/g, '') : '';
+                            const tv = wholeNums(plain(q.text || q.question));
+                            // (the question ASKS for a value it shows - "Tap 55 on the number line." - when its only number is the answer)
+                            if (/_{2,}/.test(sayT) && /\d/.test(a) && tv.length && tv.every((v) => v === a)) F('SAY-GAP-GIVEN', key, i, `the Say gap is ${a}, which the question gives: "${sayT}"`);
+                        }
+                        // HELP-THIN (F5): a provider skill that loses at least half its steps ends on a step saying what to do
+                        try {
+                            const pv = kit.getProvider(cat, skill);
+                            const rawP = pv && Array.isArray(pv.real) && pv.real.includes('workedSteps') ? (pv.workedSteps(q) || []).filter((x) => x && x.text) : [];
+                            if (rawP.length >= 3 && steps.length && (rawP.length - steps.length) * 2 >= rawP.length) {
+                                const last = steps[steps.length - 1];
+                                if (!last.split(/[.,;:!?]\s+/).some((c) => VERB.test(c.trim())) && !/\?/.test(last)) F('HELP-THIN', key, i, `${steps.length} of ${rawP.length} steps shown, and the last says nothing to do: "${last}"`);
+                            }
+                        } catch (e) { /* no provider steps */ }
+                    }
                     for (let p = 0; p < paths.length; p++) {
                         const [kind, where, text] = paths[p];
                         const t = String(text || '');
@@ -189,8 +318,8 @@ function exitAfterFlush(code) {
                         //     line of the same help writes that fact filled ("9 + 4 = 13."). Only the equation the gap sits in
                         //     counts, and only a later line of the same path.
                         const later = paths.slice(p + 1).filter((x) => x[0] === kind).map((x) => x[2]).join(' | ') + ' | ' + t.slice(m.index + m[0].length);
-                        // (on STEPS the filled fact may be the answer sentence S8 leaves out: it is read from the steps as written)
-                        if (workedGap(t, m, kind === 'STEPS' ? `${later} | ${rawSteps.slice(rawSteps.indexOf(t) + 1)}` : later)) continue;
+                        // (r2 WORKED-GAP, F1 F2: only a fill the pupil SEES counts - never the hidden fullWorked steps S8 leaves out)
+                        if (workedGap(t, m, later)) continue;
                         offenders.push({ key, seed: i, kind, where, text: t.slice(0, 220), blank: m[0].trim() });
                     }
                 }
@@ -208,10 +337,33 @@ function exitAfterFlush(code) {
                     for (let k = 1; k <= 3; k++) sl.practiceLadderWrong(q, `zz${k}`);
                     const box = document.querySelector('#questionCard .mq-ladder-worked, #visualAid .mq-ladder-worked');
                     if (box) hiddenFail.push(`${key}: no worked step, yet a "Here is how" box is shown ("${(box.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 100)}")`);
+                    // r2 F8: with no box, the status line does not point at one
+                    const fb = (document.getElementById('feedbackArea') || {}).textContent || '';
+                    if (!box && /Here is how/i.test(fb)) hiddenFail.push(`${key}: no "Here is how" box, yet the status line says "${fb.trim().slice(0, 80)}"`);
                 } catch (e) { errors.push(`${key}: card render threw ${e && e.message}`); }
             }
-            return { skills: list.length, items, offenders, errors, empty: [...empty].sort(), sayless: [...sayless].sort(), hiddenFail, hiddenN: firstEmpty.size };
-        }, { SKILL, CATEGORY, N_SEEDS, BLANK_SRC });
+            // LISTEN (F6): a box shown with no Say line still has Listen (speech on)
+            let listenN = 0;
+            for (const [key, q] of firstSayless) {
+                const [cat, skill] = key.split(':');
+                try {
+                    const st = window.state;
+                    const tts = st.ttsEnabled; st.ttsEnabled = true;
+                    st.category = cat; st.skill = skill; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+                    if (window.showView) window.showView('gameView');
+                    const q2 = Object.assign({}, q);
+                    st.currentQ = q2;
+                    window.renderQuestion();
+                    for (let k = 1; k <= 3; k++) sl.practiceLadderWrong(q2, `zz${k}`);
+                    const box = document.querySelector('#questionCard .mq-ladder-worked, #visualAid .mq-ladder-worked');
+                    if (box) { listenN++; if (!box.querySelector('.mq-lw-speak')) F('LISTEN', key, 0, `a "Here is how" box with no Listen: "${(box.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 100)}"`); }
+                    st.ttsEnabled = tts;
+                } catch (e) { errors.push(`${key}: listen card render threw ${e && e.message}`); }
+            }
+            const emptyWhat = {};
+            for (const [key, q] of firstEmpty) emptyWhat[key] = `"${plain(q.text).slice(0, 80)}" ans ${JSON.stringify(q.ans)}; hint "${plain(q.hint).slice(0, 100)}"`;
+            return { emptyWhat, skills: list.length, items, offenders, errors, empty: [...empty].sort(), sayless: [...sayless].sort(), hiddenFail, hiddenN: firstEmpty.size, findings, listenN };
+        }, { SKILL, CATEGORY, N_SEEDS, BLANK_SRC, S8_SKILLS: S8_EXCEPTIONS.map((x) => x.skill) });
 
         const byKey = new Map();
         for (const o of res.offenders) {
@@ -231,15 +383,49 @@ function exitAfterFlush(code) {
         // only shrinks; a skill not on it whose "Here is how" goes empty FAILs.
         const newEmpty = res.empty.filter((k) => !EMPTY_PIN.includes(k));
         res.empty.filter((k) => EMPTY_PIN.includes(k)).forEach((k) => console.log(`  pinned HELP-EMPTY ${k}: every worked step states the answer (no provider steps; owner lane to write them)`));
-        newEmpty.forEach((k) => console.log(`  FAIL HELP-EMPTY ${k}: "Here is how" has no step left once the answer is left out`));
-        if (newEmpty.length) code = 1;
+        newEmpty.forEach((k) => console.log(`  FAIL HELP-EMPTY ${k}: "Here is how" has no step left once the answer is left out (${res.emptyWhat[k] || ''})`));
+        if (newEmpty.length) failed.add('HELP-EMPTY');
         // SAYLESS pin (lead ruling 2026-11-20): skills whose provider frame takes values the screen cannot fill (no sayValues,
         // and the question's own numbers do not fit it). Shrink-only: a skill not on it that loses its Say line FAILs.
         const newSayless = res.sayless.filter((k) => !SAYLESS_PIN.includes(k));
         newSayless.forEach((k) => console.log(`  FAIL SAYLESS ${k}: the provider has a Say frame but the screen shows no Say line`));
-        if (newSayless.length) code = 1;
+        if (newSayless.length) failed.add('SAYLESS');
+        // S8 allow-list: exactly ONE named entry (lead 2026-11-20); a second entry FAILs
+        if (S8_EXCEPTIONS.length !== 1 || S8_EXCEPTIONS[0].skill !== 'placevalue:digit_value_unit_form' || !S8_EXCEPTIONS[0].source) {
+            console.log(`  FAIL S8-EXCEPTION the allow-list must hold only placevalue:digit_value_unit_form (has ${S8_EXCEPTIONS.map((x) => x.skill).join(', ')})`);
+            failed.add('S8-EXCEPTION');
+        }
+        // round-2 checks, each with its shrink-only pin
+        const FULL = !SKILL && !CATEGORY;
+        const byCheck = {};
+        for (const f of res.findings) (byCheck[f.check] = byCheck[f.check] || new Map()).set(f.key, f);
+        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'HELP-THIN', 'LISTEN'];
+        const lists = {};
+        for (const c of CHECKS) {
+            const m = byCheck[c] || new Map();
+            const pin = PINS[c] || [];
+            lists[c] = [...m.keys()].sort();
+            let nNew = 0;
+            for (const [k, f] of [...m.entries()].sort()) {
+                if (pin.includes(k)) { if (VERBOSE) console.log(`  pinned ${c} ${k} seed ${f.seed}: ${f.text}`); continue; }
+                console.log(`  FAIL ${c} ${k} seed ${f.seed}: ${f.text}`); nNew++;
+            }
+            const stale = FULL ? pin.filter((k) => !m.has(k)) : [];
+            stale.forEach((k) => console.log(`  FAIL ${c} pin ${k} no longer fails: take it off the pin (pins only shrink)`));
+            if (nNew || stale.length) failed.add(c);
+            console.log(`ws-hint-no-blank: ${c} ${m.size} skills (pin ${pin.length})`);
+        }
+        if (FULL) {
+            const staleE = EMPTY_PIN.filter((k) => !res.empty.includes(k));
+            const staleS = SAYLESS_PIN.filter((k) => !res.sayless.includes(k));
+            staleE.forEach((k) => console.log(`  FAIL HELP-EMPTY pin ${k} no longer empty: take it off EMPTY_PIN`));
+            staleS.forEach((k) => console.log(`  FAIL SAYLESS pin ${k} has a Say line now: take it off SAYLESS_PIN`));
+            if (staleE.length || staleS.length) failed.add('PIN-STALE');
+        }
+        console.log(`ws-hint-no-blank: LISTEN ${res.listenN} boxes with no Say line checked`);
+        if (SHOW_LISTS) console.log('PINS ' + JSON.stringify(lists));
         res.hiddenFail.forEach((f) => console.log(`  FAIL HELP-EMPTY-HIDDEN ${f}`));
-        if (res.hiddenFail.length) code = 1;
+        if (res.hiddenFail.length) failed.add('HELP-EMPTY-HIDDEN');
         console.log(`ws-hint-no-blank: HELP-EMPTY ${res.empty.length} skills (pin ${EMPTY_PIN.length}), SAYLESS ${res.sayless.length} (pin ${SAYLESS_PIN.length}), HELP-EMPTY-HIDDEN ${res.hiddenN} cards checked, ${res.hiddenFail.length} showing a box`);
         if (SHOW_LISTS) { console.log('EMPTY ' + JSON.stringify(res.empty)); console.log('SAYLESS ' + JSON.stringify(res.sayless)); }
         const kindCount = {};
@@ -247,7 +433,13 @@ function exitAfterFlush(code) {
         console.log(`ws-hint-no-blank: ${res.skills} skills, ${res.items} items, ${keys.length} skills with a blank in their help`
             + (Object.keys(kindCount).length ? ` (${Object.entries(kindCount).sort().map(([k, n]) => `${k} ${n}`).join(', ')} lines)` : ''));
         if (!res.skills) { console.log('  FAIL no skill matched the filter'); code = 1; }
-        if (keys.length || res.errors.length) code = 1;
+        if (keys.length) failed.add('BLANK'); if (res.errors.length) failed.add('ERROR');
+        // --only <CHECK>: the verdict counts that one check (a backtest row proves one check; WORKED-GAP is the BLANK detector's
+        // worked-gap exemption, so it is judged by BLANK)
+        // (a comma list judges a group: --only HINT-LEAK,SAY-LEAK)
+        const onlyIds = ONLY ? ONLY.split(',').map((x) => (x.trim() === 'WORKED-GAP' ? 'BLANK' : x.trim())).filter(Boolean) : [];
+        if (onlyIds.length ? onlyIds.some((x) => failed.has(x)) || failed.has('ERROR') : failed.size) code = 1;
+        if (failed.size) console.log(`ws-hint-no-blank: failing checks ${[...failed].sort().join(', ')}${onlyIds.length ? ` (judged: ${onlyIds.join(', ')})` : ''}`);
         if (app.problems.length) {
             app.problems.slice(0, 5).forEach((p) => console.log(`  (page ${p.type}: ${String(p.text).slice(0, 160)})`));
         }

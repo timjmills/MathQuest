@@ -311,7 +311,7 @@ export function ladderWrong(q, value, ctx = {}) {
     if (!e) {
         const rungs = rungsFor(q, ctx);
         if (!rungs.length) return null;
-        e = { n: 0, last: null, rungs, q, kind: ctx.kind, teacher: teacherTouchIds(q, ctx) };
+        e = { n: 0, last: null, rungs, q, ctx, kind: ctx.kind, teacher: teacherTouchIds(q, ctx) };
         _entries.set(q, e);
     }
     const v = String(value == null ? '' : value).trim();
@@ -387,7 +387,12 @@ function touchHow(e, id) {
 function messageFor(e) {
     if (e.n > e.rungs.length) return '';
     const r = e.rungs[e.n - 1];
-    if (r.id === 'worked') return 'Here is how. Finish it, then try again.';
+    // (HINT-NO-BLANK r2 F8: no worked step left means no "Here is how" box - the message never points at a box that is not there)
+    if (r.id === 'worked') {
+        let n = 1;
+        try { n = workedStepsFor(e.q, e.ctx || {}).length; } catch (err) { n = 1; }
+        return n ? 'Here is how. Finish it, then try again.' : 'Not yet. Try again.';
+    }
     const name = NAMES[r.id] || 'the help';
     const how = TOUCH_IDS.includes(r.id) ? touchHow(e, r.id) : '';
     if (how) return `Not yet. ${how}`;
@@ -739,11 +744,13 @@ export function drawLadder(root, q, ctx = {}) {
 /* ------------------------------------------------------------------ the worked steps */
 
 /** The answer's written forms, and every value the provider marks as written by the steps. */
-function answerTokens(q, steps) {
+export function answerTokens(q, steps) {
     const out = new Set();
     const add = (v) => {
         const s = String(v == null ? '' : v).trim();
-        if (!s || s.length > 12) return;
+        // a word answer may be long ("Scale Drawing", a definition: HINT-NO-BLANK r2 F13); a number never is
+        // ... and an expression answer ("5 × 100 + 7 × 10 + 9 × 1") is written whole, however long
+        if (!s || s.length > (/[A-Za-z]{2}/.test(s) ? 90 : /\d\s*[+×−÷]\s*\d/.test(s) ? 60 : 12)) return;
         out.add(s);
         const n = Number(s.replace(/,/g, ''));
         if (Number.isFinite(n) && Math.abs(n) >= 1000) out.add(n.toLocaleString('en-US'));
@@ -758,6 +765,15 @@ function answerTokens(q, steps) {
     // worksheet's first rung printed "The 9 is in the tens place: 90" for every place box)
     if (q && typeof q.ans === 'string' && /;/.test(q.ans)) q.ans.split(';').forEach(add);
     if (q && Array.isArray(q.expandedValues)) q.expandedValues.forEach(add);
+    // HINT-NO-BLANK r2 F4: a list answer ("80, 4, 5, 8": the missing factors) - every element is a value of the answer
+    if (q && typeof q.ans === 'string' && /^\s*-?[\d.\/]+(\s*,\s*-?[\d.\/]+)+\s*$/.test(q.ans)) q.ans.split(',').forEach(add);
+    // ... and a sort (bin map: tile id -> bin id): a bin's label with its tiles listed IS the sort (F14, "Rounds to 60: 64, 61")
+    if (q && q.ans && typeof q.ans === 'object' && !Array.isArray(q.ans) && Array.isArray(q.bins) && Array.isArray(q.tiles)) {
+        q.bins.forEach((b) => {
+            const ls = q.tiles.filter((t) => t && q.ans[t.id] === b.id).map((t) => String(t.label));
+            if (b && b.label != null && ls.length) out.add(`${b.label}: ${ls.join(', ')}`);
+        });
+    }
     // a set of chosen option ids ("Click ALL ..."): the steps print it joined ("Answer: opt0,opt2")
     if (q && q.answerType === 'multi-select-check' && Array.isArray(q.ans) && q.ans.length) {
         q.ans.forEach(add);
@@ -773,9 +789,10 @@ function answerTokens(q, steps) {
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /** Does this text state one of the answer's forms? A word answer ("A", "tens") only as a whole word. */
-function statesAnswer(text, tokens) {
+export function statesAnswer(text, tokens) {
     return tokens.some((tok) => (/^[A-Za-z][A-Za-z ]*$/.test(tok)
-        ? new RegExp(`(^|[^A-Za-z])${reEsc(tok)}(?![A-Za-z])`).test(text)
+        ? new RegExp(`(^|[^A-Za-z])${reEsc(tok)}(?![A-Za-z])`, tok.length > 3 ? 'i' : '').test(text)
+        : /[A-Za-z]{2}/.test(tok) && tok.length > 12 ? String(text).toLowerCase().includes(tok.toLowerCase())
         : new RegExp(`(^|[^\\d.,:])${reEsc(tok)}(?![\\d])`).test(text)));
 }
 
@@ -797,10 +814,14 @@ export function withoutAnswer(text, tokens) {
     }).filter((x) => x.trim()).join(' ').trim();
 }
 
-/** The sentence up to its last "= <answer>" (or "≈"), when only a unit word or punctuation follows; '' otherwise. */
+/**
+ * The sentence up to its last "= <answer>" (or "≈"), when only a unit (up to three words: "square units", "cubic cm",
+ * "square feet", "cm²") or punctuation follows; '' otherwise. (HINT-NO-BLANK r2 F7: one unit word only dropped
+ * "= 36 ÷ 2 = 18 square units." whole.)
+ */
 function cutAtAnswer(x, tokens) {
     for (const tok of tokens) {
-        const m = new RegExp(`\\s*[=≈]\\s*${reEsc(tok)}(?![\\d/])(\\s*[A-Za-z°%¢$]*)?\\s*([.!]?)\\s*$`).exec(x);
+        const m = new RegExp(`\\s*[=≈]\\s*${reEsc(tok)}(?![\\d/])((?:\\s*[A-Za-z°%¢$²³]+){0,3})\\s*([.!]?)\\s*$`).exec(x);
         if (m && m.index > 0) {
             const head = x.slice(0, m.index).replace(/[\s:,]+$/, '');
             return /\d/.test(head) ? `${head}.` : '';
@@ -827,21 +848,75 @@ function plain(html) {
     return String(html || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+/** The provider's screen-only help (`screenHelp(q) -> {steps?, say?}`, HINT-NO-BLANK r2): never printed, S8-clean. */
+function screenHelpOf(q, cat, skill) {
+    try {
+        const p = getProvider(cat, skill);
+        const h = p && typeof p.screenHelp === 'function' ? p.screenHelp(q) : null;
+        return h && typeof h === 'object' ? h : null;
+    } catch (e) { return null; }
+}
+
+const OP_WORD = { '+': 'plus', '×': 'times', '−': 'minus', '-': 'minus', '÷': 'divided by' };
+const NUM = String.raw`\d[\d,]*(?:\.\d+)?`;
+const GAP_RE = new RegExp(String.raw`(${NUM})\s*([+×−÷-])\s*(?:\?|_{2,})\s*=\s*(${NUM})|(?:\?|_{2,})\s*([+×−÷-])\s*(${NUM})\s*=\s*(${NUM})`);
+const BARE_RE = /^[\d\s().,/]*\d[\d\s().,/]*[+−×÷-][\d\s+−×÷().,/-]*\d\s*\.?$/;  // an expression with no '=' and no word
+// a step that tells the pupil what to do (an instruction verb first), for the HELP-THIN close
+const DOES = /^(?:now:?\s+|then:?\s+|so\s+)?(find|count|add|subtract|take|multiply|divide|work|look|read|point|write|think|start|make|use|say|split|circle|match|put|move|check|draw|mark|join|share|compare|ask|tap|choose|halve|double|partition|round|fill|shade|trace|touch|jump|regroup|exchange|cross|colou?r|place|name|show|turn|go|skip|group|sort|plot|measure|label|build|break|change|try|remember|cut|fold|order|list|keep|line up|hop|drag)\b/i;
+// any sentence or clause of the step starts with an instruction ("If you know one factor, divide 80 by it.")
+const saysWhatToDo = (t) => String(t).split(/[.,;:!?]\s+/).some((c) => DOES.test(c.trim()));
+const exprOf = (t) => String(t).replace(/\s+/g, '').replace(/\.$/, '');
+
+/**
+ * HINT-NO-BLANK r2 (F1, F2, F9): the shown steps read as instructions. A fact written with a gap ("7 + ? = 10") whose
+ * filled form no later SHOWN step writes (S8 left it out) is asked in words ("7 plus what number makes 10?"); a step
+ * left as a bare expression ("10 + 5.") is dropped when an earlier step already writes it, else it says what to do.
+ */
+function readable(steps) {
+    const out = [];
+    steps.forEach((t, i) => {
+        let x = t;
+        const m = GAP_RE.exec(x);
+        if (m) {
+            const later = steps.slice(i + 1).join(' | ');
+            const [a, op, c] = m[1] ? [m[1], m[2], m[3]] : [m[5], m[4], m[6]];
+            const filled = m[1] ? new RegExp(`${reEsc(a)}\\s*${reEsc(op)}\\s*${NUM}\\s*=\\s*${reEsc(c)}(?!\\d)`) : new RegExp(`${NUM}\\s*${reEsc(op)}\\s*${reEsc(a)}\\s*=\\s*${reEsc(c)}(?!\\d)`);
+            if (!filled.test(later)) {
+                const ask = m[1] ? `${a} ${OP_WORD[op]} what number makes ${c}?` : `What number ${OP_WORD[op]} ${a} makes ${c}?`;
+                x = x.slice(0, m.index) + ask + x.slice(m.index + m[0].length).replace(/^\s*\./, '');
+                x = x.replace(/^[^:]*\bwith a gap:\s*/i, 'Think: ');
+            }
+        }
+        if (BARE_RE.test(x)) {
+            const e = exprOf(x);
+            if (out.some((y) => exprOf(y).includes(e))) return;
+            x = `Now work out ${x.replace(/\.$/, '').trim()}.`;
+        }
+        out.push(x);
+    });
+    return out;
+}
+
 /** This item's worked steps, the sentence that states the answer left out (no blank). */
 export function workedStepsFor(q, ctx = {}) {
     const { cat, skill } = whereFrom(q, ctx);
     let raw = [];
-    try {
-        const p = getProvider(cat, skill);
-        if (p && Array.isArray(p.real) && p.real.includes('workedSteps') && typeof p.workedSteps === 'function') {
-            const st = p.workedSteps(q);
-            if (Array.isArray(st)) raw = st.filter((s) => s && s.text);
-        }
-    } catch (e) { raw = []; }
+    const sh = q && q.fullWorked ? null : screenHelpOf(q, cat, skill);
+    if (sh && Array.isArray(sh.steps) && sh.steps.length) raw = sh.steps.map((t) => ({ text: String(t), marks: [] }));
+    if (!raw.length) {
+        try {
+            const p = getProvider(cat, skill);
+            if (p && Array.isArray(p.real) && p.real.includes('workedSteps') && typeof p.workedSteps === 'function') {
+                const st = p.workedSteps(q);
+                if (Array.isArray(st)) raw = st.filter((s) => s && s.text);
+            }
+        } catch (e) { raw = []; }
+    }
     if (raw.length < 2 && typeof window !== 'undefined' && typeof window.generateSolutionSteps === 'function') {
         try {
             const g = window.generateSolutionSteps(q) || [];
-            if (Array.isArray(g)) raw = g.map(plain).filter((t) => t && !/^Problem:/i.test(t)).map((t) => ({ text: t.replace(/^Step \d+:\s*/i, ''), marks: [] })).slice(0, 5);
+            // (r2 F13: the popup's own "Answer: ..." line is the answer, never a step; its "Hint:" label is not one either)
+            if (Array.isArray(g)) raw = g.map(plain).filter((t) => t && !/^Problem:/i.test(t) && !/^Answer\s*:/i.test(t) && !/\[object /.test(t)).map((t) => ({ text: t.replace(/^Step \d+:\s*/i, '').replace(/^Hint:\s*/i, ''), marks: [] })).slice(0, 5);
         } catch (e) { /* keep what there is */ }
     }
     if (!raw.length && q && q.hint) raw = [{ text: plain(q.hint), marks: [] }];
@@ -850,9 +925,31 @@ export function workedStepsFor(q, ctx = {}) {
     // HINT-NO-BLANK (2026-11-20, every skill): no step prints a "___"; the sentence that states the answer is left out (S8).
     // (a value the question itself gives - 10 ÷ 1 = 10 - is no leak: ws-support-ladder S8 tests it the same way)
     const given = new Set([...(String(plain(q && q.text)).match(/\d[\d,]*(?:\.\d+)?/g) || []).map((x) => x.replace(/,/g, '')),
+        ...(String(plain(q && q.text)).match(/\d+\/\d+/g) || []),
         ...(q && Array.isArray(q.operands) ? q.operands.map(String) : [])]);
     const tokens = q && q.fullWorked ? [] : answerTokens(q, raw).filter((tok) => !given.has(tok.replace(/,/g, '')));
-    const out = raw.slice(0, 6).map((s) => withoutAnswer(plain(s.text), tokens)).filter(Boolean);
+    let out = raw.slice(0, 6).map((s) => withoutAnswer(plain(s.text), tokens)).filter(Boolean);
+    if (!(q && q.fullWorked)) out = readable(out);
+    // r2 F5 (HELP-THIN): when leaving the answer out took at least half the steps and the last one left says nothing to do,
+    // close with what to do next - the skill's own general Steps line (no item numbers), else the item's sum to work out
+    const shownRaw = Math.min(raw.length, 6);
+    if (!(q && q.fullWorked) && out.length && shownRaw >= 3 && (shownRaw - out.length) * 2 >= shownRaw && !saysWhatToDo(out[out.length - 1]) && !/\?/.test(out[out.length - 1])) {
+        let close = '';
+        try {
+            const p = getProvider(cat, skill);
+            const gen = p && typeof p.strings === 'function' ? p.strings({ q }).steps : null;
+            const lines = Array.isArray(gen) ? gen.map((t) => plain(t)).filter((t) => t && DOES.test(t) && !/_{2,}|\?/.test(t) && !statesAnswer(t, tokens) && !out.includes(t)) : [];
+            close = lines.length ? lines[lines.length - 1] : '';
+        } catch (e) { close = ''; }
+        // ... else the item's own hint, when it is clean (no answer, no gap) and not shown already
+        const hp = q && q.hint ? plain(q.hint) : '';
+        if (!close && hp && !/_{2,}|[□☐▢]|(?:^|[\s(=+×÷−-])\?(?=\s*(?:$|[=+×÷−),.;]))/.test(hp) && !statesAnswer(hp, tokens) && !out.includes(hp)) close = hp;
+        if (!close) {
+            const bp = binaryParts(Object.assign({}, q, { options: [] }));
+            if (bp && bp.a != null && bp.b != null && bp.op) close = `Now work out ${bp.a} ${({ '+': '+', '-': '−', '*': '×', '/': '÷' })[opKey(bp.op)] || bp.op} ${bp.b}.`;
+        }
+        if (close && !statesAnswer(close, tokens)) out.push(close === hp || /^(now|then)\b/i.test(close) ? close : `Now: ${close.charAt(0).toLowerCase()}${close.slice(1)}`);
+    }
     // every step named the answer: the hint, the answer left out the same way, is the help that is left
     if (!out.length && raw.length && q && q.hint) { const h = withoutAnswer(plain(q.hint), tokens); if (h) out.push(h); }
     // ... else the skill's general steps (the page's Steps band: no item numbers, so no answer and no gap)
@@ -875,7 +972,8 @@ function givenValues(q) {
     const out = [];
     const add = (v) => { const t = String(v).replace(/,/g, ''); if (t && !out.includes(t)) out.push(t); };
     if (q.pv && q.pv.n !== undefined) add(q.pv.n);
-    (plain(q.text || q.question).match(/\d[\d,]*(?:\.\d+)?/g) || []).forEach(add);
+    // a fraction is ONE given value (r2 F10: "1/4" was read as 1 and 4 -> "1 minus 4 is ___.")
+    (plain(q.text || q.question).match(/\d[\d,]*(?:\.\d+)?(?:\/\d+)?/g) || []).forEach(add);
     return out;
 }
 
@@ -901,6 +999,8 @@ function sayWithAnswerGap(frame, filled, q) {
 export function sayFor(q, ctx = {}) {
     if (q && typeof q.sayText === 'string' && q.sayText) return q.sayText;
     const { cat, skill } = whereFrom(q, ctx);
+    const sh = screenHelpOf(q, cat, skill);
+    if (sh && typeof sh.say === 'string' && sh.say) return sh.say;
     let frame = '';
     let filled = '';
     try {
@@ -923,8 +1023,14 @@ export function sayFor(q, ctx = {}) {
         let k = 0;
         return frame.replace(/__/g, () => (k < 2 ? String(ops[k++]) : '___'));
     }
-    // HINT-NO-BLANK (2026-11-20): the frame's one gap is the answer, the pupil's to say.
-    if (blanks === 1) return frame.replace(/__/g, '___');
+    // HINT-NO-BLANK (2026-11-20): the frame's one gap is the answer, the pupil's to say - unless the question GIVES that
+    // value ("Tap 55 on the number line."): then it is filled, never a gap (r2 F11, "55 is here.")
+    if (blanks === 1) {
+        const a = String(q && q.ans != null && typeof q.ans !== 'object' ? q.ans : '').replace(/,/g, '');
+        const textVals = (plain(q && (q.text || q.question)).match(/\d[\d,]*(?:\.\d+)?(?:\/\d+)?/g) || []).map((x) => x.replace(/,/g, ''));
+        if (a && /\d/.test(a) && textVals.length && textVals.every((v) => v === a)) return frame.replace(/__/g, fmtShown(a));
+        return frame.replace(/__/g, '___');
+    }
     // lead ruling 2026-11-20 (option 3): a provider with no sayValues - its frame takes the numbers the question SHOWS, in
     // order, when they fill every gap but the last and the last gap closes the sentence (the answer, left for the pupil);
     // never the answer itself. Otherwise the frame is not shown (SAYLESS, ws-hint-no-blank).
@@ -969,6 +1075,8 @@ function workedHTML(q, ctx) {
         + (say ? `<div class="mq-lw-say"><b>Say:</b> <span>${esc(say)}</span>`
             + (voice ? ` <button type="button" class="mq-lw-speak" data-say="${esc(spoken)}" aria-label="Read the steps and the Say line aloud">Listen</button>` : '')
             + `</div>` : '')
+        // r2 F6: a shown box always has Listen - with no Say line it reads the steps
+        + (!say && voice ? `<div class="mq-lw-say"><button type="button" class="mq-lw-speak" data-say="${esc(spoken)}" aria-label="Read the steps aloud">Listen</button></div>` : '')
         + `</div>`;
 }
 
