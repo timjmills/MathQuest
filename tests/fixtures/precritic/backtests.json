@@ -14277,6 +14277,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-eb-role-stories",
+   "check": "every role the mult-sizes card offers composes on mult_4by1_column: Word problems need provider stories (ws-empty-band EB-ROLE)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-empty-band EB-ROLE",
+   "fail": {
+    "commit": "b3cdc3887",
+    "state": "multiplication:multiply provider (workedSteps only): no stories, word-problems not composed"
+   },
+   "pass": {
+    "commit": "3dcf99542",
+    "state": "stories: storiesFor('x')"
+   },
+   "command": "cd {root} && node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_4by1_column --vocab-ink --page-fill --margin 2 2>&1 | grep -E '^EB-ROLE' | sed -E 's/^EB-ROLE +PASS.*/ws-empty-band-eb-role: OK/; s/^EB-ROLE +FAIL.*/ws-empty-band-eb-role: FAIL/'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
