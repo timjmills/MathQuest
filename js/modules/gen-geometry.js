@@ -3667,7 +3667,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.text = `What is the area of this triangle?`;
                 q.ans = area;
                 q.answerType = "number";
-                q.hint = `Area of a triangle = (base × height) ÷ 2 = (${base} × ${height}) ÷ 2 = ${base * height} ÷ 2 = ${area} square units.`;
+                q.hint = base === area || height === area
+                    ? 'Area of a triangle = (base × height) ÷ 2. Multiply the base by the height, then halve it.'
+                    : `Area of a triangle = (base × height) ÷ 2 = (${base} × ${height}) ÷ 2. Multiply ${base} × ${height}, then halve it.`;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Area of a Triangle</div>
                     ${svg}

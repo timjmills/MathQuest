@@ -157,7 +157,8 @@ function createNewTest() {
             passingScore: 70,
             sectionMode: 'sequential',
             shuffleWithinSections: false,
-            printVersions: 1
+            printVersions: 1,
+            allowSkip: true
         }
     };
 }
@@ -1375,6 +1376,10 @@ function qbRenderSettings() {
             <div class="tvq-suffix"><input type="number" class="tv-input" id="qbSetPass" value="${Number(s.passingScore) || 0}" min="0" max="100" onchange="updateQuizSetting('passingScore', Math.max(0, Math.min(100, parseInt(this.value) || 0)))"><span aria-hidden="true">%</span></div>
           </div>
         </div>
+      </section>
+      <section class="tvq-group" aria-labelledby="qbSetSkipH">
+        <h3 class="tvq-group-h" id="qbSetSkipH">Skipping</h3>
+        ${settingSwitch('qbSetSkip', 'allowSkip', s.allowSkip !== false, 'Online: pupils can skip a question', 'Skip flags the question and moves on. Before they submit, every skipped question comes back once.')}
       </section>
       <section class="tvq-group" aria-labelledby="qbSetShuffleH">
         <h3 class="tvq-group-h" id="qbSetShuffleH">Shuffling</h3>

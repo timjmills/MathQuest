@@ -88,12 +88,18 @@ registerSkill('vocabulary:vocab_grade_pictures', {
         if (templateOf(q) === 'vocab-pick3') {
             // (step 1 is the Guided page's grey hint, guided.js hintOf: it names a cue - the word's first letter - never the
             // instruction again: critic r2 #5; ws-vocab-unit V12)
-            // (the cue picks out ONE bank word: the first letter only when no other bank word starts with it, else the
-            // word's meaning - critic r3 #5: "starts with c" with column and commutative in the bank; ws-vocab-unit V14)
-            const first = String(p.word).charAt(0).toLowerCase();
-            const unique = (p.bank || []).filter((w) => String(w).charAt(0).toLowerCase() === first).length === 1;
+            // GUIDED-HINT-LEAK (bank) (lf-roles critic r14 z1, lead 2026-11-20; replaces critic r3 #5's one-word cue): the cue
+            // narrows the bank to TWO words, never one (a one-word cue is the answer, PT 2.3). The answer's first letter when another
+            // bank word shares it; else that letter and one other bank word's letter, in alphabetical order (the order gives nothing).
+            // ws-vocab-unit V14.
+            const ini = (w) => String(w).charAt(0).toLowerCase();
+            const first = ini(p.word);
+            const bank = (p.bank || []).map(String);
+            const other = bank.find((w) => w !== p.word && ini(w) !== first);
+            const shared = bank.filter((w) => ini(w) === first).length >= 2 || !other;
+            const cue = shared ? `Its word starts with "${first}".` : `Its word starts with "${[first, ini(other)].sort().join('" or "')}".`;
             return clampSteps([
-                step(unique ? `Its word starts with "${first}".` : `Its word means ${meaningOf(p.word)}.`),
+                step(cue),
                 step('Read the three words in the box.'),
                 step(`Write "${p.word}" on the line.`, [{ slot: 'answer', value: p.word }]),
             ]);

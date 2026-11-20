@@ -351,9 +351,8 @@ export function resetAttemptTracking() {
     flushDeferredAdaptive();
     state.currentQAttempts = 0;
     state.currentQAttemptHistory = [];
-    // Hide skip button + clear any cross-outs
-    const skipBtn = document.getElementById('skipQuestionBtn');
-    if (skipBtn) skipBtn.style.display = 'none';
+    // Skip button from the rule (always on for the practice card / MAP; boss / race after N wrong tries)
+    updateSkipButton();
     const histBox = document.getElementById('attemptHistoryBox');
     if (histBox) { histBox.innerHTML = ''; histBox.style.display = 'none'; }
     // Re-enable any wrong-choice buttons (cross-outs cleared on next render anyway)
@@ -475,6 +474,9 @@ export function skipCurrentItem() {
 // Adaptive level changes are held while an item's support ladder climbs (a "Going back to Level
 // 2" toast must not land on a support step): its wrong answers are recorded when the item ends.
 let _deferredAdaptive = null;          // { skillId, n }
+/** A skip is never a miss: forget the wrong tries held back for the adaptive ladder (lf-hosts skip). */
+export function dropDeferredAdaptive() { _deferredAdaptive = null; }
+
 export function flushDeferredAdaptive() {
     const d = _deferredAdaptive;
     _deferredAdaptive = null;
@@ -973,8 +975,7 @@ function _ladderAfter(q, userAns) {
     practiceLadderWrong(q, userAns);
     const sb = document.getElementById('solutionBtn');
     if (sb) sb.style.display = 'none';
-    const skipBtn = document.getElementById('skipQuestionBtn');
-    if (skipBtn) skipBtn.style.display = 'none';
+    updateSkipButton();
     const card = document.getElementById('questionCard');
     if (card) card.classList.remove('incorrect-bg');
 }
@@ -1213,13 +1214,13 @@ export function checkAnswer(userAns, btnElement) {
         // Update goal progress display
         updateGoalProgress();
 
-        // Check if problem goals are met (Mixed Mode)
-        if (checkProblemGoals()) {
-            return; // Game ended due to goal reached
-        }
+        // Check if problem goals are met (Mixed Mode). When they end the run (the end screen follows in 600 ms) the item
+        // is still finished below (hasAnswered, the practice log): an early return left hasAnswered false, so the
+        // pupil's Enter re-submitted the live-checked last item - scored twice and a second end screen (lf-hosts F3).
+        const runEnding = checkProblemGoals();
 
         // Auto-advance with green flash + slide transition
-        if (shouldShowNextButton()) {
+        if (!runEnding && shouldShowNextButton()) {
             setTimeout(() => {
                 transitionToNextQuestion();
             }, 2500);

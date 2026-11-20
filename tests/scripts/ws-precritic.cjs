@@ -992,6 +992,8 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-roles r16 F3, lead: a Guided continuation page's cells hold their content - CELL-FITS, two-step stories M / L)
+        add(gate('guided-cellfit', 'ws-guided-cellfit (CELL-FITS: Guided pages 2+ hold their cells; GUIDED-HINT-LEAK box numbers; HINT-OVERMASK given numbers stay - HINT-UNIFORM waits on lf-algebra)', 'the Guided role', 'browser', 'ws-guided-cellfit', ['--only', 'CELL-FITS,HINT-LEAK,HINT-OVERMASK'], { missingMsg: 'ws-guided-cellfit is not in this tree' }));
         // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
         // below with no overlap, TITLE-LONG never shrinks / at most two lines / cut with a warning - on every role, M and L)
         add(gate('frame-title', 'ws-frame-title (the page-title option on every role and key: TITLE-IDENT, TITLE-PLACE, TITLE-LONG)', `${scope} × every role × M/L`, 'browser', 'ws-frame-title', ['--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-frame-title.cjs' }));
@@ -1278,6 +1280,13 @@ function buildPlan(ctx) {
         // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
         // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
         add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        // lf-hosts skip (owner request 2026-11-19): Skip on the practice card, online worksheet, quiz and MAP test - the button,
+        // the count, never wrong, the end-of-run return pass (same item, scored once), "skipped" in the teacher's results, the
+        // teacher's off; a fixed mult_facts run, planned once per --skill run, at the widths of tests/lib/ws-screen-widths.cjs
+        add(gate('skip', 'ws-skip (SKIP-RETURN / SKIP-NOT-WRONG / SKIP-BTN / SKIP-COUNT / SKIP-RESULTS / SKIP-OFF: card, worksheet, quiz, MAP)', 'card, worksheet, quiz, MAP × 820 / 1024 / 1280 / 1366', 'browser', 'ws-skip', [], { missingMsg: 'ws-skip is not in this tree' }));
+        // lf-hosts skip critic r2 F3/F4 (lead-routed): a keyboard-finished practice run ends ONCE (one end screen, one session
+        // row, score = correct / total) and infinite-practice Finish counts only answered items; a fixed run at 1280
+        add(gate('end-run', 'ws-end-run (END-ONCE / END-INF: typed + Enter practice run of mult_facts and sub_word_problems ends once; Finish counts answered items)', 'practice card × 1280', 'browser', 'ws-end-run', [], { missingMsg: 'ws-end-run is not in this tree' }));
         add(gate('phone-card', 'ws-phone-card (the screen card check: practice card, worksheet and quiz at 820 / 1024 / 1280 / 1366 px: clip, first-box focus, 48 px answer boxes, real taps, focus ring, cell read)', `${scope} × 820x1180, 1024x768, 1280x900, 1366x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
         // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280, 1366, 1024 and 820 px, the lane's skills
         // only (≈ 2 s a skill a width; one browser, inside this row's slot). A skill with no options panel is skipped by
@@ -1310,6 +1319,9 @@ function buildPlan(ctx) {
         // VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY (node, seeded); pins in tests/fixtures/precritic/vq-baseline.json
         // (shrink-only). A pinned finding is PASS (baseline); any other finding, or a skill missing from the output, is FAIL.
         add(gate('visual-quality', 'ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell)', scope, 'node', 'ws-visual-quality', ['--skill', keys.join(',')], { parse: PARSE.visualQuality, keys, expect: { mention: keys } }));
+        // ---- HINT-NO-BLANK (lf-placevalue 2026-11-20; first found on placevalue:digit_value_unit_form, ws-unit-form-bank check 5):
+        // the screen help - "Here is how" steps, the Say line, the hint, the Show Solution steps - never shows an unfilled blank
+        add(gate('hint-no-blank', 'ws-hint-no-blank (HINT-NO-BLANK: no "___" / {n} / gap "?" in the screen help: worked steps, Say line, hint, solution; HELP-EMPTY pinned)', `${scope} × 4 seeds`, 'browser', 'ws-hint-no-blank', ['--skill', keys.join(',')], { missingMsg: 'ws-hint-no-blank is not in this tree' }));
         // ---- lane lf-vocab (2026-11-07; design/cards/vocabulary): the picture vocabulary rules V1-V7 (every word drawn, one
         // right answer an item, no word twice on a page, every lesson set splits into two clash-free trios) whenever a picture
         // vocabulary skill is in scope. Default parse: its last "ws-vocab-unit: OK|FAIL" line and its exit code.

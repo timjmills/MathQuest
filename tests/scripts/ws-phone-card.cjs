@@ -71,6 +71,8 @@
 const fs = require('fs');
 const path = require('path');
 const { open, ROOT } = require('../lib/ws-harness.cjs');
+// the tablet widths where the 48 px tool-button and working-box floors are judged (THE one table)
+const TABLETS = [...require('../lib/ws-screen-widths.cjs').TABLET_WIDTHS];
 
 const TOOL = 'ws-phone-card';
 const argv = process.argv.slice(2);
@@ -222,6 +224,7 @@ function PROBE() {
     if (cellN && window.CELL_EMPTY && window.CELL_EMPTY(paper)) findings.push({ rule: 'CELL-READ', msg: 'the card cell (#questionPaper [data-ws-cell]) holds no drawn mark and no answer slot (an empty cell that carries a kind)' });
     // TOUCH-TARGET (lf-checks queue 10)
     for (const t of TARGETS('#questionCard')) findings.push({ rule: 'TOUCH-TARGET', msg: t });
+    if (window.TOOLS) for (const t of window.TOOLS('#questionCard')) findings.push({ rule: 'TOUCH-TARGET', msg: t });
     // TOUCH-UNIQUE (lf-hosts critic r1 F4); FOCUS-RING (F3) moves the focus, so main() runs it after this probe
     if (window.UNIQUE) for (const t of window.UNIQUE('#questionCard')) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
     // TOUCH (owner 2026-11-13): answer boxes are 48 px touch targets on a tablet (44 px at an explicit phone width)
@@ -270,6 +273,8 @@ function TARGETS(rootSel) {
     const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
     const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
     const OPT = '.mq-carry, .column-carry-input, .mq-opswork, .mq-wwork, [data-mq-work], [data-ws-slot^="regroup"], .mq-regroup';
+    const TW = window.__MQ_TABLETS || [];
+    const TAB = TW.length > 0 && window.innerWidth >= Math.min(...TW) && window.innerWidth <= Math.max(...TW);
     const groups = new Map();
     for (const rt of roots) {
         for (const el of rt.querySelectorAll('input, textarea, [contenteditable="true"]')) {
@@ -277,10 +282,38 @@ function TARGETS(rootSel) {
             if (!vis(el) || el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup')) continue;
             const r = el.getBoundingClientRect();
             const opt = el.matches(OPT) || /carry|regroup/i.test(String(el.className));
-            const floor = opt ? 44 : 48;
+            // lf-placevalue critic (lead-routed, 2026-11-20): at a TABLET width (tests/lib/ws-screen-widths.cjs TABLET_WIDTHS) a
+            // working box the pupil types in (the sentence frame's sign circle, a word-work number box) is held to the 48 px answer
+            // floor too, as ws-grade-render holds it (add_wp_20's worksheet sign circle was 46 x 46 at 820 / 1024 and passed here
+            // at 44); only a carry / regroup scratch box keeps SP-10's 44 px (SP-23)
+            const scratch = /carry|regroup/i.test(String(el.className) + ' ' + (el.getAttribute('data-ws-slot') || '') + ' ' + (el.getAttribute('data-mq-kind') || ''));
+            const floor = opt && (scratch || !TAB) ? 44 : 48;
             if (r.width >= floor - 0.5 && r.height >= floor - 0.5) continue;
             const cls = typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '';
-            const k = `${el.tagName.toLowerCase()}${cls} ${Math.round(r.width)} x ${Math.round(r.height)} px (${opt ? 'a working box: want >= 44 x 44, RUBRIC H6' : 'an answer place: want >= 48 x 48, SP-10'})`;
+            const k = `${el.tagName.toLowerCase()}${cls} ${Math.round(r.width)} x ${Math.round(r.height)} px (${floor === 44 ? 'a working box: want >= 44 x 44, RUBRIC H6' : opt ? 'a working box typed on a tablet: want >= 48 x 48, SP-10' : 'an answer place: want >= 48 x 48, SP-10'})`;
+            groups.set(k, (groups.get(k) || 0) + 1);
+        }
+    }
+    return [...groups.entries()].map(([k, n]) => `${n} x ${k}`);
+}
+
+/* In the page: TOUCH-TARGET on the card's TOOL buttons (lf-placevalue critic, lead-routed 2026-11-20: the practice card's Listen /
+   Hint / Read buttons were 44 px tall; owner 2026-11-13: 48 px touch targets on a tablet). At a TABLET width (window.__MQ_TABLETS,
+   from tests/lib/ws-screen-widths.cjs) every visible button of the card's tool row (#questionCard > .mq-qactions: Hint, Read,
+   Calculator, Solution, Skip, Check), of the open hint (.mq-hint-inline: Listen, close, Got it!) and a worked-steps Listen
+   (.mq-lw-speak) is at least 48 x 48 px. Returns one message per (id / class, size) group. Pure DOM: the self-test runs it. */
+function TOOLS(rootSel) {
+    const TW = window.__MQ_TABLETS || [];
+    if (!(TW.length > 0 && window.innerWidth >= Math.min(...TW) && window.innerWidth <= Math.max(...TW))) return [];
+    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    const groups = new Map();
+    for (const rt of document.querySelectorAll(rootSel)) {
+        for (const el of rt.querySelectorAll(':scope > .mq-qactions button, .mq-hint-inline button, button.mq-lw-speak')) {
+            if (!vis(el)) continue;
+            const r = el.getBoundingClientRect();
+            if (r.width >= 47.5 && r.height >= 47.5) continue;
+            const nm = el.id ? `#${el.id}` : (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '');
+            const k = `tool button${nm ? ' ' + nm : ''} "${String(el.textContent || '').replace(/[^\x20-\x7e]/g, '').trim().slice(0, 14)}" ${Math.round(r.width)} x ${Math.round(r.height)} px (a card tool button on a ${window.innerWidth} px tablet: want >= 48 x 48)`;
             groups.set(k, (groups.get(k) || 0) + 1);
         }
     }
@@ -516,7 +549,7 @@ async function selfTest() {
         // the tablet default (owner 2026-11-13). The fixtures below predate TOUCH; their CLIP-X / FOCUS cases judge every
         // rule but TOUCH (noTouch), and TOUCH has its own cases at the end.
         await page.setViewport({ width: 820, height: 1180 });
-        const run0 = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
+        const run0 = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`); return page.evaluate(PROBE); };
         const noTouch = (r) => Object.assign({}, r, { findings: r.findings.filter((x) => x.rule !== 'TOUCH') });
         const run = async (v) => noTouch(await run0(v));
         const good = await run('good');
@@ -547,15 +580,38 @@ async function selfTest() {
         const pd = await run('padded');
         if (pd.findings.some((x) => x.rule === 'TOUCH-TARGET')) fails.push(`a drawn 40 px box in 48 px of transparent padding: no TOUCH-TARGET finding (${JSON.stringify(pd.findings)})`);
         await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" style="width:44px;height:44px"><input style="width:46px;height:48px"><textarea style="width:60px;height:30px"></textarea><div class="mq-wsbar"><input style="width:20px;height:20px"></div></div>');
+        await page.evaluate('window.__MQ_TABLETS = [];');   // the off-tablet floors (a tablet holds working boxes to 48: below)
         const ht = await page.evaluate(TARGETS, '#h');
         if (ht.length !== 2 || !ht.some((t) => /46 x 48/.test(t)) || !ht.some((t) => /textarea 60 x 30/.test(t))) fails.push(`working boxes at 44 pass, a 46 px answer box and a 30 px textarea fail, the chrome bar is skipped: ${JSON.stringify(ht)}`);
-        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
+        // lf-placevalue critic (lead-routed 2026-11-20): at a TABLET width a typed working box (add_wp_20's worksheet sign circle,
+        // 46 x 46) is held to 48 px; a carry / regroup box keeps 44; off the tablet widths (1280) the working box keeps 44
+        await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" data-mq-kind="regroup" style="width:44px;height:44px"><input class="mq-wwork mq-gl-sign" style="width:46px;height:46px"><input class="mq-wwork" style="width:48px;height:48px"></div>');
+        await page.evaluate(`window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
+        const hw = await page.evaluate(TARGETS, '#h');
+        if (hw.length !== 1 || !/1 x input\.mq-wwork\.mq-gl-sign 46 x 46 px \(a working box typed on a tablet/.test(hw[0])) fails.push(`820: the 46 px sign circle fails, carry / regroup 44 and a 48 px working box pass: ${JSON.stringify(hw)}`);
+        // TOOLS: the card's tool row and the open hint's buttons are >= 48 x 48 on a tablet (Hint / Read / Listen were 44 px tall)
+        const toolPage = (h) => `<div id="questionCard"><div class="mq-qactions" style="display:flex;gap:10px"><button id="hintBtn" style="height:${h}px;width:80px">Hint</button><button id="ttsBtn" style="height:${h}px;width:80px">Read</button><button id="skipQuestionBtn" style="height:48px;width:80px">Skip</button><button id="calcBtn" style="display:none;height:20px">Calc</button></div><div class="mq-hint-inline"><button id="hintSpeakBtn" style="height:${h}px;width:80px">Listen</button></div></div>`;
+        await page.setContent(toolPage(44));
+        await page.evaluate(`window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
+        const tb = await page.evaluate(TOOLS, '#questionCard');
+        if (tb.length !== 3 || !tb.some((t) => /#hintBtn "Hint" 80 x 44/.test(t)) || !tb.some((t) => /#ttsBtn/.test(t)) || !tb.some((t) => /#hintSpeakBtn "Listen" 80 x 44/.test(t))) fails.push(`820: Hint / Read / Listen at 44 px tall fail, Skip at 48 and the hidden Calculator pass: ${JSON.stringify(tb)}`);
+        await page.setContent(toolPage(48));
+        await page.evaluate(`window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
+        const tg = await page.evaluate(TOOLS, '#questionCard');
+        if (tg.length) fails.push(`820: tool buttons at 48 px pass: ${JSON.stringify(tg)}`);
+        await page.setViewport({ width: 1280, height: 900 });
+        await page.setContent(toolPage(44));
+        await page.evaluate(`window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
+        const t12 = await page.evaluate(TOOLS, '#questionCard');
+        if (t12.length) fails.push(`1280 (not a tablet): the tool-button floor is not judged: ${JSON.stringify(t12)}`);
+        await page.setViewport({ width: 820, height: 1180 });
+        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`); return noTouch(await page.evaluate(PROBE)); };
         const lifted = await runL('lifted');
         if (lifted.focus !== 'ok' || lifted.findings.length) fails.push(`legacy ones box lifted 4 px by .mq-active-box and focused: must be ok (${JSON.stringify(lifted.findings)})`);
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
-        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`); return noTouch(await page.evaluate(PROBE)); };
         const bl = await runB('bare-left');
         const bf = bl.findings.find((x) => x.rule === 'FOCUS');
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
@@ -581,7 +637,7 @@ async function selfTest() {
         const rb = await page.evaluate(() => window.RINGS('#c'));
         if (rb.length) fails.push(`one blue 4 px ring (inset shadow and outline): no FOCUS-RING finding (${JSON.stringify(rb)})`);
         // TOUCH (owner 2026-11-13): 40 px answer boxes FAIL at 820 and 1024; 48 px boxes pass; at an explicit 390 the floor is 44
-        const touchAt = async (w, px) => { await page.setViewport({ width: w, height: 900 }); await page.setContent(BARE('bare-right').replace('input{width:48px;height:48px}', `input{width:${px}px;height:${px}px;box-sizing:border-box}`)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return (await page.evaluate(PROBE)).findings.filter((x) => x.rule === 'TOUCH'); };
+        const touchAt = async (w, px) => { await page.setViewport({ width: w, height: 900 }); await page.setContent(BARE('bare-right').replace('input{width:48px;height:48px}', `input{width:${px}px;height:${px}px;box-sizing:border-box}`)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`); return (await page.evaluate(PROBE)).findings.filter((x) => x.rule === 'TOUCH'); };
         if (!(await touchAt(820, 40)).length) fails.push('TOUCH: 40 px answer boxes at 820 must FAIL');
         if (!(await touchAt(1024, 46)).length) fails.push('TOUCH: 46 px answer boxes at 1024 must FAIL');
         if ((await touchAt(1024, 48)).length) fails.push('TOUCH: 48 px answer boxes at 1024 must pass');
@@ -624,7 +680,7 @@ async function fixtureRun(file) {
         await page.setViewport({ width: 820, height: 1180 });
         await page.setContent(fs.readFileSync(path.resolve(file), 'utf8'));
         await page.waitForFunction(() => document.readyState === 'complete');
-        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
         const m = await page.evaluate(PROBE);
         findings = m.findings;
         const ck = await page.evaluate(`(${CELL_KIND})(window.__MQ_KIND_MOD)`);
@@ -702,7 +758,7 @@ async function main() {
                         await cardReady(page);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
                         m = await page.evaluate(PROBE);
                         // FOCUS-RING moves the focus, so it runs after PROBE (and puts it back)
                         if (!m.error) for (const t of await page.evaluate(() => window.RINGS('#questionCard'))) m.findings.push({ rule: 'FOCUS-RING', msg: t });
@@ -710,6 +766,16 @@ async function main() {
                         if (!m.error) { const ck = await page.evaluate(`(${CELL_KIND})()`); if (ck) m.findings.push({ rule: 'CELL-READ', msg: ck }); }
                         // TOUCH-HIT (lf-hosts critic r2 F1): real taps; skipped when --only names other rules
                         if (!m.error && (!ONLY.length || ONLY.includes('TOUCH-HIT'))) for (const t of await touchHit(page, '#questionCard')) m.findings.push({ rule: 'TOUCH-HIT', msg: t });
+                        // TOUCH-TARGET on the open hint's buttons (Listen, close, Got it!; lf-placevalue critic 2026-11-20): last, as
+                        // opening the hint changes the card
+                        if (!m.error && (!ONLY.length || ONLY.includes('TOUCH-TARGET')) && TABLETS.includes(size.w)) {
+                            const opened = await page.evaluate(() => { const b = document.getElementById('hintBtn'); if (!b || b.disabled || !b.getClientRects().length) return false; b.click(); return true; });
+                            if (opened) {
+                                await page.waitForFunction(() => !!document.querySelector('#questionCard .mq-hint-inline button'), { timeout: 3000 }).catch(() => {});
+                                await settle(page);
+                                for (const t of await page.evaluate(() => window.TOOLS('#questionCard .mq-hint-inline'))) m.findings.push({ rule: 'TOUCH-TARGET', msg: `(hint open) ${t}` });
+                            }
+                        }
                         m = keep(m);
                         if (m.error) throw new Error(m.error);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
@@ -756,7 +822,7 @@ async function main() {
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await hostReady(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper');
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY}; window.TOOLS = ${TOOLS}; window.__MQ_TABLETS = ${JSON.stringify(TABLETS)};`);
                         m = await page.evaluate(HOST_PROBE, host);
                         if (host === 'quiz') for (const t of await page.evaluate((sel) => window.RINGS(sel), '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'FOCUS-RING', msg: t });
                         if (!ONLY.length || ONLY.includes('TOUCH-HIT')) for (const t of await touchHit(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'TOUCH-HIT', msg: t });
