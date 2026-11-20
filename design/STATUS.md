@@ -940,3 +940,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-19 — Deploy ws-merge-master (lf-checks; critic r5 PASS 9/9/9/8)
 - Lanes merge master into their branch with `MQ_COMMIT_TRAILER="<footer>" node tests/scripts/ws-merge-master.mjs --commit`: ledger / backtests / status files unioned row by row; a both-sides row or line conflict is left for the lane (exit 1). Self-test 28 cases; backtests merge-master-r1 / -crlf / -only-empty.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy gate robustness: ws-key-json and ws-tof-stem restart / retry (lf-checks; critics 9/8/9/8 each)
+- ws-key-json and ws-tof-stem evaluate per skill with a 120 s protocol timeout, restart the browser and retry once; two failures make a finding. The full key-json sweep runs whole again (734 skills).
+- Gates (test-harness-only change): boot-smoke, code-snapshot, key-json FULL sweep, tof-stem FULL sweep, backtests key-json-retry / tof-stem-retry, backtest + precritic self-tests, precritic-plan.
