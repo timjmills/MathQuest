@@ -12100,9 +12100,7 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   },
-   "pending": true,
-   "pendingReason": "build step 1b (MR-B): AREA_LABELS is not exported by js/modules/teacher-areas.js yet; re-arm (drop pending) when it lands"
+   }
   },
   {
    "id": "mix-review-count",

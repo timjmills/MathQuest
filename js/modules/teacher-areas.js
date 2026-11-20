@@ -39,6 +39,26 @@ export const AREAS = {
     NOSTD: { name: 'No standard', short: 'No standard', long: 'No standard', css: 'slate', icon: 'nostd' },
 };
 
+/**
+ * The CCSS domain label of every area key: the ONE whole label map (mixed-review card design/cards/mixed-review/mixed-review.md
+ * §7a "Area labels", copied exactly from the lessons-browser card §0 R1, commit 55ae9d090; lead ruling 2026-11-19 §9.1). The
+ * mixed-review chips, key summary and results read it; lf-checks and the lessons browser reuse it. No other file holds the
+ * whole map (`node tests/scripts/ws-mix-review.mjs --check labels`). MIXED and NOSTD are never in the mixed-review pool.
+ */
+export const AREA_LABELS = Object.freeze({
+    CC: 'Counting & Cardinality',
+    OA: 'Operations & Algebraic Thinking',
+    NBT: 'Number & Operations in Base Ten',
+    NF: 'Number & Operations—Fractions (decimals live here)',
+    MEAS: 'Measurement (Measurement & Data)',
+    DATA: 'Data (Measurement & Data)',
+    G: 'Geometry',
+    RPNS: 'Ratios & Proportional Relationships / The Number System (grade 6)',
+    MIXED: 'Mixed (several domains)',
+    WORDS: 'Words (maths vocabulary)',
+    NOSTD: 'No CCSS domain (proposed; the ruling did not name it — 1 grade-3 lesson)',
+});
+
 /** The area icons (20 x 20, drawn in currentColor), copied from the signed mock-up. */
 export const AREA_ICONS = {
     dots: '<circle cx="6" cy="6" r="2.2" fill="currentColor"/><circle cx="14" cy="6" r="2.2" fill="currentColor"/><circle cx="6" cy="14" r="2.2" fill="currentColor"/><circle cx="14" cy="14" r="2.2" fill="currentColor"/>',
