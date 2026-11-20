@@ -820,7 +820,7 @@ function cutCount(text, tokens) {
         if (items[0] === '1' || items[0] === '0') return 'say one number for each one';
         const keep = items.slice(0, Math.min(at, 3));
         return keep.length ? `${keep.join(', ')}, …` : '…';
-    });
+    }).replace(/… ?\./g, '…'); // the sentence's own full stop after a cut run is not doubled ("8, 9, …." -> "8, 9, …")
 }
 
 function plain(html) {
