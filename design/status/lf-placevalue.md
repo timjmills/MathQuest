@@ -545,3 +545,18 @@ they would show no box; once a family has screenHelp the r3 rule covers it (and 
 - `shapes_early` (2): mixed_shapes_early, name_3d_shapes
 - `subtraction` (1): sub_5_pictures
 - `vocabulary` (1): vocab_pick3_words
+
+### 2026-11-20 — HINT-NO-BLANK r3 critic + stop (budget)
+
+Critic r3 (`design/audit/runs/lf-placevalue/critic-hint-no-blank-r3.md`): change 2 expand-2col PASS (9/9/8/9 at 1024).
+Change 1 FAIL. Lane skills on the choice rule now score >= 8 (expanded_notation 9/9/8/9; identify, expand, compare, make_a_ten,
+round_nl 9s; add_facts 9s and sub_facts 8s keep their r2 steps). Findings:
+- R3-2 compensation (cut own steps, no "Now add"): FIXED here, check PREFER-SH (`hint-no-blank-r3-prefer-sh`).
+- R3-1 factors_identify "1 × 30 = 30" + lone "Factor pairs:" - number_theory (not ours), kept r2 under A12, same as master. Routed:
+  its lane writes screenHelp (then the r3 rule hides the leak). Check: --strict-pins on a critic-named skill.
+- R3-3 round_sort_* Show Solution "Answer: [object Object]" (OURS, pre-existing on master) - NEXT WEEK; check SOL-OBJECT.
+- R3-4 expand / expanded_notation / round_nl_* Show Solution "Problem:" line garbled ("673 + ? + ___") from the generic
+  fallback at solution-display.js:894 (OURS, pre-existing) - NEXT WEEK; check SOL-PROBLEM (drop the Problem-line exemption).
+- Minor: R3-5 nearest_10000 box wording vs card scaffold ("Four or less: round down" / "4 or less -> keep it", "cut line");
+  R3-6 sub_facts Show Solution uses column borrow (lf-ops). Expand-2col: start the rule at ~1000 px (960-1000 stays 1 column).
+Stopped at the budget stop; the round cap is reached for HINT-NO-BLANK, so R3-3 / R3-4 start next week with their checks first.
