@@ -12261,6 +12261,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "skip-results-pupil",
+   "check": "ws-skip SKIP-RESULTS (pupil breakdown): on the quiz results screen the pupil sees a question still skipped after the return pass as a neutral 'Skipped' (no red cross), with its answer line, as the teacher's view does",
+   "kind": "commit-pair",
+   "rule": "SKIP-RESULTS (lf-hosts skip critic r2 F2)",
+   "fail": {
+    "commit": "1c2959693",
+    "state": "the pupil breakdown showed the skipped Q3 with a red cross and the answer, while the teacher view read 'Skipped'"
+   },
+   "pass": {
+    "commit": "96f23a96c",
+    "state": "the skipped row reads a neutral 'Skipped' pill, the answer line kept"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts quiz --rules SKIP-RESULTS",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
