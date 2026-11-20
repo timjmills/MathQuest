@@ -122,7 +122,7 @@ Y4.B4 tables: `Y4.B4.S2` … `Y4.B4.S6` (S6 is the 3/6/9 chart lesson, unchanged
 (c): `algebra_two_step_letter_equation-<before|after>-<M|L>-<pupil|key>-p1.png` (before = 0983c6791).
 Name pattern: `<id>-<before|after>-<M|L>-<pupil|key>-p1.png` (80 files).
 
-## Gates (head 9d9551f95 = the fix merged with master a98297951 by ws-merge-master)
+## Gates (head 9d9551f95 = the fix merged with master a98297951; re-checked on edf61f391 = merged with master eb2e26972: boot OK, CELL-FITS the same 28, lesson-pages the same, backtests OK, baseline re-written on the merged tree - only two_step_letter_equation differs from master)
 
 - `node --input-type=module --check`: every changed JS file OK. `ws-lesson-pages --self-test` OK (13), `ws-lesson-cellfits --self-test` OK (5).
 - ws-boot-smoke OK · ws-roles-unit OK (113) · ws-precritic-plan OK (414 rows on path; checks-from-critics 372 pass, 91 exempt, 0 fail).

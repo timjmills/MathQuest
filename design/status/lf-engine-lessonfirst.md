@@ -1,6 +1,6 @@
 Lane: lf-engine-lessonfirst (lf-engine)
 Title: LESSON-EMPTY-FIRST + LESSON-OPENER-SAME root-cause fix (owner's grade-3 WRM lesson review, 2026-11-19)
-Branch: claude/sweet-newton-c8wrv1-lf-engine-lessonfirst (from lf-checks 0983c6791; merged master 65c28ccdf by ws-merge-master)
+Branch: claude/sweet-newton-c8wrv1-lf-engine-lessonfirst (from lf-checks 0983c6791; merged master eb2e26972 by ws-merge-master)
 Builder: lane session at medium effort (first build of this fix)
 State: critic-ready (shared narrow critic, with lf-checks' two checks)
 Updated: 2026-11-20 (c added)
