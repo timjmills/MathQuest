@@ -226,6 +226,19 @@ function exitAfterFlush(code) {
                 if (typeof a !== 'string' || !/^\s*-?[\d.\/]+(\s*,\s*-?[\d.\/]+)+\s*$/.test(a)) return [];
                 return a.split(',').map((x) => x.trim()).filter((x) => x && x !== '0' && g.has(x.replace(/,/g, '')));
             }
+            // (r3, same class as R2-1: a ONE-value answer that equals a given number - the 3 of "a length of 3 inches" - is still
+            // stated when a step writes it as a result: "= 3 inches", "that's 2")
+            function resTokens(q) {
+                const a = q.ans; const g = givenOf(q);
+                if ((typeof a !== 'number' && typeof a !== 'string') || !/^-?\d[\d,]*(?:\.\d+)?(?:\/\d+)?$/.test(String(a).trim())) return [];
+                const x = String(a).trim().replace(/,/g, '');
+                return x !== '0' && g.has(x) ? [x] : [];
+            }
+            function statesRes(text, e) {
+                const t = String(text).replace(/(\d),(?=\d{3})/g, '$1');
+                const k = esc(String(e));
+                return new RegExp(`[=≈]\\s*${k}(?![\\d/]|\\.\\d)|\\bthat(?:'s| is)\\s+${k}(?![\\d/]|\\.\\d)`, 'i').test(t);
+            }
             function statesOp(text, e) {
                 const t = String(text).replace(/(\d),(?=\d{3})/g, '$1');
                 const k = esc(String(e));
@@ -389,15 +402,15 @@ function exitAfterFlush(code) {
                         const steps = paths.filter((x) => x[0] === 'STEPS').map((x) => x[2]);
                         const sayT = (paths.find((x) => x[0] === 'SAY') || [])[2] || '';
                         const hintT = (paths.find((x) => x[0] === 'HINT') || [])[2] || '';
-                        const opt = opTokens(q);
+                        const opt = opTokens(q); const rt = resTokens(q);
                         // HINT-LEAK / SAY-LEAK (F3): the hint and the Say line are help: S8 holds on them too
-                        const hl = toks.find((tk) => statesG(hintT, tk)) || opt.find((e) => statesOp(hintT, e));
+                        const hl = toks.find((tk) => statesG(hintT, tk)) || opt.find((e) => statesOp(hintT, e)) || rt.find((e) => statesRes(hintT, e));
                         if (hintT && hl) F('HINT-LEAK', key, i, `hint states "${hl}": "${hintT}"`);
                         const sl8 = toks.find((tk) => statesG(sayT, tk));
                         if (sayT && sl8) F('SAY-LEAK', key, i, `Say states "${sl8}": "${sayT}"`);
                         // STEPS-LEAK (F4, F13, F14)
                         steps.forEach((t, k) => {
-                            const tl = toks.find((tk) => statesG(t, tk)) || opt.find((e) => statesOp(t, e));
+                            const tl = toks.find((tk) => statesG(t, tk)) || opt.find((e) => statesOp(t, e)) || rt.find((e) => statesRes(t, e));
                             const so = statesSort(t, q);
                             if (tl) F('STEPS-LEAK', key, i, `step ${k + 1} states "${tl}": "${t}"`);
                             else if (so) F('STEPS-LEAK', key, i, `step ${k + 1} states the sort "${so}": "${t}"`);

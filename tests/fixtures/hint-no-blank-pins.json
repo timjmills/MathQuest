@@ -1,5 +1,5 @@
 {
- "_note": "HINT-NO-BLANK r2 (lf-placevalue 2026-11-20): shrink-only pins of pre-existing skills owned by other lanes; owner lanes in design/status/lf-placevalue.md. A skill leaves its pin in the change that fixes it; a new skill joining FAILs, and a pinned skill that passes FAILs until it is taken off. r3 (lf-placevalue 2026-11-20, lead ruling: help chosen, never cut): DANGLING-HEAD, ORPHAN, HELP-GENERIC added; HINT-LEAK / STEPS-LEAK read list-answer operands (R2-1) and expression terms (R2-3).",
+ "_note": "HINT-NO-BLANK r2 (lf-placevalue 2026-11-20): shrink-only pins of pre-existing skills owned by other lanes; owner lanes in design/status/lf-placevalue.md. A skill leaves its pin in the change that fixes it; a new skill joining FAILs, and a pinned skill that passes FAILs until it is taken off. r3 (lf-placevalue 2026-11-20, lead ruling: help chosen, never cut): DANGLING-HEAD, ORPHAN, HELP-GENERIC added; HINT-LEAK / STEPS-LEAK read list-answer operands (R2-1) and expression terms (R2-3), and a one-value answer equal to a given number written as a result (\"= 3 inches\").",
  "HINT-LEAK": [
   "addition:add_10_regroup",
   "addition:add_5_pictures",
@@ -123,6 +123,7 @@
   "geo_mixed:geo_meas_all",
   "geo_mixed:geometry_all",
   "graphs:pictograph_how_many_more",
+  "integers:abs_value",
   "integers:mixed_integers",
   "integers:ordering_rationals",
   "measurement:capacity",
@@ -165,6 +166,7 @@
  "HELP-THIN": [
   "addition:add_sub_fact_family",
   "addition:cloze_addition",
+  "composing:base10_build",
   "composing:base10_build_hundreds",
   "composing:chart_to_120",
   "composing:hundreds_chart_fill",
@@ -210,6 +212,7 @@
   "fraction_operations:sub_frac_like_nv",
   "fraction_operations:sub_frac_unlike_nv",
   "fraction_operations:sub_fractions_like",
+  "fraction_operations:sub_mixed_like",
   "fraction_operations:sub_mixed_unlike",
   "fraction_operations:sub_mixed_unlike_nv",
   "fractions:benchmark_fractions",
@@ -252,6 +255,7 @@
   "addition:add_20_mixed",
   "addition:add_20_regroup",
   "addition:add_sub_fact_family",
+  "algebra:combine_like_terms",
   "algebra:function_table_easy",
   "algebra:function_table_find_inputs",
   "algebra:write_expression",
@@ -303,6 +307,7 @@
   "graphs:pie_chart",
   "graphs:tally_chart",
   "graphs:tally_how_many_more",
+  "integers:abs_value",
   "integers:add_int",
   "integers:number_line_int",
   "integers:order_negatives",

@@ -900,7 +900,10 @@ function helpLeak(q, raw) {
         .sort((a, b) => b.length - a.length);
     const ops = q && typeof q.ans === 'string' && LIST_ANS.test(q.ans)
         ? q.ans.split(',').map((x) => x.trim()).filter((x) => x && x !== '0' && given.has(x.replace(/,/g, ''))) : [];
-    const opRe = ops.map((e) => new RegExp(`(^|[^\\d.,/])${reEsc(e)}\\s*[×÷+−*-]\\s*\\d|[×÷+−*-]\\s*${reEsc(e)}(?![\\d/]|\\.\\d)\\s*=`));
+    // (r3: a ONE-value answer equal to a given number is still stated as a result: "= 3 inches", "that's 2")
+    const a1 = q && (typeof q.ans === 'number' || typeof q.ans === 'string') ? String(q.ans).trim().replace(/,/g, '') : '';
+    if (/^-?\d+(?:\.\d+)?(?:\/\d+)?$/.test(a1) && a1 !== '0' && given.has(a1)) ops.push({ res: a1 });
+    const opRe = ops.map((e) => (typeof e === 'object' ? new RegExp(`[=≈]\\s*${reEsc(e.res)}(?![\\d/]|\\.\\d)|\\bthat(?:'s| is)\\s+${reEsc(e.res)}(?![\\d/]|\\.\\d)`, 'i') : new RegExp(`(^|[^\\d.,/])${reEsc(e)}\\s*[×÷+−*-]\\s*\\d|[×÷+−*-]\\s*${reEsc(e)}(?![\\d/]|\\.\\d)\\s*=`)));
     return (t) => {
         const x = String(t).replace(/(\d),(?=\d{3})/g, '$1');
         // (a word answer in any case: "Odd" is stated by "it is odd"; "Less than 18" by "less than 18")
