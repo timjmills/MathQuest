@@ -575,17 +575,17 @@ else {
 }
 
 // ---- round 5 (rule 5, critic r3): the checks of critic r3's findings, written before the fixes -----------------------
-// V14 (hint uniqueness, critic r3 #5): the Guided page's grey hint (worked step 1) picks out exactly ONE bank word. A
-// first-letter cue counts only when one bank word starts with that letter; otherwise the hint must give the word's meaning.
+// V14 GUIDED-HINT-LEAK (bank) (lf-roles critic r14 z1, lead 2026-11-20; replaces critic r3 #5's "exactly one"): the Guided page's
+// grey hint (worked step 1) applied to the item's word bank leaves at least TWO words, the answer among them - a hint that leaves
+// one gives the answer away (PT 2.3: the hint holds none of its answer). 'Its word starts with "f".' left only factor of
+// factor / product / rule. A hint that names a meaning picks one word: it fails too.
 {
     const prov = K.getProvider('vocabulary', 'vocab_grade_pictures');
     for (const r of runs) for (const q of deal('vocab_pick3_words', r.opts, 8, 7900)) {
         const p = q.cell.payload, t = String(((prov.workedSteps(q) || [])[0] || {}).text || '');
-        const m = /starts with "(.)"/.exec(t);
-        if (m) {
-            const hits = p.bank.filter((w) => String(w).charAt(0).toLowerCase() === m[1].toLowerCase());
-            if (hits.length !== 1) fail(`V14 ${JSON.stringify(r.opts)} "${p.word}": the hint "${t}" fits ${hits.length} bank words (${p.bank.join(', ')})`);
-        } else if (!t.toLowerCase().includes(String((W.VOCAB_WORDS[p.word] || {}).meaning || '@@').toLowerCase())) fail(`V14 ${JSON.stringify(r.opts)} "${p.word}": the hint "${t}" names no cue that picks one bank word`);
+        const letters = [...t.matchAll(/"(.)"/g)].map((m) => m[1].toLowerCase());
+        const hits = letters.length && /starts with/.test(t) ? p.bank.filter((w) => letters.includes(String(w).charAt(0).toLowerCase())) : [p.word];
+        if (hits.length < 2 || !hits.includes(p.word)) fail(`V14 GUIDED-HINT-LEAK ${JSON.stringify(r.opts)} "${p.word}": the hint "${t}" leaves ${hits.length} of the bank (${p.bank.join(', ')}): ${hits.join(', ')}`);
     }
 }
 // V15 (write-line length, critic r3 #7): the 1 picture, 3 words answer line is >= 1.2 x the widest bank word at the answer
