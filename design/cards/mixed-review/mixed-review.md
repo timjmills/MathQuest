@@ -474,7 +474,7 @@ card-critic-r4.md, FAIL min 5) found the items below; each is DEFERRED to the na
 | L9 | 12.1 long word problems ("2 a page at L if 4-5 lines"); `KIND_CAP` allows 3 | step 2 (MR-B); BUILT step 3 (lead ruling 2026-11-20: pairs only) | a long word-problem kind capped at 2 at L, dealt in pairs (prop p, `count-long-wp`) |
 | L10 | Legacy skills print as typical (373 of 708 draw no kit cell); the class improves as skills migrate to kit cells | V1 (lead ruling 2026-11-20, ACCEPTED) | none in this lane: each family's kit migration re-classes its rows (a new V1 table only while no V1 code has shipped, else V2) |
 
-Signed: unsigned (re-sign needed: L10 added, 2026-11-20; was: owner, 2026-11-20, build-now ruling; §10 known limitations accepted)
+Signed: owner, 2026-11-20 (build-now ruling; §10 known limitations L1-L10 accepted; re-signed after L10)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
