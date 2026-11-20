@@ -485,3 +485,48 @@ on master, queued for next week's PSC layout pass (with the trim to the ceiling 
     135 mm of a 239 mm body. Check first: PAGEFILL --roles opener must FAIL; fix the geometry estimate.
   - R3-6: growing_shape_patterns' Pre-skill Check prints doubled answer areas (PSC cells from the prerequisites' legacy print via
     print-generate.js + the adapters.js legacy stamp). Folds into the Quick review build, check first.
+
+## For lf-ops: stack-cell EB-BAND on PSC
+
+Ruling (lead, 2026-11-20, item 3): the stack template's footprint and measure (`js/modules/sheet/cells/stack.js`) belong to
+lf-ops. The 3-column Pre-skill Check choice (`measureCols` 3) goes into next week's lf-roles build.
+
+Measured on the PSC, seed 7, master 9ae9ccd5d, ws-empty-band --only EB-BAND,EB-SIDE. "Ink" = cell height minus the band.
+Drawn height vs hMinAt: the stacked bands (L, and M page 2) draw every cell AT its measured minimum height (`hMinAt`, no growth),
+so drawn = hMinAt and the band lies inside the measure itself: the measure asks about 34-40 % more height than the stack draws.
+The M page-1 quadrant cells (45.8-53.8 mm) are also grown by the quadrant layout ((quadH - strip) / 2), which is role-side.
+EB-SIDE at 92.3 mm is the 2-column band (no 3-column choice yet): role-side, next week.
+
+| Page | Rule | Cells | Cell mm | Ink mm (EB-BAND) | Band / side % |
+|---|---|---|---|---|---|
+| subtraction:sub_100_no_regroup M p1 | EB-BAND | 6 | 53.8 | 33.9-34.0 | 36.8-37 % |
+| subtraction:sub_100_no_regroup M p1 | EB-SIDE | 8 | 45.8 | - | 31.5-31.8 % |
+| subtraction:sub_100_no_regroup L p1 | EB-SIDE | 4 | 92.3 | - | 34.6-34.6 % |
+| subtraction:sub_100_no_regroup L p2 | EB-BAND | 5 | 62.6 | 40.8-41.0 | 34.6-34.9 % |
+| subtraction:sub_100_no_regroup L p2 | EB-SIDE | 6 | 92.3 | - | 38.3-38.3 % |
+| subtraction:sub_1k_no_regroup M p1 | EB-BAND | 7 | 53.8 | 33.8-34.0 | 36.8-37.1 % |
+| subtraction:sub_1k_no_regroup M p1 | EB-SIDE | 12 | 45.8 | - | 31.5-31.8 % |
+| subtraction:sub_1k_no_regroup L p1 | EB-BAND | 2 | 62.6 | 40.8-40.9 | 34.7-34.8 % |
+| subtraction:sub_1k_no_regroup L p1 | EB-SIDE | 6 | 92.3 | - | 34.6-38.3 % |
+| subtraction:sub_1k_no_regroup L p2 | EB-BAND | 5 | 62.6 | 40.8-41.0 | 34.6-34.9 % |
+| subtraction:sub_1k_no_regroup L p2 | EB-SIDE | 6 | 92.3 | - | 38.3-38.3 % |
+| subtraction:sub_10k_no_regroup M p1 | EB-SIDE | 4 | 45.8 | - | 31.5-31.7 % |
+| subtraction:sub_10k_no_regroup M p1 | EB-BAND | 8 | 53.8 | 33.9-34.0 | 36.8-37 % |
+| subtraction:sub_10k_no_regroup L p1 | EB-SIDE | 4 | 92.3 | - | 38.3-38.3 % |
+| subtraction:sub_10k_no_regroup L p1 | EB-BAND | 1 | 62.6 | 40.8-40.8 | 34.8-34.8 % |
+| subtraction:sub_10k_no_regroup L p2 | EB-BAND | 5 | 62.6 | 40.8-41.0 | 34.6-34.9 % |
+| subtraction:sub_10k_no_regroup L p2 | EB-SIDE | 6 | 92.3 | - | 34.6-34.6 % |
+| subtraction:sub_100k_no_regroup M p1 | EB-BAND | 6 | 52.6 | 34.0-34.1 | 35.2-35.3 % |
+| subtraction:sub_100k_no_regroup M p2 | EB-BAND | 8 | 52.6 | 33.9-34.1 | 35.2-35.6 % |
+| subtraction:sub_100k_no_regroup M p2 | EB-SIDE | 8 | 92.3 | - | 34.9-34.9 % |
+| subtraction:sub_100k_no_regroup L p1 | EB-BAND | 3 | 62.6 | 40.8-40.9 | 34.7-34.8 % |
+| subtraction:sub_100k_no_regroup L p1 | EB-SIDE | 4 | 92.3 | - | 34.6-34.6 % |
+| subtraction:sub_100k_no_regroup L p2 | EB-BAND | 6 | 62.6 | 40.8-41.0 | 34.6-34.9 % |
+| subtraction:sub_100k_no_regroup L p2 | EB-SIDE | 6 | 92.3 | - | 30.6-30.6 % |
+| subtraction:sub_1m_no_regroup M p1 | EB-BAND | 3 | 52.6 | 34.0-34.1 | 35.2-35.3 % |
+| subtraction:sub_1m_no_regroup M p1 | EB-SIDE | 4 | 92.3 | - | 34.9-34.9 % |
+| subtraction:sub_1m_no_regroup M p2 | EB-BAND | 6 | 52.6 | 33.9-34.0 | 35.4-35.5 % |
+| subtraction:sub_1m_no_regroup M p2 | EB-SIDE | 6 | 92.3 | - | 31.7-31.7 % |
+| subtraction:sub_1m_no_regroup L p1 | EB-BAND | 3 | 62.6 | 40.7-40.9 | 34.7-34.9 % |
+| subtraction:sub_1m_no_regroup L p1 | EB-SIDE | 4 | 92.3 | - | 30.6-30.6 % |
+| subtraction:sub_1m_no_regroup L p2 | EB-BAND | 6 | 62.6 | 40.7-41.1 | 34.4-34.9 % |
