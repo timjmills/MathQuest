@@ -998,13 +998,25 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                             const twin = tw.filter((k) => k.cols[0] === b && k.rows.filter((r) => r >= a && r <= a + 2).length >= 2).length;
                             let dead = 0, deadBad = 0;
                             for (let r = 0; r < 10; r++) {
-                                const half = (h) => (r >= a && r <= a + 2 && b === h * 5) || tw.some((k) => k.rows.includes(r) && k.cols[0] === h * 5);
-                                if (half(0) && half(1)) { dead++; if (![0, 3, 6, 9].includes(r)) deadBad++; }
+                                // (a row is dead when the teaching windows and the shown ones - Model, anchor - print all ten of its squares)
+                                const cov = new Set(r >= a && r <= a + 2 ? [0, 1, 2, 3, 4].map((x) => b + x) : []);
+                                kept.filter((k) => k.cols.length < 10 && k.rows.includes(r)).forEach((k) => k.cols.forEach((c) => cov.add(c)));
+                                if (cov.size === 10) { dead++; if (![0, 3, 6, 9].includes(r)) deadBad++; }
                             }
                             return ext * 1000 + twin * 500 + deadBad * 100 + Math.max(0, dead - 1) * 100;
                         };
                         const order = shuffle(slots.slice());
                         _rank100 = order.map((x) => ({ x, v: score(x) })).sort((p, q) => p.v - q.v).map((o) => o.x);
+                        // (the layout that meets all three: four windows that share no square - Guided 1-25 and 26-50 on opposite halves,
+                        // Independent 51-75 and 76-100 the same, or mirrored - so only two chart rows, in different practice bands, are
+                        // printed whole and every other row keeps five fresh squares. It is laid from the first Guided
+                        // window's place; the ranked slots follow, for a deal the sheet refuses)
+                        const g1 = tw[0];
+                        let h = rng(0, 1) * 5, top = rng(0, 1) === 0;
+                        if (g1) { h = g1.cols[0]; top = g1.rows[0] < 5; }
+                        const o = 5 - h;
+                        const lay = top ? [[0, h], [2, o], [5, h], [7, o]] : [[7, h], [5, o], [2, h], [0, o]];
+                        if (!g1 || [0, 7].includes(g1.rows[0])) _rank100 = lay.concat(_rank100.filter(([a, b]) => !lay.some(([x, y]) => x === a && y === b)));
                     }
                     const free100 = _rank100.filter(([a, b]) => !kept.some((k) => !k.shows && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5));
                     [r0, c0] = free100.length ? free100[(_tw100++) % free100.length] : slots[0];
@@ -1111,8 +1123,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             if ([...forced].some((i) => barred.has(i)) || forced.size > want) continue;
             // spread across the rows: each row holds floor(want / R) or one more, the extra rows dealt
             for (let t = 0, T = kept.length ? 60 : 300; t < T && !pickIdx.length; t++) {
-                const extra = shuffle(Array.from({ length: R }, (_, r) => r)).slice(0, want % R);
-                const quota = Array.from({ length: R }, (_, r) => Math.floor(want / R) + (extra.includes(r) ? 1 : 0));
+                // (critic blanks r6 H2: a rows-of-ten grid spreads its gaps over the rows that still have a free square - a row the
+                // teaching sheet printed whole holds none)
+                const liveR = Array.from({ length: R }, (_, r) => r).filter((r) => !_lessonRows || Array.from({ length: C }, (_, c) => r * C + c).some((i) => !barred.has(i)));
+                const LR = liveR.length || R;
+                const extra = shuffle(liveR.slice()).slice(0, want % LR);
+                const quota = Array.from({ length: R }, (_, r) => (liveR.includes(r) ? Math.floor(want / LR) + (extra.includes(r) ? 1 : 0) : 0));
                 const set = new Set(forced);
                 let ok = true;
                 for (let r = 0; r < R && ok; r++) {
