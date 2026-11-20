@@ -835,7 +835,11 @@ export function hintOf(it, { raw = false } = {}) {
     };
     // ({raw: true}: the same pick, unmasked - the source ws-guided-cellfit HINT-OVERMASK compares the printed hint against)
     const keep = (t) => { const m = maskBoxes(t); return m.slice((/^\s*Step\s+\d+\s*:/.exec(m) || [''])[0].length).replace(/___|[\s.,:;=+\-−×÷()]/g, '') ? (raw ? t.replace(/,(?=\d{3}\b)/g, '') : m) : ''; };
-    const pick = steps.find(own) || (all.find(own) && keep(all.find(own)) ? all.find(own) : '') || steps[0];
+    // (outside a story, the own step used masked is never one whose kept text still gives the answer: a place-value "Find the
+    // underlined digit: 7." shows a given digit that is its answer - pre-W2 the plain first step stood there, and stands there
+    // again. A story's Step 1 keeps its given operands and gaps its result, so HINT-UNIFORM holds there.)
+    const ownAll = all.find(own);
+    const pick = steps.find(own) || (ownAll && keep(ownAll) && (it.template === 'word-work' || !hintGivesAnswer(keep(ownAll), it)) ? ownAll : '') || steps[0];
     if (pick) return keep(pick);
     // Every step names part of the answer (a clock's first step gives its hour): the first step
     // becomes a frame, its answer numbers left as gaps ("The short hand has passed ___."), so the
