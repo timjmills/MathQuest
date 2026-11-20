@@ -27,3 +27,17 @@ Spend at the stop: session cost_usd $1,216.42 (2026-11-15) (baseline $756.09).
 - Every finding gets a check that fails on the bad commit and passes on the fix, a backtest, a place on precritic's path, and a ledger row.
 - Never write a card's "Signed:" line; the lead signs.
 - Run browser gates one at a time. ws-precritic and ws-backtest are never wrapped.
+
+## Queued after the reset (lead 2026-11-20)
+- **count_by_tables Pre-skill Check at L: narrow re-grade.** It now prints the lf-roles deployed fill: 10 items, legal under ruling 1c (ceiling 8). Run it together with lf-roles' PSC trim pass. Re-arm the backtests `eb-lastpage-cbt-pre-skill-check` and `cap-parity-cbt-pre-skill-check`, which are pending, superseded by 1c, with a fail state below the ceiling.
+- **area-model-div template round 3:** start with the two root-cause tools (see lf-ops-amdiv.md).
+- **Bugs branch** (-lf-ops-bugs 9e8d06c83):
+  - the division-cell fact-size side band (H13 on divide bracket, tiles=21, regroup=mixed);
+  - the add_facts precritic;
+  - a narrow critic on the changed pages.
+- **Sizes** (-lf-ops-sizes 4783d88b7; card signed 55f7c31d4):
+  - the 6 lessons;
+  - mult_3by2_standard Reason It L OVERFLOW;
+  - area_model_4by1 LONE-PAGE;
+  - record the confirmed 4x1 deal decision in the card;
+  - the full critic.

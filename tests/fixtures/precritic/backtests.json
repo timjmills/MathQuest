@@ -12142,7 +12142,9 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "pending": true,
+   "pendingReason": "lead ruling 2026-11-20 (c): superseded by ruling 1c (role-capacity.js Pre-skill Check L ceiling 8 items, 35465ad9c). Under 1c the fail state 3038af154 (count_by_tables L, 10 items) is legal, so this row no longer proves its rule. Re-arm in the after-reset narrow re-grade of the cbt L Pre-skill page (with lf-roles' PSC trim pass), with a fail state below the ceiling; never by editing this one."
   },
   {
    "id": "cap-parity-cbt-pre-skill-check",
@@ -12164,7 +12166,9 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "pending": true,
+   "pendingReason": "lead ruling 2026-11-20 (c): superseded by ruling 1c (role-capacity.js Pre-skill Check L ceiling 8 items, 35465ad9c). Under 1c the fail state 3038af154 (count_by_tables L, 10 items) is legal, so this row no longer proves its rule. Re-arm in the after-reset narrow re-grade of the cbt L Pre-skill page (with lf-roles' PSC trim pass), with a fail state below the ceiling; never by editing this one."
   },
   {
    "id": "eb-lastpage-fixture-pre-skill-check",
