@@ -12215,6 +12215,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-cont-hint-cellfit",
+   "check": "ws-guided-cellfit CELL-FITS: on Guided pages 2+, every top-level cell holds its content (two-step stories, M / L, seeds 1, 2, 591220)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-cellfit CELL-FITS (lf-roles r16 F3)",
+   "fail": {
+    "commit": "ead49fcce",
+    "state": "two-step Guided L page 2 hinted try: content 13 px past the cell, bottom rule clipped"
+   },
+   "pass": {
+    "commit": "dd4942463",
+    "state": "every continuation cell holds its content"
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
