@@ -52,7 +52,7 @@
 //                      than the 14 mm writing floor (F10: band 100 Reason It L squeezed A | B beside the response to 10.4 mm squares).
 //   (chart blanks critic r2, 2026-11-20:)
 //   LESSON-TWIN        no two pupil windows of one lesson packet hold the same squares and gaps (worked example left out; R2-1).
-//   ANSWER-VARIETY     on a page of 4+ pupil windows no one answer set covers half of them or more (R2-1; r4 F1: was more than half).
+//   ANSWER-VARIETY     on a page of 4+ pupil windows no one answer set covers half of them or more on a lesson sheet (r4 F1), more than half on other roles (R2-1).
 //   CROSSING-IN-PLAY   a chart_to_120 lesson packet leaves a pupil gap at 100, 101, 110 or 111 (R2-1).
 //   STEP-COVER         on a page with a Steps band every gap is solved by a printed step from a printed neighbour (R2-2).
 //   SHEET-ANSWER-SET   no two pupil windows on one lesson page share their sorted answer set (r4 F1).
@@ -350,7 +350,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             const ws = pupilWins(pg.items); if (ws.length < 4) return;
                             const cnt = new Map(); ws.forEach((w) => { const k = w.gaps.slice().sort((a, b) => a - b).join(', '); cnt.set(k, (cnt.get(k) || 0) + 1); });
                             const [topSet, topN] = [...cnt].sort((a, b) => b[1] - a[1])[0];
-                            if (topN * 2 >= ws.length) out.push(`ANSWER-VARIETY ${key} ${role} ${size} seed ${s} p${pi + 1}: ${topN} of ${ws.length} windows answer ${topSet}`);
+                            // half or more on a LESSON sheet (r4 F1, a lesson finding); more than half on the other roles (R2-1 as built)
+                            if (role === 'lesson' ? topN * 2 >= ws.length : topN * 2 > ws.length) out.push(`ANSWER-VARIETY ${key} ${role} ${size} seed ${s} p${pi + 1}: ${topN} of ${ws.length} windows answer ${topSet}`);
                         });
                         if (packet && on('CROSSING-IN-PLAY') && skillId === 'chart_to_120') {
                             const all = packet.flatMap((pg) => pupilWins(pg.items)).flatMap((w) => w.gaps);
