@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium
 Critic rounds: 3, PASS r3 (8/8/8/8 card, worksheet, quiz)
 
 ## Now
+- 2026-11-20: lesson player slice 1 LIVE (I do, board, add-within-10, D11 part bar; 4 critic rounds: r1 FAIL, r2 FAIL, cap root cause -> stage-fill check, r3 FAIL at 820 only, A26/A26b fix, narrow 820 PASS; all widths >= 8). Parked. NEXT WEEK: slice 2 (We do) at medium, then the remaining parts; D12 itemsFor(req) stays a clean public function for My Worksheets.
 - 2026-11-20 STOPPED at the round cap: lesson player slice 1 (claude/sweet-newton-c8wrv1-lf-hosts-player-s1 @ 68b6ba366). Critic r3: board 1920, desktop 1280/1366 and tablet 1024 all >= 8; FAIL only at 820 (C2 7 / C4 7): in the stacked layout the count-on hops (5 6 7) sit directly above the sum and can read as a top row of the addition (paper puts them beside). Fix: hops below the answer row or beside the drawing at 820; check: --render asserts hops never above / overlapping the drawing in a stacked layout. Lead decides: fix next round, or ship without 820.
 - Digit-floor fix (35f9fc8ae) with the lead for deploy.
 - 2026-11-20 (resumed, +$50): host fit digit floor + fit reset (lf-algebra fitk2 ported) - deploy head 35f9fc8ae sent, lead deploying after lf-engine; new ws-fit-floor, rows fit-floor / twin-fit-reset. Lesson player card SIGNED with D11 (any part, any order) and D12 (any sheet -> interactive; itemsFor(req) stays a clean public function for My Worksheets) on claude/sweet-newton-c8wrv1-lf-hosts-player. Parked after the deploy.
