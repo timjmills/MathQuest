@@ -14137,6 +14137,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "twin-fit-reset",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-twin-fit-reset TWIN-FIT-RESET: a worksheet kit twin narrowed and fitted, then widened and fitted, returns to its own --mq-k2",
+   "rule": "TWIN-FIT-RESET (lf-algebra for lf-hosts, lead 2026-11-20; ws-worksheet-reflow WS-DIGIT number_patterns_rule@1024 22.9 px)",
+   "fail": {
+    "commit": "8caa04f3b",
+    "state": "fitTwinRows only lowered --mq-k2: a fit run at the 3-column try kept the shrunk drawing in the 2-up card (22.9 px digits)"
+   },
+   "pass": {
+    "commit": "958abe1e6",
+    "state": "a new fit key starts from the twin's base --mq-k2; the worksheet refits its twins once its columns settle (26.5 px)"
+   },
+   "command": "node tests/scripts/ws-twin-fit-reset.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
