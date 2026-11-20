@@ -371,3 +371,11 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - PNGs: design/status/lf-roles/r10/.
 - 2026-11-14 r10 narrow critic: count_by_tables M + vocab_grade_pictures L PASS; QUEUED: X1 count_by_tables Guided L p2 EB-BAND 33% (pre-existing; hold count rows to ink on continuation pages); X2 two_step_add_then_div Guided M p1 Model alone (PAGE_TYPES 2.3; check GUIDED-MODEL-ALONE first); chart_120 (b)/(c). Stopped at budget ($319 of $345).
 - 2026-11-14 r11 (X1, X2 of critic r10): X1 fixed - Guided continuation pages of count rows held to their measure (roles/guided.js 1337; GUIDED-COUNT-TIGHT, backtest guided-count-tight FAIL 448bc5e74 -> OK d3629b594); count_by_tables L p2 rows now ~36 mm, EB-BAND OK. X2 not fixable without overflow: two_step_add_then_div M needs 219.8 mm for Model + hinted try in 193.7 mm drawn room (L 237.8+ in 179.9); GUIDED-MODEL-ALONE guards the case where they fit (passes before and after). Passed Guided pages: 96 hashes identical. PNG: design/status/lf-roles/r11/.
+- 2026-11-20 PSC fill (lead request): check 27ec319a3 adds 'pre-skill-check' to ws-empty-band EBLAST_BLOCKING_ROLES (FAIL on 50
+  EB-LASTPAGE / CAP-PARITY findings, 32 PSC skills at M / L); fix ea36c4f61: counts() deals each prerequisite past its base 4 (up to
+  2 x its share of the role-capacity.js ceiling), fillBands grows the band with the fewest rows on each page while the next row fits
+  and the page stays <= the ceiling; items too wide for the band's columns are passed over; R13's band split (paginateBands) is
+  untouched. After: EB-LASTPAGE / CAP-PARITY PASS on all 32; page counts unchanged on every page (no 1 -> 2 or 2 -> 1); only
+  pre-skill-check pages changed (96 of 480 role pages); ws-lesson-baseline 334 identical; capacity pin 61 rises, 0 drops.
+  Backtest `psc-fill-eblast` PASS. OPEN for the lead: more cells raise the pre-existing EB-BAND / EB-SIDE counts on the stack
+  skills' PSC pages (sub_100k M EB-BAND 7 -> 14 etc.) and div_facts PSC M gains 2 EB-SIDE (30.8 %, equation cell in a 2-col band).
