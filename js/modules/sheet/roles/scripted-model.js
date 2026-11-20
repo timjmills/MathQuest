@@ -100,7 +100,47 @@ function statesOf(it) {
     return t && typeof t.statePayload === 'function' ? t : null;
 }
 
+/** A state's step text: "(n) text" (the outlined circle marker). */
+const stepTextHtml = (steps, i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+
+/**
+ * What a full-width state draws for step i besides its cell (plan's stateItem): the 1 picture, 3 words state drawn wide, a trace
+ * template's marks of steps 1..i, the last state answered in trace grey.
+ */
+function stateOpts(it, o, i, steps, marks, ans) {
+    const payload = Object.assign({}, o && o.payload, it.template === 'vocab-pick3' ? { wideState: true } : {});
+    if (marks) return Object.keys(marks[i]).length ? Object.assign({}, o, { payload: Object.assign(payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) }) : Object.assign({}, o, { payload });
+    return Object.assign({}, o, { payload }, i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {});
+}
+
+/**
+ * MEASURED STATES (lf-engine vocabfix item 3, 2026-11-20): the host measures a full-width (1-column) state AS DRAWN - each
+ * state with its step text over it, every state stacked in ONE grid cell so the box is the tallest of them - and the plan sizes
+ * the row from that measure. It reserved two step-text lines (textH2) on a one-line step (vocab_grade_pictures Model p1 36 % /
+ * 32 % empty, 3 states on 2 pages) and measured a count row without the marks its states trace (count_by_tables L: the row cut
+ * to 47 mm under a second line of boxes). Beside (2 columns) and across layouts measure the state alone, as before. `stateRender`
+ * is the item's own drawing, which the page uses.
+ */
+function measuredStates(it) {
+    const steps = stepsFor(it);
+    if (!steps.length || typeof it.render !== 'function') return it;
+    const marks = marksFor(it, steps);
+    const ans = answerOf(it);
+    const base = it.render;
+    const render = (c, o = {}) => {
+        if (!o || o.cols !== 1) return base(c, o);
+        const one = (i) => `<div style="grid-area:1/1;min-width:0"><div class="mq-steptop">${stepTextHtml(steps, i)}</div>${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`;
+        return `<div style="display:grid">${steps.map((_, i) => one(i)).join('')}</div>`;
+    };
+    return Object.assign({}, it, { render, stateRender: base, statesMeasured: true, measured: null });
+}
+
 export function prepare(it, info = {}) {
+    const p = prepareOwn(it, info);
+    return p ? measuredStates(p) : p;
+}
+
+function prepareOwn(it, info = {}) {
     // (lf-placevalue compare r2, critic r1 F4: an item its generator marks `noModel` - the compare "=" item, which decides
     // nothing - is never the worked example; the host deals the next one)
     if (it && it.q && it.q.noModel && !(info && info.index)) return null;
@@ -345,7 +385,14 @@ export function plan(input = {}) {
     // A state too wide for the half-width state column (a word problem, a wide picture) takes the
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
     const h1 = hMinAt([it], 1, ctx);
-    let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : h1 + textH2;
+    // (MEASURED STATES: a full-width state's measure holds its step text - prepare/measuredStates; else the two-line estimate)
+    const textOn = it.statesMeasured ? 0 : textH2;
+    // (and the pages are dealt at the height the row is laid out at: the measure less what the ROW-STRETCH CAP below takes off -
+    // dealt at the measure, a count row that fits one page at its capped 50 mm took two, or merged its steps)
+    const offMm = 2 + koMm(ctx.size);
+    const laidH = (h) => (it.statesMeasured && cols === 1 ? Math.min(h, rowCapMm(h - offMm, [it])) : h);
+    let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : laidH(h1 + textOn);
+    let laid = !!it.statesMeasured && cols === 1;   // (H is already the laid-out height: the cap below is not taken twice)
     // (a sentence story prints its story once over the frames: its lines come off the first page's room)
     const story = isSentenceStory(it) && Array.isArray(it.storyLines) ? it.storyLines : null;
     const storyMm = story ? story.length * (m.pitch + 1.6) + 5 : 0;
@@ -368,8 +415,9 @@ export function plan(input = {}) {
         if (steps.length >= 4 && parallel(steps[1]) && parallel(steps[2])) {
             variants.push({ steps: [steps[0], `${steps[1]} ${steps[2]}`, ...steps.slice(3)], marks: [marks[0], marks[2], ...marks.slice(3)], merged: 1 });
         }
-        const texts = [{ tH: textH2, one: 0 }];
-        if (steps.every((t) => t.length <= 48)) texts.push({ tH: textH1, one: 1 });
+        // (MEASURED STATES: the measure holds each state's own text - one candidate; a merged step's text may wrap to two lines)
+        const texts = it.statesMeasured ? [{ tH: 0, one: 0, measured: true }] : [{ tH: textH2, one: 0 }];
+        if (!it.statesMeasured && steps.every((t) => t.length <= 48)) texts.push({ tH: textH1, one: 1 });
         const exactDeal = (n, Hs) => {
             // the fewest pages P whose pages hold n states with the Say band on page P only, each page >= 2 when that can be
             const capAt = (k, P) => Math.floor(((k ? mCont.budget : m.budget) - m.strip - (k === P - 1 ? m.say : 0)) / Hs);
@@ -384,7 +432,7 @@ export function plan(input = {}) {
         const better = (a, b) => { for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return a[k] < b[k]; return false; };
         let best = null;
         for (const v of variants) for (const t of texts) {
-            const Hs = h1 + t.tH;
+            const Hs = laidH(h1 + t.tH) + (t.measured && v.merged && !v.steps.every((x) => x.length <= 48) && steps.every((x) => x.length <= 48) ? textH2 - textH1 : 0);
             for (const d of [dealOf(v.steps.length, Math.max(1, Math.floor(room1 / Hs)), Math.max(1, Math.floor(roomC / Hs))), exactDeal(v.steps.length, Hs)]) {
                 if (!d) continue;
                 // the merged text is long: two lines (textH2) even when the unmerged steps are one line each
@@ -432,24 +480,27 @@ export function plan(input = {}) {
         textMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
         H = hMinAt([it], across, ctx) + textMm;
         deal = [steps.length];
+        laid = false;
     }
     const acrossRows = across ? Math.ceil(steps.length / across) : 0;
     // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4, layout.rowCapMm): a state row is held to what it draws + its writing
     // room - hMinAt is the measure + 2 mm and the measure holds a tab keep-out a Model state does not draw (CL-14)
-    { const off = 2 + koMm(ctx.size); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
+    if (!laid) { const off = 2 + koMm(ctx.size); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
     if (story) providerWorkedSteps(it, 6).forEach((st, g) => (st.marks || []).forEach((mk) => { if (mk && mk.slot && !writtenAt.has(mk.slot)) writtenAt.set(mk.slot, g); }));
-    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+    const stepText = (i) => stepTextHtml(steps, i);
     // (a template that draws its step states: state i's payload and, on the step that writes it, the traced answer)
     const stT = !marks && !story ? statesOf(it) : null;
     const stWs = stT ? providerWorkedSteps(it, 6) : [];
     const stAt = (i) => (stT && stWs.length === steps.length ? stT.statePayload(it.q.cell.payload || {}, stWs, i) : null);
+    // (the item's own drawing: prepare's measuring render stacks every state - MEASURED STATES)
+    const itRender = it.stateRender || it.render;
     const stateItem = (i) => planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
-            + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
+            + (story ? sentenceFrameAt(itRender(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : itRender(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : stAt(i) ? Object.assign({ payload: Object.assign({}, o && o.payload, stAt(i).payload) }, stAt(i).answer && ans ? { shown: ans, ink: 'trace' } : {})
                         : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
