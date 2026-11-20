@@ -39,7 +39,10 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
 // `relay` (default true): false keeps the lattice - a short last row stays on the full rows' columns
 // and the rest is the unruled blank run (PG-15). Fact rows: one cell width per section (Lane D restart
 // critic r1 R1-2: a re-laid 9-cell last row was 20.7 mm wide under 18.6 mm cells).
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, relay: relayOk = true } = {}) {
+// `centerLast` (chart blanks r3, GRID-EVEN): a short last row keeps the lattice - its cells one column wide like every other
+// cell, centred under the full rows (2 x cols tracks, every cell two of them), with no empty bordered run beside them. Opt-in:
+// a page of chart windows whose deal fell short of whole rows (a window that would give another's answer away is never dealt).
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, relay: relayOk = true, centerLast = false } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     // a cell that spans tracks (grid-column:span N in its style) fills them: no blank run for them
@@ -52,19 +55,29 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
     // equal (CL-3). Only a plain grid (no spanning cell, rows = the rows the cells need).
     const rem = used % cols;
     const rowStrips = rowGap > 0 && Math.ceil(used / cols) > 1 && Number.isFinite(parseFloat(height));
-    const relay = relayOk && rem > 0 && cols > 1 && !spans && !spanFirst && !rowStrips && (!rows || rows === Math.ceil(used / cols));
+    const plainLast = rem > 0 && cols > 1 && !spans && !spanFirst && !rowStrips && !colsTpl && (!rows || rows === Math.ceil(used / cols));
+    const centred = !!centerLast && plainLast;
+    const relay = !centred && relayOk && rem > 0 && cols > 1 && !spans && !spanFirst && !rowStrips && (!rows || rows === Math.ceil(used / cols));
     const gcd = (a, b) => (b ? gcd(b, a % b) : a);
     const tracks = relay ? (cols * rem) / gcd(cols, rem) : cols;
     let k = start;
     const out = cells.map((c, i) => {
         const item = typeof c === 'string' ? { html: c } : c;
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
-        const sp = relay ? `grid-column:span ${i >= cells.length - rem ? tracks / rem : tracks / cols};` : '';
+        const sp = relay ? `grid-column:span ${i >= cells.length - rem ? tracks / rem : tracks / cols};`
+            : centred ? 'grid-column:span 2;' : '';
         return cell(item.html, { label: lab, cls: item.cls || '', style: sp + (item.style || ''), keyAttr: item.keyAttr || '', ebItem: item.ebItem, ebPartial: item.ebPartial });
     });
-    if (!relay && used < n) out.push(blankRun((used % cols) + 1));
+    if (!relay && !centred && used < n) out.push(blankRun((used % cols) + 1));
+    // (the centred last row: paper either side of it, over the grid's ink and its outer frame - never a bordered empty run)
+    if (centred) {
+        const pad = (side) => `<div class="ws-gridpad ws-gridpad--${side}" aria-hidden="true" style="grid-column:span ${cols - rem};"></div>`;
+        out.splice(cells.length - rem, 0, pad('l'));
+        out.push(pad('r'));
+    }
     const r = rows || Math.ceil(cells.length / cols);
     if (relay) { cls = `${cls} relaid`.trim(); cols = tracks; }
+    if (centred) { cls = `${cls} centred`.trim(); cols *= 2; }
     // `rowGap` (mm, RUBRIC H13 page fill): a sheet whose problem count is fixed (a Test, the
     // teacher's count) spends the page's spare height as WHITESPACE BETWEEN rows - each row its
     // own framed strip - never as empty space inside the cells. Only with a fixed height.

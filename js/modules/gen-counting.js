@@ -939,7 +939,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // no two side by side in a row, every gap a printed neighbour) holds the most it can, silently.
         const _hcRaw = Number(_kOpt('tiles'));
         const _hcWant = [1, 2, 3, 4, 5, 6, 7, 8].includes(_hcRaw) ? _hcRaw : big ? [1, 2, 2, 3][_kDeal(4)] : CHART_TILES_DEFAULT;   // (number_chart_fill keeps its own "1 to 3, dealt")
-        const want = Math.min(chartGapCap(R, C, _to120 && R === 3 && C === 5 && _grid === 'window' && _gaps === 'scatter'), _hcWant);
+        // (every window of the band on the same rows - band 120's rows 91-120, and bands 20 and 30, whose windows are the whole
+        // band's rows: six windows side by side, so the sheet's gaps repeat every five columns - chart blanks r3, ws-empty-band
+        // on hundreds_chart_fill {band: 30}: without the shared pattern four windows were dealt and stretched to the page)
+        const _sameRows = !big && _grid === 'window' && C === 5 && (_to120 ? R === 3 : rowHi - rowLo + 1 === R);
+        const want = Math.min(chartGapCap(R, C, _sameRows && _gaps === 'scatter'), _hcWant);
         const neighbours = (i) => {
             const r = Math.floor(i / C), c = i % C, out = [];
             if (c > 0) out.push(i - 1);
@@ -951,13 +955,36 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // The sheet's kept windows (chart-giveaway.js setChartSheet): a square a kept window leaves empty is empty here too, a
         // square it prints is never empty here, and a window of a kept window's own squares is not dealt again.
         const kept = (_gaps === 'scatter' && chartSheet()) || [];
+        // (a run or pattern - "Empty squares" row / column / every other - is dealt against the sheet too, chart blanks r3,
+        // ws-options-verify capacity: dealt blind, most windows of band 120 printed another's gap and were never dealt, so a
+        // page held 2 to 4. Its window and run are drawn again until no gap is printed elsewhere and no kept gap printed here.)
+        const keptRun = (_gaps !== 'scatter' && chartSheet()) || [];
+        const runFits = (rs, cs, nums) => keptRun.every((k) => {
+            const inK = (n) => k.rows.includes(Math.floor((n - 1) / 10)) && k.cols.includes((n - 1) % 10);
+            const inW = (n) => rs.includes(Math.floor((n - 1) / 10)) && cs.includes((n - 1) % 10);
+            if (k.rows.join() === rs.join() && k.cols.join() === cs.join() && (!k.ext || k.shows)) return false;
+            if (k.shows) return !nums.some(inK);
+            return !nums.some((n) => inK(n) && !k.gaps.includes(n)) && !k.gaps.some((n) => inW(n) && !nums.includes(n));
+        }) && (!(_sameRows && _gaps === 'column') || colFits(nums));
+        // (a run down a column on a band whose windows share their rows keeps the first kept window's column five columns on - its
+        // (row, column mod 5) - so every one of the six windows holds exactly one: two columns four apart left a window that
+        // held both, and a page of five)
+        const k0Run = keptRun.find((k) => !k.shows && k.gaps.length);
+        const resOf = (n) => `${Math.floor((n - 1) / 10)}:${((n - 1) % 10) % 5}`;
+        const colFits = (nums) => !k0Run || nums.every((n) => k0Run.gaps.some((g) => resOf(g) === resOf(n)));
         let rows, cols, at, pickIdx = [];
-        for (let w = 0; w < (kept.length ? 24 : 1) && !pickIdx.length; w++) {
+        let runLast = null;
+        for (let w = 0; w < (kept.length ? 24 : keptRun.length ? 150 : 1) && !pickIdx.length; w++) {
             const win = pickWin();
             rows = win.rows; cols = win.cols;
             const atW = (i) => rows[Math.floor(i / C)] * 10 + cols[i % C] + 1;
             at = atW;
-            if (_gaps !== 'scatter') { pickIdx = _chartGaps({ R, C, grid: _grid, gaps: _gaps, per: [1, 2, 2, 3][_kDeal(4)], tiles: _hcWant, neighbours, rng }); break; }
+            if (_gaps !== 'scatter') {
+                const idx = _chartGaps({ R, C, grid: _grid, gaps: _gaps, per: [1, 2, 2, 3][_kDeal(4)], tiles: _hcWant, neighbours, rng });
+                if (!keptRun.length || !idx.length || runFits(rows, cols, idx.map(atW))) { pickIdx = idx; break; }
+                if (!runLast) runLast = { rows, cols, at: atW, idx };
+                continue;
+            }
             const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
             const idxOf = (n) => rows.indexOf(Math.floor((n - 1) / 10)) * C + cols.indexOf((n - 1) % 10);
             // (a window of the same squares: never on the same run or a shown one; on another page it repeats with the same gaps)
@@ -978,7 +1005,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             // Band 120's windows all lie on rows 91-120 (six of them, side by side), so a sheet's gaps repeat every five columns: a
             // later window blanks exactly the squares of the first kept window's pattern (row, column mod 5) - every window then
             // holds the same count, spread the same way, and no window prints another's gap.
-            const _per5 = _to120 && R === 3 && C === 5;
+            const _per5 = _sameRows;
             const resKey = (n) => `${Math.floor((n - 1) / 10)}:${((n - 1) % 10) % 5}`;
             // (not beside a SHOWN window: it prints every square of its five columns, so the gaps keep to the other columns)
             if (_per5 && kept.some((k) => !k.shows) && !kept.some((k) => k.shows)) {
@@ -1019,6 +1046,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 pickIdx = cand;
             }
         }
+        // (no run fitted the sheet: the first one drawn - the dealer passes it over, it prints another window's gap)
+        if (!pickIdx.length && runLast) { rows = runLast.rows; cols = runLast.cols; at = runLast.at; pickIdx = runLast.idx; }
         // Fallback (never expected): alternate squares of each row honour every rule, up to the cap.
         if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, want);
         const blanks = pickIdx.sort((x, y) => x - y).map(at);

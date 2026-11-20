@@ -1268,6 +1268,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // (`capFillCont`, lesson 3a P1d r3 - critic H13: cells stretched to the shared height hold their content in the MIDDLE)
                 items: its.map((it) => { const pi = planItem(it, level, L.side4 ? L.drawCols : L.cols); return capFill && sec.capFillCont ? Object.assign({}, pi, { style: `${pi.style || ''}justify-content:center;` }) : pi; }),
                 _its: its,
+                // (chart blanks r3, GRID-EVEN: a page of chart windows dealt short of whole rows - band 120's lesson page holds five
+                // windows, a sixth would print another's answer - keeps the lattice, its last window one column wide, centred)
+                centerLast: its.length > 0 && its.every((it) => it && it.q && it.q.cell && it.q.cell.template === 'chartwindow'),
                 // (CL-4d: a grid that fills its page by flex has no height here; the stretch mark below reads the page's grid)
                 _flexMm: fillByFlex && !spread && !gap.gap && !shape ? avail : 0,
             });

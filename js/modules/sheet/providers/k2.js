@@ -414,10 +414,12 @@ function chartSteps(q) {
             const rs = rows.slice(i, i + per);
             const vals = parts.filter((t) => rs.includes(rowOf(t)));
             const lo = rs[0] * 10 + 1, hi = rs[rs.length - 1] * 10 + 10;
-            out.push(step(`From ${lo} to ${hi}: count on by 1 along ${rs.length === 1 ? 'the row' : 'each row'}. Write ${andList(vals)}.`,
+            // (short, two lines at most in a Scripted Model's state column at L - the long "... along the row." form wrapped to
+            // three, the Model fell back to text cells beside each state, 60-70 % empty: ws-empty-band EB-BAND, chart blanks r3)
+            out.push(step(`From ${lo} to ${hi}, count on by 1${rs.length === 1 ? '' : ' in each row'}. Write ${andList(vals)}.`,
                 vals.map((t) => ({ slot: `b${parts.indexOf(t)}`, value: String(t) }))));
         }
-        out.push(step('Check: across, each number is 1 more. Down, each number is 10 more.'));
+        out.push(step('Check: each number is 1 more across and 10 more down.'));
         return out;
     }
     // FOUR short states for two or three gaps, as a one-gap window has (a Scripted Model lays four states out in its rows; three

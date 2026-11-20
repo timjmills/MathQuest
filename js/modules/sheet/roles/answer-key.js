@@ -407,6 +407,7 @@ function gridPart(part, ctx, report) {
         spanFirst: !!part.spanFirst,
         rowGap: Number(part.rowGap) || 0,
         relay: part.relay !== false,
+        centerLast: !!part.centerLast,
     });
 }
 

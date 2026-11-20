@@ -177,6 +177,11 @@
     margin: calc(-1 * var(--ws-hair)) 0 0 calc(-1 * var(--ws-hair)); }
 :is(.ws-page, .ws-sheet) .ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
 :is(.ws-page, .ws-sheet) .ws-cell.blankrun { grid-column: var(--from) / -1; }
+/* grid.js `centerLast` (chart blanks r3): a short last row centred on the lattice; the paper either side covers the grid's
+   ink and its outer frame, so the full rows close over it and the last row's cells keep their own lines */
+:is(.ws-page, .ws-sheet) .ws-grid.centred > .ws-gridpad { background: var(--ws-paper); margin-bottom: calc(-1 * var(--ws-heavy)); }
+:is(.ws-page, .ws-sheet) .ws-grid.centred > .ws-gridpad--l { margin-left: calc(-1 * var(--ws-heavy)); }
+:is(.ws-page, .ws-sheet) .ws-grid.centred > .ws-gridpad--r { margin-right: calc(-1 * var(--ws-heavy)); }
 :is(.ws-page, .ws-sheet) .ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
 :is(.ws-page, .ws-sheet) .ws-tab { position: absolute; left: 0; top: 0; min-width: var(--ws-tab); height: var(--ws-tab); padding: 0 .6mm; background: var(--ws-ink); color: var(--ws-paper);
     font-size: var(--ws-tabnum); font-weight: 700; line-height: var(--ws-tab); text-align: center; }
