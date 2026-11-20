@@ -121,6 +121,8 @@ const ALLOW = new Set(list(arg('allow', '')));
     // pages that held this white before the check existed, each with its reason and owner (WHITE-ROW reports them, never fails them)
     const WHITE_ROW_KNOWN = {
         'algebra:two_step_mult_div_first test L': 'pre-existing on master: one two-step story a Test page at L; routed to lf-roles with critic rowcap-s2 N3',
+        'division:div_facts_long review M': 'the Mixed Review share (20-45 %) and whole rows cap it: its long-division earlier row is 84-94 mm, so a third main row with the mixed row passes the ceiling or the share (rose 8 -> 10 this round); a lead call',
+        'division:div_facts_long review L': 'as M: 8 a page (4 main columns do not fit at L); a lead call',
     };
     if (has('check') && !has('no-white-row')) {
         const ceilOf = {};
@@ -159,8 +161,11 @@ const ALLOW = new Set(list(arg('allow', '')));
                 });
                 // (the role caps the count when one more row would pass its ceiling - "unless the deal or the role caps the count")
                 const known = WHITE_ROW_KNOWN[k];
-                if (w && w.whiteMm > w.rowMm + 3 && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size] && known) console.log(`  known ${k}: WHITE-ROW ${w.whiteMm} mm (${known})`);
-                else if (w && w.whiteMm > w.rowMm + 3 && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size]) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
+                // (one more row FITS when the white holds it with the roles' own room - 1.15 x its height, the Error Analysis / Guided need -
+                // plus the grid's rules; a story row of 112 mm under 120 mm of white does not)
+                const more = w && w.whiteMm > 1.15 * w.rowMm + 3;
+                if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size] && known) console.log(`  known ${k}: WHITE-ROW ${w.whiteMm} mm (${known})`);
+                else if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size]) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
             }
             await app2.close();
         }

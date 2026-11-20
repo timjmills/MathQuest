@@ -246,18 +246,6 @@ function geometryAt(pools, input, mainCols = 0) {
     };
     let best = bands === 2 ? search(0.2, true) : search(0, false);
     if (best.n < 0 && bands === 2) best = search(0, true);
-    // ROW-STRETCH CAP refill (critic lf-engine-rowcap-s2 F4): rows are drawn at their cap, so a page whose plan leaves more than one
-    // main row of white under it while under the ceiling takes the plan that prints MORE - the earlier share's 20 % floor gives way
-    // (add_facts Review M: 6 + 4 = 10 with 100 mm white; 9 + 2 = 11 fits), and the earlier band may take the main band's columns
-    if (bands === 2 && best.n > 0 && best.n < ceil) {
-        const usedOf = (b) => mainAt(b.mRows).h + b.eRows * b.eh + (b.eWide || 0) * (b.ehw || 0);
-        const whiteOf = (b) => availOf(mainAt(b.mRows).bands) - usedOf(b);
-        if (whiteOf(best) > M.h) {
-            const wider = !split && M.cols > E.cols && fitsAt(earlier, M.cols, ctx) ? [{ c: M.cols, h: hMinAt(earlier, M.cols, ctx), hw: 0, nMax: Infinity, wMax: 0 }] : [];
-            const alt = search(0, true, eOpts.concat(wider.filter((o) => Number.isFinite(o.h) && o.h > 0)));
-            if (alt.n > best.n) best = alt;
-        }
-    }
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
     // lf-ops r-review: at S a static-width earlier step (stacks) may take a 5th column - narrower cells round the same ink, as
