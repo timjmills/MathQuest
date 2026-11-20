@@ -11905,6 +11905,26 @@
    }
   },
   {
+   "id": "t15-hidden",
+   "check": "ws-tables15 T15-HIDDEN: at Tables to 12 x 12 (144) and 10 x 10 (100) the hidden 13-15 ticks of mult_facts / div_facts are never dealt and never named (option summary, fact-set title, I Can line), whatever the ticks: all, 7 and 8 unticked, only 13-15, or decoded from a share code with the D / E / F tokens",
+   "kind": "commit-pair",
+   "rule": "T15-HIDDEN (hotfix t15fix 2026-11-20: ws-share-options FAIL 14, the Sets screen and Quick Start card read Times: 0 ... 6, 9 ... 15 on a 12 x 12 set)",
+   "fail": {
+    "commit": "65c28ccdf",
+    "state": "describeOptions lists every ticked value, so a 12 x 12 set with 7 and 8 unticked reads Times: 0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15"
+   },
+   "pass": {
+    "commit": "9fa7613d6",
+    "state": "describeOptions and the read-only option list drop the ticks valueHide hides under the band; dealing already clamped to the band (_tableLegal)"
+   },
+   "command": "node tests/scripts/ws-tables15.mjs --root {root} --rules T15-HIDDEN --skill multiplication:mult_facts,division:div_facts",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "guided-count-tight",
    "check": "a Guided continuation page of count rows holds them to their measured height (lf-roles r11 X1, critic r10: count_by_tables Guided L seed 972334 page 2, 4 rows at 45.8 mm for ~30 mm ink, EB-BAND 33 %)",
    "kind": "commit-pair",
@@ -12063,6 +12083,46 @@
    }
   },
   {
+   "id": "key-json-retry",
+   "check": "ws-key-json sweep: the browser restarts every --restart-every skills and on a crash / protocol timeout, and a crashed skill is retried once in a fresh browser (MQ_KEYJSON_CRASH_AT kills the browser on that skill's first try)",
+   "kind": "commit-pair",
+   "rule": "ws-key-json sweep retry (lead 2026-11-19: the full deploy sweep died with Target closed / Navigating frame was detached after the 2026-11-15 container restart)",
+   "browser": true,
+   "fail": {
+    "commit": "d38308824",
+    "state": "one browser for the whole sweep: a dead browser ends the gate with an uncaught TargetCloseError"
+   },
+   "pass": {
+    "commit": "a9051bb03",
+    "state": "restart every 40 skills and on a crash, retry once, protocolTimeout 120 s; the planted crash is retried and the run ends OK"
+   },
+   "command": "env MQ_KEYJSON_CRASH_AT=2 node {root}/tests/scripts/ws-key-json.cjs --skills addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply,geometry:coordinate_q1 --restart-every 2 2>&1 | grep -q 'retried 1' && echo 'key-json-retry: OK' || echo 'key-json-retry: FAIL (no crash retried)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tof-stem-retry",
+   "check": "ws-tof-stem sweep survives a browser crash mid-sweep: the skill is retried once in a fresh browser and every skill is still reported (deploy timeouts 2026-11-14)",
+   "kind": "commit-pair",
+   "rule": "ws-tof-stem restart / retry (MQ_TOF_CRASH_AT)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "one evaluate over every skill: no restart, no retry, no sweep line"
+   },
+   "pass": {
+    "commit": "9d7772a36",
+    "state": "crash at skill 2 retried; 4 of 4 measured"
+   },
+   "command": "env MQ_TOF_CRASH_AT=2 node {root}/tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply --restart-every 2 2>&1 | grep -qE 'retried 1([^0-9]|$)' && echo 'tof-retry: OK' || echo 'tof-retry: FAIL (no crash retried)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "skip-return",
    "check": "ws-skip SKIP-RETURN / SKIP-RESULTS: on the practice card, online worksheet, quiz and MAP test every skipped item comes back at the end after \"You skipped n. Let's fix them.\", identical (text, answer, drawing), one at a time; each is scored once; a second skip ends it \"skipped\" in the teacher's results",
    "kind": "commit-pair",
@@ -12072,8 +12132,8 @@
     "state": "no return pass: Skip appears only after 5 wrong tries; skipped items never come back; quiz has no Skip; the teacher results read a blank as Wrong"
    },
    "pass": {
-    "commit": "515d9f54a",
-    "state": "every host returns the skipped items at the end (same item object), scores each once, and shows a second-pass skip as skipped"
+    "commit": "96f23a96c",
+    "state": "(re-pointed from 515d9f54a, lf-hosts skip critic r2 F2: SKIP-RESULTS now also judges the pupil breakdown, which 515d9f54a showed as a red cross) every host returns the skipped items at the end (same item object), scores each once, and shows a second-pass skip as skipped"
    },
    "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280,820 --rules SKIP-RETURN,SKIP-RESULTS",
    "browser": true,
@@ -12256,6 +12316,26 @@
     "state": "the dot redo leaves 'skipped'; the return pass scores it"
    },
    "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts map --rules SKIP-MAP-REDO",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-results-pupil",
+   "check": "ws-skip SKIP-RESULTS (pupil breakdown): on the quiz results screen the pupil sees a question still skipped after the return pass as a neutral 'Skipped' (no red cross), with its answer line, as the teacher's view does",
+   "kind": "commit-pair",
+   "rule": "SKIP-RESULTS (lf-hosts skip critic r2 F2)",
+   "fail": {
+    "commit": "1c2959693",
+    "state": "the pupil breakdown showed the skipped Q3 with a red cross and the answer, while the teacher view read 'Skipped'"
+   },
+   "pass": {
+    "commit": "96f23a96c",
+    "state": "the skipped row reads a neutral 'Skipped' pill, the answer line kept"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts quiz --rules SKIP-RESULTS",
    "browser": true,
    "expect": {
     "fail": "FAIL",
