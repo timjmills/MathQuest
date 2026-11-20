@@ -144,6 +144,22 @@ const ONE_PAGE_ROLES = new Set(['pre-skill-check']);
 // r3 (critic eblast r2 G1 / G2, round cap; EBLAST-ADVISORY root cause): the rules INFERRED capacity from white space, so a page
 // full BY DESIGN read as "another row fits" (Mixed practice L at its 5-row §12.1 ceiling: 10 vs 21; Scripted Model frames: 6 vs
 // 10). Each role's DESIGNED ceiling is declared once in the kit (js/modules/sheet/role-capacity.js, WDS §12.1); the rules read it.
+// EBLAST-BLOCKING (lead 2026-11-20, after critic eblast r3): the rules stay ADVISORY globally, but are FINDINGS on these roles.
+// The list is PINNED: it may only GROW (`--pin-check` fails when an entry of the merge-base copy is gone, as no-dropped-row does for
+// backtests). Seeded with every role green on all passed skills (sweep 2026-11-20); pre-skill-check is out until its owner fixes it.
+// EBLAST-BLOCKING-BEGIN
+const EBLAST_BLOCKING_ROLES = [
+    'independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'mixed-practice', 'true-false', 'reason-it',
+    'word-problems', 'stretch', 'scripted-model', 'opener', 'lesson', 'fact-probe', 'fact-rows',
+];
+// EBLAST-BLOCKING-END
+const BLOCKING = new Set(EBLAST_BLOCKING_ROLES);
+/** 'finding' or 'advisory': an EB-LASTPAGE / CAP-PARITY red on `role` (blockAll: --eblast-block). Pure. */
+const eblastMode = (role, blockAll, list = BLOCKING) => (blockAll || list.has(String(role || '').split(' ')[0]) ? 'finding' : 'advisory');
+/** The allow-list read from a source text (between the markers), or null. Pure. */
+const blockingOf = (src) => { const m = /EBLAST-BLOCKING-BEGIN([\s\S]*?)EBLAST-BLOCKING-END/.exec(String(src || '')); return m ? [...m[1].matchAll(/'([a-z-]+)'/g)].map((x) => x[1]) : null; };
+/** The entries of `base` missing from `cur` (the pin: the list may only grow). Pure. */
+const pinLost = (base, cur) => (base || []).filter((r) => !(cur || []).includes(r));
 let CAPK = null; try { CAPK = require(path.join(__dirname, '..', '..', 'js', 'modules', 'sheet', 'role-capacity.js')); } catch (e) { CAPK = null; }
 const declOf = (role) => (CAPK && role ? CAPK.roleCapacity(String(role).split(' ')[0]) : null);
 const atCap = (role, size, pg) => !!(CAPK && role && size && CAPK.atCeiling(String(role).split(' ')[0], size, pg));
@@ -155,7 +171,7 @@ const lastPageBad = (role, pg, pages = 1, fullRows = NaN, size = null) => {
     if (pages > 1 && !ONE_PAGE_ROLES.has(role)) return Number.isFinite(fullRows) && fullRows > 0 && Number.isFinite(pg.rows) && pg.rows * 3 < fullRows
         ? `the last of ${pages} pages holds ${pg.rows} row(s) against ${fullRows} on a full page (fewer than one third: PG-23 rebalances the rows across the pages)` : null;
     const gap = Number.isFinite(pg.gapMm) && pg.gapMm > 0 ? ` + ${pg.gapMm.toFixed(1)} mm gap` : '';
-    return pg.pct >= 30 && rowFits(pg) ? `${pg.pct} % of the last page body is empty under its last block (${pg.whiteMm.toFixed(1)} mm; its next ${pg.rowMm.toFixed(1)} mm row${gap} fits; limit 30 %): the role fixes its count, so the page must fill${pages > 1 ? ` (and it spills to ${pages} pages: PT-PRE-1 is one page)` : ''}` : null;
+    return pg.pct >= 30 && rowFits(pg) ? `${pg.pct} % of the last page body is empty under its last block (${pg.whiteMm.toFixed(1)} mm; its next ${pg.rowMm.toFixed(1)} mm row${gap} fits; limit 30 %): the role fixes its count, so the page must fill${declOf(role) && Number.isFinite(declOf(role)[size]) ? ` (below its declared ${size} ceiling of ${declOf(role)[size]} ${declOf(role).unit})` : ''}${pages > 1 ? ` (and it spills to ${pages} pages: PT-PRE-1 is one page)` : ''}` : null;
 };
 // Who sets a role's item count (critic eblast r1 F2): a role module with no counts() export deals the TEACHER's count (independent,
 // more-practice); a teacher column count (--columns) sets it too. Only a role that fills its own page by counts() is judged by
@@ -185,6 +201,29 @@ const capParityBad = (m, l, role = null) => {
 };
 // The capacity-declaration check (r3 machine check first): every page role a skill in js/modules/redesign-passed.js renders (its
 // signed card's offered roles, else DEFAULT_ROLES) declares its ceiling. Returns {roles, gaps}.
+// r4 (critic eblast r3 G1, drift): the table restates 8 ceilings the role modules hold as their own constants; the check reads
+// each role's OWN constant from its source and fails when the two differ (role, size, both values, file). The role modules are
+// not refactored (other lanes own them). ROLE_CONST: role -> the constant's name in js/modules/sheet/roles/<role>.js.
+const ROLE_CONST = { 'guided': 'CEILING', 'error-analysis': 'CEILING', 'review': 'CEILING', 'test': 'CEILING', 'true-false': 'CEILING',
+    'reason-it': 'ROWS', 'word-problems': 'PER_PAGE', 'mixed-practice': 'MAX_SHELVES' };
+/** The {S, M, L} a role source declares as `const NAME = { S: n, M: n, L: n }` (or Object.freeze({...})), or null. Pure. */
+const roleConstOf = (src, name) => { const m = new RegExp(`(?:^|\\n)\\s*(?:export\\s+)?const\\s+${name}\\s*=\\s*(?:Object\\.freeze\\(\\s*)?\\{\\s*S:\\s*(\\d+),\\s*M:\\s*(\\d+),\\s*L:\\s*(\\d+)\\s*\\}`).exec(String(src || ''));
+    return m ? { S: +m[1], M: +m[2], L: +m[3] } : null; };
+/** The drift defects between the table and the role constants. table: {role: {M, L}}; srcOf(role) -> [file, text]. */
+function capacityDrift(table, srcOf) {
+    const out = [];
+    for (const [role, name] of Object.entries(ROLE_CONST)) {
+        const [file, src] = srcOf(role); const c = roleConstOf(src, name); const d = table[role];
+        if (!c) { out.push(`${role}: ${file} declares no ${name} = { S, M, L } to compare (role-capacity.js copies it)`); continue; }
+        if (!d) continue;
+        for (const z of ['M', 'L']) if (c[z] !== d[z]) out.push(`${role} ${z}: role-capacity.js says ${d[z]}, ${file} ${name} says ${c[z]}`);
+    }
+    return out;
+}
+// `--role-src role=path[,role=path]`: read that role's constant from another file (the backtest's drift fixture)
+const ROLE_SRC = Object.fromEntries(((process.argv.includes('--role-src') && process.argv[process.argv.indexOf('--role-src') + 1]) || '').split(',').filter(Boolean).map((x) => x.split('=')));
+const roleSrcFile = (role) => { const f = ROLE_SRC[role] ? path.resolve(ROLE_SRC[role]) : path.join(__dirname, '..', '..', 'js', 'modules', 'sheet', 'roles', `${role}.js`);
+    let t = null; try { t = fs.readFileSync(f, 'utf8'); } catch (e) { t = null; } return [path.relative(ROOT, f), t]; };
 function capacityCheck() {
     const src = fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'modules', 'redesign-passed.js'), 'utf8');
     const ids = [...new Set([...src.matchAll(/^\s*'([a-z0-9_]+:[a-z0-9_]+)',?\s*$/gm)].map((m) => m[1]))];
@@ -194,7 +233,7 @@ function capacityCheck() {
         try { const p = JSON.parse(execFileSync(process.execPath, [path.join(__dirname, '..', 'lib', 'ws-card-plan.mjs'), '--skill', key, '--root', ROOT], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }))[0]; if (p && p.cards && p.cards.length && p.roles.length) r = p.roles; } catch (e) { r = null; }
         for (const x of (r || ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'])) roles.add(x);
     }
-    return { ids, roles: [...roles], gaps: CAPK ? CAPK.capacityGaps([...roles]) : ['js/modules/sheet/role-capacity.js: no declared capacity table'] };
+    return { ids, roles: [...roles], gaps: CAPK ? [...CAPK.capacityGaps([...roles]), ...capacityDrift(CAPK.ROLE_CAPACITY, roleSrcFile)] : ['js/modules/sheet/role-capacity.js: no declared capacity table'] };
 }
 // the page-fill measure of every page in scope (browser side): {pct, whiteMm, rowMm, gapMm, rows, items, size}
 const measurePageFill = (scope) => [...document.querySelectorAll(scope)].map((pg) => {
@@ -363,6 +402,17 @@ function itemParityFinding(tagged, plain, what) {
 // (the limits are defined before --self-test: its centred EB-BAND cases call judge())
 const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
 const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
+if (argv.includes('--pin-check')) {
+    // the merge-base with the main branch (or --base <rev>); a base with no list yet has nothing to lose
+    const i = argv.indexOf('--base'); let base = i > -1 ? argv[i + 1] : null; let src = null;
+    try { if (!base) base = execFileSync('git', ['merge-base', 'HEAD', 'origin/master'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+        src = execFileSync('git', ['show', `${base}:tests/scripts/ws-empty-band.cjs`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 26 }); } catch (e) { src = null; }
+    const fi = argv.indexOf('--file'); const cur = fi > -1 ? blockingOf(fs.readFileSync(path.resolve(argv[fi + 1]), 'utf8')) : EBLAST_BLOCKING_ROLES;
+    const lost = pinLost(blockingOf(src), cur);
+    for (const r of lost) console.log(`  FAIL EBLAST_BLOCKING_ROLES lost '${r}' (in ${base}; the list may only grow)`);
+    console.log(`ws-empty-band --pin-check: ${lost.length ? `FAIL (${lost.length})` : 'OK'} (${(cur || []).length} blocking roles; base ${base || '-'} ${blockingOf(src) ? `has ${blockingOf(src).length}` : 'has no list'})`);
+    process.exit(lost.length ? 1 : 0);
+}
 if (argv.includes('--capacity-check')) {
     const r = capacityCheck();
     for (const g of r.gaps) console.log(`  FAIL ${g}`);
@@ -533,7 +583,22 @@ if (argv.includes('--self-test')) {
             ['r3 independent: CAP-PARITY not judged (teacher count)', /teacher/.test(capNotJudged('independent') || ''), true],
             ['r3 pre-skill-check is judged', capNotJudged('pre-skill-check'), null],
             ['r3 true-false 4 vs 6 at its L ceiling 4: OK', !!capParityBad({ items: 6 }, { items: 4, rows: 2, full: false }, 'true-false'), false],
-            ['r3 value pre-skill-check 3 vs 6 (L ceiling 16): FAIL', !!capParityBad({ items: 6 }, { items: 3, rows: 1, full: false }, 'pre-skill-check'), true]];
+            ['r3 value pre-skill-check 3 vs 6 (L ceiling 16): FAIL', !!capParityBad({ items: 6 }, { items: 3, rows: 1, full: false }, 'pre-skill-check'), true],
+            // r4 (critic eblast r3 G1): the table is compared with each role's own constant
+            ['r4 the real tree: no drift', CAPK ? capacityDrift(CAPK.ROLE_CAPACITY, roleSrcFile).length : 1, 0],
+            ['r4 planted guided CEILING M 9 vs 8: FAIL naming role, size, values, file', CAPK ? capacityDrift(CAPK.ROLE_CAPACITY, (r) => (r === 'guided' ? ['x/guided.js', 'const CEILING = { S: 10, M: 9, L: 6 };'] : roleSrcFile(r))).join('|') : '', 'guided M: role-capacity.js says 8, x/guided.js CEILING says 9'],
+            ['r4 Object.freeze constant read', JSON.stringify(roleConstOf('const MAX_SHELVES = Object.freeze({ S: 9, M: 7, L: 5 });', 'MAX_SHELVES')), '{"S":9,"M":7,"L":5}'],
+            // EBLAST-BLOCKING: per-role findings, pinned list
+            ['blocking: an allow-listed role red is a finding', eblastMode('test', false), 'finding'],
+            ['blocking: pre-skill-check (not listed) red is advisory', eblastMode('pre-skill-check', false), 'advisory'],
+            ['blocking: --eblast-block makes every red a finding', eblastMode('pre-skill-check', true), 'finding'],
+            ['blocking: a role key with columns reads its role', eblastMode('review cols 3', false), 'finding'],
+            ['blocking: pre-skill-check is not seeded', BLOCKING.has('pre-skill-check'), false],
+            ['pin: the list reads from its markers', JSON.stringify(blockingOf("// EBLAST-BLOCKING-BEGIN\nconst X = ['test', 'review'];\n// EBLAST-BLOCKING-END")), '["test","review"]'],
+            ['pin: removing an entry FAILs', pinLost(['test', 'review'], ['test']).join(), 'review'],
+            ['pin: growing is OK', pinLost(['test'], ['test', 'pre-skill-check']).length, 0],
+            ['pin: the live source parses to the live list', JSON.stringify(blockingOf(fs.readFileSync(__filename, 'utf8'))), JSON.stringify(EBLAST_BLOCKING_ROLES)],
+            ['r4 constant missing: FAIL', CAPK ? capacityDrift(CAPK.ROLE_CAPACITY, (r) => (r === 'test' ? ['x/test.js', 'const OTHER = 1;'] : roleSrcFile(r))).length : 0, 1]];
         const lbad = lc.filter(([, v, w]) => v !== w);
         for (const [n, got, want] of lbad) console.log(`self-test FAIL: ${n}: ${got}, want ${want}`);
         if (lbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-LASTPAGE / CAP-PARITY)`); process.exit(1); }
@@ -562,7 +627,7 @@ if (argv.includes('--self-test')) {
         const cbad = cc.filter(([, got, want]) => got !== want);
         for (const [nm, , want] of cbad) console.log(`self-test FAIL: EB-BAND centred ${nm} should ${want ? 'fail' : 'pass'}`);
         const n = bad.length + kbad.length + cbad.length;
-        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length}; EB-LASTPAGE 6 + CAP-PARITY 5; r2 gap 6 + count 6 + PG-23 4 + notes 2; r3 declared ceilings 13)`);
+        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length}; EB-LASTPAGE 6 + CAP-PARITY 5; r2 gap 6 + count 6 + PG-23 4 + notes 2; r3 declared ceilings 13; r4 drift 4; blocking 5 + pin 4)`);
         process.exit(n ? 1 : 0);
     }).catch((e) => { console.log(`self-test FAIL: cannot import the sheet kit (${e.message})`); console.log('ws-empty-band self-test: FAIL'); process.exit(1); });
     return;
@@ -996,7 +1061,7 @@ async function htmlMain() {
     const findings = []; const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
     // EBLAST-ADVISORY (lead 2026-11-20, critic eblast r2: false reds on passed skills): EB-LASTPAGE and CAP-PARITY REPORT only
     // (printed, never blocking) until critic r3 passes the rebuilt rules; --eblast-block makes them findings (backtest rows)
-    const FA = (rule, where, msg) => { if (has('eblast-block')) return F(rule, where, msg); if (!ONLY || ONLY.includes(rule)) console.log(`  ADVISORY (not critic-passed) ${rule} ${where}: ${msg}`); };
+    const FA = (rule, where, msg, role) => { if (eblastMode(role, has('eblast-block')) === 'finding') return F(rule, where, msg); if (!ONLY || ONLY.includes(rule)) console.log(`  ADVISORY (not critic-passed) ${rule} ${where}: ${msg}`); };
     const app = await open({ seed: 1 });
     try {
         const sh = await app.browser.newPage();
@@ -1024,11 +1089,11 @@ async function htmlMain() {
             const groups = {}; for (const p of await sh.evaluate(measurePageFill, scope)) (groups[p.size || '-'] = groups[p.size || '-'] || []).push(p);
             for (const [z, pf] of Object.entries(groups)) {
                 const why = lastPageBad(role, pf[pf.length - 1], pf.length, pf[0].rows, z === '-' ? null : z);
-                if (why) FA('EB-LASTPAGE', `${path.basename(HTML)} ${role} ${z} p${pf.length}`, why);
+                if (why) FA('EB-LASTPAGE', `${path.basename(HTML)} ${role} ${z} p${pf.length}`, why, role);
             }
             if (groups.M && groups.L) { const by = countSetBy(roleSrc(role), null);
                 const why = by === 'role' ? capParityBad({ items: groups.M[0].items, rows: groups.M[0].rows, full: !rowFits(groups.M[0]) }, { items: groups.L[0].items, rows: groups.L[0].rows, full: !rowFits(groups.L[0]) }, role) : null;
-                if (why) FA('CAP-PARITY', `${path.basename(HTML)} ${role} M/L`, why); }
+                if (why) FA('CAP-PARITY', `${path.basename(HTML)} ${role} M/L`, why, role); }
         }
         console.log(`note: ${slotInkNote(SLOT_INK)}`);
         for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
@@ -1045,7 +1110,7 @@ async function main() {
     const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
     // EBLAST-ADVISORY (lead 2026-11-20, critic eblast r2: false reds on passed skills): EB-LASTPAGE and CAP-PARITY REPORT only
     // (printed, never blocking) until critic r3 passes the rebuilt rules; --eblast-block makes them findings (backtest rows)
-    const FA = (rule, where, msg) => { if (has('eblast-block')) return F(rule, where, msg); if (!ONLY || ONLY.includes(rule)) console.log(`  ADVISORY (not critic-passed) ${rule} ${where}: ${msg}`); };
+    const FA = (rule, where, msg, role) => { if (eblastMode(role, has('eblast-block')) === 'finding') return F(rule, where, msg); if (!ONLY || ONLY.includes(rule)) console.log(`  ADVISORY (not critic-passed) ${rule} ${where}: ${msg}`); };
     const app = await open({ seed: 1 });
     const { page } = app;
     const T0 = Date.now();
@@ -1137,7 +1202,7 @@ async function main() {
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
                             const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp, pf.length, pf[0].rows, j.size);
-                            if (why) FA('EB-LASTPAGE', `${key} ${j.tag} p${pf.length}`, why);
+                            if (why) FA('EB-LASTPAGE', `${key} ${j.tag} p${pf.length}`, why, j.role);
                             else notes.push(`${key} ${j.tag} EB-LASTPAGE p${pf.length}/${pf.length}: ${lp.pct} % empty (${lp.whiteMm.toFixed(1)} mm, row ${Number.isFinite(lp.rowMm) ? lp.rowMm.toFixed(1) : '-'} mm, gap ${Number.isFinite(lp.gapMm) ? lp.gapMm.toFixed(1) : '-'} mm, ${lp.rows} row(s) of ${pf[0].rows} on p1)${lastPageNote(j.role, roleSrc(j.role), j)}`);
                         }
                         // CAP-PARITY: page 1's items and fill, per role and size (judged after the skill's jobs)
@@ -1188,7 +1253,7 @@ async function main() {
                 { const nj = capNotJudged(rk); if (nj) { notes.push(`${key} ${rk} CAP-PARITY not judged: ${nj} (M ${z.M.items}/page, L ${z.L.items}/page)`); continue; } }
                 if (atCap(rk, 'L', z.L)) { notes.push(`${key} ${rk} CAP-PARITY: L at its declared ceiling (${declOf(rk).L} ${declOf(rk).unit}; M ${z.M.items}/page, L ${z.L.items}/page) - OK`); continue; }
                 const why = capParityBad(z.M, z.L, rk);
-                if (why) FA('CAP-PARITY', `${key} ${rk} M/L`, why);
+                if (why) FA('CAP-PARITY', `${key} ${rk} M/L`, why, rk);
                 else notes.push(`${key} ${rk} CAP-PARITY: M ${z.M.items}/page, L ${z.L.items}/page${z.L.full ? ' (L page full)' : ''} - OK`);
             }
             // screen hosts
