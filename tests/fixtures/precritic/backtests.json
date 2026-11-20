@@ -12141,6 +12141,26 @@
     "commit": "52a9b2499",
     "state": "742 live skills, 690 with pupil options (difficulty 1,241, facts 5); no teacher option; the pin holds"
    }
+  },
+  {
+   "id": "student-explorer-nodup-plate-s",
+   "check": "lead 2026-11-20 (base red on ws-student-explorer): an explorer thumbnail never shows its question twice; at plate S (the explorer card layout, not the retired print size) placevalue:unit_form's crop head repeated the drawn item it sits over",
+   "kind": "commit-pair",
+   "rule": "ws-student-explorer THUMB legible sweep NODUP",
+   "browser": true,
+   "fail": {
+    "commit": "03a92fa2",
+    "state": "FAIL (1): THUMB legible sweep (S): placevalue:unit_form NODUP - the head \"556 = ___ hundreds ___ tens ___ ones\" above the drawn row that says it in boxes"
+   },
+   "pass": {
+    "commit": "ec45e671",
+    "state": "OK: the head says what to do (\"Fill in the boxes.\") when the drawn item already says the whole question"
+   },
+   "command": "node tests/scripts/ws-student-explorer.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
