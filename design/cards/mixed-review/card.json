@@ -727,5 +727,21 @@
     "report": "design/lanes/lf-mixreview/card-critic-r3.md (b323ff0f)",
     "verdict": "FAIL, min 6 (K1 8, K2 6, K3 7, K4 7, K5 8)",
     "fixes": "card section 9e (each defect -> fix -> check-v1 property and FAIL fixture); root cause: normative deal sentences no property asserted -> check-v1 --trace"
+  },
+  "knownLimitations": {
+    "ruling": "owner via lead, 2026-11-20: build now without perfect sharing",
+    "deferredStep": "MR-SHARE-EXACT",
+    "items": [
+      "L1 share replay drift ~0.5% (to 17% on kind pools)",
+      "L2 props f/g/h/j trust the dealer",
+      "L3 trace wording",
+      "L4 fc not kind",
+      "L5 codes from FROZEN_SKILL_CODES",
+      "L6 table grade wording",
+      "L7 seed wording",
+      "L8 step-1 map",
+      "L9 long word problems at L"
+    ],
+    "shareUiWarning": false
   }
 }

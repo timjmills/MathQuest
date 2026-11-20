@@ -454,6 +454,24 @@ Report: `design/lanes/lf-mixreview/card-critic-r3.md` (b323ff0f). Card round 4, 
 
 **Not proved here (named for step 1):** `share-two-codecs` (needs the app's `skill-codes.js` encode path for mixed review, not built), `count-shelf-k-differs` (needs the browser engine), and every `[X:…]` sentence (33: hosts, breakdown, labels, pool picker, print lint). The trace guarantees each names a §8 check; it cannot prove the product check exists until step 1 lands it.
 
+## 10. Known limitations (owner ruling 2026-11-20)
+
+The owner ruled on 2026-11-20 (via the lead): build now, without perfect sharing. Card critic r4 (design/lanes/lf-mixreview/
+card-critic-r4.md, FAIL min 5) found the items below; each is DEFERRED to the named build step and is not a blocker for steps
+1-5. Each has a CHECKS_FROM_CRITICS ledger row so it cannot be forgotten.
+
+| # | Limitation | Deferred to | Its check when built |
+|---|---|---|---|
+| L1 | Share-code replay re-deals a DIFFERENT sheet on about 0.5 % of codes (501 of 108,000 single sheets; up to 17 % on kind pools): replay deals from the dealt list alone, so the dealer chooses with a smaller cycle | **MR-SHARE-EXACT** (new step after step 5): `deal()` returns the replay of its own code (deal -> encode -> replay, one pass); until it lands the share UI shows NO warning to teachers (owner ruling) | `deal(replay(code(x))) == deal(x)` swept in `check-v1 --fill` and in MIX-REVIEW-SHARE, FAIL fixture `fail-a-replay-drift` |
+| L2 | Props f (comeback), g (top-ups), h and j (SHELF / SHELF_MAX) read the dealer's own report | MR-SHARE-EXACT | each property recomputes from first principles; one FAIL fixture each |
+| L3 | The trace detector misses common rule wordings (18 untagged rules found) | step 1 (MR-E) | trace inverts its default: every §2 / §3 / §7a bullet sentence and Decision cell is normative unless marked `[I]`; FAIL fixtures for the planted forms |
+| L4 | Step 2 rows carry `fc` (class) not `kind`, so the live footprint, not `KIND_CLASS`, would decide the class | step 2 (MR-B) | MIX-REVIEW-POOL fails on a product row with `fc` |
+| L5 | The V1 table's codes come from data.js; fixture codes clash with `FROZEN_SKILL_CODES` | step 2 (MR-B) | build the table from `FROZEN_SKILL_CODES` (pin any skill without a code first); assert row.code === FROZEN_SKILL_CODES[id]; the §7a example codes are synthetic |
+| L6 | "Placement grade" in §2 / §7a: the dealer sorts by the frozen table's grade | step 2 (MR-B) | text: "the frozen V1 table's grade" |
+| L7 | §9b step 3 seed wording | step 3 (MR-A) | text as §7a: try 0 = `item.seed` (four parts), try r >= 1 = five parts, S' |
+| L8 | Step 1's property -> check map omits j2, l, m, n | step 1 (MR-E) | copy the §8 V1-core column into step 1 |
+| L9 | 12.1 long word problems ("2 a page at L if 4-5 lines"); `KIND_CAP` allows 3 | step 2 (MR-B) | a long word-problem kind capped at 2 at L |
+
 Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
