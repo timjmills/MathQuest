@@ -83,52 +83,33 @@ const BLANK_SRC = String.raw`(_{2,})|(\{[A-Za-z][\w.]*\})|([□☐▢])|((?:^|[\
 // (r3 2026-11-20, lead ruling: the help is chosen whole - the skill's steps minus only a final answer sentence, its screenHelp, the
 // clean hint - or hidden. 25 -> 132: a skill whose steps state the answer in more than their last sentence and whose hint states it
 // too now shows no box; owner lanes in design/status/lf-placevalue.md)
-const EMPTY_PIN = [
-    'addition:add_5_pictures', 'addition:comparison_word', 'addition:number_families_add', 'algebra:build_expr_multdiv',
-    'algebra:combine_like_terms', 'algebra:distributive_expr', 'algebra:factor_out_gcf', 'algebra:two_step_add_then_div',
-    'algebra:two_step_estimate_check', 'algebra:two_step_mult_div_first', 'algebra_mixed:number_theory_all',
-    'all_mixed:grade_5_mixed', 'all_mixed:grade_k_mixed', 'angles_lines:additive_angles',
-    'angles_lines:angles_around_point', 'angles_lines:angles_in_right_angle', 'angles_lines:angles_on_straight_line',
-    'angles_lines:identify_angles', 'angles_lines:identify_lines', 'angles_lines:measure_angles',
-    'angles_lines:mixed_angles_lines', 'area_perimeter:area', 'area_perimeter:area_distributive_visual',
-    'area_perimeter:area_missing_side', 'area_perimeter:area_polygon_decompose', 'area_perimeter:area_unit_squares',
-    'area_perimeter:mixed_area_perimeter', 'area_perimeter:perimeter_grid', 'area_perimeter:volume',
-    'area_perimeter:volume_composite', 'area_perimeter:volume_missing_edge', 'comparing:compare_groups',
-    'comparing:mixed_comparing', 'composing:mixed_composing', 'composing:odd_even', 'composing:whole_as_fraction',
-    'conversions:d_to_p', 'conversions:f_to_d', 'conversions:find_whole_from_pct', 'conversions:mixed_conversions',
-    'coordinates:coord_distance_q1', 'coordinates:coord_polygon', 'coordinates:mixed_coordinates',
-    'coordinates:net_surface_area', 'data_analysis:mad', 'data_analysis:mixed_data_analysis', 'decimals:mixed_decimals',
-    'decimals:round_decimals', 'division:div_2by1_long', 'division:div_3by1_long', 'division:div_3by2_long',
-    'division:div_4by1_long', 'division:div_fix_estimate', 'division:mixed_division', 'frac_dec_mixed:conversions_all',
-    'frac_dec_mixed:decimals_all', 'frac_dec_mixed:fdp_all', 'fraction_operations:add_frac_like_nv',
-    'fraction_operations:add_frac_unlike', 'fraction_operations:add_frac_unlike_nv',
-    'fraction_operations:add_fractions_like', 'fraction_operations:add_mixed_like_nv',
-    'fraction_operations:add_mixed_unlike_nv', 'fraction_operations:decompose_frac_nv',
-    'fraction_operations:decompose_fractions', 'fraction_operations:div_unit_frac_nv',
-    'fraction_operations:div_unit_fraction', 'fraction_operations:estimate_frac_ops', 'fraction_operations:frac_10_100',
-    'fraction_operations:frac_10_100_nv', 'fraction_operations:frac_as_div_nv', 'fraction_operations:frac_as_div_word',
-    'fraction_operations:frac_as_division', 'fraction_operations:frac_mult_word',
-    'fraction_operations:frac_mult_word_plain', 'fraction_operations:frac_word_mixed',
-    'fraction_operations:frac_word_mixed_plain', 'fraction_operations:frac_word_problems',
-    'fraction_operations:frac_word_problems_plain', 'fraction_operations:mixed_fraction_ops',
-    'fraction_operations:mult_frac_frac', 'fraction_operations:mult_frac_frac_nv',
-    'fraction_operations:mult_frac_whole_nv', 'fraction_operations:mult_scaling_nv',
-    'fraction_operations:sub_frac_like_nv', 'fraction_operations:sub_frac_unlike', 'fraction_operations:sub_mixed_like',
-    'fraction_operations:sub_mixed_like_nv', 'fraction_operations:unit_frac_div_whole',
-    'fraction_operations:whole_div_unit_frac', 'fractions:equiv_frac_nv', 'fractions:equiv_frac_visual',
-    'fractions:fraction_nl_drag', 'fractions:fraction_of_set', 'fractions:fraction_of_set_hard',
-    'fractions:fraction_of_set_hard_nv', 'fractions:fraction_of_set_nv', 'fractions:graph_fractions',
-    'fractions:mixed_fractions', 'fractions:order_fractions', 'fractions:shade_fraction', 'geo_mixed:geo_meas_all',
-    'geo_mixed:geometry_all', 'graphs:pictograph_how_many_more', 'measurement:capacity', 'measurement:pictograph_intro',
-    'measurement:time_half_hour', 'measurement:time_hour', 'measurement:time_quarter',
-    'multiplication:equal_or_unequal_groups', 'multiplication:mixed_multiplication', 'multiplication:mult_by_hundred',
-    'multiplication:mult_by_ten', 'multiplication:mult_chart_shade', 'multiplication:mult_facts',
-    'multiplication:mult_facts_15', 'multiplication:mult_missing_digit', 'multiplication:mult_zeros',
-    'multiplication:number_families_mult', 'number_theory:list_multiples', 'number_theory:missing_multiples',
-    'number_theory:multiples', 'patterns:notice_patterns', 'shapes_classify:classify_triangles',
-    'shapes_classify:cross_section_3d', 'shapes_classify:mixed_shapes', 'shapes_classify:net_identify',
-    'shapes_early:compose_rect_from_squares', 'shapes_early:mixed_shapes_early', 'shapes_early:name_3d_shapes',
-    'subtraction:sub_5_pictures', 'vocabulary:vocab_pick3_words'];
+// R2_KEEP (A12 guard witnesses, no screenHelp, r2 steps kept): addition:add_facts, subtraction:sub_facts - judged in the page (R2-KEEP)
+const EMPTY_PIN = [ // A12 (lead 2026-11-20): back to the r2 set; skills without screenHelp keep master r2 help
+    "algebra:build_expr_multdiv",
+    "angles_lines:identify_angles",
+    "angles_lines:mixed_angles_lines",
+    "conversions:find_whole_from_pct",
+    "conversions:mixed_conversions",
+    "coordinates:net_surface_area",
+    "fraction_operations:div_unit_frac_nv",
+    "fraction_operations:estimate_frac_ops",
+    "fraction_operations:frac_mult_word",
+    "fraction_operations:frac_mult_word_plain",
+    "fraction_operations:frac_word_mixed_plain",
+    "fraction_operations:mixed_fraction_ops",
+    "fraction_operations:mult_frac_whole_nv",
+    "fraction_operations:unit_frac_div_whole",
+    "fraction_operations:whole_div_unit_frac",
+    "fractions:equiv_frac_nv",
+    "fractions:order_fractions",
+    "measurement:capacity",
+    "multiplication:mixed_multiplication",
+    "multiplication:mult_missing_digit",
+    "shapes_classify:classify_triangles",
+    "shapes_classify:cross_section_3d",
+    "shapes_classify:mixed_shapes",
+    "shapes_classify:net_identify",
+    "shapes_early:compose_rect_from_squares"];
 
 // (filled from the first run of the option-3 fix, 2026-11-20; owner lanes in design/status/lf-placevalue.md. r2 2026-11-20: 131 -> 126;
 // fractions:shade_fraction joined - its Say line filled the 3 of "2/3", which SAY-FILL forbids)
@@ -371,6 +352,9 @@ function exitAfterFlush(code) {
                     try { rawSteps = sl.workedStepsFor(Object.assign({}, q, { fullWorked: true }), ctx).join(' | '); } catch (e) { rawSteps = ''; }
                     // HELP-EMPTY: leaving the answer out must not leave "Here is how" with nothing in it
                     if (rawSteps && !paths.some((x) => x[0] === 'STEPS')) { empty.add(key); if (!firstEmpty.has(key)) firstEmpty.set(key, q); }
+                    // R2-KEEP (lead ruling A12, 2026-11-20): a skill with no screenHelp keeps master's r2 box - the fact skills'
+                    // own steps (critic r2 scored add_facts 9) are not swapped for a one-line hint
+                    if (['addition:add_facts', 'subtraction:sub_facts'].includes(key) && paths.filter((x) => x[0] === 'STEPS').length < 2) F('R2-KEEP', key, i, `the box shows ${paths.filter((x) => x[0] === 'STEPS').length} step(s), want its own r2 steps (>= 2)`);
                     // SAYLESS: the skill's provider has a Say frame, but the screen shows no Say line for this item
                     try {
                         const pv = kit.getProvider(cat, skill);
@@ -555,7 +539,7 @@ function exitAfterFlush(code) {
         const FULL = !SKILL && !CATEGORY;
         const byCheck = {};
         for (const f of res.findings) (byCheck[f.check] = byCheck[f.check] || new Map()).set(f.key, f);
-        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'HELP-THIN', 'LISTEN',
+        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'R2-KEEP', 'HELP-THIN', 'LISTEN',
             'DANGLING-HEAD', 'ORPHAN', 'HELP-GENERIC'];
         const lists = {};
         for (const c of CHECKS) {
