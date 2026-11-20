@@ -225,7 +225,8 @@ export function practiceRequest({ common, size, practiceSize, lessonNo, section,
         size: practiceSize,
         role: 'independent', tabId: `Practice ${lessonNo}`,
         // (`blocks`: practiceBlockSections - one section per block, in order, on the one page)
-        sections: blocks ? blocks : [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
+        // (`fillClamped`: a shape clamped to fewer columns fills its page like any Independent page - layout.js PAGE FILL; LESSON-FILL)
+        sections: blocks ? blocks : [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1], fillClamped: true })],
         seed,
         // (At L type the strip's words are a point bigger: 2 mm more for it.)
         stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }

@@ -964,7 +964,9 @@ function buildPlan(ctx) {
         // (lf-engine row cap, critic r1 F3: a capped template's rows are counted at the height they are drawn - ROWCAP-FILL)
         add(gate('rowcap-fill', 'ws-rowcap-fill (ROWCAP-FILL: capped rows counted at drawn + room)', 'the page engine', 'node', 'ws-rowcap-fill', [], { missingMsg: 'ws-rowcap-fill is not in this tree' }));
         // (lf-placevalue vocab deploy, lf-engine review of fbca1a582: a Mixed page's packing counts a page-opening shelf with its strip - MIX-PAGES)
-        add(gate('mix-pages', 'ws-mix-pages (MIX-PAGES: a lead shelf the Mixed packing adds never prints a page of its own)', 'the Mixed page engine', 'node', 'ws-mix-pages', [], { missingMsg: 'ws-mix-pages is not in this tree' }));
+        add(gate('mix-pages', 'ws-mix-pages (MIX-PAGES: a lead shelf the Mixed packing adds never prints a page of its own; MIX-DROP: a shelf that fits is never dropped)', 'the Mixed page engine', 'node', 'ws-mix-pages', [], { missingMsg: 'ws-mix-pages is not in this tree' }));
+        // (lf-engine vocabfix item 2: a lesson part over two pages never leaves a page more white than the next page's first item needs)
+        add(gate('lesson-fill', "ws-lesson-fill (LESSON-FILL: the lesson's Practice page never leaves room for the next page's item)", `${scope} lesson × M/L`, 'browser', 'ws-lesson-fill', ['--lessons', keys.join(',')], { missingMsg: 'ws-lesson-fill is not in this tree' }));
         // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
         // below with no overlap, TITLE-LONG never shrinks / at most two lines / cut with a warning - on every role, M and L)
         add(gate('frame-title', 'ws-frame-title (the page-title option on every role and key: TITLE-IDENT, TITLE-PLACE, TITLE-LONG)', `${scope} × every role × M/L`, 'browser', 'ws-frame-title', ['--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-frame-title.cjs' }));

@@ -697,6 +697,9 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
 
     let cols;
     let clamped = false;
+    // (`overflow`: a problem wider than its cell in 1 column, or taller than the page - a clamp the page fill never passes;
+    // a column count clamped to what fits is not one)
+    let overflow = false;
     let reason = '';
     if (requested === 'auto') {
         // DN-15: the largest N up to the Auto cap that fits with the Auto margins. It never
@@ -725,6 +728,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     let hMin = atCols.hMin;
     if (!atCols.fits) {
         clamped = true;
+        overflow = true;
         notes.push('A problem is wider than its cell even in 1 column.');
     }
     const hard = Math.max(1, Math.floor((G - SAFETY_H_MM) / Math.max(1, hMin)));
@@ -817,6 +821,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     if (cols === 1 && cls !== 'word' && cls !== 'wide' && rows < ONE_COL_ROWS.min) notes.push('Very tall problems: fewer than 3 rows fit.');
     if (hMin > G - SAFETY_H_MM) {
         clamped = true;
+        overflow = true;
         notes.push('A problem is taller than the page at this size.');
     }
 
@@ -908,7 +913,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     let filled = false;
     // Column stacks keep 12.1's grid too: their cell height is the pupil's regrouping space.
     const stacked = infos.some((i) => i.fp.tracks && !i.fp.factLike);
-    if (FILL_ROLES.has(role) && !clamped && !packed && !stacked && !gridOverride && hMin > 0 && cls !== 'word' && cls !== 'long') {
+    // (`section.fillClamped`, a lesson's Practice page - lf-engine vocabfix item 2: its [6, 2] shape clamped to 1 column took the
+    // 1-column target of 4 rows and, clamped, was never filled: follow_given_rule M p3 4 rows of 28.5 mm, 45 % white, and 2
+    // more on p4. A column clamp alone fills like any page; an overflow never does. The page cap still holds the count.)
+    // (and the grid height the lesson hands in under its step strip is the grid it fills)
+    if (FILL_ROLES.has(role) && (!clamped || (section.fillClamped && !overflow)) && !packed && !stacked && (!gridOverride || section.fillClamped) && hMin > 0 && cls !== 'word' && cls !== 'long') {
         // (the heights at the columns the page now has: dense packing above may have moved to more
         // columns, where a support box stacks under its problem - div_facts think at S measured 15 mm at
         // 2 columns and 25.5 mm at 3, and 10 rows of 3 ran 10.8 mm past the page; critic laned-restart R1-4)
@@ -917,7 +926,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         // (ROW-STRETCH CAP stage 2: the rows are drawn at most at their cap, so they USE at most that much of the grid)
         const used = rows * Math.min(G / rows, fillLimit(hFill), atFill.capH > 0 ? atFill.capH : Infinity);
         const fit = Math.floor((G - SAFETY_H_MM) / roomed(atFill, DENSE_ROOM));
-        if (used < PAGE_FILL * G && fit >= 5 / cols) {
+            if (used < PAGE_FILL * G && fit >= 5 / cols) {
             let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
             if (cols === 2 && want > 1 && !section.freeRows) want = TWO_COL_ROWS.find((r) => r <= want) || want;
             if (want > rows) {
@@ -1002,7 +1011,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     return {
         role, cls, requested, cols, rows, perPage, pages, count,
         cellW: widths.nominal, innerW: widths.inner, cellH, hMin: r2(hMin), gridH: G, gridHCont: Gc,
-        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, reason, note, notes, inPlace,
+        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, overflow, reason, note, notes, inPlace,
         digitPt, trackMm, size, look, availableWidthMm: W,
     };
 }
