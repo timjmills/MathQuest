@@ -207,7 +207,7 @@ export function genCountByTables(q) {
     const labels = timesMode !== 'none' && isTable ? values.map(v => `${fmt(v / t)} × ${fmt(t)}`) : null;
 
     q.text = `${down ? 'Count back' : 'Count'} by ${fmt(t)}. Write the missing numbers.`;
-    q.printText = `${down ? 'Count back' : 'Count'} by the number in the box. Write the missing numbers.`;
+    q.printText = `${down ? 'Count back' : 'Count'} by the number in the arrow. Write the missing numbers.`;
     q.ans = list(parts);
     q.keyParts = parts.map(String);
     q.acceptedAnswers = acceptLists(parts);

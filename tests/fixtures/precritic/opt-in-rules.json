@@ -325,7 +325,13 @@
       "name": "ws-screen-ink-size --only TEXT-SIZE --no-baseline on identify / unit_form / value (opt-in lf-placevalue lead 15:35: identify's screen numeral 30 px under the card / quiz digit floor 40-56 px; unit_form / value words 14 pt under their 16 pt print)",
       "script": "ws-screen-ink-size",
       "kind": "browser",
-      "args": ["--skill", "placevalue:identify,placevalue:unit_form,placevalue:value", "--only", "TEXT-SIZE", "--no-baseline"]
+      "args": [
+       "--skill",
+       "placevalue:identify,placevalue:unit_form,placevalue:value",
+       "--only",
+       "TEXT-SIZE",
+       "--no-baseline"
+      ]
      }
     },
     "pv-identify-heads": {
@@ -341,7 +347,16 @@
       "name": "ws-grade-render --gate --quiz-builder (opt-in lf-placevalue critic live1 N5: TOUCH-TARGET on the lane skills' card, online worksheet and builder-made quiz at 820 / 1024 - an answer box >= 48 px; the render-gate row renders no builder quiz)",
       "script": "ws-grade-render",
       "kind": "browser",
-      "args": ["--roles", "independent", "--size", "M", "--gate", "--quiz-builder", "--out", "/tmp/mq-pv-touch-gate"]
+      "args": [
+       "--roles",
+       "independent",
+       "--size",
+       "M",
+       "--gate",
+       "--quiz-builder",
+       "--out",
+       "/tmp/mq-pv-touch-gate"
+      ]
      }
     },
     "pv-words-pages": {
@@ -357,7 +372,10 @@
       "name": "ws-pv-screen-numeral (opt-in lf-placevalue live1, lf-hosts critic via the lead 2026-11-13: expand's online-worksheet numerals at the 29 px digit floor, WS-NUMERAL; no operator alone at a line's end, WS-WRAP-OP)",
       "script": "ws-pv-screen-numeral",
       "kind": "browser",
-      "args": ["--skills", "placevalue:expand"]
+      "args": [
+       "--skills",
+       "placevalue:expand"
+      ]
      }
     },
     "pv-words-opener-gate": {
@@ -365,7 +383,18 @@
       "name": "ws-grade-render --gate --roles opener --size L on the to_words deal (opt-in lf-placevalue critic live1 r2 N7: the numeral-to-words Model's answer line left its cell, OVERFLOW; the lane's precritic dealt the opener only the default way)",
       "script": "ws-grade-render",
       "kind": "browser",
-      "args": ["--roles", "opener", "--size", "L", "--opts", "{\"wordform\":[\"to_words\"]}", "--gate", "--no-screen", "--out", "/tmp/mq-pv-words-opener-gate"]
+      "args": [
+       "--roles",
+       "opener",
+       "--size",
+       "L",
+       "--opts",
+       "{\"wordform\":[\"to_words\"]}",
+       "--gate",
+       "--no-screen",
+       "--out",
+       "/tmp/mq-pv-words-opener-gate"
+      ]
      }
     }
    }
@@ -384,6 +413,119 @@
     "empty-band": {
      "args": [
       "--model-states"
+     ]
+    }
+   }
+  },
+  {
+   "lane": "lf-ops-props",
+   "why": "r4 probe (design/status/lf-ops-props.md 'Round r4'): the bands on the array / count-row pages came from row STRETCH - practice.js spreadRows, the guided rows and the lesson Practice capFill ignored the footprint's `noStretch` (lead ruling 2026-11-12 (b)). ROW-STRETCH (ws-print-lint, opt-in) holds a row of noStretch templates to 1.25 x its tallest item (1.42 on a pageCap page) and its shortest item's band to 20 %, on every grid role at S / M / L and on the lane skills' lesson pages. The independent page is judged on the print-lint-kit rows (L / S / M); the other grid roles on print-lint-rowstretch-<size>. Screen: ws-screen-slots --screen-digit (SCREEN-DIGIT + TRAIN-FIT, lead ruling (a) 2026-11-13: the count-row train at the digit floor, no sideways scroll, no ink past its cell).",
+   "skills": [
+    "multiplication:mult_properties",
+    "multiplication:arrays_groups",
+    "multiplication:count_by_tables"
+   ],
+   "gates": {
+    "print-lint-rowstretch-L": {
+     "newRow": {
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size L --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "script": "ws-print-lint",
+      "kind": "browser",
+      "parse": "printLint",
+      "args": [
+       "--source",
+       "kit",
+       "--roles",
+       "more-practice,test,guided,mixed-practice,review,reason-it",
+       "--size",
+       "L",
+       "--lints",
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP"
+      ]
+     },
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-rowstretch-S": {
+     "newRow": {
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size S --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "script": "ws-print-lint",
+      "kind": "browser",
+      "parse": "printLint",
+      "args": [
+       "--source",
+       "kit",
+       "--roles",
+       "more-practice,test,guided,mixed-practice,review,reason-it",
+       "--size",
+       "S",
+       "--lints",
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP"
+      ]
+     },
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-rowstretch-M": {
+     "newRow": {
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size M --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "script": "ws-print-lint",
+      "kind": "browser",
+      "parse": "printLint",
+      "args": [
+       "--source",
+       "kit",
+       "--roles",
+       "more-practice,test,guided,mixed-practice,review,reason-it",
+       "--size",
+       "M",
+       "--lints",
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP"
+      ]
+     },
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-lesson-L": {
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-lesson-S": {
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-kit": {
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-kit-S": {
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "print-lint-kit-M": {
+     "args": [
+      "--rules",
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
+     ]
+    },
+    "screen-slots": {
+     "args": [
+      "--screen-digit",
+      "--array-orient"
      ]
     }
    }
