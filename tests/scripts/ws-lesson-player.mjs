@@ -47,6 +47,9 @@ const LESSON = arg('--lesson', 'add-within-10');
 const BOARD_W = 1920;
 const WIDTHS = SW.widthsArg(process.argv, [...SW.SCREEN_WIDTHS, BOARD_W]);
 const HEIGHT = (w) => (w === BOARD_W ? 1080 : SW.heightOf(w));
+// The signed cell-digit size per width (card drawing.sizes, D5): board 104 px at 1280 / 1366, x1.5 at 1920; the tablet
+// (820 / 1024) board at the player's tablet scale 0.8 (83 px; the card names no tablet figure). Critic r1 F4: >= this.
+const DIGIT_TARGET = (w) => (w >= 1600 ? 156 : w >= 1200 ? 104 : 83);
 const SHOTS = arg('--shots');
 const fails = [];
 const notes = [];
@@ -106,7 +109,7 @@ function checkIdo(mods, exampleQ) {
 
 /* ================================================================ browser */
 async function openPlayer(width, part = 'ido', extra = '') {
-    const h = await H.open({ viewport: { width, height: HEIGHT(width), deviceScaleFactor: SHOTS ? 2 : 1 }, pagePath: `/index.html?lesson=${encodeURIComponent(LESSON)}&part=${part}&mode=board${extra}`, lock: TOOL });
+    const h = await H.open({ viewport: { width, height: HEIGHT(width), deviceScaleFactor: SHOTS ? 2 : 1 }, pagePath: `/index.html?lesson=${encodeURIComponent(LESSON)}&part=${part}${/[?&]?mode=/.test(extra) ? '' : '&mode=board'}${extra}`, lock: TOOL });
     try {
         // (fail fast where no player exists - a tree before slice 1 - then give the lesson build its time)
         await H.waitFor(h.page, () => typeof window.openLessonPlayer === 'function' && !!document.getElementById('mqLessonPlayer'), 15000, 'lesson player opened');
@@ -153,6 +156,19 @@ function measureInPage() {
     const doc = document.documentElement;
     out.hscroll = Math.max(doc.scrollWidth, document.body.scrollWidth) > window.innerWidth + 1 || r.scrollWidth > r.clientWidth + 1;
     out.mode = r.dataset.mode;
+    // the Leave control (critic r1 F1): visible on every stage
+    const lv = r.querySelector('[data-act="leave"]');
+    const lq = lv && lv.getBoundingClientRect();
+    out.leave = lv && lv.offsetParent !== null && getComputedStyle(lv).visibility !== 'hidden' ? { w: lq.width, h: lq.height } : null;
+    // stage-level H13 (critic r1 F4): the largest band of the stage (rows, then columns) that no content block covers
+    const stgEl = r.querySelector('.mq-lp-stage');
+    if (stgEl) {
+        const sq = stgEl.getBoundingClientRect();
+        const blocks = [...stgEl.querySelectorAll('.mq-lp-steps, .mq-lp-cell, .mq-lp-msg')].map((e) => e.getBoundingClientRect()).filter((q) => q.width > 1 && q.height > 1);
+        const band = (lo, hi, spans) => { let cur = lo, g = 0; for (const [a, b] of spans.sort((x, y) => x[0] - y[0])) { g = Math.max(g, a - cur); cur = Math.max(cur, b); } return Math.max(g, hi - cur) / Math.max(1, hi - lo); };
+        out.stageBandY = band(sq.top, sq.bottom, blocks.map((q) => [q.top, q.bottom]));
+        out.stageBandX = band(sq.left, sq.right, blocks.map((q) => [q.left, q.right]));
+    }
     out.small = [...r.querySelectorAll('button')].filter((b) => b.offsetParent !== null).map((b) => { const q = b.getBoundingClientRect(); return { t: b.textContent.trim(), w: q.width, h: q.height }; });
     const EMOJI = /\p{Extended_Pictographic}/u;
     const walker = document.createTreeWalker(r, NodeFilter.SHOW_TEXT);
@@ -237,6 +253,141 @@ function measureInPage() {
     return out;
 }
 
+/** Every black mark of the drawing (cell drawing + hops), keyed by kind + text + its nth occurrence (critic r1 F3). */
+function inkMarksInPage() {
+    const r = document.getElementById('mqLessonPlayer');
+    const roots = [...r.querySelectorAll('.mq-lp-cell .mq-lp-draw, .mq-lp-cell .mq-lp-hops')];
+    const BLACK = 'rgb(0, 0, 0)';
+    const out = [];
+    const seen = {};
+    const add = (key, q) => { if (!(q.width > 0.5 || q.height > 0.5)) return; seen[key] = (seen[key] || 0) + 1; out.push({ key: `${key}#${seen[key]}`, x: q.left, y: q.top, w: q.width, h: q.height }); };
+    for (const root of roots) {
+        for (const el of root.querySelectorAll('*')) {
+            const cs = getComputedStyle(el);
+            if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+            if (el instanceof SVGElement) {
+                if (!['path', 'text', 'rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'].includes(el.tagName)) continue;
+                const black = (cs.fill === BLACK && el.tagName !== 'line') || (cs.stroke === BLACK && parseFloat(cs.strokeWidth) > 0);
+                if (black) add(`S:${el.tagName}:${(el.textContent || '').trim()}`, el.getBoundingClientRect());
+                continue;
+            }
+            for (const c of el.childNodes) if (c.nodeType === 3 && c.nodeValue.trim() && cs.color === BLACK) { const rg = document.createRange(); rg.selectNodeContents(c); add(`T:${c.nodeValue.trim()}`, rg.getBoundingClientRect()); }
+            for (const side of ['Top', 'Bottom', 'Left', 'Right']) if (parseFloat(cs[`border${side}Width`]) > 0 && cs[`border${side}Style`] !== 'none' && cs[`border${side}Color`] === BLACK) add(`B:${side}:${el.className && el.className.baseVal === undefined ? el.className : ''}`, el.getBoundingClientRect());
+        }
+    }
+    return out;
+}
+
+/**
+ * The dot card's place against the digits, on screen and on the printed chart panel of the same state (critic r1 F2): every
+ * digit's centre from the card's centre, in card heights. The chart is drawn in its own document (sheetDocument: the
+ * print stylesheet), so the check never borrows the player's CSS.
+ */
+async function cueVsChart(page, lesson) {
+    return page.evaluate(async (lessonArg) => {
+        const rel = (draw) => {
+            const cue = draw && draw.querySelector('.mq-cue');
+            if (!cue) return null;
+            const cq = cue.getBoundingClientRect();
+            const cx = cq.left + cq.width / 2, cy = cq.top + cq.height / 2;
+            const out = {};
+            const seen = {};
+            const doc = draw.ownerDocument;
+            const walker = doc.createTreeWalker(draw, NodeFilter.SHOW_TEXT);
+            for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+                const t = n.nodeValue.trim();
+                if (!/^\d+$/.test(t) || n.parentElement.closest('.mq-cue, .mq-hops, .mq-chops, svg')) continue;
+                const rg = doc.createRange(); rg.selectNodeContents(n);
+                const q = rg.getBoundingClientRect();
+                seen[t] = (seen[t] || 0) + 1;
+                out[`${t}#${seen[t]}`] = [((q.left + q.width / 2) - cx) / cq.height, ((q.top + q.height / 2) - cy) / cq.height];
+            }
+            return out;
+        };
+        const P = await import('/js/modules/lesson-player/plan.js');
+        const ps = await import('/js/modules/print-sheet.js');
+        const st = window.lessonPlayerState();
+        const id = P.resolveLessonId(lessonArg);
+        const res = await ps.buildSheet(P.chartRequest(id, st.seed));
+        const fr = document.createElement('iframe');
+        fr.style.cssText = 'position:fixed;left:-5000px;top:0;width:900px;height:1300px;border:0;';
+        document.body.appendChild(fr);
+        await new Promise((ok) => { fr.onload = ok; fr.srcdoc = ps.sheetDocument(res.pupilHtml, 'chart'); });
+        await new Promise((ok) => setTimeout(ok, 400));
+        try { await fr.contentDocument.fonts.ready; } catch (e) { /* no fonts api */ }
+        const panels = [...fr.contentDocument.querySelectorAll('.mq-cstate')].slice(0, st.steps).map((p) => rel(p.querySelector('.mq-cdraw')));
+        const notes = [...fr.contentDocument.querySelectorAll('.mq-cnote')].map((e) => e.textContent.trim());
+        fr.remove();
+        return { panels, notes };
+    }, lesson);
+}
+const cueOnScreen = (page) => page.evaluate(() => {
+    const draw = document.querySelector('#mqLessonPlayer .mq-lp-cell .mq-lp-draw');
+    const cue = draw && draw.querySelector('.mq-cue');
+    if (!cue) return null;
+    const cq = cue.getBoundingClientRect();
+    const cx = cq.left + cq.width / 2, cy = cq.top + cq.height / 2;
+    const out = {};
+    const seen = {};
+    const walker = document.createTreeWalker(draw, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const t = n.nodeValue.trim();
+        if (!/^\d+$/.test(t) || n.parentElement.closest('.mq-cue, .mq-hops, .mq-chops, svg')) continue;
+        const rg = document.createRange(); rg.selectNodeContents(n);
+        const q = rg.getBoundingClientRect();
+        seen[t] = (seen[t] || 0) + 1;
+        out[`${t}#${seen[t]}`] = [((q.left + q.width / 2) - cx) / cq.height, ((q.top + q.height / 2) - cy) / cq.height];
+    }
+    return out;
+});
+
+/** Ink never moves (F3), the dot card sits where the chart puts it (F2), every chart step note is on screen (F5). */
+async function stillAndChart(w) {
+    let h;
+    try { h = await openPlayer(w); } catch (e) { fail('reveal', `${w}: the player did not open (${e.message.split('\n')[0]})`); return; }
+    try {
+        const { page } = h;
+        const st = await state(page);
+        const chart = await cueVsChart(page, LESSON);
+        let prev = null;
+        let moved = 0;
+        let cueBad = 0;
+        let cueSeen = 0;
+        const shownNotes = [];
+        for (let k = 0; k < st.steps; k++) {
+            const marks = await page.evaluate(inkMarksInPage);
+            if (prev) {
+                const at = new Map(marks.map((m) => [m.key, m]));
+                for (const m of prev) {
+                    const n = at.get(m.key);
+                    if (!n) continue;
+                    if (Math.abs(n.x - m.x) > 1 || Math.abs(n.y - m.y) > 1) { moved++; if (moved <= 4) fail('reveal', `${w} step ${k} -> ${k + 1}: F3 black mark ${m.key} moved ${Math.round(n.x - m.x)}, ${Math.round(n.y - m.y)} px`); }
+                }
+            }
+            prev = marks;
+            const scr = await cueOnScreen(page);
+            const pap = chart.panels[k];
+            if (pap && !scr) { cueBad++; fail('reveal', `${w} step ${k + 1}: F2 the chart panel draws the dot card, the screen does not`); }
+            if (pap && scr) {
+                cueSeen++;
+                for (const key of Object.keys(pap)) {
+                    const a = pap[key], b = scr[key];
+                    if (!b) continue;
+                    const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+                    if (d > 0.35) { cueBad++; fail('reveal', `${w} step ${k + 1}: F2 digit ${key} sits (${b.map((v) => v.toFixed(2)).join(', ')}) card heights from the dot card on screen, (${a.map((v) => v.toFixed(2)).join(', ')}) on the chart`); }
+                }
+            }
+            shownNotes.push(await page.evaluate(() => (document.querySelector('#mqLessonPlayer .mq-lp-cell') || {}).textContent || ''));
+            if (k < st.steps - 1) await press(page, 'ArrowRight');
+        }
+        if (!moved) ok('reveal', `${w}: F3 no black mark moved across ${st.steps} steps`);
+        if (!cueBad && cueSeen) ok('reveal', `${w}: F2 the dot card sits where the chart puts it (${cueSeen} states)`);
+        const missing = chart.notes.filter((n) => !shownNotes.some((t) => t.replace(/\s+/g, ' ').includes(n.replace(/\s+/g, ' '))));
+        if (missing.length) fail('reveal', `${w}: F5 chart step note(s) not on screen: ${missing.map((n) => `"${n}"`).join(', ')}`);
+        else ok('reveal', `${w}: F5 every chart step note on screen (${chart.notes.length})`);
+    } finally { await h.close(); }
+}
+
 async function render() {
     for (const w of WIDTHS) {
         let h;
@@ -261,10 +412,14 @@ async function render() {
                 ms.push(m);
                 if (m.band >= 0.30) bands.push({ k, tag, m });
                 if (m.stepsFoot !== undefined && m.stepsFoot > 6) fail('render', `${tag}: H13 the Steps column has ${Math.round(m.stepsFoot)} px empty under its last row`);
-                const target = 104 * m.k;
+                const target = DIGIT_TARGET(w);
                 if (m.digitPx < floor) fail('render', `${tag}: digits ${m.digitPx.toFixed(0)} px under the ${floor} px floor`);
-                if (m.mode === 'board' && m.digitPx < target * 0.8) fail('render', `${tag}: board digits ${m.digitPx.toFixed(0)} px under 80 % of the ${target.toFixed(0)} px target`);
-                console.log(`       ${tag}: band ${(m.band * 100).toFixed(1)} %, steps foot ${Math.round(m.stepsFoot || 0)} px, digits ${m.digitPx.toFixed(0)} px`);
+                if (m.mode === 'board' && m.digitPx < target - 1) fail('render', `${tag}: F4 board digits ${m.digitPx.toFixed(0)} px under the signed ${target} px`);
+                if (!m.leave) fail('render', `${tag}: F1 no visible Leave control`);
+                else if (m.leave.w < min - 0.5 || m.leave.h < min - 0.5) fail('render', `${tag}: F1 Leave ${Math.round(m.leave.w)}x${Math.round(m.leave.h)} under ${min} px`);
+                if (m.stageBandY >= 0.30 || m.stageBandX >= 0.30) fail('render', `${tag}: F4 stage H13 empty band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} % of the stage (rows ${(m.stageBandY * 100).toFixed(1)} %, columns ${(m.stageBandX * 100).toFixed(1)} %)`);
+                if (k > 0 && ms[0] && Math.abs(ms[0].cellH - m.cellH) > 1) fail('render', `${tag}: F4 the cell is ${m.cellH} px tall, ${ms[0].cellH} px at step 1 (the cell grows: fix it at its largest state)`);
+                console.log(`       ${tag}: band ${(m.band * 100).toFixed(1)} %, stage band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} %, steps foot ${Math.round(m.stepsFoot || 0)} px, cell ${m.cellH} px, digits ${m.digitPx.toFixed(0)} px (target ${target})`);
                 if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await h.page.screenshot({ path: join(SHOTS, `ido-board-${w}-step${k + 1}.png`) }); }
                 if (k < st.steps - 1) await press(h.page, 'ArrowRight');
             }
@@ -336,6 +491,113 @@ async function reveal() {
         if (!gone) fail('reveal', 'Esc did not leave the player'); else ok('reveal', 'Next after the last step -> We do; Esc leaves (URL cleaned)');
         if (h.problems.length) fail('reveal', `console errors: ${h.problems.map((p) => p.text).join(' | ').slice(0, 300)}`);
     } finally { await h.close(); }
+    for (const w of [1280, BOARD_W, 820]) await stillAndChart(w);
+}
+
+const leaveBox = (page) => page.evaluate(() => {
+    const b = document.querySelector('#mqLessonPlayer [data-act="leave"]');
+    if (!b || b.offsetParent === null || getComputedStyle(b).visibility === 'hidden') return null;
+    const q = b.getBoundingClientRect();
+    return { w: q.width, h: q.height };
+});
+
+/**
+ * Critic r1 F1 (Leave on every stage, closing like Esc; the message stage leaves no dead pills), F6 (the lesson name as
+ * typed, escaped once), F7 (mode=pupil: not built, so Board with no Pupil pill), F8 (the I do tick only after its last step).
+ */
+async function leaveAndMarks() {
+    const leaveOk = async (page, tag, minPx) => {
+        const b = await leaveBox(page);
+        if (!b) { fail('any-part', `${tag}: F1 no visible Leave control`); return false; }
+        if (b.w < minPx - 0.5 || b.h < minPx - 0.5) fail('any-part', `${tag}: F1 Leave ${Math.round(b.w)}x${Math.round(b.h)} under ${minPx} px`);
+        return true;
+    };
+    // every built / not-yet-built part stage, at the board (64) and on a tablet (48)
+    for (const [w, minPx] of [[1280, 64], [820, 48]]) {
+        let h;
+        try { h = await openPlayer(w, 'ido'); } catch (e) { fail('any-part', `${w}: the player did not open`); continue; }
+        try {
+            const { page } = h;
+            for (const part of ['warmup', 'ido', 'wedo', 'youdo', 'exit']) {
+                await page.click(`.mq-lp-pill[data-part="${part}"]`);
+                await new Promise((r) => setTimeout(r, 100));
+                await leaveOk(page, `${w} ${part}`, minPx);
+            }
+            await page.click('.mq-lp-pill[data-part="ido"]');
+            await new Promise((r) => setTimeout(r, 100));
+            if (await leaveBox(page)) {
+                await page.click('#mqLessonPlayer [data-act="leave"]');
+                await new Promise((r) => setTimeout(r, 200));
+                const gone = await page.evaluate(() => !document.getElementById('mqLessonPlayer') && !/lesson=/.test(location.search) && !document.body.classList.contains('mq-lp-open'));
+                if (!gone) fail('any-part', `${w}: F1 Leave did not close the player (as Esc does)`);
+                else ok('any-part', `${w}: F1 Leave on every part stage (>= ${minPx} px); Leave closes the player`);
+            }
+        } finally { await h.close(); }
+    }
+    // the "No such lesson" stage: Leave shown, no dead pills, the typed name shown literally (escaped once)
+    {
+        const raw = '<b>x';
+        const h = await H.open({ viewport: { width: 1280, height: 900 }, pagePath: `/index.html?lesson=${encodeURIComponent(raw)}&mode=board`, lock: TOOL });
+        try {
+            const { page } = h;
+            try { await H.waitFor(page, () => !!document.querySelector('#mqLessonPlayer .mq-lp-stage-msg'), 15000, 'message stage'); } catch (e) { fail('any-part', 'unknown lesson: no message stage'); }
+            const m = await page.evaluate((rawArg) => {
+                const r = document.getElementById('mqLessonPlayer');
+                if (!r) return null;
+                const msg = r.querySelector('.mq-lp-stage').textContent;
+                const live = [...r.querySelectorAll('.mq-lp-pill')].filter((b) => b.offsetParent !== null && getComputedStyle(b).visibility !== 'hidden' && !b.disabled);
+                return { literal: msg.includes(`“${rawArg}”`), entity: /&lt;|&gt;|&amp;/.test(msg), injected: !!r.querySelector('.mq-lp-stage b'), livePills: live.length, msg: msg.trim().slice(0, 120) };
+            }, raw);
+            if (!m) fail('any-part', 'unknown lesson: no player');
+            else {
+                if (!m.literal || m.entity || m.injected) fail('any-part', `F6 unknown lesson name not shown literally: "${m.msg}"`);
+                else ok('any-part', `F6 the unknown lesson name shows literally ("${raw}"), escaped once, no markup`);
+                if (m.livePills) fail('any-part', `F1 the message stage shows ${m.livePills} live part pills that do nothing`);
+            }
+            if (await leaveOk(page, 'unknown lesson', 64)) {
+                await page.click('#mqLessonPlayer [data-act="leave"]');
+                await new Promise((r) => setTimeout(r, 200));
+                if (await page.evaluate(() => !!document.getElementById('mqLessonPlayer'))) fail('any-part', 'F1 Leave did not close the "No such lesson" stage');
+                else ok('any-part', 'F1 the "No such lesson" stage: Leave shown and closes it; no dead pills');
+            }
+        } finally { await h.close(); }
+    }
+    // mode=pupil (not built in slice 1): Board, with no Pupil pill
+    {
+        let h;
+        try { h = await openPlayer(1280, 'ido', '&mode=pupil'); } catch (e) { fail('any-part', 'mode=pupil: the player did not open'); h = null; }
+        if (h) {
+            try {
+                const m = await h.page.evaluate(() => { const r = document.getElementById('mqLessonPlayer'); return { mode: r.dataset.mode, pill: (r.querySelector('.mq-lp-mode') || {}).textContent || '', url: location.search }; });
+                if (m.mode !== 'board' || /pupil/i.test(m.pill)) fail('any-part', `F7 mode=pupil shows "${m.pill}" in the ${m.mode} layout (pupil mode is not built: Board, no Pupil pill)`);
+                else ok('any-part', 'F7 mode=pupil opens the Board (pupil mode not built), no Pupil pill');
+            } finally { await h.close(); }
+        }
+    }
+    // the I do tick only after its last step has been reached
+    {
+        let h;
+        try { h = await openPlayer(1280, 'ido'); } catch (e) { fail('any-part', 'tick: the player did not open'); h = null; }
+        if (h) {
+            try {
+                const { page } = h;
+                const tick = () => page.evaluate(() => { const b = document.querySelector('.mq-lp-pill[data-part="ido"]'); return /\u2713/.test(b.textContent) || b.classList.contains('is-done'); });
+                await page.click('.mq-lp-pill[data-part="wedo"]');
+                await new Promise((r) => setTimeout(r, 100));
+                const early = await tick();
+                await page.click('.mq-lp-pill[data-part="ido"]');
+                await new Promise((r) => setTimeout(r, 100));
+                const st = await state(page);
+                for (let k = 0; k < st.steps - 1; k++) await press(page, 'ArrowRight');
+                await page.click('.mq-lp-pill[data-part="wedo"]');
+                await new Promise((r) => setTimeout(r, 100));
+                const late = await tick();
+                if (early) fail('any-part', 'F8 the I do pill shows its tick after a visit that never reached the last step');
+                if (!late) fail('any-part', 'F8 the I do pill shows no tick after its last step was reached');
+                if (!early && late) ok('any-part', 'F8 the I do tick appears only once its last step has been reached');
+            } finally { await h.close(); }
+        }
+    }
 }
 
 async function anyPart() {
@@ -381,6 +643,7 @@ async function anyPart() {
         if (s.part !== 'ido' || s.step !== 1) fail('any-part', `a jump back to I do did not keep its step (step ${s.step + 1}, want 2)`);
         ok('any-part', 'PLAYER-ANY-PART: every part opens by ?part=, the part bar jumps to every part (URL follows), Next / Back cross parts, I do keeps its step');
     } finally { await h.close(); }
+    await leaveAndMarks();
     notes.push('PLAYER-ANY-PART packet page ids (anchor chart, Guided, Independent ...): slice 4, not in slice 1');
 }
 

@@ -16,14 +16,14 @@
 //
 // Later slices add their parts' renderers to RENDER (warmup, wedo, youdo, exit) and their plans to plan.js.
 
-import { planLesson, parseLaunch, launchSearch, chartRequest, PLAYER_PARTS, PART_IDS, partOf, lessonSeedOf } from './plan.js';
+import { planLesson, parseLaunch, launchSearch, chartRequest, PLAYER_PARTS, PART_IDS, partOf, lessonSeedOf, BUILT_MODES } from './plan.js';
 import { stopSpeaking } from '../hints-speech.js';
 import { stateDrawing, chartLayout } from '../sheet/lesson-pages/chart.js';
 import { panelHops } from '../sheet/lesson-arch/fact.js';
 import { lessonData } from '../lessons/library.js';
 import { stepMarker, stateGroups } from '../sheet/lesson-pages/common.js';
 import { resolveCtx } from '../sheet/index.js';
-import { LESSON_CSS } from '../sheet/lesson-css.js';
+import { SHEET_ENGINE_CSS } from '../sheet/roles/practice.js';
 import { workedStepsOf } from '../sheet/anchors.js';
 
 const ROOT_ID = 'mqLessonPlayer';
@@ -46,12 +46,16 @@ function rootEl() { return document.getElementById(ROOT_ID); }
 export async function openLessonPlayer(launch = (typeof location !== 'undefined' ? location.search : '')) {
     const l = typeof launch === 'string' ? parseLaunch(launch) : Object.assign({ part: 'ido', mode: 'board' }, launch || {});
     if (!l || !l.lesson) {
+        S = null;
         mountShell({ title: 'Lesson', mode: 'board' });
-        stageMessage('No such lesson', `There is no lesson called “${esc((l && l.raw) || '')}”. Check the link.`);
+        // (critic r1 F6: the name as typed, as TEXT - stageMessage sets textContent, so it is escaped once, never parsed)
+        stageMessage('No such lesson', `There is no lesson called “${(l && l.raw) || ''}”. Check the link.`);
         return lessonPlayerState();
     }
+    // (critic r1 F7: pupil mode is not built in this slice - the Board plays, and no Pupil pill shows)
+    if (!BUILT_MODES.includes(l.mode)) l.mode = 'board';
     if (l.seed === undefined || l.seed === null) l.seed = lessonSeedOf(l.lesson);
-    S = { launch: l, plan: null, part: PART_IDS.includes(l.part) ? l.part : 'ido', pos: {}, visited: new Set(), ready: false, spoke: '', item: null };
+    S = { launch: l, plan: null, part: PART_IDS.includes(l.part) ? l.part : 'ido', pos: {}, visited: new Set(), done: new Set(), ready: false, spoke: '', item: null, fit: null };
     mountShell({ title: 'Lesson', mode: l.mode });
     stageMessage('Getting the lesson ready…', 'The worked example is being made from the lesson.');
     try {
@@ -111,12 +115,13 @@ function mountShell({ title, mode }) {
     r.setAttribute('role', 'dialog');
     r.setAttribute('aria-modal', 'true');
     r.setAttribute('aria-label', 'Lesson player');
-    r.dataset.mode = mode || 'board';
+    r.dataset.mode = BUILT_MODES.includes(mode) ? mode : 'board';
     r.innerHTML = `
 <header class="mq-lp-top">
   <h1 class="mq-lp-title">${esc(title)}</h1>
-  <span class="mq-lp-mode">${mode === 'pupil' ? 'Pupil' : 'Board'}</span>
+  <span class="mq-lp-mode">Board</span>
   <nav class="mq-lp-rail" aria-label="Lesson parts">${PLAYER_PARTS.map((p) => `<button type="button" class="mq-lp-pill" data-part="${p.id}"${p.built ? '' : ' data-soon'}>${esc(p.name)}</button>`).join('')}</nav>
+  <button type="button" class="mq-lp-leave" data-act="leave" aria-label="Leave the lesson">Leave</button>
 </header>
 <main class="mq-lp-stage" aria-live="polite"></main>
 <footer class="mq-lp-bar">
@@ -129,15 +134,18 @@ function mountShell({ title, mode }) {
     document.body.appendChild(r);
     document.body.classList.add('mq-lp-open');
     // the chart's own drawing rules (sheet/lesson-css.js, scoped to the kit's .ws-sheet), once per page
+    // (critic r1 F2: the WHOLE engine stylesheet - it carries the lesson rules AND the dot card's place beside its addend,
+    // .mq-cuewrap / .mq-cue - so the screen lays the chart's drawing out as the paper does)
     if (!document.getElementById('mqLessonPlayerKitCss')) {
         const css = document.createElement('style');
         css.id = 'mqLessonPlayerKitCss';
-        css.textContent = LESSON_CSS;
+        css.textContent = SHEET_ENGINE_CSS;
         document.head.appendChild(css);
     }
-    r.querySelector('.mq-lp-rail').addEventListener('click', (e) => {
+    r.querySelector('.mq-lp-top').addEventListener('click', (e) => {
+        if (e.target.closest('[data-act="leave"]')) { closeLessonPlayer(); return; }
         const b = e.target.closest('[data-part]');
-        if (b) goPart(b.dataset.part);
+        if (b && !r.dataset.idle) goPart(b.dataset.part);
     });
     r.querySelector('.mq-lp-bar').addEventListener('click', (e) => {
         const b = e.target.closest('[data-act]');
@@ -162,7 +170,11 @@ function stageMessage(head, body) {
     const st = rootEl() && rootEl().querySelector('.mq-lp-stage');
     if (!st) return;
     st.className = 'mq-lp-stage mq-lp-stage-msg';
-    st.innerHTML = `<div class="mq-lp-msg"><h2>${esc(head)}</h2><p>${esc(body)}</p></div>`;
+    st.innerHTML = '<div class="mq-lp-msg"><h2></h2><p></p></div>';
+    st.querySelector('h2').textContent = head;
+    st.querySelector('p').textContent = body;
+    // (critic r1 F1: no part to show - the presenter buttons and the part pills hide (none would do anything); Leave stays)
+    rootEl().dataset.idle = '1';
     const bar = rootEl().querySelector('.mq-lp-bar');
     if (bar) bar.dataset.idle = '1';
 }
@@ -221,7 +233,7 @@ function onKey(e) {
 let resizeT = 0;
 function onResize() {
     clearTimeout(resizeT);
-    resizeT = setTimeout(() => { if (S && S.ready && S.part === 'ido') { S.zoom = 0; fitDrawing(); } }, 60);
+    resizeT = setTimeout(() => { if (S && S.ready) { S.fit = null; if (S.part === 'ido') render(); } }, 60);
 }
 
 /* ============================================================== read aloud (D6: on demand on the board) */
@@ -263,12 +275,16 @@ function render() {
         const on = id === S.part;
         if (on) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
         b.classList.toggle('is-on', on);
-        b.classList.toggle('is-done', !on && S.visited.has(id) && def.built);
-        b.textContent = def.name + (!on && S.visited.has(id) && def.built ? ' ✓' : '');
+        // (critic r1 F8: the tick only once the part was finished - for I do, its last step reached)
+        const tick = !on && S.done.has(id) && def.built;
+        b.classList.toggle('is-done', tick);
+        b.textContent = def.name + (tick ? ' ✓' : '');
         b.setAttribute('aria-label', `${def.name}${def.built ? '' : ' (coming soon)'}${on ? ', showing' : ''}`);
     });
     const bar = r.querySelector('.mq-lp-bar');
     delete bar.dataset.idle;
+    delete r.dataset.idle;
+    if (S.part === 'ido' && idoPart().steps.length && (S.pos.ido || 0) >= idoPart().steps.length - 1) S.done.add('ido');
     if (S.part === 'ido') renderIdo(r);
     else renderSoon(r, S.part);
 }
@@ -324,6 +340,16 @@ function statePieces(group) {
 
 const kit = (html) => `<div class="mq-lp-zoom"><div class="ws-sheet ws-L ws-ican mq-lp-kit"><div class="mq-cdraw">${html}</div></div></div>`;
 
+/** A step's words, and its note in bold under them as the chart draws it (critic r1 F5: "Same numbers? Start with either."). */
+const wordsHtml = (st) => (st ? `<p class="mq-lp-words">${esc(st.words)}</p>${st.note ? `<p class="mq-lp-note">${esc(st.note)}</p>` : ''}` : '');
+
+/**
+ * The Say band (P-17): filled after the last step, absent before it - its room kept (blank, no stub) so nothing moves. It
+ * closes the words column (critic r1 F4: a full-width strip under the drawing kept a 42 % empty band on step 1 - the answer
+ * row's room AND the strip's room in one band).
+ */
+const sayHtml = (p, last) => (!p.say ? '' : last ? `<div class="mq-lp-say"><b>Say:</b> <span>${esc(p.say)}</span></div>` : '<div class="mq-lp-sayroom" aria-hidden="true"></div>');
+
 function renderIdo(r) {
     const st = r.querySelector('.mq-lp-stage');
     const p = idoPart();
@@ -339,16 +365,19 @@ function renderIdo(r) {
         return `<li class="mq-lp-step ${cls}"${i === k ? ' aria-current="step"' : ''}><span class="mq-lp-n">${stepMarker(i + 1)}</span><span class="mq-lp-t">${esc(s.name)}</span></li>`;
     }).join('');
     const chant = p.chant ? `<p class="mq-lp-chant"><b>Rule:</b> ${esc(p.chant)}</p>` : '';
+    // (critic r1 F3 / F4: every box keeps the size of its LARGEST state from step 1 - the drawing, the words, the hops and
+    // the Say band's room - so the cell never grows and no mark already drawn moves; fitDrawing sets the sizes)
     st.innerHTML = `
 <aside class="mq-lp-steps" aria-label="Steps"><h2>Steps</h2><ol>${stepsHtml}</ol>${chant}</aside>
 <section class="mq-lp-cellwrap">
   <div class="mq-scell mq-lp-cell" role="group" aria-label="Worked example, step ${k + 1} of ${n}" data-step="${k + 1}" data-steps="${n}">
     ${instr ? `<div class="mq-lp-instr">${esc(instr)}</div>` : ''}
     <div class="mq-lp-work" data-variant="${pc.variant}">
-      <div class="mq-lp-draw">${kit(pc.draw)}</div>
-      <div class="mq-lp-side">${cur ? `<p class="mq-lp-words">${esc(cur.words)}</p>` : ''}${pc.hops ? `<div class="mq-lp-hops">${kit(pc.hops)}</div>` : ''}</div>
+      <div class="mq-lp-group">
+        <div class="mq-lp-draw">${kit(pc.draw)}</div>
+        <div class="mq-lp-side"><div class="mq-lp-wordsbox">${wordsHtml(cur)}</div>${pc.variant === 'row' ? `<div class="mq-lp-hops">${pc.hops ? kit(pc.hops) : ''}</div>` : ''}${sayHtml(p, last)}</div>
+      </div>
     </div>
-    ${last && p.say ? `<div class="mq-lp-say"><b>Say:</b> <span>${esc(p.say)}</span></div>` : ''}
   </div>
 </section>`;
     setBar(n ? `Step ${k + 1} of ${n}${last && p.say ? ' <span class="mq-lp-together">· Say it together</span>' : ''}` : 'Worked example');
@@ -364,71 +393,186 @@ function renderSoon(r, id) {
     setBar(esc(def.name));
 }
 
+/* ============================================================== sizing (critic r1 F3 / F4) */
+
+const kOf = (r) => parseFloat(getComputedStyle(r).getPropertyValue('--lp-k')) || 1;
+// The signed cell-digit size (card drawing.sizes, D5): board 104 px at 1280 / 1366, x1.5 at 1920 (156 px); the tablet board
+// at the player's tablet scale (--lp-k 0.8: 83 px - the card names no tablet figure).
+const digitTarget = (r) => 104 * kOf(r);
+const basePxOf = () => (resolveCtx({ mode: 'print', size: 'L', look: 'ican' }).metrics.digitPt || 28) * (4 / 3);
+
 /**
- * Size the drawing: ONE zoom for every state of the I do (the digits never jump between steps), the digits at the host's
- * target (--lp-digit: the board's 104 px at 1280, x1.5 at 1920 - card drawing.sizes) unless the largest state, with the
- * Say band under it, would pass the stage; the whole drawing (hops too) scales as one, so its geometry is the printed
- * chart's. The zoom is measured on every state (a hidden sizer) and kept per viewport size.
+ * Size the I do once per viewport: ONE zoom for every state (the digits never jump), the drawing at the signed digit size,
+ * and every box at its largest state's size, so the cell is the same from step 1 and no mark moves (F3, F4). When the
+ * drawing does not fit at the signed size, the layout gives room first - the Steps strip collapses to chips, the words and
+ * hops go under the drawing - and only then does the zoom fall (content never shrinks while room is left, card D5).
  */
 function fitDrawing() {
     const r = rootEl();
-    const work = r && r.querySelector('.mq-lp-work');
-    if (!work || !S) return;
-    const zooms = [...r.querySelectorAll('.mq-lp-zoom')];
-    // (the board's 104 px at --lp-k 1: the custom property's calc() is not resolved by getPropertyValue, so the scale is read)
-    const target = 104 * (parseFloat(getComputedStyle(r).getPropertyValue('--lp-k')) || 1);
-    const basePx = (resolveCtx({ mode: 'print', size: 'L', look: 'ican' }).metrics.digitPt || 28) * (4 / 3);
+    if (!r || !S || !r.querySelector('.mq-lp-work')) return;
     const key = `${window.innerWidth}x${window.innerHeight}`;
-    if (!S.zoom || S.zoomKey !== key) {
-        S.zoomKey = key;
-        S.zoom = measureZoom(r, work, target / basePx);
-    }
-    zooms.forEach((z) => { z.style.zoom = String(S.zoom); });
-    r.dataset.digitPx = String(Math.round(basePx * S.zoom));
-    r.dataset.digitTarget = String(Math.round(target));
+    if (!S.fit || S.fit.key !== key) S.fit = Object.assign(solveFit(r), { key });
+    applyFit(r, S.fit);
 }
 
-function measureZoom(r, work, want) {
+/** The largest state of every box, measured at zoom 1 (drawing, hops) or at a given width (words). */
+function measureStates(r) {
     const p = idoPart();
+    const groups = p.steps.length ? [...new Set(p.steps.map((s) => s.group))] : [0];
     const sizer = document.createElement('div');
     sizer.className = 'mq-lp-sizer';
     sizer.setAttribute('aria-hidden', 'true');
     sizer.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;';
-    const states = p.steps.length ? [...new Set(p.steps.map((s) => s.group))] : [0];
-    sizer.innerHTML = states.map((g) => { const pc = statePieces(g); return `<div class="mq-lp-sz" data-g="${g}">${kit(pc.draw)}<div class="mq-lp-szh">${pc.hops ? kit(pc.hops) : ''}</div></div>`; }).join('')
-        + (p.say ? `<div class="mq-lp-say">${esc(`Say: ${p.say}`)}</div>` : '');
+    sizer.innerHTML = groups.map((g) => { const pc = statePieces(g); return `<div class="mq-lp-sz">${kit(pc.draw)}<div class="mq-lp-szh">${pc.hops ? kit(pc.hops) : ''}</div></div>`; }).join('');
     r.appendChild(sizer);
     let wD = 1, hD = 1, wH = 0, hH = 0;
     sizer.querySelectorAll('.mq-lp-sz').forEach((el) => {
-        const d = el.firstElementChild;
-        const h = el.querySelector('.mq-lp-szh .mq-lp-zoom');
-        wD = Math.max(wD, d.scrollWidth); hD = Math.max(hD, d.scrollHeight);
-        if (h) { wH = Math.max(wH, h.scrollWidth); hH = Math.max(hH, h.scrollHeight); }
+        const d = el.firstElementChild.getBoundingClientRect();
+        // (the drawing's box ends at its lowest INK, not at the template's own bottom padding: that padding is white the
+        // cell would carry as a band under the answer row - critic r1 F4, H13)
+        let inkB = 0;
+        for (const x of el.firstElementChild.querySelectorAll('*')) {
+            if (x.children.length && !(x instanceof SVGGraphicsElement && x.tagName !== 'svg' && x.tagName !== 'g')) continue;
+            const q = x.getBoundingClientRect();
+            if (q.width > 0.5 && q.height > 0.5) inkB = Math.max(inkB, q.bottom - d.top);
+        }
+        wD = Math.max(wD, d.width); hD = Math.max(hD, inkB > 0 ? Math.min(d.height, inkB + 1) : d.height);
+        const hz = el.querySelector('.mq-lp-szh .mq-lp-zoom');
+        if (hz) { const q = hz.getBoundingClientRect(); wH = Math.max(wH, q.width); hH = Math.max(hH, q.height); }
     });
-    const say = sizer.querySelector('.mq-lp-say');
-    const sayH = say && !work.parentElement.querySelector('.mq-lp-say') ? say.offsetHeight : 0;
-    sizer.remove();
-    const words = work.querySelector('.mq-lp-words');
-    const wordsH = words ? words.offsetHeight : 0;
-    const wordsW = words ? Math.min(words.scrollWidth, work.clientWidth * 0.45) : 0;
+    // the words of every step (and its note) at a width: natural one-line width, longest word, height at a width
+    const wb = document.createElement('div');
+    wb.className = 'mq-lp-wordsbox';
+    sizer.innerHTML = '';
+    sizer.appendChild(wb);
+    const steps = p.steps.length ? p.steps : [null];
+    wb.style.width = 'max-content';
+    let natW = 0;
+    steps.forEach((st) => { wb.innerHTML = wordsHtml(st); natW = Math.max(natW, wb.getBoundingClientRect().width); });
+    wb.style.width = 'min-content';
+    let minW = 0;
+    steps.forEach((st) => { wb.innerHTML = wordsHtml(st); minW = Math.max(minW, wb.getBoundingClientRect().width); });
+    const cache = {};
+    const wordsH = (w) => {
+        const kw = Math.round(w);
+        if (cache[kw] !== undefined) return cache[kw];
+        wb.style.width = `${kw}px`;
+        let h = 0;
+        steps.forEach((st) => { wb.innerHTML = wordsHtml(st); h = Math.max(h, wb.getBoundingClientRect().height); });
+        cache[kw] = h;
+        return h;
+    };
+    const p2 = idoPart();
+    const sb = document.createElement('div');
+    sb.className = 'mq-lp-say';
+    sb.innerHTML = p2.say ? `<b>Say:</b> <span>${esc(p2.say)}</span>` : '';
+    // (measured inside a words column, where its own rules apply)
+    const sideBox = document.createElement('div');
+    sideBox.className = 'mq-lp-side';
+    sideBox.style.width = 'max-content';
+    sideBox.appendChild(sb);
+    sizer.appendChild(sideBox);
+    sb.style.width = 'max-content';
+    const sayNat = p2.say ? sb.getBoundingClientRect().width : 0;
+    const sayCache = {};
+    const sayH = (w) => {
+        if (!p2.say) return 0;
+        const kw = Math.round(w);
+        if (sayCache[kw] === undefined) { sb.style.width = `${kw}px`; sayCache[kw] = sb.getBoundingClientRect().height; }
+        return sayCache[kw];
+    };
+    return { wD, hD, wH, hH, natW: Math.ceil(Math.max(natW, sayNat)) + 2, minW: Math.ceil(minW) + 2, wordsH, sayH, done: () => sizer.remove() };
+}
+
+function setLayout(r, { chips, stack }) {
+    if (chips) r.dataset.chips = '1'; else delete r.dataset.chips;
+    const work = r.querySelector('.mq-lp-work');
+    if (stack) work.dataset.stack = '1'; else delete work.dataset.stack;
+}
+
+function solveFit(r) {
+    const p = idoPart();
+    const k = kOf(r);
+    const want = digitTarget(r) / basePxOf();
+    const m = measureStates(r);
+    const cell = r.querySelector('.mq-lp-cell');
+    const wrap = r.querySelector('.mq-lp-cellwrap');
+    const work = r.querySelector('.mq-lp-work');
+    let sayH = 0;
     const row = work.dataset.variant === 'row';
-    const gap = 56 * (parseFloat(getComputedStyle(r).getPropertyValue("--lp-k")) || 1);
-    // (the cell is sized to its content - H13: no empty band inside it at any step - so the room is the stage's: the cell's
-    // column less the cell's other bands, with the Say band's room kept for the last step)
-    const cell = work.closest('.mq-lp-cell');
-    const wrap = work.closest('.mq-lp-cellwrap');
-    const wcs = getComputedStyle(work);
-    const padV = parseFloat(wcs.paddingTop) + parseFloat(wcs.paddingBottom);
-    const availH = wrap.clientHeight - (cell.offsetHeight - work.offsetHeight) - sayH - padV - 6;
-    const availW = work.clientWidth - 24;
-    let z;
-    if (row) {
-        // the drawing beside the side column (words over hops)
-        z = Math.min(want, (availW - gap) / (wD + Math.max(wH, wordsW / Math.max(want, 0.01))), availH / hD, hH ? (availH - wordsH - 8) / hH : Infinity);
-    } else {
-        z = Math.min(want, availW / Math.max(wD, wH || 0), (availH - wordsH - 14) / (hD + hH));
+    const gap = 48 * k, gapS = 10 * k;
+    const tablet = window.matchMedia('(max-width: 1199px)').matches;
+    // (a tablet's tall stage: the drawing may grow past the tablet scale, up to the board's own 104 px, to fill it - H13)
+    const cap = tablet ? want * 1.25 : want;
+    const layouts = tablet ? [{ chips: 1, stack: 0 }, { chips: 1, stack: 1 }]
+        : [{ chips: 0, stack: 0 }, { chips: 1, stack: 0 }, { chips: 0, stack: 1 }, { chips: 1, stack: 1 }];
+    const sizeAt = (lay, availW, availH) => {
+        for (let z = cap; z >= 0.2; z *= 0.985) {
+            const hops = m.hH ? gapS + m.hH * z : 0;
+            if (row && !lay.stack) {
+                const sideW = Math.max(m.wH * z, Math.min(m.natW, availW - gap - m.wD * z));
+                if (m.wD * z + gap + sideW > availW + 0.5 || sideW < m.minW) continue;
+                const wh = m.wordsH(sideW);
+                const sh = m.sayH(sideW) ? gapS + m.sayH(sideW) : 0;
+                const h = Math.max(m.hD * z, wh + hops + sh);
+                if (h > availH + 0.5) continue;
+                return { z, sideW, wordsH: wh, sayH: m.sayH(sideW), groupW: m.wD * z + gap + sideW, groupH: h };
+            }
+            const sideW = Math.min(availW, Math.max(m.wH * z, m.natW, m.wD * z));
+            if (Math.max(m.wD, m.wH) * z > availW + 0.5) continue;
+            const wh = m.wordsH(sideW);
+            const sh = m.sayH(sideW) ? gapS + m.sayH(sideW) : 0;
+            const h = m.hD * z + gapS * 1.4 + wh + hops + sh;
+            if (h > availH + 0.5) continue;
+            return { z, sideW, wordsH: wh, sayH: m.sayH(sideW), groupW: Math.max(m.wD * z, sideW), groupH: h };
+        }
+        return null;
+    };
+    let best = null;
+    for (const lay of layouts) {
+        setLayout(r, lay);
+        cell.style.height = `${wrap.clientHeight}px`;
+        const wcs = getComputedStyle(work);
+        const availW = work.clientWidth - parseFloat(wcs.paddingLeft) - parseFloat(wcs.paddingRight);
+        const availH = work.clientHeight - parseFloat(wcs.paddingTop) - parseFloat(wcs.paddingBottom);
+        const f = sizeAt(lay, availW, availH);
+        if (!f) continue;
+        const cand = Object.assign({ lay, stageH: wrap.clientHeight, chromeH: cell.offsetHeight - availH }, f);
+        if (!best || f.z > best.z + 1e-4) best = cand;
+        if (f.z >= cap - 1e-4) break;
     }
-    return Math.max(0.2, +z.toFixed(4));
+    m.done();
+    if (!best) best = { lay: layouts[layouts.length - 1], z: 0.2, sideW: 0, wordsH: 0, groupW: 0, groupH: 0, sayH, stageH: wrap.clientHeight, chromeH: 0 };
+    best.wD = m.wD; best.hD = m.hD; best.wH = m.wH; best.hH = m.hH;
+    // The cell: its content's height (its largest state), centred in the stage column, so the stage's spare room is split
+    // above and below it (stage H13) and none of it adds to the step-1 band inside the cell (cell H13); at most the stage.
+    const c = best.chromeH + best.groupH;
+    best.cellH = Math.min(best.stageH, Math.ceil(c) + 2);
+    return best;
+}
+
+function applyFit(r, f) {
+    setLayout(r, f.lay);
+    const z = String(+f.z.toFixed(4));
+    r.querySelectorAll('.mq-lp-cell .mq-lp-zoom').forEach((el) => { el.style.zoom = z; });
+    const cell = r.querySelector('.mq-lp-cell');
+    cell.style.height = `${Math.floor(f.cellH)}px`;
+    const draw = r.querySelector('.mq-lp-draw');
+    draw.style.width = `${Math.ceil(f.wD * f.z)}px`;
+    draw.style.height = `${Math.ceil(f.hD * f.z)}px`;
+    const side = r.querySelector('.mq-lp-side');
+    side.style.width = `${Math.ceil(f.sideW)}px`;
+    r.querySelector('.mq-lp-wordsbox').style.minHeight = `${Math.ceil(f.wordsH)}px`;
+    const hops = r.querySelector('.mq-lp-hops');
+    if (hops) {
+        hops.style.width = `${Math.ceil(f.wH * f.z)}px`;
+        hops.style.height = `${Math.ceil(f.hH * f.z)}px`;
+        hops.style.display = f.hH ? '' : 'none';
+    }
+    const room = r.querySelector('.mq-lp-sayroom, .mq-lp-say');
+    if (room) room.style.height = `${Math.ceil(f.sayH)}px`;
+    r.dataset.digitPx = String(Math.round(basePxOf() * f.z));
+    r.dataset.digitTarget = String(Math.round(digitTarget(r)));
 }
 
 export default { openLessonPlayer, closeLessonPlayer, lessonPlayerState };

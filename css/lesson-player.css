@@ -37,14 +37,16 @@ body.mq-lp-open { overflow: hidden; }
 /* ---- top bar: title, mode pill, the part bar (D11: every pill jumps) ---- */
 .mq-lp-top {
     background: var(--lp-chrome); color: var(--lp-chrome-ink);
-    display: flex; align-items: center; flex-wrap: wrap; gap: calc(10px * var(--lp-k)) calc(16px * var(--lp-k));
+    display: flex; align-items: center; flex-wrap: nowrap; gap: calc(10px * var(--lp-k)) calc(16px * var(--lp-k));
     padding: calc(8px * var(--lp-k)) calc(24px * var(--lp-k));
 }
-.mq-lp-title { margin: 0; font-size: calc(26px * var(--lp-k)); font-weight: 700; line-height: 1.2; min-width: 0; }
+.mq-lp-title { margin: 0; font-size: calc(26px * var(--lp-k)); font-weight: 700; line-height: 1.2; min-width: 0; flex: 1 1 auto; }
 .mq-lp-mode {
     font-size: calc(16px * var(--lp-k)); padding: 4px 12px; border: 2px solid var(--lp-chrome-dim); border-radius: 18px; color: var(--lp-chrome-dim);
 }
-.mq-lp-rail { display: flex; gap: calc(6px * var(--lp-k)); margin-left: auto; flex-wrap: wrap; }
+.mq-lp-rail { display: flex; gap: calc(6px * var(--lp-k)); margin-left: auto; flex-wrap: nowrap; flex: none; }
+.mq-lp-mode { flex: none; }
+.mq-lp-leave { flex: none; }
 .mq-lp-pill {
     font: 400 calc(18px * var(--lp-k)) "Andika", sans-serif;
     min-height: var(--lp-pill); padding: 0 calc(14px * var(--lp-k)); border-radius: calc(var(--lp-pill) / 2);
@@ -54,7 +56,14 @@ body.mq-lp-open { overflow: hidden; }
 .mq-lp-pill[data-soon] { border-style: dashed; }
 .mq-lp-pill.is-done { border-color: #7fb08a; color: #cfe8d4; }
 .mq-lp-pill.is-on { background: #fff; color: var(--lp-chrome); border-color: #fff; border-style: solid; font-weight: 700; }
-.mq-lp-pill:focus-visible, .mq-lp-btn:focus-visible { outline: 4px solid #ffd166; outline-offset: 2px; }
+/* Leave (critic r1 F1): on every stage, closes the player as Esc does; the pills hide while there is no part to show */
+.mq-lp-leave {
+    font: 700 calc(20px * var(--lp-k)) "Andika", sans-serif;
+    min-height: var(--lp-ctl); min-width: var(--lp-ctl); padding: 0 calc(18px * var(--lp-k)); border-radius: 12px;
+    border: 2px solid #fff; background: transparent; color: #fff; cursor: pointer;
+}
+.mq-lp[data-idle] .mq-lp-rail { visibility: hidden; }
+.mq-lp-leave:focus-visible, .mq-lp-pill:focus-visible, .mq-lp-btn:focus-visible { outline: 4px solid #ffd166; outline-offset: 2px; }
 
 /* ---- the stage ---- */
 .mq-lp-stage {
@@ -88,32 +97,40 @@ body.mq-lp-open { overflow: hidden; }
 .mq-lp-step.is-later .mq-lnum { border-color: #949494; color: #949494; }
 .mq-lp-chant { margin: calc(12px * var(--lp-k)) 0 0; font-size: var(--lp-steps); line-height: 1.25; }
 
-/* The cell: the B&W Andika screen cell at board size */
-/* The cell is sized to its content at every step (H13: no empty band inside it); it grows downward as marks are added,
-   top-aligned, so earlier ink never moves. The stage background under it is chrome, not the cell. */
-.mq-lp-cellwrap { display: flex; flex-direction: column; justify-content: flex-start; min-height: 0; min-width: 0; }
+/* The cell: the B&W Andika screen cell at board size. Critic r1 F3 / F4: the cell keeps ONE height from step 1 (its largest
+   state, set by player.js fitDrawing, centred in the stage column with the spare room shared inside and around it), and
+   every box in it (drawing, words, hops, the Say band's room) keeps its largest state's size, so no mark ever moves. */
+.mq-lp-cellwrap { display: flex; flex-direction: column; justify-content: center; min-height: 0; min-width: 0; }
 .mq-scell.mq-lp-cell {
     --mq-digit: var(--lp-digit); --mq-text: var(--lp-text);
-    flex: none; display: flex; flex-direction: column;
+    flex: none; display: flex; flex-direction: column; min-height: 0;
     border: 3px solid #000; background: #fff; padding: 0;
 }
-.mq-lp-instr { font-size: var(--lp-text); line-height: 1.25; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k)); border-bottom: 2px solid #000; }
+.mq-lp-instr { flex: none; font-size: var(--lp-text); line-height: 1.25; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k)); border-bottom: 2px solid #000; }
 .mq-lp-work {
-    flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: calc(14px * var(--lp-k)); padding: calc(16px * var(--lp-k)) calc(12px * var(--lp-k));
+    flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center;
+    padding: calc(12px * var(--lp-k)) calc(16px * var(--lp-k)) calc(8px * var(--lp-k));
 }
-.mq-lp-draw { display: flex; align-items: center; justify-content: center; max-width: 100%; }
-.mq-lp-work[data-variant="row"] { flex-direction: row; gap: calc(56px * var(--lp-k)); }
-.mq-lp-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(8px * var(--lp-k)); min-width: 0; }
-.mq-lp-work[data-variant="row"] .mq-lp-side { align-items: flex-start; max-width: 45%; }
-.mq-lp-work[data-variant="row"] .mq-lp-words { text-align: left; }
+.mq-lp-group { flex: none; display: flex; flex-direction: column; align-items: center; gap: calc(14px * var(--lp-k)); }
+.mq-lp-work[data-variant="row"]:not([data-stack]) .mq-lp-group { flex-direction: row; align-items: flex-start; gap: calc(48px * var(--lp-k)); }
+.mq-lp-draw { flex: none; display: block; }
+.mq-lp-draw > .mq-lp-zoom, .mq-lp-hops > .mq-lp-zoom { display: block; width: max-content; }
+.mq-lp-side { flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: calc(10px * var(--lp-k)); min-width: 0; }
+.mq-lp-wordsbox { flex: none; }
+.mq-lp-hops { flex: none; display: block; }
+.mq-lp-work:not([data-variant="row"]) .mq-lp-wordsbox, .mq-lp-work[data-stack] .mq-lp-wordsbox { text-align: center; width: 100%; }
 .mq-lp-zoom { display: inline-block; }
 /* the chart's state drawing, as on paper (the kit's .ws-sheet rules), without the page box: zoomed as a whole to the
    board's digit size by player.js fitDrawing, so its geometry is the printed chart's */
 .mq-lp .ws-sheet.mq-lp-kit { display: block; width: auto; max-width: none; overflow: visible; background: transparent; }
-.mq-lp-words { margin: 0; font-size: calc(34px * var(--lp-k)); line-height: 1.25; text-align: center; color: #000; }
+.mq-lp-words { margin: 0; font-size: calc(34px * var(--lp-k)); line-height: 1.25; color: #000; }
+/* a step's note, bold under its words, as the chart prints it (critic r1 F5) */
+.mq-lp-note { margin: calc(6px * var(--lp-k)) 0 0; font-size: calc(30px * var(--lp-k)); line-height: 1.25; font-weight: 700; color: #000; }
+.mq-lp-sayroom { flex: none; }
+/* the Say band closes the words column (P-17): a rule above it, the column's width */
+.mq-lp-side .mq-lp-say { align-self: stretch; padding: calc(8px * var(--lp-k)) 0 0; flex-wrap: wrap; column-gap: 0.35em; row-gap: 0; }
 .mq-lp-say {
-    border-top: 2px solid #000; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k));
+    flex: none; box-sizing: border-box; border-top: 2px solid #000; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k));
     font-size: calc(34px * var(--lp-k)); line-height: 1.25; color: #000; display: flex; gap: 0.35em; align-items: baseline;
 }
 
@@ -132,7 +149,7 @@ body.mq-lp-open { overflow: hidden; }
     display: flex; align-items: center; gap: calc(16px * var(--lp-k));
     padding: calc(14px * var(--lp-k)) calc(24px * var(--lp-k));
 }
-.mq-lp-bar[data-idle] .mq-lp-btn { visibility: hidden; }
+.mq-lp-bar[data-idle] .mq-lp-btn, .mq-lp-bar[data-idle] .mq-lp-keys { visibility: hidden; }
 .mq-lp-btn {
     min-width: var(--lp-ctl); min-height: var(--lp-ctl); border-radius: 12px; border: 2px solid #fff;
     background: transparent; color: #fff; font: 700 calc(24px * var(--lp-k)) "Andika", sans-serif;
@@ -144,6 +161,14 @@ body.mq-lp-open { overflow: hidden; }
 .mq-lp-together { color: #ffd166; font-weight: 700; }
 .mq-lp-keys { font-size: calc(16px * var(--lp-k)); color: var(--lp-chrome-dim); text-align: right; line-height: 1.35; margin-left: auto; }
 
+/* ---- a drawing too big beside the Steps strip (card: "the Steps strip collapses to chips"; player.js solveFit) ---- */
+.mq-lp[data-chips] .mq-lp-stage-ido { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+.mq-lp[data-chips] .mq-lp-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 8px 12px; }
+.mq-lp[data-chips] .mq-lp-steps h2 { margin: 0; }
+.mq-lp[data-chips] .mq-lp-steps ol { flex-direction: row; flex-wrap: wrap; gap: 8px 14px; }
+.mq-lp[data-chips] .mq-lp-step { display: flex; gap: 8px; }
+.mq-lp[data-chips] .mq-lp-chant { margin: 0; }
+
 /* ---- tablet (820 / 1024): the Steps strip becomes one chip row above the cell (L11); the key legend hides ---- */
 @media (max-width: 1199px) {
     .mq-lp-stage-ido { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
@@ -153,4 +178,7 @@ body.mq-lp-open { overflow: hidden; }
     .mq-lp-step { display: flex; gap: 8px; }
     .mq-lp-chant { margin: 0; }
     .mq-lp-keys { display: none; }
+    .mq-lp-mode { display: none; }
+    .mq-lp-top { padding: 8px 12px; gap: 8px; }
+    .mq-lp-pill { padding: 0 10px; }
 }

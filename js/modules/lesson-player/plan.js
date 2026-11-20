@@ -36,6 +36,8 @@ export const PLAYER_PARTS = Object.freeze([
 export const PART_IDS = Object.freeze(PLAYER_PARTS.map((p) => p.id));
 export const DEFAULT_PART = 'ido';
 export const MODES = Object.freeze(['board', 'pupil']);
+// The modes this slice plays (critic r1 F7): pupil mode is slice 2, so a ?mode=pupil link opens the Board until then.
+export const BUILT_MODES = Object.freeze(['board']);
 
 export const partOf = (id) => PLAYER_PARTS.find((p) => p.id === id) || null;
 
@@ -64,7 +66,7 @@ export function chartRequest(id, seed) {
     };
 }
 
-/** ?lesson=&part=&s=&mode= (unknown part -> I do; mode defaults to board, the only mode of slice 1). */
+/** ?lesson=&part=&s=&mode= (unknown part -> I do; a mode this slice does not play (pupil) -> board, BUILT_MODES). */
 export function parseLaunch(search = '') {
     let p;
     try { p = new URLSearchParams(String(search || '')); } catch (e) { return null; }
@@ -76,7 +78,7 @@ export function parseLaunch(search = '') {
     const sRaw = p.get('s');
     const seed = sRaw !== null && sRaw !== '' && Number.isFinite(Number(sRaw)) ? Number(sRaw) >>> 0 : (lesson ? lessonSeedOf(lesson) : 0);
     const modeRaw = String(p.get('mode') || 'board').toLowerCase();
-    const mode = MODES.includes(modeRaw) ? modeRaw : 'board';
+    const mode = BUILT_MODES.includes(modeRaw) ? modeRaw : 'board';
     return { raw, lesson, part, seed, mode, board: p.get('board') === '1' };
 }
 
