@@ -475,12 +475,14 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     let fallback = false;
     // CELL-FITS (lead via lf-engine 2026-11-20): panels that do not fit one page even at zoom 1 were drawn at zoom 1 anyway
     // and ran over the Say band, the footer and the page edge (sizing said ok: the zoom was 1). Without a tail band they now
-    // run onto as many chart pages as they need, at full size (`perPage` panel rows a page); nothing shrinks.
+    // run onto as many chart pages as they need, at full size (`perPage` panel rows a page); nothing shrinks. Only a chartFull
+    // chart (above): a chart whose measured panels merely read taller than the page prints as before (its measure over-reads
+    // its render - add_wp_10, fact_family_sort ... are inside their page by CELL-FITS).
     let perPage = 0;
     if (mode === 'one') {
         const z1 = solve((q) => lay.rows * H(q), availP, 1, zMax);
         if (z1) z = z1;
-        else if (!tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
+        else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
     }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
