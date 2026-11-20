@@ -540,3 +540,19 @@ Noted by the critic (not this lane, queued):
 - H16 doubled answer area in division:div_equation_parts' cell (inside div_facts_long's check; identical on master): division family.
 - D2's "subtracting sub 1k / sub 50" title comes from a NON-LIVE skill id (subtraction:sub_50): buildSheet builds it anyway. Check:
   buildSheet / PSC title judge refuse an id not in SKILLS (next week, with the Quick review build).
+
+### qreview: Pre-skill Check + Quick review build (card design/cards/psc-review, 2026-11-20, edfa8cd7a)
+Built at medium (first build of a new page section). `roles/pre-skill-check.js` `sources` adds one-item review pools from the
+bridge's `reviewCandidates` (print-sheet.js: SKILL_STANDARDS primary-code domain CC/OA/NBT/NF/MD-m/MD-d/G, grade <= the
+pupil's, NF from grade 3, 8/10-passed first, kit cells only, never the lesson skill / a prerequisite / a prerequisite host's
+preset); `reviewRows` lays at most one item per domain in whole rows of 4 or 2 like-height cells (spread 1.25, ink >= 72 % of
+the cell, +1 mm room), on the LAST page only. Scores "Check __/n" (one-strip checks) and "Review __/m"; header Score = n + m;
+key labels `[data-review-label]` "<domain> · <skill>" in grey. EB-PSCCAP counts check cells only ([data-psc-review]).
+- ws-psc-review FAIL e4b28d588 -> OK edfa8cd7a (row psc-review-band); EB-PAGE (row psc-review-ebpage) OK on add/sub/mult/div_facts M
+  and add/sub_facts L.
+- Still red, for a ruling: EB-PAGE mult/div_facts L 31 / 33 % (no second like-height pair among the grade-3 kit cells at L) and
+  sub_wp_20 L p1 51 % (an R13 2 + 2 split's first page: the card puts the review on the last page only). Capped A (check
+  cells grown to the EB-BAND limit) is NOT built: it conflicts with EB-STRETCH (drawn + 3 mm).
+- Passed over by rule (template defects, not this band): word-work at L (two-digit tab 1.6 mm, TAB-CLEAR; red on sub_wp_20's own
+  L check on master) and composing:fraction_number_line (its line touches a two-digit tab at M).
+- EB-PSCCAP (1f11f3c1e) stays red as briefed; ws-empty-band --self-test fails on its missing backtest row (as on psc2).
