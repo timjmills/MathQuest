@@ -10,6 +10,16 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-20 14:40 UTC: rowcap + vocabfix PASSED the round-cap critic r1 and are with the lead for DEPLOY.**
+  - Head: claude/sweet-newton-c8wrv1-lf-engine-vocabfix @ 19e2fc9fe (code 4ecba079c, merged with master 9ae9ccd5d). Report: design/audit/runs/lf-engine-vocabfix-r1/REPORT.md.
+  - At deploy: run ws-merge-master (master has moved to 2c42746aa), re-pin 1,284 lesson hashes (row cap), stamp the CSS.
+  - Minor findings to fix next week:
+    - m1 Guided tries keep a tab indent with no number (check GUIDED-TAB); lf-engine.
+    - m2 vocab_grade_pictures Model content (state progression, sentence case, Say 1 mm high); vocab lane.
+    - m3 Error Analysis name tag about 8 pt (MIN-PT ≥ 10 pt at M).
+  - PT-PRE-3 comes from master (903f2d778); routed to lf-roles.
+  - Parked at about $1,460 (stop $1,506.55). Nothing running.
+
 - **2026-11-20: week stop.** Spend is about $1,435 of the $1,481.60 stop.
   - **Lesson first page: SHIP as a strict improvement** (lead ruling).
     - Branch: claude/sweet-newton-c8wrv1-lf-engine-lessonfirst. The critic r1 report is at 4fd22cf49.
