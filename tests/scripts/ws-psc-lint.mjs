@@ -159,7 +159,7 @@ async function main() {
         for (const i of instrRepeats(b.bands.map((x) => (x.instr ? `p${x.page} ${x.instr}` : '')))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}" (two strips of one instruction: share one)`);
         for (const [j, bd] of b.bands.entries()) { const bad = stripTagBad(bd.instr, b.labels, LIB); if (bad) F('PSC-INSTR', `strip ${j + 1} "${bd.instr}" carries "${bad}" (a tag or a skill label means nothing to a pupil)`); }
         // (PSC-DEAL: the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
-        if (metaOk && b.metaBands.every((x) => Array.isArray(x.items))) b.metaBands.forEach((bd, j) => { for (const why of dealBad(bd.items)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
+        if (Array.isArray(b.metaBands) && b.metaBands.length && b.metaBands.every((x) => Array.isArray(x.items))) b.metaBands.forEach((bd, j) => { for (const why of dealBad(bd.items)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
         else { const pools = [...new Set(b.items.map((it) => it.pool))]; b.bands.forEach((bd, j) => { const its = b.items.filter((it) => it.pool === pools[j]).slice(0, bd.n); for (const why of dealBad(its)) F('PSC-DEAL', `band ${j + 1}: ${why}`); }); }
         // (PSC-TWIN-MIX: a band whose skill two pools dealt holds items of both; an item's pool from the role, else by its text)
         if (metaOk) for (const [j, bd] of b.metaBands.entries()) {
