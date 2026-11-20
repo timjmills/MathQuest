@@ -167,6 +167,10 @@ export const SKILL_PRESETS = Object.freeze({
     // mult_facts and div_facts ("Tables to 15 x 15").
     'multiplication:mult_facts_15': { skill: 'mult_facts', opts: { band: 225 } },
     'division:div_facts_15': { skill: 'div_facts', opts: { band: 225 } },
+    // 2026-11-20 (lane lf-algebra, multiply-three card Q5): both groupings (the associative property) and a missing factor are
+    // tasks of their own; mtForm stays an option of multiply_three_numbers.
+    'multiplication:mult_three_two_ways': { skill: 'multiply_three_numbers', opts: { mtForm: 'both' } },
+    'multiplication:mult_three_missing_factor': { skill: 'multiply_three_numbers', opts: { mtForm: 'missing' } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

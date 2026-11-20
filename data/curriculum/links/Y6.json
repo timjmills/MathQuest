@@ -1037,11 +1037,13 @@
     {
      "key": "number_theory:factor_tchart_medium",
      "why": "Y5.B3.S3 Factors: a square number has a repeated factor pair"
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "Y4.B4.S13 Multiply three numbers (built 2026-11-20): three factors, the easy pair first"
     }
    ],
-   "preBuild": [
-    "mult_three"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "area_perimeter:volume",
@@ -1055,7 +1057,7 @@
      "why": "powers inside order of operations"
     }
    ],
-   "note": "W33 holds the negative-number lessons (for Y6.B1.S8) and Y3 Use arrays, Y4 Multiply three numbers, Y5 Square numbers and Cube numbers. Y4 Multiply three numbers has no skill (mult_three is the preBuild); Y5 Square and Cube numbers are this step's own build (square_cube). exponents_simple is tagged with \"The power alone\" so the \"+ 96\" second step is off.",
+   "note": "W33 holds the negative-number lessons (for Y6.B1.S8) and Y3 Use arrays, Y4 Multiply three numbers, Y5 Square numbers and Cube numbers. Y4 Multiply three numbers is multiplication:multiply_three_numbers (a pre skill here); Y5 Square and Cube numbers are this step's own build (square_cube). exponents_simple is tagged with \"The power alone\" so the \"+ 96\" second step is off.",
    "envision": [
     {
      "proposal": "square_cube",
@@ -1673,11 +1675,13 @@
     {
      "key": "subtraction:sub_check_by_adding",
      "why": "Y3.B2.S21 Inverse operations (prior learning wk W11)"
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "Y4.B4.S13 Multiply three numbers (built 2026-11-20): three factors, the easy pair first"
     }
    ],
-   "preBuild": [
-    "mult_three"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "order_of_operations:oop_easy",
@@ -6162,16 +6166,18 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "times-table facts to 12 × 12, the products inside l × w × h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, has no skill: mult_three)"
+     "why": "times-table facts to 12 × 12, the products inside l × w × h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, is multiplication:multiply_three_numbers)"
     },
     {
      "key": "shapes_early:count_edges_faces_vertices",
      "why": "3-D shape vocabulary"
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "Y4.B4.S13 Multiply three numbers (built 2026-11-20): three factors, the easy pair first"
     }
    ],
-   "preBuild": [
-    "mult_three"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "area_perimeter:volume",
@@ -6181,7 +6187,7 @@
      }
     }
    ],
-   "note": "Y5.B15 volume steps are also untaught, so pupils meet cube counting here for the first time; volume_cubes is the build; mult_three is the preBuild.",
+   "note": "Y5.B15 volume steps are also untaught, so pupils meet cube counting here for the first time; volume_cubes is the build; multiply_three_numbers (built 2026-11-20) is a pre skill.",
    "envision": [
     {
      "proposal": "volume_cubes",
@@ -6216,7 +6222,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "times-table facts to 12 × 12, the products inside l × w × h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, has no skill: mult_three)"
+     "why": "times-table facts to 12 × 12, the products inside l × w × h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, is multiplication:multiply_three_numbers)"
     },
     {
      "key": "multiplication:multiply",
@@ -6224,11 +6230,14 @@
      "opts": {
       "tiles": 31
      }
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "Y4.B4.S13 Multiply three numbers (built 2026-11-20): three factors, the easy pair first"
     }
    ],
    "preBuild": [
-    "volume_cubes",
-    "mult_three"
+    "volume_cubes"
    ],
    "related": [
     {
@@ -9837,7 +9846,7 @@
     "Y4.B5.S2"
    ],
    "teaches": "replacing a factor by a factor pair to make the product easy: 14 × 5 = 7 × 2 × 5 = 7 × 10; 12 × 4 = 12 × 2 × 2",
-   "why": "mult_properties breaks apart by addition only; mult_three multiplies three given numbers and never splits one"
+   "why": "mult_properties breaks apart by addition only; multiply_three_numbers multiplies three given numbers and never splits one"
   },
   "formulae": {
    "family": "algebra",
@@ -10421,27 +10430,6 @@
     "Y5.B6.S3"
    ],
    "teaches": "multiplying a mixed number by a whole number (2 1/3 × 4)"
-  },
-  "mult_three": {
-   "family": "operations",
-   "improves": [
-    "Y4.B5.S2"
-   ],
-   "kind": "new",
-   "name": "Multiply Three Numbers",
-   "representation": "three-factor expressions with a bracket prompt to choose the easy pair first",
-   "reused": true,
-   "skill": "multiplication:multiply_three_numbers",
-   "source": "WRM_PROPOSALS",
-   "steps": [
-    "Y6.B2.S6",
-    "Y6.B2.S15",
-    "Y6.B10.S7",
-    "Y6.B10.S8",
-    "Y4.B4.S12",
-    "Y4.B4.S13"
-   ],
-   "teaches": "multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7)"
   },
   "multi_step_four_ops": {
    "after": [],

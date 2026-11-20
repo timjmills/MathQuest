@@ -502,7 +502,9 @@ const toMakeGate = (tag, Qc) => {
     // Grade 3 "Properties of multiplication" (CCSS BUILD): the associative property and the detailed lesson's follow-ons
     const pm = L.find((l) => l.grade === '3' && /^Properties of multiplication/.test(l.title));
     const pr = pm && perLesson.get(pm.key);
-    ok(pr && pr.items.some((x) => x.todo === 'mult_three' && /associative/i.test(x.covers)) && pr.items.filter((x) => x.kind === 'lesson').length >= 2 && pr.items.some((x) => x.kind === 'fix'),
+    // (2026-11-20, lane lf-algebra: mult_three is BUILT - multiplication:multiply_three_numbers closes the associative clause -
+    // so it is no longer a skill to be made)
+    ok(pr && !pr.items.some((x) => x.todo === 'mult_three') && pr.items.filter((x) => x.kind === 'lesson').length >= 2 && pr.items.some((x) => x.kind === 'fix'),
         `to-make ${tag}: Grade 3 "Properties of multiplication" lists ${pr ? pr.items.map((x) => x.name).join(' | ') : 'nothing'}`);
 };
 toMakeGate('(no files)', buildQueue());

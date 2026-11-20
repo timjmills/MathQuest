@@ -296,6 +296,7 @@ export const SKILL_GRADES = {
     'sub_2d_1d': 2,                                                       // 2.NBT.B.5 (2026-10-23 preset, SU-C C3)
     'chart_to_120': 1,                                                    // 1.NBT.A.1 to 120 (2026-11-12 preset, chartwindow card)
     'div_facts_long': 3,                                                  // 3.OA.C.7 facts in the 4.NBT.B.6 bracket (2026-10-31 preset, facts card Q4)
+    'multiply_three_numbers': 3, 'mult_three_two_ways': 3, 'mult_three_missing_factor': 3,   // 3.OA.B.5 (2026-11-20, lf-algebra multiply-three card Q4)
     'mult_facts_15': 4, 'div_facts_15': 5,                                // past 3.OA.C.7: 2-digit x 2-digit (4.NBT.B.5), 2-digit divisors (5.NBT.B.6); 2026-11-14 presets, t15
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
@@ -834,6 +835,11 @@ export const SKILLS = {
         { v: "count_by_12s", l: "Count by 12s", presetOf: "count_by_tables" },
         // APPENDED 2026-11-14 — PRESET (owner, lane lf-ops t15): the times tables on to 15 x 15 (mult_facts, Tables to 15 x 15).
         { v: "mult_facts_15", l: "Multiplication Facts to 15 × 15", presetOf: "mult_facts" },
+        // APPENDED 2026-11-20 — lane lf-algebra (multiply-three card, signed): three factors, the easy pair first (3.OA.B.5),
+        // and its two PRESETS (card Q5): both groupings (mtForm both) and a missing factor (mtForm missing).
+        { v: "multiply_three_numbers", l: "Multiply Three Numbers" },
+        { v: "mult_three_two_ways", l: "Multiply Three Numbers Two Ways (Associative Property)", presetOf: "multiply_three_numbers" },
+        { v: "mult_three_missing_factor", l: "Missing Factor with Three Numbers", presetOf: "multiply_three_numbers" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (÷1 to ÷12)" },
@@ -2049,6 +2055,7 @@ export const SKILL_PRINT_SIZE = {
     add_facts: "compact", sub_facts: "compact", mult_facts: "compact", div_facts: "compact",
     div_facts_long: "compact",
     mult_facts_15: "compact", div_facts_15: "compact",
+    multiply_three_numbers: "standard",
     add: "compact", subtract: "compact", multiply: "compact", divide: "compact",
     compare: "compact", compare_int: "compact", compare_decimal: "compact",
     odd_even: "compact", prime_composite: "compact",

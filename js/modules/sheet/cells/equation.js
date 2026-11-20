@@ -122,6 +122,9 @@ const slotShape = (p) => {
 
 register('equation', {
     render(p, ctx) {
+        // multiply_three_numbers (lane lf-algebra, card design/cards/multiply-three): the three-factor chain. Additive: a
+        // payload without `chain` draws exactly as before.
+        if (p.chain) return chainRender(p, ctx);
         const u = p.unknown || 'result';
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
         const digits = p.digits || String(unknownValue(Object.assign({}, p, { result }))).replace('-', '').length || 2;
@@ -226,12 +229,14 @@ register('equation', {
         return `<div class="ws-eq"${tight ? ` style="gap:${ACROSS_GAP_EM}em"` : ''}>${pieces.join('')}</div>`;
     },
     answerKey(p) {
+        if (p.chain) return chainKey(p);
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
         const value = unknownValue(Object.assign({}, p, { result }));
         const display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
         return { value, display, slots: { answer: { value: String(value), graded: true, accept: [display] } } };
     },
     footprint(p, ctx) {
+        if (p.chain) return chainFootprint(p, ctx);
         const em = (ctx.metrics.digitPt / 72) * 25.4;
         const isDivFact = p.fact && (p.op === '/' || p.op === '÷') && (p.unknown || 'result') === 'result';
         const A = String(p.a).length, B = String(p.b).length;
@@ -262,6 +267,7 @@ register('equation', {
         };
     },
     inputs(p, ctx) {
+        if (p.chain) return chainSlots(p).map((s) => Object.assign({}, s, { maxLength: 3, inputmode: 'numeric' }));
         const u = p.unknown || 'result';
         return [{
             id: 'answer', kind: u === 'op' ? 'sign' : 'number', shape: slotShape(p), graded: true,
@@ -269,9 +275,14 @@ register('equation', {
             scopes: ['full', 'answer-only'],
         }];
     },
-    layout() { return { card: 'card-simple', checker: 'value' }; },
+    layout(p) { return { card: 'card-simple', checker: p && p.chain && p.form === 'both' ? 'list' : 'value' }; },
     /** S5 / P-LC-9: one slot - blank until the step that writes it (grey), black after it. */
     stepState(p, steps, k, ctx) {
+        if (p.chain) {
+            const ink = {};
+            for (const m of stepMarks(steps, k)) ink[m.slot] = m;
+            return chainRender(p, ctx, ink);
+        }
         return this.render(p, Object.assign({}, ctx, { state: singleSlotState(stepMarks(steps, k)) }));
     },
 });
@@ -282,4 +293,130 @@ register('equation', {
  */
 export function equationColumns(sampleWMm, availableWMm = 186, maxCols = 4) {
     return Math.max(1, Math.min(maxCols, Math.floor(availableWMm / sampleWMm)));
+}
+
+/* ------------------------------------------------------- the three-factor chain (multiply_three_numbers) */
+// Card design/cards/multiply-three (signed 2026-11-20). Payload:
+//   {chain: true, f: [a, b, c], group: 'L' | 'R' (the bracketed pair: a × b, or b × c), form: 'solve' | 'choose' | 'both' |
+//    'missing', bracket: bool (the printed bracket, the hint that fades), turn: bool (the pair making 10 sits apart: the
+//    chain prints '= (a × c) × b' after 'a × b × c'), at: the missing factor's place (0-2, form 'missing'), digits}
+// Lines: the '=' signs in one column (a two-column grid); the inner product box is working (ungraded); the product line is
+// the ONE graded answer ('both': one per chain, 'answer' and 'answer2'). TY-25: 1 em tracks for × and =; SL-3: the product
+// after '=' is a line, a number inside an expression is a box.
+
+const chainProduct = (p) => p.f.reduce((x, y) => x * y, 1);
+/** The pair the chain multiplies first and the factor left: from the group, or the turned pair (a and c). */
+function chainPair(p, group = p.group) {
+    const [a, b, c] = p.f;
+    if (p.turn) return { x: a, y: c, rest: b, left: true };
+    return group === 'R' ? { x: b, y: c, rest: a, left: false } : { x: a, y: b, rest: c, left: true };
+}
+const chainDigits = (p) => Math.max(2, String(chainProduct(p)).length);
+
+/** Every writing place of a chain, in order: [{id, shape, digits, graded, value}]. */
+function chainSlots(p) {
+    const P = chainProduct(p);
+    const d = chainDigits(p);
+    const base = (id, shape, digits, graded, value, order) => ({
+        id, kind: 'number', shape, digits, graded, value: String(value), order, scopes: graded ? ['full', 'answer-only'] : ['full'],
+    });
+    if (p.form === 'missing') return [base('answer', 'box', 1, true, p.f[p.at || 0], 0)];
+    if (p.form === 'both') {
+        const L = chainPair(p, 'L'), R = chainPair(p, 'R');
+        return [
+            base('inner', 'box', d, false, L.x * L.y, 50), base('answer', 'line', d, true, P, 0),
+            base('inner2', 'box', d, false, R.x * R.y, 51), base('answer2', 'line', d, true, P, 1),
+        ];
+    }
+    const pr = chainPair(p);
+    const out = [base('inner', 'box', d, false, pr.x * pr.y, 50)];
+    if (p.form === 'choose' || p.bracket === false) out.push(base('rest', 'box', 1, false, pr.rest, 51));
+    out.push(base('answer', 'line', d, true, P, 0));
+    return out;
+}
+
+function chainKey(p) {
+    const slots = {};
+    for (const s of chainSlots(p)) slots[s.id] = { value: s.value, graded: s.graded, accept: [s.value] };
+    const g = chainSlots(p).filter((s) => s.graded).map((s) => s.value);
+    const value = g.length > 1 ? g.join(', ') : (p.form === 'missing' ? Number(g[0]) : Number(g[0]));
+    return { value, display: g.join(', '), slots };
+}
+
+/** One slot drawn in its state: the cell's own state, or a step mark's ink (stepState). */
+function chainSlotHtml(s, ctx, marks) {
+    let st = ctx.state, key = s.value;
+    if (marks) {
+        const m = marks[s.id] || (s.id === 'answer' ? marks.ans : null);
+        st = m ? (m.ink === 'trace' ? 'traced' : 'answered') : 'blank';
+        key = m ? m.value : '';
+    }
+    const c = Object.assign({}, ctx, { state: st });
+    let html = blank(s, c, st === 'wrong' ? null : key);
+    // AK-2: a value on the answer line is written at the digit size, as the one-line sentence draws it.
+    if (s.shape === 'line') html = html.replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${st === 'answered' || st === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`);
+    return html;
+}
+
+function chainRender(p, ctx, marks = null) {
+    const S = {};
+    for (const s of chainSlots(p)) S[s.id] = chainSlotHtml(s, ctx, marks);
+    const [a, b, c] = p.f;
+    const X = `<span class="o">${opGlyph('x')}</span>`;
+    const n = (v) => `<span>${esc(v)}</span>`;
+    const op = (v) => `<span class="o" style="width:0.4em">${v}</span>`;
+    const expr = (bits) => `<span class="ws-mt-expr" style="display:inline-flex;align-items:flex-end;gap:0.14em;white-space:nowrap">${bits.join('')}</span>`;
+    const row = (eq, bits) => `<span class="ws-mt-eq" style="text-align:center">${eq ? '<span class="o">=</span>' : ''}</span>${expr(bits)}`;
+    const grid = (rows, extra = '') => `<div class="ws-eq ws-mt-chain" data-ws-chain="${esc(p.form || 'solve')}"${extra} style="display:inline-grid;grid-template-columns:1em auto;column-gap:0.28em;row-gap:0.3em;align-items:end;justify-items:start">${rows.join('')}</div>`;
+    const grouped = (L, bracket) => (L
+        ? [...(bracket ? [op('(')] : []), n(a), X, n(b), ...(bracket ? [op(')')] : []), X, n(c)]
+        : [n(a), X, ...(bracket ? [op('(')] : []), n(b), X, n(c), ...(bracket ? [op(')')] : [])]);
+    if (p.form === 'missing') {
+        const fs = p.f.map((v, i) => (i === (p.at || 0) ? S.answer : n(v)));
+        const L = p.group !== 'R';
+        const br = p.bracket !== false;
+        const bits = L
+            ? [...(br ? [op('(')] : []), fs[0], X, fs[1], ...(br ? [op(')')] : []), X, fs[2]]
+            : [fs[0], X, ...(br ? [op('(')] : []), fs[1], X, fs[2], ...(br ? [op(')')] : [])];
+        return `<div class="ws-eq ws-mt-missing" data-ws-chain="missing" style="gap:0.14em;white-space:nowrap">${bits.join('')}<span class="o">=</span>${n(chainProduct(p))}</div>`;
+    }
+    if (p.form === 'both') {
+        const one = (L, inner, ans) => grid([
+            row(false, grouped(L, true)),
+            row(true, L ? [inner, X, n(c)] : [n(a), X, inner]),
+            row(true, [ans]),
+        ]);
+        return `<div class="ws-mt-both" data-ws-chain="both" style="display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:1.2em;row-gap:0.6em">${one(true, S.inner, S.answer)}${one(false, S.inner2, S.answer2)}</div>`;
+    }
+    const pr = chainPair(p);
+    const rows = [];
+    if (p.form === 'choose' || p.bracket === false) {
+        rows.push(row(false, [n(a), X, n(b), X, n(c)]));
+        rows.push(row(true, [S.inner, X, S.rest]));
+    } else if (p.turn) {
+        // Q6: the pair making 10 sits apart - the chain turns it round on a line of its own, never silently.
+        rows.push(row(false, [n(a), X, n(b), X, n(c)]));
+        rows.push(row(true, [op('('), n(a), X, n(c), op(')'), X, n(b)]));
+        rows.push(row(true, [S.inner, X, n(pr.rest)]));
+    } else {
+        rows.push(row(false, grouped(pr.left, true)));
+        rows.push(row(true, pr.left ? [S.inner, X, n(c)] : [n(a), X, S.inner]));
+    }
+    rows.push(row(true, [S.answer]));
+    return grid(rows);
+}
+
+function chainFootprint(p, ctx) {
+    const em = (ctx.metrics.digitPt / 72) * 25.4;
+    const d = chainDigits(p);
+    const B = blankWidth(d, ctx.size);
+    if (p.form === 'missing') {
+        return { wMm: Math.ceil(em * (0.58 * (2 + String(chainProduct(p)).length) + 3 * 1 + 0.8 + 6 * 0.14) + blankWidth(1, ctx.size) + 6), hMm: Math.ceil(em * 1.15 + 4), factLike: false, maxCols: 2, stretchCap: STRETCH_CAP.equation };
+    }
+    const lines = (p.form === 'choose' || p.bracket === false) ? 3 : p.turn ? 4 : 3;
+    // the widest line: '(a × b) × c' (3 digits, two × tracks, two brackets), or '= [ ] × [ ]' (two boxes)
+    const chainW = 1.28 * em + Math.max(em * (3 * 0.58 + 2 + 0.8 + 6 * 0.14), B + blankWidth(1, ctx.size) + em * (1 + 2 * 0.14) + 2);
+    const wMm = p.form === 'both' ? 2 * chainW + 1.2 * em + 6 : chainW + 6;
+    const hMm = lines * em * 1.15 + (lines - 1) * 0.3 * em + 4;
+    return { wMm: Math.ceil(wMm), hMm: Math.ceil(hMm), factLike: false, maxCols: p.form === 'both' ? 1 : 2, stretchCap: STRETCH_CAP.equation };
 }

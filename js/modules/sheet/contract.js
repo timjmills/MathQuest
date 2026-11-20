@@ -313,6 +313,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'grow-next': 'Draw Term 4. Write how many each term has.',
     'grow-rule': 'Draw Term 4. Write how many each term has. Write the rule.',
     'grow-far': 'Draw Term 4. Write how many each term has, up to Term 10.',
+    // lane lf-algebra (2026-11-20), APPEND ONLY: multiply_three_numbers (multiply-three card Q9).
+    mult3: 'Multiply the pair in brackets first.',
+    'mult3-choose': 'Pick an easy pair. Multiply it first.',
+    'mult3-both': 'Multiply both ways. Write each product.',
+    'mult3-missing': 'Write the missing factor.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

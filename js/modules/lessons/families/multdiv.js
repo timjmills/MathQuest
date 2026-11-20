@@ -8,6 +8,34 @@
 // Pure data.
 
 export const ROUTINES = Object.freeze({
+    // ------------------------------------------------------------- Multiply three numbers (lane lf-algebra, 2026-11-20)
+    // multiply-three card (signed): Y4.B4.S13, 3.OA.B.5 associative property; lesson shape A2 / fact.
+    'mult-three-easy-pair': {
+        archetype: 'fact',
+        casesPending: 'Built with the multiply-three card (2026-11-20); its cases are declared when the lesson is carded (lessons-first).',
+        concepts: [
+            { id: 'pair', text: 'Find an easy pair: a 10, or a fact I know.' },
+            { id: 'first', text: 'Multiply the pair first.' },
+            { id: 'same', text: 'Any pair first gives the same product.' },
+        ],
+        vocab: [
+            { word: 'factor', meaning: 'a number we multiply', picture: { kind: 'text', text: '2 × 5 × 7' } },
+            { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '70' } },
+            { word: 'brackets', meaning: 'do this part first', picture: { kind: 'text', text: '(2 × 5) × 7' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find an easy pair.' },
+            { icon: 'write', text: 'Multiply the pair.' },
+            { icon: 'check', text: 'Multiply by the last number.' },
+            { icon: 'say', text: 'Say it.' },
+        ],
+        chant: 'Easy pair first, then the last one.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Pupils add the last number or stop after the pair; the chant names both moves in order.',
+        },
+        example: { match: 'easy pair|make' },
+    },
     // ------------------------------------------------------------- Division facts (3)
     // Ported from master's lessons/prereqs.js (Lane D R4 prep, node-lint LESSON-DATA): div_facts divides by thinking
     // of the times fact (3.OA.6, 3.OA.7).
@@ -325,6 +353,16 @@ export const LESSONS = Object.freeze({
             { key: 'multiplication:mult_facts', opts: { constant: [2], notation: ['across'], band: 100 }, why: 'A known times fact: the fact an array is named by.' },
         ],
         mixWith: [{ key: 'multiplication:arrays_groups', opts: { forms: [0] } }, { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }],
+    },
+    'skill:multiplication:multiply_three_numbers': {
+        routine: 'mult-three-easy-pair',
+        practice: { skill: 'multiplication:multiply_three_numbers' },
+        prereqsPending: 'Lane lf-algebra (multiply-three card): a Warm-up of the facts it multiplies until its Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'multiplication:mult_facts', opts: { band: 100 }, why: 'The times facts each step of the chain uses.' },
+            { key: 'multiplication:mult_zeros', opts: { forms: [0] }, why: 'Times 10: the pair that makes 10 turns the chain into a ten fact.' },
+        ],
+        mixWith: [{ key: 'multiplication:mult_facts', opts: { band: 100 } }, { key: 'multiplication:mult_properties', opts: { forms: [0] } }],
     },
     'skill:vocabulary:vocab_grade_pictures': {
         routine: 'vocab-picture-words',

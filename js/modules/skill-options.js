@@ -4046,6 +4046,42 @@ const LF_ALGEBRA_OPTIONS = {
 Object.assign(SKILL_OPTIONS, LF_ALGEBRA_OPTIONS);
 // ---- end lf-algebra
 
+// ===========================================================================
+// lane lf-algebra (2026-11-20) · APPEND ONLY · multiplication:multiply_three_numbers (card design/cards/multiply-three, signed)
+// ===========================================================================
+// Read by gen-operations.js _genMultiplyThree. Keys: mtForm 4X, mtPair 4Y, mtBracket 4Z, mtBand 5X. mtForm 'both' and
+// 'missing' are ALSO the preset skills mult_three_two_ways and mult_three_missing_factor (skill-presets.js, card Q5).
+SKILL_OPTIONS['multiplication:multiply_three_numbers'] = [
+    {
+        id: 'mtForm', label: 'Task', type: 'enum', default: 'solve', group: 'difficulty',
+        values: [
+            { v: 'solve', l: 'Multiply: the easy pair first' },
+            { v: 'both', l: 'Both ways: two groupings, one product' },
+            { v: 'missing', l: 'Missing factor' },
+        ],
+        // (the two-ways task draws two chains a cell, the missing factor one line)
+        addsDrawingValues: ['both'],
+        helpShort: 'Multiply three numbers; show both groupings give one product; or find a missing factor.',
+        help: 'One task a page. Multiply: the pair is multiplied first, then the last number; one answer, the product. '
+            + 'Both ways: the two groupings side by side, a product for each. Missing factor: one box in the fact.',
+    },
+    {
+        id: 'mtPair', label: 'Easy pair', type: 'enum', default: 'ten', group: 'difficulty',
+        values: [{ v: 'ten', l: 'A pair that makes 10 (2 and 5)' }, { v: 'any', l: 'Any fact I know' }],
+        help: 'The pair multiplied first. A pair that makes 10 comes first; when it sits apart the chain turns it round on a line of its own.',
+    },
+    {
+        id: 'mtBand', label: 'Products within', type: 'enum', default: 100, group: 'difficulty',
+        values: [{ v: 30, l: '30' }, { v: 60, l: '60' }, { v: 100, l: '100' }],
+        help: 'The biggest product. The factors are 1 to 9, never 0; 1 only within 30.',
+    },
+    {
+        id: 'mtBracket', label: 'Print the bracket', type: 'bool', default: true, group: 'support',
+        helpShort: 'On: the easy pair is bracketed. Off: the pupil picks the pair and writes it.',
+        help: 'A hint that fades. On, the easy pair is in brackets. Off, the chain reads "= [ ] × [ ]": the pupil writes the pair\'s product and the number left.',
+    },
+];
+
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
     const pre = _presetDefs(categoryId, skillId, optionsFor);

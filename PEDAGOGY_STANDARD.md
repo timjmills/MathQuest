@@ -1327,6 +1327,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `grow-next` | Draw Term 4. Write how many it has. | growing_shape_patterns: the next term (screen: Make Term 4 on the grid. Type how many it has.) |
 | `grow-rule` | Draw Term 4. Write how many it has. Write the rule. | growing_shape_patterns: the next term and the rule |
 | `grow-far` | Find the rule. Write how many Term 10 has. | growing_shape_patterns: a later term |
+| `mult3` | Multiply the pair in brackets first. | multiply_three_numbers: the three-factor chain, the bracketed pair first (lane lf-algebra, added 2026-11-20) |
+| `mult3-choose` | Pick an easy pair. Multiply it first. | multiply_three_numbers, bracket off: the pupil writes the pair's product and the number left |
+| `mult3-both` | Multiply both ways. Write each product. | mult_three_two_ways: the two groupings, a product each (associative property) |
+| `mult3-missing` | Write the missing factor. | mult_three_missing_factor: one box in a three-factor fact |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

@@ -1115,6 +1115,10 @@ export const SKILL_WRM = {
     'division:div_3by2_long': ['Y6.B2.S11'],
     // 2026-10-31 (owner, facts card Q4): division facts written in the long-division bracket.
     'division:div_facts_long': [{ step: 'Y4.B5.S11', partial: 'division facts to 12 x 12 in the long-division bracket: the notation, with no exchange past a fact' }],
+    // 2026-11-20 (lane lf-algebra, multiply-three card Q3): Y4.B4.S13, and Y4.B5.S2's associative regrouping in part.
+    'multiplication:multiply_three_numbers': ['Y4.B4.S13', { step: 'Y4.B5.S2', partial: 'the associative regrouping of three factors (a × b × c); the step goes on to multiply 2-digit numbers' }],
+    'multiplication:mult_three_two_ways': [{ step: 'Y4.B4.S13', partial: 'both groupings of three factors give one product (the associative property)' }],
+    'multiplication:mult_three_missing_factor': [{ step: 'Y4.B4.S13', partial: 'a missing factor in a three-factor fact' }],
     'multiplication:mult_facts_15': [{ step: 'Y4.B4.S10', partial: 'the 12 times-table carried on to 15 x 15 (the 13, 14 and 15 tables; WRM stops at 12 x 12)' }],
     'division:div_facts_15': [{ step: 'Y4.B4.S10', partial: 'dividing by 12 carried on to 15 x 15 (÷13, ÷14, ÷15; WRM stops at 12 x 12)' }],
     'number_sense:near_doubles': ['Y1.B5.S5'],
@@ -2321,15 +2325,6 @@ export const WRM_PROPOSALS = {
         family: 'operations',
         steps: ['Y3.B4.S11'],
     },
-    mult_three: {
-        kind: 'new', skill: 'multiplication:multiply_three_numbers',
-        name: 'Multiply Three Numbers',
-        teaches: 'multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7)',
-        representation: 'three-factor expressions with a bracket prompt to choose the easy pair first',
-        family: 'operations',
-        steps: ['Y4.B4.S12', 'Y4.B4.S13'],
-        improves: ['Y4.B5.S2'],
-    },
     correspondence: {
         kind: 'new', skill: 'multiplication:correspondence_problems',
         name: 'Correspondence Problems',
@@ -2512,6 +2507,15 @@ export const WRM_PROPOSALS = {
         representation: 'a bar model / ratio table beside a short story; write the missing amount',
         family: 'ratio',
         steps: ['Y6.B6.S10'],
+    },    // 2026-11-20 (lane lf-algebra, multiply-three card Q3): Y4.B4.S12 was closed only by the numbering slip in mult_three (built and
+    // deleted); the step's own build, div_by_itself (Y4.json envision, ops-tables card Q6), is recorded here so the step keeps a proposal.
+    div_by_itself: {
+        kind: 'option', skill: 'division:div_facts', option: 'facts: ones and itself',
+        name: 'Divide by 1 and by Itself (option)',
+        teaches: 'solve n ÷ 1 = __ and n ÷ n = __ from a sharing picture, then as facts only',
+        representation: 'equation cell 7 ÷ 7 = □ with an optional row of dots ringed into one group / seven groups (hint scaffold that fades)',
+        family: 'operations',
+        steps: ['Y4.B4.S12'],
     },
 };
 

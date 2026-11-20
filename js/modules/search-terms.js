@@ -37,6 +37,9 @@ export const CONCEPTS = {
         'standard algorithm', 'written method', 'formal method', 'formal written method', 'algorithm'],
     column_add: ['column addition', 'vertical addition', 'written addition', 'standard algorithm addition'],
     column_sub: ['column subtraction', 'vertical subtraction', 'written subtraction', 'standard algorithm subtraction'],
+    // lane lf-algebra (2026-11-20, multiply-three card): three factors, grouped (3.OA.B.5)
+    three_factors: ['multiply three numbers', 'three factors', 'associative property', 'associative', 'grouping factors',
+        'regroup factors', 'times three numbers', 'multiply 3 numbers', 'associative property of multiplication'],
     column_mult: ['column multiplication', 'short multiplication', 'long multiplication', 'standard algorithm',
         'standard algorithm multiplication', 'formal written method', 'written method', 'written multiplication',
         'vertical multiplication', 'column method', 'column', 'columns', '2 digit by 1 digit', '2 digit by 2 digit',
@@ -230,6 +233,7 @@ export const CONCEPT_RULES = [
     [/number_bonds|make_ten|teen_compose|cloze_addition|compose_whole/, ['number_bonds']],
     [/make_ten|make_a_ten|ten_frame/, ['ten_frame']],
     [/arrays_groups|dot_array|repeated_add|equal_or_unequal|share_into_groups|mult_properties/, ['arrays']],
+    [/^multiplication:(multiply_three_numbers|mult_three_two_ways|mult_three_missing_factor)$/, ['three_factors']],
     [/check_by|sub_check|div_check/, ['inverse_check']],
     [/missing|cloze|which_sign|missing_factor/, ['missing_number'], { label: true }],
     [/number_ops_mixed:/, ['addition', 'subtraction', 'multiplication', 'division', 'mixed_review']],
@@ -532,6 +536,13 @@ export const SKILL_TERMS = {
         'long division', 'short division', 'bus stop method', 'divide a 3 digit number'],
     'division:div_4by1_long': ['4 digit by 1 digit division', 'divide 4 digit by 1 digit', 'four digit by one digit division',
         'long division', 'short division', 'bus stop method', 'divide a 4 digit number'],
+    // lane lf-algebra 2026-11-20 (multiply-three card section 7): the host and its two presets
+    'multiplication:multiply_three_numbers': ['multiply three numbers', 'three factors', 'brackets multiply', 'easy pair first',
+        'times three numbers', 'multiply 3 numbers', 'multiplying three numbers', 'make a ten multiply'],
+    'multiplication:mult_three_two_ways': ['associative property two ways', 'regroup factors', 'same product', 'associative property',
+        'associative property of multiplication', 'grouping factors', 'multiply both ways', 'two ways same product'],
+    'multiplication:mult_three_missing_factor': ['missing factor three numbers', 'unknown factor', 'missing factor with three numbers',
+        'find the missing factor', 'three factors missing one', 'unknown factor three numbers'],
     'multiplication:mult_facts_15': ['13 times table', '14 times table', '15 times table', 'times tables to 15', 'tables to 15',
         '15 x 15', 'multiplication facts to 15', 'times tables 13 14 15', 'multiply by 13', 'multiply by 15'],
     'division:div_facts_15': ['divide by 13', 'divide by 14', 'divide by 15', 'division facts to 15', 'division tables to 15',
@@ -683,7 +694,7 @@ export const PRIMARY_SKILLS = {
     'division:long_div_2digit': ['long division'],
     'conversions:d_to_f': ['decimals to fractions', 'decimal to fraction', 'decimal to fractions', 'decimals to fraction', 'convert decimals to fractions'],
     'conversions:f_to_d': ['fractions to decimals', 'fraction to decimal', 'fraction to decimals', 'fractions to decimal', 'convert fractions to decimals'],
-    // critic r5: no skill deals the associative property, so 'associative' finds nothing (REAL_WORDS keeps it uncorrected);
+    // critic r5: 'associative' is never corrected (REAL_WORDS); since 2026-11-20 it finds the three-factor skills;
     // 'distributive property' leads with the skill named for it (R-F); 'zero / identity property' reach the skill that deals them (C-G)
     'multiplication:mult_properties': ['commutative property', 'commutative', 'properties of multiplication', 'multiplication properties',
         'commutative property of multiplication', 'distributive property of multiplication', 'zero property', 'zero property of multiplication',

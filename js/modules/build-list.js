@@ -167,7 +167,6 @@ export const WRM_EXTENSIONS = {
     mass_ops: { adds: 'Grade 4 word problems with simple fractions or decimals and a larger-to-smaller unit change', ccss: ['3.MD.A.2', '4.MD.A.2'], ee: [] },
     mass_scales: { adds: 'EE level: which tool measures it (scale, jug, ruler)?', ccss: ['3.MD.A.2'], ee: ['M.EE.3.MD.2'] },
     share_group: { adds: 'share an even number of objects equally between two groups (EE 2.OA.3), to 20', ccss: [], ee: ['M.EE.2.OA.3'] },
-    mult_three: { adds: 'show that (3 × 5) × 2 = 3 × (5 × 2) as a strategy (associative property)', ccss: ['3.OA.B.5'], ee: [] },
     frac_count: { adds: 'locate 4/4 and 1 (and 6/3 and 2) at the same point', ccss: ['3.NF.A.3c'], ee: [] },
     frac_nl_equiv: { adds: 'Grade 3 level (halves, quarters, eighths) for 3.NF.A.3a, not only Year 6', ccss: ['3.NF.A.3a'], ee: [] },
     compare_numerator: { adds: 'Grade 3 same-numerator comparisons and unit fractions (1/3 vs 1/5) with models, for the EE', ccss: ['3.NF.A.3d'], ee: ['M.EE.6.NS.1'] },

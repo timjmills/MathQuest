@@ -2356,6 +2356,10 @@
      "opts": {
       "range": 100
      }
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "three-factor facts with the 6 times-table inside (3.OA.B.5)"
     }
    ],
    "note": "Direct: mult_facts and div_facts with constant [6] (generated: every item is a 6× or ÷6 fact). mult_div_fact_family moved to related: it has no table option (generated 12 × 9, 5 × 10, 11 × 2)."
@@ -3197,6 +3201,10 @@
       ],
       "band": 100
      }
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "three factors, the easy pair first: the same standard (3.OA.B.5)"
     }
    ],
    "note": ""
@@ -3270,7 +3278,7 @@
      "why": "dividend, divisor, quotient named"
     }
    ],
-   "note": "mult_properties is tagged here today as partial; the existing proposal mult_three also lists this step, which looks like a numbering slip (owner question).",
+   "note": "mult_properties is tagged here today as partial. (The numbering slip that listed mult_three here is fixed: multiply_three_numbers teaches Y4.B4.S13, multiply-three card Q3.)",
    "envision": [
     {
      "proposal": "div_by_itself",
@@ -3284,13 +3292,26 @@
   },
   "Y4.B4.S13": {
    "title": "Multiply three numbers",
-   "direct": [],
-   "partial": [],
-   "verdict": "gap",
-   "missing": "multiplying three 1-digit numbers, choosing the order (associative property: 2 × 5 × 7 = 10 × 7)",
-   "build": [
-    "mult_three"
+   "direct": [
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "opts": {},
+     "why": "three 1-digit factors, the easy pair multiplied first (a pair making 10, then any known fact; 2 × 5 × 7 = 10 × 7), the product within 100"
+    }
    ],
+   "partial": [
+    {
+     "key": "multiplication:mult_three_two_ways",
+     "missing": "shows both groupings give one product (the associative property itself); the step's choosing of the easy pair is the host's task"
+    },
+    {
+     "key": "multiplication:mult_three_missing_factor",
+     "missing": "a missing factor in a three-factor fact; the step's own task is the product"
+    }
+   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "multiplication:mult_properties",
@@ -3331,19 +3352,18 @@
     {
      "key": "number_theory:factor_links_easy",
      "why": "factor pairs inside the product"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "why": "the order property (3.OA.B.5): the same standard, a factor pair turned round",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     }
    ],
-   "note": "mult_three teaches exactly this step.",
-   "envision": [
-    {
-     "proposal": "mult_three",
-     "name": "Multiply Three Numbers",
-     "kind": "new skill multiplication:multiply_three_numbers",
-     "teaches": "multiply three 1-digit numbers, choosing which two to multiply first (2 × 7 × 5 = 10 × 7)",
-     "closes": "multiplying three 1-digit numbers, choosing the order (associative property: 2 × 5 × 7 = 10 × 7)",
-     "representation": "three-factor expressions with a bracket prompt to choose the easy pair first"
-    }
-   ]
+   "note": "multiply_three_numbers teaches exactly this step (multiply-three card, 2026-11-20); its presets cover the two-ways and missing-factor tasks."
   },
   "Y4.B5.S1": {
    "title": "Factor pairs",
@@ -3412,6 +3432,10 @@
     {
      "key": "number_theory:factor_links_easy",
      "missing": "finds the factor pairs of a number (24: 1 × 24, 2 × 12 …); never uses one to multiply"
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "missing": "multiplies three given factors with the easy pair first; never replaces a factor by a factor pair (14 × 5 = 7 × 2 × 5)"
     }
    ],
    "verdict": "partial",
@@ -3455,6 +3479,10 @@
       ],
       "band": 100
      }
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "Y4.B4.S13 Multiply three numbers: the associative regrouping a factor pair uses (7 × 2 × 5 = 7 × 10)"
     }
    ],
    "preBuild": [],
@@ -3469,7 +3497,7 @@
      }
     }
    ],
-   "note": "Reusing mult_three: its associative regrouping (a × b × c) is the same move; the proposal should add the \"split a factor\" form.",
+   "note": "multiply_three_numbers (built 2026-11-20) regroups three given factors, the same move; the factor_pair_strategy proposal adds the \"split a factor\" form.",
    "envision": [
     {
      "proposal": "factor_pair_strategy",
@@ -9013,23 +9041,6 @@
    ],
    "reused": false
   },
-  "mult_three": {
-   "kind": "new",
-   "skill": "multiplication:multiply_three_numbers",
-   "name": "Multiply Three Numbers",
-   "teaches": "multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7)",
-   "representation": "three-factor expressions with a bracket prompt to choose the easy pair first",
-   "family": "operations",
-   "steps": [
-    "Y4.B4.S12",
-    "Y4.B4.S13"
-   ],
-   "improves": [
-    "Y4.B5.S2"
-   ],
-   "reused": true,
-   "source": "WRM_PROPOSALS"
-  },
   "factor_pair_strategy": {
    "kind": "option",
    "skill": "multiplication:mult_properties",
@@ -9042,7 +9053,7 @@
     "3.OA.B.5",
     "4.OA.B.4"
    ],
-   "why": "mult_properties breaks apart by addition only; mult_three multiplies three given numbers and never splits one",
+   "why": "mult_properties breaks apart by addition only; multiply_three_numbers multiplies three given numbers and never splits one",
    "steps": [
     "Y4.B5.S2",
     "Y4.B5.S15"

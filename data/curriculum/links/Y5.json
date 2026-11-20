@@ -2164,18 +2164,20 @@
       ]
      },
      "why": "Y4.B4.S12 Divide a number by 1 and itself (lower grade, same idea; the multiplication half: the order facts (3 × 4 = 4 × 3) a product of three equal factors is regrouped by)"
+    },
+    {
+     "key": "multiplication:multiply_three_numbers",
+     "why": "Y4.B4.S13 Multiply three numbers (built 2026-11-20): three factors, the easy pair first"
     }
    ],
-   "preBuild": [
-    "mult_three"
-   ],
+   "preBuild": [],
    "related": [
     {
      "key": "area_perimeter:volume",
      "why": "volume of a box (length × width × height): a cube number is the volume of an n × n × n cube"
     }
    ],
-   "note": "Above CCSS K-5 (6.EE.A.1). Prior-learning Y4.B4.S13 Multiply three numbers has no skill (mult_three).",
+   "note": "Above CCSS K-5 (6.EE.A.1). Prior-learning Y4.B4.S13 Multiply three numbers is multiplication:multiply_three_numbers (built 2026-11-20).",
    "envision": [
     {
      "proposal": "square_cube",
@@ -11040,24 +11042,6 @@
     "Y5.B3.S6": "square numbers drawn as square arrays, recognising square numbers to 144, and the ² notation linked to n × n",
     "Y5.B3.S7": "cube numbers built from unit cubes, recognising cube numbers, the ³ notation as n × n × n"
    }
-  },
-  "mult_three": {
-   "kind": "new",
-   "skill": "multiplication:multiply_three_numbers",
-   "name": "Multiply Three Numbers",
-   "teaches": "multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7)",
-   "representation": "three-factor expressions with a bracket prompt to choose the easy pair first",
-   "family": "operations",
-   "steps": [
-    "Y4.B4.S12",
-    "Y4.B4.S13",
-    "Y5.B3.S7"
-   ],
-   "improves": [
-    "Y4.B5.S2"
-   ],
-   "reused": true,
-   "source": "WRM_PROPOSALS"
   },
   "mult_multiples": {
    "kind": "option",

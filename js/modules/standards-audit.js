@@ -117,7 +117,9 @@ export const CCSS_AUDIT = {
     '3.OA.A.2': F(['division:div_word_problems', 'division:share_into_groups', 'division:nl_div']),
     '3.OA.A.3': F(['multiplication:mult_word_problems', 'division:div_word_problems', 'algebra:build_expr_multdiv']),
     '3.OA.A.4': F(['division:missing_mult_div', 'number_ops_mixed:missing_factor_or_addend']),
-    '3.OA.B.5': P(['multiplication:mult_properties'], ['the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0'], ['mult_three']),
+    // (2026-11-20, lane lf-algebra: the associative clause is multiply_three_numbers - three factors, the easy pair first, both
+    // groupings (mult_three_two_ways); mult_three built and deleted from the build list)
+    '3.OA.B.5': F(['multiplication:mult_properties', 'multiplication:multiply_three_numbers', 'multiplication:mult_three_two_ways']),
     '3.OA.B.6': F(['multiplication:mult_div_fact_family', 'division:missing_mult_div']),
     '3.OA.C.7': F(['multiplication:mult_facts', 'division:div_facts']),
     '3.OA.D.8': F(['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult', 'algebra:two_step_add_then_div', 'algebra:two_step_letter_equation', 'algebra:two_step_estimate_check', 'number_sense:estimate_sums_diffs'], 'two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)'),

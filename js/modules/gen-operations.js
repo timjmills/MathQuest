@@ -2884,6 +2884,8 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
         if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
         return q;
     }
+    // multiply_three_numbers (lane lf-algebra, card design/cards/multiply-three): its own deal, before the shared loop.
+    if (mappedSkill === 'multiply_three_numbers') { _genMultiplyThree(q, helpers); return q; }
     if (_generateSizedMultDiv(q, selected, helpers)) result = q;
     else {
         for (let t = 0; t < 60; t++) {
@@ -2902,6 +2904,102 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
         _applyVerticalColumnInstruction(q, mappedSkill);
     }
     return result;
+}
+
+// ================================================================ MULTIPLY THREE NUMBERS
+// multiplication:multiply_three_numbers (3.OA.B.5, WRM Y4.B4.S13; card design/cards/multiply-three, signed 2026-11-20).
+// Three factors 1-9, never 0 (1 only on the 'within 30' band); the PRODUCT within the band (mtBand 30 / 60 / 100). mtPair
+// 'ten': one pair is 2 and 5; when it sits apart (5 × 7 × 2) the chain prints a 'turn it round' line (Q6). mtPair 'any': a
+// known fact bracketed where it stands. mtForm: solve (default) / both (two groupings, the associative property) / missing (one
+// factor). mtBracket off: the pupil picks the pair ('= [ ] × [ ]'). The multisets of a band are DEALT across a page (no repeat
+// while the band has enough); the order and the group position are separate seeded draws.
+const _MT_CACHE = new Map();
+function _mtTriples(band, pair, form) {
+    const k = `${band}:${pair}:${form}`;
+    if (_MT_CACHE.has(k)) return _MT_CACHE.get(k);
+    const lo = band <= 30 ? 1 : 2;
+    const out = [];
+    for (let a = lo; a <= 9; a++) for (let b = a; b <= 9; b++) for (let c = b; c <= 9; c++) {
+        const P = a * b * c;
+        if (P > band) continue;
+        const fs = [a, b, c];
+        if (fs.filter((v) => v === 1).length > 1) continue;
+        if (fs.includes(P)) continue;                         // the answer never equals a printed number
+        if (pair === 'ten') {
+            const i2 = fs.indexOf(2), i5 = fs.indexOf(5);
+            if (i2 < 0 || i5 < 0) continue;
+        }
+        if (form === 'both' && a === c) continue;            // all three the same: both chains alike
+        out.push(fs);
+    }
+    _MT_CACHE.set(k, out);
+    return out;
+}
+function _genMultiplyThree(q, helpers) {
+    const rng = helpers.rng;
+    const band = [30, 60, 100].includes(Number(_opt('mtBand'))) ? Number(_opt('mtBand')) : 100;
+    let form = _opt('mtForm');
+    if (!['solve', 'both', 'missing'].includes(form)) form = 'solve';
+    const pair = _opt('mtPair') === 'any' ? 'any' : 'ten';
+    const bracket = _opt('mtBracket') !== false;
+    let list = _mtTriples(band, pair, form);
+    if (!list.length) list = _mtTriples(100, 'any', form);
+    const set = list[dealIndex(`mt3:${band}:${pair}:${form}`, list.length)];
+    // the order the factors print in: a seeded shuffle
+    const f = set.slice();
+    for (let i = f.length - 1; i > 0; i--) { const j = rng(0, i); [f[i], f[j]] = [f[j], f[i]]; }
+    let group = rng(0, 1) ? 'R' : 'L';
+    let turn = false;
+    if (pair === 'ten' && form !== 'missing') {
+        const i2 = f.indexOf(2), i5 = f.indexOf(5);
+        // the pair making 10 next to each other: bracketed where it stands; apart (positions 0 and 2): turned round
+        if (Math.abs(i2 - i5) === 1) group = Math.min(i2, i5) === 0 ? 'L' : 'R';
+        else turn = form === 'solve' && bracket;
+        if (form === 'both') turn = false;
+    }
+    if (pair === 'ten' && form === 'solve' && !bracket && Math.abs(f.indexOf(2) - f.indexOf(5)) !== 1) {
+        // the pupil picks the pair: the key's pair is still 2 and 5 (apart) - the chain reads it as the turned pair
+        turn = true;
+    }
+    const P = f[0] * f[1] * f[2];
+    const at = form === 'missing' ? (() => { const ok = [0, 1, 2].filter((i) => f[i] >= 2); return ok[rng(0, ok.length - 1)]; })() : 0;
+    const payload = { chain: true, f, group, form: form === 'solve' && !bracket ? 'choose' : form, bracket, turn, ...(form === 'missing' ? { at } : {}) };
+    q.cell = { template: 'equation', v: 1, payload };
+    q.visual = _kitTwin('equation', payload);
+    q.selfAnswering = true;
+    q.a = f[0]; q.b = f[1]; q.c = f[2]; q.op = '×';
+    q.factors = f.slice();
+    q.skillLabel = 'Multiply Three Numbers';
+    const fx = `${f[0]} × ${f[1]} × ${f[2]}`;
+    if (form === 'missing') {
+        const shown = f.map((v, i) => (i === at ? '?' : v));
+        q.text = `${shown[0]} × ${shown[1]} × ${shown[2]} = ${P}`;
+        q.ans = f[at];
+        q.answerType = 'number';
+        q.screenInstr = 'Type the missing factor.';
+        q.printText = 'Write the missing factor.';
+        const rest = f.filter((_, i) => i !== at).reduce((x, y) => x * y, 1);
+        q.hint = `Multiply the two numbers you know: ${rest}. What times ${rest} makes ${P}?`;
+        q.options = buildNumericOptions(f[at]);
+    } else if (form === 'both') {
+        q.text = `${fx}: multiply both ways.`;
+        q.ans = `${P}, ${P}`;
+        q.answerType = 'text';
+        q.screenInstr = 'Multiply both ways. Type each product.';
+        q.printText = 'Multiply both ways. Write each product.';
+        q.hint = `(${f[0]} × ${f[1]}) × ${f[2]} = ${f[0] * f[1]} × ${f[2]}, and ${f[0]} × (${f[1]} × ${f[2]}) = ${f[0]} × ${f[1] * f[2]}.`;
+    } else {
+        const pr = turn ? [f[0], f[2], f[1]] : group === 'R' ? [f[1], f[2], f[0]] : [f[0], f[1], f[2]];
+        q.text = `${fx} = ?`;
+        q.ans = P;
+        q.answerType = 'number';
+        q.screenInstr = bracket ? 'Multiply the pair in brackets first. Type the product.' : 'Pick an easy pair. Multiply it first. Type the product.';
+        q.printText = bracket ? 'Multiply the pair in brackets first.' : 'Pick an easy pair. Multiply it first.';
+        q.hint = `${pr[0]} × ${pr[1]} = ${pr[0] * pr[1]}. Then ${pr[0] * pr[1]} × ${pr[2]} = ${P}.`;
+        q.options = buildNumericOptions(P);
+    }
+    q.mtBand = band;
+    return q;
 }
 
 function _generateOperationsQuestionInner(q, mappedSkill, helpers) {

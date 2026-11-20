@@ -208,7 +208,7 @@ export const VISUALS = {
     V155: ['Y4:R06', 'Gattegno chart (rows 1–9 × powers of ten, decimal rows)', ['vis_gattegno']],
     V156: ['Y4:R15', 'Rounding table', []],
     V157: ['Y4:R19', 'Constant difference (matching hops on two lines)', ['vis_strategy_pictures']],
-    V158: ['Y4:R33', 'Array of arrays (three factors)', ['vis_array_options', 'mult_three']],
+    V158: ['Y4:R33', 'Array of arrays (three factors)', ['vis_array_options']],
     V159: ['Y4:R36', 'Factor pairs: arrays of n, factor bug / rainbow, pair table', ['vis_factor_diagrams']],
     V160: ['Y4:R37', 'Two stacked PV charts with a × / ÷ 10, 100 shift arrow', ['mult_multiples']],
     V161: ['Y4:R38', 'Short multiplication column; expanded partial-product column', ['vis_stack_layouts', 'vis_carry_below']],

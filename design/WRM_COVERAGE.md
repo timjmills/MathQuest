@@ -22,9 +22,9 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
+- Covered 514 (59%), partial only 151 (17%), gap 207 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 404 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 407 skills carry WRM tags. 162 proposals (119 new skills, 43 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -32,10 +32,10 @@ Sources:
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 19 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
-| Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
+| Year 4 | 3 | 14 | 129 | 82 (64%) | 18 | 29 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 23 | 32 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **151** | **208** |
+| **All** | | **97** | **872** | **514 (59%)** | **151** | **207** |
 
 ## Source disagreements
 
@@ -468,7 +468,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B2.S4 Rules of divisibility  
   _proposal id: divisibility_rules_
 
-### operations (27 proposals, 54 steps)
+### operations (27 proposals, 53 steps)
 
 - **Share and Make Groups** — new skill `division:share_and_group_early`. Teaches sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly. Representation: counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair.  
   Closes (13): R.B9.S6 Make pairs-odd and even; R.B9.S8 Double to 8 (make a double); R.B11.S10 Bonds to 10 (3 parts); R.B11.S12 Doubles to 10 (make a double); R.B11.S13 Explore even and odd; R.B14.S2 How many did I add; R.B14.S4 How many did I take away; R.B16.S1 Explore sharing; R.B16.S2 Sharing; R.B16.S3 Explore grouping; R.B16.S5 Even and odd sharing; Y1.B9.S9 Make equal groups - sharing; Y2.B5.S8 Make equal groups – sharing  
@@ -493,10 +493,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Add and Subtract 10s Across 100 (option)** — option on `addition:add_sub_100s`: tens across 100. Teaches adding or subtracting multiples of 10 across a hundred (180 + 30, 210 − 40). Representation: a band option "tens across 100" with a number line support.  
   Closes (2): Y3.B2.S7 Add 10s across a 100; Y3.B2.S9 Subtract 10s across a 100  
   _proposal id: cross_100_
-- **Multiply Three Numbers** — new skill `multiplication:multiply_three_numbers`. Teaches multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7). Representation: three-factor expressions with a bracket prompt to choose the easy pair first.  
-  Closes (2): Y4.B4.S12 Divide a number by 1 and itself; Y4.B4.S13 Multiply three numbers  
-  Strengthens: Y4.B5.S2  
-  _proposal id: mult_three_
 - **Part-Whole Model** — new skill `composing:part_whole_model`. Teaches parts and wholes: the cherry part-whole model, writing the four number sentences it shows, and finding a missing part. Representation: the bar/cherry part-whole diagram in B&W with one box empty; write the missing part or the number sentence.  
   Closes (1): Y1.B2.S1 Introduce parts and wholes  
   Strengthens: Y1.B2.S2  
@@ -556,6 +552,9 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Add or Multiply?** — new skill `algebra:add_or_multiply`. Teaches recognising additive and multiplicative relationships between two quantities. Representation: two sets of values in a table; tick "add 3" or "multiply by 3".  
   Closes (1): Y6.B6.S1 Add or multiply  
   _proposal id: add_or_mult_
+- **Divide by 1 and by Itself (option)** — option on `division:div_facts`: facts: ones and itself. Teaches solve n ÷ 1 = __ and n ÷ n = __ from a sharing picture, then as facts only. Representation: equation cell 7 ÷ 7 = □ with an optional row of dots ringed into one group / seven groups (hint scaffold that fades).  
+  Closes (1): Y4.B4.S12 Divide a number by 1 and itself  
+  _proposal id: div_by_itself_
 
 ### placevalue (8 proposals, 33 steps)
 
@@ -2554,10 +2553,12 @@ whatever happens to the WRM gaps.
   Vocabulary: factor, product, commutative  
 - **Y4.B4.S12** Divide a number by 1 and itself — PARTIAL. _3.OA.B.5, 3.OA.B.6_  
   Partial: Multiplication Properties (Visual) (`multiplication:mult_properties`), missing dividing a number by 1 and by itself  
-  Proposal: Multiply Three Numbers  
+  Proposal: Divide by 1 and by Itself (option)  
   Vocabulary: inverse, commutative, itself  
-- **Y4.B4.S13** Multiply three numbers — GAP. _3.OA.B.5_  
-  Proposal: Multiply Three Numbers  
+- **Y4.B4.S13** Multiply three numbers — covered. _3.OA.B.5_  
+  Skills: Multiply Three Numbers (`multiplication:multiply_three_numbers`)  
+  Partial: Multiply Three Numbers Two Ways (Associative Property) (`multiplication:mult_three_two_ways`), missing both groupings of three factors give one product (the associative property)  
+  Partial: Missing Factor with Three Numbers (`multiplication:mult_three_missing_factor`), missing a missing factor in a three-factor fact  
   Vocabulary: factor, product, commutative  
 - _Awsaj supplement (not a WRM step):_ Patterns on the multiplication table — 3.OA.C.7, 3.OA.D.9
 - _Awsaj supplement (not a WRM step):_ Two-step word problems with the four operations — 3.OA.D.8
@@ -2570,7 +2571,7 @@ whatever happens to the WRM gaps.
 - **Y4.B5.S2** Use factor pairs — covered. _3.OA.B.5, 4.OA.B.4, M.EE.4.OA.4_  
   Skills: Factor Links - Easy (Visual) (`number_theory:factor_links_easy`)  
   Partial: Multiplication Properties (Visual) (`multiplication:mult_properties`), missing using factor pairs to multiply mentally (12 × 5 = 6 × 2 × 5)  
-  Proposal: Multiply Three Numbers  
+  Partial: Multiply Three Numbers (`multiplication:multiply_three_numbers`), missing the associative regrouping of three factors (a × b × c); the step goes on to multiply 2-digit numbers  
   Vocabulary: split, any order, partition  
 - **Y4.B5.S3** Multiply by 10 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 10}; Multiply by 10 (`multiplication:mult_by_ten`)  

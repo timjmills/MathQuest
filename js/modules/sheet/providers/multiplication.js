@@ -506,3 +506,136 @@ function mpWrong(q) {
             { value: r + c, misconception: 'turn-product-factor', slot: 'answer', explain: `Added ${r} and ${c}. The product is ${P}.` },
         ]);
 }
+
+/* ================================================================ multiply_three_numbers */
+// Lane lf-algebra (2026-11-20), card design/cards/multiply-three (signed): the three-factor chain on the `equation` template.
+// Misconceptions (card section 6): M-MT1 mt-add-last, M-MT2 mt-stop-pair, M-MT3 mt-reuse, M-MT4 mt-grouping-changes.
+
+/** The chain of an item: {f, P, x, y, rest, inner, form, at}, or null. */
+const mtOf = (q) => {
+    const c = q && q.cell;
+    if (!c || c.template !== 'equation') return null;
+    const p = obj(c.payload);
+    if (!p || !p.chain || !Array.isArray(p.f) || p.f.length !== 3) return null;
+    const f = p.f.map(Number);
+    if (f.some((v) => !Number.isFinite(v))) return null;
+    const P = f[0] * f[1] * f[2];
+    const pr = p.turn ? { x: f[0], y: f[2], rest: f[1] } : p.group === 'R' ? { x: f[1], y: f[2], rest: f[0] } : { x: f[0], y: f[1], rest: f[2] };
+    return { f, P, ...pr, inner: pr.x * pr.y, form: p.form || 'solve', at: Number(p.at) || 0, turn: !!p.turn, group: p.group === 'R' ? 'R' : 'L' };
+};
+const MT_STEPS = ['Find the easy pair.', 'Multiply the pair.', 'Multiply by the last number.', 'Say it.'];
+const MT_STRINGS = {
+    solve: strings({
+        iCan: 'I can multiply three numbers.',
+        instructionKey: 'mult3',
+        steps: MT_STEPS,
+        say: '__ times __ is __. __ times __ is __.',
+        sayValues: (q) => { const m = mtOf(q); return m ? [m.x, m.y, m.inner, m.inner, m.rest, m.P] : ''; },
+        vocabulary: ['factor', 'product', 'pair'],
+    }),
+    choose: strings({
+        iCan: 'I can multiply three numbers.',
+        instructionKey: 'mult3-choose',
+        steps: MT_STEPS,
+        say: '__ times __ is __. __ times __ is __.',
+        sayValues: (q) => { const m = mtOf(q); return m ? [m.x, m.y, m.inner, m.inner, m.rest, m.P] : ''; },
+        vocabulary: ['factor', 'product', 'pair'],
+    }),
+    both: strings({
+        iCan: 'I can multiply three numbers both ways.',
+        instructionKey: 'mult3-both',
+        steps: ['Multiply the first pair, then the last number.', 'Multiply the last pair, then the first number.', 'Check: the same product.'],
+        say: 'Both ways make __.',
+        sayValues: (q) => { const m = mtOf(q); return m ? [m.P] : ''; },
+        vocabulary: ['factor', 'product', 'grouping'],
+    }),
+    missing: strings({
+        iCan: 'I can find a missing factor.',
+        instructionKey: 'mult3-missing',
+        steps: ['Multiply the two numbers you know.', 'Think: what times that makes the product?', 'Write the missing factor.'],
+        say: 'The missing factor is __.',
+        sayValues: (q) => { const m = mtOf(q); return m ? [m.f[m.at]] : ''; },
+        vocabulary: ['factor', 'product'],
+    }),
+};
+const mtNb = (s) => String(s).replace(/(\d|\)) ([×=]) (?=[\d(])/g, '$1 $2 ');
+
+function mtSteps(q) {
+    const m = mtOf(q);
+    if (!m) return [];
+    const [a, b, c] = m.f;
+    if (m.form === 'missing') {
+        const known = m.f.filter((_, i) => i !== m.at);
+        const k = known[0] * known[1];
+        return [
+            step(mtNb(`Multiply the numbers you know: ${known[0]} × ${known[1]} = ${k}.`)),
+            step(mtNb(`Think: ${k} × what = ${m.P}?`)),
+            step(`Write ${m.f[m.at]}.`, [{ slot: 'answer', value: String(m.f[m.at]) }]),
+        ];
+    }
+    if (m.form === 'both') {
+        return [
+            step(mtNb(`(${a} × ${b}) × ${c}: ${a} × ${b} = ${a * b}.`), [{ slot: 'inner', value: String(a * b) }]),
+            step(mtNb(`${a * b} × ${c} = ${m.P}.`), [{ slot: 'answer', value: String(m.P) }]),
+            step(mtNb(`${a} × (${b} × ${c}): ${b} × ${c} = ${b * c}.`), [{ slot: 'inner2', value: String(b * c) }]),
+            step(mtNb(`${a} × ${b * c} = ${m.P}. Both ways make ${m.P}.`), [{ slot: 'answer2', value: String(m.P) }]),
+        ];
+    }
+    const pick = m.turn ? `${m.x} and ${m.y} make ${m.inner}. Turn them next to each other.` : `The easy pair is ${m.x} × ${m.y}.`;
+    const pairMarks = m.form === 'choose' ? [{ slot: 'inner', value: String(m.inner) }, { slot: 'rest', value: String(m.rest) }] : [{ slot: 'inner', value: String(m.inner) }];
+    return [
+        step(mtNb(pick)),
+        step(mtNb(`${m.x} × ${m.y} = ${m.inner}.`), pairMarks),
+        step(mtNb(`${m.inner} × ${m.rest} = ${m.P}.`), [{ slot: 'answer', value: String(m.P) }]),
+        step(mtNb(`${m.x} times ${m.y} is ${m.inner}. ${m.inner} times ${m.rest} is ${m.P}.`)),
+    ];
+}
+
+function mtWrong(q) {
+    const m = mtOf(q);
+    if (!m) return null;
+    if (m.form === 'missing') {
+        const known = m.f.filter((_, i) => i !== m.at);
+        const k = known[0] * known[1];
+        return chooseWrong(q, [
+            { value: m.P - k, misconception: 'mt-add-last', slot: 'answer', explain: `Took ${k} from ${m.P}. The missing factor times ${k} makes ${m.P}: ${m.f[m.at]}.` },
+            { value: k, misconception: 'mt-stop-pair', slot: 'answer', explain: `Wrote ${k}, the two numbers multiplied. The missing factor is ${m.f[m.at]}.` },
+        ]);
+    }
+    if (m.form === 'both') {
+        const off = m.P + m.f[1];
+        return chooseWrong(q, [
+            { value: `${m.P}, ${off}`, misconception: 'mt-grouping-changes', slot: 'answer2', slots: { inner: String(m.f[0] * m.f[1]), answer: String(m.P), inner2: String(m.f[1] * m.f[2]), answer2: String(off) },
+                explain: `Thought the second grouping makes a different product. Both ways make ${m.P}.` },
+        ], { rotate: false });
+    }
+    const slots = (inner, ans) => Object.assign({ inner: String(inner), answer: String(ans) }, m.form === 'choose' ? { rest: String(m.rest) } : {});
+    return chooseWrong(q, [
+        { value: m.inner + m.rest, misconception: 'mt-add-last', slot: 'answer', slots: slots(m.inner, m.inner + m.rest),
+            explain: `Added ${m.rest} at the end: ${m.inner} + ${m.rest}. Multiply: ${m.inner} × ${m.rest} = ${m.P}.` },
+        { value: m.inner, misconception: 'mt-stop-pair', slot: 'answer', slots: slots(m.inner, m.inner),
+            explain: `Stopped after the pair. ${m.inner} × ${m.rest} = ${m.P}.` },
+        { value: m.inner * m.y, misconception: 'mt-reuse', slot: 'answer', slots: slots(m.inner, m.inner * m.y),
+            explain: `Multiplied ${m.inner} by ${m.y} again. The number left is ${m.rest}: ${m.inner} × ${m.rest} = ${m.P}.` },
+    ]);
+}
+
+/** The task a page carries: the item's own, else the option (a page with no item yet). */
+const mtTask = (ref = {}) => {
+    const m = mtOf(ref && ref.q);
+    if (m) return m.form;
+    const o = (ref && ref.opts) || {};
+    if (o.mtForm === 'both' || o.mtForm === 'missing') return o.mtForm;
+    return o.mtBracket === false ? 'choose' : 'solve';
+};
+
+registerSkill('multiplication:multiply_three_numbers', {
+    strings: (ref = {}) => (MT_STRINGS[mtTask(ref)] || MT_STRINGS.solve)(ref),
+    misconceptions: ['mt-add-last', 'mt-stop-pair', 'mt-reuse', 'mt-grouping-changes'],
+    workedSteps: (q) => mtSteps(q),
+    wrongAnswer: (q) => mtWrong(q),
+    // (card section 3, Q8: solve / choose M 8 / L 6, two across; both one a row; missing M 10 / L 8)
+    footprint: { kind: 'equation', factLike: false, maxCols: 2, measure: true },
+    // (card section 7a: the Test is unaided - no printed bracket)
+    roleOpts: (role, opts) => (/^test/.test(String(role)) && (!opts || !opts.mtForm || opts.mtForm === 'solve') ? Object.assign({}, opts, { mtBracket: false }) : opts),
+});

@@ -21,7 +21,7 @@ the first entry.
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
 - **MATCH 6 · PARTIAL 103 · GAP 101.**
-- The 204 PARTIAL / GAP representations are closed by 93 existing build-list entries (merged) and 54 entries added from this catalogue.
+- The 204 PARTIAL / GAP representations are closed by 92 existing build-list entries (merged) and 54 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
@@ -209,7 +209,7 @@ the first entry.
 | V155 | Gattegno chart (rows 1–9 × powers of ten, decimal rows) | Y4 R06, Y5 N5-04, Y6 N02 | 16 | GAP | `placevalue:place_value_10x` | `vis_gattegno`* | `placevalue` |
 | V156 | Rounding table | Y4 R15 | 1 | MATCH | `number_sense:rounding_table` | - | - |
 | V157 | Constant difference (matching hops on two lines) | Y4 R19 | 1 | GAP | `number_sense:compensation` | `vis_strategy_pictures`* | `algebra` |
-| V158 | Array of arrays (three factors) | Y4 R33 | 1 | GAP | `multiplication:mult_properties` | `vis_array_options`*, `mult_three` | `operations` |
+| V158 | Array of arrays (three factors) | Y4 R33 | 1 | GAP | `multiplication:mult_properties` | `vis_array_options`* | `operations` |
 | V159 | Factor pairs: arrays of n, factor bug / rainbow, pair table | Y4 R36, Y5 N5-12 | 4 | PARTIAL | - | `vis_factor_diagrams`* | `numtheory` |
 | V160 | Two stacked PV charts with a × / ÷ 10, 100 shift arrow | Y4 R37 (GAP), Y6 N03 (MATCH) | 10 | PARTIAL | `placevalue:place_value_10x`, `multiplication:mult_zeros` | `mult_multiples` | `operations` |
 | V161 | Short multiplication column; expanded partial-product column | Y4 R38 (MATCH / GAP) | 2 | PARTIAL | `template:stack`, `multiplication:multiply`, `multiplication:mult_missing_digit` | `vis_stack_layouts`*, `vis_carry_below`* | `operations` |
@@ -394,7 +394,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `tens_any` Add and Subtract Multiples of Ten (option) | `operations` | standards audit | V089 | 2 |
 | `long_div_rem` Long Division with Remainders (option) | `operations` | White Rose audit | V190 | 2 |
 | `div_factors` Division Using Factors | `operations` | White Rose audit | V192 | 2 |
-| `mult_three` Multiply Three Numbers | `operations` | White Rose audit | V158 | 1 |
 | `known_facts` Reason from Known Facts | `operations` | White Rose audit | V193 | 1 |
 | `vis_supports_wiring` Wire the Built Picture Panes as Supports | `placevalue` | added from visual catalogue | V001, V003, V004, V020, V025, V085, V102, V113, V114 | 239 |
 | `vis_pv_bands_millions` Widen Place Value to 7 Digits (millions) | `placevalue` | added from visual catalogue | V003, V004, V006, V175, V186 | 86 |

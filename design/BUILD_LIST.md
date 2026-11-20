@@ -19,9 +19,9 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 278 entries: **132 new skills, 90 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
-- 162 from the White Rose audit (42 extended for standards), 62 from the standards audit.
-- They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
+- 278 entries: **131 new skills, 91 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
+- 162 from the White Rose audit (41 extended for standards), 62 from the standards audit.
+- They close 113 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
 - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
@@ -29,7 +29,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 | Lane | Entries | New skills | Options | Repairs | Added from visual catalogue | Standards closed | WRM steps closed | Representations drawn | Visual reach (steps) |
 |---|---|---|---|---|---|---|---|---|---|
 | Counting and early number (K-1 pictures) (`k2`) | 34 | 16 | 6 | 0 | 12 | 20 | 34 | 55 | 454 |
-| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 44 | 19 | 12 | 1 | 12 | 23 | 50 | 35 | 316 |
+| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 44 | 18 | 13 | 1 | 12 | 22 | 49 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 8 | 36 | 23 | 327 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 13 | 11 | 0 | 4 | 17 | 20 | 17 | 104 |
 | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
@@ -640,20 +640,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 size 2×1 → 3×1 → 4×1 → 2×2 → 3×2, each first without then with carries, then zero digits · O3 carry boxes, placeholder-zero box and partial-product rows (structural, stay) · traced first digit (hint, fades) · O6 column only.
 - **Misconceptions:** forgets to add the carry; leaves out the placeholder zero in the second row; multiplies only the ones by the tens digit; adds the partial products in the wrong columns.
 
-### 11. Multiply Three Numbers — `mult_three`
-
-- **What:** new skill `multiplication:multiply_three_numbers`. Grade 3 · family operations · source White Rose audit.
-- **Closes (standards):** 3.OA.B.5 · tag with CCSS 3.OA.B.5, 3.OA.B.6, 4.OA.B.4, EE M.EE.4.OA.4
-- **Closes (White Rose steps):** Y4.B4.S12, Y4.B4.S13 · strengthens Y4.B5.S2
-- **Teaches:** multiplying three 1-digit numbers using the associative property (2 × 5 × 7 = 10 × 7).
-- **Extended for the standards:** show that (3 × 5) × 2 = 3 × (5 × 2) as a strategy (associative property).
-- **Problem types:** (1) multiply three numbers; (2) choose the easy pair first; (3) show two ways give the same (associative, 3.OA.B.5); (4) find the missing factor.
-- **Representation:** three-factor expressions with a bracket prompt to choose the easy pair first. Templates: `fact`, `equation`.
-- **Answer:** write the answer.
-- **Ladder:** O2 with 10 → any 1-digit · O3 bracket prompt → none · O6 brackets / plain.
-- **Misconceptions:** adds the third number; multiplies two and stops.
-
-### 12. Add and Subtract With a Base-10 Picture (option) — `stack_base10_support`
+### 11. Add and Subtract With a Base-10 Picture (option) — `stack_base10_support`
 
 - **What:** option on `addition:add_100_mixed` (and `subtraction:sub_100_mixed`, `addition:add_1k_mixed`, `subtraction:sub_1k_mixed`): support "base-10 picture" beside the column (a structural drawing of tens and ones / hundreds that regroups with the written method). Grade 1-2 · family operations · source standards audit.
 - **Closes (standards):** 1.NBT.C.4, 2.NBT.B.7 · tag with CCSS 1.NBT.C.4, 2.NBT.B.7, EE M.EE.2.NBT.7
@@ -665,7 +652,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 100 → 1,000; no regroup → regroup · O3 picture with exchange drawn → picture only → none · O6 rods / place-value disks.
 - **Misconceptions:** adds the tens as ones; exchanges but forgets to add the new ten.
 
-### 13. Related Times-Tables — `tables_links`
+### 12. Related Times-Tables — `tables_links`
 
 - **What:** new skill `multiplication:related_tables`. Grade 2-3 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.OA.B.5, 3.OA.C.7, 3.OA.D.9, 3.NBT.A.3, 3.OA.B.6, EE M.EE.3.OA.6, M.EE.3.OA.8, M.EE.3.NBT.3
@@ -677,7 +664,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2→4 → 3→6 → 4→8 → 9s · O3 known table given → none · O6 table / columns.
 - **Misconceptions:** adds 2 instead of doubling; doubles the factor and the product.
 
-### 14. Add and Subtract Multiples of Ten (option) — `tens_any`
+### 13. Add and Subtract Multiples of Ten (option) — `tens_any`
 
 - **What:** option on `addition:add_sub_10s`: task: any multiple of 10 from a multiple of 10 (70 − 30), and a 2-digit number ± a multiple of 10 (34 + 20); support: tens rods. Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.NBT.C.4, 1.NBT.C.6 · tag with CCSS 1.NBT.C.4, 1.NBT.C.6, EE M.EE.1.NBT.4
@@ -689,7 +676,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 ± 10 (today) → multiples of 10 → 2-digit ± multiple of 10 · O3 rods drawn and crossed out → none · O6 rods / number line.
 - **Misconceptions:** 70 − 30 = 4; 34 + 20 = 36 (adds to the ones).
 
-### 15. Add or Subtract 1 or 2 — `add_sub_1_2`
+### 14. Add or Subtract 1 or 2 — `add_sub_1_2`
 
 - **What:** new skill `addition:add_sub_1_or_2`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** K.CC.B.4c · tag with CCSS K.OA.A.5, K.CC.B.4c, EE M.EE.1.OA.5
@@ -702,7 +689,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 10 → 20 · O3 track with start circled → none · O6 track / objects.
 - **Misconceptions:** counts the start number; adds instead of taking away.
 
-### 16. Make Equal Groups — `equal_groups_early`
+### 15. Make Equal Groups — `equal_groups_early`
 
 - **What:** new skill `multiplication:make_equal_groups`. Grade 1 · family operations · source White Rose audit.
 - **Closes (standards):** 2.OA.C.4 · tag with CCSS 3.OA.A.1, 2.OA.C.4, EE M.EE.3.OA.1
@@ -715,7 +702,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2s, 5s, 10s → any to 25 · O3 groups ringed → none · O6 rings / arrays.
 - **Misconceptions:** counts groups as the total; adds unequal groups as equal.
 
-### 17. Bonds to 100 — `bonds_100`
+### 16. Bonds to 100 — `bonds_100`
 
 - **What:** new skill `addition:bonds_to_100`. Grade 1-2 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 1.NBT.B.2, 1.NBT.C.4, K.OA.A.4, 2.NBT.B.5, EE M.EE.1.NBT.2, M.EE.1.NBT.4, M.EE.2.NBT.5
@@ -727,7 +714,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 tens → multiples of 5 → any · O3 hundred square shaded → none · O6 square / bond.
 - **Misconceptions:** 37 + 73 = 100; makes 100 in each place (37 + 73).
 
-### 18. Times as Many: Statements and Equations (option) — `comparison_statements`
+### 17. Times as Many: Statements and Equations (option) — `comparison_statements`
 
 - **What:** option on `multiplication:mult_comparison` (and `multiplication:mult_comparison_plain`): form "statement ↔ equation": 35 = 5 × 7 read as "35 is 5 times as many as 7" (and 7 times as many as 5), and the equation written for a comparison sentence. Grade 4 · family operations · source standards audit.
 - **Closes (standards):** 4.OA.A.1 · tag with CCSS 4.OA.A.1, EE M.EE.4.OA.1
@@ -739,7 +726,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 facts to 5 × 5 → 10 × 10 · O3 comparison bar model → none · O6 bars / plain.
 - **Misconceptions:** reads 5 × 7 as "5 more than 7"; only one of the two statements is true.
 
-### 19. True or False Equations (repair) — `equal_sign_repair`
+### 18. True or False Equations (repair) — `equal_sign_repair`
 
 - **What:** repair on `addition:equal_sign`: route the skill to its own generator (it deals plain column addition today) and add the forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5, 4 + 1 = 5 + 2. Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.OA.D.7 · tag with CCSS 1.OA.D.7, EE M.EE.1.OA.7, M.EE.6.EE.1-2
@@ -751,7 +738,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 10 → 20; + only → + and − · O3 balance picture under each side → none · O6 balance / plain.
 - **Misconceptions:** = means "the answer comes next"; 7 = 8 − 1 is false because the answer is on the left.
 
-### 20. Multiply a 4-Digit Number by a 1-Digit Number (option) — `mult_4x1`
+### 19. Multiply a 4-Digit Number by a 1-Digit Number (option) — `mult_4x1`
 
 - **What:** option on `multiplication:multiply` (and `multiplication:area_model_mult`): size "4-digit × 1-digit" (tiles 41) on the column method and the area model (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 4 · family operations · source standards audit.
 - **Closes (standards):** 4.NBT.B.5 · tag with CCSS 4.NBT.B.5, EE -
@@ -763,7 +750,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 no carry → carries → zero digits (3,045 × 6) · O3 carry boxes and partial products → none · O6 area model / column.
 - **Misconceptions:** forgets a carry into the thousands; multiplies a zero digit as 1.
 
-### 21. What Do +, − and = Mean? (option) — `sign_meanings`
+### 20. What Do +, − and = Mean? (option) — `sign_meanings`
 
 - **What:** option on `number_ops_mixed:which_sign`: range 10 with + − = only and the words plus / add / combine, take away / subtract / separate, the same as / equal. Grade 2 · family operations · source standards audit.
 - **Closes (standards):** M.EE.2.NBT.5
@@ -775,7 +762,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 + and − → with = · O3 picture beside the words → words only · O6 pictures / plain.
 - **Misconceptions:** = means "write the answer"; take away written with +.
 
-### 22. Correspondence Problems — `correspondence`
+### 21. Correspondence Problems — `correspondence`
 
 - **What:** new skill `multiplication:correspondence_problems`. Grade 3 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.OA.A.3, 3.OA.D.8, EE M.EE.3.OA.7
@@ -787,7 +774,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2 × 3 → 4 × 5 · O3 table started → none · O6 table / tree.
 - **Misconceptions:** adds; misses a pairing.
 
-### 23. Find the Difference — `difference`
+### 22. Find the Difference — `difference`
 
 - **What:** new skill `subtraction:find_the_difference`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.OA.A.1, 1.OA.C.5, EE M.EE.K.OA.1, M.EE.1.OA.5
@@ -798,6 +785,18 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Answer:** write the difference and the sentence.
 - **Ladder:** O2 within 10 → 20 · O3 cubes paired → none · O6 cubes / bars / line.
 - **Misconceptions:** adds the two amounts; counts the larger bar.
+
+### 23. Divide by 1 and by Itself (option) — `div_by_itself`
+
+- **What:** option on `division:div_facts`: facts: ones and itself. Grade 3 · family operations · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 3.OA.B.5, 3.OA.B.6, EE -
+- **Closes (White Rose steps):** Y4.B4.S12
+- **Teaches:** solve n ÷ 1 = __ and n ÷ n = __ from a sharing picture, then as facts only.
+- **Problem types:** SPEC MISSING.
+- **Representation:** equation cell 7 ÷ 7 = □ with an optional row of dots ringed into one group / seven groups (hint scaffold that fades). Templates: -.
+- **Answer:** SPEC MISSING.
+- **Ladder:** SPEC MISSING.
+- **Misconceptions:** SPEC MISSING.
 
 ### 24. Division Using Factors — `div_factors`
 
@@ -909,7 +908,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 
 ### Added from visual catalogue (appended 2026-09-25; the entries above are unchanged)
 
-Your existing entries that also draw catalogued representations (build them with these pictures): `share_group` (V040); `long_mult` (V191); `mult_three` (V158); `tens_any` (V089); `equal_groups_early` (V037); `comparison_statements` (V028); `difference` (V108); `div_factors` (V192); `known_facts` (V193); `long_div_rem` (V190); `mult_multiples` (V160).
+Your existing entries that also draw catalogued representations (build them with these pictures): `share_group` (V040); `long_mult` (V191); `tens_any` (V089); `equal_groups_early` (V037); `comparison_statements` (V028); `difference` (V108); `div_factors` (V192); `known_facts` (V193); `long_div_rem` (V190); `mult_multiples` (V160).
 
 ### 33. The Bar-Model Family (every WRM bar) — `vis_bar_family`
 

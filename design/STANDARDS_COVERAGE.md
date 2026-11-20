@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 732 live skills; 623 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 737 live skills; 628 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 278 entries — 132 new skills, 90 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 278 entries — 131 new skills, 91 options on existing skills, 2 repairs; 162 from the White Rose audit (41 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
 | K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
 | 1 | 10 / 11 / 0 of 21 (48% full) | 12 / 11 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
 | 2 | 11 / 11 / 4 of 26 (42% full) | 11 / 10 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
-| 3 | 13 / 12 / 0 of 25 (52% full) | 19 / 14 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
+| 3 | 14 / 11 / 0 of 25 (56% full) | 20 / 13 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 15 / 12 / 1 of 28 (54% full) | 20 / 12 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **77 / 89 / 11 of 177 (44% full)** | **104 / 91 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -246,26 +246,26 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 9 | **How Many Were Added? How Many Went? (change unknown)** (`map_change_unknown_story`) | option on `addition:add_word_problems` | 1.OA.A.1, 2.OA.A.1 | - |
 | 10 | **Compare Stories: Find the Smaller Amount** (`map_compare_smaller_unknown`) | option on `subtraction:sub_word_problems` | 1.OA.A.1, 2.OA.A.1 | - |
 | 11 | **Multi-Digit Multiplication: Standard Algorithm** (`mult_standard`) | new `multiplication:mult_standard` | 4.NBT.B.5, 5.NBT.B.5 | - |
-| 12 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
-| 13 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
-| 14 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
-| 15 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
-| 16 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
-| 17 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
-| 18 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
-| 19 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
-| 20 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
-| 21 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
-| 22 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
-| 23 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
-| 24 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
-| 25 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
-| 26 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
-| 27 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
-| 28 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
-| 29 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
-| 30 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
-| 31 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
+| 12 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
+| 13 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
+| 14 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
+| 15 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
+| 16 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
+| 17 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
+| 18 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
+| 19 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
+| 20 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
+| 21 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 22 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
+| 23 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
+| 24 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
+| 25 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
+| 26 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
+| 27 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
+| 28 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
+| 29 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
+| 30 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
+| 31 | **Divide by 1 and by Itself (option)** (`div_by_itself`) | option on `division:div_facts` | - | 1 |
 | 32 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
 | 33 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
 | 34 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
@@ -661,10 +661,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 ### Level 3
 
-- **3.OA.B.5** — PARTIAL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
-  Taught in part by: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
-  Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0  
-  Build: Multiply Three Numbers (`mult_three`)
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   Taught in part by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`); What Do You Notice? Even and Odd Products, Pattern Features (`patterns:notice_patterns`)  
   Missing: patterns in the addition table  
@@ -1352,10 +1348,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `number_ops_mixed:which_sign`, `multiplication:mult_chart_headers`
 *B. Understand properties of multiplication and the relationship between multiplication and division.*
 
-- **3.OA.B.5** — PARTIAL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
-  In part: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
-  Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0 → `mult_three`  
-  Also tagged: `multiplication:mult_break_apart`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
+- **3.OA.B.5** — FULL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
+  Taught by: Multiplication Properties (Visual) (`multiplication:mult_properties`); Multiply Three Numbers (`multiplication:multiply_three_numbers`); Multiply Three Numbers Two Ways (Associative Property) (`multiplication:mult_three_two_ways`)  
+  Also tagged: `multiplication:mult_three_missing_factor`, `multiplication:mult_break_apart`, `vocabulary:vocab_grade_pictures`, `vocabulary:vocab_pick3_words`
 - **3.OA.B.6** — FULL. Understand division as an unknown-factor problem. For example, find 32 ÷ 8 by finding the number that makes 32 when multiplied by 8.  
   Taught by: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
   Also tagged: `multiplication:number_families_mult`, `division:div_check_by_multiplying`, `number_ops_mixed:number_families_mixed`
@@ -1363,7 +1358,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.OA.C.7** — FULL. Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division (e.g., knowing that 8 × 5 = 40, one knows 40 ÷ 5 = 8) or properties of operations. By the end of Grade 3, know from memory all products of two one-digit numbers.  
   Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`); Division Facts (÷1 to ÷12) (`division:div_facts`)  
-  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `division:div_facts_long`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
+  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `division:div_facts_long`, `multiplication:mult_facts_15`, `division:div_facts_15`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
 *D. Solve problems involving the four operations, and identify and explain patterns in arithmetic.*
 
 - **3.OA.D.8** — FULL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
@@ -1524,7 +1519,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.B.5** — PARTIAL. Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers, using strategies based on place value and the properties of operations. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   In part: Basic Multiplication (`multiplication:multiply`); Area Model Multiplication (`multiplication:area_model_mult`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
   Missing: a 4-digit number × a 1-digit number (the sizes stop at 3 × 1); a dedicated standard-algorithm skill with the sizes 2 × 1 to 3 × 2 (owner 2026-10-17) → `mult_4x1`, `mult_standard`  
-  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`, `multiplication:area_model_2by1`, `multiplication:area_model_3by1`
+  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`, `multiplication:mult_facts_15`, `multiplication:area_model_2by1`, `multiplication:area_model_3by1`
 - **4.NBT.B.6** — FULL. Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Basic Division (`division:divide`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`); Division with Remainders (Visual) (`division:div_remainders`) — divide at tiles 41 is 4-digit ÷ 1-digit  
   Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_4by1_long`, `division:div_facts_long`, `number_sense:reasonable_quotients`
@@ -1663,7 +1658,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `multiplication:mult_2by2_standard`
 - **5.NBT.B.6** — FULL. Find whole-number quotients of whole numbers with up to four-digit dividends and two-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`); Zero in the Quotient (`division:div_zero_in_quotient`)  
-  Also tagged: `division:div_3by2_long`
+  Also tagged: `division:div_3by2_long`, `division:div_facts_15`
 - **5.NBT.B.7** — PARTIAL. Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.  
   In part: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`); Multiplying Decimals (`decimals:mult_decimal`); Dividing Decimals (`decimals:div_decimal`)  
   Missing: concrete models or drawings for decimal operations, related to the written method → `decimal_models`, `dec_known_facts`  

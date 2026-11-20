@@ -213,7 +213,11 @@ export const MULTI_KEYS = Object.freeze({
     patTask: '4U',       // the task: parity / feature / truefalse (notice), next / rule / far (growing)
     patShow: '4V',       // the fading hint: factor labels, the printed numbers / row, the counts of Terms 1-3
     growShape: '4W',     // growing_shape_patterns: dots / squares / mixed
-    // NEXT FREE IN 4P-4Z: 4X (lane A/B fixers take 4Z downwards).
+    // lane lf-algebra (2026-11-20): multiplication:multiply_three_numbers (multiply-three card)
+    mtForm: '4X',        // the task: solve / both (two groupings) / missing (a factor)
+    mtPair: '4Y',        // the easy pair: ten (2 and 5) / any (a known fact)
+    mtBracket: '4Z',     // the printed bracket (the hint that fades) on / off
+    // 4P-4Z is full.
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -233,7 +237,8 @@ export const MULTI_KEYS = Object.freeze({
     // (Lane D 2026-10-16 had 5P / 5Q, which main gave to answerSlot / winRows; the port moved them to 5V / 5W.)
     amEdges: '5V',       // area models: the numbers around the box given / pupil writes them / mixed (2026-10-16)
     amForm: '5W',        // area-model division: the problem shown as ÷ sign / long division / fraction (a set)
-    // NEXT FREE IN BLOCK 5: 5X (5P-5U are taken above: answerSlot, winRows, winCols, minFactor, ftTrap, ftFactors).
+    mtBand: '5X',        // multiply_three_numbers (lane lf-algebra 2026-11-20; 4P-4Z full): products within 30 / 60 / 100
+    // NEXT FREE IN BLOCK 5: 5Y (5P-5U are taken above: answerSlot, winRows, winCols, minFactor, ftTrap, ftFactors; 5X mtBand).
 
     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
@@ -326,6 +331,9 @@ export const VALUE_TOKENS = Object.freeze({
     // lane lf-algebra (2026-11-07)
     patTask: Object.freeze({ parity: 'P', feature: 'F', truefalse: 'T', next: 'N', rule: 'R', far: 'X' }),
     growShape: Object.freeze({ dots: 'D', squares: 'S', mixed: 'M' }),
+    // lane lf-algebra (2026-11-20): multiply_three_numbers
+    mtForm: Object.freeze({ solve: 'S', both: 'B', missing: 'M' }),
+    mtPair: Object.freeze({ ten: 'T', any: 'A' }),
     // lane lf-vocab (2026-11-07)
     vocabTask: Object.freeze({ match3: 'M', pick3: 'P' }),
     answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
@@ -497,6 +505,8 @@ export const SCALAR_ONLY = Object.freeze({
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
     // lane lf-algebra (2026-11-07)
     patShow: 'bool',
+    // lane lf-algebra (2026-11-20)
+    mtBracket: 'bool', mtBand: 'decimal',
 });
 
 /**

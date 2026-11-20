@@ -429,9 +429,9 @@ const TOP2 = [
 
 // Correctly spelt words no skill teaches: 0 results is the honest answer (they must NOT be "corrected"
 // into a nearby vocabulary word: compass -> compare, east -> past, days -> ways, root -> foot ...).
-const EXPECT0 = ['compass directions', 'lost', 'tie', 'pond', 'may', 'compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar',
-    // critic r5 P-E: no skill deals the associative property (Multiplication Properties deals commutative, distributive, identity, zero)
-    'associative', 'associative property', 'associative property of addition', 'associative property of multiplication'];
+const EXPECT0 = ['compass directions', 'lost', 'tie', 'pond', 'may', 'compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar'];
+// (critic r5 P-E held 'associative' to no results while no skill dealt it; since 2026-11-20 multiply_three_numbers and its
+// preset mult_three_two_ways deal it - lane lf-algebra, multiply-three card - so those queries are no longer expected empty.)
 // [query, the correction shown, or null for none]
 const CORRECTIONS = [['tile', null], ['tiles', null], ['compass', null], ['days', null], ['full', null], ['area', null],
     ['tme', 'time'], ['aera', 'area'], ['perimter', 'perimeter'], ['subtracton', 'subtraction'], ['fractoins', 'fractions'],
