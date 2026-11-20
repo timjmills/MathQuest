@@ -61,7 +61,9 @@ ws-backtest: mix-drop, mix-pages, lesson-fill, model-measured-states, vocab-mode
   - vocab_grade_pictures: EB-PAGE (p1 36 % / 39 %) and EB-STRETCH cleared. It now prints 1 page at M and L.
   - vocab_pick3_words: EB-STRETCH cleared (16 mm over → 0).
   - two_step_letter_equation L: EB-PAGE 3 pages → 1.
-- **Local EB-CLIP** (ink at least 0.5 mm above the row rule; screen render, seed 4242):
+- **ws-empty-band with the rowcap branch's EB-CLIP**, after merging b5c99c91d: `--only EB-CLIP,EB-STRETCH,EB-PAGE
+  --page-fill` on count_by_tables, vocab_grade_pictures, vocab_pick3_words and number_patterns_rule, scripted-model M/L: OK.
+- **Local EB-CLIP** (ink at least 0.5 mm above the row rule; screen render, seed 4242), measured before the merge:
   - count_by_tables L: −1.28 mm → +2.02 mm, rows 47 → 50.3 mm.
   - number_patterns_rule L: −2.68 → +0.72 mm.
   - vocab M / L: 1.64 / 0.70 mm.
