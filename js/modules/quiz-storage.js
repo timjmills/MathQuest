@@ -2,7 +2,8 @@
 // Layer 1: depends only on state.js
 
 const DB_NAME = 'mathquest_quizzes';
-const DB_VERSION = 1;
+// 2 (My Worksheets, design/my-worksheets/CARD.md §3): the upgrade ONLY adds the `sheets` store; tests / results untouched.
+const DB_VERSION = 2;
 let dbInstance = null;
 
 function generateId() {
@@ -24,6 +25,12 @@ function openDB() {
                 resultStore.createIndex('testId', 'testId');
                 resultStore.createIndex('completedAt', 'completedAt');
             }
+            if (!db.objectStoreNames.contains('sheets')) {
+                const sheetStore = db.createObjectStore('sheets', { keyPath: 'id' });
+                sheetStore.createIndex('updatedAt', 'updatedAt');
+                sheetStore.createIndex('folder', 'folder');
+                sheetStore.createIndex('unit', 'unit.block');
+            }
         };
         req.onsuccess = (e) => {
             dbInstance = e.target.result;
@@ -31,6 +38,11 @@ function openDB() {
         };
         req.onerror = (e) => reject(e.target.error);
     });
+}
+
+/** The one connection to `mathquest_quizzes` (sheet-library.js keeps its `sheets` store here). */
+export function openQuizDB() {
+    return openDB();
 }
 
 export async function initQuizDB() {

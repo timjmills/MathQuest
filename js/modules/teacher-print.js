@@ -184,6 +184,7 @@ export function openPrintWith(list) {
         pr.sections = [sec];
         pr.seed = freshSeed();
         pr.view = 0;
+        pr.editingId = null;
         return;
     }
     const skills = (Array.isArray(list) ? list : [])
@@ -194,6 +195,7 @@ export function openPrintWith(list) {
     pr.sections = [newSection(skills)];
     pr.seed = freshSeed();
     pr.view = 0;
+    pr.editingId = null;   // (a new sheet: Save makes a new record)
 }
 
 /**
@@ -206,6 +208,7 @@ export function printSkills(skills) {
     pr.sections = [newSection((skills || []).map((s) => ({ ...s })))];
     pr.seed = freshSeed();
     pr.view = 0;
+    pr.editingId = null;   // (a new sheet: Save makes a new record)
 }
 
 /**
@@ -228,7 +231,83 @@ export function printDetailedLesson(lessonId) {
     pr.seed = DL_PACK_SEED;
     pr.dlRetry = true;
     pr.view = 0;
+    pr.editingId = null;
     return true;
+}
+
+/* ================================================================= My Worksheets (design/my-worksheets/CARD.md)
+   A saved sheet is the request this screen built (last.req), with the screen's own settings (`ui`) for Edit. */
+
+/** Build a stored request ({paper, parts, idx}) exactly as this screen prints it: {pupilHtml, keyHtml, docHtml, parts …}. */
+export function buildPrintRequest(req) { return buildAll(req); }
+
+/** Build the sheet on screen now (no wait for the 350 ms quiet), and return it. */
+export async function printBuiltNow() {
+    if (!root) return null;
+    clearTimeout(buildTimer);
+    await runBuild();
+    return last;
+}
+
+const UI_KEYS = ['title', 'titlePos', 'size', 'look', 'paper', 'photocopySafe', 'anchors', 'header', 'key', 'testHints', 'keyPlace', 'keyStyle', 'keyNewSheet', 'seed', 'versions'];
+const SEC_KEYS = ['role', 'columns', 'letters', 'pages', 'mixed', 'skills', 'partOpts', 'partRefresh', 'lessonId', 'parts', 'lessonSeeds'];
+function uiSnapshot() {
+    const o = {};
+    for (const k of UI_KEYS) if (pr[k] !== undefined) o[k] = pr[k];
+    o.sections = pr.sections.filter((s) => s.skills.length || s.role === 'detailed-lesson').map((s) => { const x = {}; for (const k of SEC_KEYS) if (s[k] !== undefined) x[k] = s[k]; return x; });
+    return JSON.parse(JSON.stringify(o));
+}
+
+/** What Save keeps: {host, req, ui, firstHtml}, or null before a sheet is built. */
+export function printSaveDraft() {
+    if (!last || !last.req || !last.pages || !last.pages.length) return null;
+    const p0 = last.parts[0] && last.parts[0].res;
+    return {
+        host: 'teacher-print', req: JSON.parse(JSON.stringify(last.req)), ui: uiSnapshot(),
+        firstHtml: (p0 && p0.pupilPages && p0.pupilPages[0]) || '',
+        pages: last.pages.length,
+        name: pr.title.trim() ? `${pr.title.trim()} · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : undefined,
+    };
+}
+
+/**
+ * Load a saved sheet's settings into this screen (My Worksheets › Edit; Save then updates `editingId`, or saves a copy).
+ * `ui` is the screen's own snapshot; a record without one ({req}) is read back from its request.
+ */
+export function loadPrintUi(ui, { editingId = null, req = null } = {}) {
+    initState();
+    const u = ui && typeof ui === 'object' ? ui : uiFromReq(req);
+    for (const k of UI_KEYS) if (u[k] !== undefined) pr[k] = JSON.parse(JSON.stringify(u[k]));
+    if (pr.size === 'S') pr.size = 'M';
+    const secs = (Array.isArray(u.sections) ? u.sections : []).map((x) => Object.assign(newSection([]), JSON.parse(JSON.stringify(x)), { optionsOpen: '', picking: false, menu: '', types: false }));
+    if (secs.length) pr.sections = secs;
+    pr.editingId = editingId || null;
+    pr.view = 0;
+    if (root && root.dataset.built && root.isConnected) { root.querySelector('#tvSheetTitle').value = pr.title; renderWhat(); renderSetup(); scheduleBuild(0); }
+}
+function uiFromReq(req) {
+    const parts = (req && req.parts) || [];
+    const p0 = parts[0] || {};
+    const i0 = req && req.idx ? req.idx[0] : 0;
+    return {
+        size: p0.size, paper: req && req.paper, seed: Number.isFinite(p0.seed) ? (p0.seed - i0 * 7919) >>> 0 : undefined,
+        key: p0.key ? !!(p0.key === true || p0.key.on) : true,
+        sections: parts.map((p) => ({
+            role: p.role, skills: ((p.sections && p.sections[0] && p.sections[0].skills) || []).map((k) => ({ categoryId: k.categoryId, skillId: k.skillId, opts: k.opts || {}, weight: k.weight > 1 ? k.weight : 1 })),
+            columns: (p.sections && p.sections[0] && p.sections[0].columns) || 'auto', letters: p.letters || ['A', 'B'],
+            pages: p.role === 'lesson' ? p.practicePages || 1 : (p.sections && p.sections[0] && p.sections[0].pages) || 1,
+            mixed: !!p.mixed, partOpts: p.partOpts, lessonId: p.lessonId,
+        })),
+    };
+}
+
+async function saveToLibrary() {
+    const draft = printSaveDraft();
+    if (!draft) { toast('Add a skill first'); return; }
+    try {
+        const M = await import('./my-worksheets.js');
+        await M.openSaveDialog(draft, { editingId: pr.editingId || null, onSaved: (rec) => { pr.editingId = rec.id; renderSetup(); } });
+    } catch (e) { console.warn('[teacher-print] save failed', e); toast('Could not open Save'); }
 }
 
 /** Re-print a stored printout (Home, "Recent printouts"). */
@@ -394,6 +473,7 @@ function onClick(e) {
         case 'new-numbers': pr.seed = freshSeed(); scheduleBuild(0); break;
         case 'print': doPrint(); break;
         case 'open-tab': openTab(); break;
+        case 'save-sheet': saveToLibrary(); break;
         default: break;
     }
 }
@@ -996,6 +1076,7 @@ function renderSetup() {
     <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}${sheetCap ? ' aria-describedby="tvPrintSheets"' : ''}>${icon('print', 18)}<span>${printLabel}</span></button>${sheetCap ? `
     <p class="tv-cap tv-print-sheets" id="tvPrintSheets">${sheetCap}</p>` : ''}
     <button type="button" class="tv-btn tv-btn-block" data-act="open-tab"${pages ? '' : ' aria-disabled="true"'}>${icon('external', 18)}<span>Open in a new tab</span></button>
+    <button type="button" class="tv-btn tv-btn-block" data-act="save-sheet"${pages ? '' : ' aria-disabled="true"'}>${icon('bookmark', 18)}<span>${pr.editingId ? 'Save changes to My Worksheets' : 'Save to My Worksheets'}</span></button>
     <button type="button" class="tv-btn tv-btn-ghost" data-act="new-numbers" style="align-self:center;">${icon('reset', 16)}<span>New numbers</span></button>
   </div>
   ${classicHTML()}`;

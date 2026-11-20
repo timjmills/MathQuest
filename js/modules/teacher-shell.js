@@ -38,7 +38,7 @@ import { renderTodoScreen, openTodo, todoHashActive, clearTodoHash, todoLessonFo
 import { mapHashActive, clearMapHash } from './teacher-map-tasks.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample, fit as fitSample } from './teacher-preview.js';
 
-const SCREENS = ['skills', 'home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
+const SCREENS = ['skills', 'home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress', 'sheets'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
 // (the legacy views stay for their old entry points; pupils never reach the navigator).
 const REPLACED_VIEWS = { skillsOrganizerView: 'library', mapSelectorView: 'map' };
@@ -57,7 +57,8 @@ const PLACES = {
     classes: { label: 'Classes', tabs: [['run', 'Run on the board'], ['quizzes', 'Quizzes'], ['map', 'MAP tests'], ['progress', 'Progress']] },
     me: { label: 'Me', tabs: [] },
 };
-const PLACE_OF = { settings: 'me' };
+// My Worksheets (design/my-worksheets/CARD.md) opens from the profile menu, beside Settings.
+const PLACE_OF = { settings: 'me', sheets: 'me' };
 for (const [place, p] of Object.entries(PLACES)) for (const key of [...p.tabs.map((t) => t[0]), ...(p.retired || [])]) PLACE_OF[key] = place;
 const DEFAULT_SCREEN = 'skills';
 // T6 (IMPROVEMENT_PLAN §2.9): retired screens leave the menus but stay reachable by tvGo(key), hashes and old links.
@@ -1206,6 +1207,8 @@ const RENDER = {
     quizzes: renderQuizzes,
     settings: renderSettings,
     progress: renderProgress,
+    // lazy: the screen and its store load when the teacher first opens it
+    sheets: (el) => import('./my-worksheets.js').then((m) => m.renderSheetsScreen(el)).catch((e) => { console.error('[teacher-shell] My Worksheets did not load', e); el.innerHTML = '<p class="tv-sub" style="padding:24px">My Worksheets could not load. Reload the page to try again.</p>'; }),
 };
 
 // The module is loaded (deferred) after the DOM is parsed and before init() runs, so the

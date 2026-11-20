@@ -1014,3 +1014,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - PSC instructions without label tails, shared strips for same-instruction bands (item-range sub-scores), de-dupe (no answer x3, no turnarounds), compare-sign floor (>= 2 signs, never 3 in a row), twin pools merged ("Division Word Problems"), Opener GROWCAP 0 for count rows. New ws-psc-lint (PSC-TITLE/INSTR/STRIP1/LESSON/DEAL/TWIN/TWIN-MIX, forms A/B).
 - Rulings A10, A21 (strip reprints on a new page; stacked quadrants under one strip; lesson per-question check as master). Capacity re-pinned: sub_2d_1d PSC M 6->5, L 6->4 (2 pages -> 1). PT-PRE-3 expectation 8 (lead ruling 1c); PT-PRE-1 fixture tags each pool with its own skill.
 - ws-layout-unit 31 (the known list; master's extra PT-PRE-3 fixed). Queued: H16 div_equation_parts doubled answer area (division family); buildSheet/PSC title must refuse a non-live id.
+
+## 2026-11-20 — Deploy My Worksheets (lf-partopts; critic r2 PASS, every width ≥ 8)
+- Save to My Worksheets on Print worksheets / simple print / online worksheet (teacher-only); library screen (Me menu): unit folders + own folders, tags, search, sorts, Print / Play / Send code / New mix / Edit (overwrite + Save as a copy) / Rename / Move / Duplicate / Delete + Undo; .mqsheets export/import; ?sheet= codes; 450 warn / 500 cap. Storage: new `sheets` store in mathquest_quizzes (DB v2, add-only). Look per A19 (current teacher shell; owner approved).
+- New ws-my-worksheets (13 checks) on precritic --teacher + deploy session 1. Deferred: N1 (top-bar button heights), N2 (late-deal save edge) - ledger rows exempt with their checks specified.
+- Master reds routed to lf-engine: ws-partopts-unit FILL-BT / ROWFIT-BT (row-cap drift; fix in progress).

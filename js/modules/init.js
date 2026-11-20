@@ -225,6 +225,16 @@ export function checkURLParameters() {
         }).catch((e) => { console.warn('[init] could not read the quick print in the link', e); });
     }
 
+    // A saved worksheet link ?sheet=SH1.… (My Worksheets, design/my-worksheets/CARD.md §6): a teacher is offered Save and
+    // Print, a pupil plays it. Old ?c= / ?set= / ?qp= links are unchanged.
+    const sheetParam = urlParams.get('sheet');
+    if (sheetParam) {
+        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+        import('./my-worksheets.js').then(({ openSheetCode }) => openSheetCode(sheetParam))
+            .catch((e) => { console.warn('[init] could not open the worksheet in the link', e); });
+        return;
+    }
+
     // Check ?c= or ?code= (Direct Play link)
     const code = urlParams.get('code') || urlParams.get('c');
     // An MX- mixed code (the Mixed Settings link) names each skill by category letter + position
