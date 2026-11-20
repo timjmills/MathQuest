@@ -187,3 +187,23 @@ changed, before = 414a0e108, after = this head (buildSheet role lesson, practice
 - `vocabpics-M-model-*` and `vocabpics-L-model-*` (p1–p2 → p1)
 - `vocabpics-L-lesson-mixed-*` (p6–p7)
 - `countbytables-L-model-*` (p1)
+
+## PARKED (2026-11-20, owner budget stop): resume here
+
+**State.** Head 3744c25d5 is merged with rowcap 19666510e and master. Its gates are green: boot, roles-unit, precritic-plan, capacity-pin (0 falls) and the lesson baseline (2556 identical). layout-unit shows only its known fails. The critic has NOT run, because the machine checks below are still red. That critic is rowcap's round cap: if it fails, stop and report.
+
+**Resume, in order:**
+
+1. **The Scripted Model, rowcap critic F1 class.** Measure the two-column "state beside its step" layout as it is drawn, not as estimated; 5054c8748 measures only the full-width states. Then fix the print-only foot, where the Say band covers the Model frame's bottom edge. These still FAIL:
+   - RR-BOX ×16: every Model page of add_wp_10_plain, fact_family_sort and count_by_tables, at M and L, pupil and key.
+   - EB-CLIP ×5: add_wp_10_plain L and fact_family_sort L.
+   - EB-PAGE: add_wp_10_plain M 38 %, L 33 %.
+
+   These must all be green before the critic runs.
+2. **ROLE-CAPPED ERROR-ANALYSIS (lead 2026-11-20).** Add the named PAGEFILL note in ws-print-lint, as for Review. This clears print-lint-fill-M on count_by_tables EA M and fact_family_sort EA M.
+3. **One round-cap critic** on this head. Scope:
+   - rowcap F1–F5;
+   - vocab items 1–3;
+   - rulings A and B, ROLE-CAPPED REVIEW and ROLE-CAPPED EA;
+   - the three loosenings (TAB-CLEAR 1 mm, the PAGEFILL 20–30 % note, the WHITE-ROW known list);
+   - the count_by_tables L Say-band clip.
