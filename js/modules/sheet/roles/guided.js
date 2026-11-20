@@ -1347,7 +1347,16 @@ export function plan(input = {}) {
         // (guided-tight-rows, lf-roles r8a: a `tightRows` page's plain try rows - no Model, no hint - drop the label keep-out
         // the measure reserved (layout.koMm: a Guided try has no letter), so the row is its ink and pads, centred below)
         const ko = tightAll ? koMm(ctx.size) : 0;
-        const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r) - (ko && !inkRow(r) && !(pi === 0 && (r === 0 || r === hintRow)) ? ko : 0));
+        // GUIDED-MODEL-HINT-ROW (lf-roles r14 Y1, critic r13: add_wp_20 / sub_wp_10 Guided L, EB-STRETCH 6.6 mm over): a row holding the
+        // Model AND hinted tries draws the Model's worked lines under the Model and the hint line under each try - side by side, so the
+        // row needs the taller of (Model + its extra) and (try + its hint), never the two added (the Model draws no hint line).
+        const sideBySide = (r) => pi === 0 && r === 0 && r === hintRow && nModels === 1 && !facts && !tightAdd && !spanHere && !span2Here && rowItems(0).length > 1;
+        const rowNeed = (r) => {
+            if (!sideBySide(r)) return Math.max(1, ...hsOf(r)) + add(r);
+            const hs = hsOf(r);
+            return Math.max(hs[0] + (pg.extra || 0), Math.max(1, ...hs.slice(1)) + (fit.hint || 0));
+        };
+        const w = Array.from({ length: rows }, (_, r) => rowNeed(r) - (ko && !inkRow(r) && !(pi === 0 && (r === 0 || r === hintRow)) ? ko : 0));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
         const sumW = w.reduce((x, y) => x + y, 0);
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
