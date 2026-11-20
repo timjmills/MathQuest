@@ -124,6 +124,12 @@ body.mq-lp-open { overflow: hidden; }
    answer room sits at the foot, above the Say band (two bands, each under H13's 30 %, not one 43 % band) */
 .mq-lp-work[data-stack] .mq-lp-side, .mq-lp-work:not([data-variant="row"]) .mq-lp-side { order: -1; }
 .mq-lp-hops { flex: none; display: block; }
+/* A26 (lead ruling 2026-11-20; critic r3 F1): stacked, the hops go BELOW the answer row, never above the sum, where they read
+   as its top row. The side box dissolves so the words stay first and the hops follow the drawing; player.js applyFit sets
+   the words' width and the hops' top margin (>= 0.5 digit under the drawing's foot, as solveFit sizes it). */
+.mq-lp-work[data-stack] .mq-lp-side { display: contents; }
+.mq-lp-work[data-stack] .mq-lp-wordsbox { order: -1; }
+.mq-lp-work[data-stack] .mq-lp-hops { order: 1; }
 .mq-lp-work:not([data-variant="row"]) .mq-lp-wordsbox, .mq-lp-work[data-stack] .mq-lp-wordsbox { text-align: center; width: 100%; }
 .mq-lp-zoom { display: inline-block; }
 /* the chart's state drawing, as on paper (the kit's .ws-sheet rules), without the page box: zoomed as a whole to the

@@ -485,6 +485,10 @@ function setLayout(r, { chips, stack }) {
     if (stack) work.dataset.stack = '1'; else delete work.dataset.stack;
 }
 
+// A26 (lead ruling 2026-11-20; critic r3 F1): stacked, the hops' top margin under the drawing - with the group's gap,
+// 0.6 of a drawn digit, so they read as the count-on under the sum's answer, never as a row of the sum.
+const hopsDrop = (z, k) => Math.max(0, 0.6 * basePxOf() * z - 14 * k);
+
 function solveFit(r) {
     const p = idoPart();
     const k = kOf(r);
@@ -515,7 +519,8 @@ function solveFit(r) {
             const sideW = Math.min(availW, Math.max(m.wH * z, m.natW, m.wD * z));
             if (Math.max(m.wD, m.wH) * z > availW + 0.5) continue;
             const wh = m.wordsH(sideW);
-            const h = m.hD * z + gapS * 1.4 + wh + hops;
+            // (A26: stacked, the hops sit under the answer row, a group gap plus hopsDrop(z) below the drawing's foot)
+            const h = m.hD * z + gapS * 1.4 + wh + (m.hH ? gapS * 1.4 + hopsDrop(z, k) + m.hH * z : 0);
             if (h > availH + 0.5) continue;
             return { z, sideW, wordsH: wh, groupW: Math.max(m.wD * z, sideW), groupH: h };
         }
@@ -563,9 +568,13 @@ function applyFit(r, f) {
     draw.style.height = `${Math.ceil(f.hD * f.z)}px`;
     const side = r.querySelector('.mq-lp-side');
     side.style.width = `${Math.ceil(f.sideW)}px`;
-    r.querySelector('.mq-lp-wordsbox').style.minHeight = `${Math.ceil(f.wordsH)}px`;
+    const wbx = r.querySelector('.mq-lp-wordsbox');
+    wbx.style.minHeight = `${Math.ceil(f.wordsH)}px`;
+    // (A26: stacked, the side box dissolves (display: contents), so the words carry its width and the hops their drop)
+    wbx.style.width = f.lay.stack ? `${Math.ceil(f.sideW)}px` : '';
     const hops = r.querySelector('.mq-lp-hops');
     if (hops) {
+        hops.style.marginTop = f.lay.stack ? `${Math.ceil(hopsDrop(f.z, kOf(r)))}px` : '';
         hops.style.width = `${Math.ceil(f.wH * f.z)}px`;
         hops.style.height = `${Math.ceil(f.hH * f.z)}px`;
         hops.style.display = f.hH ? '' : 'none';

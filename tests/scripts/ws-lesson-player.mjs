@@ -28,6 +28,12 @@
 //                cell inside the stage on every side; no orphan mode pill on the "No such lesson" screen. ON by default on
 //                this tree; a backtest checkout (MQ_ROOT set) runs it only with --stage-fill, so the rows pinned before A22
 //                (ink-still, dot-card, stage-h13-digits) keep judging the contract their commits were built to.
+//   --hops-below (lf-hosts player critic r3 F1; lead ruling A26 2026-11-20) - in --render, at every width and step: the
+//                count-on hops box never sits above the drawing, and where it overlaps the drawing's columns it starts at least
+//                0.5 of a digit height below the drawing's foot (the answer row); beside the drawing (no shared column) is fine.
+//                ON by default on this tree; a backtest checkout (MQ_ROOT set) runs it only with --hops-below.
+//                A26b (lead 2026-11-20): at 820 portrait ONLY, the answer row + the hops' room under it is reserved room (H13:
+//                <= 35 % without it, <= 47 % with it, and the last step inks all of it - a check of its own).
 //   --hints / --exit / --sheet-to-play / packet page ids: later slices (2, 3, 5 / 4) - reported NOT IN SLICE 1, never passed
 //
 //   --widths 1280,1920   override the widths (default SCREEN_WIDTHS + 1920)   --shots <dir>  write PNGs (dsf 2)
@@ -57,6 +63,8 @@ if (!modes.length && !later.length) modes = MODES.slice();
 const LESSON = arg('--lesson', 'add-within-10');
 // A22 (lead ruling 2026-11-20): the stage-fill / Say-band contract; see --stage-fill above
 const A22 = argv.includes('--stage-fill') || !process.env.MQ_ROOT;
+// A26 (lead ruling 2026-11-20): the hops go below the answer row (or beside the drawing), never above it; see --hops-below
+const A26 = argv.includes('--hops-below') || !process.env.MQ_ROOT;
 const BOARD_W = 1920;
 const WIDTHS = SW.widthsArg(process.argv, [...SW.SCREEN_WIDTHS, BOARD_W]);
 const HEIGHT = (w) => (w === BOARD_W ? 1080 : SW.heightOf(w));
@@ -294,6 +302,16 @@ function measureInPage() {
             out.align = beside ? { beside: true, d: cr.top - pq.top } : { beside: false, d: cr.top - (pq.bottom + gapY), gapY };
         }
     }
+    // the count-on hops box against the drawing (A26): above, below or beside, in px
+    {
+        const hp = r.querySelector('.mq-lp-hops');
+        const dr = r.querySelector('.mq-lp-draw');
+        if (hp && dr && getComputedStyle(hp).display !== 'none') {
+            const hq = hp.getBoundingClientRect(), dq = dr.getBoundingClientRect();
+            // (rel*: from the cell's inner top, as bandAt / inkAt, for the A26b reserved room)
+            if (hq.width > 1 && hq.height > 1) out.hops = { overlapX: Math.min(hq.right, dq.right) - Math.max(hq.left, dq.left), top: hq.top, bottom: hq.bottom, drawTop: dq.top, drawBottom: dq.bottom, relTop: hq.top - top, relBottom: hq.bottom - top, relDrawTop: dq.top - top, relDrawBottom: dq.bottom - top };
+        }
+    }
     out.draw = (r.querySelector('.mq-lp-draw') || {}).innerHTML || '';
     out.grey = !!r.querySelector('.mq-lp-draw :is([data-ws-ink="trace"], [data-ws-mark="trace"])') || [...r.querySelectorAll('.mq-lp-draw *')].some((e) => { const c = getComputedStyle(e); return c.color === 'rgb(148, 148, 148)' || (parseFloat(c.borderTopWidth) > 0 && c.borderTopColor === 'rgb(148, 148, 148)') || c.fill === 'rgb(148, 148, 148)' || c.stroke === 'rgb(148, 148, 148)' || /#949494/i.test(e.getAttribute('fill') || '') || /#949494/i.test(e.getAttribute('stroke') || ''); });
     return out;
@@ -452,6 +470,36 @@ function stageFill(tag, m, target) {
     }
 }
 
+/** A26 (lf-hosts player critic r3 F1): the hops never above the drawing, never within 0.5 digit of it in a shared column. */
+function hopsBelow(tag, m) {
+    const hp = m.hops;
+    if (!hp) return;
+    const d = m.digitPx * 0.5;
+    if (hp.overlapX <= 0) return;
+    if (hp.top < hp.drawTop) fail('render', `${tag}: A26 the count-on hops sit above the drawing (hops ${Math.round(hp.top)}-${Math.round(hp.bottom)} px, drawing from ${Math.round(hp.drawTop)} px, ${Math.round(hp.overlapX)} px of shared columns): they read as a top row of the sum`);
+    else if (hp.top < hp.drawBottom + d - 0.5) fail('render', `${tag}: A26 the count-on hops start ${Math.round(hp.top - hp.drawBottom)} px under the drawing's foot in its columns (>= 0.5 digit, ${Math.round(d)} px)`);
+}
+
+/**
+ * A26b (lead ruling 2026-11-20): the reserved room of the 820-portrait stacked I do - from the band's top (inside the drawing,
+ * under its rule) to the hops' foot - and the band left with it inked; null anywhere else (another width, landscape, the
+ * hops not under the drawing, a band that does not start in the drawing's answer row). Scoped here on purpose.
+ */
+function a26bReserved(w, m, last) {
+    if (w !== 820 || HEIGHT(w) <= w || !m.hops || !last || !last.hops) return null;
+    const hp = m.hops;
+    const [a] = m.bandAt;
+    if (hp.top < hp.drawBottom || a < hp.relDrawTop || a > hp.relDrawBottom) return null;
+    const res = [a, hp.relBottom];
+    const spans = [...m.inkAt, res].sort((x, y) => x[0] - y[0]);
+    let cur = 0, gap = 0;
+    for (const [p, q] of spans) { gap = Math.max(gap, p - cur); cur = Math.max(cur, q); }
+    gap = Math.max(gap, m.cellH - cur);
+    const hits = (lo, hi) => last.inkAt.some(([p, q]) => q > lo + 2 && p < hi - 2);
+    const lastAns = hits(a, hp.relDrawBottom), lastHops = hits(hp.relTop, hp.relBottom);
+    return { rest: m.cellH ? gap / m.cellH : 0, lastAns, lastHops, lastInks: lastAns && lastHops };
+}
+
 /** A22 minor 2: the "No such lesson" screen shows no orphan mode pill. */
 async function unknownLessonPill() {
     const h = await H.open({ viewport: { width: 1280, height: 900 }, pagePath: `/index.html?lesson=${encodeURIComponent('no-such-lesson-x')}&mode=board`, lock: TOOL });
@@ -495,6 +543,7 @@ async function render() {
                 if (m.stageBandY >= 0.30 || m.stageBandX >= 0.30) fail('render', `${tag}: F4 stage H13 empty band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} % of the stage (rows ${(m.stageBandY * 100).toFixed(1)} %, columns ${(m.stageBandX * 100).toFixed(1)} %)`);
                 if (k > 0 && ms[0] && Math.abs(ms[0].cellH - m.cellH) > 1) fail('render', `${tag}: F4 the cell is ${m.cellH} px tall, ${ms[0].cellH} px at step 1 (the cell grows: fix it at its largest state)`);
                 if (A22) stageFill(tag, m, target);
+                if (A26) hopsBelow(tag, m);
                 console.log(`       ${tag}: band ${(m.band * 100).toFixed(1)} %, stage band ${(Math.max(m.stageBandY, m.stageBandX) * 100).toFixed(1)} %, steps foot ${Math.round(m.stepsFoot || 0)} px, cell ${m.cellH} px, digits ${m.digitPx.toFixed(0)} px (target ${target})${A22 ? `, stage empty ${(m.stageEmpty * 100).toFixed(1)} %, cell top ${m.align ? `${m.align.beside ? 'vs Steps top' : 'under chips'} ${m.align.d.toFixed(1)}` : '-'} px, Say ${m.sayBand ? `${(m.sayBand.ratio * 100).toFixed(1)} % wide` : 'none'}` : ''}`);
                 if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await h.page.screenshot({ path: join(SHOTS, `ido-board-${w}-step${k + 1}.png`) }); }
                 if (k < st.steps - 1) await press(h.page, 'ArrowRight');
@@ -509,6 +558,16 @@ async function render() {
                 const [a, b] = m.bandAt;
                 const inked = later.some((x) => x.inkAt.some(([p, q]) => q > a + 2 && p < b - 2));
                 if (k < ms.length - 1 && m.band <= 0.35 && inked) { notes.push(`${tag}: band ${(m.band * 100).toFixed(1)} % excused (PT-MOD-3: a later step inks it)`); continue; }
+                // A26b (lead ruling 2026-11-20, as A22(a)): ONLY in this player at 820 portrait, where A26 puts the hops under the
+                // answer row, the answer row plus the hops' room below it is reserved room later steps ink, not an empty band:
+                // the band with that room taken out stays <= 35 %, with it <= 47 %, and the LAST step inks all of it (both the
+                // answer row and the hops). Never at another width, never outside ws-lesson-player.
+                const res = a26bReserved(w, m, ms[ms.length - 1]);
+                if (k < ms.length - 1 && res && m.band <= 0.47 && res.rest <= 0.35) {
+                    if (!res.lastInks) fail('render', `${tag}: A26b the last step does not ink all of the reserved room (answer row ${res.lastAns ? 'inked' : 'EMPTY'}, hops ${res.lastHops ? 'inked' : 'EMPTY'})`);
+                    else notes.push(`${tag}: band ${(m.band * 100).toFixed(1)} % excused (A26b, 820 portrait only: the answer row + the hops' room below it is reserved room the last step inks; ${(res.rest * 100).toFixed(1)} % without it)`);
+                    continue;
+                }
                 fail('render', `${tag}: H13 empty band ${(m.band * 100).toFixed(1)} % of the cell (${m.cellH} px)`);
             }
             if (SHOTS) {
