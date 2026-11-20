@@ -605,7 +605,8 @@ function rowSize(p, ctx) {
 const PW = Object.freeze({
     // whole box, part drop, part gap (mm); the bars of the model (WDS 11.2 minimums)
     M: { topW: 34, topH: 22, drop: 12, gap: 22, onesGap: 6, barW: 52, barH: 16 },
-    L: { topW: 40, topH: 26, drop: 12, gap: 22, onesGap: 6, barW: 56, barH: 18 },
+    // (L: an 18 mm drop - the diagram is as tall as the 4-bar model, so a model row's cell holds no 30 % band; ws-empty-band)
+    L: { topW: 40, topH: 26, drop: 18, gap: 22, onesGap: 6, barW: 56, barH: 18 },
 });
 const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
 /** The part boxes' geometry at the ctx size (mm). */
@@ -622,14 +623,16 @@ function pwGeom(p, ctx) {
     // spread rather than leave a band at each side)
     const colW = Math.max(wholeW, fracW) + gap;
     const rowW = colW * parts.length;
-    const maxW = Math.max(rowW, parts.length > 2 ? parts.length * (Math.max(wholeW, fracW) + 14) : 110);
+    const maxW = Math.max(rowW, parts.length > 2 ? parts.length * (Math.max(wholeW, fracW) + 14) : 140);
+    // the least width: the boxes 4 mm apart (a narrow lesson panel or Model pane); the top box never narrower than itself
+    const minW = Math.max(parts.length * Math.max(wholeW, fracW) + (parts.length - 1) * 4, 0);
     // compose: the whole box is the writing place - a wholes zone beside the fraction slot
     const writeTop = p.form === 'compose' || p.form === 'name';
     const topW = writeTop ? Math.max(G.topW, wholeW + 2 + fracW) : G.topW;
     const topH = writeTop ? partH : G.topH;
     const lab = zonePt(ctx) * PT_MM * 1.35;
     const W = Math.max(topW, rowW);
-    return { k, G, hw, wholeW, fracBar, fracW, partH, parts, gap, colW, rowW, maxW, topW, topH, lab, W, H: topH + G.drop + partH + 1.5 + lab };
+    return { k, G, hw, wholeW, fracBar, fracW, partH, parts, gap, colW, rowW, maxW, minW: Math.max(minW, topW), topW, topH, lab, W, H: topH + G.drop + partH + 1.5 + lab };
 }
 /** A value as the slot shows it in this state ('' on the pupil page). */
 function pwVal(p, ctx, id) {
@@ -671,7 +674,8 @@ function pwSlot(ctx, id, v, { w, h, zone = false, pt, marks = null, bare = false
     // a zone is a writing place on the bar (no outline on paper); on screen it is a 48 px touch target with a hairline
     // (`bare`: the slot IS its part box - the box draws the outline, on screen too)
     const border = (zone && !twin) || bare ? 'border:0;' : `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[pwSize(ctx)])};`;
-    const height = twin ? `max(48px, ${L(ctx, h)})` : L(ctx, h);
+    // (52 px: the input inside a 1 px outline stays a 48 px touch target, H6)
+    const height = twin ? `max(52px, ${L(ctx, h)})` : L(ctx, h);
     return `<span class="fm-pw-slot" data-ws-slot="${id}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${hook} `
         + `style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${height};${border}`
         + `background:#fff;font-size:${twin ? D(ctx, pt) : P(ctx, pt)};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK.ink};flex:none;${KEY_FEATURES}">`
@@ -751,7 +755,7 @@ function pwDiagram(p, ctx) {
         + cols.map((c) => `<span style="display:flex;flex-direction:column;align-items:center;">${c}</span>`).join('') + `</span>`;
     const join = twin ? ` data-mq-join="parts" data-mq-sep="${compose ? ' ' : ' + '}"` : '';
     return `<span class="fm-pw" data-ws-slot-group="answer"${join} style="display:flex;flex-direction:column;align-items:center;box-sizing:border-box;`
-        + `width:100%;min-width:${L(ctx, g.W)};max-width:${L(ctx, g.maxW)};margin:0 auto;flex:0 1 auto;">${top}${joins}${row}</span>`;
+        + `width:100%;min-width:${L(ctx, g.minW)};max-width:${L(ctx, g.maxW)};margin:0 auto;padding-top:${L(ctx, 0.6)};flex:0 1 auto;">${top}${joins}${row}</span>`;
 }
 /** The equation form: "2 3/4 = [ ] + [ ]/[ ]" (the faded form, no diagram). */
 function pwEquation(p, ctx) {
@@ -780,7 +784,7 @@ function partitionRow(p, ctx) {
     }
     // model on: the bars at the left, the diagram centred in the width after them (card Q10, EB-SIDE); on a narrow
     // screen card the bars stand above the diagram (flex-wrap)
-    return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:wrap;align-items:flex-start;row-gap:${L(ctx, 4)};justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
+    return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:${isTwin(ctx) ? 'nowrap' : 'wrap'};align-items:flex-start;row-gap:${L(ctx, 4)};justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
         // the tab keep-out on paper: the bars start after the item's tab
         + `${isTwin(ctx) ? '' : `padding-left:${L(ctx, SZ(ctx).tabMm + 3)};`}">`
         + `${pwBars(p, ctx)}<span style="flex:1 1 auto;display:flex;justify-content:center;">${diagram}</span></div>`;

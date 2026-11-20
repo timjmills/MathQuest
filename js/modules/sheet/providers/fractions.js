@@ -569,6 +569,12 @@ registerFractionSentence('fraction_operations:div_unit_fraction', '÷');
 // frac-model task 'partition'. The misconceptions are the card's M-MP1..M-MP4: concatenating the digits, counting every
 // part across the bars as the denominator, counting the shaded parts as wholes, swapping the wholes and the numerator.
 
+// TY-7: a fraction in running text is never a slash fraction - the Steps, the Say line, the explanations and the Stretch
+// table name it in words ("3 quarters", "2 and 3 quarters"), as it is said aloud
+const FRAC_NAME = { 2: ['half', 'halves'], 3: ['third', 'thirds'], 4: ['quarter', 'quarters'], 5: ['fifth', 'fifths'], 6: ['sixth', 'sixths'],
+    7: ['seventh', 'sevenths'], 8: ['eighth', 'eighths'], 9: ['ninth', 'ninths'], 10: ['tenth', 'tenths'], 12: ['twelfth', 'twelfths'] };
+const frw = (n, d) => { const nm = FRAC_NAME[d]; return nm ? `${n} ${Number(n) === 1 ? nm[0] : nm[1]}` : `${n} over ${d}`; };
+const mxw = (w, n, d) => (Number(n) ? (Number(w) ? `${w} and ${frw(n, d)}` : frw(n, d)) : String(w));
 const partitionOf = (q) => { const p = payloadOf(q); return p && p.task === 'partition' ? p : null; };
 const MN_SAY = '__ is __ wholes and __.';
 const MN_BY_FORM = {
@@ -586,8 +592,8 @@ const MN_BY_FORM = {
 const mnSayValues = (q) => {
     const p = partitionOf(q);
     if (!p) return null;
-    const mixed = mixedText(p.w, p.n, p.d), frac = fr(p.n, p.d);
-    if (p.form === 'compose') return `${p.w} and ${frac} make ${mixed}.`;
+    const mixed = mxw(p.w, p.n, p.d), frac = frw(p.n, p.d);
+    if (p.form === 'compose') return `${p.w} wholes and ${frac} make ${mixed}.`;
     if (p.form === 'name') return `The bars show ${mixed}. ${mixed} is ${p.w} wholes and ${frac}.`;
     if (p.form === 'ones' || p.ones) return `${mixed} is ${Array.from({ length: p.w }, () => '1').join(' + ')} + ${frac}.`;
     return [mixed, p.w, frac];
@@ -607,7 +613,7 @@ mnStrings.def = MN_STRINGS.two.def;
 function mnSteps(q) {
     const p = partitionOf(q);
     if (!p) return [];
-    const mixed = mixedText(p.w, p.n, p.d), frac = fr(p.n, p.d);
+    const mixed = mxw(p.w, p.n, p.d), frac = frw(p.n, p.d);
     const fracMarks = [{ slot: 'n', value: String(p.n) }, { slot: 'd', value: String(p.d) }];
     const bars = p.model === 'bar';
     if (p.form === 'name') {
@@ -623,7 +629,7 @@ function mnSteps(q) {
             step(`Read the parts: ${p.w} wholes and ${frac}.`),
             step(`Write the wholes: ${p.w}.`, [{ slot: 'w', value: String(p.w) }]),
             step(`Write the fraction ${frac} beside the ${p.w}: ${mixed}.`, fracMarks),
-            step(`Say: ${p.w} and ${frac} make ${mixed}.`),
+            step(`Say: ${p.w} wholes and ${frac} make ${mixed}.`),
         ]);
     }
     const ones = p.form === 'ones' || !!p.ones;
@@ -645,11 +651,11 @@ function mnWrongs(q) {
     const c = [];
     if (p.form === 'compose') {
         if (n !== w && w < d) c.push({ value: `${n} ${w}/${d}`, misconception: 'swapped-parts', slot: 'w', slots: { w: String(n), n: String(w), d: String(d) },
-            explain: `Swapped the wholes and the top number: ${n} ${w}/${d}, not ${w} ${n}/${d}. The wholes come first.` });
+            explain: `Swapped the wholes and the top number: ${mxw(n, w, d)}, not ${mxw(w, n, d)}. The wholes come first.` });
         c.push({ value: `${w} ${n}/${d * (w + 1)}`, misconception: 'all-parts-denominator', slot: 'd', slots: { w: String(w), n: String(n), d: String(d * (w + 1)) },
             explain: `Counted every part of every bar (${d * (w + 1)}) as the denominator. One whole has ${d} parts.` });
         c.push({ value: `${w}${n}/${d}`, misconception: 'concat-digits', slot: 'n', slots: { w: '', n: `${w}${n}`, d: String(d) },
-            explain: `Wrote the digits side by side: ${w}${n}/${d}. ${w} is the wholes; ${n}/${d} is the fraction.` });
+            explain: `Wrote the digits side by side: ${w}${n} over ${d}. ${w} is the wholes; ${frw(n, d)} is the fraction.` });
         return c;
     }
     if (p.form === 'name') {
@@ -660,7 +666,7 @@ function mnWrongs(q) {
         c.push({ value: `${w} ${n}/${d * (w + 1)} = ${w} + ${n}/${d * (w + 1)}`, misconception: 'all-parts-denominator', slot: 'md', slots: { ...top(w, n, d * (w + 1)), w: String(w), n: String(n), d: String(d * (w + 1)) },
             explain: `Counted every part of every bar (${d * (w + 1)}) as the denominator. One whole has ${d} parts.` });
         if (n !== w && w < d) c.push({ value: `${w} ${n}/${d} = ${n} + ${w}/${d}`, misconception: 'swapped-parts', slot: 'w', slots: { ...top(w, n, d), w: String(n), n: String(w), d: String(d) },
-            explain: `Swapped the parts: ${n} wholes and ${w}/${d}. The wholes of ${w} ${n}/${d} are ${w}.` });
+            explain: `Swapped the parts: ${n} wholes and ${frw(w, d)}. The wholes of ${mxw(w, n, d)} are ${w}.` });
         return c;
     }
     const ones = p.form === 'ones' || !!p.ones;
@@ -670,14 +676,14 @@ function mnWrongs(q) {
         explain: `Counted every part of every bar (${d * (w + 1)}) as the denominator. The fraction is part of ONE whole: ${d} parts.` });
     if (!ones) {
         if (n !== w && w < d) c.push({ value: `${n} + ${w}/${d}`, misconception: 'swapped-parts', slot: 'w', slots: { w: String(n), n: String(w), d: String(d) },
-            explain: `Swapped the parts: ${n} wholes and ${w}/${d}. The big number is the wholes: ${w}.` });
+            explain: `Swapped the parts: ${n} wholes and ${frw(w, d)}. The big number is the wholes: ${w}.` });
         c.push({ value: `${w * d + n} + ${n}/${d}`, misconception: 'shaded-as-wholes', slot: 'w', slots: { w: String(w * d + n), n: String(n), d: String(d) },
             explain: `Counted the shaded parts (${w * d + n}) as wholes. Count the FULL bars: ${w}.` });
         c.push({ value: `${w}${n} + ${n}/${d}`, misconception: 'concat-digits', slot: 'w', slots: { w: `${w}${n}`, n: String(n), d: String(d) },
             explain: `Wrote the digits side by side in the wholes box (${w}${n}). The wholes are ${w}.` });
     } else if (n !== 1) {
         c.push({ value: text(1, 1, d), misconception: 'shaded-as-wholes', slot: 'n', slots: { ...wholeSlots(1), n: '1', d: String(d) },
-            explain: `Wrote 1/${d} for the part bar. ${n} of its ${d} parts are shaded: ${n}/${d}.` });
+            explain: `Wrote ${frw(1, d)} for the part bar. ${n} of its ${d} parts are shaded: ${frw(n, d)}.` });
     }
     return c;
 }
@@ -696,13 +702,13 @@ registerSkill('fractions:mixed_numbers_intro', {
         if (!p) return null;
         const { w, n, d } = p;
         const rows = [];
-        for (let k = 1; k < w; k++) rows.push([String(k), mixedText(w - k, n, d)]);
-        for (let a = 1; a < n; a++) rows.push([mixedText(w, a, d), fr(n - a, d)]);
-        for (let k = 1; k < w; k++) for (let a = 1; a < n; a++) rows.push([mixedText(k, a, d), mixedText(w - k, n - a, d)]);
+        for (let k = 1; k < w; k++) rows.push([String(k), mxw(w - k, n, d)]);
+        for (let a = 1; a < n; a++) rows.push([mxw(w, a, d), frw(n - a, d)]);
+        for (let k = 1; k < w; k++) for (let a = 1; a < n; a++) rows.push([mxw(k, a, d), mxw(w - k, n - a, d)]);
         if (rows.length < 3) return null;
         return {
-            prompt: [`Write ${mixedText(w, n, d)} as two parts in different ways.`, 'Write one way in each row.'],
-            columns: ['part', 'part'], example: [String(w), fr(n, d)], keyRows: rows, total: rows.length + 1,
+            prompt: [`Write ${mxw(w, n, d)} as two parts in different ways.`, 'Write one way in each row.'],
+            columns: ['part', 'part'], example: [String(w), frw(n, d)], keyRows: rows, total: rows.length + 1,
         };
     },
     // capacity (card Q9, measured by ws-empty-band): a model row is a full-width row (M 3 / L 2 a page), a model-off
@@ -710,7 +716,9 @@ registerSkill('fractions:mixed_numbers_intro', {
     footprint: { kind: 'frac-model', factLike: false, maxCols: 2, measure: true },
     // no bar model where the page judges or tests: the Test is unaided (card 7a role:test), and Error analysis, True or False?
     // and Reason It judge a WRITTEN partition of a printed mixed number (their A / B panels hold the diagram, not the bars)
-    roleOpts: (role, opts) => (/^(test|error-analysis|check-it|true-false|reason)/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : opts),
+    // (the opener's Model pane is half the page: the bars stood over the diagram and ran the page over - ws-cell-checks OVERFLOW;
+    // its Steps and the Scripted Model teach the bars. compose / name draw their bars whatever this says)
+    roleOpts: (role, opts) => (/^(test|error-analysis|check-it|true-false|reason|opener|lesson-opener)/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : opts),
     // the Pre-skill check: the fraction and whole-number skills this one stands on (data.js order would give the presets
     // appended before it); nearest first
     // (on bars, the model this skill draws: a page of one picture)
