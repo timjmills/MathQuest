@@ -14297,6 +14297,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "g3oa9-sweep-neighbour",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-detailed-lesson --sweep (LP-SWEEP) on g3-oa9-input-output-rule seed 25: the lesson builds, every T6 placeholder has a value",
+   "rule": "LP-SWEEP (g3-oa9 lesson precritic 2026-11-20)",
+   "fail": {
+    "commit": "e3c0d443b",
+    "state": "seed 25: unknown placeholder {exit.0.wrong.neighbouroutputs} - the exit + table's Out gaps all equal the rule"
+   },
+   "pass": {
+    "commit": "c03a3010c",
+    "state": "the + items T6 names want ftNeighbour (a gap that is not the rule)"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --sweep --seed-list 25",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
