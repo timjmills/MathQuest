@@ -911,3 +911,20 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   clean. One route: the pre-skill-check composer (critic r2 G4: systemic, PT-PRE-1), not per skill.
 - Still ADVISORY (`--eblast-block` for findings); the lead flips to blocking after critic r3. The 6 eblast rows PASS;
   `ws-precritic-plan --checks-from-critics` OK (351 pass, 90 exempt, 0 fail).
+
+## 2026-11-20 — EBLAST r4: drift check (critic eblast r3 G1) + per-role blocking allow-list (lead)
+
+- **G1 drift fixed (cheaper route; the role modules are untouched):** `ws-empty-band --capacity-check` parses each role's OWN
+  ceiling constant (guided / error-analysis / review / test / true-false `CEILING`, reason-it `ROWS`, word-problems `PER_PAGE`,
+  mixed-practice `MAX_SHELVES`) and FAILs on any difference with `role-capacity.js`, naming role, size, both values and file
+  (or a missing constant). Self-test: planted guided M 9 vs 8 FAILs, the real tree OK. Row `eblast-role-capacity-drift` PASS.
+  N1 fixed too: the EB-LASTPAGE message names the declared ceiling.
+- **EBLAST-BLOCKING:** global ADVISORY kept; EB-LASTPAGE / CAP-PARITY are FINDINGS on `EBLAST_BLOCKING_ROLES` (in the gate,
+  between markers). `--pin-check` fails when the list loses an entry of the merge-base copy (it may only grow). Row
+  `eblast-blocking-pin` PASS. Seeded (full sweep of all 32 passed skills, M + L, 0 reds outside pre-skill-check): independent,
+  more-practice, guided, error-analysis, review, test, mixed-practice, true-false, reason-it, word-problems, stretch,
+  scripted-model, opener, lesson, fact-probe, fact-rows.
+- **pre-skill-check stays ADVISORY. Every one of its pages is red today** (critic r3): 39 advisory reds across the 32 skills,
+  all of them pre-skill-check (one-row pages at 78-82 %, spills to p2 at L, CAP-PARITY below its 16-item L ceiling). Its owner
+  must fix the role composer (PT-PRE-1 four quadrants on one page) before it joins the list. These rules cannot block it until then.
+- Rows: CHECKS_FROM_CRITICS +2; backtests `eblast-role-capacity-declared`, `-drift`, `eblast-blocking-pin` PASS.
