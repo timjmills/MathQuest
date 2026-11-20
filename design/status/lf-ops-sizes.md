@@ -52,3 +52,44 @@
   - empty-band: stack independent EB-BAND (mult_3by1_column M/L, 35 % bands), area-model reason-it bands.
 - Not re-run this round (cap): slot-clip, role-cover (timed out last run, no finding seen), grade-render (its 12 were the chart
   overflow fixed here + the area lesson-L host overflow above), the sharded precritic.
+
+## 2026-11-20 sharded precritic
+
+lf-ops checker (Opus medium, run only, no product edits). Branch `claude/sweet-newton-c8wrv1-lf-ops-sizes` @ 744ec778a
+(contains master) against master @ 2c42746aa. The six skills were run gate by gate, each shard in the foreground in under 9 min.
+On master the five presets are run as their hosts with `--opts`: mult_4by1_column = multiply tiles 41,
+mult_3by2_standard = multiply tiles 32, area_model_4by1 = area_model_mult tiles 41, area_model_2by2 / area_model_3by2 =
+area_model_mult_hard tiles 22 / 23. mult_2by2_standard is the same id on both.
+Classes: **new** = only on the branch; **new\*** = a role master never rendered, because master has no signed card for these
+hosts and uses the default roles; **master** = the same on master (count b/m); **fixed** = red on master, green on the branch;
+**ruled** = A9 capacity rulings. None of the A9 rulings showed up in these gates.
+Logs: scratchpad `shards/{b,m}-<gate>-<idx>.txt` (idx 0-5 in the order above); `file:line` below points into them.
+
+| gate | mult_4by1_column | mult_3by2_standard | area_model_4by1 | area_model_2by2 | area_model_3by2 | mult_2by2_standard |
+|---|---|---|---|---|---|---|
+| print-lint kit L | green / green | green / green | green / green | green / green | green / green | green / **fixed** (master H13 20) |
+| print-lint kit M | green / green | green / green | green / green | green / green | green / green | green / **fixed** (master H13 12) |
+| print-lint lesson L | **new** TOPSTART CL-4b 12 | **new** H13 2, TOPSTART 12, WRAP-OP 4, DN-2 2 | master PG-12 2/8; **new** TOPSTART 12, DN-2 2; fixed ILLEGIBLE 36 | master ILLEGIBLE 20/50, PG-12 8/10, PAGEFILL, LONE; **new** WRAP-OP 4, DN-2 2 | master PG-12 2/10, TOPSTART 4/4, WRAP 2/4; **new** PG-13 4, DN-2 2, LONE 2; fixed ILLEGIBLE 60 | **new** TOPSTART 12, BD-10 1, WRAP-OP 2, DN-2 4, LONE 1 (master 0; branch 12+6 pages vs master 4+2) |
+| print-lint lesson M | master TOPSTART 12/32 | master TOPSTART 12/32; **new** H13 4, WRAP-OP 2 | green / **fixed** (master ILLEGIBLE 36, PG-12 8, TOPSTART 12) | master ILLEGIBLE 20/50, PG-12 8/10, TOPSTART 12/12; **new** WRAP-OP 4 | master TOPSTART 12/12; **new** PG-13 4, DN-2 2, LONE 2; fixed ILLEGIBLE 60, PG-12 10 | master TOPSTART 12/32; **new** WRAP-OP 2, DN-2 2 |
+| empty-band | FAIL 141 / 109: master BAND indep L 45/12, test, review, lesson M; **new** BAND indep M 9, more-practice M 9, SIDE indep L 16, lesson L 2+2; **new\*** opener, scripted-model, stretch | FAIL 96 / 109: master BAND indep L, lesson M, review L, test M, guided L; **new** BAND indep M 6, more-practice M 6, SIDE indep L 16, lesson M 6, test M 4, EB-PAGE lesson L 1, **GDPCAP guided L 1**; **new\*** pre-skill-check, opener, scripted-model, stretch | FAIL 31 / 22: master indep L, guided M, reason-it EDGE, lesson PAGE; **new** BAND lesson L/M 2+2, EDGE lesson 1+1; **new\*** opener, scripted-model PAGE 5, pre-skill-check, stretch | FAIL 27 / 12: master guided, review M, reason-it, lesson PAGE M; **new** lesson PAGE L 2, BAND lesson M 2, SIDE lesson 1+1; **new\*** scripted-model, opener, pre-skill-check, stretch | FAIL 27 / 7: master guided L, reason-it, lesson PAGE M; **new** lesson EDGE L 1, PAGE L 2; **new\*** scripted-model, pre-skill-check, opener, word-problems, stretch | FAIL 125 / 93: master indep M, more-practice M, test, SIDE indep L 20/10, more-practice L; **new** BAND indep L 24, SIDE lesson L/M 6+6, EB-PAGE lesson M 1, **GDPCAP guided L 1**; **new\*** pre-skill-check, scripted-model, opener, stretch |
+| cell-checks --card (master: no card, so `--roles` with the same 15 roles) | **new** PUPILTAG error-analysis M 8 | **new** OVERFLOW lesson L/M 2+2 (tiles=null variant) | master OVERFLOW lesson L, opener, reason-it L, PUPILTAG; **new** OVERFLOW reason-it M 4 | master OVERFLOW lesson, opener, PUPILTAG, LONE-PAGE true-false L; **new** LONE-PAGE reason-it L, word-problems L+M | master OVERFLOW lesson, opener, PUPILTAG; **new** LONE-PAGE reason-it L, true-false L, word-problems L+M; OVERFLOW word-problems L 2, reason-it L/M | **new** OVERFLOW lesson L/M 6+6 (variants tiles=41 and tiles=null; `--roles` run green) |
+| grade-render --gate (lesson, test, independent at M, L) | green | green | FAIL 4 (lesson L p6) vs master 36: master | FAIL 4 vs master 42: master | FAIL 8 vs master 44: master | green |
+| options-verify (pin: design/audit/baselines/options-verify.json) | **new** notation across x2 (not pinned; same class as the mult_2by2 pin); skipAfter 2/20 master | **new** notation across x2; skipAfter master | skipAfter master | skipAfter master | skipAfter master | notation pinned; skipAfter master |
+| coverage-matrix | OK | OK | OK | OK | OK | OK / OK |
+| sibling-compare | OK (9 at or below siblings) | FAIL: 13 unproven, no approved sibling on the branch template | FAIL: 19 unproven | FAIL: 14 unproven | FAIL: 19 unproven | FAIL: 14 unproven; master FAIL 20 counts above the stack siblings |
+| slot-clip | OK | OK | OK | OK | OK | OK (master not run: branch green) |
+
+Evidence for the **new** reds (scratchpad `shards/`):
+- PUPILTAG mult_4by1_column error-analysis M: `b-cc-0.txt:112`. The "<Name> wrote:" label sits 1.8 mm from the work; PT-ERR-4 needs 2-4 mm.
+- OVERFLOW lesson: mult_3by2_standard `b-cc-1.txt:113` and mult_2by2_standard `b-cc-5.txt:117`, both on lesson page 1 cell 3 (tiles=null) and cell 1 (tiles=41).
+- OVERFLOW area_model_4by1 reason-it M: `b-cc-2.txt:132`. OVERFLOW area_model_3by2 word-problems L: `b-cc-4.txt:145`.
+- LONE-PAGE: area_model_2by2 `b-cc-3.txt:133-134`; area_model_3by2 `b-cc-4.txt:136,143-144`. These are reason-it L, true-false L and word-problems M/L, outside the A9 rulings, which name area_model_4by1 and mult Reason It only.
+- Lesson print-lint, mult_2by2_standard L: `b-lessL-5.txt:15` (BD-10). The branch lesson is 12+6 pages; master's is 4+2. mult_3by2 H13: `b-lessL-all.txt:75`.
+- EB-GDPCAP guided L, 8 scored tries against the ceiling of 6: `b-eb-1.txt:97` and `b-eb-5.txt:97`.
+- options-verify notation=across on the presets: `b-ov-0.txt:2` and `b-ov-1.txt:2`. The presets are not in the pin.
+- sibling-compare "no approved siblings": `b-sib-1.txt:21`. tests/fixtures/precritic/siblings.json has no entry for the branch's multiplication templates.
+
+Not run, with the reason:
+- ws-role-cover: its estimate is about 63 min of slot time per skill (2 shards of 30+ min). That does not fit 9-minute foreground shards inside the $12 cap.
+- grade-render on the other 12 roles, raster-fit, screen gates (screen-slots, screen-answer, chromebook-fit, phone-card, options-shots), guided-echo, two-step, the node unit gates and the rest of the plan: not run within the cap.
+- master cell-checks `--card --card-opts`: master has no signed card for these hosts.
