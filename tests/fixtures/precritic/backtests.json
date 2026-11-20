@@ -12419,6 +12419,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-hint-overmask",
+   "check": "ws-guided-cellfit HINT-OVERMASK: a Guided hint may not gap a number printed in its try's own question text (two-step presets + passed word-work and placevalue identify / value / compare, M / L, seeds 1, 2, 591220)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-cellfit HINT-OVERMASK (lead ruling 2026-11-20, lf-roles r18)",
+   "fail": {
+    "commit": "1e2e51860",
+    "state": "add_wp_10 Guided M: \"The numbers are ___ and ___.\" over a story printing 3 and 2; placevalue identify \"Find the underlined digit: ___.\""
+   },
+   "pass": {
+    "commit": "2076d974a",
+    "state": "\"The numbers are 3 and 2.\"; two-step \"Step 1: circle +. 22 + 14 = ___.\""
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only HINT-OVERMASK --skills addition:add_wp_10,subtraction:sub_wp_20_plain,placevalue:identify,placevalue:value,algebra:two_step_add_then_div --sizes M,L --seeds 1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

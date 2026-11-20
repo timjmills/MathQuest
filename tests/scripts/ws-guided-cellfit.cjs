@@ -171,5 +171,5 @@ if (FIXTURE) {
     }
     bad.forEach((x) => console.log('  ' + x));
     console.log(bad.length ? `ws-guided-cellfit: FAIL (${bad.length})` : 'ws-guided-cellfit: OK');
-    process.exit(bad.length ? 1 : 0);
+    process.stdout.write("", () => process.exit(bad.length ? 1 : 0));   // (a long FAIL list is flushed before exit: ws-backtest reads the last line)
 })().catch((e) => { console.log('ws-guided-cellfit: FAIL (error ' + (e && e.message) + ')'); process.exit(1); });

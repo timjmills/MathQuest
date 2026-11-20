@@ -430,3 +430,12 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
   provider hint lands. The precritic gate runs CELL-FITS,HINT-LEAK only. Passed sweep: placevalue:compare seed 2 "Every digit is the
   same: 932 and 932." flagged (probably the key repeating the given number); reported, not fixed.
 - Pre-skill Check fill: EB-LASTPAGE / CAP-PARITY are not on origin/master, so stopped as briefed.
+
+## Round r18 (2026-11-20): W2 mask keeps given numbers
+
+- Check (1e2e51860, red before the fix): ws-guided-cellfit HINT-OVERMASK (a hint may not gap a number printed in its try's question:
+  q.text, plus a place-value cell's drawn numeral and its digits; compared against hintOf(it, {raw: true}), the same pick unmasked).
+  GUIDED-HINT-LEAK now exempts numbers printed in the try's own pupil cell (compare "932 and 932"); still red on 8533a8b48
+  ("22 + 14 = 36."). HINT-OVERMASK is on the precritic guided-cellfit gate.
+- Fix (2076d974a, guided.js hintOf): the box-number mask skips every number the question prints; the label-and-gaps drop stays.
+- Backtest row guided-hint-overmask (FAIL 1e2e51860 → OK 2076d974a, a narrow sweep so the FAIL line is read) PASS; guided-hint-box-leak re-proved PASS (FAIL 8533a8b48 → OK 174348717). ws-guided-cellfit now flushes a long FAIL list before exit (the full sweep printed 333 findings and lost its last line). Hash proof: see the hand-over.
