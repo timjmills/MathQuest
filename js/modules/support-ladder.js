@@ -772,15 +772,48 @@ function answerTokens(q, steps) {
 
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** A step's text with the answer left for the pupil: a count running up to it is cut, the answer blanked. */
-export function hideAnswer(text, tokens) {
-    let t = String(text || '');
+/** Does this text state one of the answer's forms? A word answer ("A", "tens") only as a whole word. */
+function statesAnswer(text, tokens) {
+    return tokens.some((tok) => (/^[A-Za-z][A-Za-z ]*$/.test(tok)
+        ? new RegExp(`(^|[^A-Za-z])${reEsc(tok)}(?![A-Za-z])`).test(text)
+        : new RegExp(`(^|[^\\d.,:])${reEsc(tok)}(?![\\d])`).test(text)));
+}
+
+/**
+ * HINT-NO-BLANK (ws-hint-no-blank, 2026-11-20) with S8 (the answer is nowhere in the ladder): a step keeps every sentence
+ * with the item's own worked values and LEAVES OUT what states the answer - never a "___" in its place: a sum that ends
+ * in the answer stops before it, any other sentence naming the answer goes ("7 + 2 = 9. Write 9." under 9 -> "7 + 2."). A count running up to the
+ * answer is cut (cutCount). '' when every sentence states the answer.
+ */
+export function withoutAnswer(text, tokens) {
+    const t = String(text || '');
     if (!tokens.length) return t;
+    const counted = cutCount(t, tokens);
+    return counted.split(/(?<=[.!?])\s+/).map((x) => {
+        if (!statesAnswer(x, tokens)) return x;
+        // a sum that ENDS in the answer keeps its working: "Add the ones: 4 + 5 = 9." -> "Add the ones: 4 + 5."
+        const cut = cutAtAnswer(x, tokens);
+        return cut && !statesAnswer(cut, tokens) ? cut : '';
+    }).filter((x) => x.trim()).join(' ').trim();
+}
+
+/** The sentence up to its last "= <answer>" (or "≈"), when only a unit word or punctuation follows; '' otherwise. */
+function cutAtAnswer(x, tokens) {
+    for (const tok of tokens) {
+        const m = new RegExp(`\\s*[=≈]\\s*${reEsc(tok)}(?![\\d/])(\\s*[A-Za-z°%¢$]*)?\\s*([.!]?)\\s*$`).exec(x);
+        if (m && m.index > 0) {
+            const head = x.slice(0, m.index).replace(/[\s:,]+$/, '');
+            return /\d/.test(head) ? `${head}.` : '';
+        }
+    }
+    return '';
+}
+
+/** The count rule: "Count on 2: 7, 8." -> "7, …"; a count from 1 to the answer -> the instruction to count. */
+function cutCount(text, tokens) {
     const isAns = (x) => tokens.includes(x.trim());
-    // "Count on 2: 7, 8." -> "7, …" (where the count starts); a count from 1 up to the answer
-    // ("Count: 1, 2, 3 ... 18.") is the answer itself, so it becomes the instruction to count.
     const N = '\\d+(?:,\\d{3})*';
-    t = t.replace(new RegExp(`${N}(?:(?:, | ?\\.\\.\\. ?| ?… ?)${N})+`, 'g'), (run) => {
+    return String(text).replace(new RegExp(`${N}(?:(?:, | ?\\.\\.\\. ?| ?… ?)${N})+`, 'g'), (run) => {
         const items = run.split(/, | ?\.\.\. ?| ?… ?/);
         const at = items.findIndex(isAns);
         if (at < 0) return run;
@@ -788,17 +821,13 @@ export function hideAnswer(text, tokens) {
         const keep = items.slice(0, Math.min(at, 3));
         return keep.length ? `${keep.join(', ')}, …` : '…';
     });
-    for (const tok of tokens) {
-        t = t.replace(new RegExp(`(^|[^\\d.,:])${reEsc(tok)}(?![\\d])`, 'g'), '$1___');
-    }
-    return t;
 }
 
 function plain(html) {
     return String(html || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-/** This item's worked steps, the answer hidden. */
+/** This item's worked steps, the sentence that states the answer left out (no blank). */
 export function workedStepsFor(q, ctx = {}) {
     const { cat, skill } = whereFrom(q, ctx);
     let raw = [];
@@ -817,29 +846,70 @@ export function workedStepsFor(q, ctx = {}) {
     }
     if (!raw.length && q && q.hint) raw = [{ text: plain(q.hint), marks: [] }];
     // owner bug fix 2026-11-15: an item that asks for its help filled (q.fullWorked: the unit-form value of a digit)
-    // shows every step with the item's own numbers - no "___" left for the pupil to decode
-    const tokens = q && q.fullWorked ? [] : answerTokens(q, raw);
-    return raw.slice(0, 6).map((s) => hideAnswer(plain(s.text), tokens));
+    // shows every step with the item's own numbers - no "___" left for the pupil to decode.
+    // HINT-NO-BLANK (2026-11-20, every skill): no step prints a "___"; the sentence that states the answer is left out (S8).
+    // (a value the question itself gives - 10 ÷ 1 = 10 - is no leak: ws-support-ladder S8 tests it the same way)
+    const given = new Set([...(String(plain(q && q.text)).match(/\d[\d,]*(?:\.\d+)?/g) || []).map((x) => x.replace(/,/g, '')),
+        ...(q && Array.isArray(q.operands) ? q.operands.map(String) : [])]);
+    const tokens = q && q.fullWorked ? [] : answerTokens(q, raw).filter((tok) => !given.has(tok.replace(/,/g, '')));
+    const out = raw.slice(0, 6).map((s) => withoutAnswer(plain(s.text), tokens)).filter(Boolean);
+    // every step named the answer: the hint, the answer left out the same way, is the help that is left
+    if (!out.length && raw.length && q && q.hint) { const h = withoutAnswer(plain(q.hint), tokens); if (h) out.push(h); }
+    // ... else the skill's general steps (the page's Steps band: no item numbers, so no answer and no gap)
+    if (!out.length && raw.length) {
+        try {
+            const p = getProvider(cat, skill);
+            const gen = p && typeof p.strings === 'function' ? p.strings({}).steps : null;
+            if (Array.isArray(gen)) gen.map((t) => plain(t)).filter((t) => t && !/_{2,}|\?\s*(=|$)/.test(t)).slice(0, 4).forEach((t) => out.push(t));
+        } catch (e) { /* none */ }
+    }
+    return out;
 }
 
-/** The Say: frame with this item's given numbers and the answer left as a blank. */
+/** The filled Say line with the ONE value that is the answer put back as its gap; '' unless exactly one value is the answer. */
+function sayWithAnswerGap(frame, filled, q) {
+    if (!filled || /_{2,}/.test(filled)) return '';
+    const parts = frame.split('__');
+    const re = new RegExp(`^${parts.map(reEsc).join('(.+?)')}$`);
+    const m = re.exec(filled);
+    if (!m) return '';
+    const vals = m.slice(1);
+    const tokens = answerTokens(q, []);
+    const isAns = vals.map((v) => tokens.includes(String(v).trim()) || tokens.includes(String(v).trim().replace(/,/g, '')));
+    if (isAns.filter(Boolean).length !== 1) return '';
+    return parts.reduce((acc, lit, i) => acc + lit + (i < vals.length ? (isAns[i] ? '___' : vals[i]) : ''), '');
+}
+
+/** The Say: frame with this item's given numbers and the answer left as ONE gap (no gap for a given value). */
 export function sayFor(q, ctx = {}) {
     if (q && typeof q.sayText === 'string' && q.sayText) return q.sayText;
     const { cat, skill } = whereFrom(q, ctx);
     let frame = '';
+    let filled = '';
     try {
         const p = getProvider(cat, skill);
-        if (p && typeof p.strings === 'function') frame = String(p.strings({ q }).say || '');
+        if (p && typeof p.strings === 'function') {
+            const str = p.strings({ q });
+            frame = String(str.say || '');
+            if (typeof str.sayFill === 'function') { try { filled = String(str.sayFill(q) || ''); } catch (e) { filled = ''; } }
+        }
     } catch (e) { frame = ''; }
     if (!frame) return '';
     const blanks = (frame.match(/__/g) || []).length;
+    // HINT-NO-BLANK: the provider's frame filled with THIS item's values (SCC 3.8 sayFill), the answer's ONE value then left
+    // as the gap for the pupil to say (S8)
+    const own = blanks > 1 ? sayWithAnswerGap(frame, filled, q) : '';
+    if (own) return own;
     const bp = binaryParts(Object.assign({}, q, { options: [] }));
     const ops = bp ? [bp.a, bp.b] : Array.isArray(q.operands) ? q.operands.slice(0, 2) : [];
     if (blanks === 3 && ops.length === 2) {
         let k = 0;
         return frame.replace(/__/g, () => (k < 2 ? String(ops[k++]) : '___'));
     }
-    return frame.replace(/__/g, '___');
+    // HINT-NO-BLANK (2026-11-20): the frame's one gap is the answer, the pupil's to say. A frame whose other gaps are the
+    // item's GIVEN values ("___ divided by ___ equals ___" with no operands to fill) is no help on screen: not shown.
+    if (blanks === 1) return frame.replace(/__/g, '___');
+    return '';
 }
 
 // Listen reads the WHOLE box — every step, then the Say line — not the Say line alone (owner

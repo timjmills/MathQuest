@@ -1502,7 +1502,7 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.hint = isAdd
             ? `Work the column the box is in. The two digits in that column have to make the digit under the rule — and remember any ten regrouped from the column to its right.`
             : isMul
-                ? `Multiply the ones first: the ones digit of ? × ${b} has to be ${total % 10}.`
+                ? `Multiply the ones first: the missing digit × ${b} must end in ${total % 10}.`
                 : `Work the column the box is in. The two digits in that column have to leave the digit under the rule — and remember any ten regrouped away.`;
         // No in-cell caption: q.text already carries the instruction, and BD-10 puts it above
         // the cells, never inside one. The dashed box is itself the instruction (LS-8: dashed
@@ -3094,7 +3094,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.ans = product;
                 q.a = rows; q.b = cols;
                 q.answerType = 'number';
-                q.hint = `Count ${rows} rows with ${cols} dots in each row. ${rows} \u00d7 ${cols} = ?`;
+                q.hint = `Count ${rows} rows with ${cols} dots in each row. Multiply ${rows} \u00d7 ${cols}.`;
                 q.options = buildNumericOptions(product);
                 // Tag common array-multiplication misconceptions.
                 if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
@@ -3436,7 +3436,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.ans = answer;
                 q.a = a; q.b = b; q.op = isAdd ? '+' : '-';
                 q.answerType = 'number';
-                q.hint = isAdd ? `Words like "more", "altogether", "in all" mean ADD. Stack them up and add: ${a.toLocaleString()} + ${b.toLocaleString()} = ?` : `Words like "left", "remain", "took away" mean SUBTRACT. Stack them up: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
+                q.hint = isAdd ? `Words like "more", "altogether", "in all" mean ADD. Stack them up and add ${a.toLocaleString()} + ${b.toLocaleString()}.` : `Words like "left", "remain", "took away" mean SUBTRACT. Stack them up: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
 
                 // ── Column workmat (col-arith) ──
                 // add_wp_*/sub_wp_* templates always make the SUM/DIFFERENCE
@@ -4602,7 +4602,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.text = `${a} × ${b} = ${splitPart} × ${b} + ___ × ${b}. What is the missing number?`;
                     q.ans = missingPart;
                     q.printSlot = true;   // the ___ is the answer slot on paper (AK-4: key = pupil slots)
-                    q.hint = `Distributive property: ${a} × ${b} = (${splitPart} + ?) × ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
+                    q.hint = `Distributive property: ${a} × ${b} = (${splitPart} + ${missingPart}) × ${b}, since ${splitPart} + ${missingPart} = ${a}. The missing number is ${missingPart}.`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(missingPart);
 
@@ -5410,7 +5410,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(joinTemplates);
-                    q.hint = `Add the two amounts: ${a} + ${b} = ?`;
+                    q.hint = `Add the two amounts: ${a} + ${b}.`;
                 } else if (roll === 'start_unknown') {
                     // Type 2: Compare more — "Sam has X. Mia has Y more than Sam. How many does Mia have?"
                     a = rng(2, maxNum);
@@ -5451,7 +5451,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(compareTemplates);
-                    q.hint = `${name2} has more, so add: ${a} + ${b} = ?`;
+                    q.hint = `${name2} has more, so add ${a} + ${b}.`;
                 } else if (roll < 0.72) {
                     // Type 3: Missing addend — "Sam has X stickers. He needs Y total. How many more?"
                     const part = rng(2, Math.max(3, maxNum - 2));
@@ -5473,7 +5473,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(missingTemplates);
-                    q.hint = `Find the missing part: ${a} + ? = ${b}. Subtract: ${b} − ${a} = ?`;
+                    q.hint = `Find the missing part: subtract ${b} − ${a}.`;
                 } else if (roll < 0.86) {
                     // Type 4: Start unknown — "Some were in a tree. X more came. Now there are Y. How many at start?"
                     const total = rng(5, maxNum);
@@ -5487,7 +5487,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `${name1} had some ${scenario.unit}. ${name2} gave ${name1} ${b} more. Now ${name1} has ${total} ${scenario.unit}. How many did ${name1} have at first?`,
                     ];
                     q.text = pick(startTemplates);
-                    q.hint = `Find the start: ? + ${b} = ${total}. Subtract: ${total} − ${b} = ?`;
+                    q.hint = `Find the start: subtract ${total} − ${b}.`;
                 } else {
                     // Type 5: Change-unknown — start known, end known, change is the unknown.
                     // Per worksheet-feedback §4.4 — explicit add change-unknown templates.
@@ -5516,7 +5516,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(changeTemplates);
-                    q.hint = `Find the change: ${a} + ? = ${total}. Subtract: ${total} − ${a} = ?`;
+                    q.hint = `Find the change: subtract ${total} − ${a}.`;
                     // Set b for the visual to show the answer change.
                     b = answer;
                 }
@@ -5668,7 +5668,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(takeTemplates);
-                    q.hint = `Take away: ${total} − ${taken} = ?`;
+                    q.hint = `Take away: ${total} − ${taken}.`;
                 } else if (roll === 'compare') {
                     // Type 2: Compare difference — "Team A scored X. Team B scored Y. How many more?"
                     total = rng(5, maxNum);
@@ -5700,7 +5700,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(compareTemplates);
-                    q.hint = `Find the difference: ${total} − ${taken} = ?`;
+                    q.hint = `Find the difference: ${total} − ${taken}.`;
                 } else if (roll < 0.72) {
                     // Type 3: Missing subtrahend (change-unknown for subtraction) —
                     // "Had X, now has Y. How many were removed?"
@@ -5728,7 +5728,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(missingTemplates);
-                    q.hint = `Find what was removed: ${total} − ? = ${remaining}. Subtract: ${total} − ${remaining} = ?`;
+                    q.hint = `Find what was removed: subtract ${total} − ${remaining}.`;
                 } else if (roll < 0.86) {
                     // Type 4: Compare fewer — "Sam has X. Mia has Y fewer. How many does Mia have?"
                     total = rng(5, maxNum);
@@ -5751,7 +5751,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(fewerTemplates);
-                    q.hint = `Fewer means subtract: ${total} − ${fewer} = ?`;
+                    q.hint = `Fewer means subtract: ${total} − ${fewer}.`;
                 } else {
                     // Type 5: Start-unknown for subtraction — "Some birds were on a wire.
                     // ${b} flew away. Now there are ${a-b}. How many were there at first?"
@@ -5785,7 +5785,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(startTemplates);
-                    q.hint = `Find the start: ? − ${away} = ${remaining}. Add: ${remaining} + ${away} = ?`;
+                    q.hint = `Find the start: add ${remaining} + ${away}.`;
                 }
 
                 // Visual showing crossing out items
@@ -6038,7 +6038,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(groupTemplates);
-                    q.hint = `Multiply: ${groups} groups x ${perGroup} in each = ?`;
+                    q.hint = `Multiply: ${groups} groups x ${perGroup} in each.`;
                 } else if (roll === 'arrays') {
                     // Type 2: Array — "X rows of Y"
                     groups = rng(2, Math.min(wpMultMax, 8));
@@ -6055,7 +6055,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `A ${ctx.place} has ${groups} rows of ${ctx.thing} with ${perGroup} in each row. How many ${ctx.thing} are there in total?`,
                     ];
                     q.text = pick(arrayTemplates);
-                    q.hint = `Think of it as an array: ${groups} rows x ${perGroup} columns = ?`;
+                    q.hint = `Think of it as an array: ${groups} rows x ${perGroup} columns.`;
                 } else if (roll < 0.70) {
                     // Type 3: Price/rate — "Each costs $X. Buy Y. Total cost?"
                     const price = rng(2, Math.min(wpMultMax, 10));
@@ -6070,7 +6070,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `${name1} wants to buy ${qty} ${storeItem} that cost $${price} each. What is the total cost?`,
                     ];
                     q.text = pick(priceTemplates);
-                    q.hint = `Multiply the price by the quantity: $${price} x ${qty} = ?`;
+                    q.hint = `Multiply the price by the quantity: $${price} x ${qty}.`;
                 } else if (roll < 0.85) {
                     // Type 4: Multiplicative comparison — "X times as many as Y"
                     const base = rng(2, Math.min(wpMultMax, 8));
@@ -6094,7 +6094,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(compTemplates);
-                    q.hint = `"Times as many" means multiply: ${base} x ${multiplier} = ?`;
+                    q.hint = `"Times as many" means multiply: ${base} x ${multiplier}.`;
                 } else {
                     // Type 5: Rate/measurement — distance / time / per-unit context.
                     // Pulls in distance & time domains naturally for multiplication.
@@ -6111,7 +6111,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `Each box weighs ${rate} pounds. How much do ${units} boxes weigh in all?`,
                     ];
                     q.text = pick(rateTemplates);
-                    q.hint = `Multiply the rate by the number of units: ${rate} x ${units} = ?`;
+                    q.hint = `Multiply the rate by the number of units: ${rate} x ${units}.`;
                 }
 
                 q.ans = answer;
@@ -6432,7 +6432,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(shareTemplates);
-                    q.hint = `Divide to find how many in each group: ${total} / ${groups} = ?`;
+                    q.hint = `Divide to find how many in each group: ${total} / ${groups}.`;
                 } else if (roll === 'grouping') {
                     // Type 2: Equal grouping — "X items, Y per group, how many groups?"
                     groups = rng(2, Math.min(wpDivMax, 10));
@@ -6458,7 +6458,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         ];
                     }
                     q.text = pick(groupingTemplates);
-                    q.hint = `Divide to find how many groups: ${total} / ${perGroup} = ?`;
+                    q.hint = `Divide to find how many groups: ${total} / ${perGroup}.`;
                 } else if (roll < 0.75) {
                     // Type 3: Measurement — "X total, each gets Y, how many people can share?"
                     groups = rng(2, Math.min(wpDivMax, 10));
@@ -6470,7 +6470,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `A teacher has ${total} ${scenario.unit} to hand out. Each student gets ${perGroup}. How many students get ${scenario.unit}?`,
                     ];
                     q.text = pick(measureTemplates);
-                    q.hint = `Divide total by the amount each person gets: ${total} / ${perGroup} = ?`;
+                    q.hint = `Divide total by the amount each person gets: ${total} / ${perGroup}.`;
                 } else if (roll < 0.90) {
                     // Type 4: Array inverse — "X items in Y rows, how many per row?"
                     groups = rng(2, Math.min(wpDivMax, 8));
@@ -6482,7 +6482,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `A display has ${total} ${scenario.unit} in ${groups} rows. Each row has the same number. How many ${scenario.unit} are in one row?`,
                     ];
                     q.text = pick(arrayInvTemplates);
-                    q.hint = `Find items per row: ${total} / ${groups} = ?`;
+                    q.hint = `Find items per row: ${total} / ${groups}.`;
                 } else {
                     // Type 5: Rate / unit-rate — distance / time / per-unit division.
                     groups = rng(2, Math.min(wpDivMax, 10));
@@ -6496,7 +6496,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         `${name1} read ${total} pages in ${groups} days. ${name1} read the same number each day. How many pages did ${name1} read each day?`,
                     ];
                     q.text = pick(rateTemplates);
-                    q.hint = `Divide total by the number of units: ${total} / ${groups} = ?`;
+                    q.hint = `Divide total by the number of units: ${total} / ${groups}.`;
                 }
 
                 q.ans = answer;
@@ -6952,7 +6952,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const result = rng(2, ldMaxQ); // quotient scaled by range
                     a = b * result; // dividend (ensures clean division)
                     q.ans = result;
-                    q.hint = `Use long division: How many times does ${b} go into ${a}? Think: ${b} × ? = ${a}`;
+                    q.hint = `Use long division: How many times does ${b} go into ${a}? Think: ${b} times what number makes ${a}?`;
 
                     // Visual long division - format depends on problem size
                     const divDigits = a.toString().split('');
@@ -7283,7 +7283,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Regular addition (mental math)
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
-                    q.hint = `Start at ${a.toLocaleString()} and count up ${b.toLocaleString()}. Or: ${a.toLocaleString()} + ${b.toLocaleString()} = ?`;
+                    q.hint = `Start at ${a.toLocaleString()} and count up ${b.toLocaleString()}. Or: add ${a.toLocaleString()} + ${b.toLocaleString()}.`;
                     q.visual = `<div style="font-weight:700;">${a.toLocaleString()} + ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count up ${b.toLocaleString()}</div>`;
                     // PRINT: a one-line item, written the way the teacher chose (CONTRACT 2).
                     // Decimals keep 'basic-add', whose cell carries a decimal point and a wide
