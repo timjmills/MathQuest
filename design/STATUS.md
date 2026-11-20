@@ -933,4 +933,6 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 
 ## 2026-11-19 — Deploy ws-merge-master (lf-checks; critic r5 PASS 9/9/9/8)
 - Lanes merge master into their branch with `MQ_COMMIT_TRAILER="<footer>" node tests/scripts/ws-merge-master.mjs --commit`: ledger / backtests / status files unioned row by row; a both-sides row or line conflict is left for the lane (exit 1). Self-test 28 cases; backtests merge-master-r1 / -crlf / -only-empty.
+## 2026-11-19 — Deploy two-step Guided (lf-algebra; lead ruling 2026-11-14: the two-step bar drops on Guided via ctx.guided)
+- Two-step family Guided pages: cells read ctx.guided and drop the bar scaffold on Guided Models / tries; ws-two-step --guided / --align / --screen-align / --ldiv / --print / --ea OK on the lane head; lesson baseline identical.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.

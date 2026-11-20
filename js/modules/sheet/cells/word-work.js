@@ -1387,7 +1387,10 @@ function chooseLayout(p, ctx) {
  */
 function twoStepBarFor(p, ctx) {
     if (!p || !Array.isArray(p.steps) || p.steps.length !== 2 || ctx.state === 'wrong') return '';
-    const teach = !isTwin(ctx) && Number(ctx.scaffoldLevel) >= 2;
+    // (two-step card decision 4 amended, lead ruling 2026-11-14 GUIDED-MODEL-ALONE: the bar is drawn on the Opener, the Scripted
+    // Model and the chart; the Guided page - its Model and its tries, `ctx.guided` set by the Guided role - drops it, a scaffold
+    // fade, so the Model and a try share the page)
+    const teach = !isTwin(ctx) && Number(ctx.scaffoldLevel) >= 2 && !ctx.guided;
     if (!p.bar2 && !teach) return '';
     const put = filled(ctx) && !isTwin(ctx);
     // (the room the cell gives it: a two-step cell is full width - its inner width less the story's left inset)
