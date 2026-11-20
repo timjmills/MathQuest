@@ -12177,6 +12177,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-model-hint-row",
+   "check": "ws-empty-band EB-STRETCH on add_wp_20 / sub_wp_10 Guided L: the Model row beside hinted tries is held to the taller of the two, not their sum",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH (lf-roles r14 Y1, GUIDED-MODEL-HINT-ROW)",
+   "fail": {
+    "commit": "aad74cb32",
+    "state": "Model row 131.5 mm over a 121.9 mm cell, 6.6 mm over (hint line 8.6 mm added on top of the Model worked lines)"
+   },
+   "pass": {
+    "commit": "58c90c6fe",
+    "state": "row within drawn + 3 mm room"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_20,subtraction:sub_wp_10 --roles guided --sizes L --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

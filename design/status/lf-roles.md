@@ -387,3 +387,13 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - Pre-skill Check identify L (lead item): NOT changed. Page-1-fill means 3 + 1 bands (5 + 1 items). That conflicts with ruling R13 and
   ws-roles-unit PSC-2PG-BALANCE (2 + 2, never a one-item page), and moves 37 passed PSC pages. The change was reverted, and the conflict
   was returned to the lead.
+
+## Round r14 (2026-11-20): Y1 word-work Guided Model row (critic r13)
+
+- The cause was not the line count. WORK-LINES-COUNT was measured by hand on add_wp_20 L: workLinesMm predicts 4 lines and the Model draws 4 (26.5 mm).
+  The row ADDED the tries' hint line (8.6 mm at L) to the Model's worked lines, but the two stand side by side in one row.
+- Fix GUIDED-MODEL-HINT-ROW (guided.js `rowNeed`): row 0 needs max(Model + extra, try + hint). EB-STRETCH / full ws-empty-band OK on all
+  5 skills at M,L, and on add_wp_10, sub_wp_20, sub_wp_20_plain, vocab_pick3_words and hundreds_chart_fill (20 findings -> 0, none new).
+- Hash (ROLES=guided) changed: add_wp_20_plain S/L, add_wp_10 S/M, sub_wp_20 L, add_wp_10_plain S/M/L, add_wp_20 S/L, sub_wp_10 S/L,
+  sub_wp_10_plain S/L, sub_wp_20_plain L, vocab_pick3_words S/M/L, hundreds_chart_fill M/L. Every one is a Model row that held the same sum.
+- Backtest `guided-model-hint-row` (FAIL aad74cb32 -> OK 58c90c6fe) PASS. y2 (single-word last line) not done.
