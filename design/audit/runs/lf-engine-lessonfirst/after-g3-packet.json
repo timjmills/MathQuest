@@ -72,7 +72,7 @@
    "pages": [
     {
      "cells": 4,
-     "ink": 120
+     "ink": 126
     },
     {
      "cells": 9,
@@ -89,7 +89,7 @@
    ],
    "opener": {
     "template": "",
-    "text": "16 × 7 is 6 groups of 7.6×7"
+    "text": "18 × 6 is 8 groups of 6.8×6"
    }
   },
   {
@@ -229,7 +229,7 @@
    "pages": [
     {
      "cells": 4,
-     "ink": 123
+     "ink": 120
     },
     {
      "cells": 9,
@@ -246,7 +246,7 @@
    ],
    "opener": {
     "template": "",
-    "text": "17 × 5 is 7 groups of 5.7×5"
+    "text": "16 × 7 is 6 groups of 7.6×7"
    }
   },
   {
@@ -258,7 +258,7 @@
    "pages": [
     {
      "cells": 4,
-     "ink": 125
+     "ink": 127
     },
     {
      "cells": 9,
@@ -275,7 +275,7 @@
    ],
    "opener": {
     "template": "",
-    "text": "111 × 5 is 11 groups of 5.11×5"
+    "text": "15 × 11 is 5 groups of 11.5×11"
    }
   },
   {
@@ -287,7 +287,7 @@
    "pages": [
     {
      "cells": 4,
-     "ink": 125
+     "ink": 133
     },
     {
      "cells": 9,
@@ -304,7 +304,7 @@
    ],
    "opener": {
     "template": "",
-    "text": "112 × 6 is 12 groups of 6.12×6"
+    "text": "17 × 12 is 7 groups of 12.7×12"
    }
   },
   {
