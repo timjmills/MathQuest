@@ -156,7 +156,7 @@ export function extras(input = {}) {
     const lesson = input.lesson || {};
     const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const ex = pickExample(main, data0);
+    const ex = pickExample(main, data0, { variant: lesson.variant });
     const data = chartDataOf(fitLessonData(data0, ex), ex);
     // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
     const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
@@ -350,7 +350,7 @@ function planOnce(input = {}) {
     const lesson = input.lesson || {};
     const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const example = pickExample(main, data0);
+    const example = pickExample(main, data0, { variant: lesson.variant });
     const data = chartDataOf(fitLessonData(data0, example), example);
     const exSteps = example ? stripStepsFor(example, workedStepsOf(example), data) : [];
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);

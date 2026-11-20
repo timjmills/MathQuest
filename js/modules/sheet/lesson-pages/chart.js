@@ -26,7 +26,7 @@ import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, 
  * is state n of the Model), and ordinary numbers - the lower third of the candidates by size (the
  * research: easy numbers first, but never the trivial 1 + 1).
  */
-export function pickExample(items, data) {
+export function pickExample(items, data, opt = {}) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const want = data && Array.isArray(data.steps) ? data.steps.length : 0;
     const all0 = items.map((it, i) => ({ it, i, steps: workedStepsOf(it) })).filter((x) => x.steps.length >= 2);
@@ -66,12 +66,41 @@ export function pickExample(items, data) {
     // move to the nearer ten is seen, not a 1-tick hop from 79).
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     if (pref && pool.some((x) => pref.test(String((x.it.q && x.it.q.text) || '')))) pool = pool.filter((x) => pref.test(String((x.it.q && x.it.q.text) || '')));
+    // LESSON-OPENER-SAME (lf-engine, owner's grade-3 review 2026-11-19): a times-table lesson (every fact of the pool shares
+    // one factor - mult_facts {constant: [6]}) is modelled on an ordinary fact of ITS OWN table. The widest-operands rule below
+    // is a column skill's; on a fixed table it picked 10 / 11 / 12 x the table for every lesson ("11 x 6", "11 x 9": the edge
+    // fact, and 11 is another lesson's table). The other factor is one of 3-9 and, with the orientation, moves with the
+    // lesson's `variant` (its WRM step number), so two consecutive steps never open on the same model.
+    const tableX = fixedTableOf(pool);
+    if (tableX) return tableX;
     const sorted = pool.slice().sort((a, b) => easeScore(a.it.q) - easeScore(b.it.q) || a.i - b.i);
     // Two digits beat one for a column skill: the example has the widest operands the skill deals.
     const widest = Math.max(...sorted.map((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0)));
     const wide = sorted.filter((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0) === widest);
     const list = wide.length ? wide : sorted;
     return list[Math.min(list.length - 1, Math.floor(list.length / 3))].it;
+
+    // (the fixed-table model above: null when the pool is not one table's multiplication facts)
+    function fixedTableOf(cands) {
+        const facts = cands.filter((x) => x.it.q && x.it.q.cell && x.it.q.cell.template === 'fact' && /^[×x*]$/.test(String((x.it.q.cell.payload || {}).op || '').trim()));
+        if (facts.length < 3 || facts.length !== cands.length) return null;
+        const ops = facts.map((x) => operandsOf(x.it.q).map(Number));
+        if (ops.some((o) => o.length !== 2 || !o.every(Number.isFinite))) return null;
+        const table = [...new Set(ops[0])].find((v) => ops.every((o) => o.includes(v)));
+        if (table === undefined || table < 2) return null;
+        const ORD = [3, 4, 5, 6, 7, 8, 9].filter((f) => f !== table);
+        const v = Number.isFinite(Number(opt.variant)) ? Math.abs(Math.floor(Number(opt.variant))) : 0;
+        const want = ORD[v % ORD.length];
+        const tableFirst = v % 2 === 1;
+        const score = (o) => {
+            const other = o[0] === table ? o[1] : o[0];
+            const edge = other < 3 || other > 9 ? 100 : 0;
+            return edge + Math.abs(other - want) * 2 + ((o[0] === table) === tableFirst ? 0 : 1);
+        };
+        let best = 0;
+        for (let k = 1; k < facts.length; k++) if (score(ops[k]) < score(ops[best])) best = k;
+        return facts[best].it;
+    }
 }
 
 /**

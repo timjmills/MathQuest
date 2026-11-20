@@ -23,6 +23,8 @@
 //   --req packet (default) the lesson PACKET the lessons browser builds and the owner saw: role 'lesson', EVERY live direct
 //                skill of the step in one section, mixed: true, key on, size M, seed 4242, practicePages 1
 //   --req print  teacher-wrm.js printLesson's request: the FIRST live direct skill only, mixed: false
+//   (both: the lesson's own seed and lessonVariant, wrm-links.js wrmLessonSeed / wrmLessonVariant, as printLesson sends them
+//    since lf-engine 2026-11-19; was seed 4242 for every lesson)
 //   --rules LESSON-EMPTY-FIRST,LESSON-OPENER-SAME   (default both)   --blocks Y4.B4,...  (only those WRM blocks)
 //   --report-only (never exit 1)
 //   --warn  findings print `ws-lesson-pages: WARNING (n findings)` and exit 4 (the deploy gate's WARNING, ws-deploy-gates.sh
@@ -128,7 +130,10 @@ async function measure(grade, blocks, reqKind) {
             const live = (k) => { const [c, s] = String(k).split(':'); return !!(data.SKILLS[c] || []).some((x) => x && x.v === s && !x.retired && !x.tombstone); };
             return W.allLessons().filter((l) => l.type !== 'assessment' && String(l.gradeLabel || '').replace(/^Grade\s*/i, '') === String(grade)).map((l) => {
                 const ds = (W.linksFor(l).direct || []).filter((x) => live(x.key)).map((x) => ({ key: x.key, opts: x.opts || {} }));
-                return ds.length ? { id: l.step || l.key, step: l.step || '', block: l.step ? l.step.replace(/\.S\d+$/, '') : '', title: l.title, skill: ds[0].key, skills: ds } : null;
+                // (the lesson's own seed and variant, as teacher-wrm.js printLesson sends them - lf-engine 2026-11-19; a tree
+                // without them builds with 4242 and no variant, as the screen did)
+                const own = typeof W.wrmLessonSeed === 'function' ? { seed: W.wrmLessonSeed(l), variant: W.wrmLessonVariant(l) } : { seed: 4242, variant: null };
+                return ds.length ? Object.assign({ id: l.step || l.key, step: l.step || '', block: l.step ? l.step.replace(/\.S\d+$/, '') : '', title: l.title, skill: ds[0].key, skills: ds }, own) : null;
             }).filter(Boolean);
         }, { grade });
         const todo = list.filter((l) => !blocks || blocks.includes(l.block));
@@ -138,8 +143,9 @@ async function measure(grade, blocks, reqKind) {
                 const sk = (reqKind === 'print' ? l.skills.slice(0, 1) : l.skills).map((d) => { const [c, s] = d.key.split(':'); return { categoryId: c, skillId: s, opts: d.opts }; });
                 const req = reqKind === 'print'
                     ? { role: 'lesson', sections: [{ skills: sk }], practicePages: 1, mixed: false, size: 'M', look: 'auto', paper: 'A4',
-                        header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' }, seed: 4242 }
-                    : { role: 'lesson', sections: [{ skills: sk }], size: 'M', paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true };
+                        header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' }, seed: l.seed }
+                    : { role: 'lesson', sections: [{ skills: sk }], size: 'M', paper: 'A4', seed: l.seed, key: true, practicePages: 1, mixed: true };
+                if (l.variant !== null && l.variant !== undefined) req.lessonVariant = l.variant;
                 let res;
                 try { res = await window.buildSheet(req); } catch (e) { return { error: String(e && e.message || e) }; }
                 const host = document.createElement('div');
