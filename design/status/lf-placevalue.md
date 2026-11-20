@@ -77,6 +77,16 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-20 **W1 vocab pick-3 Model / Lesson steps** (builder, Opus low; branch claude/lf-placevalue-vocab-deploy). Picked z1
+  5f202c638 (lf-roles); picked ddabf985a's guided.js + compose.js hunks only (its word-work.js hunk is lf-algebra's). Provider:
+  steps are "Read the three words in the box." / the picture's feature (PICK_FEATURE, 47 words, never the answer word) / "Write
+  <word> on the line."; z1's cue sits on step 1 `hint` (Guided only). multdiv.js lesson step names: Read the words. / Look at the
+  picture. / Write its word on the line. (no sentence twice). Check MODEL-STEP-NOT-CUE (ws-vocab-unit node + --browser); backtest
+  `vocab-model-step-not-cue` FAIL d7810d658 -> OK 40f36bdec; ledger row. Re-pinned: lesson-baseline 36 vocab_pick3_words packet
+  keys; V23 4 Guided pupil hashes. Held set still exactly 62. PNGs design/status/lf-placevalue/w1/. STOPPED at spend cap with
+  precritic --strict RED: NEW render-gate OVERFLOW lesson-M p4 (packet Guided) 0.5 mm (OK on 8cae05dbd; z1's longer two-word cue
+  hint); print-lint lesson M/L, AK-2 scripted-model key, CL-4b error-analysis, screen-slots, screen-support-eq, sibling-compare,
+  content-audit no-match not yet compared with 8cae05dbd. ws-merge-master not run.
 - 2026-11-20 **vocab deploy blockers** (builder, Opus medium, branch claude/lf-placevalue-vocab-deploy; brief
   design/audit/runs/lf-placevalue/builder-vocab-blockers-brief.md). Merged origin/master d38308824 (master does NOT contain
   lf-engine rowcap 3b0fdbcbb: it rides in on this branch). Lesson baseline rebuilt from master's pin (master clean, 2590
