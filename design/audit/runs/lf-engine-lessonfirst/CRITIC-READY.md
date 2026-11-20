@@ -67,10 +67,53 @@ skill and options. I left it, rather than tune seeds until the gate goes quiet.
   B2.S3/S4, B6.S1/S2, B6.S8/S9, B7.S4/S5, B7.S7/S8, B8.S5/S6, B10.S1/S2, B12.S2/S3, B14.S4/S5. The per-step seed keeps their
   pages from being identical; it does not make them teach their step.
 
+## (c) CELL-FITS and the two_step_letter_equation Model page (lead, 2026-11-20)
+
+**Check:** `tests/scripts/ws-lesson-cellfits.mjs` (new). CELL-FITS reads every `.ws-cell` box of every lesson page on the RENDER.
+It checks text runs (Range rects), svg shapes, img, and drawn frames or fills, each against its NEAREST box and the `.ws-page`,
+with a 0.6 mm tolerance. `--self-test` covers 5 planted cases. It runs on precritic `--role lesson` as gate `lesson-cellfits`
+(every `lessons/library.js` lesson × M/L, blocking). Backtest `lesson-cell-fits`: FAIL on 0983c6791 measured (104 ink pieces
+outside their panel, 14 outside the page), OK on the fix measured. Its ledger row is in `CHECKS_FROM_CRITICS.md`.
+
+**Root cause:** `chart.js chartLayout` chose panels by state count alone: 4 states, a 2 × 2 grid. When those panels did not fit
+the page even at zoom 1, `chartPage` drew them at zoom 1 anyway, and its sizing still said `ok` (the fallback is reported only
+below zoom 1). The two-step story, the bars and the "= n" equation measure as fitting one across, not two. They were drawn
+into half-width panels and ran past the page edge into the Say band and the footer.
+
+**Fix (chart.js chartPage, chartLayout):** a 2 × 2 chart that cannot fit at zoom 1 AND whose state drawings fit one across but
+not two takes `chartFull`: one full-width panel a row. A chartFull chart whose panels do not fit one page runs onto further chart
+pages at full size, with Say and Rule on the last page. Nothing shrinks. Every other chart is untouched.
+Two earlier tries were too broad and are not in the head; the baseline caught both:
+- deciding chartFull from the example ITEM's measure (14 lessons changed that did not overflow);
+- paginating every zoom-1 fallback chart (the same 14: their measured panels over-read their render).
+
+**Result:** two_step_letter_equation M and L, pupil and key: CELL-FITS OK. Its chart is now **4 pages, one full-width panel each**:
+each panel is 120 mm (the story is repeated in every panel), so two do not fit a page at full size. **Critic: each chart page is
+about 45 % blank** (`png/algebra_two_step_letter_equation-after-*`). That is the honest cost of "nothing shrinks" with this panel.
+The real fix is content: a chart that prints the story once, as the detailed two-step lesson does (`chartWide` + `chartRow` +
+`tailRead`, its own data). That belongs to the algebra lesson lane, not the engine.
+
+**Lesson baseline:** 64 of 2590 hashes changed, all `algebra:two_step_letter_equation` (M, L × seeds 4242, 1 × pupil-p1..p7,
+key-p1..p7, pupilHtml, keyHtml): the chart grew from 1 page to 4, so every later page shifted. Re-pinned in the same commit.
+Every other lesson is identical.
+
+**What else CELL-FITS finds (every library lesson × M/L, seed 4242; identical on 0983c6791 and on this head, except the
+lesson fixed above):** 28 pages.
+- the two-step family's 3-state anchor charts (row variant): multi_step_word (+ _plain), two_step_add_then_mult,
+  two_step_add_then_div, two_step_estimate_check, M and L. Ink 12-58 mm outside the panels; the measured panel height
+  under-reads the render, so the chart "fits". Not changed here (the narrow fix leaves fitting-by-measure charts alone).
+  The same content fix as above is the cure.
+- two_step_estimate_check: lesson sheet p3 (a word-work frame, 1-21 mm right) and Mixed p8 (a pv cell, 4.2 mm).
+- place-value Mixed pages at L: identify, value, expand, combine, unit_form, compare, number_word_form (pv cells, 1.8 mm
+  bottom); sub_50_no_regroup, sub_2d_1d, Y2.B2.S17 (pv multiple-choice, 0.6 mm).
+- Vocabulary match cells at L, 0.7-1.5 mm top: number_word_form, Y1.B2.S9, Y3.B2.S12, Y4.B2.S5, div_facts.
+Full list: `cellfits-before.txt` / `cellfits-after.txt` (this folder).
+
 ## PNGs (`png/`, page 1, pupil and key, M and L, before = 0983c6791, after = this branch)
 
 Empty-first, 5 blocks: `Y4.B4.S11`, `Y4.B5.S1`, `Y4.B6.S3`, `Y3.B12.S4`, `Y4.B12.S2`.
 Y4.B4 tables: `Y4.B4.S2` … `Y4.B4.S6` (S6 is the 3/6/9 chart lesson, unchanged).
+(c): `algebra_two_step_letter_equation-<before|after>-<M|L>-<pupil|key>-p1.png` (before = 0983c6791).
 Name pattern: `<id>-<before|after>-<M|L>-<pupil|key>-p1.png` (80 files).
 
 ## Gates (merged tree)
