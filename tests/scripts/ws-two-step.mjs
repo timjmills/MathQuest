@@ -45,6 +45,8 @@
 //              on the online worksheet and the practice card at 820 / 1024 / 1280 / 1366
 //   GUIDED-MODEL-ALONE (--guided, browser; lf-roles critic r8b / lead 2026-11-14, PAGE_TYPES 2.3: a Guided page holds the Model AND
 //              tries) the first Guided page of a two-step skill holds the Model and at least one try, at M / L
+//   GUIDED-HINT-STEP (--guided, browser; lead 2026-11-20, live on master: "Step 1: circle −. 26 − 6 = 20." under the first try) a
+//              two-step Guided try's grey hint names the sign and the operation only - it prints no number (PAGE_TYPES 2.3)
 //   GUIDED-NO-MID (--guided, browser; lead 2026-11-20, card decision 6 amended) no Guided cell - Model or try - prints the hidden middle
 //              question (.mq-wwmid): it stays on the Opener, Scripted Model and lesson chart; its two lines held the Model alone on page 1
 //   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
@@ -652,7 +654,7 @@ async function guidedMode() {
                 const pages = [...d.querySelectorAll('.ws-page')];
                 const mm = (el) => (el ? Math.round(el.getBoundingClientRect().height * 25.4 / 96) : 0);
                 const c1 = top(pages[0]), c2 = top(pages[1]);
-                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')), mids: d.querySelectorAll('.mq-wwmid').length };
+                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')), mids: d.querySelectorAll('.mq-wwmid').length, hints: [...d.querySelectorAll('.mq-hintline')].map((h) => h.textContent.trim()).filter((t) => /\d/.test(t.replace(/\bStep \d\b/g, ''))) };
                 d.remove();
                 return r;
             }, { sk, size, seed });
@@ -666,6 +668,7 @@ async function guidedMode() {
             // (lead 2026-11-20, GUIDED-NO-MID: with the middle question off the Guided page, _plain and the column-step Models share page 1
             // at M - their exemptions end; (Visual) keeps its ruled bar at M, and L stays exempt)
             const exempt = size === 'L' || sk === 'multi_step_word';
+            if (r.hints.length) out.push(`GUIDED-HINT-STEP ${sk} ${size} seed ${seed}: a try's hint prints numbers, the Step 1 boxes given away: "${r.hints[0]}"`);
             if (r.mids) out.push(`GUIDED-NO-MID ${sk} ${size} seed ${seed}: the Guided page prints the hidden middle question in ${r.mids} place(s) (Opener / Scripted Model / chart only, card decision 6 amended)`);
             if (r.cells < 2) {
                 const msg = `${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (${r.colModel ? 'column-step Model, ' : ''}Model ${r.model} mm, first try ${r.firstTry} mm; ${r.pages} pages)`;
