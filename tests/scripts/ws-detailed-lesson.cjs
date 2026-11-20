@@ -780,6 +780,14 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     row('E27', 'Counters in rows of at most 5 (6 to 10 with the 5-group gap drawn)', pupil.flatMap((p) => p.perRow.map((n) => `${p.id}:${n}`)).join(', ') || 'no counters', pupil.every((p) => p.perRow.every((n, i) => e27RowOk(n, (p.perRowXs || [])[i]))));
     const chs = pages.filter((p) => /^P2[a-z]?$/.test(p.id));
     row('E26', 'Every anchor-chart step panel adds a grey (newest) mark', chs.length ? chs.map((ch) => `${ch.id} ${ch.panels.filter(Boolean).length} / ${ch.panels.length} panels`).join('; ') : 'no chart', chs.length > 0 && chs.every((ch) => ch.panels.length > 0 && ch.panels.every(Boolean)));
+    // E42 SCRIPT-PANEL (lf-algebra patterns critic r3 R3-9): every "Panel N" / "panel N" a teacher page names is a panel the
+    // anchor chart prints (T4 named "Panel 5" and "Panel 6: the trap" on a 4-panel chart)
+    {
+        const nPanels = Math.max(0, ...chs.map((ch) => ch.panels.length));
+        const named = pages.filter((x) => x.teacher).flatMap((p) => [...String(p.text || '').matchAll(/\b[Pp]anels? (\d+)(?:\s*(?:–|-|and|to)\s*(\d+))?/g)].flatMap((m) => [Number(m[1]), m[2] ? Number(m[2]) : null].filter((v) => v !== null).map((v) => ({ id: p.id, v }))));
+        const bad = named.filter((x) => x.v > nPanels || x.v < 1);
+        row('E42', 'Every chart panel a teacher page names is printed (SCRIPT-PANEL)', `${named.length} panel reference(s), chart ${nPanels} panel(s)${bad.length ? `; missing: ${bad.map((x) => `${x.id} panel ${x.v}`).join(', ')}` : ''}`, !bad.length);
+    }
     row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === `${p.id}-key`)));
     return rows;
 }
