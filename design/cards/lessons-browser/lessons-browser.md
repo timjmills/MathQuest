@@ -1,9 +1,10 @@
 # Design card: Lessons browser (lessons-passed registry, status chips, grade / area / 8/10 filters, Thumbnails | List)
 
-Status: DESIGN, amended with the OWNER RULINGS of 2026-11-19 (section 0; they override anything below that disagrees). Designer: Opus medium, 2026-11-19, branch claude/sweet-newton-c8wrv1-lf-tools-lessons.
+Status: **READY FOR SIGNATURE** (owner approved the mock 2026-11-20 with two additions, section 0b). Sections 0 and 0b govern; they override anything below that disagrees. Designer: Opus medium, 2026-11-19, branch claude/sweet-newton-c8wrv1-lf-tools-lessons.
 Requests: owner via the lead, 2026-11-14 to 11-19 (items 1-7 below). Mock: `design/status/lf-checks/lessons-browser/mock.html`
 (the app's teacher CSS, real lesson rows from `wrm-links.js` + `data/curriculum/links/<Y>.json`), screenshots beside it at
-1366 x 768 and 1024 x 768, DSF 2: `a-list`, `b-thumbs`, `c-only`, `d-skills`, `e-open` (`-1366.png`, `-1024.png`).
+1366 x 768 and 1024 x 768, DSF 2: `a-list` (colour), `b-thumbs` (colour), `c-only`, `d-skills`, `e-open`, `f-unit` (By unit / date,
+current unit highlighted) (`-1366.png`, `-1024.png`).
 No 390 px host (FASTEST_PLAN rule 7).
 
 ## 0. Owner rulings (2026-11-19, via the lead) — these govern
@@ -65,6 +66,77 @@ a chip; **every row shows under the school grade it is listed in, and only a row
 entries need a `renderStamp` equal to the current `render-stamps.json` value; `PENDING_RECHECK` ids are live and never marked.
 FILTER-PASSED also covers the empty state. New **AREA-LABELS**: both screens render every area chip from `AREA_LABELS`
 (no area label string elsewhere in teacher-*.js).
+
+## 0b. Owner additions (2026-11-20): colour, By unit / date, and the re-check result
+
+**Re-check result (design/status/lf-checks/critic-lessons-recheck.md, 2026-11-20).** The narrow re-check passed 3 lessons with
+render stamps at d38308824: g3-oa5-mult-properties, g3-oa9-mult-table-patterns, g4-nbt1-ten-times-value. They are the seed of
+`LESSONS_PASSED` (evidence line = that file + the stamp digests it lists). g2-nbt3, g3-oa9-input-output-rule and g1-oa1 failed
+on gates and stay in `PENDING_RECHECK` ("Pending re-check" chip) until they pass after their fixes. The mock shows this state.
+
+### Colour (existing colours only; text stays black on white or on a pale tint)
+
+| Element | Colour source | Treatment |
+|---|---|---|
+| Area heading | `AREAS[a].css` -> `--<css>-deep` / `--<css>-tint` (css/teacher-tokens.css) | 6 px left band in deep, tint background, ink text |
+| Area chip | same | deep dot; when chosen, tint fill + 2 px deep border |
+| Lesson row / card | same | deep dot before the title; 4 px deep top band on a thumbnail card |
+| Grade chip, grade badge | data.js `GRADE_COLORS[g].bg` | a swatch outlined 1 px ink; when chosen, a 4 px underline in the grade colour + 2 px ink border. Never a grade-colour fill under text |
+| ✓ 8/10 chip | `#E3F4E8` fill, `#1D6B37` border and ✓ (the Lessons screen's existing `.is-full` pair) | ink text |
+| To build chip | `#FFF1D6` fill, `#9A5B00` border (amber) | ink text |
+| CCSS Build chip | white, 1.5 px ink outline, bold | ink text |
+| Pending re-check | white, 1.5 px dotted ink outline | ink text |
+
+**Contrast (WCAG 2.x, measured 2026-11-20).** Text: ink #111 on white 18.9:1; on every area tint 15.4-17.0:1; on the ✓ chip
+16.5:1; on the To build chip 16.9:1: all AA (4.5) and AAA. Non-text (3:1, 1.4.11): area deep colours on white 8.3-8.8:1; ✓ border
+6.5:1; amber border 5.4:1. Grade colours on white are 1.4-4.8:1 (yellow grade 3 1.4), so a grade colour never carries text or
+stands alone: each swatch has an ink outline (18.9:1) and the grade is always written. Ink on a grade-colour fill would fail at
+grade 6 (3.9:1), which is why no grade chip is filled. Dark mode: the teacher tokens' existing dark pairs; re-measure in the build.
+
+### Third view: "By unit / date"
+
+- View toggle: Thumbnails | List | By unit / date. Lessons are grouped by the school's units, each a header
+  "Unit 2 · Number & Operations: Fractions · 1 Nov – 26 Nov · 35 lessons" with the unit's area band; rows as in List.
+- Unit order and names: **`data/curriculum/wrm-sequence.json`** `grades[].units[]` (id, name, domain, `weeks` "W07–W11", lessons
+  in the site's order); week dates come from `grades[].weeks[W].weekOf`. The site lists units D1..D5; the TEACHING order is by
+  start week (grade 3: D1, D3, D2, D4, D5), and the view uses the teaching order.
+- Current unit: the unit whose start ≤ today ≤ end; between units (a break), the last unit that has
+  started (grade 3 on 20 Nov 2026: Unit 2, Fractions). It gets an ink border, tint fill and a "Now" tag, opens expanded, and is
+  scrolled into view on open; the other units start collapsed to their header (a click opens one).
+- Filters (grade, area, Only 8/10 ✓) apply inside units; a unit with no matching lesson is hidden.
+- Dates live in ONE file per school year, **`data/curriculum/pacing/<YYYY-YY>.json`** (2026-27 first), chosen by today's date
+  (Aug–Jul year). No file for the year: the units show in the site's order, no dates, no "Now".
+
+Schema:
+```json
+{
+  "schoolYear": "2026-27",
+  "source": "Awsaj Domain Sequence workbook 2026-27 (weeks); edited by hand each year",
+  "grades": {
+    "3": [
+      { "unit": "D1", "start": "2026-09-06", "end": "2026-10-22" },
+      { "unit": "D3", "start": "2026-11-01", "end": "2026-11-26" },
+      { "unit": "D2", "start": "2026-11-29", "end": "2027-01-28" },
+      { "unit": "D4", "start": "2027-01-31", "end": "2027-03-25" },
+      { "unit": "D5", "start": "2027-03-28", "end": "2027-04-15" }
+    ]
+  }
+}
+```
+Dates are ISO, inclusive, local school days. The file lists each grade's units in teaching order. A one-off seed script
+(`tests/scripts/ws-pacing-seed.mjs`) derives it from `weeks[].weekOf`. Where the workbook gives two units the same boundary week
+(grade 3: W07 ends D1 and starts D3; W11 ends D3 and starts D2), the seed gives the week to the earlier unit and starts the next
+unit the following week. The teacher can edit the file to split a week by day. The grade 3 rows above are that seed.
+
+**PACING-FILE** (`tests/scripts/ws-pacing.mjs`; on precritic's path for this lane, and a deploy gate): every file in
+data/curriculum/pacing/ parses. `schoolYear` matches the file name. Every grade is a WRM_SEQUENCE grade, and every unit id exists
+in that grade. Each grade lists every unit of the grade exactly once. start ≤ end. No two units of a grade overlap by a day. The
+order of units in the file equals their order by start week in wrm-sequence.json (the school's teaching order). Every date falls
+inside the school year (Aug–Jul). LESSON-BROWSE adds: in By unit / date, the rows under a unit equal that unit's filtered
+lessons, the "Now" unit is the one the dates choose for a pinned test date, and it is in the viewport after open.
+
+Files added by 0b: `data/curriculum/pacing/2026-27.json`, `tests/scripts/ws-pacing.mjs`, `tests/scripts/ws-pacing-seed.mjs`; colour
+rules additive in css/teacher-wrm.css and css/teacher-library.css (existing tokens only).
 
 ## What exists today (read before building)
 
