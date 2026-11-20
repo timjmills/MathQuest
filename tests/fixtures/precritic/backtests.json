@@ -12301,6 +12301,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "touch-card-tools",
+   "check": "ws-phone-card TOUCH-TARGET (TOOLS): the practice card's tool buttons (Hint, Read, Skip, Check) and the open hint's Listen / close / Got it! are >= 48 x 48 px at the tablet widths 820 and 1024 (mult_facts card)",
+   "kind": "commit-pair",
+   "rule": "TOUCH-TARGET tool buttons (lf-placevalue critic, lead-routed to lf-hosts 2026-11-20)",
+   "fail": {
+    "commit": "e487f8f9a",
+    "state": "master: Hint / Read / Listen / hint close / Got it! 44 px tall, Check 46 px in the compact bar at 1024 x 768"
+   },
+   "pass": {
+    "commit": "85009d405",
+    "state": "every card tool button and hint button 48 px tall (additive CSS), the row still one line at 820"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_facts --sizes 820x1180,1024x768 --items 1 --hosts card --only TOUCH-TARGET --no-siblings-check",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-wp20-sign",
+   "check": "ws-phone-card TOUCH-TARGET (tablet working-box floor): add_wp_20's typed sign circle on the online worksheet is >= 48 x 48 px at 820 and 1024",
+   "kind": "commit-pair",
+   "rule": "TOUCH-TARGET working boxes at 48 px on a tablet (lf-placevalue critic, lead-routed to lf-hosts 2026-11-20)",
+   "fail": {
+    "commit": "e487f8f9a",
+    "state": "master: the worksheet sign circle input.mq-wwork.mq-gl-sign 46 x 46 px at 820 / 1024 (passed at the old 44 px working-box floor)"
+   },
+   "pass": {
+    "commit": "85009d405",
+    "state": "the sign circle 48 x 48 px, centre held by an equal negative margin"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills addition:add_wp_20 --sizes 820x1180,1024x768 --items 1 --hosts card,worksheet --only TOUCH-TARGET --no-siblings-check",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
