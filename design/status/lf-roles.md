@@ -388,3 +388,12 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
   PASS.
 - QUEUED for next week (lead ruling 2): the pre-existing stack-cell EB-BAND / EB-SIDE on the sub_*_no_regroup PSC pages (counts
   rise with the filled rows on pages already red on master); not fixed in this lane round.
+
+### PSC fill: narrow critic PASS (2026-11-20, 2e01daf04)
+Independent critic (medium): correctness 9, teaching 8, layout 8, contract 8. 52 page screenshots (div_facts, add_facts,
+sub_wp_20, placevalue:identify, sub_1k; M/L; seeds 1, 7); other roles hash-identical to master. Minor defects, all pre-existing
+on master, queued for next week's PSC layout pass (with the trim to the ceiling and the stack-cell EB-BAND / EB-SIDE, lead 2026-11-20):
+- D1 sub_wp_20 L p1 48 % empty with a 2nd page of 6: check = EB-PAGE blocking for pre-skill-check, or "total fits under ceiling + 1 row -> one page".
+- D2 sub_1k PSC title "Pre-skill check: subtracting sub 1k" (skill id leaks): check = PSC title lint for id fragments.
+- D3 sub_wp_20 M p1: two adjacent bands with the same "Subtract." instruction, ragged 8 / 4: check = adjacent-band identical-instruction lint.
+- D4 add_facts M seed 7: three items answer 12, a turnaround pair in one band: check = deal-diversity (<= 2 share an answer, no turnaround pair per band).
