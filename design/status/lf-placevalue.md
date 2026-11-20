@@ -272,3 +272,36 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
   Print unchanged: ws-role-sweep 512/512 identical vs master, ws-lesson-baseline --check 2590 identical, ws-capacity-pin OK.
   RULING ASKED: owner S8 (no answer in the ladder) vs the unit-form "help filled" precedent - kept S8; 100 skills lose the
   Say line (frames of given-value gaps without sayValues) until their providers add sayValues.
+
+### HINT-NO-BLANK hand-off (lead ruling option 3, 2026-11-20): provider work owed by the family lanes
+
+Both lists live in tests/scripts/ws-hint-no-blank.cjs and may only shrink (a new skill joining either FAILs). A lane removes
+its skills from the pin in the change that fixes them.
+
+**EMPTY_PIN - write provider `workedSteps` (every current step states the answer, so the "Here is how" box is hidden):**
+
+| Lane | Skills (workedSteps) |
+|---|---|
+| fractions lane | `conversions:find_whole_from_pct`, `conversions:mixed_conversions`, `fraction_operations:div_unit_frac_nv`, `fraction_operations:estimate_frac_ops`, `fraction_operations:frac_10_100_nv`, `fraction_operations:frac_mult_word`, `fraction_operations:frac_mult_word_plain`, `fraction_operations:frac_word_mixed_plain`, `fraction_operations:mult_frac_whole_nv`, `fraction_operations:unit_frac_div_whole`, `fraction_operations:whole_div_unit_frac`, `fractions:compose_target_frac`, `fractions:equiv_frac_nv` |
+| geometry lane | `angles_lines:identify_angles`, `angles_lines:mixed_angles_lines`, `area_perimeter:area_distributive_visual`, `area_perimeter:area_polygon_decompose`, `area_perimeter:area_triangle`, `area_perimeter:area_unit_squares`, `area_perimeter:mixed_area_perimeter`, `coordinates:net_surface_area`, `geo_mixed:geo_meas_all`, `shapes_classify:classify_triangles`, `shapes_classify:cross_section_3d`, `shapes_classify:mixed_shapes`, `shapes_classify:net_identify` |
+| lf-algebra | `algebra:build_expr_multdiv` |
+| time-money / measurement lane | `measurement:capacity` |
+
+**SAYLESS_PIN - add provider `sayValues` (the frame has gaps for values the question does not show, so no Say line):**
+
+| Lane | Skills (sayValues) |
+|---|---|
+| fractions lane | `decimals:decimal_nl_drag`, `fraction_operations:add_frac_unlike`, `fraction_operations:add_fractions_like`, `fraction_operations:add_mixed_like`, `fraction_operations:add_mixed_unlike`, `fraction_operations:div_unit_fraction`, `fraction_operations:mult_frac_frac`, `fraction_operations:mult_frac_whole`, `fraction_operations:sub_frac_unlike`, `fraction_operations:sub_fractions_like`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_unlike`, `fractions:compare`, `fractions:compare_fractions_nl`, `fractions:compare_to_half`, `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`, `fractions:identify`, `fractions:identify_fraction_nl`, `fractions:mixed_nl_drag`, `fractions:write_fraction`, `fractions:write_fraction_nl` |
+| k2 (counting) lane | `comparing:compare_groups`, `composing:base10_build`, `composing:base10_build_hundreds`, `composing:chart_to_120`, `composing:compose_whole`, `composing:fraction_number_line`, `composing:hundreds_chart_fill`, `composing:odd_even`, `composing:ten_frame_build_teen`, `composing:whole_as_fraction` |
+| lf-algebra | `algebra:function_table_easy`, `algebra:function_table_find_inputs`, `algebra:function_table_find_rule`, `algebra:function_table_hard`, `algebra:two_step_estimate_check`, `algebra:two_step_letter_equation`, `patterns:follow_given_rule`, `patterns:notice_patterns`, `patterns:number_patterns_rule`, `patterns:skip_count_grid`, `patterns:skip_count_line` |
+| lf-ops | `addition:add_sub_fact_family`, `addition:cloze_addition`, `addition:fact_family_sort`, `addition:nl_add`, `division:div_remainders`, `integers:integer_nl_drag`, `multiplication:arrays_groups`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_tables`, `multiplication:dot_array_mult`, `multiplication:mult_arrays`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:mult_chart_headers`, `multiplication:mult_chart_pattern`, `multiplication:mult_chart_shade`, `multiplication:mult_comparison`, `multiplication:mult_comparison_plain`, `multiplication:mult_equal_groups`, `multiplication:mult_properties`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `subtraction:sub_5_pictures` |
+| lf-placevalue | `number_sense:between_tens`, `number_sense:estimate_diff`, `number_sense:estimate_products`, `number_sense:estimate_quotient`, `number_sense:estimate_sum`, `number_sense:estimate_sums_diffs`, `number_sense:nearest_10`, `number_sense:nearest_100`, `number_sense:nearest_1000`, `number_sense:nearest_10000`, `number_sense:nearest_100000`, `number_sense:nearest_million`, `number_sense:reasonable_quotients`, `number_sense:round_nl_hundred_thousands`, `number_sense:round_nl_ten_thousands`, `number_sense:round_nl_thousands`, `number_sense:round_sort_10`, `number_sense:round_sort_100`, `number_sense:round_sort_1000`, `number_sense:round_sort_10000`, `number_sense:round_sort_100000`, `number_sense:round_sort_hundredths`, `number_sense:round_sort_million`, `number_sense:round_sort_tenths`, `number_sense:rounding_table`, `number_sense:rounding_visual`, `placevalue:combine`, `placevalue:expanded_notation`, `placevalue:identify`, `placevalue:one_tenth_value`, `placevalue:place_value_10x`, `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:ten_times_story`, `placevalue:ten_times_value` |
+| lf-vocab | `vocabulary:vocab_grade_pictures` |
+| time-money / measurement lane | `measurement:clock_parts`, `measurement:coin_value`, `measurement:count_notes_and_coins`, `measurement:elapsed_15min`, `measurement:elapsed_30min`, `measurement:elapsed_find_duration`, `measurement:elapsed_find_start`, `measurement:elapsed_hour`, `measurement:elapsed_mixed`, `measurement:elapsed_visual_easy`, `measurement:elapsed_visual_hard`, `measurement:elapsed_visual_medium`, `measurement:enough_money`, `measurement:minutes_by_fives_all`, `measurement:money`, `measurement:money_change`, `measurement:money_compare`, `measurement:time_fives_ring`, `measurement:time_sense` |
+
+- 2026-11-20 option 3 (lead ruling on the S8 conflict) built, 990d37c13: the Say line fills the numbers the question SHOWS
+  (operands, q.pv.n, the text's numbers) and never the answer; no worked step -> no "Here is how" box (HELP-EMPTY-HIDDEN card
+  assertion in ws-hint-no-blank). Counts: empty-box 28 skills, Say-less 131 skills (both pinned, shrink-only; table above).
+  HELP-EMPTY-HIDDEN does not FAIL on ada1a1e73: no item there has no step AND a Say line (the 28 cards drew no box; a forced
+  probe over every provider skill found none) - ledger row exempt, the assertion is a guard. unit_form help: hash-identical to
+  master 65c28ccdf on the card (box DOM, hint, Say, steps; ws-unit-form-bank seeds 3, 7, 11, 19, 42, 77), no exception needed.
