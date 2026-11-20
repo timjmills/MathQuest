@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20: band-100 lesson PAGEFILL + ANSWER-REUSE fixed (teaching windows fixed on rows 41-70; practice third rows grid always the least-reused band, 31-60). echo lesson + variants: hundreds_chart_fill clean; 3 ANSWER-VARIETY on chart_to_120 review/true-false seed 4242 are pre-existing at 6449ae672. print-lint lesson M/L OK, boot OK, backtest c120b-answer-reuse PASS.
 - 2026-11-20: chart blanks r4 fix BUILT (lead ruling option 1), commit c29d324f8; cap reached, partly proven.
   - Band 120: both Independent windows review 1-25 in disjoint columns, and lesson deals refuse a repeated answer set or a near-twin. Guided and the practice grids keep the crossing of 100.
   - Band 100: teaching windows on rows 3-7 (r0 2-4). Practice prints rows of ten on the least-touched bands (1-30, 71-100, then one more).

@@ -935,7 +935,6 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // (not in a band-120 lesson packet: its windows keep to the example's edge columns, and its practice page's rows grid holds the
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
-        let _pw = 0;   // (pickWin's calls: band 100's rows grid tries the least-reused band, then either band)
         const pickWin = () => {
             // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
             // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
@@ -943,9 +942,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             if (k10.length) {
                 // (none left: the first grid's own squares - a twin, which the dealer refuses, so the page holds the grids it has)
                 const free = (band === 120 ? [6, 3] : [7, 3, 4]).filter((a) => !k10.some((k) => k.rows.some((r) => r >= a && r <= a + 2)));
-                // (band 100: of the bands left, the one whose squares the teaching windows blanked least - ANSWER-REUSE, critic blanks r4 F2)
+                // (band 100: of the bands left, always the one whose squares the teaching windows blanked least - ANSWER-REUSE, critic blanks r4 F2)
                 const reused = (a) => kept.filter((k) => !k.shows && k.cols.length !== 10).reduce((t, k) => t + k.gaps.filter((n) => Math.floor((n - 1) / 10) >= a && Math.floor((n - 1) / 10) <= a + 2).length, 0);
-                const fr2 = band === 100 && free.length > 1 && (_pw++ % 2 === 0) ? free.filter((a) => reused(a) === Math.min(...free.map(reused))) : free;
+                const fr2 = band === 100 && free.length > 1 ? free.filter((a) => reused(a) === Math.min(...free.map(reused))) : free;
                 const r1 = fr2.length ? fr2[rng(0, fr2.length - 1)] : k10[0].rows[0];
                 return { rows: [r1, r1 + 1, r1 + 2], cols: Array.from({ length: C }, (_, k) => k) };
             }
@@ -962,8 +961,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                     const fr = [0, 5].filter((x) => !used.includes(x));
                     c0 = fr.length ? fr[rng(0, fr.length - 1)] : 0;
                 }
-                // (critic blanks r4 F2: band 100's teaching windows keep to rows 3-6, so rows 1-30 and 71-100 stay fresh for practice)
-                if (band === 100) r0 = rng(2, 4);
+                // (critic blanks r4 F2 + PAGEFILL follow-up: band 100's teaching windows sit on rows 41-70, so 1-30 and 71-100 stay fresh and
+                // the practice page's third rows-of-ten grid, 31-60, re-asks only the teaching gaps on 41-60 - ANSWER-REUSE under a third)
+                if (band === 100) r0 = 4;
             }
             return { rows: Array.from({ length: R }, (_, k) => r0 + k), cols: Array.from({ length: C }, (_, k) => c0 + k) };
         };
