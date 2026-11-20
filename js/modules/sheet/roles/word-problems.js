@@ -185,7 +185,10 @@ export function prepare(it, info = {}) {
         // (lead ruling A9 (2), 2026-11-20: a 4-part area model - 4-digit x 1-digit - is 150 mm at L, wider than the 117 mm work
         // space beside the answer column: it ran 7.6 mm out of the cell. It takes the UNDER layout, the answer row under it.)
         const pl = (it.q && it.q.cell && it.q.cell.payload) || {};
-        const wideModel = WIDE_MODELS.has(it.template) || (it.template === 'area-model' && c.size === 'L' && Array.isArray(pl.parts) && pl.parts.length >= 4);
+        // (lane lf-ops sizes fix 2026-11-20: ... and a 2-row model of 3 parts - 3-digit x 2-digit, 148 mm at L with its row labels - ran
+        // its labels 1.5 mm out of the cell's left edge beside the answer column: ws-cell-checks OVERFLOW, area_model_3by2 L)
+        const wideModel = WIDE_MODELS.has(it.template) || (it.template === 'area-model' && c.size === 'L' && Array.isArray(pl.parts)
+            && (pl.parts.length >= 4 || (pl.parts.length >= 3 && Array.isArray(pl.rows) && pl.rows.length >= 2)));
         return `<div class="mq-wp mq-wp2${kLevel ? ' mq-wpk' : ''}${model && wideModel ? ' mq-wpunder' : ''}">`
             + `<div class="ws-story mq-wpstory">${st.lines.slice(0, 6).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
             + space
