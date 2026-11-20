@@ -561,3 +561,12 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-marks-tick { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid var(--action); border-radius: 6px; color: var(--action); }
 #teacherApp .ts-marks-plan { flex: none; display: inline-block; width: 24px; height: 24px; border: 2px solid #E07B00; border-radius: 6px; }
 @media (max-width: 819px) { #teacherApp .ts-marks-pop { left: 0; right: auto; } }
+
+/* The lessons-browser card (2026-11-20), Skills screen: the Maths area chips (AREA_LABELS; chosen = the area's tint and a
+   2 px deep border, ink text) and the "Only 8/10 ✓" switch (drawn by css/teacher-wrm.css .tvw-only). ADDITIVE. */
+#teacherApp .ts-areas { flex-wrap: wrap; }
+#teacherApp .ts-areabtn, #teacherApp .ts-area-all { min-height: 48px; height: auto; white-space: normal; text-align: left; gap: var(--sp-8); }
+#teacherApp .ts-areabtn .tvw-n { font-weight: 400; }
+#teacherApp .ts-areabtn[aria-pressed="true"] { background: var(--a-tint); color: var(--text); border: 2px solid var(--a-deep); box-shadow: none; }
+#teacherApp .ts-only { min-height: 48px; }
+#teacherApp #tsAreaRow[hidden] { display: none; }

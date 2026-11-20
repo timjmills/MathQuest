@@ -22,6 +22,15 @@
 //   #wrm/<grade>/<D1|extra>      the list at that domain section (a Pre-K small-unit id opens its domain)
 //   #wrm/<grade>/<unit>/<n|slug> a lesson (unchanged from the unit pages, so old bookmarks still open it)
 // The sequence and link data (~350 KB with standards) load the first time the screen opens, never at boot.
+//
+// The lessons BROWSER (owner 2026-11-14..20, signed card design/cards/lessons-browser): the list is a browser over every
+// lesson of the school grade(s) chosen. Grade chips (All + the grades the lessons carry, grade-of.js), Maths area chips
+// (AREA_LABELS, teacher-areas.js; the list grouped under area headings), the status chips (one coverage chip, CCSS Build,
+// ✓ 8/10 from lessons-passed.js only, Pending re-check), the summary (WRM and CCSS Build counted apart), the "Only 8/10 ✓"
+// switch (per viewer, kept across grade and area changes), and three views: Thumbnails | List | By unit / date (the
+// school's units in teaching order with the dates of data/curriculum/pacing/<YYYY-YY>.json, the current unit marked Now).
+// A lesson opens over the list with "← All lessons", which comes back to the same grade, area, switch, view and scroll:
+//   #wrm/<grade|all>?a=<area>&only=1&view=thumbs|unit   the browser's state (a lesson keeps its own link, as before)
 
 import { icon, esc, hideToast, toast, copyText, findSkill } from './teacher-ui.js';
 import { skillView, viewToggleHTML } from './teacher-preview.js';
@@ -34,6 +43,13 @@ import { loadYear, loadDetailed, loadLinksData } from './links-data.js';
 import { indexDetailed, detailedOf, DETAILED_CAP } from './detailed-links.js';
 import { printDetailedLesson } from './teacher-print.js';
 import { detailedLessonFor } from './lessons/detailed/index.js';
+import { AREA_ORDER, AREA_LABELS, areaOf, areaOfCode } from './teacher-areas.js';
+import { LESSONS_PASSED, PENDING_RECHECK, passLine } from './lessons-passed.js';
+import { gradeWord as gradeChipWord, gradeLong } from './grade-of.js';
+import { GRADE_COLORS } from './data.js';
+/** The grade's colour (0b: data.js GRADE_COLORS; a grade it has no colour for keeps the teacher token): a swatch only. */
+const grStyle = (g) => (GRADE_COLORS[g] && GRADE_COLORS[g].bg ? ` style="--gr:${GRADE_COLORS[g].bg}"` : '');
+import { mountCropped, croppedReady } from './teacher-chip.js';
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -58,6 +74,19 @@ const LAST_KEY = 'mq_teacher_wrm_last';   // T4: the last lesson opened, so the 
 const NARROW = '(max-width: 1023px)';
 const narrow = () => typeof matchMedia === 'function' && matchMedia(NARROW).matches;
 
+/** The browser's state (design/cards/lessons-browser): grade ('all' or a grade id), area ('' = all), the 8/10 switch, the
+ *  view, the page scroll to come back to, and the units opened in the By unit / date view. */
+const B = { grade: '', area: '', only: false, view: 'list', scroll: 0, units: new Set(), unitsAt: '' };
+const BROWSE_KEY = 'mq_teacher_lessons_browse';
+const VIEWS = [['thumbs', 'Thumbnails'], ['list', 'List'], ['unit', 'By unit / date']];
+(function restoreBrowse() {
+    try {
+        const s = JSON.parse(localStorage.getItem(BROWSE_KEY) || 'null');
+        if (s && typeof s === 'object') { B.only = s.only === true; if (VIEWS.some((x) => x[0] === s.view)) B.view = s.view; }
+    } catch (e) { /* per-viewer convenience only */ }
+})();
+function persistBrowse() { try { localStorage.setItem(BROWSE_KEY, JSON.stringify({ only: B.only, view: B.view })); } catch (e) { /* per-viewer convenience only */ } }
+
 const v = {
     grade: '', sec: '', lesson: '',  // sec: the domain section the list is at ('D1' … or 'extra'); lesson key
     query: '',
@@ -73,10 +102,10 @@ const resetPick = () => { pick.reset(); preFor = ''; tmOpen = false; };
 function load() {
     if (L) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(([a, b]) => { L = a; SEQ = b; L.setSkillLabeler(skillLabelOf); })
+        loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(([a, b]) => { L = a; SEQ = b; L.setSkillLabeler(skillLabelOf); L.setAreaFns({ areaOf, areaOfCode }); loadPacing(); })
             .catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
         // the detailed-lessons hook: nothing is fetched unless index.json says the file exists
-        loadDetailed().then((d) => { detailed = d ? indexDetailed(d) : null; if (detailed && root && root.isConnected && L && root.querySelector('#tvwLessons')) draw(); });
+        loadDetailed().then((d) => { detailed = d ? indexDetailed(d) : null; rowsCache.clear(); if (detailed && root && root.isConnected && L && root.querySelector('#tvwLessons')) draw(); });
         // owner 2026-10-17 ("clearly say all of the planned skills … per lesson", "per grade/domain"): the Skills to be
         // made list (every source, one entry per id) names, kinds and gap lines for the lesson and domain cards
         loading.then(() => Promise.all([import('./build-queue.js'), import('./lesson-tomake.js'), import('./todo-text.js'), loadLinksData()])).then(([Q, T, TT, data]) => {
@@ -87,6 +116,7 @@ function load() {
             TT.setTodoNames(queue);
             unitCache.clear();
             factCache.clear();
+            rowsCache.clear();
             if (root && root.isConnected && root.querySelector('#tvwLessons')) draw();
         }).catch((e) => { console.warn('[teacher-wrm] to-make', e); });
     }
@@ -98,16 +128,35 @@ const unitCache = new Map();         // 'grade|section' -> unitToMake rows
 const factCache = new Map();         // lesson key -> row facts (cleared when link files arrive)
 const tmuOpen = new Set();           // 'grade|section' of the domain to-make cards the teacher opened
 const tmuAll = new Set();            // … and the ones showing every row
+const rowsCache = new Map();         // grade -> wrm-links browseRows (cleared when the link files or detailed lessons arrive)
+
+/* ---- the school-year dates (By unit / date): data/curriculum/pacing/index.json names the files, so a year with no file
+ * costs no failed request. PACING: undefined while loading, null when this school year has no file. */
+let PACING;
+/** Today, or the date a check pins (window.__MQ_TODAY__ = 'YYYY-MM-DD'). */
+function todayDate() {
+    const t = typeof window !== 'undefined' && window.__MQ_TODAY__;
+    const d = t ? new Date(`${t}T12:00:00`) : new Date();
+    return Number.isNaN(d.getTime()) ? new Date() : d;
+}
+function loadPacing() {
+    const year = L.schoolYearOf(todayDate());
+    fetch('data/curriculum/pacing/index.json').then((r) => (r.ok ? r.json() : null))
+        .then((ix) => (ix && Array.isArray(ix.years) && ix.years.includes(year) ? fetch(`data/curriculum/pacing/${year}.json`).then((r) => (r.ok ? r.json() : null)) : null))
+        .catch(() => null)
+        .then((p) => { PACING = p && p.grades ? p : null; if (B.view === 'unit' && root && root.isConnected && root.querySelector('#tvwLessons') && !v.lesson) { drawList(); scrollToNow(); } });
+}
 
 // Curated year files (data/curriculum/links/<YEAR>.json) load on demand: the years of the steps of the grade on
 // screen (a copied-in lesson's step is another year's). They win over the computed rules.
 const curatedDone = new Set();
 function ensureCurated() {
-    const years = new Set([SEQ.WRM_SEQUENCE.find((g) => g.id === v.grade)?.year].filter(Boolean));
-    for (const s of sections()) for (const l of s.lessons) if (l && l.step) years.add(l.step.split('.')[0]);
+    const gids = [...new Set([v.grade, ...browseGradeIds()].filter((g) => g && g !== 'all'))];
+    const years = new Set(gids.map((gid) => SEQ.WRM_SEQUENCE.find((g) => g.id === gid)?.year).filter(Boolean));
+    for (const gid of gids) for (const s of gradeData(gid).secs) for (const l of s.lessons) if (l && l.step) years.add(l.step.split('.')[0]);
     const want = [...years].filter((y) => !curatedDone.has(y));
     if (!want.length) return Promise.resolve();
-    return Promise.all(want.map((y) => loadYear(y).then((d) => { curatedDone.add(y); if (d) { L.addCuratedYear(d); factCache.clear(); unitCache.clear(); } })));
+    return Promise.all(want.map((y) => loadYear(y).then((d) => { curatedDone.add(y); if (d) { L.addCuratedYear(d); factCache.clear(); unitCache.clear(); rowsCache.clear(); } })));
 }
 
 /** Open the screen at a school-site lesson by its site id (from the Skills to be made screen). False when it is not listed. */
@@ -160,6 +209,7 @@ function secKeyFor(seg, gid = v.grade) {
 function setLesson(l) {
     if (v.lesson !== l.key) tmOpen = false;
     v.grade = l.grade;
+    if (B.grade !== 'all') B.grade = l.grade;
     v.lesson = l.key;
     v.sec = (placeOf(l) || { sec: { key: '' } }).sec.key;
     if (v.legacy && v.legacy.for !== l.key) v.legacy = null;
@@ -195,26 +245,47 @@ function lessonName(l) {
     const lead = l.type === 'assessment' ? 'Assessment' : L.isCoreLesson(l) ? `Lesson ${p ? p.n : l.n}` : `Extra lesson ${p ? p.n : ''}`.trim();
     return `${lead}: ${l.title}`;
 }
-function rememberGrade() { try { localStorage.setItem(GRADE_KEY, v.grade); } catch (e) { /* per-viewer convenience only */ } }
+function rememberGrade() { try { localStorage.setItem(GRADE_KEY, B.grade || v.grade); } catch (e) { /* per-viewer convenience only */ } }
 function rememberedGrade() { try { return localStorage.getItem(GRADE_KEY) || ''; } catch (e) { return ''; } }
 
 /* ================================================================= hash */
+
+/** The list's link: #wrm/<grade|all>?a=<area>&only=1&view=thumbs|unit (only what differs from the default). */
+function listHash() {
+    const g = B.grade || v.grade;
+    const q = [];
+    if (B.area) q.push(`a=${encodeURIComponent(B.area)}`);
+    if (B.only) q.push('only=1');
+    if (B.view !== 'list') q.push(`view=${B.view}`);
+    return `#wrm${g ? `/${encodeURIComponent(g)}` : ''}${q.length ? `?${q.join('&')}` : ''}`;
+}
 
 export function wrmHashActive() { return /^#wrm(\/|$)/.test(location.hash || ''); }
 
 // #wrm/<grade>/<unit>/<slug> opens a lesson (W1, critic 2026-10-30: the slug of its title or site id, never its list
 // number); #wrm/<grade>/<section> the list. A numbered link from before the 2026-10-17 reorder opens the lesson it was
 // made for (wrm-links resolveLessonHash and the frozen table), says so in the lesson head, and is rewritten to its slug.
+function splitHash(h) { const i = String(h || '').indexOf('?'); return i < 0 ? [String(h || ''), ''] : [h.slice(0, i), h.slice(i + 1)]; }
 function readHash() {
-    const r = L.resolveLessonHash(location.hash || '');
-    if (!/^#wrm/.test(location.hash || '')) return;
-    if (r.grade && SEQ.WRM_SEQUENCE.some((g) => g.id === r.grade)) v.grade = r.grade;
+    const [h, q] = splitHash(location.hash || '');
+    if (!/^#wrm/.test(h)) return;
+    const r = L.resolveLessonHash(h);
+    const seg0 = decodeURIComponent(h.split('/')[1] || '');
+    const qs = new URLSearchParams(q);
+    // the browser's state rides on the list link: #wrm/<grade|all>?a=<area>&only=1&view=thumbs|unit
+    if (q || !r.lesson) {
+        B.area = AREA_ORDER.includes(qs.get('a') || '') ? qs.get('a') : '';
+        if (qs.has('only')) B.only = qs.get('only') === '1';
+        if (qs.has('view') && VIEWS.some((x) => x[0] === qs.get('view'))) B.view = qs.get('view');
+    }
+    if (seg0 === 'all') B.grade = 'all';
+    else if (r.grade && SEQ.WRM_SEQUENCE.some((g) => g.id === r.grade)) { v.grade = r.grade; if (!(r.lesson && B.grade === 'all')) B.grade = r.grade; }
     // the notice stays while the same lesson is re-read from its rewritten (slug) link, e.g. the screen re-opening
     if (r.legacy) v.legacy = { ...r.legacy, for: r.lesson ? r.lesson.key : '', alt: r.legacy.alt ? r.legacy.alt.key : '' };
     else if (!(v.legacy && r.lesson && v.legacy.for === r.lesson.key)) v.legacy = null;
     if (r.lesson) { setLesson(r.lesson); return; }
     v.lesson = '';
-    v.sec = secKeyFor(r.seg);
+    v.sec = '';
     if (v.legacy && v.legacy.gone) toast(`This link was to "${v.legacy.title}", a lesson the school's list no longer has. Choose a lesson in the list.`);
 }
 /** The notice a redirected numbered link shows in the lesson head (W1): what it opens and why, and the other lesson. */
@@ -228,7 +299,7 @@ function legacyNoteHTML(l) {
 
 function writeHash(replace) {
     const l = v.lesson ? L.lessonByKey(v.lesson) : null;
-    const h = l ? L.lessonHash(l) : `#wrm${v.grade ? `/${encodeURIComponent(v.grade)}${v.sec ? `/${encodeURIComponent(v.sec)}` : ''}` : ''}`;
+    const h = l ? L.lessonHash(l) : listHash();
     if (location.hash === h) return;
     if (replace) history.replaceState(history.state, '', h);
     else history.pushState(history.state, '', h);
@@ -298,21 +369,18 @@ export function renderWrmScreen(el) {
     load().then(() => {
         if (!L) { el.querySelector('#tvwBody').innerHTML = '<p class="tv-cap">Could not load the lessons. Reload the page to try again.</p>'; return; }
         if (wrmHashActive()) readHash();
-        // a phone coming back to Lessons sees the list at the last lesson's area, the next lesson marked "Next"
-        else if (narrow() && v.lesson) { const l0 = L.lessonByKey(v.lesson); v.sec = (placeOf(l0) || { sec: { key: v.sec } }).sec.key; v.lesson = ''; resetPick(); }
-        if (!v.grade) {
-            const r = rememberedGrade(); v.grade = grades().some((g) => g.id === r) ? r : '2';
-            // T4: opens where the teacher was last — that grade's last lesson, the next one marked "Next"
-            const last = L.lessonByKey(rememberedLesson());
-            // on a phone the list opens at that lesson's area with the next one marked (the panel would cover the
-            // grade and area rows); wider, the lesson itself is open beside the list
-            if (last && last.grade === v.grade) { if (narrow()) v.sec = (placeOf(last) || { sec: { key: '' } }).sec.key; else setLesson(last); }
+        if (!B.grade) {
+            const r = rememberedGrade();
+            B.grade = r === 'all' || grades().some((g) => g.id === r) ? r : '2';
         }
+        if (!v.grade) v.grade = B.grade === 'all' ? '2' : B.grade;
+        // the browser opens on the list (the last lesson the teacher opened is marked "Next"); a lesson link opens the lesson
         writeHash(true);
         ensureCurated().then(() => {
             draw();
+            root.querySelector('#tvwBody')?.classList.toggle('is-lesson', !!v.lesson);
             if (v.lesson) placeFocus('none');
-            else if (v.sec) jumpTo(v.sec, false);
+            else if (B.view === 'unit') scrollToNow();
         });
     });
 }
@@ -320,104 +388,221 @@ export function renderWrmScreen(el) {
 /** Re-read the hash (Back / Forward / a pasted link). */
 export function wrmOnHashChange() {
     if (!L || !root || !root.isConnected) return;
-    const before = { grade: v.grade, sec: v.sec, lesson: v.lesson };
+    const before = JSON.stringify([B.grade, B.area, B.only, B.view, v.grade, v.lesson]);
+    const was = v.lesson;
     readHash();
-    if (v.grade === before.grade && v.lesson === before.lesson) {
-        if (!v.lesson && v.sec !== before.sec && v.sec) jumpTo(v.sec, false);
-        return;
-    }
+    if (!v.lesson) writeHash(true);   // the list's link names its whole state (a link without view= keeps the view)
+    if (JSON.stringify([B.grade, B.area, B.only, B.view, v.grade, v.lesson]) === before) return;
     resetPick();
     ensureCurated().then(() => {
-        if (v.grade !== before.grade || !root.querySelector('#tvwLessons')) draw();
-        else showLesson();
+        if (!root.querySelector('#tvwLessons')) draw();
+        else { drawList(); showLesson(); }
         if (v.lesson) placeFocus('none');
+        else if (was) restoreScroll(was);
     });
 }
 
 function draw() {
     const body = root.querySelector('#tvwBody');
-    const list0 = root.querySelector('#tvwLessons');
-    // a redraw of the same grade (the link files or the Skills to be made list arriving) keeps the list where it was:
-    // the first heading or row at the list's top stays at the same place, whatever changed height above it
-    let anchor = null;
-    if (list0 && list0.dataset.grade === v.grade) {
-        const lt = Math.max(list0.getBoundingClientRect().top, 0);
-        for (const r of list0.querySelectorAll('.tvw-sec-h, .tvw-nrow')) {
-            const t = r.getBoundingClientRect().top;
-            if (t >= lt - 1) { anchor = { sel: r.id ? `#${CSS.escape(r.id)}` : `.tvw-nrow[data-w-lesson="${CSS.escape(r.dataset.wLesson)}"]`, top: t }; break; }
-        }
-    }
     const g = gradeRec();
     drawMeta();
     body.innerHTML = `
-      <div class="ts-filters tvw-filters">
-        <div class="ts-frow" role="group" aria-labelledby="tvwGradeH"><span class="ts-flabel" id="tvwGradeH">Grade</span>
-          <div class="ts-pills">${grades().map((x) => `<button type="button" class="ts-pill tvw-gradebtn" data-w-grade="${esc(x.id)}" data-grade="${esc(x.id)}" aria-pressed="${x.id === v.grade}" aria-label="${esc(x.label)}"><i class="ts-gsw" aria-hidden="true"></i>${esc(GRADE_BTN[x.id] || x.label)}</button>`).join('')}</div></div>
-        <div class="ts-fdiv" role="presentation"></div>
-        <nav class="ts-frow" aria-labelledby="tvwDomH"><span class="ts-flabel" id="tvwDomH">Maths area</span>
-          <div class="ts-seg tvw-doms" id="tvwDoms">${domButtonsHTML()}</div></nav>
-      </div>
-      <div class="tvw-ngrid${v.lesson ? ' is-open' : ''}" id="tvwGrid">
-        <div class="tvw-navlist" id="tvwLessons" data-grade="${esc(v.grade)}" role="region" aria-label="${esc(`Lessons of ${g ? g.label : ''}`)}">${listHTML()}</div>
+      <div class="ts-filters tvw-filters tvw-bfilters" id="tvwFilters">${filtersHTML()}</div>
+      <div class="tvw-sum" id="tvwSum" aria-live="polite">${summaryHTML()}</div>
+      <div class="tvw-ngrid is-browse${v.lesson ? ' is-open' : ''}" id="tvwGrid" data-w-view="${B.view}">
+        <div class="tvw-navlist tvw-blist" id="tvwLessons" data-grade="${esc(B.grade)}" data-w-view="${B.view}" role="region" aria-label="${esc(B.grade === 'all' ? 'Lessons of every grade' : `Lessons of ${g ? g.label : ''}`)}">${listHTML()}</div>
         <section class="tvw-detail tvw-panel" id="tvwDetail" aria-live="polite" aria-label="The lesson">${panelHTML()}</section>
       </div>`;
     after(root.querySelector('#tvwDetail'));
+    lessonThumbs();
+}
+/** Redraw the filters, the summary and the list in place (a grade, area, switch or view change). */
+function drawList() {
+    const f = root.querySelector('#tvwFilters');
     const list = root.querySelector('#tvwLessons');
-    const a = anchor && list.querySelector(anchor.sel);
-    if (a) {
-        const delta = a.getBoundingClientRect().top - anchor.top;
-        if (Math.abs(delta) > 0.5) { if (listScrolls(list)) list.scrollTop += delta; else window.scrollBy(0, delta); }
-    } else { const cur = list.querySelector('.tvw-nrow[aria-current="true"]'); if (cur) scrollRowIntoList(cur); }
+    if (!f || !list) { draw(); return; }
+    f.innerHTML = filtersHTML();
+    root.querySelector('#tvwSum').innerHTML = summaryHTML();
+    list.dataset.grade = B.grade;
+    list.dataset.wView = B.view;
+    root.querySelector('#tvwGrid').dataset.wView = B.view;
+    list.innerHTML = listHTML();
+    drawMeta();
+    lessonThumbs();
 }
 
-/** "Grade 2 • 29 lessons": the grade and the lessons of the maths area the teacher is in. */
+/* ---- the browser's rows (wrm-links.js browseRows: grade, kind, coverage, area, pass) */
+function rowsOf(gid) {
+    if (!rowsCache.has(gid)) rowsCache.set(gid, L.browseRows(gid, { live, detailed }));
+    return rowsCache.get(gid);
+}
+/** The grades on screen: every grade the school lists lessons in ('all'), else the one chosen. */
+function browseGradeIds() { return !L ? [] : B.grade === 'all' ? L.browseGrades() : B.grade ? [B.grade] : []; }
+const gradeRows = () => browseGradeIds().flatMap(rowsOf);
+const keepRow = (r) => (!B.area || r.area === B.area) && (!B.only || !!r.pass);
+/** For checks: the rows the list shows now, in order (ids, area, grade). */
+export function lessonBrowseRows() { return L ? browseGradeIds().flatMap((gid) => byArea(rowsOf(gid).filter(keepRow)).flatMap((x) => x.rows)).map((r) => ({ key: r.key, grade: r.grade, area: r.area, pass: r.pass, kind: r.kind, cover: r.cover })) : []; }
+/** Rows grouped under the areas in AREA_ORDER. */
+function byArea(rows) { return AREA_ORDER.map((a) => ({ area: a, rows: rows.filter((r) => r.area === a) })).filter((x) => x.rows.length); }
+
+const sw = (on) => `<span class="tvw-sw${on ? ' is-on' : ''}" aria-hidden="true"></span>`;
+function filtersHTML() {
+    const gs = L.browseGrades();
+    const grades = [['all', 'All'], ...gs.map((x) => [x, gradeChipWord(x)])].map(([id, w]) => `<button type="button" class="ts-pill tvw-gradebtn" data-w-grade="${esc(id)}"${id === 'all' ? '' : ` data-grade="${esc(id)}"${grStyle(id)} aria-label="${esc(gradeLong(id))}"`} aria-pressed="${B.grade === id}">${id === 'all' ? '' : '<i class="ts-gsw" aria-hidden="true"></i>'}${esc(w)}</button>`).join('');
+    const base = gradeRows();
+    const carried = AREA_ORDER.filter((a) => base.some((r) => r.area === a));
+    const n = (a) => base.filter((r) => r.area === a && (!B.only || r.pass)).length;
+    const areas = `<button type="button" class="ts-pill tvw-areabtn is-all" data-w-area="" aria-pressed="${!B.area}">All areas</button>` + carried.map((a) => `<button type="button" class="ts-pill tvw-areabtn" data-w-area="${a}" data-domain="${a}" aria-pressed="${B.area === a}"><i class="tvw-adot" aria-hidden="true"></i><span class="tvw-area-l">${esc(AREA_LABELS[a])}</span> <span class="tvw-n">${n(a)}</span></button>`).join('');
+    const views = VIEWS.map(([k, l]) => `<button type="button" data-w-view="${k}" aria-pressed="${B.view === k}">${esc(l)}</button>`).join('');
+    return `<div class="ts-frow" role="group" aria-labelledby="tvwGradeH"><span class="ts-flabel" id="tvwGradeH">Grade</span><div class="ts-pills">${grades}</div></div>
+        <div class="ts-fdiv" role="presentation"></div>
+        <div class="ts-frow" role="group" aria-labelledby="tvwDomH"><span class="ts-flabel" id="tvwDomH">Maths area</span><div class="ts-pills tvw-areas" id="tvwAreas">${areas}</div></div>
+        <div class="ts-fdiv" role="presentation"></div>
+        <div class="ts-frow tvw-showrow"><span class="ts-flabel" id="tvwShowH">Show</span>
+          <button type="button" class="tvw-only" data-w-only="1" aria-pressed="${B.only}" aria-describedby="tvwShowH">${sw(B.only)}<span>Only 8/10 ✓ (${LESSONS_PASSED.size})</span></button>
+          <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tvwViewH">View</span>
+          <div class="ts-seg tvw-viewseg" role="group" aria-labelledby="tvwViewH">${views}</div></div>`;
+}
+function summaryHTML() {
+    const rows = gradeRows().filter((r) => !B.area || r.area === B.area);
+    const c = L.browseCounts(rows);
+    const part = (name, x) => `<span class="tvw-sum-part" data-w-sum="${name === 'WRM' ? 'wrm' : 'build'}"><b>${name}:</b> ${x.n} lesson${x.n === 1 ? '' : 's'} · ${x.pass} ✓ · ${x.full} built · ${x.part} covers part · ${x.build} to build</span>`;
+    const shown = gradeRows().filter(keepRow).length;
+    const year = L.schoolYearOf(todayDate());
+    const dates = B.view !== 'unit' ? '' : PACING ? ` · unit dates: school pacing ${esc(year)}` : PACING === null ? ` · no unit dates for ${esc(year)} yet: units in the school's order` : '';
+    return `<p class="tvw-sum-l">${part('WRM', c.wrm)}<span class="tvw-sum-sep" aria-hidden="true"></span>${part('CCSS Build', c.build)}</p>
+      <p class="tvw-sum-cap">${LESSONS_PASSED.size} lesson${LESSONS_PASSED.size === 1 ? '' : 's'} passed 8/10 · ${PENDING_RECHECK.size} pending re-check after their fixes${B.only ? ` · showing the ${shown} passed` : ''}${dates}</p>`;
+}
+
+/** "Grade 3 • 158 lessons". */
 function drawMeta() {
     const meta = root && root.querySelector('#tvwMeta');
-    if (!meta) return;
+    if (!meta || !L) return;
+    const n = gradeRows().filter(keepRow).length;
     const g = gradeRec();
-    const secs = sections();
-    const s = secs.find((x) => x.key === curSecKey()) || secs[0];
-    const n = s ? s.lessons.length : 0;
-    meta.textContent = `${g ? g.label : ''}${s ? ` • ${s.name}` : ''} • ${n} lesson${n === 1 ? '' : 's'}`;
-}
-function curSecKey() { const l = v.lesson ? L.lessonByKey(v.lesson) : null; return (l && (placeOf(l) || { sec: {} }).sec.key) || v.sec; }
-function domButtonsHTML() {
-    // n3 (critic 2026-10-30): the area the subtitle names is marked, also before a lesson opens (the first section)
-    const cur = curSecKey() || (sections()[0] || {}).key;
-    return sections().map((s) => `<button type="button" class="tvw-dombtn${s.extra ? ' is-extra' : ''}" data-w-sec="${esc(s.key)}" aria-controls="tvwSec-${esc(s.key)}" aria-pressed="${s.key === cur}"${s.key === cur ? ' aria-current="true"' : ''}>${esc(s.name)}</button>`).join('');
+    meta.textContent = `${B.grade === 'all' ? 'All grades' : g ? g.label : ''}${B.area ? ` • ${AREA_LABELS[B.area]}` : ''} • ${n} lesson${n === 1 ? '' : 's'}`;
 }
 
 let nextKey = '';
 function listHTML() {
-    const secs = sections();
     nextKey = (nextLesson() || {}).key || '';
-    if (!secs.length) return '<p class="tv-cap tvw-pad">This grade has no lessons yet.</p>';
-    return secs.map(secHTML).join('');
+    const gids = browseGradeIds();
+    const many = gids.length > 1;
+    const out = gids.map((gid) => {
+        const rows = rowsOf(gid).filter(keepRow);
+        if (!rows.length) return '';
+        const head = many ? `<h2 class="tvw-grade-h" data-grade="${esc(gid)}"${grStyle(gid)}><i class="ts-gsw" aria-hidden="true"></i>${esc(gradeLong(gid))} <span class="tvw-sec-n">${rows.length} lesson${rows.length === 1 ? '' : 's'}</span></h2>` : '';
+        if (B.view === 'unit') return head + unitsHTML(gid, rows, many);
+        return head + byArea(rows).map((x) => areaSecHTML(gid, x.area, x.rows, many)).join('');
+    }).join('');
+    if (out) return out;
+    if (B.only) {
+        const pend = [...PENDING_RECHECK.keys()].map((id) => (detailed && detailed.all.find((r) => r.id === id)) || null).filter(Boolean).map((r) => r.title);
+        return `<div class="tv-card tvw-bempty" data-w-empty="only"><p class="tv-h3">No lesson here has passed 8/10 yet.</p>
+          <p class="tv-cap">${pend.length ? `Pending re-check after their fixes: ${esc(pend.join('; '))}.` : ''} Turn off "Only 8/10 ✓" to see every lesson.</p></div>`;
+    }
+    return '<p class="tv-cap tvw-pad" data-w-empty="none">No lessons match. Choose another grade or area.</p>';
 }
 
-function secHTML(s) {
-    const n = s.lessons.length;
-    const place = gradeData().place;
-    const rows = (ls) => `<ol class="tvw-list tvw-nlist">${ls.map((l) => rowHTML(l, place.get(l.key).n)).join('')}</ol>`;
-    const body = s.extra
-        ? s.groups.map((x) => `<h3 class="tvw-sub-h tvw-nsub" data-w-extra-kind="${esc(x.kind)}">${esc(x.label)}</h3>${rows(x.lessons)}`).join('')
-        : s.parts.length > 1
-            ? s.parts.map((p) => `<h3 class="tvw-sub-h tvw-nsub">${esc(p.name.replace(/^[^:]*:\s*/, ''))}</h3>${rows(p.lessons)}`).join('')
-            : rows(s.lessons);
-    return `<section class="tvw-sec${s.extra ? ' is-extra' : ''}" id="tvwSec-${esc(s.key)}" data-w-secbox="${esc(s.key)}" aria-labelledby="tvwSecH-${esc(s.key)}">
-        <h2 class="tvw-sec-h" id="tvwSecH-${esc(s.key)}" tabindex="-1"><span class="tvw-sec-t">${esc(s.name)}</span> <span class="tvw-sec-n">${n} lesson${n === 1 ? '' : 's'}</span></h2>
-        ${s.extra ? '<p class="tvw-sec-cap">Support lessons, projects, enrichment and assessments from the school site that are not part of a maths area.</p>' : ''}
-        ${tmuWrapHTML(s)}
-        ${body}
+function areaSecHTML(gid, a, rows, many) {
+    const n = rows.length;
+    const id = `${gid}-${a}`;
+    const h = many ? 'h3' : 'h2';
+    const tmu = !many && !B.only && B.view === 'list' ? tmuWrapHTML({ key: a, name: AREA_LABELS[a], extra: false, lessons: rows.map((r) => r.lesson) }) : '';
+    const body = B.view === 'thumbs'
+        ? `<ul class="ts-grid tvw-lgrid" data-view="medium">${rows.map((r) => cardHTML(r)).join('')}</ul>`
+        : `<ol class="tvw-list tvw-nlist">${rows.map((r, i) => rowHTML(r, i + 1)).join('')}</ol>`;
+    return `<section class="tvw-sec tvw-asec" id="tvwSec-${esc(id)}" data-w-secbox="${esc(a)}" data-w-sec-grade="${esc(gid)}" data-domain="${a}" aria-labelledby="tvwSecH-${esc(id)}">
+        <${h} class="tvw-sec-h tvw-area-h" id="tvwSecH-${esc(id)}" tabindex="-1"><span class="tvw-sec-t">${esc(AREA_LABELS[a])}</span> <span class="tvw-sec-n">${n} lesson${n === 1 ? '' : 's'}</span></${h}>
+        ${tmu}${body}
       </section>`;
 }
 
-function rowHTML(l, n) {
-    const c = coverage(l);
-    const build = L.siteFlagText(l) === 'CCSS · BUILD';
-    const tags = `${c ? `<span class="tvw-tag tvw-ntag is-${c}">${COVER_TAG[c]}</span>` : ''}${build ? '<span class="tvw-tag tvw-ntag is-build">CCSS · BUILD</span>' : ''}`;
-    return `<li><button type="button" class="tvw-lesson tvw-nrow${c === 'gap' ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${c || 'none'}"${l.site ? ` data-w-site="${esc(l.site)}"` : ''}${l.key === v.lesson ? ' aria-current="true"' : ''}>
-      <span class="tvw-nrow-n">${n}</span><span class="tvw-nrow-t">${esc(l.title)}${l.key === nextKey ? ' <span class="tvw-next" data-w-next-mark="1">Next</span>' : ''}</span>${tags ? `<span class="tvw-nrow-tags">${tags}</span>` : ''}</button></li>`;
+/** The status chips of a row (§3, R5, 0b): Pending re-check · CCSS Build · one coverage chip · ✓ 8/10. */
+const COVER_CHIP = { full: 'Full', part: 'Covers part', build: 'To build' };
+function chipsHTML(r) {
+    return `${r.pending ? '<span class="tvw-tag tvw-ntag is-pending" data-w-chip="pending">Pending re-check</span>' : ''}${r.kind === 'build' ? '<span class="tvw-tag tvw-ntag is-ccss" data-w-chip="ccss">CCSS Build</span>' : ''}<span class="tvw-tag tvw-ntag is-cover-${r.cover}" data-w-chip="${r.cover}">${COVER_CHIP[r.cover]}</span>${r.pass ? '<span class="tvw-tag tvw-ntag is-pass" data-w-chip="pass">✓ 8/10</span>' : ''}`;
+}
+const cornerHTML = (r) => (r.pass ? '<span class="ts-pass" role="img" aria-label="Passed 8/10" title="This lesson passed the 8/10 quality check"></span>' : '');
+
+function rowHTML(r, n) {
+    const l = r.lesson;
+    return `<li><button type="button" class="tvw-lesson tvw-nrow tvw-brow${r.pass ? ' is-passed' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${r.cover}" data-w-area="${r.area}" data-w-kind="${r.kind}" data-w-pass="${esc(r.pass)}" data-w-pending="${esc(r.pending)}" data-domain="${r.area}"${l.site ? ` data-w-site="${esc(l.site)}"` : ''}${l.key === v.lesson ? ' aria-current="true"' : ''}>
+      <span class="tvw-nrow-n">${n}</span><span class="tvw-nrow-t"><i class="tvw-adot" aria-hidden="true"></i>${esc(l.title)}${l.key === nextKey ? ' <span class="tvw-next" data-w-next-mark="1">Next</span>' : ''}</span><span class="tvw-nrow-tags">${chipsHTML(r)}</span>${cornerHTML(r)}</button></li>`;
+}
+
+/** A thumbnail card (§7): the lesson's first teaching skill drawn as a real item (lazy), title, grade, chips, corner. */
+function cardHTML(r) {
+    const l = r.lesson;
+    const fs = r.firstSkill && liveKey(r.firstSkill.key) ? r.firstSkill : null;
+    const prev = fs
+        ? `<span class="tvw-lthumb" data-w-thumb="${esc(fs.key)}"${fs.opts ? ` data-w-thumb-opts="${esc(JSON.stringify(fs.opts))}"` : ''} aria-hidden="true"></span>`
+        : `<span class="tvw-lthumb is-empty" aria-hidden="true"><span>${r.cover === 'build' ? 'To build' : 'No preview yet'}</span></span>`;
+    return `<li class="ts-card tvw-lcard${r.pass ? ' is-passed' : ''}" data-domain="${r.area}" data-w-card="${esc(l.key)}">
+      ${prev}
+      <button type="button" class="tvw-lcard-t" data-w-lesson="${esc(l.key)}" data-w-verdict="${r.cover}" data-w-area="${r.area}" data-w-pass="${esc(r.pass)}"><i class="tvw-adot" aria-hidden="true"></i>${esc(l.title)}${l.key === nextKey ? ' <span class="tvw-next" data-w-next-mark="1">Next</span>' : ''}</button>
+      <span class="tvw-lcard-chips"><span class="tvw-gbadge" data-grade="${esc(r.grade)}"${grStyle(r.grade)} title="${esc(gradeLong(r.grade))}"><i class="ts-gsw" aria-hidden="true"></i>${esc(r.grade === 'PK' ? 'Pre-K' : r.grade)}</span>${chipsHTML(r)}</span>
+      ${cornerHTML(r)}
+    </li>`;
+}
+
+/* ---- lazy previews: a card's item is drawn only when it nears the viewport (never every lesson on load) */
+let lio = null;
+function drawLessonThumb(host) {
+    if (!host.isConnected || host.dataset.wDone) return;
+    host.dataset.wDone = '1';
+    const [c, s] = String(host.dataset.wThumb || '').split(':');
+    let opts;
+    try { opts = host.dataset.wThumbOpts ? JSON.parse(host.dataset.wThumbOpts) : undefined; } catch (e) { opts = undefined; }
+    const frame = document.createElement('span');
+    frame.className = 'tvp-frame ts-frame';
+    host.appendChild(frame);
+    mountCropped(frame, c, s, opts, 0, 'medium');
+}
+function lessonThumbs() {
+    const hosts = root ? root.querySelectorAll('#tvwLessons [data-w-thumb]:not([data-w-done])') : [];
+    if (!hosts.length) return;
+    if (typeof IntersectionObserver === 'undefined') { hosts.forEach(drawLessonThumb); return; }
+    if (!lio) {
+        lio = new IntersectionObserver((entries) => {
+            for (const en of entries) { if (!en.isIntersecting) continue; lio.unobserve(en.target); drawLessonThumb(en.target); }
+        }, { rootMargin: '0px 0px 120px 0px' });
+    }
+    hosts.forEach((h) => {
+        const [c, s] = String(h.dataset.wThumb || '').split(':');
+        let opts;
+        try { opts = h.dataset.wThumbOpts ? JSON.parse(h.dataset.wThumbOpts) : undefined; } catch (e) { opts = undefined; }
+        // drawn before (measured): no flash, but still only when on screen
+        if (croppedReady(c, s, opts, 0) && h.getBoundingClientRect().top < innerHeight) drawLessonThumb(h); else lio.observe(h);
+    });
+}
+
+/* ---- By unit / date (0b) */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dayWord = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? `${+m[3]} ${MONTHS[+m[2] - 1]}` : ''; };
+function unitsHTML(gid, rows, many) {
+    const units = L.unitGroups(gid, rows, PACING || null, todayDate()).filter((u) => u.rows.length);
+    if (B.unitsAt !== `${B.grade}|${PACING ? 1 : 0}`) {
+        // a new grade (or the dates arriving): only the current unit is open
+        B.unitsAt = `${B.grade}|${PACING ? 1 : 0}`;
+        B.units = new Set();
+        for (const x of browseGradeIds()) for (const u of L.unitGroups(x, rowsOf(x), PACING || null, todayDate())) if (u.now) B.units.add(`${x}|${u.unit}`);
+    }
+    const h = many ? 'h3' : 'h2';
+    return units.map((u, i) => {
+        const k = `${gid}|${u.unit}`;
+        const open = B.units.has(k);
+        const dates = u.start ? `<span class="tvw-unit-d">${esc(dayWord(u.start))} – ${esc(dayWord(u.end))}</span>` : '';
+        return `<section class="tvw-sec tvw-unit${u.now ? ' is-now' : ''}${open ? ' is-open' : ''}" data-w-unit="${esc(u.unit)}" data-w-unit-grade="${esc(gid)}" data-domain="${u.area}"${u.now ? ' data-w-now="1"' : ''}>
+          <${h} class="tvw-unit-hh"><button type="button" class="tvw-unit-h" data-w-unit-toggle="${esc(k)}" aria-expanded="${open}" aria-controls="tvwUnit-${esc(gid)}-${esc(u.unit)}">${icon(open ? 'chevD' : 'chevR', 18)}<span class="tvw-unit-t">Unit ${i + 1} · ${esc(u.name)}</span>${dates}<span class="tvw-sec-n">${u.rows.length} lesson${u.rows.length === 1 ? '' : 's'}</span>${u.now ? '<span class="tvw-now">Now</span>' : ''}</button></${h}>
+          <ol class="tvw-list tvw-nlist" id="tvwUnit-${esc(gid)}-${esc(u.unit)}"${open ? '' : ' hidden'}>${u.rows.map((r, j) => rowHTML(r, j + 1)).join('')}</ol>
+        </section>`;
+    }).join('');
+}
+/** The current unit at the top of the window (By unit / date, on open). */
+function scrollToNow() {
+    const now = root && root.querySelector('#tvwLessons .tvw-unit.is-now');
+    if (now) now.scrollIntoView({ block: 'start', behavior: 'instant' });
 }
 
 /**
@@ -533,8 +718,8 @@ function tmuWrapHTML(s) {
 }
 function redrawTmu(secKey) {
     const w = root.querySelector(`[data-w-tmu-wrap="${CSS.escape(secKey)}"]`);
-    const s = sections().find((x) => x.key === secKey);
-    if (w && s) w.outerHTML = tmuWrapHTML(s);
+    const rows = rowsOf(B.grade).filter((r) => r.area === secKey && keepRow(r));
+    if (w && rows.length) w.outerHTML = tmuWrapHTML({ key: secKey, name: AREA_LABELS[secKey] || secKey, extra: false, lessons: rows.map((r) => r.lesson) });
 }
 
 function panelHTML() {
@@ -546,7 +731,7 @@ function panelHTML() {
           <div class="tv-h3">Choose a lesson</div><p class="tv-cap">Pick a lesson in the list, or find one with the search box. You will see the skills that teach it, the skills to do first and the skills that go with it.</p></div>`;
     }
     const nx = nextLesson();
-    return `<div class="tvw-panel-top"><button type="button" class="tv-btn tvw-back" data-w-back="1">${icon('back', 18)}<span>Back to the lessons</span></button>${nx ? `<button type="button" class="tv-btn tvw-nextl-top" data-w-nextl="${esc(nx.key)}" aria-label="${esc(`Next lesson: ${nx.title}`)}"><span>Next lesson</span>${icon('chevR', 18)}</button>` : ''}</div>${detailHTML(l)}`;
+    return `<div class="tvw-panel-top"><button type="button" class="tv-btn tvw-back" data-w-back="1">${icon('back', 18)}<span>All lessons</span></button>${nx ? `<button type="button" class="tv-btn tvw-nextl-top" data-w-nextl="${esc(nx.key)}" aria-label="${esc(`Next lesson: ${nx.title}`)}"><span>Next lesson</span>${icon('chevR', 18)}</button>` : ''}</div>${detailHTML(l)}`;
 }
 
 function detailHTML(l) {
@@ -576,7 +761,11 @@ function detailHTML(l) {
     const core = L.isCoreLesson(l);
     const lead = assess ? 'Assessment' : core ? `Lesson ${p ? p.n : l.n}` : `Extra lesson ${p ? p.n : ''}`.trim();
     const group = !core ? (L.EXTRA_KINDS.find((k) => k[0] === L.extraKind(l)) || [])[1] : '';
-    return `<div class="tv-card tvw-head">
+    // the browser's facts of this lesson (its grade, area and status chips, and the 8/10 mark from lessons-passed.js only)
+    const br = l.type === 'assessment' ? null : rowsOf(l.grade).find((r) => r.key === l.key) || null;
+    const bhead = br ? `<div class="tvw-bhead" data-w-bhead="${esc(l.key)}"><span class="tvw-gbadge" data-grade="${esc(br.grade)}"${grStyle(br.grade)} title="${esc(gradeLong(br.grade))}"><i class="ts-gsw" aria-hidden="true"></i>${esc(br.grade === 'PK' ? 'Pre-K' : br.grade)}</span><span class="tvw-tag tvw-ntag tvw-area-chip" data-domain="${br.area}"><i class="tvw-adot" aria-hidden="true"></i>${esc(AREA_LABELS[br.area])}</span>${chipsHTML(br)}</div>
+        ${br.pass ? `<p class="tvw-passline" data-w-passline="${esc(br.pass)}">${br.pass === l.key ? 'This lesson' : `Its detailed lesson “${esc((detailed && detailed.all.find((x) => x.id === br.pass) || {}).title || 'this lesson')}”`} ${esc(passLine(br.pass))}.</p>` : br.pending ? '<p class="tvw-passline is-pending" data-w-passline="pending">Pending re-check: its detailed lesson passed before, and a new check found something to fix. It shows 8/10 again once a reviewer passes it after the fix.</p>' : ''}` : '';
+    return `<div class="tv-card tvw-head${br && br.pass ? ' is-passed' : ''}"${br ? ` data-domain="${br.area}"` : ''}>${br ? cornerHTML(br) : ''}${bhead}
         <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(secNameOf(l))}${group ? ` · ${esc(group)}` : ''}${l.weeks.length ? ` · <span class="tvw-week">Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}</span>` : ''}</p>
         ${legacyNoteHTML(l)}
         <h2 class="tv-h2 tvw-title" tabindex="-1"><span class="tvw-title-n">${esc(lead)}</span> ${esc(l.title)}</h2>
@@ -826,10 +1015,9 @@ function showLesson() {
     for (const b of root.querySelectorAll('#tvwLessons .tvw-nrow[aria-current]')) b.removeAttribute('aria-current');
     const row = v.lesson ? root.querySelector(`#tvwLessons .tvw-nrow[data-w-lesson="${CSS.escape(v.lesson)}"]`) : null;
     if (row) row.setAttribute('aria-current', 'true');
-    const doms = root.querySelector('#tvwDoms');
-    if (doms) doms.innerHTML = domButtonsHTML();
     drawMeta();
     root.querySelector('#tvwGrid')?.classList.toggle('is-open', !!v.lesson);
+    root.querySelector('#tvwBody')?.classList.toggle('is-lesson', !!v.lesson);
     redrawDetail();
 }
 
@@ -886,16 +1074,24 @@ function openLesson(key, focus = 'row') {
     const l = L.lessonByKey(key);
     if (!l) return Promise.resolve();
     hideToast();   // m8: a toast belongs to the lesson it was made on
-    const same = l.grade === v.grade && !!root.querySelector('#tvwLessons');
+    // the list's place, so "← All lessons" comes back to it (§7)
+    if (!v.lesson) B.scroll = window.scrollY || document.documentElement.scrollTop || 0;
+    const same = (B.grade === 'all' || l.grade === B.grade) && !!root.querySelector('#tvwLessons');
     setLesson(l);
     resetPick();
     writeHash(false);
     return ensureCurated().then(() => {
         if (same) showLesson(); else draw();
-        placeFocus(focus);
+        placeFocus(focus === 'row' ? 'title' : focus);
     });
 }
 
+/** Back on the list at the same grade, area, switch, view and scroll, the lesson's row in focus. */
+function restoreScroll(was) {
+    window.scrollTo(0, B.scroll || 0);
+    const row = was ? root.querySelector(`#tvwLessons [data-w-lesson="${CSS.escape(was)}"]`) : null;
+    if (row) row.focus({ preventScroll: true });
+}
 function closeLesson() {
     const was = v.lesson;
     hideToast();
@@ -903,22 +1099,32 @@ function closeLesson() {
     resetPick();
     writeHash(false);
     showLesson();
-    const row = was ? root.querySelector(`#tvwLessons .tvw-nrow[data-w-lesson="${CSS.escape(was)}"]`) : null;
-    if (row) { row.scrollIntoView({ block: 'center', behavior: 'instant' }); row.focus({ preventScroll: true }); }
+    restoreScroll(was);
 }
 
 function chooseGrade(gid) {
     hideToast();
-    Object.assign(v, { grade: gid, sec: '', lesson: '' });
+    B.grade = gid;
+    if (gid !== 'all') v.grade = gid;
+    Object.assign(v, { sec: '', lesson: '' });
+    // an area the new grade does not carry is let go (the switch and the view stay, §4)
     rememberGrade();
     resetPick();
-    writeHash(false);
     return ensureCurated().then(() => {
-        draw();
-        const list = root.querySelector('#tvwLessons');
-        if (list) list.scrollTop = 0;
+        if (B.area && !gradeRows().some((r) => r.area === B.area)) B.area = '';
+        writeHash(false);
+        if (root.querySelector('#tvwLessons')) { drawList(); showLesson(); } else draw();
+        window.scrollTo(0, 0);
         root.querySelector(`[data-w-grade="${CSS.escape(gid)}"]`)?.focus();
     });
+}
+/** A browser control changed (area, switch, view): redraw the list in place, the control keeps the focus. */
+function browseChanged(sel) {
+    persistBrowse();
+    writeHash(false);
+    drawList();
+    if (sel) root.querySelector(sel)?.focus({ preventScroll: true });
+    if (B.view === 'unit') scrollToNow();
 }
 
 /** The CCSS code the search matched (else the lesson's first code). */
@@ -944,12 +1150,20 @@ function wire(el) {
         if (d.wTodo) { window.tvGo?.('todo'); return; }
         if (!L) return;
         if (d.wGrade) { chooseGrade(d.wGrade); return; }
-        if (d.wSec) {
-            v.sec = d.wSec;
-            if (!v.lesson) writeHash(true);
-            for (const b of root.querySelectorAll('#tvwDoms [data-w-sec]')) { b.setAttribute('aria-pressed', String(b === t)); if (b === t) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); }
-            drawMeta();
-            jumpTo(d.wSec, true);
+        if (d.wArea !== undefined && t.classList.contains('tvw-areabtn')) { B.area = d.wArea; browseChanged(`#tvwAreas [data-w-area="${CSS.escape(B.area)}"]`); return; }
+        if (d.wOnly) { B.only = !B.only; browseChanged('[data-w-only]'); return; }
+        if (d.wView && t.closest('.tvw-viewseg')) { B.view = d.wView; browseChanged(`.tvw-viewseg [data-w-view="${CSS.escape(B.view)}"]`); return; }
+        if (d.wUnitToggle) {
+            const k = d.wUnitToggle;
+            if (B.units.has(k)) B.units.delete(k); else B.units.add(k);
+            const sec = t.closest('.tvw-unit');
+            const open = B.units.has(k);
+            sec.classList.toggle('is-open', open);
+            t.setAttribute('aria-expanded', String(open));
+            const ol = sec.querySelector('.tvw-nlist');
+            if (ol) ol.hidden = !open;
+            const ic = t.querySelector('svg');
+            if (ic) ic.outerHTML = icon(open ? 'chevD' : 'chevR', 18);
             return;
         }
         if (d.wBack) { closeLesson(); return; }
@@ -1032,6 +1246,7 @@ function wire(el) {
             return;
         }
         // the slide-over closes with Escape (narrow screens)
-        if (e.key === 'Escape' && v.lesson && narrow() && t.closest && t.closest('#tvwDetail')) { e.preventDefault(); closeLesson(); }
+        // Escape is "← All lessons" (the lesson opens over the list at every width)
+        if (e.key === 'Escape' && v.lesson && t.closest && t.closest('#tvwDetail') && !t.closest('input, textarea, select')) { e.preventDefault(); closeLesson(); }
     });
 }

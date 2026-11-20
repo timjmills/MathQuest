@@ -51,7 +51,7 @@
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-student-opts, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-student-opts, ws-teacher-wrm, ws-teacher-wrm --fallback, ws-lessons-browse (+ node: ws-lessons-passed, ws-pacing),
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/, plus
 #            ws-detailed-lesson --lesson <id> --check for every PASSED long lesson (data/curriculum/detailed-lessons.json
 #            critic verdict PASS: the gate-drift guard, lf-checks 2026-11-07: a kit ruling or a merge cannot silently turn a
@@ -866,6 +866,8 @@ build_list() {
   else add 1 fn "ws-print-lint --source kit (limit $PRINT_LINT_LIMIT)" "print_lint_limit"; fi
   browser_gate 1 ws-teacher-wrm ws-teacher-wrm.cjs
   browser_gate 1 "ws-teacher-wrm --fallback" ws-teacher-wrm.cjs --fallback
+  # the lessons browser (lf-checks, card design/cards/lessons-browser 2026-11-20; ~3 min): LESSON-DOMAIN, AREA-LABELS, FILTER-PASSED, LESSON-BROWSE
+  browser_gate 1 ws-lessons-browse ws-lessons-browse.mjs
   browser_gate 1 ws-screen-answer ws-screen-answer.cjs
   browser_gate 1 ws-teacher-shell ws-teacher-shell.cjs
   browser_gate 1 ws-teacher-library ws-teacher-library.cjs
@@ -897,6 +899,8 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 ws-lessons-passed ws-lessons-passed.mjs   # the ONE registry of whole lessons at 8/10: live ids, evidence, render stamps current
+  node_gate 1 ws-pacing ws-pacing.mjs                   # PACING-FILE: the school-year unit dates of the By unit / date view
   node_gate 1 "ws-empty-band --pin-check" ws-empty-band.cjs --pin-check   # critic eblast r4 P1: the blocking-role list may only grow (merge-base pin, fails closed)
   node_gate 1 "ws-empty-band --capacity-check" ws-empty-band.cjs --capacity-check   # every role used by a passed skill declares its ceiling, no drift
   node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate

@@ -39,6 +39,27 @@ export const AREAS = {
     NOSTD: { name: 'No standard', short: 'No standard', long: 'No standard', css: 'slate', icon: 'nostd' },
 };
 
+/**
+ * THE ONE area label table (owner ruling R1, 2026-11-19, design/cards/lessons-browser): every area CHIP and HEADING on
+ * the Lessons screen (teacher-wrm.js) and the Skills screen (teacher-library.js) reads its words from here; no other
+ * teacher-*.js file spells an area label (checked by ws-lessons-browse.mjs AREA-LABELS).
+ */
+export const AREA_LABELS = {
+    CC: 'Counting & Cardinality',
+    OA: 'Operations & Algebraic Thinking',
+    NBT: 'Number & Operations in Base Ten',
+    NF: 'Number & Operations—Fractions',
+    MEAS: 'Measurement (Measurement & Data)',
+    DATA: 'Data (Measurement & Data)',
+    G: 'Geometry',
+    RPNS: 'Ratios & Proportional Relationships / The Number System',
+    MIXED: 'Mixed (several domains)',
+    WORDS: 'Words (maths vocabulary)',
+    NOSTD: 'No CCSS domain',
+};
+/** An area's label (AREA_LABELS), the NOSTD label for an unknown key. */
+export const areaLabel = (key) => AREA_LABELS[key] || AREA_LABELS.NOSTD;
+
 /** The area icons (20 x 20, drawn in currentColor), copied from the signed mock-up. */
 export const AREA_ICONS = {
     dots: '<circle cx="6" cy="6" r="2.2" fill="currentColor"/><circle cx="14" cy="6" r="2.2" fill="currentColor"/><circle cx="6" cy="14" r="2.2" fill="currentColor"/><circle cx="14" cy="14" r="2.2" fill="currentColor"/>',

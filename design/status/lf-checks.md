@@ -975,3 +975,18 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   so the gate crashed (ERR_MODULE_NOT_FOUND). Now it copies the whole js/modules tree with a {"type":"module"} package.json
   (no new import can break it, no typeless-package warning), and --self-test loads skill-options.js and its imports. Row
   `content-audit-module-load` (a real --skill add_facts run: crash on master, OK on the fix).
+## 2026-11-20 — lessons browser build (signed card design/cards/lessons-browser)
+
+- Built: `js/modules/lessons-passed.js` (THE ONE registry: 3 passed with render stamps at d38308824, 3 pending re-check),
+  `js/modules/grade-of.js`, `AREA_LABELS` in teacher-areas.js, `wrm-links.js` browseRows / lessonArea / lessonCover /
+  browseCounts / unitGroups, the Lessons screen browser (grade chips All + generated, area chips + headings, status chips,
+  WRM | CCSS Build summary, "Only 8/10 ✓", Thumbnails | List | By unit / date with Now, "← All lessons" restoring state),
+  the Skills screen's generated grade pills + area chips + "Only 8/10 ✓", `data/curriculum/pacing/2026-27.json` (seeded by
+  `ws-pacing-seed.mjs` from the site's unit weeks; Pre-K and grade 2 D3 have no weeks: undated).
+- Gates: `ws-lessons-browse.mjs` (LESSON-DOMAIN, AREA-LABELS, FILTER-PASSED, LESSON-BROWSE, SCREEN), `ws-lessons-passed.mjs`,
+  `ws-pacing.mjs`; on precritic --teacher and in deploy session 1. Grade-3 counts equal the card's R5 line exactly.
+- RED BY DESIGN, lead decision needed: `ws-lessons-passed` FAILS on the merged tree (LP-STAMP stale on all 3 passes).
+  master e7c418bd4 (lf-ops, 2026-11-20 08:14) re-pinned design/audit/baselines/lesson-baseline.json, which changed the
+  pinned pages of the 3 detailed lessons after the critic's d38308824 stamp (its message: class-only lint markers
+  mq-tofblank / mq-smstate). With `--baseline-ref d38308824` the gate is OK. Either a narrow critic re-stamps the 3 on
+  the current render, or they move to PENDING_RECHECK until then.
