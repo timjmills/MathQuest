@@ -15290,6 +15290,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-player-stage-fill",
+   "check": "ws-lesson-player --render --reveal --stage-fill (A22): at 820 / 1024 / 1280 / 1366 / 1920, every I do step: the cell top == the Steps top +-4 px (or directly under the chip row), < 30 % of the stage outside the cell and the Steps, .mq-lp-say >= 95 % of the cell's inner width below the drawing with its frame and 'Say:' label from step 1 and its line only after the last step, digits in [signed, 1.25 x signed], the cell inside the stage; no orphan mode pill on the 'No such lesson' screen",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r2 F1 / F2 (root cause, cap rule; lead ruling A22 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "0cdd280a8",
+    "state": "player r2: the cell centred 144 px below the Steps' top with 47 % of the 1280 stage empty; the Say band moved into the words column (46 % of the cell's width) and absent before the last step; a lone 'Board' pill on the unknown-lesson screen"
+   },
+   "pass": {
+    "commit": "d43d8f222",
+    "state": "A22: the cell top-aligned with the Steps (or under the chips), stage empty <= 28.4 %, the Say band full width under the drawing from step 1, digits 126 / 128 / 175 / 104 / 104 px, no mode pill on the message stage"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --render --reveal --stage-fill",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
