@@ -12913,6 +12913,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "model-beside-clip",
+   "check": "ws-empty-band EB-CLIP on the two-column (state beside its step) Scripted Model: the beside state is measured as drawn and its row keeps that height. Critic rowcap-s2 F1 class / vocabfix resume: add_wp_10_plain L word-work states ran 0.8 mm past the row rule, fact_family_sort L family-check 0.1 mm above it (and the frame's foot covered in print, RR-BOX)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-CLIP (precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "d2306451c",
+    "state": "EB-CLIP 5 on add_wp_10_plain L / fact_family_sort L Scripted Model"
+   },
+   "pass": {
+    "commit": "dd5e01659",
+    "state": "beside states measured as drawn: EB-CLIP 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10_plain,addition:fact_family_sort --roles scripted-model --sizes L --hosts none --no-baseline --only EB-CLIP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
