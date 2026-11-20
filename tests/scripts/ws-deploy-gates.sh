@@ -51,7 +51,7 @@
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-student-opts, ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/, plus
 #            ws-detailed-lesson --lesson <id> --check for every PASSED long lesson (data/curriculum/detailed-lessons.json
 #            critic verdict PASS: the gate-drift guard, lf-checks 2026-11-07: a kit ruling or a merge cannot silently turn a
@@ -875,6 +875,8 @@ build_list() {
   # the pupil skill explorer (owner 2026-11-05; ~30 s): by grade / by area, picks reach the bottom row, Print and Play
   browser_gate 1 ws-student-explorer ws-student-explorer.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
+  # the pupil options sheet (lf-studentopts 2026-11-19; ~4 min): CARRY / COUNT / PUPIL at 1280, 1366, 1024, 820 + the node UNIT
+  browser_gate 1 ws-student-opts ws-student-opts.cjs
   # SCREEN-INK-SIZE on every redesign-passed skill (lead 2026-11-13), against its pin: screen pictures at print size, drawings wide before tall
   browser_gate 1 "ws-screen-ink-size --passed" ws-screen-ink-size.cjs --passed
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)

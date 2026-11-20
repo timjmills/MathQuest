@@ -758,6 +758,7 @@
                         <span class="mode-name">Print Worksheet</span>
                     </div>
                     <div class="student-start-wrap student-only">
+                    <p class="student-play-count" id="studentStartCount" aria-live="polite" hidden></p>
                     <div class="student-start-buttons" id="studentStartButtons" role="group" aria-label="Start">
                         <button type="button" class="student-start-btn" data-mode="practice" onclick="startMode('practice')"><span class="mode-icon" aria-hidden="true">🎓</span><span class="mode-name">Start practice</span></button>
                         <button type="button" class="student-start-btn" data-mode="boss" onclick="startMode('boss')"><span class="mode-icon" aria-hidden="true">🐉</span><span class="mode-name">Start boss battle</span></button>
@@ -857,6 +858,7 @@
                 <span class="student-sel-count" id="studentSelCount" aria-live="polite">Pick skills above</span>
                 <div class="student-sel-btns">
                     <button type="button" class="student-sel-btn" id="studentSelAddBtn" onclick="addSelectionToQuickStart()" disabled><span aria-hidden="true">&#43;</span><span>Add to Quick Start</span></button>
+                    <span class="student-play-count" id="studentPlayCount" hidden></span>
                     <button type="button" class="student-sel-btn student-sel-play" id="studentSelPlayBtn" onclick="playStudentSelection()" disabled><span aria-hidden="true">&#9654;</span><span>Play</span></button>
                     <button type="button" class="student-sel-btn" id="studentSelSendBtn" onclick="sendStudentSelection()" disabled><span>Send</span></button>
                 </div>

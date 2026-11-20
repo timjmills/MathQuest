@@ -108,6 +108,9 @@
 //   --unit <unit-id>  every lesson of design/lessons-first/queue.json's unit whose long lesson is built (its `long`
 //             field names the detailed lesson id); a lesson with no long lesson yet is named in an N/A row (its short lesson's
 //             checks, ws-lesson-check --unit, join when lf-engine merges phase 0).
+//   --student         the pupil home (lane lf-studentopts, 2026-11-19): ws-student-opts --unit, ws-student-opts (the options
+//             sheet: CARRY / COUNT / PUPIL at 1280, 1366, 1024, 820), ws-student-explorer, ws-share-options, ws-lesson-link-uses,
+//             ws-simple-print
 //   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
 //             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-pdf-preview (print preview parity + timing),
 //             ws-plain-words --check, and the four lesson-parts rows above (ws-partopts-unit x 3, ws-partopts-shots)
@@ -449,6 +452,19 @@ function judge(g, run, p) {
 }
 
 const PARSE = {
+    // ws-student-opts (lane lf-studentopts, 2026-11-19): its own verdict line, and a browser run must say it checked every width
+    // it was asked for (`  @<w>: checked`), a --unit run its `  unit:` line - else it checked something else
+    studentOpts(g, out, code) {
+        const m = [...out.matchAll(/^ws-student-opts: (OK|FAIL)\b(.*)$/gm)];
+        if (!m.length) return unparsed('no "ws-student-opts: OK|FAIL" line', out);
+        const fl = out.split('\n').filter((l) => /^\s+FAIL /.test(l)).map((l) => l.trim().replace(/^FAIL /, ''));
+        if (m[m.length - 1][1] === 'FAIL') return { result: 'FAIL', findings: `${fl.length} finding(s): ${fl.slice(0, 3).join(' | ')}`, detail: fl.slice(0, 12), explainsExit: code !== 0 };
+        if (!/^\s+unit: /m.test(out)) return { result: 'FAIL', findings: 'no "unit:" line: the pupil subset was not checked', detail: tailLines(out), explainsExit: false };
+        const want = (g.expect && g.expect.widths) || [];
+        const miss = want.filter((w) => !new RegExp(`^\\s+@${w}: checked`, 'm').test(out));
+        if (miss.length) return { result: 'FAIL', findings: `checked nothing at ${miss.join(', ')} px (the scope asks for ${want.join(', ')})`, detail: tailLines(out), explainsExit: false };
+        return { result: 'PASS', findings: want.length ? `CARRY / COUNT / PUPIL / UNIT at ${want.join(', ')} px` : 'UNIT (pupilOptionsFor on every live skill)', detail: [], explainsExit: code === 0 };
+    },
     // ws-screen-support-eq (lf-hosts 2026-11-13): its verdict comes from ONE place, the tool's own verdict() line, which
     // accounts for every skill in scope (checked / no supports / not run). The row maps it 1:1 - OK PASS, N/A N/A, FAIL FAIL -
     // and applies no rule of its own (the generic skill-mention rule read "algebra:x: no supports" as an absent skill, so the
@@ -855,7 +871,7 @@ function roleCoverPlan(keys) {
 }
 
 /* ============================================================== plan */
-function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N] [--only gate-id,...]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
+function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L] | --student  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N] [--only gate-id,...]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
 const OPT_IN_FILE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'opt-in-rules.json');
 /** Add each opted-in lane's args to its gate rows (opt-in-rules.json), judged only on the scope's skills of that lane. */
@@ -903,6 +919,21 @@ function applyOptIn(rows, keys) {
  * rows partopts-*); design/lessons-first/CHECKS_FROM_CRITICS.md names each row's check, backtest id and precritic row.
  */
 const PARTOPTS_LESSONS = 'number_sense:nearest_10,addition:add_wp_10,placevalue:identify,division:div_facts,addition:fact_family_sort';
+/**
+ * --student (lane lf-studentopts, 2026-11-19): the pupil home. The options sheet (ws-student-opts: CARRY, COUNT, PUPIL at the
+ * four screen widths, and its node UNIT), with the pupil gates it must keep green: the explorer, options through share links,
+ * a detailed lesson link's uses, and the simple print.
+ */
+const STUDENT_WIDTHS = [1280, 1366, 1024, 820];
+function addStudent(add) {
+    add(gate('student-opts-unit', 'ws-student-opts --unit (pupilOptionsFor on every live skill: no teacher option, counts pinned)', 'every live skill', 'node', 'ws-student-opts', ['--unit'], { parse: PARSE.studentOpts, needFlags: ['unit'], missingMsg: 'no tests/scripts/ws-student-opts.cjs' }));
+    add(gate('student-opts', 'ws-student-opts (the pupil options sheet: CARRY / COUNT / PUPIL)', 'pupil home at 1280, 1366, 1024, 820', 'browser', 'ws-student-opts', [], { parse: PARSE.studentOpts, expect: { widths: STUDENT_WIDTHS }, missingMsg: 'no tests/scripts/ws-student-opts.cjs' }));
+    add(gate('student-explorer', 'ws-student-explorer', 'pupil skill explorer', 'browser', 'ws-student-explorer', []));
+    add(gate('share-options', 'ws-share-options', 'options through share links (teacher and pupil)', 'browser', 'ws-share-options', []));
+    add(gate('lesson-link-uses', 'ws-lesson-link-uses', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
+    add(gate('simple-print', 'ws-simple-print', 'the simple print (pupil and teacher)', 'browser', 'ws-simple-print', []));
+}
+
 function addPartOpts(add, ctx) {
     const sub = '5 graded lessons × M / L';
     add(gate('partopts-unit', 'ws-partopts-unit (lesson parts: PO-2a-e, EB-ROWFIT, PO-NOROOM, PO-REM, PO-CAP, PO-VOC + the PO-2w step walk)', sub, 'browser', 'ws-partopts-unit',
@@ -1455,6 +1486,7 @@ function buildPlan(ctx) {
         add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
         addPartOpts(add, ctx);
     }
+    if (ctx.student) addStudent(add);
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
     // a tracked file holding one (node, < 1 s)
     add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
@@ -1598,7 +1630,7 @@ async function pool(items, n, fn) {
 /* ============================================================== flags */
 const VALUE_FLAGS = new Set(['only', 'skill', 'batch', 'sample-cap', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
 const REPEATABLE = new Set(['skill', 'lesson', 'unit', 'only']);
-const BOOL_FLAGS = new Set(['teacher', 'copy-light', 'dry-run', 'write-role-sample', 'list-live', 'strict', 'allow-not-built', 'report-only', 'help', 'h']);
+const BOOL_FLAGS = new Set(['teacher', 'student', 'copy-light', 'dry-run', 'write-role-sample', 'list-live', 'strict', 'allow-not-built', 'report-only', 'help', 'h']);
 /** Every problem with the command line, as messages (empty when it is good). */
 function checkArgs(argv) {
     const errs = [];
@@ -1688,7 +1720,8 @@ async function main() {
     }
     const lessons = [...new Set([...lessonScope, ...unitInfo.flatMap((u) => u.built.map((b) => b.id))])].filter((l) => detailedIds.includes(l));
     if (lessons.length && !role) role = 'lesson';
-    if (!wantSkills.length && !template && !role && !teacher && !unitIds.length) usage('give a scope: --skill, --template, --role, --lesson, --unit or --teacher');
+    const student = has('student');
+    if (!wantSkills.length && !template && !role && !teacher && !student && !unitIds.length) usage('give a scope: --skill, --template, --role, --lesson, --unit, --teacher or --student');
     if (role) {
         const R = sheetRoles();
         const ok = new Set([...R.roles, ...Object.keys(R.aliases)]);
@@ -1699,7 +1732,7 @@ async function main() {
     const dry = has('dry-run');
     const logs = path.resolve(arg('logs', `/tmp/mq-precritic/${stamp}-${process.pid}`));
     if (!dry) fs.mkdirSync(logs, { recursive: true });
-    const ctx = { batch: batchKeys, copyLight, samplePath: path.join(logs, batchKeys.length ? 'copy-light-batch-sample.json' : 'copy-light-sample.json'), sampleCap: arg('sample-cap', null), logs, template, role, teacher, grade: arg('grade', null), lesson: teacher ? arg('lesson', null) : null, lessons, unitInfo, timeoutMin: +arg('timeout', '90'), skills: [], roleSample: [], live: [], templateScan: null };
+    const ctx = { batch: batchKeys, copyLight, samplePath: path.join(logs, batchKeys.length ? 'copy-light-batch-sample.json' : 'copy-light-sample.json'), sampleCap: arg('sample-cap', null), logs, template, role, teacher, grade: arg('grade', null), lesson: teacher ? arg('lesson', null) : null, lessons, unitInfo, timeoutMin: +arg('timeout', '90'), skills: [], roleSample: [], live: [], templateScan: null, student };
 
     // ---- scope: skills (validated against the live list), the template's skills, the role sample
     let scanNote = '';
@@ -1755,7 +1788,7 @@ async function main() {
     const dirtyFiles = git(['status', '--porcelain', '--untracked-files=all']).split('\n').filter(Boolean)
         .filter((l) => !l.startsWith('??') || /^\?\? "?(js|css|tests|design)\//.test(l));
     const dirty = dirtyFiles.length > 0;
-    const scopeLine = [ctx.skills.length && !template ? `--skill ${ctx.skills.map((s) => s.key).join(',')}` : '', template ? `--template ${template} (${ctx.skills.length} skills${scanNote})` : '', template && wantSkills.length ? `--skill ${wantSkills.join(',')}` : '', lessons.length || unitIds.length ? `${unitIds.map((u) => `--unit ${u}`).join(' ')}${lessonScope.length ? ` --lesson ${lessonScope.join(',')}` : ''} (${lessons.length} long lesson(s))` : '', role ? `--role ${role}` : '', teacher ? `--teacher${ctx.grade ? ` --grade ${ctx.grade}` : ''}${ctx.lesson ? ` --lesson ${ctx.lesson}` : ''}` : ''].filter(Boolean).join(' ');
+    const scopeLine = [ctx.skills.length && !template ? `--skill ${ctx.skills.map((s) => s.key).join(',')}` : '', template ? `--template ${template} (${ctx.skills.length} skills${scanNote})` : '', template && wantSkills.length ? `--skill ${wantSkills.join(',')}` : '', lessons.length || unitIds.length ? `${unitIds.map((u) => `--unit ${u}`).join(' ')}${lessonScope.length ? ` --lesson ${lessonScope.join(',')}` : ''} (${lessons.length} long lesson(s))` : '', role ? `--role ${role}` : '', teacher ? `--teacher${ctx.grade ? ` --grade ${ctx.grade}` : ''}${ctx.lesson ? ` --lesson ${ctx.lesson}` : ''}` : '', student ? '--student' : ''].filter(Boolean).join(' ');
 
     if (dry) {
         say(`${TOOL} plan: ${scopeLine}${onlyNote} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (${copyLight ? 'created for the copy-light sample only' : 'not created'})`);
