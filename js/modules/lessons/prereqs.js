@@ -59,9 +59,28 @@ export const LESSONS = (() => {
     return Object.freeze(out);
 })();
 
-/** The lesson data of a skill, or null (a skill with no authored lesson yet). */
-export function lessonFor(categoryId, skillId) {
-    return LESSONS[`${categoryId}:${skillId}`] || null;
+/** The lesson entry an option set picks (`byOption`, lane lf-ops critic r1): {forms: {1: {...}, unit: {...}}} - a set
+ *  option holding ONE value takes that value's entry; forms 2 and 3 (times 1, times 0) alone or together take `unit`;
+ *  any other mix takes `mixed`. */
+export function optionLesson(data, opts) {
+    if (!data || !data.byOption || !opts) return data;
+    let out = data;
+    for (const [id, table] of Object.entries(data.byOption)) {
+        let v = opts[id];
+        if (v === undefined || v === null) continue;
+        const list = Array.isArray(v) ? [...new Set(v.map(String))] : [String(v)];
+        const hit = list.length === 1 && table[list[0]] ? table[list[0]]
+            : table.unit && list.length && list.every((x) => x === '2' || x === '3') ? table.unit
+                : list.length > 1 && table.mixed ? table.mixed : null;
+        if (hit) out = Object.assign({}, out, hit);
+    }
+    return out;
+}
+
+/** The lesson data of a skill, or null (a skill with no authored lesson yet); `opts` picks a `byOption` entry. */
+export function lessonFor(categoryId, skillId, opts = null) {
+    const d = LESSONS[`${categoryId}:${skillId}`] || null;
+    return d && d.byOption ? optionLesson(d, opts) : d;
 }
 
 /** The lesson data of a lesson id or slug (library.js lessonData: with its `prereqs`), or null. */
@@ -78,4 +97,4 @@ export function skillRef(entry) {
     return ref;
 }
 
-export default { LESSONS, STEP_ICONS, lessonFor, lessonDataById, skillRef };
+export default { LESSONS, STEP_ICONS, lessonFor, optionLesson, lessonDataById, skillRef };

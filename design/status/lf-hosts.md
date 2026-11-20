@@ -9,6 +9,12 @@ Builder profile: mq-opus-medium
 Critic rounds: 3, PASS r3 (8/8/8/8 card, worksheet, quiz)
 
 ## Now
+- 2026-11-20 (logged by lf-algebra for lf-hosts, lead ruling) LATENT, next week with the twin >= 29 px floor: screen-cell.js fitTwinRows'
+  general pass only ever LOWERS --mq-k2 (one fit per cell-width key, `k < cur`), and layoutWorksheetGrid tries the cards at 3 columns
+  first at 1024 (grid >= 960 px). A twin fitted during that try keeps the smaller drawing in the 2-up card it settles in. It showed as
+  number_patterns_rule 26.2 -> 22.9 px before count_by_tables (204ebc315) took count-row off the fit. Fix built and parked (closed PR #52,
+  branch claude/sweet-newton-c8wrv1-lf-algebra-fitk2): reset to the twin's base --mq-k2 on a new fit key; refit the grid's twins once the
+  columns settle; check ws-twin-fit-reset needs a probe template that still goes through the fit (count-row no longer does).
 - Items 1-3 PASSED critic r3 (8/8/8/8 on card, worksheet, quiz at 820/1024/1280/1366). Deploy head sent to the lead (see Log).
 - Item 4 (two-step) done on claude/sweet-newton-c8wrv1-lf-hosts-twostep @ 5719fe9b6 (on lf-algebra, no master); lead routed it to lf-algebra (merge master, then take the branch).
 - Lane folds into lf-checks (owner fast plan). Remainder handed to lf-checks: see "Hand-over".
