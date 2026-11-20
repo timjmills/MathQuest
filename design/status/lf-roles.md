@@ -439,3 +439,9 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
   ("22 + 14 = 36."). HINT-OVERMASK is on the precritic guided-cellfit gate.
 - Fix (2076d974a, guided.js hintOf): the box-number mask skips every number the question prints; the label-and-gaps drop stays.
 - Backtest row guided-hint-overmask (FAIL 1e2e51860 → OK 2076d974a, a narrow sweep so the FAIL line is read) PASS; guided-hint-box-leak re-proved PASS (FAIL 8533a8b48 → OK 174348717). ws-guided-cellfit now flushes a long FAIL list before exit (the full sweep printed 333 findings and lost its last line). Hash proof: see the hand-over.
+- Fix 2: outside a story, the own step W2 used masked is skipped when its kept text gives the answer (hintGivesAnswer), so
+  placevalue identify / value print their pre-W2 first step again ("The letter above it is O."). HINT-UNIFORM is now green on all
+  four presets (two_step_mult_div_first keeps "5 x 2" and gaps the 10).
+- Hash proof (rolehash, guided + scripted-model 192 pages, lesson 96): HEAD vs HEAD with guided.js from 8533a8b48 (pre-W2; it is
+  the only file W2 touched since) - 192 / 192 and 96 / 96 identical. origin/master is not a usable base: the branch's 42 unmerged
+  commits change 172 of those pages (grid heights etc.) on their own.
