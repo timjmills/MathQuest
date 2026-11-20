@@ -262,10 +262,10 @@ const REDO = new Set(['seqstrip', 'count-row', 'cloze-bank']);
 // A template whose ink starts flush with its box (a count row's tiles) lifts the "<Name> wrote:" label a little more,
 // so the label's foot stays 2-4 mm over the ink (PT-ERR-4; ws-cell-checks PUPILTAG; lead order 5, 2026-11-13)
 const TAG_LIFT = { 'count-row': 0.5, 'function-table': 0.5 };
-// TAB-CLEAR (critic lf-engine-rowcap-s2 F3): the "<Name> wrote:" tag over the work starts 2 mm under the cell's number tab. A row held to
+// TAB-CLEAR (critic lf-engine-rowcap-s2 F3): the "<Name> wrote:" tag over the work starts 2 mm right of the cell's number tab. A row held to
 // its drawing (ROW-STRETCH CAP) no longer centres the work low enough to clear the tab by chance (fact_family_sort M: the tab covered
-// "Sam chose:"), so the work keeps the tab's height + 0.75 mm above it - in its own markup, so the host measures it and the row holds it.
-const TAB_CLEAR_TOP = 'calc(var(--ws-tab, 5mm) + 0.75mm)';
+// "Sam chose:"); moving the tag ACROSS, not the work down, keeps every row's height (a margin over the work cost Error Analysis L an item).
+const TAB_CLEAR_LEFT = 'calc(var(--ws-tab, 5mm) + 2mm)';
 
 /**
  * What names each part when the parts are a plain list inside a picture (critic round 3: "1st
@@ -702,7 +702,7 @@ export function prepare(it, info = {}) {
         // (a REDO item - a count row, a strip - is written again in a zone under it that starts at the cell's left: its work starts
         // there too, never centred over it - lf-algebra critic r2 G2, the copy train 60 px left of the original)
         const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:${kind === 'redo' ? 'flex-start' : 'center'}` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative;margin-top:${TAB_CLEAR_TOP}${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? ` style="margin-left:${TAB_CLEAR_LEFT}"` : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:${TAB_CLEAR_LEFT}"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';

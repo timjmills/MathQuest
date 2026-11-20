@@ -12271,7 +12271,7 @@
     "fixture": "tests/fixtures/precritic/rr-box/rr-box.pass.pdf",
     "state": "count_by_tables Guided L printed on d8d3e9fc5: every frame edge inked"
    },
-   "command": "node tests/lib/ws-role-raster.cjs --pdf {fixture}",
+   "command": "node tests/scripts/ws-grade-render.cjs --raster-pdf {fixture}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
