@@ -3,15 +3,15 @@ Title: Screen hosts: 0-cell guard, 390 touch targets, quiz label ink, two-step h
 Session: session_013pHDnQ4fgVajj5vZ6fwpwV
 Branch: claude/sweet-newton-c8wrv1-lf-hosts (item 4: claude/sweet-newton-c8wrv1-lf-hosts-twostep, on lf-algebra 8438ca59d+)
 Owner of files: screen host code (screen-cell / practice card / quiz host) for items 1-4; host checks for items 1-5 (ws-screen-ink-size SIZE-REF / SIZE-WIDTH)
-State: passed
-Updated: 2026-11-13
+State: paused
+Updated: 2026-11-20
 Builder profile: mq-opus-medium
 Critic rounds: 3, PASS r3 (8/8/8/8 card, worksheet, quiz)
 
 ## Now
-- Items 1-3 PASSED critic r3 (8/8/8/8 on card, worksheet, quiz at 820/1024/1280/1366). Deploy head sent to the lead (see Log).
-- Item 4 (two-step) done on claude/sweet-newton-c8wrv1-lf-hosts-twostep @ 5719fe9b6 (on lf-algebra, no master); lead routed it to lf-algebra (merge master, then take the branch).
-- Lane folds into lf-checks (owner fast plan). Remainder handed to lf-checks: see "Hand-over".
+- 2026-11-20: Skip button (every student mode), keyboard end-of-run fix, infinite-Finish count and card/add_wp_20 48 px touch targets are LIVE on master 398bb4902. Lane stopped for the week (lead).
+- Next week (lead): (1) DIGIT FLOOR in the screen-cell.js host fit pass - never shrink a drawn twin's digits below the 29 px worksheet floor; wrap first, else one column (with lf-algebra, count-row twin to >= 29 px). (2) Interactive lesson player mock (card first).
+- Routed, open: ws-worksheet-reflow FAILS on master (placevalue:expand 2 -> 1 columns at 1024; number_patterns_rule numerals 26.2 -> 22.9 px); not re-pinned; owners asked via the lead; proposed for deploy session 1.
 
 ## Hand-over to lf-checks
 - r3 m1: ws-phone-card TOUCH-HIT timing flake on untouched cells (sub_100_no_regroup / expand bottom edges, add_facts quiz corner; 2-3 random misses a run). Proposed: re-tap a miss after 2 rAF, report repeats only; backtest = 3 runs on sub_100_no_regroup give the same result.
@@ -40,6 +40,7 @@ Times: builder items 1-3 (stopped, superseded by lf-checks hand-off), start 2026
 Times: builder item 4, start 2026-11-13T15:23Z, end —, profile mq-opus-medium
 
 ## Log
+- 2026-11-20: Skip: build, narrow critic r1 FAIL (card C1 5: run ended under the intro; total off by one; timer; quiz count; blank = wrong; wrong try hidden), r2 PASS (8/8/8/8, MAP 9). r2 follow-ups: ws-skip waits on state (10 rows 3x PASS), pupil results read Skipped, skip-return re-pointed to 96f23a96c. Lead ruling: MAP still-skipped = incorrect for RIT. End-run bug (3 end modals on Enter) and touch targets fixed as bug fixes with checks (ws-end-run, TOUCH-TARGET tool buttons). Deployed 398bb4902.
 - 2026-11-13: critic r3 PASS on 9a880edf1; master a8258e3f3 merged after (conflicts unions, 390 backtest rows, none dropped); deploy head sent with 8 before/after PNGs in design/status/lf-hosts/deploy/.
 - 2026-11-13: critic r2 FAIL (C1 7): F1 real taps hit the neighbour box (overflow wrapper clipped the 48 px padding) -> TOUCH-HIT; F2 precritic screen gates at 390 -> ws-screen-widths-plan; F3 CELL-READ by construction; F4 quiz flake; F5 WS-REFLOW growth-only. All fixed with rows.
 - 2026-11-13: critic r1 FAIL (worksheet C3 5): F1 worksheet digit raise reflowed passed skills -> raise removed, WS-REFLOW ratchet; F2 conflict markers committed by my merge -> ws-conflict-markers gate (landed via lf-checks); F3 yellow focus ring; F4 1 px overlapping hit areas -> TOUCH-UNIQUE; F5 fixed sleeps.
