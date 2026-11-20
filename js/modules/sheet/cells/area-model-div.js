@@ -27,6 +27,12 @@ import { stepMarks, slotInks, WHOLE_SLOTS } from '../steps.js';
 
 const NOWRAP = 'area-model-total-row';   // the online worksheet's no-wrap opt-out (see area-model.js)
 
+// The gaps under the side-length boxes and over the problem row, in em. Print is tighter than the screen (template round 2,
+// 2026-11-20: the long / fraction model measured 58 mm at M, 0.6 mm over a quarter of the page body, so it printed 3 rows
+// - 6 a page, H13 - in 76.5 mm cells, EB-BAND 28 %; 1.5 mm less gap prints 4 rows, 8 a page). The screen keeps its gaps.
+const gapUnder = (twin) => (twin ? 0.15 : 0.1);
+const gapOver = (twin) => (twin ? 0.45 : 0.3);
+
 const quotOf = (p) => Number(p.dividend) / Number(p.divisor);
 const qParts = (p) => p.parts.map((v) => Number(v) / Number(p.divisor));
 const formOf = (p) => (['long', 'fraction'].includes(p.form) ? p.form : 'sign');
@@ -107,11 +113,11 @@ register('area-model-div', {
             problem = `<span>${D}</span>${op('÷')}<span>${V}</span>${op('=')}${totalSlot}`;
         }
         const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(1)}`}">`
-            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(G.sideMm)};margin-bottom:0.15em">${top}</div>`
+            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(G.sideMm)};margin-bottom:${gapUnder(twin)}em">${top}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span class="${NOWRAP}" style="flex:0 0 ${g.em(G.sideMm)};display:flex;justify-content:center;font-weight:700">${side}</span>`
             + `<span class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;border:${HAIR} solid ${INK.ink}">${rects}</span></div>`
-            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">${problem}</div></div>`;
+            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:${gapOver(twin)}em;white-space:nowrap">${problem}</div></div>`;
         return root(g, 'area-model-div', model, 'text-align:center;white-space:nowrap;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
@@ -138,9 +144,14 @@ register('area-model-div', {
             // hMm from the ink (template round 2026-11-19, EB-BAND / L-TOPSTART): the boxes row, the model, the problem row and
             // their gaps, plus the cell's own pads (CL-8: 3 mm a side) - no slack (was + 14 mm, which the unmeasured planners -
             // the lesson's Practice band - read as a 70 mm row for 41 mm of ink at M)
-            hMm: Math.ceil(g.stripMm + 0.15 * g.E + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 1) + 6),
-            inkHMm: Math.ceil(g.stripMm + 0.15 * g.E + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 1)),
+            hMm: Math.ceil(g.stripMm + gapUnder(g.twin) * g.E + G.hMm + probH + gapOver(g.twin) * g.E + (g.twin ? 0 : 1) + 6),
+            inkHMm: Math.ceil(g.stripMm + gapUnder(g.twin) * g.E + G.hMm + probH + gapOver(g.twin) * g.E + (g.twin ? 0 : 1)),
             measure: true, factLike: false, maxCols: 2,
+            // (template round 2, 2026-11-20, H13 / EB-BAND: the long and fraction forms' extra height is the problem's own second
+            // line, not working room - every answer is a box in the drawing - so a dense page packs them at their measured height
+            // (denseRoom 1, layout.js) and they print the sign form's rows: 8 a page at M, not 6 in 76.5 mm cells. The sign form
+            // keeps the default 1.2.)
+            ...(formOf(p) === 'sign' ? {} : { denseRoom: 1 }),
         };
     },
     inputs(p) {
