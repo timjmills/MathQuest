@@ -400,3 +400,4 @@ Every list may only shrink: a skill joining FAILs, and on a full sweep a pinned 
 | lf-ops | `addition:add_sub_fact_family` |
 
 
+- 2026-11-20 expand-2col (claude/lf-placevalue-expand-2col): expand online worksheet at 1024 back to 2 columns (boxes 101 -> 78 x 74 on #worksheetView at 960-1279 px, sentence one line, digit 29 px, input >= 48 x 48); 820 1 / 1280 2 / 1366 2 unchanged; ws-pv-screen-numeral WS-COLS (backtest pv-expand-ws-cols-1024 FAIL 9ae9ccd5d -> OK 72f61f850); reflow re-pinned for the 4 expand keys only; PNGs design/status/lf-placevalue/reflow-expand/2col/.
