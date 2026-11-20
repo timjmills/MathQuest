@@ -156,3 +156,16 @@ Independent critic (Opus medium), comparing 68565d00b with master eb2e26972, 64 
   - no new empty band and no overflow;
   - the key is correct.
   - Scores: fidelity 9, teaching 9, key 10, space 8–9. Master scored 8 for space; nothing regressed.
+
+### Re-pin on master 398bb4902 (merge 14691b209)
+
+- Rewritten by the protocol on the merged tree: 2,714 hashes (master's pin: 2,590).
+- **Against our previous pin (68565d00b):** only `vocabulary:vocab_pick3_words` moved, 16 keys (M/L x 4242/1: pupil-p1, key-p1,
+  pupilHtml, keyHtml). These are exactly the 16 keys master re-pinned in b4341eef8 (z1 Guided hint). Nothing else moved.
+- **Against master's pin at 398bb4902:** 2,226 keys differ. That is exactly the set our accounting above explained against
+  eb2e26972: the 102 real pages in 8 lessons, the class-only pages (`mq-tofblank` / `mq-smstate` / `mq-pagecap` and the engine
+  `<style>`) with their whole-HTML hashes, and the 124 keys of the 3 new pins (mult_properties 42, arrays_groups 42,
+  count_by_tables 40). There are 0 unexplained keys, and no expected key went missing.
+- **vocab_pick3_words:** our 16 keys cannot equal master's hashes, because this lesson's pages carry the engine `<style>`.
+  Dumping the lesson on both trees (master worktree at 398bb4902, whose render matches its pin) gives 52 of 52 pages identical
+  once the engine style and the marker classes are removed. Master's z1 change is fully present, and the rest is class-only.
