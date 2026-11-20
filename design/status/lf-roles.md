@@ -371,3 +371,77 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - PNGs: design/status/lf-roles/r10/.
 - 2026-11-14 r10 narrow critic: count_by_tables M + vocab_grade_pictures L PASS; QUEUED: X1 count_by_tables Guided L p2 EB-BAND 33% (pre-existing; hold count rows to ink on continuation pages); X2 two_step_add_then_div Guided M p1 Model alone (PAGE_TYPES 2.3; check GUIDED-MODEL-ALONE first); chart_120 (b)/(c). Stopped at budget ($319 of $345).
 - 2026-11-14 r11 (X1, X2 of critic r10): X1 fixed - Guided continuation pages of count rows held to their measure (roles/guided.js 1337; GUIDED-COUNT-TIGHT, backtest guided-count-tight FAIL 448bc5e74 -> OK d3629b594); count_by_tables L p2 rows now ~36 mm, EB-BAND OK. X2 not fixable without overflow: two_step_add_then_div M needs 219.8 mm for Model + hinted try in 193.7 mm drawn room (L 237.8+ in 179.9); GUIDED-MODEL-ALONE guards the case where they fit (passes before and after). Passed Guided pages: 96 hashes identical. PNG: design/status/lf-roles/r11/.
+
+## Round r13 (2026-11-20): Guided Model row EB-STRETCH (planner over-estimate)
+
+- Finding: multiplication:mult_facts Guided L, Model row 69.4 mm over a 60.8 mm cell, 5.6 mm past drawn + 3 mm room (EB-STRETCH).
+  The cause was not the think cue (THINK_CUE_MM applies only to division facts). It was `workLinesMm`: 0.5 em a character in 186/cols - 8 mm
+  reckoned the worked line "Count by 6, 7 times: 6, 12, 18, 24, 30, 36, 42." as 3 lines, and it draws 2 (Andika 0.45 em, 111 mm, in a
+  57.5 mm column).
+- Fix (WORK-LINES-MEASURED, guided.js workLinesMm): Andika advance widths measured in the browser (ANDIKA_EM, 0.6 em for any other
+  character), a greedy word wrap at spaces, the drawn column 186/cols - 4.5 mm, and a 2 % margin. EB-STRETCH FAIL -> OK, full ws-empty-band OK.
+- Hash (ROLES=guided, passed skills): changed = add_wp_20_plain L, add_wp_10_plain L, add_wp_20 L, sub_wp_10 S/L, sub_wp_10_plain S/L.
+  These are word-work Model rows that held the same over-estimate. Their rows shrink 6.6 mm and stay above their ink (EB-STRETCH 13.3 -> 6.6 mm over, the
+  EB-BAND 31-33 % fails cleared). The remaining 6.6 mm is word-work, outside r13.
+- Backtest `guided-worklines-measured` (FAIL 661965d43 -> OK 15b738cb3) PASS. PNG r13/mult_facts-guided-L.png.
+- Pre-skill Check identify L (lead item): NOT changed. Page-1-fill means 3 + 1 bands (5 + 1 items). That conflicts with ruling R13 and
+  ws-roles-unit PSC-2PG-BALANCE (2 + 2, never a one-item page), and moves 37 passed PSC pages. The change was reverted, and the conflict
+  was returned to the lead.
+
+## Round r14 (2026-11-20): Y1 word-work Guided Model row (critic r13)
+
+- The cause was not the line count. WORK-LINES-COUNT was measured by hand on add_wp_20 L: workLinesMm predicts 4 lines and the Model draws 4 (26.5 mm).
+  The row ADDED the tries' hint line (8.6 mm at L) to the Model's worked lines, but the two stand side by side in one row.
+- Fix GUIDED-MODEL-HINT-ROW (guided.js `rowNeed`): row 0 needs max(Model + extra, try + hint). EB-STRETCH / full ws-empty-band OK on all
+  5 skills at M,L, and on add_wp_10, sub_wp_20, sub_wp_20_plain, vocab_pick3_words and hundreds_chart_fill (20 findings -> 0, none new).
+- Hash (ROLES=guided) changed: add_wp_20_plain S/L, add_wp_10 S/M, sub_wp_20 L, add_wp_10_plain S/M/L, add_wp_20 S/L, sub_wp_10 S/L,
+  sub_wp_10_plain S/L, sub_wp_20_plain L, vocab_pick3_words S/M/L, hundreds_chart_fill M/L. Every one is a Model row that held the same sum.
+- Backtest `guided-model-hint-row` (FAIL aad74cb32 -> OK 58c90c6fe) PASS. y2 (single-word last line) not done.
+
+## Round r15 (2026-11-20): z1 vocab pick-3 Guided hint leak (critic r14)
+
+- The cue (js/modules/sheet/providers/vocabulary.js, the vocab-pick3 workedSteps step 1) picked out ONE bank word on purpose (old V14),
+  so it gave the answer. It now narrows the bank to two: the answer's first letter when another word shares it, else that
+  letter and one other bank word's letter, in alphabetical order. Check: ws-vocab-unit V14 GUIDED-HINT-LEAK (bank).
+- Hash (ROLES=guided): only vocab_pick3_words guided S/M/L changed. Backtest `vocab-hint-bank-leak` PASS. y2 deferred (lead).
+
+## Round r16 (2026-11-20): F3 continuation-cell overflow; F4 returned to the lead
+
+- F3: the two-step stories' Guided L page 2 hinted try overflowed its cell by 13 px. `hintRow` was set on page 1 only, so a
+  continuation row never took the hint height. Fix GUIDED-CONT-HINT (guided.js, the `hintRow` / `hintedHere` lines): the row holding the
+  hinted tries on any page takes the hint. New check ws-guided-cellfit CELL-FITS, now a precritic browser gate. Backtest
+  `guided-cont-hint-cellfit` (FAIL ead49fcce -> OK dd4942463). Hash ROLES=guided: no passed page changed. No refill: pages 2 + 3 are
+  116 + 104 mm, more than one L body. Unrelated, already on the base: EB-STRETCH 2-3 mm on the page-1 Model of the three two-step skills.
+- F4: hintOf gives "Step 1: …" on every two-step preset. The hint is dropped by sheetFitPlain's round-4 rule ("the hint line never
+  costs page 1 its only try") when Model + hinted try does not fit page 1 (add_then_div and mult_div_first at M seed 1). Not changed:
+  it needs a lead ruling (keep the hint and move the try to page 2, against GUIDED-MODEL-ALONE, or keep the rule).
+- 2026-11-20 QUEUED (lead, after F3/F4): PRE-SKILL-CHECK red on every passed skill under lf-checks rebuilt EB-LASTPAGE / CAP-PARITY (PT-PRE-1/2 underfill: add_facts / sub_facts 78 %, div_facts, placevalue:value L p2 45 %). Fix the role fill to reach its declared ceiling (role-capacity.js), checks first, keep R13 2+2 where 2 pages are needed. Park with notes if the week budget runs out.
+
+## Round r17 (2026-11-20): HINT-UNIFORM guard, W2 hint box-number mask
+
+- Checks (commit 8533a8b48, red before the fix): ws-guided-cellfit HINT-UNIFORM (one hint kind on the two-step presets' first tries;
+  the ruled GUIDED-HINT-DROP-P1 drop is now a plan note) and GUIDED-HINT-LEAK box numbers (no hint prints a number a box of the same
+  try expects; the circled sign may stay).
+- Fix (174348717, guided.js hintOf): every box number is masked (answer, key slots, a story's step boxes); a hint left with only its
+  label and gaps is dropped. lf-algebra's `st.hint` preference line is theirs to add; the mask applies to it as well.
+- Hash: Guided 30 passed pages changed (add_wp_10 / add_wp_20 / add_wp_10_plain / add_wp_20_plain / sub_wp_10 / sub_wp_20 /
+  sub_wp_10_plain / sub_wp_20_plain, placevalue identify / value, S/M/L each); Scripted Model 0 / 96, lesson 0 / 96 changed.
+- Open: HINT-UNIFORM red on two_step_mult_div_first (Step 1 "5 x 2 = 10." masks to blanks and is dropped) until lf-algebra's
+  provider hint lands. The precritic gate runs CELL-FITS,HINT-LEAK only. Passed sweep: placevalue:compare seed 2 "Every digit is the
+  same: 932 and 932." flagged (probably the key repeating the given number); reported, not fixed.
+- Pre-skill Check fill: EB-LASTPAGE / CAP-PARITY are not on origin/master, so stopped as briefed.
+
+## Round r18 (2026-11-20): W2 mask keeps given numbers
+
+- Check (1e2e51860, red before the fix): ws-guided-cellfit HINT-OVERMASK (a hint may not gap a number printed in its try's question:
+  q.text, plus a place-value cell's drawn numeral and its digits; compared against hintOf(it, {raw: true}), the same pick unmasked).
+  GUIDED-HINT-LEAK now exempts numbers printed in the try's own pupil cell (compare "932 and 932"); still red on 8533a8b48
+  ("22 + 14 = 36."). HINT-OVERMASK is on the precritic guided-cellfit gate.
+- Fix (2076d974a, guided.js hintOf): the box-number mask skips every number the question prints; the label-and-gaps drop stays.
+- Backtest row guided-hint-overmask (FAIL 1e2e51860 → OK 2076d974a, a narrow sweep so the FAIL line is read) PASS; guided-hint-box-leak re-proved PASS (FAIL 8533a8b48 → OK 174348717). ws-guided-cellfit now flushes a long FAIL list before exit (the full sweep printed 333 findings and lost its last line). Hash proof: see the hand-over.
+- Fix 2: outside a story, the own step W2 used masked is skipped when its kept text gives the answer (hintGivesAnswer), so
+  placevalue identify / value print their pre-W2 first step again ("The letter above it is O."). HINT-UNIFORM is now green on all
+  four presets (two_step_mult_div_first keeps "5 x 2" and gaps the 10).
+- Hash proof (rolehash, guided + scripted-model 192 pages, lesson 96): HEAD vs HEAD with guided.js from 8533a8b48 (pre-W2; it is
+  the only file W2 touched since) - 192 / 192 and 96 / 96 identical. origin/master is not a usable base: the branch's 42 unmerged
+  commits change 172 of those pages (grid heights etc.) on their own.

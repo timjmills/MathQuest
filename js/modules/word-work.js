@@ -236,7 +236,7 @@ export function workHint(p) {
     const V = { '+': 'Add', '-': 'Subtract', '*': 'Multiply', '/': 'Divide' };
     const steps = (p && p.steps) || [];
     if (steps.length <= 1) {
-        return steps.map((st) => `${V[st.op] || 'Work it out'}: ${st.top} ${G[st.op] || st.op} ${st.bottom} = ?`).join('');
+        return steps.map((st) => `${V[st.op] || 'Work out'}: ${st.top} ${G[st.op] || st.op} ${st.bottom}.`).join('');
     }
     const lines = steps.map((st, i) => {
         const pre = `Step ${i + 1}: `;
@@ -258,7 +258,7 @@ export function workHint(p) {
             case '-': return `${pre}Subtract ${b} from ${a}.`;
             case '*': return `${pre}Multiply ${aPrev ? a : b} by ${aPrev ? b : a}.`;
             case '/': return `${pre}Divide ${a} by ${b}.`;
-            default: return `${pre}${a} ${st.op} ${b} = ?`;
+            default: return `${pre}Work out ${a} ${st.op} ${b}.`;
         }
     });
     return lines.join('<br>');

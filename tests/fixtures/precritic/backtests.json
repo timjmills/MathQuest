@@ -12639,6 +12639,602 @@
    }
   },
   {
+   "id": "skip-return",
+   "check": "ws-skip SKIP-RETURN / SKIP-RESULTS: on the practice card, online worksheet, quiz and MAP test every skipped item comes back at the end after \"You skipped n. Let's fix them.\", identical (text, answer, drawing), one at a time; each is scored once; a second skip ends it \"skipped\" in the teacher's results",
+   "kind": "commit-pair",
+   "rule": "SKIP-RETURN (owner request via lf-hosts, 2026-11-19: Skip button on every student mode)",
+   "fail": {
+    "commit": "d38308824",
+    "state": "no return pass: Skip appears only after 5 wrong tries; skipped items never come back; quiz has no Skip; the teacher results read a blank as Wrong"
+   },
+   "pass": {
+    "commit": "96f23a96c",
+    "state": "(re-pointed from 515d9f54a, lf-hosts skip critic r2 F2: SKIP-RESULTS now also judges the pupil breakdown, which 515d9f54a showed as a red cross) every host returns the skipped items at the end (same item object), scores each once, and shows a second-pass skip as skipped"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280,820 --rules SKIP-RETURN,SKIP-RESULTS",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-not-wrong",
+   "check": "ws-skip SKIP-NOT-WRONG / SKIP-BTN / SKIP-COUNT / SKIP-OFF: a skip never counts as wrong (no incorrect status, streak, XP, adaptive levels, skill progress, Leitner and MAP RIT unchanged); the button is visible from the start, >= 48 x 48, with Hint / Read; 'Skipped: n' is right; the teacher setting off hides it",
+   "kind": "commit-pair",
+   "rule": "SKIP-NOT-WRONG (owner request via lf-hosts, 2026-11-19)",
+   "fail": {
+    "commit": "d38308824",
+    "state": "Skip hidden until 5 wrong tries (a fresh item has no Skip), no Skipped count, no quiz Skip, no MAP / quiz off setting"
+   },
+   "pass": {
+    "commit": "515d9f54a",
+    "state": "Skip on from the first moment on every host, 48 px, never a miss, counted, and off per quiz / MAP test / skill"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280,820 --rules SKIP-NOT-WRONG,SKIP-BTN,SKIP-COUNT,SKIP-OFF",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-end-gate",
+   "check": "ws-skip SKIP-END-GATE: no end screen or session-history row while the return-pass intro or the pass is up; exactly one of each after it (real typing + Enter, wrong try then Skip, Skip on the last item)",
+   "kind": "commit-pair",
+   "rule": "SKIP-END-GATE (lf-hosts skip critic r1 F1)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a stray advance from an earlier item finished the run under the intro: 'Completed 5 problems! Score: 2', row 2/6, the pass then ran on a finished game"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "nextQuestion is a no-op while a pass exists; the run ends once, through _endRun, after the pass"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card --rules SKIP-END-GATE",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-total",
+   "check": "ws-skip SKIP-TOTAL: the session row is correct / totalProblems after a return pass",
+   "kind": "commit-pair",
+   "rule": "SKIP-TOTAL (lf-hosts skip critic r1 F2)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "qCount = totalProblems + 1 at the end: 4 right of 4 read 4/5"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "qCount = totalProblems: the row reads 4/5 for 4 of 5 (80 %)"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card --rules SKIP-TOTAL",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-timer",
+   "check": "ws-skip SKIP-TIMER: a timer that expires under the return-pass intro ends the run cleanly (intro gone, still-skipped items 'skipped', not wrong) on the card and the quiz",
+   "kind": "commit-pair",
+   "rule": "SKIP-TIMER (lf-hosts skip critic r1 F3)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "the intro stayed over the end modal / the submitted quiz; a tap threw TypeError setting 'active'"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "endGame / submitQuiz clear the intro and the pass; every intro / pass callback is guarded"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card,quiz --rules SKIP-TIMER",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-count-match",
+   "check": "ws-skip SKIP-COUNT-MATCH: the intro's n equals the Skipped: n shown; the quiz pass is the skipped questions only; the worksheet count drops on answer, not on show; the card header reads 'Fixing k of n'",
+   "kind": "commit-pair",
+   "rule": "SKIP-COUNT-MATCH (lf-hosts skip critic r1 F4, F6 worksheet, ruling R3)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "quiz pill 'Skipped: 1' vs intro 'You skipped 3' (flagged-and-answered and never-skipped blanks in the pass); the worksheet count dropped when a card was shown; header 'Q5/5'"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "the pass is exactly the skipped items; counts agree; header 'Fixing 1 of 3'"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card,worksheet,quiz --rules SKIP-COUNT-MATCH",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-blank",
+   "check": "ws-skip SKIP-BLANK: a blank Next in the return pass ends the item skipped / not answered on the worksheet and the quiz",
+   "kind": "commit-pair",
+   "rule": "SKIP-BLANK (lf-hosts skip critic r1 F5)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a blank Next was graded Wrong (worksheet 3/4) / 'incorrect' in the quiz results"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "a blank Next is a second skip: skipped, out of the total"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts worksheet,quiz --rules SKIP-BLANK",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-keep-wrong",
+   "check": "ws-skip SKIP-KEEP-WRONG: a skip after a wrong try reads 'Incorrect, then skipped' (dot, session row skippedAfterWrong, dashboard)",
+   "kind": "commit-pair",
+   "rule": "SKIP-KEEP-WRONG (lf-hosts skip critic r1 F6)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "the skip overwrote 'incorrect': the teacher saw only 'Skipped'"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "the wrong try stays visible to the teacher"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card --rules SKIP-KEEP-WRONG",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-map-rit",
+   "check": "ws-skip SKIP-MAP-RIT: in the MAP test an item still skipped after the return pass scores as incorrect for RIT and still reads 'skipped'",
+   "kind": "commit-pair",
+   "rule": "SKIP-MAP-RIT (lead ruling 2026-11-19, lf-hosts skip)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a twice-skipped item never moved RIT"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "MAP_STILL_SKIPPED_SCORES_WRONG scores it wrong for RIT at finalize; the row stays skipped"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts map --rules SKIP-MAP-RIT",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-map-redo",
+   "check": "ws-skip SKIP-MAP-REDO: a navigator-dot redo of a skipped MAP item does not clear 'skipped'",
+   "kind": "commit-pair",
+   "rule": "SKIP-MAP-REDO (lf-hosts skip ruling R4)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a correct dot redo cleared 'skipped', so the item never came back"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "the dot redo leaves 'skipped'; the return pass scores it"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts map --rules SKIP-MAP-REDO",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-results-pupil",
+   "check": "ws-skip SKIP-RESULTS (pupil breakdown): on the quiz results screen the pupil sees a question still skipped after the return pass as a neutral 'Skipped' (no red cross), with its answer line, as the teacher's view does",
+   "kind": "commit-pair",
+   "rule": "SKIP-RESULTS (lf-hosts skip critic r2 F2)",
+   "fail": {
+    "commit": "1c2959693",
+    "state": "the pupil breakdown showed the skipped Q3 with a red cross and the answer, while the teacher view read 'Skipped'"
+   },
+   "pass": {
+    "commit": "96f23a96c",
+    "state": "the skipped row reads a neutral 'Skipped' pill, the answer line kept"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts quiz --rules SKIP-RESULTS",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "end-run-once",
+   "check": "ws-end-run END-ONCE: a typed + Enter practice run (mult_facts, sub_word_problems) ends with one end modal, one session row, score = correct/total",
+   "kind": "commit-pair",
+   "rule": "END-ONCE (lf-hosts skip critic r2 F3, lead-routed)",
+   "fail": {
+    "commit": "65c28ccdf",
+    "state": "the live check and Enter both finished the run: several end modals and session rows (\"6/9, 6/8 ...\" for 5 of 5)"
+   },
+   "pass": {
+    "commit": "f7448b02d",
+    "state": "endGame once per run, hasAnswered set on the goal end, one advance per item: 1 modal, 1 row, 5/5"
+   },
+   "command": "node tests/scripts/ws-end-run.cjs --root {root} --rules END-ONCE",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "end-run-inf",
+   "check": "ws-end-run END-INF: infinite practice, 3 answered, Finish with a 4th on screen counts 3",
+   "kind": "commit-pair",
+   "rule": "END-INF (lf-hosts skip critic r2 F4, lead-routed)",
+   "fail": {
+    "commit": "65c28ccdf",
+    "state": "Finish counted the unanswered item on screen (3/4)"
+   },
+   "pass": {
+    "commit": "f7448b02d",
+    "state": "finishPracticeRun counts answered items only (3/3)"
+   },
+   "command": "node tests/scripts/ws-end-run.cjs --root {root} --rules END-INF",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-card-tools",
+   "check": "ws-phone-card TOUCH-TARGET (TOOLS): the practice card's tool buttons (Hint, Read, Skip, Check) and the open hint's Listen / close / Got it! are >= 48 x 48 px at the tablet widths 820 and 1024 (mult_facts card)",
+   "kind": "commit-pair",
+   "rule": "TOUCH-TARGET tool buttons (lf-placevalue critic, lead-routed to lf-hosts 2026-11-20)",
+   "fail": {
+    "commit": "e487f8f9a",
+    "state": "master: Hint / Read / Listen / hint close / Got it! 44 px tall, Check 46 px in the compact bar at 1024 x 768"
+   },
+   "pass": {
+    "commit": "85009d405",
+    "state": "every card tool button and hint button 48 px tall (additive CSS), the row still one line at 820"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_facts --sizes 820x1180,1024x768 --items 1 --hosts card --only TOUCH-TARGET --no-siblings-check",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-wp20-sign",
+   "check": "ws-phone-card TOUCH-TARGET (tablet working-box floor): add_wp_20's typed sign circle on the online worksheet is >= 48 x 48 px at 820 and 1024",
+   "kind": "commit-pair",
+   "rule": "TOUCH-TARGET working boxes at 48 px on a tablet (lf-placevalue critic, lead-routed to lf-hosts 2026-11-20)",
+   "fail": {
+    "commit": "e487f8f9a",
+    "state": "master: the worksheet sign circle input.mq-wwork.mq-gl-sign 46 x 46 px at 820 / 1024 (passed at the old 44 px working-box floor)"
+   },
+   "pass": {
+    "commit": "85009d405",
+    "state": "the sign circle 48 x 48 px, centre held by an equal negative margin"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills addition:add_wp_20 --sizes 820x1180,1024x768 --items 1 --hosts card,worksheet --only TOUCH-TARGET --no-siblings-check",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-hint-bank-leak",
+   "check": "ws-vocab-unit V14 GUIDED-HINT-LEAK (bank): the pick-3 Guided hint applied to the word bank leaves at least two words, the answer among them",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V14 GUIDED-HINT-LEAK (lf-roles critic r14 z1)",
+   "fail": {
+    "commit": "76d2cd9f1",
+    "state": "Its word starts with \"f\". leaves only factor of factor / product / rule"
+   },
+   "pass": {
+    "commit": "5f202c638",
+    "state": "the cue names two bank words letters"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --only V14",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-cont-hint-cellfit",
+   "check": "ws-guided-cellfit CELL-FITS: on Guided pages 2+, every top-level cell holds its content (two-step stories, M / L, seeds 1, 2, 591220)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-cellfit CELL-FITS (lf-roles r16 F3)",
+   "fail": {
+    "commit": "ead49fcce",
+    "state": "two-step Guided L page 2 hinted try: content 13 px past the cell, bottom rule clipped"
+   },
+   "pass": {
+    "commit": "dd4942463",
+    "state": "every continuation cell holds its content"
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only CELL-FITS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-hint-uniform",
+   "check": "ws-guided-cellfit HINT-UNIFORM: the two-step presets' first tries carry one hint kind; a first try with no hint passes only as the ruled GUIDED-HINT-DROP-P1 note (Model + 1 try on page 1)",
+   "kind": "fixture",
+   "rule": "ws-guided-cellfit HINT-UNIFORM (lead F4, GUIDED-HINT-DROP-P1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/guided-hint/uniform-fail.json",
+    "state": "planted: the hint dropped with no ruled note"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/guided-hint/uniform-pass.json",
+    "state": "the drop carries the ruled note"
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-hint-box-leak",
+   "check": "ws-guided-cellfit GUIDED-HINT-LEAK (box numbers): no Guided hint prints a number a box of the same try expects (two-step presets, M / L, seeds 1, 2, 591220)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-cellfit GUIDED-HINT-LEAK (lead W2, critic r15 W2)",
+   "fail": {
+    "commit": "8533a8b48",
+    "state": "two_step_add_then_div L p2: \"Step 1: circle +. 22 + 14 = 36.\" over its Step 1 boxes"
+   },
+   "pass": {
+    "commit": "174348717",
+    "state": "\"Step 1: circle +. ___ + ___ = ___.\""
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only HINT-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-hint-overmask",
+   "check": "ws-guided-cellfit HINT-OVERMASK: a Guided hint may not gap a number printed in its try's own question text (two-step presets + passed word-work and placevalue identify / value / compare, M / L, seeds 1, 2, 591220)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-cellfit HINT-OVERMASK (lead ruling 2026-11-20, lf-roles r18)",
+   "fail": {
+    "commit": "1e2e51860",
+    "state": "add_wp_10 Guided M: \"The numbers are ___ and ___.\" over a story printing 3 and 2; placevalue identify \"Find the underlined digit: ___.\""
+   },
+   "pass": {
+    "commit": "2076d974a",
+    "state": "\"The numbers are 3 and 2.\"; two-step \"Step 1: circle +. 22 + 14 = ___.\""
+   },
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only HINT-OVERMASK --sizes M --seeds 1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-every-skill",
+   "check": "ws-hint-no-blank: the screen help (Here is how steps, Say line, hint, Show Solution steps) of every live skill shows no unfilled blank (___, {n}, a gap '?'); the answer sentence is left out, never blanked (S8)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK (owner bug 2026-11-15 on placevalue:digit_value_unit_form, ws-unit-form-bank check 5; made the rule for every skill, lf-placevalue 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "65c28ccdf",
+    "state": "master: 675 of 734 skills print ___ in their help (hideAnswer blanks the answer, Say frames of given-value gaps, '= ?' hints)"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "the answer sentence is left out (S8), the Say line keeps at most the answer's gap, hints rewritten: 0 skills (r2 2026-11-20: was 2b2a03c0b, whose blanks passed only through the rawSteps worked-gap hole the critic found; F1, F2)"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,division:div_facts,addition:add_wp_20,placevalue:identify,subtraction:sub_facts --only BLANK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-worked-gap",
+   "check": "ws-hint-no-blank WORKED-GAP: the worked-gap exemption accepts only a fill the pupil SEES in a later shown step, never the hidden fullWorked steps (F1 sub_facts \"7 + ? = 10.\", F2 div_facts \"9 × __ = 99.\")",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: a \"?\" / \"__\" gap filled only in the steps S8 hides"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: the gap fact is asked in words (\"7 plus what number makes 10?\")"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill subtraction:sub_facts,division:div_facts --only WORKED-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-hint-say-leak",
+   "check": "ws-hint-no-blank HINT-LEAK + SAY-LEAK: the hint and the Say line never state the answer (F3 sub_facts \"Or think: 3 + 7 = 10\", div_facts \"9 × 11 = 99\", area_triangle \"= 18 square units.\")",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: three hints state the answer"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: hints give the strategy without the result"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill subtraction:sub_facts,division:div_facts,area_perimeter:area_triangle --only HINT-LEAK,SAY-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-steps-leak",
+   "check": "ws-hint-no-blank STEPS-LEAK: no shown step states an element of a list answer, a long word answer or a sort, or prints \"Answer:\" / \"[object\" (F4 factors_identify, F13 vocab_grade_6_measurement, F14 round_sort_10)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: factor pairs list every missing factor; \"Answer: [object Object]\"; \"Rounds to 60: 64, 61.\""
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: list / sort / long-word tokens cut; fallback \"Answer:\" lines dropped"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_theory:factors_identify,vocabulary:vocab_grade_6_measurement,number_sense:round_sort_10 --only STEPS-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-unit-cut",
+   "check": "ws-hint-no-blank UNIT-CUT + HELP-EMPTY: withoutAnswer cuts \"= 18 square units.\" / \"cubic units\" / \"square cm\" / \"cm²\" at the answer, and area_triangle leaves EMPTY_PIN (F7)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: one unit word only: the whole sentence dropped, the box hidden"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: the cut keeps \"... = 36 ÷ 2.\"; EMPTY_PIN 28 -> 25"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill area_perimeter:area_triangle --only UNIT-CUT,HELP-EMPTY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-status-line",
+   "check": "ws-hint-no-blank HELP-EMPTY-HIDDEN: with no \"Here is how\" box the status line does not say \"Here is how. Finish it, then try again.\" (F8)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: status line points at a hidden box"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: \"Not yet. Try again.\" when no box is shown"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill area_perimeter:area_triangle --only HELP-EMPTY-HIDDEN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-say-fill",
+   "check": "ws-hint-no-blank SAY-FILL + SAY-GAP-GIVEN: every number filled into the Say line is a whole given value (never \"1\" of \"1/4\"), and the gap is never a value the question gives (F10 sub_frac_unlike, F11 place_on_number_line)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: \"1 minus 4 is ___.\"; \"___ is here.\" for \"Tap 16\""
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: fractions are one given value; \"16 is here.\""
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill fraction_operations:sub_frac_unlike,number_sense:place_on_number_line --only SAY-FILL,SAY-GAP-GIVEN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-bare-step",
+   "check": "ws-hint-no-blank BARE-STEP: a shown step is never a bare expression (\"10 + 5.\") or a repeat of an earlier step (F9 add_facts, add_wp_20)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: \"10 + 5.\"; \"16 + 2.\" after \"Write 16 + 2 in the boxes.\""
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: \"Now work out 10 + 5.\"; the repeat dropped"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,addition:add_wp_20 --only BARE-STEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-help-thin",
+   "check": "ws-hint-no-blank HELP-THIN + LISTEN + SAYLESS: a provider help that loses at least half its steps ends on a step saying what to do; a shown box always has Listen; identify has a Say line (F5, F6 placevalue:identify)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: steps end \"The letter above it is H.\"; no Say, no Listen"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: \"Find the place name that starts with H.\"; Say \"The 8 is in the ___ place.\"; Listen"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill placevalue:identify --only HELP-THIN,LISTEN,SAYLESS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-say-order",
+   "check": "ws-hint-no-blank SAY-ORDER: a Say line whose last word is the gap right after a number stands for a number; with a word or sign answer the given values were put in the answer's place (R2-5 fractions:compare)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md R2-5); lead ruling 2026-11-20 smaller head",
+   "browser": true,
+   "fail": {
+    "commit": "566880762",
+    "state": "critic r2 head: fractions:compare \"1/2 is 3/4 ___.\""
+   },
+   "pass": {
+    "commit": "dd0bcc356",
+    "state": "in-order fallback only for a one-number answer; compare has no Say line (SAYLESS pin)"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill fractions:compare,fractions:compare_to_half --only SAY-ORDER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "mult-size-presets",
    "check": "every multiplication size pair is a preset of its host (tiles 21/31/41/22/32 on multiply, 21/31/41 on area_model_mult, 22/23 on area_model_mult_hard), each item deals its size, multiply 2-digit multipliers draw the kit long-multiplication cell, and area_model_3by2 writes the 3-digit factor first (lead 2026-11-19; card mult-sizes Q2 / Q3)",
    "kind": "commit-pair",

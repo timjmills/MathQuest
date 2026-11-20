@@ -3764,10 +3764,13 @@ export const calculatorOption = () => ({
 // `skipAfter` (Wave 1 item 1.3): wrong tries on one question before the pupil's Skip button
 // appears. Per skill, default 5; 0 turns Skip off for the skill.
 export const skipAfterOption = () => ({
-    id: 'skipAfter', label: 'Skip appears after', type: 'int', default: 5, min: 0, max: 20, step: 1,
-    help: 'Wrong tries on one question before the pupil sees a Skip button. 0 turns Skip off for this skill.',
-    tip: 'Skip: how many wrong tries before the pupil may skip a question (0 = never).',
-    group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
+    // lf-hosts skip R1 (2026-11-19): on the practice card and online worksheet Skip shows from the start, so the
+    // value there is on (> 0) / off (0); boss and race still read it as the wrong tries before Skip appears.
+    // The stored values and the share-code key are unchanged.
+    id: 'skipAfter', label: 'Skip button (0 = off)', type: 'int', default: 5, min: 0, max: 20, step: 1,
+    help: 'Practice card and online worksheet: any number above 0 shows Skip from the start; 0 turns Skip off for this skill (the MAP test has its own Pupils can skip switch). Boss and race: the wrong tries on one question before Skip appears.',
+    tip: 'Skip button: 0 = off. Above 0 = on (boss / race: after that many wrong tries).',
+    group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip on (boss / race after ${Number(v)})` : 'Skip off'),
 });
 export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
 
