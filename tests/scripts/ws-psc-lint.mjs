@@ -36,6 +36,12 @@ export function dealBad(items) {
     for (const it of items) { const k = JSON.stringify(it.ans); by.set(k, (by.get(k) || 0) + 1); }
     // (a sign or yes / no answer has only two or three values: a compare band shares them by nature)
     for (const [k, n] of by) if (n > 2 && !SIGN_ANS.test(k)) out.push(`${n} items share the answer ${k}`);
+    // (lead A10 sign floor: a compare band - every answer a sign - shows at least 2 different signs, never one sign 3 in a row)
+    const signs = items.map((it) => JSON.stringify(it.ans));
+    if (signs.length >= 2 && signs.every((k) => /^"[<>=]"$/.test(k))) {
+        if (new Set(signs).size < 2) out.push(`a compare band of ${signs.length} shows one sign only (${signs[0]})`);
+        for (let i = 2; i < signs.length; i++) if (signs[i] === signs[i - 1] && signs[i] === signs[i - 2]) { out.push(`the sign ${signs[i]} three times in a row (items ${i - 1}-${i + 1})`); break; }
+    }
     const fs0 = items.map((it) => factOf(it.text));
     for (let i = 0; i < fs0.length; i++) for (let j = i + 1; j < fs0.length; j++) {
         const p = fs0[i], q = fs0[j];
@@ -57,7 +63,10 @@ function selfTest() {
         ['D4 three 12s', dealBad([{ ans: 12 }, { ans: 12 }, { ans: 12 }]).length, 1],
         ['D4 two 12s ok', dealBad([{ ans: 12 }, { ans: 12 }]).length, 0],
         ['D4 turnaround', dealBad([{ text: '5 + 7 =', ans: 12 }, { text: '7 + 5 =', ans: 12 }]).length, 1],
-        ['D4 three ">" (a compare band) ok', dealBad([{ ans: '>' }, { ans: '>' }, { ans: '>' }]).length, 0],
+        ['D4 three ">" is no shared-answer fail (the sign floor judges it)', dealBad([{ ans: '>' }, { ans: '>' }, { ans: '>' }]).some((x) => /share the answer/.test(x)), false],
+        ['SIGN one sign only', dealBad([{ ans: '>' }, { ans: '>' }]).some((x) => /one sign only/.test(x)), true],
+        ['SIGN three in a row', dealBad([{ ans: '<' }, { ans: '>' }, { ans: '>' }, { ans: '>' }]).some((x) => /three times in a row/.test(x)), true],
+        ['SIGN mixed ok', dealBad([{ ans: '<' }, { ans: '>' }, { ans: '>' }, { ans: '=' }, { ans: '>' }]).length, 0],
         ['D4 double not a turnaround', dealBad([{ text: '6 + 6 =', ans: 12 }, { text: '6 + 6 =', ans: 12 }]).length, 0],
     ];
     const bad = t.filter(([, got, want]) => got !== want);
