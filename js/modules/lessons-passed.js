@@ -34,22 +34,27 @@ export const LESSONS_PASSED = new Map([
 export const PENDING_RECHECK = new Map([
     ['g3-oa5-mult-properties', {
         evidence: RECHECK,
+        kind: 'changed',
         why: 'Stale since master e7c418bd4 re-pinned its pages (design/status/lf-checks/critic-lessons-browser-r1.md, 2026-11-20): 48 of 58 pages render differently from the graded d38308824 render (instruction words, an expected answer, grid heights, dot arrays); a narrow critic must grade the new render.',
     }],
     ['g3-oa9-mult-table-patterns', {
         evidence: RECHECK,
+        kind: 'changed',
         why: 'Stale since master e7c418bd4 re-pinned its pages (design/status/lf-checks/critic-lessons-browser-r1.md, 2026-11-20): 8 of 50 pages render differently from the graded d38308824 render (instruction words, dot arrays swapped); a narrow critic must grade the new render.',
     }],
     ['g2-nbt3-read-write-1000', {
         evidence: 'Detailed lessons (lesson 1), critic r4 PASS 30/30 pages >= 8; design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md, 2026-10-16',
+        kind: 'fix',
         why: 'Re-check 2026-11-20 (design/status/lf-checks/critic-lessons-recheck.md): sweep seed 17 does not build.',
     }],
     ['g1-oa1-bar-model-wp-20', {
         evidence: 'Detailed lessons (lesson 2), critic r4 PASS 21/21 pages >= 8; design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md, 2026-10-17',
+        kind: 'fix',
         why: 'Re-check 2026-11-20 (design/status/lf-checks/critic-lessons-recheck.md): E9 P6 overflow, E35, LP-RASTER, sweep.',
     }],
     ['g3-oa9-input-output-rule', {
         evidence: 'Detailed lessons (lesson 5), critic r3 PASS; design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md, 2026-10-17',
+        kind: 'fix',
         why: 'Re-check 2026-11-20 (design/status/lf-checks/critic-lessons-recheck.md): sweep seed 25 does not build.',
     }],
 ]);
@@ -92,6 +97,8 @@ export function passLine(id) {
 export function pendingKind(id) {
     const e = PENDING_RECHECK.get(String(id || ''));
     if (!e) return '';
+    if (e.kind === 'changed' || e.kind === 'fix') return e.kind;
+    // fallback only (critic r2 D12: ws-lessons-passed LP-PENDING-KIND requires an explicit kind)
     return /re-?pinned|render(?:s|ed)? differently|\bstale\b|pages changed/i.test(String(e.why || '')) ? 'changed' : 'fix';
 }
 /** The reason in plain words, for the teacher screens. */

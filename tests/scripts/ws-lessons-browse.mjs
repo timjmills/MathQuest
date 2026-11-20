@@ -45,7 +45,7 @@ const fails = {};
 const check = (rule, ok, msg) => { if (!ok) (fails[rule] = fails[rule] || []).push(msg); };
 const RULES = ['LESSON-DOMAIN', 'AREA-LABELS', 'FILTER-PASSED', 'LESSON-BROWSE', 'SCREEN',
     // critic lessons-browser r1 (2026-11-20): one rule per defect, so each has its own backtest row
-    'THUMB-DETAILED-FIRST-PAGE', 'SKILLS-VIEWS', 'PENDING-WORDS', 'UNIT-NOW-ON-HASH', 'THUMB-NO-CLIP', 'HEAD-NO-REPEAT', 'ROUNDTRIP-VIEW', 'SKILLS-GRADE-PILLS'];
+    'THUMB-DETAILED-ITEM', 'THUMB-NO-FREEZE', 'SKILLS-VIEWS', 'PENDING-WORDS', 'UNIT-NOW-ON-HASH', 'THUMB-NO-CLIP', 'HEAD-NO-REPEAT', 'ROUNDTRIP-VIEW', 'SKILLS-GRADE-PILLS'];
 // --plant <what>: plant a known-bad state in the CHECK's own reading, to prove an assertion can fail (ws-backtest args rows):
 //   roundtrip-thumbs  the "list" round trip starts from a link with no view= after the thumbnails (the r1 D9 state)
 //   drop-grade-pill   one Skills grade pill (grade 3) is removed before the pills are read (r1 D10)
@@ -373,42 +373,57 @@ try {
             await go('#wrm/3?a=&view=list');
         }
 
-        /* ---------------- THUMB-DETAILED-FIRST-PAGE (critic r1 D1): a detailed lesson's card shows its first page, cached */
-        if (want('THUMB-DETAILED-FIRST-PAGE') && w === WIDTHS[0]) {
+        /* ---------------- THUMB-DETAILED-ITEM (lead ruling A20, critic r2 D11): a detailed lesson's card shows its first
+           teaching skill's ITEM card (the r1 state), and no first-page build starts on load or scroll */
+        if (want('THUMB-DETAILED-ITEM') && w === WIDTHS[0]) {
             const buildable = new Set(await page.evaluate(() => import(new URL('js/modules/lessons/detailed/index.js', location.href).href).then((m) => Object.keys(m.DETAILED_LESSONS || {}))));
             const withDl = ALL_ROWS.filter((r) => (r.detailed || []).some((id) => buildable.has(id)));
-            check('THUMB-DETAILED-FIRST-PAGE', withDl.length > 0, 'no lesson row has a detailed lesson to test');
-            const pageReady = async (key, tag) => {
-                await page.$eval(`#tvwLessons [data-w-card="${key}"]`, (c) => c.scrollIntoView({ block: 'center' }));
-                try { await waitFor(page, `!!document.querySelector('#tvwLessons [data-w-card="${key}"] [data-w-page-ready]')`, 150000, `first page ${key}`); } catch (e) { check('THUMB-DETAILED-FIRST-PAGE', false, `${tag}: the first page of ${key} was not drawn`); return null; }
-                return page.evaluate((k) => { const h = document.querySelector(`#tvwLessons [data-w-card="${k}"] [data-w-page]`); const f = h && h.querySelector('iframe'); const pg = f && f.contentDocument && f.contentDocument.querySelector('.ws-page'); const hr = h.getBoundingClientRect(); const fr = f.getBoundingClientRect(); return { kind: h.dataset.wThumbKind, page: !!pg, inside: fr.left >= hr.left - 1 && fr.top >= hr.top - 1 && fr.right <= hr.right + 1 && fr.bottom <= hr.bottom + 1, builds: window.__mqLessonPageBuilds || 0 }; }, key);
-            };
+            check('THUMB-DETAILED-ITEM', withDl.length > 0, 'no lesson row has a detailed lesson to test');
+            const b0 = await page.evaluate(() => window.__mqLessonPageBuilds || 0);
             for (const g of [...new Set(withDl.map((r) => r.grade))]) {
                 await go(`#wrm/${g}?view=thumbs`);
-                const kinds = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('#tvwLessons [data-w-card]')].map((c) => [c.dataset.wCard, (c.querySelector('[data-w-thumb-kind]') || {}).dataset?.wThumbKind || ''])));
-                for (const r of withDl.filter((x) => x.grade === g)) check('THUMB-DETAILED-FIRST-PAGE', kinds[r.key] === 'detailed', `grade ${g}: ${r.key} (detailed ${r.detailed.join(', ')}) shows ${kinds[r.key] || 'an item'}, not its first page`);
-                for (const [k, v] of Object.entries(kinds)) if (v === 'detailed') check('THUMB-DETAILED-FIRST-PAGE', withDl.some((r) => r.key === k), `grade ${g}: ${k} shows a first page but has no detailed lesson`);
+                for (const r of withDl.filter((x) => x.grade === g)) {
+                    const k = await page.evaluate((key) => { const c = document.querySelector(`#tvwLessons [data-w-card="${key}"]`); if (!c) return null; c.scrollIntoView({ block: 'center' }); return { page: !!c.querySelector('[data-w-page]'), item: !!c.querySelector('[data-w-thumb]') }; }, r.key);
+                    await sleep(400);
+                    check('THUMB-DETAILED-ITEM', k && !k.page && (k.item || !r.firstSkill), `grade ${g}: ${r.key} (detailed ${r.detailed.join(', ')}) card: ${JSON.stringify(k)}; want its first skill's item card, no first page`);
+                }
+                await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } });
+                await sleep(800);
             }
-            const r0 = withDl.find((r) => r.pass) || withDl[0];
-            await go(`#wrm/${r0.grade}?view=thumbs`);
-            const b0 = await page.evaluate(() => window.__mqLessonPageBuilds || 0);
-            const p1 = await pageReady(r0.key, 'first draw');
-            if (p1) check('THUMB-DETAILED-FIRST-PAGE', p1.kind === 'detailed' && p1.page && p1.inside && p1.builds === b0 + 1, `${r0.key} first draw: ${JSON.stringify(p1)} (builds before ${b0})`);
-            await page.$eval('.tvw-viewseg [data-w-view="list"]', (b) => b.click());
-            await sleep(300);
-            await page.$eval('.tvw-viewseg [data-w-view="thumbs"]', (b) => b.click());
-            await sleep(300);
-            const p2 = await pageReady(r0.key, 'second draw');
-            if (p1 && p2) check('THUMB-DETAILED-FIRST-PAGE', p2.builds === p1.builds, `${r0.key} second draw built the page again (${p1.builds} -> ${p2.builds}): not served from the cache`);
-            // a new visit (reload): served from IndexedDB, no build
-            await page.goto('about:blank');
-            await page.goto(`${app.base}/index.html#wrm/${r0.grade}?view=thumbs`, { waitUntil: 'networkidle2', timeout: 60000 });
-            await waitFor(page, () => typeof window.setUserRole === 'function' && typeof window.tvGo === 'function', 30000, 'reload');
-            await page.evaluate(() => window.setUserRole('teacher'));
-            await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active #tvwLessons [data-w-card]'), 20000, 'reload list');
-            const p3 = await pageReady(r0.key, 'after a reload');
-            if (p3) check('THUMB-DETAILED-FIRST-PAGE', p3.builds === 0 && p3.page, `${r0.key} after a reload: ${p3.builds} build(s), want 0 (IndexedDB)`);
-            await shot('b-thumbs-firstpage', w);
+            const b1 = await page.evaluate(() => window.__mqLessonPageBuilds || 0);
+            check('THUMB-DETAILED-ITEM', b1 === b0, `${b1 - b0} first-page build(s) started on load or scroll (lead ruling A20: only on request)`);
+            await go('#wrm/3?view=list');
+        }
+
+        /* ---------------- THUMB-NO-FREEZE (critic r2 D11): CPU x4, cold cache (IndexedDB cleared), grade 3 Thumbnails at
+           1024, scroll through. FAIL if any long task > 200 ms or any rAF frame gap > 500 ms. Measured only from the moment
+           the Lessons screen is shown (the app's own boot is outside this rule). */
+        if (want('THUMB-NO-FREEZE') && w === 1024) {
+            const cdp = await page.target().createCDPSession();
+            await page.evaluate(() => new Promise((res) => { try { for (const n of ['mq-lesson-pages', 'mathquest-lesson-pages']) indexedDB.deleteDatabase(n); } catch (e) { /* */ } res(); }));
+            await cdp.send('Storage.clearDataForOrigin', { origin: new URL(app.base).origin, storageTypes: 'indexeddb' }).catch(() => {});
+            await page.evaluate(() => { window.__mqLessonPageBuilds = 0; });
+            await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+            try {
+                await go('#wrm/3?view=thumbs');
+                await page.evaluate(() => {
+                    const M = window.__mqFreeze = { long: 0, gap: 0 };
+                    try { new PerformanceObserver((l) => { for (const e of l.getEntries()) M.long = Math.max(M.long, e.duration); }).observe({ type: 'longtask' }); } catch (e) { M.err = String(e); }
+                    let t = performance.now();
+                    const tick = (n) => { M.gap = Math.max(M.gap, n - t); t = n; if (!M.stop) requestAnimationFrame(tick); };
+                    requestAnimationFrame(tick);
+                });
+                const H = await page.evaluate(() => document.body.scrollHeight);
+                for (let y = 0; y <= H; y += 500) { await page.evaluate((yy) => window.scrollTo(0, yy), y); await sleep(700); }
+                await sleep(4000);
+                const m = await page.evaluate(() => { window.__mqFreeze.stop = true; return window.__mqFreeze; });
+                check('THUMB-NO-FREEZE', !m.err, `longtask observer: ${m.err}`);
+                check('THUMB-NO-FREEZE', m.long <= 200, `a long task of ${Math.round(m.long)} ms (budget 200 ms) on the grade 3 Thumbnails at CPU x4, cold cache`);
+                check('THUMB-NO-FREEZE', m.gap <= 500, `a frame gap of ${Math.round(m.gap)} ms (budget 500 ms) on the grade 3 Thumbnails at CPU x4, cold cache`);
+            } finally {
+                await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+                await cdp.detach().catch(() => {});
+            }
             await go('#wrm/3?view=list');
         }
 
@@ -426,6 +441,8 @@ try {
             check('FILTER-PASSED', marks === rows.length, `@${w} ${marks} corner marks for ${rows.length} passed rows`);
             // PENDING-WORDS: the summary never says "fix" for every pending lesson; each words its own reason
             const sum = await page.$eval('#tvwSum', (x) => x.textContent);
+            // critic r2 D12: every pending line words a reason (the text after the title is at least 10 characters)
+            for (const t of await page.$$eval('#tvwLessons [data-w-pend], [data-w-pend]', (li) => li.map((x) => { const b = x.querySelector('b'); return x.textContent.slice(((b && b.textContent) || '').length).replace(/^[:\s]+|[.\s]+$/g, ''); }))) check('PENDING-WORDS', t.length >= 10, `@${w} a pending line has an empty reason: "${t}"`);
             check('PENDING-WORDS', !/fix/i.test(sum), `@${w} the summary claims a fix for every pending lesson: "${sum.replace(/\s+/g, ' ').trim()}"`);
             for (const g of GRADES) {
                 await click(`.tvw-gradebtn[data-w-grade="${g}"]`);

@@ -71,6 +71,7 @@ function evidenceOk(id, line) {
 }
 
 for (const id of P.LESSONS_PASSED.keys()) if (P.PENDING_RECHECK.has(id)) fail('LP-LIVE', `${id} is both passed and pending re-check`);
+for (const [id, e] of P.PENDING_RECHECK) if (!e || !['changed', 'fix'].includes(e.kind)) fail('LP-PENDING-KIND', `${id}: a pending entry needs kind: 'changed' | 'fix' (critic lessons-browser r2 D12), has ${JSON.stringify(e && e.kind)}`);
 for (const [id, e] of [...P.LESSONS_PASSED, ...P.PENDING_RECHECK]) {
     const k = kindOf(id);
     if (!k) { fail('LP-LIVE', `${id} is not a live detailed, library or skill lesson`); continue; }

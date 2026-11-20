@@ -269,3 +269,5 @@ back link, header mark), `js/modules/wrm-links.js` (grade via grade-of.js; `less
 Seed data/curriculum/pacing/2026-27.json from the school site / wrm-sequence.json weeks where they carry dates; units without a date stay undated. The owner checks and updates the dates each year.
 
 Signed: owner, 2026-11-20
+
+Waiver A20 (lead, delegated approval, 2026-11-20): §7 'first page as thumbnail' is waived for detailed lessons until the on-request 'Show first page' button plus THUMB-NO-FREEZE ship (next week, item 1).

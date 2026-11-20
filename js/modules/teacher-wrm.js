@@ -539,11 +539,8 @@ function rowHTML(r, n) {
 function cardHTML(r) {
     const l = r.lesson;
     const fs = r.firstSkill && liveKey(r.firstSkill.key) ? r.firstSkill : null;
-    // a lesson with a detailed lesson shows that lesson's FIRST PAGE (card §7, critic r1 D1); the others its first skill's item
-    const dl = (r.detailed || []).find((id) => detailedLessonFor(id)) || '';
-    const prev = dl
-        ? `<span class="tvw-lthumb is-page" data-w-page="${esc(dl)}" data-w-thumb-kind="detailed" aria-hidden="true"><span class="tvw-lthumb-wait">First page…</span></span>`
-        : fs
+    // lead ruling A20: detailed lessons show the item card too; the first page is built only on request (next week)
+    const prev = fs
         ? `<span class="tvw-lthumb" data-w-thumb="${esc(fs.key)}"${fs.opts ? ` data-w-thumb-opts="${esc(JSON.stringify(fs.opts))}"` : ''} aria-hidden="true"></span>`
         : `<span class="tvw-lthumb is-empty" aria-hidden="true"><span>${r.cover === 'build' ? 'To build' : 'No preview yet'}</span></span>`;
     return `<li class="ts-card tvw-lcard${r.pass ? ' is-passed' : ''}" data-domain="${r.area}" data-w-card="${esc(l.key)}">
@@ -597,6 +594,7 @@ function fitWhole(host, frame) {
     frame.classList.remove('ts-cut-r', 'ts-cut-b');
     host.dataset.wFit = '1';
 }
+/** Lead ruling A20: not called from list/thumbnail rendering; kept for the on-request "Show first page" button. */
 /** The one-page sheet document of a detailed lesson (its first page, the seed every pack was built with). */
 function buildFirstPage(id) {
     return buildSheet({ role: 'detailed-lesson', lessonId: id, paper: 'A4', seed: 4242, key: { on: true }, sections: [{ skills: [] }] }).then((res) => {
@@ -611,16 +609,15 @@ function buildFirstPage(id) {
 }
 function lessonThumbs() {
     const hosts = root ? root.querySelectorAll('#tvwLessons [data-w-thumb]:not([data-w-done])') : [];
-    const pages = root ? root.querySelectorAll('#tvwLessons [data-w-page]:not([data-w-done])') : [];
-    const drawOne = (el) => (el.dataset.wPage ? mountLessonPage(el, el.dataset.wPage, buildFirstPage) : drawLessonThumb(el));
-    if (typeof IntersectionObserver === 'undefined') { hosts.forEach(drawLessonThumb); pages.forEach(drawOne); return; }
+    // lead ruling A20: no first-page build (mountLessonPage / buildFirstPage) on load or scroll
+    void mountLessonPage; void buildFirstPage;
+    if (!hosts.length) return;
+    if (typeof IntersectionObserver === 'undefined') { hosts.forEach(drawLessonThumb); return; }
     if (!lio) {
         lio = new IntersectionObserver((entries) => {
-            for (const en of entries) { if (!en.isIntersecting) continue; lio.unobserve(en.target); drawOne(en.target); }
+            for (const en of entries) { if (!en.isIntersecting) continue; lio.unobserve(en.target); drawLessonThumb(en.target); }
         }, { rootMargin: '0px 0px 120px 0px' });
     }
-    pages.forEach((h) => lio.observe(h));
-    if (!hosts.length) return;
     hosts.forEach((h) => {
         const [c, s] = String(h.dataset.wThumb || '').split(':');
         let opts;
