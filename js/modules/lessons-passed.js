@@ -20,17 +20,26 @@
 // Pure: no window, no DOM, no state.
 
 const RECHECK = 'Narrow critic re-check (lane lf-checks, critic-lessons-recheck), PASS C1-C4 >= 8 on every page at seed 4242 with check / lp / sweep gates green; design/status/lf-checks/critic-lessons-recheck.md, 2026-11-20';
-const stamp = (s4242, s1) => ({ source: 'lesson-baseline', commit: 'd38308824', digests: { 4242: s4242, 1: s1 } });
+const RESTAMP = 'Narrow critic lessons-browser r1 (lane lf-checks), class-only re-stamp of the critic-lessons-recheck PASS (render d38308824 -> e7c418bd4 pixel-identical on every page at seeds 4242 and 1); design/status/lf-checks/critic-lessons-browser-r1.md, 2026-11-20';
 
 /** id -> { evidence, renderStamp } */
 export const LESSONS_PASSED = new Map([
-    ['g3-oa5-mult-properties', { evidence: RECHECK, renderStamp: stamp('0cda3e0c24a33489', '7c734ff89b44c1bc') }],
-    ['g3-oa9-mult-table-patterns', { evidence: RECHECK, renderStamp: stamp('ff995039ee67d75a', '01212d690ea75536') }],
-    ['g4-nbt1-ten-times-value', { evidence: RECHECK, renderStamp: stamp('a3df41cd05c748f5', '53d68b783f764412') }],
+    // Re-stamped by the narrow critic lessons-browser r1: master e7c418bd4 re-pinned its pages, and the change is class-only
+    // (mq-pagecap on 12 grids, no CSS for it; engine <style> rules for classes these pages do not carry); all 54 pages at
+    // seeds 4242 and 1 are pixel-identical to the d38308824 render the re-check graded.
+    ['g4-nbt1-ten-times-value', { evidence: RESTAMP, renderStamp: { source: 'lesson-baseline', commit: 'e7c418bd4', digests: { 4242: 'bf2a28db905c2d3d', 1: '0105df71052471f4' } } }],
 ]);
 
 /** id -> { evidence (the earlier pass), why (what the re-check found) } */
 export const PENDING_RECHECK = new Map([
+    ['g3-oa5-mult-properties', {
+        evidence: RECHECK,
+        why: 'Stale since master e7c418bd4 re-pinned its pages (design/status/lf-checks/critic-lessons-browser-r1.md, 2026-11-20): 48 of 58 pages render differently from the graded d38308824 render (instruction words, an expected answer, grid heights, dot arrays); a narrow critic must grade the new render.',
+    }],
+    ['g3-oa9-mult-table-patterns', {
+        evidence: RECHECK,
+        why: 'Stale since master e7c418bd4 re-pinned its pages (design/status/lf-checks/critic-lessons-browser-r1.md, 2026-11-20): 8 of 50 pages render differently from the graded d38308824 render (instruction words, dot arrays swapped); a narrow critic must grade the new render.',
+    }],
     ['g2-nbt3-read-write-1000', {
         evidence: 'Detailed lessons (lesson 1), critic r4 PASS 30/30 pages >= 8; design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md, 2026-10-16',
         why: 'Re-check 2026-11-20 (design/status/lf-checks/critic-lessons-recheck.md): sweep seed 17 does not build.',
