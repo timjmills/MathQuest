@@ -1,4 +1,5 @@
 // skill-options.js — the options a skill carries with it.
+import { pupilWorded, pupilWithheld } from './pupil-option-words.js';
 import { normalizeRows } from './count-rows.js';
 import { presetOf } from './skill-presets.js';   // pure table, imports nothing   // pure, imports nothing: node still loads this file bare
 //
@@ -4081,6 +4082,60 @@ export function offeredOptionsFor(categoryId, skillId) {
     return out;
 }
 
+// The panel's three headings (skill-options-ui.js OPTION_GROUPS): an option names its group itself (`group`); options that
+// predate the field are placed by id. Read here too by the pupil subset below.
+const GROUP_BY_ID = {
+    band: 'difficulty', range: 'difficulty', decimals: 'difficulty', constant: 'difficulty', regroup: 'difficulty',
+    unknown: 'difficulty', place: 'difficulty', places: 'difficulty', step: 'difficulty', dir: 'difficulty',
+    op: 'difficulty', power: 'difficulty', zeroPlace: 'difficulty', midpoint: 'difficulty', order: 'difficulty',
+    wordform: 'difficulty', simplestForm: 'difficulty',
+    level: 'support', pictures: 'support', support: 'support',
+    notation: 'layout', orientation: 'layout', response: 'layout', task: 'layout', tiles: 'layout',
+};
+export function optionGroup(def) {
+    return (def && (def.group || GROUP_BY_ID[def.id])) || 'difficulty';
+}
+
+// ---- The pupil's options (design/student-opts/CARD.md §4, signed 2026-11-19) ----
+// A pupil changes only how hard the problems are: the "Harder / easier" group (and "Which facts", the same group drawn
+// last for the x / ÷ tick lists - card decision D1) and Max Number. Layout, appearance, More, the number line, pupil
+// play, supports and the support level stay the teacher's; so do hidden options, options a page role or print size
+// gates, and the count-by rows editor (card decision D2). `pupil: true | false` on a def moves it across the rule.
+export const PUPIL_GROUPS = Object.freeze(['difficulty', 'facts']);
+export function isPupilOption(def) {
+    if (!def || def.hidden) return false;
+    if (pupilWithheld(def)) return false;      // the words layer withholds teacher / page choices (card D3, critic r1 F2 / F4)
+    if (def.pupil === true || def.pupil === false) return def.pupil;
+    if (def.id === 'level' || def.type === 'rows' || def.hiddenOnRoles || def.offeredAtSize) return false;
+    if (def.id === 'range') return true;
+    return PUPIL_GROUPS.includes(optionGroup(def));
+}
+/** The options a pupil may change on a skill: the curated subset of offeredOptionsFor (never a teacher or print option). */
+export function pupilOptionsFor(categoryId, skillId) {
+    // in pupil words (pupil-option-words.js): the teacher's labels stay on the teacher panel (critic r1 F2)
+    return offeredOptionsFor(categoryId, skillId).filter(isPupilOption).map(pupilWorded).filter(Boolean);
+}
+/** What is chosen, in pupil words, over the pupil options only ('' at the defaults). */
+export function describePupilOptions(categoryId, skillId, opts) {
+    const defs = pupilOptionsFor(categoryId, skillId);
+    const packed = packOptions(categoryId, skillId, opts || {});
+    const parts = [];
+    for (const def of defs) {
+        if (!(def.id in packed)) continue;
+        const v = packed[def.id];
+        if (def.type === 'bool') { parts.push(v ? def.label : `No ${String(def.label).toLowerCase()}`); continue; }
+        if (def.type === 'set') {
+            const all = def.values || [];
+            const ls = all.filter((x) => (v || []).includes(x.v)).map((x) => x.l);
+            parts.push(`${def.label}: ${!ls.length ? 'any' : (ls.length === all.length && def.allLabel) ? def.allLabel : ls.join(', ')}`);
+            continue;
+        }
+        const hit = (def.values || []).find((x) => x.v === v);
+        parts.push(`${def.label}: ${hit ? hit.l : v}`);
+    }
+    return parts.join(' · ');
+}
+
 /** The defaults for a skill: what it generates when the teacher chooses nothing. */
 /**
  * The option values a page ROLE must not deal (an option def's `hiddenOnRoles: {role: [values]}`): {optionId: [values]}.
@@ -4317,7 +4372,10 @@ export function describeOptions(categoryId, skillId, opts) {
         if (def.type === 'bool') { parts.push(v ? def.label : `No ${def.label.toLowerCase()}`); continue; }
         if (def.type === 'rows') { parts.push(`${def.label}: ${typeof def.summary === 'function' ? def.summary(v) : (Array.isArray(v) ? v.length : 0)}`); continue; }
         if (def.type === 'set') {
-            const all = (def.values || []);
+            // hotfix t15fix: a tick the other options hide (the 13-15 of the x / ÷ fact sets under "Tables to" 10 x 10 or
+            // 12 x 12, `valueHide`) is neither drawn nor dealt, so the summary does not name it either (ws-tables15 T15-HIDDEN).
+            const hide = typeof def.valueHide === 'function' ? new Set(def.valueHide(normalizeOptions(categoryId, skillId, opts)) || []) : null;
+            const all = (def.values || []).filter(x => !(hide && hide.has(x.v)));
             const labels = all.filter(x => v.includes(x.v)).map(x => x.l);
             // Every box ticked reads better as the one phrase the option names it by
             // ("All three ways, mixed") than as the whole list spelled out on a dialog row.

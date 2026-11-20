@@ -848,6 +848,107 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - 2026-11-19, critic merge r4 (FAIL 7/7/7/8): an --only matching nothing passed. Fixed (0 cases → FAIL; bad regex → clean
   FAIL; self-test r4 cases, 28 in all); row `merge-master-only-empty`.
 
+## 2026-11-19 - ws-key-json full sweep survives a dead browser (lf-tools-keyjson, lead urgent)
+- Symptom: since the 2026-11-15 container restart the FULL ws-key-json sweep (deploy gate) ended with an uncaught
+  "TargetCloseError: Target closed" / "Navigating frame was detached"; `--skills` subsets passed.
+- Cause: the harness, not a skill. The sweep drove ~600 skills x every role through one browser with no crash handling (it
+  restarted every 40 skills, but any renderer / browser death ended the whole gate). /dev/shm is 16 GB, so not shm.
+  A planted browser kill reproduces the exact error on d38308824.
+- Fix (same pattern as ws-tof-stem 9d7772a36): one evaluate per skill, restart every --restart-every (40) and on a
+  crash / protocol timeout (protocolTimeout 120 s, new H.open option, same edit as the tof branch), retry the skill once,
+  a skill lost twice is a finding; a `sweep:` line names restarts and retries, each retry names its skill.
+- Backtest `key-json-retry` (MQ_KEYJSON_CRASH_AT): FAIL d38308824 -> OK a9051bb03 (ws-backtest PASS). CHECKS_FROM_CRITICS row added.
+- Full sweep (fixed tree, through /tmp/mq-browser-run.sh, 2026-11-19): `ws-key-json: OK (734 skills, 9343 sheets)`, 3683 s in the gate (71 min wall incl. ~10 min slot wait), 18 planned restarts, 0 retries: no skill crashed the page this run; the unfixed d38308824 sweep also ran 24 min without crashing before it was stopped, so the crash is intermittent (browser / renderer death), not one skill.
+
+## 2026-11-14 - ws-tof-stem sweep hardening (deploy timeouts)
+- ws-tof-stem.cjs now sweeps skill by skill: browser restart every 40 skills (--restart-every) and on crash/timeout, protocolTimeout 120 s (ws-harness open() option), one retry per skill, a skill lost twice is a FAIL. Verdict lines unchanged; new `sweep:` line (restarts, retried, seconds).
+- Backtest `tof-stem-retry` (MQ_TOF_CRASH_AT=2): crash retried, 4/4 measured. CHECKS_FROM_CRITICS row added.
+- Full sweep: 728 skills measured 728, 18 restarts, 0 retries, 348 s, ws-tof-stem: OK.
+## 2026-11-14 — EB-LASTPAGE + CAP-PARITY (lf-ops critic cbt r3 F1 root cause)
+- ws-empty-band (under --page-fill, which precritic passes by default): **EB-LASTPAGE** judges the last / only page of a
+  fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test): FAIL at >= 30 % empty when its next row
+  fits; other roles' last pages are measured and noted. **CAP-PARITY**: items a page at L >= ceil(0.7 x M) unless the L page is
+  full (white < one row); counts noted per role. Self-test: 6 + 5 pure cases.
+- Backtests eb-lastpage-cbt-pre-skill-check, cap-parity-cbt-pre-skill-check: FAIL 3038af154 pre-skill-check (L 34 % / 81 mm
+  empty; L 10 vs M 16 items) -> OK 3038af154 test / true-false / reason-it / error-analysis (re-point the pass side to the F1 fix).
+- master 448bc5e74: count_by_tables has no pre-skill-check role on its card; both rules PASS on every role. **add_facts FAILS
+  EB-LASTPAGE**: pre-skill-check M and L 78 % empty (4 items, 42.6 mm rows) - a real defect for the role's owner, not exempted.
+
+## 2026-11-19 — EB-LASTPAGE + CAP-PARITY r2 (critic eblast r1 FAIL: F1-F7), rebuild at Opus medium
+- **F1** "another row fits" is now `white >= row + the ROW GAP as rendered` (median gap between row tops' rows; else the grid's
+  computed row-gap). placevalue:value mixed-practice L (39.8 mm white, 37.2 mm row) is no longer a false red when the gap does not fit.
+- **F2** CAP-PARITY judges only roles that fill their own page (`counts()` export in `sheet/roles/<role>.js`); a role with no
+  `counts()` (independent, more-practice) or a teacher `--columns` run is the teacher's count: noted "not judged", never failed.
+- **F3** a MULTI-page fixed role's last page is judged by PG-23 (fewer than one third of a full page's rows = missed rebalance;
+  a rebalanced last page is legal however white). pre-skill-check stays one page (PT-PRE-1): its spilled page keeps the 30 % rule.
+- **F4** new fixture pairs (`tests/fixtures/precritic/page-fill/`, `--html --page-fill`, `<meta name="eb-role">`, pages tagged
+  `data-eb-size`): `eb-lastpage-fixture-pre-skill-check`, `cap-parity-fixture-row-gap`, `eb-lastpage-fixture-test-pg23`. No fix has
+  landed, so each pass side is a PLANTED page that meets the rule. The two cbt rows' pass sides are relabelled INTERIM stand-ins.
+- **F7** notes: banded / fixed-layout roles read "not a fixed-capacity role (PT-ENG-3 ...)", teacher-count roles "PG-23 ...".
+- Self-test: + 18 r2 cases (gap 6, who-sets-count 6, PG-23 4, notes 2).
+- **REAL reds, kept red and routed** (CHECKS_FROM_CRITICS 2026-11-19): add_facts pre-skill-check M and L (78 %) and sub_facts
+  pre-skill-check M and L (78 %) -> **lf-ops**; placevalue:value pre-skill-check L p2 (45 %, spills past PT-PRE-1) and its
+  CAP-PARITY (L 3 vs M 6), and placevalue:value mixed-practice CAP-PARITY (L 10 vs M 21) -> **lf-placevalue**. The last is NOT the
+  false red r1 suspected: measured with the gap, every L shelf is 37.2 mm, the rendered gap 0.5 mm, the white 39.8 mm - a shelf fits.
+- The row now measured is the page's TALLEST row (a row = its tallest cell), so "another row fits" is claimed only when any drawn
+  row fits again. Verify: self-test OK; fixtures flip FAIL -> OK (3 pairs); `ws-backtest --row` on the 3 new + 2 cbt rows: 5 PASS; `ws-empty-band --page-fill` on add_facts, sub_facts,
+  placevalue:value FAIL (7, all listed above); `ws-precritic-plan --checks-from-critics` OK (346 pass, 90 exempt, 0 fail). Lanes touching these skills see them under precritic's default `--page-fill`.
+
+## 2026-11-20 — EBLAST-ADVISORY (critic eblast r2 FAIL 6/8/4/7, round cap)
+
+- Root cause: the rules infer capacity from white space instead of the role's DESIGNED ceiling (WDS §12 caps, the role's
+  counts()), so a page full by design reads as "a row fits" (Mixed practice L at 5 rows; scripted-model).
+- Now: EB-LASTPAGE / CAP-PARITY print "ADVISORY (not critic-passed)" and never block; `--eblast-block` keeps the 5 rows
+  proving the rules; new row `eblast-advisory-fixture`. count_by_tables is clean either way.
+- Real reds (advisory, routed): lf-ops add_facts / sub_facts pre-skill-check M/L 78 %; lf-placevalue value pre-skill-check
+  L p2 45 % + CAP-PARITY 3 vs 6. The mixed-practice 10 vs 21 is FALSE (5-row ceiling).
+- Next: a fresh builder — machine check first that every role used by a passed skill declares its ceiling; the rules read
+  it; critic r3; blocking again only after r3 passes.
+
+## 2026-11-20 — EBLAST r3 build: declared role ceilings (fresh builder, Opus medium; round cap fired on EB-LASTPAGE / CAP-PARITY)
+
+- **Root cause (verified):** the rules INFERRED capacity from white space ("another row fits", `full = !rowFits(pg)`) and never
+  read a role's DESIGNED ceiling, so a page full by design read as a defect: Mixed practice L at its WDS §12.1 5-row ceiling
+  (`mixed-practice.js` MAX_SHELVES) gave CAP-PARITY 10 vs 21; Scripted Model's fixed frames (§12.1 "1 problem, 3-6 frames, same")
+  gave 6 vs 10 / 4 vs 8 because `counts()` presence was the only test.
+- **Machine check first:** `js/modules/sheet/role-capacity.js` (pure kit table, exported from `sheet/index.js`) declares every
+  role's ceiling per size, its unit (items / rows), who sets the count (`role` / `teacher` / `fixed` / `table`) and its §12.1
+  citation. `ws-empty-band --capacity-check` fails when a role rendered by any `redesign-passed.js` skill (its card's offered
+  roles, else the default list) declares nothing: 17 roles / 32 skills OK. Backtest row `eblast-role-capacity-declared`
+  (FAIL a55ce281f, OK 7fb4a0659): PASS.
+- **Rules read it:** EB-LASTPAGE judges "a row fits" only BELOW the declared ceiling at that size; CAP-PARITY judges only `role`
+  roles, passes an L page at its declared L ceiling, and caps the need at the L ceiling. Not judged, with a note: teacher-count
+  roles (independent, more-practice: PG-23, the teacher's count), fixed layouts (scripted-model, opener, lesson, stretch,
+  fact-probe: their count is a layout, not a capacity), fact-rows (ladder table, no single ceiling). Self-test +13 cases
+  (mixed L 5 rows OK; pre-skill-check M 4 of 20 FAIL; scripted-model not judged; true-false 4 vs 6 OK; value 3 vs 6 FAIL).
+- **Sweep (advisory lines, 5 passed skills: add_facts, sub_facts, value, count_by_tables, div_facts):** 8 reds, all real by
+  the declared ceiling, all pre-skill-check (below its 20 / 16 items): add_facts M/L 78 %, sub_facts M/L 78 %, div_facts M 82 % /
+  L 79 % (4 items a page), value L p2 45 % + CAP-PARITY 3 vs 6. Mixed practice 10 vs 21 is gone (L at 5 rows). count_by_tables
+  clean. One route: the pre-skill-check composer (critic r2 G4: systemic, PT-PRE-1), not per skill.
+- Still ADVISORY (`--eblast-block` for findings); the lead flips to blocking after critic r3. The 6 eblast rows PASS;
+  `ws-precritic-plan --checks-from-critics` OK (351 pass, 90 exempt, 0 fail).
+
+## 2026-11-20 — EBLAST r4: drift check (critic eblast r3 G1) + per-role blocking allow-list (lead)
+
+- **G1 drift fixed (cheaper route; the role modules are untouched):** `ws-empty-band --capacity-check` parses each role's OWN
+  ceiling constant (guided / error-analysis / review / test / true-false `CEILING`, reason-it `ROWS`, word-problems `PER_PAGE`,
+  mixed-practice `MAX_SHELVES`) and FAILs on any difference with `role-capacity.js`, naming role, size, both values and file
+  (or a missing constant). Self-test: planted guided M 9 vs 8 FAILs, the real tree OK. Row `eblast-role-capacity-drift` PASS.
+  N1 fixed too: the EB-LASTPAGE message names the declared ceiling.
+- **EBLAST-BLOCKING:** global ADVISORY kept; EB-LASTPAGE / CAP-PARITY are FINDINGS on `EBLAST_BLOCKING_ROLES` (in the gate,
+  between markers). `--pin-check` fails when the list loses an entry of the merge-base copy (it may only grow). Row
+  `eblast-blocking-pin` PASS. Seeded (full sweep of all 32 passed skills, M + L, 0 reds outside pre-skill-check): independent,
+  more-practice, guided, error-analysis, review, test, mixed-practice, true-false, reason-it, word-problems, stretch,
+  scripted-model, opener, lesson, fact-probe, fact-rows.
+- **pre-skill-check stays ADVISORY. Every one of its pages is red today** (critic r3): 39 advisory reds across the 32 skills,
+  all of them pre-skill-check (one-row pages at 78-82 %, spills to p2 at L, CAP-PARITY below its 16-item L ceiling). Its owner
+  must fix the role composer (PT-PRE-1 four quadrants on one page) before it joins the list. These rules cannot block it until then.
+- Rows: CHECKS_FROM_CRITICS +2; backtests `eblast-role-capacity-declared`, `-drift`, `eblast-blocking-pin` PASS.
+- 2026-11-20, critic eblast r4 (FAIL 8/7/9/8): P1 the pin / capacity checks were on no gate path → now precritic gates
+  `eblast-pin` + `eblast-capacity` and deploy session 1; P2 the pin failed open on an unreadable base → fails closed;
+  P3 the list's comment names which listed roles each rule actually judges (8 of the 16 are not judged today). Rows
+  `eblast-pin-dropped-entry`, `eblast-pin-fails-closed`.
+
 ## 2026-11-19 — lesson pages: LESSON-EMPTY-FIRST + LESSON-OPENER-SAME (owner via the lead; fixes routed to lf-engine)
 
 - New `tests/scripts/ws-lesson-pages.mjs` (browser; `--self-test` / `--fixture` node only). Builds every built lesson of a

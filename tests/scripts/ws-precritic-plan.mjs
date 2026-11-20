@@ -84,6 +84,8 @@ export const LANE_TOOLS = {
     // (lane lf-roles, 2026-11-13: the page title in the simple print's share code is a teacher-site check)
     'ws-title-code': { scope: ['--teacher'], flags: [] },
     'ws-frame-title-ui': { scope: ['--teacher'], flags: [] },
+    // (lane lf-studentopts, 2026-11-19: the pupil options sheet is a pupil-home check; --unit is its node half)
+    'ws-student-opts': { scope: ['--student'], flags: ['--unit'] },
 };
 /** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
 export function readLaneCommand(cmd) {
