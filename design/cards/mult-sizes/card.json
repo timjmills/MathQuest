@@ -142,6 +142,11 @@
    "date": "2026-11-19",
    "ruling": "Add the missing multiplication size-pair presets, each with its own lesson.",
    "source": "lead request, lf-ops brief"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "4-digit × 1-digit deal keeps (thousands digit × multiplier) ≤ 9 so the partial products stay 4-digit for blank edge boxes.",
+   "source": "lead 2026-11-20"
   }
  ],
  "misconceptions": [

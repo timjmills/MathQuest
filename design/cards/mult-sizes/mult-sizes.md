@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"mult-sizes","kind":"family","template":"area-model","families":["multiplication"],"match":{"templates":["area-model","stack","long-multiplication"]},"config":"design/cards/mult-sizes/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"717b475f66f1edbe","format":2,"configSha":"0e1e5d81a171"}
+{"card":"mult-sizes","kind":"family","template":"area-model","families":["multiplication"],"match":{"templates":["area-model","stack","long-multiplication"]},"config":"design/cards/mult-sizes/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"e1770a68975574a9","format":2,"configSha":"60d8c140e932"}
 {"cited":"AK-2 AX-4 AX-9 C1 CL-9 H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 PG-12 PT-FRM-6 PT-GDP-1 PT-REV-3 RP-1 SL-1 SL-3a SP-20 TY-10a VA-10 WRM-rule-18","rules":"VA-1 12d322 SL-1 e3b064 12 3cbafa AK-1 a0cc12 P-1 5a3076 AK-2 d4709f TY-20 8964d2 21 53ed7d H13 36f579 L25 1b158f 26 bbd4cc SCC-01 8aa70b LS-8 59531d PG-12 8e75fd DN-1a 6ecf1e AX-4 2eb6c1 9 74e9a4 C1 a670d9 CL-9 accb97 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 e90105 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 L1 4f7d0c 6 6e19d8 PT-FRM-6 daac17 PT-GDP-1 a0e2cc PT-REV-3 d5e0d9 RP-1 d529bd SL-3a b8219f SP-20 cfb11a TY-10a 5e59f3 VA-10@WDS 9d9099 INK-1 0e2b59 P-LC-9 bc47bd PG-20 9c7999 SL-11 fc569a","entries":"D%3Atiles%3Dnull bcefeb D%3Atiles%3D11%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amult_3by2_standard%2Cmultiplication%3Amult_4by1_column%2Cmultiplication%3Amultiply bcefeb D%3Atiles%3D21 bcefeb D%3Atiles%3D31 bcefeb D%3Atiles%3D22 bcefeb D%3Atiles%3D23 bcefeb D%3Atiles%3D41 bcefeb D%3Atiles%3D32 bcefeb D%3AamEdges%3Dgiven bcefeb D%3AamEdges%3Dblank bcefeb D%3AamEdges%3Dmixed bcefeb D%3Anotation%3Dstacked bcefeb D%3Anotation%3Dacross%40multiplication%3Amultiply bcefeb D%3Anotation%3Dacross%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amult_3by2_standard%2Cmultiplication%3Amult_4by1_column bcefeb D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
@@ -14,6 +14,7 @@
  {"id":"T-5.2","source":"§5.2","text":"Every new skill is linked in the same change: SKILL_WRM, the year record lists it direc..."},
  {"id":"T-5.3","source":"§5.3","text":"Two print sizes M and L; no phone width."},
  {"id":"T-5.4","source":"§5.4","text":"Add the missing multiplication size-pair presets, each with its own lesson."},
+ {"id":"T-5.5","source":"§5.5","text":"4-digit × 1-digit deal keeps (thousands digit × multiplier) ≤ 9 so the partial products..."},
  {"id":"T-9.1","source":"§9.1","text":"No card covered area_model_mult / area_model_mult_hard, and the stack card has no decis..."},
  {"id":"T-9.2","source":"§9.2","text":"area_model_3by2 on tiles 23: the item today reads '24 x 135' (2-digit first). Write the..."},
  {"id":"T-9.3","source":"§9.3","text":"mult_3by2_standard: multiply tiles 22 prints through the legacy column-mult format toda..."},
@@ -137,6 +138,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-10-23** — Every new skill is linked in the same change: SKILL_WRM, the year record lists it direct, pre and related links. (`owner rule, CLAUDE.md`)
 - **2026-11-13** — Two print sizes M and L; no phone width. (`owner, FASTEST_PLAN_2026-11-13`)
 - **2026-11-19** — Add the missing multiplication size-pair presets, each with its own lesson. (`lead request, lf-ops brief`)
+- **2026-11-20** — 4-digit × 1-digit deal keeps (thousands digit × multiplier) ≤ 9 so the partial products stay 4-digit for blank edge boxes. (`lead 2026-11-20`)
 
 ## 6. Misconceptions
 
@@ -233,7 +235,7 @@ Each runs as `node tests/scripts/<script> …`.
 4. **G4-Y5.B5 is queue round 4, not the current round (FASTEST_PLAN rule 1). Build now?** Recommended: Lead decision; the lead requested it 2026-11-19. If built now, ship the five presets as one unit with their lessons.
 5. **MW4K / IXL research is from public pages only (no logins). Sign now?** Recommended: Yes: the size classes and responses agree across four sources; a logged-in pass can add item counts later without changing the card.
 
-Signed: owner, 2026-11-20
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
@@ -251,7 +253,7 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `amEdges=mixed` Numbers around the box [support] (area_model_2by1, area_model_2by2, area_model_3by1, area_model_3by2, area_model_4by1, area_model_mult, area_model_mult_hard) [offered]
 - `calculator=true` Calculator [play] (all 13) [out of scope, PROPOSED]
 - `calculator=false` Calculator [play], default (all 13) [out of scope, PROPOSED]
-- `skipAfter=*` Skip appears after [play] (all 13) [out of scope, PROPOSED]
+- `skipAfter=*` Skip button (0 = off) [play] (all 13) [out of scope, PROPOSED]
 - `tiles=22` Digits × digits [difficulty], default on area_model_2by2, mult_2by2_standard (area_model_2by2, area_model_3by2, area_model_mult_hard, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
 - `tiles=23` Digits × digits [difficulty], default on area_model_3by2 (area_model_2by2, area_model_3by2, area_model_mult_hard) [offered]
 - `notation=stacked` How it is written, default (mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
@@ -264,8 +266,8 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:independent` — the skill's own items (all 13) [offered, PROPOSED]
 - `role:more-practice` — the skill's own items (all 13) [offered, PROPOSED]
 - `role:opener` (also lesson-opener) — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 13/13 (all 13) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 13/13; provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
 - `role:error-analysis` (also check-it) — provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider misconceptions: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
 - `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
 - `role:test` (also test-a, test-b) — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
@@ -275,9 +277,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:fact-probe` — the skill's own items (all 13) [out of scope, PROPOSED]
 - `role:mixed-practice` (also mixed) — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
 - `role:true-false` — provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 13/13; provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
 - `role:stretch` — the skill's own items (all 13) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 0/13 (FALLBACK, warm-up from the earlier skills in data.js order, on area_model_2by1, area_model_2by2, area_model_3by1, area_model_3by2, area_model_4by1, area_model_mult, area_model_mult_hard, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 6/13 (FALLBACK, warm-up from the earlier skills in data.js order, on area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard, mult_2by1_column, mult_3by1_column, multiply) (all 13) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
