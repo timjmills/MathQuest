@@ -11,6 +11,8 @@
 //     each support. --no-test-eq-ind turns it off (--test-eq-ind is still accepted).
 //   default pin design/audit/baselines/capacity.json; skills: js/modules/redesign-passed.js; roles: EVERY grid role of
 //   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes M,L (S dropped 2026-11-13); seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
+//   WHITE-ROW (critic lf-engine-rowcap-s2 F4/F5): a one-page Review / Test / Error Analysis under its ceiling leaves at most one row of
+//     white under its last row (rows count at the cap); --no-white-row turns it off.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -111,6 +113,48 @@ const ALLOW = new Set(list(arg('allow', '')));
         }
         return out;
     }, { ...call, ROLES, SIZES }));
+    // WHITE-ROW (critic lf-engine-rowcap-s2 F4 / F5): rows are drawn at their cap, so a one-page Review, Test or Error Analysis
+    // whose count is BELOW its §12.1 ceiling must not leave more than one row of white under its last row - the page counts rows at the
+    // cap and takes the ones that fit (add_facts Review M: 10 of 12 under 100 mm of white). Read on the printed page (print media);
+    // the ceilings are read from each role's own `const CEILING = {...}`. --no-white-row turns it off.
+    const whiteRow = [];
+    if (has('check') && !has('no-white-row')) {
+        const ceilOf = {};
+        for (const [role, file] of [['review', 'review.js'], ['test', 'test.js'], ['error-analysis', 'error-analysis.js']]) {
+            try { const m = /const CEILING = \{([^}]*)\}/.exec(fs.readFileSync(path.join(H.ROOT, 'js/modules/sheet/roles', file), 'utf8')); if (m) ceilOf[role] = Object.fromEntries([...m[1].matchAll(/([SML])\s*:\s*(\d+)/g)].map((x) => [x[1], Number(x[2])])); } catch (e) { /* no ceiling: not judged */ }
+        }
+        const keys = Object.keys(now).filter((k) => { const [sk, role, size] = k.split(' '); const v = now[k]; return !v.na && !v.opts && !v.optProbe && inFilter(sk) && ceilOf[role] && Number(v.pages) === 1 && v.items < (ceilOf[role][size] || Infinity); });
+        if (keys.length) {
+            const app2 = await H.open({});
+            const sh = await app2.browser.newPage();
+            await sh.setViewport({ width: 900, height: 1300, deviceScaleFactor: 1 });
+            for (const k of keys) {
+                const [sk, role, size] = k.split(' ');
+                const [cat, id] = sk.split(':');
+                const html = await app2.page.evaluate(async ({ cat, id, role, size }) => {
+                    const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+                    try { const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: cat, skillId: id }], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed: hash(`${cat}__${id}:${role}`) % 1000000, form: 'A', key: false, anchors: 'off' });
+                        return window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }); } catch (e) { return null; }
+                }, { cat, id, role, size });
+                if (!html) continue;
+                if (!sh.url().startsWith('http')) await sh.goto(app2.page.url(), { waitUntil: 'domcontentloaded' });
+                await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+                await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+                await sh.emulateMediaType('print');
+                const w = await sh.evaluate(() => {
+                    const MM = 96 / 25.4; const p = document.querySelector('section.ws-page, .ws-page'); if (!p) return null;
+                    const foot = p.querySelector('.ws-footer, footer'); const fTop = foot ? foot.getBoundingClientRect().top : p.getBoundingClientRect().bottom;
+                    const cells = [...p.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                    if (!cells.length) return null;
+                    const low = Math.max(...[...p.querySelectorAll('[data-ws-cell], .ws-grid')].map((e) => e.getBoundingClientRect().bottom).filter((b) => b <= fTop + 2));
+                    const rowMm = Math.min(...cells.map((c) => c.getBoundingClientRect().height)) / MM;
+                    return { whiteMm: +((fTop - low) / MM).toFixed(1), rowMm: +rowMm.toFixed(1) };
+                });
+                if (w && w.whiteMm > w.rowMm + 3) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
+            }
+            await app2.close();
+        }
+    }
     await app.close();
     if (has('write')) {
         fs.mkdirSync(path.dirname(PIN), { recursive: true });
@@ -172,7 +216,7 @@ const ALLOW = new Set(list(arg('allow', '')));
         if (z.M !== undefined && z.L !== undefined && z.M < z.L) order.push(`${g}: M ${z.M} < L ${z.L} items (SIZE-ORDER-OPT)`);
         if (z.S !== undefined && z.L !== undefined && z.S <= z.L) order.push(`${g}: S ${z.S} not greater than L ${z.L} items - the option page is the same at every size (SIZE-ORDER-OPT, D3)`);
     }
-    drops.push(...order);
+    drops.push(...order, ...whiteRow);
     // TEST-EQ-IND (critic divarray r1 Q1; lead ruling 2026-11-13, on by default): a fact skill's Test count follows its
     // Independent count on each support (div_facts and mult_facts).
     if (testEqOn) {

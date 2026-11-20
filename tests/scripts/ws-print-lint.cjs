@@ -2316,7 +2316,14 @@ function lintKitGeometry(dom, pdf, info, F) {
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
                 const body = p.footRect[1] - p.gridTop;
                 const strip = p.footRect[1] - p.gridBottom;
-                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+                // (critic lf-engine-rowcap-s2 ruling on F4 / F5: on the row-capped roles that are not practice pages - Review, Test, Error
+                // Analysis, Opener - a strip is the page's MAJOR only while the count is under the role's §12.1 ceiling; at the ceiling (or
+                // on a role whose count is its own design, the Opener) the role caps the count and the strip is reported, minor)
+                const capRole = /^(review|test|error-analysis|opener|lesson-opener)\b/.test(p.role || '');
+                const cl = capRole ? ceilingFor(p.role, p.size, false) : null;   // (the role's own §12.1 base: test.js holds a one-symbol Test to it too)
+                const roleCapped = capRole && (!cl || p.items >= cl.n);
+                if (body > 0 && strip > 0.2 * body && roleCapped) F('L-DENSITY', 'PAGEFILL', 'minor', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) - the ${p.role} count ${p.items} is at its ceiling${cl ? ` ${cl.n}` : ' (the role sets its own count)'}: a lead call, not a fill defect`, 'empty strip under a capped page');
+                else if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
             }
             // L-SUPPORT NOT-SLOT (critic divarray r1 D1): a support draws no empty closed box the size/shape of the answer
             // slot, and a frame drawn on only some cells of an array band (the × zero empty frame, the lone framed support)

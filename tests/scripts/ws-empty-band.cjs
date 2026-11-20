@@ -166,7 +166,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-STRETCH'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-STRETCH', 'EB-CLIP', 'TAB-CLEAR'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -434,6 +434,14 @@ if (argv.includes('--self-test')) {
             ['a row holding an exempt cell', stretchFindings([sc(80, 50, { tmpl: 'fact' }), sc(80, 78, { tmpl: 'division', cell: 2 })], RT).length, 0]);
         { const got = []; const n0 = STRETCH_NOTES.length; ROW_ROOM = RT; judge([sc(70, 50, { tmpl: 'fact' })], 't', (rule) => got.push(rule), 'guided'); ROW_ROOM = null;
             st.push(['Guided over the cap: FAIL, not a note', got.filter((r) => r === 'EB-STRETCH').length + (STRETCH_NOTES.length - n0), 1]); }
+        // EB-CLIP / TAB-CLEAR (critic rowcap-s2 F1-F3): ink past or on the row's rule fails, 0.5 mm clear passes; a legacy cell is
+        // judged too; a tab 0.4 mm from its text fails, 2.5 mm passes, an across fact needs 1 mm
+        const ct = (x) => { const got = []; clipTabFindings([Object.assign({ page: 1, cell: 1, hMm: 40, tmpl: 'word-work' }, x)], 't', (r) => got.push(r)); return got.join(','); };
+        st.push(['EB-CLIP ink 2 mm past the rule', ct({ inkFootMm: -2 }) === 'EB-CLIP' ? 1 : 0, 1], ['EB-CLIP ink 0.2 mm above', ct({ inkFootMm: 0.2 }) === 'EB-CLIP' ? 1 : 0, 1],
+            ['EB-CLIP 0.6 mm clear', ct({ inkFootMm: 0.6 }) ? 1 : 0, 0], ['EB-CLIP a legacy cell is judged', ct({ inkFootMm: -1, tmpl: 'legacy' }) === 'EB-CLIP' ? 1 : 0, 1],
+            ['TAB-CLEAR text 0.4 mm', ct({ inkFootMm: 3, tabGapMm: 0.4, tabNeed: 2, tabOnText: true }) === 'TAB-CLEAR' ? 1 : 0, 1], ['TAB-CLEAR text 1.6 mm', ct({ inkFootMm: 3, tabGapMm: 1.6, tabNeed: 2, tabOnText: true }) === 'TAB-CLEAR' ? 1 : 0, 1],
+            ['TAB-CLEAR text 2.5 mm', ct({ inkFootMm: 3, tabGapMm: 2.5, tabNeed: 2, tabOnText: true }) ? 1 : 0, 0], ['TAB-CLEAR across fact 1.2 mm', ct({ inkFootMm: 3, tabGapMm: 1.2, tabNeed: 1, tabOnText: true }) ? 1 : 0, 0],
+            ['TAB-CLEAR a box 1.3 mm (CL-40)', ct({ inkFootMm: 3, tabGapMm: 1.3, tabNeed: 2 }) ? 1 : 0, 0], ['TAB-CLEAR a box touching', ct({ inkFootMm: 3, tabGapMm: 0, tabNeed: 2 }) === 'TAB-CLEAR' ? 1 : 0, 1]);
         const sbad = st.filter(([, got, want]) => got !== want);
         for (const [nm, got, want] of sbad) console.log(`self-test FAIL: EB-STRETCH ${nm}: ${got} finding(s), want ${want}`);
         const n = bad.length + kbad.length + cbad.length + sbad.length;
@@ -594,7 +602,38 @@ function measureCells(scope) {
                     beside = across && [...up.children].some((k) => k !== br && !k.querySelector('[data-ws-cell]') && k.getBoundingClientRect().height > 0 && (k.textContent || '').trim().length > 0);
                 }
             } catch (e) { beside = false; }
-            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, factGrid: !!c.closest('.ws-grid.facts'), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            // EB-CLIP (critic rowcap-s2 F1 / F2): how far the cell's lowest ink ends ABOVE its row's rule (the cell's outer foot), in mm -
+            // negative when the ink runs past it (clipped by the cell, or onto the next band); the ink box is the DOM's, so a clipped frame
+            // still reports its full rect
+            const inkFootMm = +((cr.bottom - box.b) / MM).toFixed(2);
+            // TAB-CLEAR (critic rowcap-s2 F3; the ws-lesson-samples rule on every role): the item-number tab's gap to the nearest ink of
+            // its cell (text from its glyphs' ink top, a slot, a bordered box, an SVG shape), mm; an across fact keeps CL-40's 1 mm
+            let tabGapMm = null, tabWhat = '', tabNeed = 2, tabText2 = false;
+            const tabEl = c.querySelector(':scope > [data-ws-label]');
+            if (tabEl && tabEl.getBoundingClientRect().width) {
+                const t = tabEl.getBoundingClientRect(); let best = Infinity;
+                for (const d of c.querySelectorAll('*')) {
+                    if (d.closest('[data-ws-label]') || !visible(d)) continue;
+                    const st = getComputedStyle(d);
+                    let r = d.getBoundingClientRect(); if (!r.width || !r.height) continue;
+                    const inSvg = d instanceof SVGElement;
+                    if (inSvg && !/^(rect|line|path|circle|ellipse|polygon|polyline|text)$/i.test(d.tagName)) continue;
+                    const text = !inSvg && [...d.childNodes].some((x) => x.nodeType === 3 && x.textContent.trim());
+                    const leaf = inSvg || /^(img)$/i.test(d.tagName) || d.hasAttribute('data-ws-slot');
+                    const bordered = !inSvg && (parseFloat(st.borderTopWidth) || parseFloat(st.borderBottomWidth) || parseFloat(st.borderLeftWidth));
+                    if (!text && !leaf && !bordered) continue;
+                    if (text && !bordered) { const rg = document.createRange(); rg.selectNodeContents(d); const q = [...rg.getClientRects()].filter((x) => x.width && x.height);
+                        if (q.length) r = { left: Math.min(...q.map((x) => x.left)), right: Math.max(...q.map((x) => x.right)), top: Math.min(...q.map((x) => x.top)), bottom: Math.max(...q.map((x) => x.bottom)) }; }
+                    let top = r.top;
+                    if (text && !bordered) { const cv = (measureCells.cv = measureCells.cv || document.createElement('canvas').getContext('2d')); cv.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+                        const mt = cv.measureText(d.textContent.trim()); top = r.top + Math.max(0, (mt.fontBoundingBoxAscent || 0) - (mt.actualBoundingBoxAscent || 0)); }
+                    const dx = Math.max(0, r.left - t.right, t.left - r.right), dy = Math.max(0, top - t.bottom, t.top - r.bottom);
+                    const gap = Math.hypot(dx, dy) / MM;
+                    if (gap < best) { best = gap; tabWhat = text ? `"${d.textContent.trim().slice(0, 16)}"` : d.tagName.toLowerCase(); tabText2 = !!text && !bordered; }
+                }
+                if (Number.isFinite(best)) { tabGapMm = +best.toFixed(2); tabNeed = c.querySelector(':scope > .ws-eq[data-ws-across]') ? 1 : 2; }
+            }
+            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, factGrid: !!c.closest('.ws-grid.facts'), inkFootMm, tabGapMm, tabWhat, tabNeed, tabOnText: tabText2, tabText: tabEl ? tabEl.textContent.trim() : '', hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
@@ -889,6 +928,21 @@ function roomOf(R, t) {
     if (own(R.exempt, t)) return null;
     return own(R.rooms, t) ? R.rooms[t] : (Number.isFinite(R.def) ? R.def : null);
 }
+// EB-CLIP (critic lf-engine-rowcap-s2 F1 / F2, the second side of EB-STRETCH): every print cell's ink - legacy and template-less cells
+// included (critic ruling b) - ends at least CLIP_MM above its row's rule; ink past it is clipped by the cell or lies on the next band.
+// TAB-CLEAR (F3): a cell's item-number tab stands at least 2 mm (an across fact 1 mm, CL-40) from its ink. Pure: clipTabFindings.
+const CLIP_MM = 0.5;
+function clipTabFindings(cells, where, F) {
+    for (const c of cells || []) {
+        if (!c || c.noInk) continue;
+        const at = `${where} p${c.page} cell ${c.label || c.cell}`;
+        if (Number.isFinite(c.inkFootMm) && c.inkFootMm < CLIP_MM) F('EB-CLIP', at, `the cell's ink ends ${c.inkFootMm < 0 ? `${(-c.inkFootMm).toFixed(1)} mm PAST` : `${c.inkFootMm.toFixed(1)} mm above`} its row's rule (a ${c.hMm} mm row; at least ${CLIP_MM} mm above): clipped or on the next band [${c.tmpl || 'no template'}]`);
+        // (TEXT the pupil reads - a "Sam chose:" tag, a story line - keeps 2 mm (F3); a one-line fact or equation keeps CL-40's 1 mm; a box,
+        // frame or drawing may sit in CL-40's 1 mm but never touch the tab)
+        const need = c.tabOnText ? ((c.tabNeed === 1 || /^(equation|fact)$/.test(c.tmpl || '')) ? 1 : 2) : 1;
+        if (Number.isFinite(c.tabGapMm) && c.tabGapMm < need) F('TAB-CLEAR', at, `the number tab "${c.tabText}" is ${c.tabGapMm.toFixed(1)} mm from ${c.tabWhat} (at least ${need} mm) [${c.tmpl || 'no template'}]`);
+    }
+}
 function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
     const out = [];
     // (drawn = the cell's NATURAL height, natMm: the cell laid out with no row stretch - a template that flexes into its row
@@ -924,6 +978,7 @@ function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
 // True or False, Stretch, Word problems ...) are NOTED with their over-cap cell count.
 function judge(cells, where, F, role) {
     if (role === 'scripted-model') for (const c of cells) c.oneHeight = true;
+    if (!String(role || '').startsWith('host:')) clipTabFindings(cells, where, F);
     if (process.env.EB_DUMP) for (const c of cells) console.log("DUMP", where, c.page, c.cell, c.tmpl, c.hMm, c.neededMm, c.natMm, c.topPx, c.beside ? 'beside' : '');
     if (!String(role || '').startsWith('host:') && role && !STRETCH_ROLES.has(role)) { const n = stretchFindings(cells).length; if (n) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on this role yet (its composer sizes its own rows): ${n} cell(s) over the cap`); }
     if (!String(role || '').startsWith('host:')) { const lg = cells.filter((c) => c.tmpl === 'legacy' && Number.isFinite(c.natMm) && c.hMm - c.natMm - 3 > STRETCH_TOL_MM).length; if (lg) STRETCH_NOTES.push(`${where}: EB-STRETCH not judged on ${lg} legacy cell(s) over natural + 3 mm (old print HTML, measured taller than it draws)`); }
@@ -1023,7 +1078,7 @@ async function main() {
                         const cols = r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
                         const sections = new Set((r.items || []).map((it) => it.section)).size;
                         const tries = r.plan && r.plan.meta ? Number(r.plan.meta.scoreOutOf) : NaN;
-                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), pupilHtml: grid ? r.pupilHtml : null, keyHtml: grid ? r.keyHtml : null, plainPupil: plain ? plain.pupilHtml : null, plainKey: plain ? plain.keyHtml : null, cols, sections, tries, fclass: (r.items || []).map((it) => (it && it.fclass) || ''), measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).map(([k, v]) => [k, v && v.hMm])) : null)) };
+                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), keyDoc: r.keyHtml ? window.sheetDocument(r.keyHtml, (r.title || 'x') + ' key', { paper: 'A4' }) : null, pupilHtml: grid ? r.pupilHtml : null, keyHtml: grid ? r.keyHtml : null, plainPupil: plain ? plain.pupilHtml : null, plainKey: plain ? plain.keyHtml : null, cols, sections, tries, fclass: (r.items || []).map((it) => (it && it.fclass) || ''), measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).map(([k, v]) => [k, v && v.hMm])) : null)) };
                     } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
                 }, { categoryId, skillId, j, SEED, grid });
                 // a role the signed card OFFERS that the app cannot compose is a failure, not a note (critic eb-r1 D3); with no
@@ -1050,6 +1105,18 @@ async function main() {
                     // (layout.drawnRowMm: the measure + 1 mm); EB-FOOT holds that measure to the drawn height within 10 %)
                     for (const c of cells) { const ids = c.items && c.items.length ? c.items : [c.item]; const k = footCols(c, cells); const ms = ids.map((i) => (i >= 0 && b.measured && b.measured[i] ? Number(b.measured[i][k]) : NaN)); if (ms.length && ms.every((x) => x > 0)) c.measMm = Math.max(...ms) + 1; }
                     judge(cells, `${key} ${j.tag}`, F, j.role);
+                    // EB-CLIP / TAB-CLEAR on the KEY too (critic rowcap-s2 F3: the tab covered the text on the pupil page AND the key)
+                    if (b.keyDoc && !has('no-key-clip')) {
+                        const kp = await app.browser.newPage();
+                        try {
+                            await kp.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+                            await kp.goto(page.url(), { waitUntil: 'domcontentloaded' });
+                            await kp.setContent(b.keyDoc, { waitUntil: 'networkidle0', timeout: 60000 });
+                            await kp.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+                            await kp.emulateMediaType('print');
+                            clipTabFindings(await kp.evaluate(measureCells, 'body > section.ws-page, body > .ws-page'), `${key} ${j.tag} key`, F);
+                        } finally { await kp.close(); }
+                    }
                     // EB-PAGE (opt-in --page-fill; lf-placevalue critic r4 E-r4-1): a page that is not the role's last leaves 30 % or more
                     // of its body empty under its last block (identify lesson L p2: 43 %, page 3 never moved up). The last page may end short.
                     if (has('model-states') && j.role === 'scripted-model' && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
