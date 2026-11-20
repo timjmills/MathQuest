@@ -246,6 +246,13 @@ function geometryAt(pools, input, mainCols = 0) {
     };
     let best = bands === 2 ? search(0.2, true) : search(0, false);
     if (best.n < 0 && bands === 2) best = search(0, true);
+    // ROW-STRETCH CAP refill (critic lf-engine-rowcap-s2 F4): rows are drawn at their cap, so a page under its ceiling whose plan leaves
+    // white under it takes the plan that prints MORE, the earlier share's 20 % floor giving way - only where the earlier step's rows are
+    // no taller than the main ones (a long-division earlier row of 84-94 mm flipped div_facts_long's sizes: L 11 over M 10, SIZE-ORDER)
+    if (bands === 2 && best.n > 0 && best.n < ceil && E.h <= M.h * 1.2) {
+        const used = mainAt(best.mRows).h + best.eRows * best.eh + (best.eWide || 0) * (best.ehw || 0);
+        if (availOf(mainAt(best.mRows).bands) - used > 0) { const alt = search(0, true); if (alt.n > best.n) best = alt; }
+    }
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
     // lf-ops r-review: at S a static-width earlier step (stacks) may take a 5th column - narrower cells round the same ink, as
