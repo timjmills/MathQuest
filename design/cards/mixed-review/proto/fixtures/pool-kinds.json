@@ -1,0 +1,72 @@
+[
+ {
+  "id": "facts:add_10",
+  "code": "BA",
+  "grade": "1",
+  "area": "OA",
+  "kind": "fact"
+ },
+ {
+  "id": "algebra:missing_addend",
+  "code": "BB",
+  "grade": "1",
+  "area": "OA",
+  "kind": "equation"
+ },
+ {
+  "id": "addition:stack_3d",
+  "code": "BC",
+  "grade": "2",
+  "area": "NBT",
+  "kind": "stack"
+ },
+ {
+  "id": "division:long_div",
+  "code": "BD",
+  "grade": "4",
+  "area": "NBT",
+  "kind": "division"
+ },
+ {
+  "id": "fractions:shade_half",
+  "code": "BE",
+  "grade": "3",
+  "area": "NF",
+  "kind": "visual-half"
+ },
+ {
+  "id": "number_sense:line_1000",
+  "code": "BF",
+  "grade": "3",
+  "area": "NBT",
+  "kind": "visual-full"
+ },
+ {
+  "id": "patterns:in_out_table",
+  "code": "BG",
+  "grade": "4",
+  "area": "OA",
+  "kind": "table"
+ },
+ {
+  "id": "vocabulary:shape_words",
+  "code": "BH",
+  "grade": "M",
+  "area": "WORDS",
+  "kind": "text"
+ },
+ {
+  "id": "word_problems:two_step",
+  "code": "BI",
+  "grade": "3",
+  "area": "OA",
+  "kind": "word-problem"
+ },
+ {
+  "id": "measurement:legacy_scale",
+  "code": "BJ",
+  "grade": "2",
+  "area": "MEAS",
+  "kind": "legacy"
+ }
+]

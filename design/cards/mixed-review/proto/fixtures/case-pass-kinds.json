@@ -1,0 +1,51 @@
+{
+ "note": "r3 D4: one skill of each of the 10 contract kinds (word problems 3 a page at M and L, long division wide, legacy never M1)",
+ "expect": "pass",
+ "props": [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "h",
+  "j",
+  "j2",
+  "k",
+  "l",
+  "m"
+ ],
+ "input": {
+  "pool": "pool-kinds",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "order": [
+   "mixed",
+   "easyhard",
+   "area"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ]
+ }
+}

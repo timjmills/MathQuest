@@ -1,5 +1,5 @@
 {
- "note": "r1 SHARE: a codec that drops the S token",
+ "note": "r1 SHARE / r3 D7: a codec that drops the S token; decode REFUSES a V1 code without S (never seed 1), caught on that refusal",
  "expect": "fail",
  "catch": "a",
  "props": [
@@ -14,5 +14,6 @@
   "seed": 4242,
   "size": "m",
   "order": "mixed"
- }
+ },
+ "catchText": "no S seed token"
 }

@@ -257,10 +257,10 @@
   ],
   "share": {
     "form": "Direct Play link / enhanced skill code: ?c=<skills>|<tokens>",
-    "skills": "Skills part: the DEALT list in V1's pick order (out.dealt), each the frozen 2-char code + its item count as the existing weight digits + its ~option suffix (a week: week totals). Decoding replays the list as the pool in that order, no shuffle (replayInput); the counts are asserted against the re-deal (check-v1 prop a).",
+    "skills": "Skills part: the DEALT list in V1's pick order (out.dealt), each the frozen 2-char code + its item count as the existing weight digits + its ~options payload when the skill has options (a week: week totals). LEAD RULING 2026-11-20 (card section 9.19): the ~options travel IN the code; V1 encode writes them, decode reads them (check-v1 prop a, fail-a-drop-opts). Decoding replays the list as the pool in that order, no shuffle, through the FROZEN V1 table (proto/fixtures/v1-registry.json: code -> id, kind, grade, area; append-only), never the live registry; a code the table lacks is refused. The counts are asserted against the re-deal (prop a). One codec: MIX-REVIEW-SHARE share-two-codecs (build step 1) asserts skill-codes.js generateEnhancedSkillCode output equals D.encode byte for byte.",
     "newTokens": [
       "V1  mixed review, format 1 (absent: an ordinary enhanced code)",
-      "S<base36>  the seed (4 chars for 100000-999999)",
+      "S<base36>  the seed (4 chars for 100000-999999); a V1 code without S is refused, never read as seed 1 (r3 D7)",
       "O<e|a>  order easy -> hard / by area (absent: mixed)",
       "Y<week>  a Mon-Fri week set, the week number (absent: one sheet); the skills part is then the week's union with week totals",
       "K<1-5>  one day of a week code (absent with Y: the whole week)",
@@ -269,8 +269,8 @@
     ],
     "reused": "N<n> problem count (5-30), G<p|b|r|w> host (practice card / boss / race / online worksheet), H, T as today.",
     "compat": "Append-only: no frozen code, position or token meaning changes; a code with none of the new tokens decodes byte-for-byte as before (ws-code-snapshot, ws-share-options). An OLD app skips V / S / O / Y / K / P (parseEnhancedSkillCode's switch ignores unknown keys) and plays the same skills with the same weights as an ordinary mixed set: the skills survive, the identical items do not (stated, not hidden). The quiz host uses the existing ?quiz= share of a quiz built from the mix.",
-    "identical": "Identical - one dealer: dealReviewItems(req) in print-sheet.js calls V1 deal / week for the PLAN (skills, counts, pages, shelves, numbers, item seeds) and runs each item through generateQuestionFor with try r = deriveSeed('mixed-review', S, day, i, r) and the existing duplicate ladder (RETRIES 40; unique / answers / turn / repeat). buildSheet lays out that plan (no measuring decides a page); every screen host plays that list. Adapt (P1) deals only the code's listed skills (prop g).",
-    "frozenV1": "V1 is the file design/cards/mixed-review/proto/dealer-v1.mjs pinned by sha256 (proto/fixtures/frozen.json; check-v1 prop i). It moves unchanged to js/modules/mixed-review.js; any change to what it deals ships as V2 in a new file and the V1 file stays. Every input V1 reads is in the code (list, N, S, O, Y, K, Z); nothing is measured.",
+    "identical": "Identical - one dealer: dealReviewItems(req) in print-sheet.js calls V1 deal / week for the PLAN (skills, counts, pages, shelves, numbers, item seeds) and runs each item through generateQuestionFor and the existing duplicate ladder. Try 0 of item i = item.seed = deriveSeed('mixed-review', S', day, i) (four parts); try r >= 1 = deriveSeed('mixed-review', S', day, i, r) (five parts); S' = S on a single sheet (day 0), the day seed deriveSeed('mixed-review-week', S, d) on day d of a week (check-v1 prop m). Print and every host play its accepted list.",
+    "frozenV1": "V1 = four files pinned by sha256 in proto/fixtures/frozen.json (check-v1 prop i): dealer-v1.mjs, js/modules/sheet/interleave.js, js/modules/sheet/rng.js and the frozen V1 table v1-registry.json; plus 20 golden codes (proto/fixtures/golden-v1.json) that replay through the frozen table alone to their pinned items. The files move unchanged to js/modules at build step 2 (pins move with them); if lf-engine must change interleave.js or rng.js, V1 first gets frozen copies under js/modules/mixed-review-v1/; any change to what V1 deals ships as V2 in a new file.",
     "dealer": "dealReviewItems(req), exported from js/modules/print-sheet.js: the only source of a mixed review's items for print and every screen host"
   },
   "week": "DEALER V1 week(): five sheets of N; day d seed deriveSeed('mixed-review-week', S, d); one cycle; choice order fresh (unseen this week) -> not on yesterday -> least used this sheet -> least used this week -> pick order; from Wednesday the comeback = the first skill of day d-2 not on day d-1, opening day d. Every pool skill appears before any repeat other than the comeback; no skill on two consecutive days while |pool| >= 2 k_d (check-v1 prop f).",
@@ -694,28 +694,38 @@
     "fixes": "card section 9c, one row per defect D1-D13"
   },
   "proto": {
-    "dealer": "design/cards/mixed-review/proto/dealer-v1.mjs (DEALER V1: pure; frozen CAP / SHELF tables; deal, week, encode, decode, replayInput; imports dealCounts / interleave from js/modules/sheet/interleave.js and rng / shuffle / deriveSeed from js/modules/sheet/rng.js)",
-    "check": "node design/cards/mixed-review/proto/check-v1.mjs -> check-v1: OK (11 props, 31 fixtures); --table prints the section 3 table; --fill asserts prop k over every pool (exit 1 on any non-last page under half); --show <case> one fixture's deal",
-    "fixtures": "design/cards/mixed-review/proto/fixtures: pool-*.json (pinned pools, incl. pool-3mix), case-pass-* (14), case-fail-* (17, each caught), size-table.json (the pinned table), frozen.json (the V1 sha256)",
+    "dealer": "design/cards/mixed-review/proto/dealer-v1.mjs (DEALER V1: pure; frozen CAP / SHELF / KIND_CLASS / KIND_CAP tables; deal, week, encode, decode, replayInput; imports dealCounts / interleave from js/modules/sheet/interleave.js and rng / shuffle / deriveSeed from js/modules/sheet/rng.js, both pinned)",
+    "check": "node design/cards/mixed-review/proto/check-v1.mjs -> check-v1: OK (15 props, 50 fixtures; trace 117 normative sentences, 84 by a property, 33 by a product check); --table prints the section 3 table; --fill asserts props k, l, j2 over 10 pools x N x M, L x 3 orders x 300 seeds + 40 weeks a cell; --trace the card's rule -> property trace; --pin re-takes the V1 pins and golden codes (card stage only); --show <case> one fixture's deal",
+    "fixtures": "design/cards/mixed-review/proto/fixtures: pool-*.json (10 pinned pools, incl. pool-kinds and pool-legacy), case-pass-* (17), case-fail-* (33, each caught, by catchText where the reason matters), trace-fail-* (3), size-table.json, v1-registry.json (the frozen V1 table), golden-v1.json (20 golden codes), frozen.json (the 4 V1 sha256 pins)",
     "props": {
-      "a": "determinism and the code round trip (sheet, week, every K day)",
+      "a": "determinism and the code round trip (sheet, week, every K day): items, seeds, ~options, pages; a V1 code without S or Z refused",
       "b": "no skill over ceil(N/2)",
-      "c": "at most 3 skills a page",
-      "d": "no avoidable adjacency; a single-skill page exempt",
-      "e": "exact N; 2-up halves 1..5",
+      "c": "at most 3 skills a page (recomputed from the shelves)",
+      "d": "no avoidable adjacency, a single-skill page exempt; easyhard / area shelves in order",
+      "e": "exact N; 2-up exactly when the 5 fit a half page (fill recomputed); halves 1..5",
       "f": "the week: fresh before any repeat but the comeback; no consecutive days; distinct day seeds",
       "g": "adapt: only the code's listed skills; even counts",
-      "h": "the size table and the ceilings (fill <= 1 page, shelves <= 7 / 5)",
-      "i": "the V1 freeze (sha256)",
-      "j": "shelves: never over k; a short shelf only a skill's last",
-      "k": "FILL: no page but a sheet's last under half full"
+      "h": "the size table, CAP = 12.1, the kind -> class table (10 contract kinds) and KIND_CAP; fill <= 1 page and shelves <= 7 / 5 (recomputed)",
+      "i": "the V1 freeze: sha256 of dealer, interleave.js, rng.js, v1-registry.json; the 20 golden codes replay to their pinned items",
+      "j": "shelves: never over k; a short shelf only a skill's last; a legacy cell never M1",
+      "k": "FILL: no page but a sheet's last under half full (recomputed from the shelves)",
+      "j2": "a flat skill holds >= 2 items on every page it is on",
+      "l": "no page holds fewer than 2 items",
+      "m": "item seeds: deriveSeed('mixed-review', S', day, i), four parts",
+      "n": "pool: every dealt skill passes the filters (MIXED / NOSTD never); a pool under 2 refused"
     },
     "rule": "Where the card and the prototype differ, the prototype is right and the card is the defect. The product dealer is the file moved unchanged to js/modules/mixed-review.js.",
-    "h5Ruling": "Lead ruling 2026-11-20: (a) the LAST page of an exact-N sheet may be under half full (the teacher chose N); (b) whenever a class page (wide or flat) would be under half full, wide and flat items share ONE page by fill (each item 1/C of its class's cap, sum <= 1), keeping <= 3 skills a page, no avoidable adjacency, ceil(N/2), shelves, determinism. Prop k; check-v1 --fill: 0 non-last pages under half over 6 pools x N x M, L x 300 seeds; fail-k-separate-pages catches the old dealer."
+    "h5Ruling": "Lead ruling 2026-11-20: (a) the LAST page of an exact-N sheet may be under half full (the teacher chose N); (b) whenever a class page (wide or flat) would be under half full, wide and flat items share ONE page by fill (each item 1/C of its class's cap, sum <= 1), keeping <= 3 skills a page, no avoidable adjacency, ceil(N/2), shelves, determinism. Prop k; check-v1 --fill: 0 non-last pages under half over 6 pools x N x M, L x 300 seeds; fail-k-separate-pages catches the old dealer.",
+    "trace": "check-v1 --trace (default run too): every normative sentence of card sections 2, 3, 7a and the PT-MXR rules carries [P:<property>] (section 2: only P) or [X:<section 8 check or gate>]; fails on an untagged sentence or a tag naming nothing; every property cited at least once. FAIL fixtures trace-fail-untagged, trace-fail-unknown-prop, trace-fail-x-in-deal."
   },
   "criticR2": {
     "report": "design/lanes/lf-mixreview/card-critic-r2.md (30c11c14)",
     "verdict": "FAIL, min 6 (K1 7, K2 6, K3 6, K4 6, K5 8)",
     "fixes": "card section 9d (each defect -> fix -> check-v1 property or fixture)"
+  },
+  "criticR3": {
+    "report": "design/lanes/lf-mixreview/card-critic-r3.md (b323ff0f)",
+    "verdict": "FAIL, min 6 (K1 8, K2 6, K3 7, K4 7, K5 8)",
+    "fixes": "card section 9e (each defect -> fix -> check-v1 property and FAIL fixture); root cause: normative deal sentences no property asserted -> check-v1 --trace"
   }
 }

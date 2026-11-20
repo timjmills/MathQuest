@@ -1,0 +1,74 @@
+{
+ "note": "r3 D3: the r3 guard exception back (a flat skill may take 1 item on a page)",
+ "expect": "fail",
+ "catch": "j2",
+ "props": [
+  "j2"
+ ],
+ "mutate": {
+  "flatOne": true
+ },
+ "input": {
+  "pool": "pool-2mix",
+  "N": 20,
+  "seed": 1,
+  "size": "l",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40
+  ]
+ }
+}

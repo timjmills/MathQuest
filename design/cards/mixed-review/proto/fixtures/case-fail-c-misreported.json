@@ -1,0 +1,20 @@
+{
+ "note": "r3 D6: a dealer that deals 4 skills a page and REPORTS 3; c recomputes from the shelves",
+ "expect": "fail",
+ "catch": "c",
+ "catchText": "skills in its shelves",
+ "props": [
+  "c"
+ ],
+ "mutate": {
+  "maxSkills4": true,
+  "lieSkills": true
+ },
+ "input": {
+  "pool": "pool-compact",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ }
+}

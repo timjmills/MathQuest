@@ -1,5 +1,15 @@
 {
- "file": "dealer-v1.mjs",
- "sha256": "4fb82ccf1d33e08c17749ce39ecf45db30a2747a64d14e72e39b2155768b793f",
- "note": "V1 freeze: a change to what dealer-v1.mjs deals ships as V2 in a new file; this pin moves with the file to js/modules/mixed-review.js (re-taken on the import-path diff only)"
+ "files": {
+  "dealer": "design/cards/mixed-review/proto/dealer-v1.mjs",
+  "interleave": "js/modules/sheet/interleave.js",
+  "rng": "js/modules/sheet/rng.js",
+  "registry": "design/cards/mixed-review/proto/fixtures/v1-registry.json"
+ },
+ "sha256": {
+  "dealer": "a50ea40ce1de52c7f48826a15d59804a51f51a1d108942c483156f4df79c81b0",
+  "interleave": "8066c12c9e3d21e56e7549986fff31f5a286319b0a1841a945896480551fe966",
+  "rng": "6b60dcb07a01b1de991455f1ea0598ab985fe2d874a80070ab00e1545692c130",
+  "registry": "b2917ff91f66d7e6bcc3506e4ae7de4d9dfdf495cfa5d50c4c314116aeb0c8bb"
+ },
+ "note": "V1 freeze (card r3 D1): the dealer, the two kit files it imports and the frozen V1 table, by sha256. A change to any of them that changes a deal ships as V2 (a new dealer file with frozen copies of what it imports); this pin moves with the files at build step 2 (re-taken on the import-path diff only)."
 }

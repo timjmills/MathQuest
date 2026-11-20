@@ -1,0 +1,8 @@
+{
+ "note": "r3 root cause: a planted rule sentence with no property tag in \u00a72",
+ "insert": {
+  "after": "## 2. ",
+  "text": "- Every page must open with a band strip of its first skill."
+ },
+ "catchText": "no [P:...] tag"
+}

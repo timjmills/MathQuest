@@ -1,0 +1,19 @@
+{
+ "note": "r3 D6: 2-up claimed for 5 typical items at L (fill 5/8 > 1/2); e recomputes the fill",
+ "expect": "fail",
+ "catch": "e",
+ "catchText": "recomputed",
+ "props": [
+  "e"
+ ],
+ "mutate": {
+  "twoUpAlways": true
+ },
+ "input": {
+  "pool": "pool-typical",
+  "N": 5,
+  "seed": 1,
+  "size": "l",
+  "order": "mixed"
+ }
+}

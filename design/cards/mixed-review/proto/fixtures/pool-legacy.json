@@ -1,0 +1,16 @@
+[
+ {
+  "id": "measurement:legacy_scale",
+  "code": "BJ",
+  "grade": "2",
+  "area": "MEAS",
+  "kind": "legacy"
+ },
+ {
+  "id": "measurement:legacy_thermo",
+  "code": "BK",
+  "grade": "3",
+  "area": "MEAS",
+  "kind": "legacy"
+ }
+]

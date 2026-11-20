@@ -1,0 +1,251 @@
+{
+ "note": "FROZEN V1 TABLE (card r3 D1): code -> {id, kind, grade, area}, the registry a V1 code replays through, never the live one. Append-only: a new skill appends a row; no row changes. Pinned by sha256 in frozen.json (prop i). The product copy is tests/fixtures/mix-review/v1-registry.json, generated once at build step 2 from data.js / areaOf / footprint kind, then append-only.",
+ "rows": [
+  {
+   "id": "addition:within_10",
+   "code": "AA",
+   "grade": "K",
+   "area": "OA",
+   "kind": "fact"
+  },
+  {
+   "id": "addition:within_20",
+   "code": "AB",
+   "grade": "1",
+   "area": "OA",
+   "kind": "fact"
+  },
+  {
+   "id": "subtraction:within_10",
+   "code": "AC",
+   "grade": "K",
+   "area": "OA",
+   "kind": "fact"
+  },
+  {
+   "id": "subtraction:within_20",
+   "code": "AD",
+   "grade": "1",
+   "area": "OA",
+   "kind": "fact"
+  },
+  {
+   "id": "addition:two_digit_stack",
+   "code": "AE",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "stack"
+  },
+  {
+   "id": "subtraction:two_digit_stack",
+   "code": "AF",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "stack"
+  },
+  {
+   "id": "place_value:tens_ones",
+   "code": "AG",
+   "grade": "1",
+   "area": "NBT",
+   "kind": "stack"
+  },
+  {
+   "id": "place_value:hundreds",
+   "code": "AH",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "stack"
+  },
+  {
+   "id": "multiplication:facts_2_5_10",
+   "code": "AI",
+   "grade": "3",
+   "area": "OA",
+   "opts": "C78",
+   "kind": "fact"
+  },
+  {
+   "id": "division:facts",
+   "code": "AJ",
+   "grade": "3",
+   "area": "OA",
+   "kind": "fact"
+  },
+  {
+   "id": "multiplication:multiply",
+   "code": "AK",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "stack"
+  },
+  {
+   "id": "decimals:compare",
+   "code": "AL",
+   "grade": "4",
+   "area": "NF",
+   "kind": "stack"
+  },
+  {
+   "id": "fractions:number_line",
+   "code": "AM",
+   "grade": "3",
+   "area": "NF",
+   "kind": "visual-full"
+  },
+  {
+   "id": "measurement:coins",
+   "code": "AN",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "visual-full"
+  },
+  {
+   "id": "measurement:clock_hour",
+   "code": "AO",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "stack"
+  },
+  {
+   "id": "graphs:bar_read",
+   "code": "AP",
+   "grade": "2",
+   "area": "DATA",
+   "kind": "visual-full"
+  },
+  {
+   "id": "shapes:name_2d",
+   "code": "AQ",
+   "grade": "K",
+   "area": "G",
+   "kind": "stack"
+  },
+  {
+   "id": "counting:count_to_20",
+   "code": "AR",
+   "grade": "K",
+   "area": "CC",
+   "kind": "fact"
+  },
+  {
+   "id": "number_sense:number_line_100",
+   "code": "AS",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "visual-full"
+  },
+  {
+   "id": "ratios:unit_rate",
+   "code": "AT",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "stack"
+  },
+  {
+   "id": "vocabulary:maths_words",
+   "code": "AU",
+   "grade": "M",
+   "area": "WORDS",
+   "kind": "fact"
+  },
+  {
+   "id": "angles:measure",
+   "code": "AV",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "visual-full"
+  },
+  {
+   "id": "rounding:nearest_10",
+   "code": "AW",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "fact"
+  },
+  {
+   "id": "mixed:mixed_ops",
+   "code": "AX",
+   "grade": "2",
+   "area": "MIXED",
+   "kind": "stack"
+  },
+  {
+   "id": "facts:add_10",
+   "code": "BA",
+   "grade": "1",
+   "area": "OA",
+   "kind": "fact"
+  },
+  {
+   "id": "algebra:missing_addend",
+   "code": "BB",
+   "grade": "1",
+   "area": "OA",
+   "kind": "equation"
+  },
+  {
+   "id": "addition:stack_3d",
+   "code": "BC",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "stack"
+  },
+  {
+   "id": "division:long_div",
+   "code": "BD",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "division"
+  },
+  {
+   "id": "fractions:shade_half",
+   "code": "BE",
+   "grade": "3",
+   "area": "NF",
+   "kind": "visual-half"
+  },
+  {
+   "id": "number_sense:line_1000",
+   "code": "BF",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "visual-full"
+  },
+  {
+   "id": "patterns:in_out_table",
+   "code": "BG",
+   "grade": "4",
+   "area": "OA",
+   "kind": "table"
+  },
+  {
+   "id": "vocabulary:shape_words",
+   "code": "BH",
+   "grade": "M",
+   "area": "WORDS",
+   "kind": "text"
+  },
+  {
+   "id": "word_problems:two_step",
+   "code": "BI",
+   "grade": "3",
+   "area": "OA",
+   "kind": "word-problem"
+  },
+  {
+   "id": "measurement:legacy_scale",
+   "code": "BJ",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:legacy_thermo",
+   "code": "BK",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+ "note": "easy -> hard and by-area shelves left in pick order (the sort dropped)",
+ "expect": "fail",
+ "catch": "d",
+ "catchText": "out of order",
+ "props": [
+  "d"
+ ],
+ "mutate": {
+  "noSortOrder": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 30,
+  "seed": 1,
+  "size": "m",
+  "order": "easyhard"
+ },
+ "sweep": {
+  "order": [
+   "easyhard",
+   "area"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ]
+ }
+}

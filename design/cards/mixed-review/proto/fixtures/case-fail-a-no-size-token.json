@@ -14,5 +14,6 @@
   "seed": 4242,
   "size": "l",
   "order": "mixed"
- }
+ },
+ "catchText": "no Z size token"
 }

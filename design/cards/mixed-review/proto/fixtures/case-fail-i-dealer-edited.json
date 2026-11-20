@@ -10,6 +10,8 @@
   "N": 10,
   "seed": 1,
   "size": "m",
-  "appendToDealer": "\n// a quiet change\n"
+  "append": {
+   "dealer": "\n// a quiet change\n"
+  }
  }
 }

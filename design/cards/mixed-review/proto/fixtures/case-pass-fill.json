@@ -1,14 +1,18 @@
 {
- "note": "lead ruling 2026-11-20: wide and flat share a page by fill; no non-last page under half full, every pool",
+ "note": "lead ruling 2026-11-20: wide and flat share a page by fill; no non-last page under half full, every pool; r3: no page under 2 items (l), no flat skill with 1 item on a page (j2), every item seed the formula (m)",
  "expect": "pass",
  "props": [
-  "k",
   "b",
   "c",
   "d",
   "e",
   "h",
-  "j"
+  "j",
+  "j2",
+  "k",
+  "l",
+  "m",
+  "n"
  ],
  "input": {
   "pool": "pool-2mix",
@@ -40,17 +44,12 @@
    7,
    8,
    9,
-   10,
-   11,
-   12,
-   13,
-   14,
-   15,
-   16,
-   17,
-   18,
-   19,
-   20
+   10
+  ],
+  "order": [
+   "mixed",
+   "easyhard",
+   "area"
   ]
  },
  "pools": [
@@ -59,6 +58,10 @@
   "pool-typical",
   "pool-wide",
   "pool-2mix",
-  "pool-3mix"
+  "pool-3mix",
+  "pool-2",
+  "pool-6",
+  "pool-kinds",
+  "pool-legacy"
  ]
 }

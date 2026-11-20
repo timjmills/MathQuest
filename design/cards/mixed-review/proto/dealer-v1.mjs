@@ -12,14 +12,18 @@
 //     same code gives the same pages, shelves and numbers on every device and in every release of V1. The layout engine
 //     draws the plan; when a drawn page cannot hold its dealt cells it spills whole shelves to a continuation page and
 //     KEEPS the numbering, never re-deals (card §3, MIX-REVIEW-COUNT).
-//   - item content: item i's try r is generateQuestionFor({category, skill, opts, seed: deriveSeed('mixed-review', S, day,
-//     i, r)}); this file gives the r = 0 seed. The duplicate ladder (RETRIES, rungs) runs in the product's
+//   - item content: try 0 of item i is item.seed = deriveSeed('mixed-review', S', day, i) (FOUR parts); try r >= 1 is
+//     deriveSeed('mixed-review', S', day, i, r) (five parts). S' = S on a single sheet (day 0); on day d of a week, the day
+//     seed deriveSeed('mixed-review-week', S, d). The duplicate ladder (RETRIES, rungs) runs in the product's
 //     dealReviewItems(req) around this plan (card §7a "Identical").
+//   - V1 is this file + js/modules/sheet/interleave.js + js/modules/sheet/rng.js + the frozen table fixtures/v1-registry.json,
+//     each pinned by sha256 (fixtures/frozen.json), and the golden codes (fixtures/golden-v1.json) replay to pinned items.
 //
 // Reuses the real kit logic by import (both pure, SCC-01): dealCounts / interleave (js/modules/sheet/interleave.js) and
 // rng / shuffle / deriveSeed (js/modules/sheet/rng.js).
 //
-// Input  {pool: [{id, code, grade, area, fc: 'compact'|'typical'|'wide', placement?: [grades], passed?: bool}],
+// Input  {pool: [{id, code, grade, area, kind (a StaticFootprint kind; class from KIND_CLASS) | fc: 'compact'|'typical'|'wide'
+//         (a test row), placement?: [grades], passed?: bool, opts?: '<~options payload>'}],
 //         filters?: {grades?, areas?, onlyPassed?, untick?}, N, seed, order?: 'mixed'|'easyhard'|'area',
 //         size?: 'm'|'l' ('s' reads as m), week?: Y (a Mon-Fri set), day?: K (1-5, one day of the week),
 //         adapt?: {id: w} (screen only; samples the `listed` skills), listed?: [code] (the code's skills),
@@ -47,6 +51,25 @@ export const SHELF_MAX = Object.freeze({ m: 7, l: 5 });
 export const MAX_SKILLS_PAGE = 3;
 export const AREA_ORDER = Object.freeze(['CC', 'OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G', 'RPNS', 'MIXED', 'WORDS', 'NOSTD']);
 const GRADE_RANK = { K: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, M: 7 };
+/** THE FROZEN KIND -> CLASS TABLE (card r3 D4): every StaticFootprint.kind of SKILL_CELL_CONTRACT 3.5 has a row. The
+ *  registry row of a skill carries its footprint `kind`; V1 reads its class from here, never from a live footprint.
+ *  Word-problem rows and long division are WIDE (12.1: plain word-problem rows 3 / 3, long division L 4); legacy cells
+ *  are typical and never take the M1 arrangement (mixedClass refuses M1 for them, critic M1 r1 D2). Append-only. */
+export const KIND_CLASS = Object.freeze({ fact: 'compact', equation: 'compact', stack: 'typical', 'visual-half': 'typical',
+    table: 'typical', text: 'typical', legacy: 'typical', 'visual-full': 'wide', division: 'wide', 'word-problem': 'wide' });
+/** Per-kind ceilings below the class CAP (12.1 "Word problems, plain rows": 3 at M, 3 at L). */
+export const KIND_CAP = Object.freeze({ 'word-problem': Object.freeze({ m: 3, l: 3 }) });
+/** A pool row as V1 reads it: its class from KIND_CLASS when the row names a kind (a row with `fc` only is a test row). */
+export function rowOf(s, mut = {}) {
+    const kc = mut.kindClass ? { ...KIND_CLASS, ...mut.kindClass } : KIND_CLASS;
+    if (!s.kind) return s;
+    return { ...s, fc: kc[s.kind] || 'typical', legacy: s.kind === 'legacy' };
+}
+/** Problems a page of ONE skill: its kind's ceiling, else its class's CAP. */
+export function capOf(s, size, cap = CAP, mut = {}) {
+    const k = !mut.kindClass && s.kind && KIND_CAP[s.kind];
+    return k ? Math.min(k[size], cap[size][s.fc]) : cap[size][s.fc];
+}
 const groupOf = (s) => (s.fc === 'wide' ? 'wide' : 'flat');
 const clampS = (n, max = MAX_SKILLS_PAGE) => Math.max(1, Math.min(max, Math.floor(n / 2)));
 
@@ -65,12 +88,12 @@ export function capacityTable(cap = CAP) {
 }
 
 /** The pool after the teacher's filters. MIXED and NOSTD areas never enter it (card §7a). */
-export function filterPool(pool, f = {}) {
+export function filterPool(pool, f = {}, mut = {}) {
     const grades = f.grades && f.grades.length ? new Set(f.grades.map(String)) : null;
     const areas = f.areas && f.areas.length ? new Set(f.areas) : null;
     const untick = new Set(f.untick || []);
     return (pool || []).filter((s) => {
-        if (s.area === 'MIXED' || s.area === 'NOSTD') return false;
+        if ((s.area === 'MIXED' || s.area === 'NOSTD') && !mut.keepMixed) return false;
         const pl = (s.placement && s.placement.length ? s.placement : [s.grade]).map(String);
         if (grades && !(pl.some((g) => grades.has(g)) || (s.grade === 'M' && !(s.placement && s.placement.length)))) return false;
         if (areas && !areas.has(s.area)) return false;
@@ -121,21 +144,25 @@ function dealSheet(input, cycle, day, ws, mut) {
     const maxS = mut.maxSkills4 ? 4 : MAX_SKILLS_PAGE;
     let forced = ws && ws.comeback ? cycle.find((s) => s.id === ws.comeback) || null : null;
     // fill: each item is 1 / CAP[size][its class] of a page, so wide and flat items can share a page while the sum is <= 1.
-    const fillOf = (pg) => pg.chosen.reduce((a, s) => a + pg.counts[s.id] / CAPT[size][s.fc], 0);
+    const capS = (s) => capOf(s, size, CAPT, mut);
+    const fillOf = (pg) => pg.chosen.reduce((a, s) => a + pg.counts[s.id] / capS(s), 0);
+    // A FLAT skill always takes at least 2 items on a page (card r3 D3, prop j2); a wide skill may take 1 (a wide shelf of 1).
+    const minOn = (s) => (groupOf(s) === 'wide' || mut.flatOne ? 1 : 2);
     const shelvesOf = (pg) => pg.chosen.reduce((a, s) => a + Math.ceil(pg.counts[s.id] / SHELF[size][s.fc]), 0);
     const pages = []; let R = mut.ignoreN ? Infinity : N;
     for (let guard = 0; R > 0 && guard < 200; guard++) {
-        let cands = cycle.filter((s) => room(s) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
+        let cands = cycle.filter((s) => room(s) >= minOn(s)).sort((a, b) => sortKeyCmp(key(a), key(b)));
+        if (!cands.length) cands = cycle.filter((s) => room(s) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
         if (forced) cands = [forced, ...cands.filter((s) => s !== forced)];
         if (!cands.length) break;
         const first = cands[0]; const G = groupOf(first);
         const anyFresh = cands.some(fresh);
         const allowed = cands.filter((s) => groupOf(s) === G && (s === forced || !anyFresh || fresh(s)));
-        let C = CAPT[size][first.fc];
+        let C = capS(first);
         const Rr = mut.ignoreN ? C : R;
         let n = mut.ignoreN ? C : pageSize(Rr, C);
         let chosen = allowed.slice(0, Math.min(clampS(n, maxS), allowed.length));
-        const C2 = Math.min(...chosen.map((s) => CAPT[size][s.fc]));
+        const C2 = Math.min(...chosen.map(capS));
         if (C2 < C) { C = C2; n = mut.ignoreN ? C : pageSize(Rr, C); chosen = chosen.slice(0, Math.min(chosen.length, clampS(n, maxS))); }
         for (let k = 0; k < 4; k++) {
             const rs = chosen.reduce((a, s) => a + room(s), 0);
@@ -164,16 +191,42 @@ function dealSheet(input, cycle, day, ws, mut) {
             for (let k = 0; k < 6 && fillOf(pg) * 2 < 1 && R - n > 0 && pg.chosen.length < maxS; k++) {
                 let more = cycle.filter((t) => !pg.chosen.includes(t) && room(t) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
                 if (more.some(fresh)) more = more.filter(fresh);
-                const t = more[0];
-                if (!t) break;
-                let c = Math.min(room(t), R - n, Math.floor((1 - fillOf(pg)) * CAPT[size][t.fc] + 1e-9));
-                while (c > 0) { pg.counts[t.id] = c; pg.chosen.push(t); if (shelvesOf(pg) <= SHELF_MAX[size]) break; pg.chosen.pop(); delete pg.counts[t.id]; c--; }
-                if (c < 1) break;
-                if (c < 2 && SHELF[size][t.fc] > 1 && R - n - c > 0) { pg.chosen.pop(); delete pg.counts[t.id]; break; }   // one item of a skill only as a wide shelf of 1
-                topUp.push(t.id); n += c;
+                let took = null;
+                for (const t of more) {                    // the first skill in the choice order that fits with >= minOn items
+                    let c = Math.min(room(t), R - n, Math.floor((1 - fillOf(pg)) * capS(t) + 1e-9));
+                    while (c >= minOn(t)) { pg.counts[t.id] = c; pg.chosen.push(t); if (shelvesOf(pg) <= SHELF_MAX[size]) break; pg.chosen.pop(); delete pg.counts[t.id]; c--; }
+                    if (c >= minOn(t)) { took = { t, c }; break; }
+                }
+                if (!took) break;
+                topUp.push(took.t.id); n += took.c;
             }
             chosen = pg.chosen;
-            if (topUp.length) C = Math.min(...chosen.filter((s) => s.fc !== 'wide').map((s) => CAPT[size][s.fc]), C);
+            if (topUp.length) C = Math.min(...chosen.filter((s) => s.fc !== 'wide').map(capS), C);
+        }
+        const pgNow = { chosen, counts };
+        const fitsPlus = (s) => { const had = counts[s.id]; counts[s.id] = (had || 0) + 1; if (had === undefined) chosen.push(s);
+            const ok = fillOf(pgNow) <= 1 + 1e-9 && shelvesOf(pgNow) <= SHELF_MAX[size];
+            if (had === undefined) { chosen.pop(); delete counts[s.id]; } else counts[s.id] = had; return ok; };
+        // NO STRANDED FLAT ITEM (card r3 D3, prop j2): a page never leaves a flat skill exactly 1 item of room, because that
+        // last item could only ever print alone. It takes the item now (fill and shelves kept) or leaves one more.
+        if (!mut.flatOne && !mut.ignoreN) for (const s of chosen.slice()) {
+            if (groupOf(s) === 'wide' || room(s) - counts[s.id] !== 1) continue;
+            if (R - n >= 1 && fitsPlus(s)) { counts[s.id]++; n++; }
+            else if (counts[s.id] - 1 >= minOn(s) && n - 1 >= 2) { counts[s.id]--; n--; }
+        }
+        // NO LONE ITEM (card r3 D2, prop l): a page never leaves exactly 1 item to deal. In this order it takes one more item
+        // of a skill on the page, or one item of a new WIDE skill (a wide shelf of 1; at most 3 skills), the fill and the
+        // shelf ceiling kept; failing both it gives one back (the page keeps >= 2 items and each skill its minOn).
+        if (!mut.noLoneGuard && !mut.ignoreN && R - n === 1) {
+            const up = chosen.filter((s) => room(s) - counts[s.id] >= 1).sort((a, b) => counts[a.id] - counts[b.id]).find(fitsPlus);
+            const add = up || chosen.length >= maxS ? null : cycle.filter((t) => !chosen.includes(t) && groupOf(t) === 'wide' && room(t) >= 1)
+                .sort((a, b) => sortKeyCmp(key(a), key(b))).find(fitsPlus);
+            if (up) { counts[up.id]++; n++; }
+            else if (add) { chosen.push(add); counts[add.id] = 1; topUp.push(add.id); n++; }
+            else {
+                const down = chosen.filter((s) => counts[s.id] - 1 >= minOn(s)).sort((a, b) => counts[b.id] - counts[a.id])[0];
+                if (down && n - 1 >= 2) { counts[down.id]--; n--; }
+            }
         }
         for (const s of chosen) {
             total.set(s.id, (total.get(s.id) || 0) + counts[s.id]);
@@ -206,7 +259,7 @@ function dealSheet(input, cycle, day, ws, mut) {
             E.counts[s.id] += L.counts[s.id];
         }
         E.n += L.n; E.cls = [...new Set([...E.cls, ...L.cls])];
-        E.cap = Math.min(...E.cls.map((c) => CAPT[size][c]).filter((c, _, arr) => E.cls.length === 1 || c > CAPT[size].wide)) || E.cap;
+        E.cap = Math.min(...E.chosen.map(capS).filter((c) => E.cls.length === 1 || c > CAPT[size].wide)) || E.cap;
         pages.pop();
     }
     for (const pg of pages) pg.fill = fillOf(pg);
@@ -214,10 +267,10 @@ function dealSheet(input, cycle, day, ws, mut) {
     const items = []; let num = 0;
     const out = pages.map((pg, p) => {
         const kOf = (s) => SHELF[size][s.fc];
-        const sortBy = order === 'easyhard' ? (s) => [GRADE_RANK[s.grade] ?? 9, p0(s)]
+        const sortBy = mut.noSortOrder ? null : order === 'easyhard' ? (s) => [GRADE_RANK[s.grade] ?? 9, p0(s)]
             : order === 'area' ? (s) => [AREA_ORDER.indexOf(s.area), GRADE_RANK[s.grade] ?? 9, p0(s)] : null;
         const sk = sortBy ? pg.chosen.slice().sort((a, b) => sortKeyCmp(sortBy(a), sortBy(b))) : pg.chosen;
-        const oneClass = pg.cls.length === 1 && sk.length > 1;
+        const oneClass = pg.cls.length === 1 && sk.length > 1 && (mut.legacyM1 || !pg.chosen.some((s) => s.legacy));   // legacy cells never M1
         const pseed = deriveSeed('mixed-review-page', input.seed, day, p);
         let arrangement; let seq;            // seq: the page's turns in print order, each {key, size, skill}
         if (order === 'mixed' && oneClass && !mut.noShelfOrder) {
@@ -229,13 +282,16 @@ function dealSheet(input, cycle, day, ws, mut) {
             const shelves = sk.flatMap((s) => { const k = kOf(s); const c = pg.counts[s.id]; const out2 = []; for (let i = 0; i < c; i += k) out2.push({ key: s.id, size: Math.min(k, c - i) }); return mut.shortFirst ? out2.reverse() : out2; });
             seq = order === 'mixed' && !mut.noShelfOrder ? interleave(shelves, null, pseed, { maxRun: 1, firstThird: false }).order : shelves;
         }
-        const cellsOf = (t) => Array.from({ length: t.size }, () => { const i = num++; const s = pg.chosen.find((c) => c.id === t.key); const it = { n: i + 1, skill: s.id, code: s.code, seed: deriveSeed('mixed-review', input.seed, day, i), page: p + 1 }; items.push(it); return it.n; });
+        const cellsOf = (t) => Array.from({ length: t.size }, () => { const i = num++; const s = pg.chosen.find((c) => c.id === t.key); const it = { n: i + 1, skill: s.id, code: s.code, opts: s.opts || '', seed: mut.seedR0 ? deriveSeed('mixed-review', input.seed, day, i, 0) : deriveSeed('mixed-review', input.seed, day, i), page: p + 1 }; items.push(it); return it.n; });
         const shelves = seq.map((t) => ({ skill: t.key, items: cellsOf(t) }));
         const k1 = arrangement === 'm1' ? SHELF[size][pg.cls[0]] : null;
         const rows = arrangement === 'm1' ? Math.ceil(pg.n / k1) : shelves.length;
-        return { n: pg.n, cap: pg.cap, topUp: pg.topUp || [], fill: Math.round(pg.fill * 1e4) / 1e4, cls: pg.cls, arrangement, skills: sk.map((s) => s.id), shelves, rows };
+        // lieFill / lieSkills: TEST SEAMS for a dealer that misreports (card r3 D6); the properties recompute from the shelves.
+        const fill = mut.lieFill ? Math.max(0.5, pg.fill) : pg.fill;
+        const skills = mut.lieSkills ? sk.slice(0, MAX_SKILLS_PAGE).map((s) => s.id) : sk.map((s) => s.id);
+        return { n: pg.n, cap: pg.cap, topUp: pg.topUp || [], fill: Math.round(fill * 1e4) / 1e4, cls: pg.cls, arrangement, skills, shelves, rows };
     });
-    const twoUp = !mut.noTwoUp && input.N === 5 && out.length === 1 && pages[0].fill <= 0.5 + 1e-9;   // the 5 fit a half page
+    const twoUp = !mut.noTwoUp && input.N === 5 && out.length === 1 && (mut.twoUpAlways || pages[0].fill <= 0.5 + 1e-9);   // the 5 fit a half page
     // `dealt`: the skills in the order the deal first PICKED them (not print order). The code lists them in this order, so a
     // replay's cycle is the pick order and re-deals the same pages.
     const dealt = [...appear.keys()];
@@ -255,9 +311,9 @@ export function deal(input, _mutate = {}) {
 }
 
 function eligibleOf(input, mut) {
-    let el = input.replay ? (input.pool || []).slice() : filterPool(input.pool, input.filters);
+    let el = (input.replay ? (input.pool || []).slice() : filterPool(input.pool, input.filters, mut)).map((s) => rowOf(s, mut));
     if (input.adapt && input.listed && !mut.adaptFullPool) { const L = new Set(input.listed); el = el.filter((s) => L.has(s.code)); }
-    if (el.length < 2) return { error: el.length ? 'The pool holds one skill: a mixed review needs at least 2.' : 'No skill matches these filters.' };
+    if (el.length < (mut.allowOne ? 1 : 2)) return { error: el.length ? 'The pool holds one skill: a mixed review needs at least 2.' : 'No skill matches these filters.' };
     if (!COUNTS.includes(input.N)) return { error: `N must be one of ${COUNTS.join(', ')}.` };
     return el;
 }
@@ -293,7 +349,9 @@ export function encode(input, out, _mutate = {}) {
     const its = out.days ? out.days.flatMap((d) => d.items) : out.items;
     const codeOf = new Map(its.map((it) => [it.skill, it.code]));
     const cnt = new Map(); for (const it of its) cnt.set(it.code, (cnt.get(it.code) || 0) + 1);
-    const skills = out.dealt.map((id) => `${codeOf.get(id)}${cnt.get(codeOf.get(id))}`).join('-');
+    const optsOf = new Map(its.map((it) => [it.skill, it.opts || '']));
+    // Each part: <2-char code><count>[~<options payload>] (lead ruling 2026-11-20: the ~options travel IN the code).
+    const skills = out.dealt.map((id) => `${codeOf.get(id)}${cnt.get(codeOf.get(id))}${optsOf.get(id) && !_mutate.dropOpts ? `~${optsOf.get(id)}` : ''}`).join('-');
     const t = ['V1', `N${input.N}`];
     if (!_mutate.dropSeedToken) t.push(`S${(input.seed >>> 0).toString(36).toUpperCase()}`);
     if (input.order === 'easyhard') t.push('Oe'); else if (input.order === 'area') t.push('Oa');
@@ -307,8 +365,8 @@ export function encode(input, out, _mutate = {}) {
 export function decode(code) {
     const m = /^\?c=([^|]*)\|(.*)$/.exec(String(code));
     if (!m) return { error: 'not a skill code' };
-    const skills = m[1].split('-').filter(Boolean).map((p) => ({ code: p.slice(0, 2), count: Number(p.slice(2) || 1) }));
-    const d = { skills, N: null, seed: 1, order: 'mixed', week: null, day: null, adapt: false, size: null, v: null };
+    const skills = m[1].split('-').filter(Boolean).map((p) => { const [h, o] = p.split('~'); return { code: h.slice(0, 2), count: Number(h.slice(2) || 1), opts: o || '' }; });
+    const d = { skills, N: null, seed: null, order: 'mixed', week: null, day: null, adapt: false, size: null, v: null };
     for (const tok of m[2].split('-')) {
         const k = tok[0]; const v = tok.slice(1);
         if (k === 'V') d.v = Number(v);
@@ -321,11 +379,17 @@ export function decode(code) {
         else if (k === 'Z') d.size = normSize(v);
     }
     if (d.v === 1 && !d.size) d.error = 'a V1 code has no Z size token';
+    else if (d.v === 1 && !(typeof d.seed === 'number' && d.seed >= 0)) d.error = 'a V1 code has no S seed token';   // card r3 D7: refused, never seed 1
+    if (d.seed === null) d.seed = 1;
     return d;
 }
 
-/** The input a decoded code replays: the listed skills, in code order, from the app's skill registry. */
-export function replayInput(dec, registry) {
-    const byCode = new Map(registry.map((s) => [s.code, s]));
-    return { pool: dec.skills.map((x) => byCode.get(x.code)).filter(Boolean), N: dec.N, seed: dec.seed, order: dec.order, size: dec.size, week: dec.week, day: dec.day, replay: true };
+/** The input a decoded code replays: the listed skills, in code order, from the FROZEN V1 table (card r3 D1:
+ *  code -> {id, kind, grade, area}, append-only; the product's is tests/fixtures/mix-review/v1-registry.json, pinned),
+ *  never the live registry, with each part's own ~options. A code naming a code the table lacks is refused. */
+export function replayInput(dec, table) {
+    const byCode = new Map(table.map((s) => [s.code, s]));
+    const missing = dec.skills.filter((x) => !byCode.has(x.code)).map((x) => x.code);
+    if (missing.length) return { error: `not in the V1 table: ${missing.join(', ')}` };
+    return { pool: dec.skills.map((x) => ({ ...byCode.get(x.code), opts: x.opts || '' })), N: dec.N, seed: dec.seed, order: dec.order, size: dec.size, week: dec.week, day: dec.day, replay: true };
 }

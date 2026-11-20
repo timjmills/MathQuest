@@ -1,5 +1,5 @@
 {
- "note": "capacityTable equals the pinned table; the dealer's pages equal it on one-class pools",
+ "note": "capacityTable equals the pinned table; the dealer's pages equal it on one-class pools; r3 D4: the kind -> class table covers the 10 contract kinds and equals 12.1",
  "expect": "pass",
  "props": [
   "h"
@@ -14,6 +14,7 @@
    "compact": "pool-compact",
    "typical": "pool-typical",
    "wide": "pool-wide"
-  }
+  },
+  "kindCheck": true
  }
 }

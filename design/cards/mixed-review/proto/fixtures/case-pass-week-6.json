@@ -3,7 +3,10 @@
  "expect": "pass",
  "props": [
   "a",
-  "f"
+  "f",
+  "j2",
+  "l",
+  "m"
  ],
  "input": {
   "pool": "pool-6",
