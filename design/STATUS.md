@@ -979,3 +979,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - No WRM lesson prints a blank first page (empty anchor chart dropped; LESSON-EMPTY-FIRST 59 -> 0); times-table lessons model their own table (per-step seed); OPENER-SAME 22 -> 6; CELL-FITS on lesson pages with 28 known pages pinned shrink-only (cellfits-known.json); two_step_letter_equation chart re-pinned (4 full-width pages, lead ruling). Exposed first-page content defects listed per lane for next week.
 - Gates: boot-smoke, code-snapshot, no-size-s, roles-unit, lesson-pages, backtests lesson-empty-first / opener-same / cell-fits, simple-print, self-tests, precritic-plan, capacity-pin, lesson baseline.
 - Known red (lead-accepted): LESSON-OPENER-SAME 6 pairs = 5 confirmed check misfires (lf-checks fixes the signature next week) + Y4.B14.S4/S5 geo_rotate (identical skills, content item); 22 on master before.
+
+## 2026-11-20 — Deploy count_by_tables (lf-ops critic r4 8/8/8/8; redesign-passed 33) ; lesson re-pin with proof
+- count_by_tables passes the 8/10 redesign (Pre-skill check L 14 items, opener title, True or False? instruction, Scripted Model L 4 states); passed skills changed by the shared code re-graded >= 8 (hash proof design/status/lf-ops-cbt-proof.md).
+- L Pre-skill page per lead ruling 1c (10 items, lf-roles fill; re-grade queued after reset).
+- Lesson re-pin with proof (design/status/lf-ops-cbt-proof.md): 102 pages in 8 lessons changed for real (lf-ops -props work; passed sub_2d_1d / sub_50_no_regroup L p2 graded by a narrow critic, PASS); the rest class/style-only, pixel-identical sample.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
