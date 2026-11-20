@@ -968,7 +968,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 // 41-65; Independent on 46-70 and 61-85)
                 if (band === 100) {
                     // (each call takes the next slot no earlier teaching window holds, so a refused deal moves on and never drops a section)
-                    const slots = [[4, 0], [4, 5], [6, 0], [6, 5], [5, 0], [5, 5], [2, 0], [2, 5]];
+                    const slots = [[4, 0], [4, 5], [6, 0], [6, 5], [5, 0], [5, 5], [2, 0], [2, 5], [7, 0], [7, 5], [0, 0], [0, 5], [3, 0], [3, 5], [1, 0], [1, 5]];
                     const free100 = slots.filter(([a, b]) => !kept.some((k) => !k.shows && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5));
                     [r0, c0] = free100.length ? free100[(_tw100++) % free100.length] : slots[0];
                 }
