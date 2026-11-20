@@ -12033,7 +12033,7 @@
     "state": "stage 1: Guided / Scripted Model / Error Analysis / Pre-skill check rows stretched past drawn + room (count_by_tables)"
    },
    "pass": {
-    "commit": "87f3bd42f",
+    "commit": "28e9e9d1f",
     "state": "0 EB-STRETCH findings: those composers hold each row to layout.rowCapMm"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --sizes M,L --roles guided,scripted-model,error-analysis,pre-skill-check --hosts none --no-baseline --only EB-STRETCH",
@@ -12052,7 +12052,7 @@
     "state": "stage 1: every unlisted template's rows stretched past the cap (e.g. add-three 57-76 mm for a 50 mm drawing), 294 findings"
    },
    "pass": {
-    "commit": "87f3bd42f",
+    "commit": "28e9e9d1f",
     "state": "53 templates x 6 shapes: every row at most its cap, at most one row free"
    },
    "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
@@ -12071,7 +12071,7 @@
     "state": "stage 1: rowCapMm(50, an unlisted template) = Infinity"
    },
    "pass": {
-    "commit": "87f3bd42f",
+    "commit": "28e9e9d1f",
     "state": "rowCapMm(50, an unlisted template) = 53"
    },
    "command": "node tests/scripts/ws-rowcap-fill.mjs --only UNLISTED --root {root}",
