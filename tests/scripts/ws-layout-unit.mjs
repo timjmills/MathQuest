@@ -753,7 +753,8 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     eq(plan.meta.scoreOutOf, 16, 'PT-PRE-1: Score /16');
     // A skill with one earlier skill checks one quadrant, never the same skill four times.
     const one = hostPlan('pre-skill-check', [SUB_SKILL], (pool, sk, i) => subQ(500 + i * 11, 123 + i));
-    eq(one.plan.meta.scoreOutOf, 4, 'PT-PRE-3: a first skill checks itself once (4 items)');
+    // (lead ruling 1c, 2026-11-20: the check fills to its ceiling, 12 M / 8 L - this host plan is at L, so one prerequisite prints 8)
+    eq(one.plan.meta.scoreOutOf, 8, 'PT-PRE-3: a first skill checks itself once (one band, filled to the L ceiling of 8)');
 }
 // PT-STC-1..3: Stretch - no Score, a traced worked row, key rows that satisfy the check rule.
 {
