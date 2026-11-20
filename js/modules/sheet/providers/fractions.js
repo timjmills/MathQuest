@@ -667,17 +667,34 @@ registerSkill('fractions:mixed_numbers_intro', {
     workedSteps: mnSteps,
     wrongAnswer: mnWrong,
     wrongAnswers: (q) => mnWrongs(q).map((c) => chooseWrong(q, [c], { rotate: false })).filter(Boolean),
+    // Stretch (card Q8): the flexible partitions of the item's mixed number - a whole number and a mixed number (2 3/4 =
+    // 1 + 1 3/4), or a mixed number and a fraction (2 3/4 = 2 1/4 + 2/4); the standard partition is the example row
+    open: (q) => {
+        const p = partitionOf(q);
+        if (!p || p.form === 'compose') return null;
+        const { w, n, d } = p;
+        const rows = [];
+        for (let k = 1; k < w; k++) rows.push([String(k), mixedText(w - k, n, d)]);
+        for (let a = 1; a < n; a++) rows.push([mixedText(w, a, d), fr(n - a, d)]);
+        for (let k = 1; k < w; k++) for (let a = 1; a < n; a++) rows.push([mixedText(k, a, d), mixedText(w - k, n - a, d)]);
+        if (rows.length < 3) return null;
+        return {
+            prompt: [`Write ${mixedText(w, n, d)} as two parts in different ways.`, 'Write one way in each row.'],
+            columns: ['part', 'part'], example: [String(w), fr(n, d)], keyRows: rows, total: rows.length + 1,
+        };
+    },
     // capacity (card Q9, measured by ws-empty-band): a model row is a full-width row (M 3 / L 2 a page), a model-off
     // diagram half a row (M 6 / L 4); the template's footprint sizes each item from its own payload
     footprint: { kind: 'frac-model', factLike: false, maxCols: 2, measure: true },
-    // the Test is unaided: no bar model (card 7a role:test)
-    roleOpts: (role, opts) => (/^test/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : opts),
+    // no bar model where the page judges or tests: the Test is unaided (card 7a role:test), and Error analysis, True or False?
+    // and Reason It judge a WRITTEN partition of a printed mixed number (their A / B panels hold the diagram, not the bars)
+    roleOpts: (role, opts) => (/^(test|error-analysis|check-it|true-false|reason)/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : opts),
     // the Pre-skill check: the fraction and whole-number skills this one stands on (data.js order would give the presets
     // appended before it); nearest first
+    // (on bars, the model this skill draws: a page of one picture)
     preSkills: () => [
-        { categoryId: 'fractions', skillId: 'write_fraction', opts: {} },
-        { categoryId: 'fractions', skillId: 'shade_fraction', opts: {} },
-        { categoryId: 'composing', skillId: 'whole_as_fraction', opts: {} },
+        { categoryId: 'fractions', skillId: 'write_fraction', opts: { model: ['bar'] } },
+        { categoryId: 'fractions', skillId: 'shade_fraction', opts: { model: ['bar'] } },
         { categoryId: 'composing', skillId: 'compose_whole', opts: {} },
     ],
 });

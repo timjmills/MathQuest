@@ -615,31 +615,48 @@ function pwGeom(p, ctx) {
     const wholeW = blankWidth(1, k) + 6, fracBar = blankWidth(2, k), fracW = fracBar + 6;
     const partH = 2 * hw + 8;
     const ones = p.form === 'ones' ? Math.max(1, Math.round(Number(p.w) || 1)) : 1;
-    const gap = ones > 1 ? G.onesGap : G.gap;
+    const gap = ones > 1 ? G.onesGap : 16;
     const parts = [...Array.from({ length: ones }, () => wholeW), fracW];
-    const rowW = parts.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+    // the part boxes stand centred in EQUAL columns (each the widest box and the least gap), so the joins land at known
+    // fractions of the row; the diagram takes the width its cell gives it, up to `maxW` (card Q10: in a wide cell the parts
+    // spread rather than leave a band at each side)
+    const colW = Math.max(wholeW, fracW) + gap;
+    const rowW = colW * parts.length;
+    const maxW = Math.max(rowW, parts.length > 2 ? parts.length * (Math.max(wholeW, fracW) + 14) : 110);
     // compose: the whole box is the writing place - a wholes zone beside the fraction slot
     const topW = p.form === 'compose' ? Math.max(G.topW, wholeW + 2 + fracW) : G.topW;
     const topH = p.form === 'compose' ? partH : G.topH;
     const lab = zonePt(ctx) * PT_MM * 1.35;
     const W = Math.max(topW, rowW);
-    return { k, G, hw, wholeW, fracBar, fracW, partH, parts, gap, rowW, topW, topH, lab, W, H: topH + G.drop + partH + 1.5 + lab };
+    return { k, G, hw, wholeW, fracBar, fracW, partH, parts, gap, colW, rowW, maxW, topW, topH, lab, W, H: topH + G.drop + partH + 1.5 + lab };
 }
 /** A value as the slot shows it in this state ('' on the pupil page). */
 function pwVal(p, ctx, id) {
+    // a lesson / Model state (stepState): the slots the worked steps have marked so far, each in its own ink
+    if (p._marks) { const st = p._marks[id]; return st && st.value !== undefined && st.value !== null ? String(st.value) : ''; }
     if (ctx.state === 'blank') return '';
     const a = p.answer || {};
     const key = /^w\d+$/.test(id) ? '1' : id === 'w' ? a.w : id === 'n' ? a.n : id === 'd' ? a.d : '';
     if (ctx.state === 'wrong') {
         const wr = ctx.wrong || {};
         if (wr.slots && wr.slots[id] !== undefined && wr.slots[id] !== null) return String(wr.slots[id]);
-        return '';
+        // a shown answer given as its text ("2 + 3/4", "1 + 1 + 3/4", "2 3/4"): its parts in the boxes' order
+        const t = String(wr.value === undefined || wr.value === null ? '' : wr.value).trim();
+        const m = /^(.*?)\s*(\d+)\s*\/\s*(\d+)$/.exec(t);
+        if (!m) return '';
+        if (id === 'n') return m[2];
+        if (id === 'd') return m[3];
+        const wholes = m[1].split(/[+\s]+/).filter(Boolean);
+        if (id === 'w') return wholes.length === 1 ? wholes[0] : '';
+        const k = Number(id.slice(1)) - 1;
+        return wholes[k] === undefined ? '' : wholes[k];
     }
     return key === undefined || key === null ? '' : String(key);
 }
 /** One writing place: a rounded box (or, `zone`, a fraction-bar writing zone) holding a written value. */
-function pwSlot(ctx, id, v, { w, h, zone = false, pt }) {
-    const ink = v !== '' ? inkOf(ctx) : null;
+function pwSlot(ctx, id, v, { w, h, zone = false, pt, marks = null }) {
+    const st = marks && marks[id];
+    const ink = v !== '' ? (st ? (st.ink === 'trace' ? 'trace' : 'solid') : inkOf(ctx)) : null;
     const twin = isTwin(ctx);
     const hook = twin ? ` data-mq-cell="1" data-mq-w="2" data-mq-pk="${id.replace(/\d+$/, '')}" data-mq-label="${id === 'n' ? 'numerator' : id === 'd' ? 'denominator' : 'wholes'}"` : '';
     // a zone is a writing place on the bar (no outline on paper); on screen it is a 48 px touch target with a hairline
@@ -653,7 +670,7 @@ function pwSlot(ctx, id, v, { w, h, zone = false, pt }) {
 /** The fraction writing place: a zone over a 1.5 pt bar over a zone (n / d slots). */
 function pwFracSlot(p, ctx, g) {
     const pt = SZ(ctx).fracPt;
-    const z = (id) => pwSlot(ctx, id, pwVal(p, ctx, id), { w: g.fracBar, h: g.hw, zone: true, pt });
+    const z = (id) => pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.fracBar, h: g.hw, zone: true, pt });
     return `<span style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${z('n')}`
         + `<span aria-hidden="true" style="display:block;width:${L(ctx, g.fracBar)};border-top:${B(ctx, 1.5)} solid ${INK.ink};margin:${L(ctx, 1)} 0;"></span>${z('d')}</span>`;
 }
@@ -688,17 +705,17 @@ function pwDiagram(p, ctx) {
         const wv = pwVal(p, ctx, 'w');
         top = `<span class="fm-pw-whole" data-ws-slot-group="answer" style="display:inline-flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};box-sizing:border-box;`
             + `width:${L(ctx, g.topW)};min-height:${L(ctx, g.topH)};padding:${L(ctx, 1)};border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[g.k])};background:#fff;">`
-            + `${pwSlot(ctx, 'w', wv, { w: g.wholeW - 6, h: 2 * g.hw + 2, zone: true, pt: digitPt(ctx) })}${pwFracSlot(p, ctx, g)}</span>`;
+            + `${pwSlot(ctx, 'w', wv, { marks: p._marks, w: g.wholeW - 6, h: 2 * g.hw + 2, zone: true, pt: digitPt(ctx) })}${pwFracSlot(p, ctx, g)}</span>`;
     } else {
         top = `<span class="fm-pw-whole" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, g.topW)};`
             + `height:${L(ctx, g.topH)};border:${B(ctx, 1.5)} solid ${INK.ink};background:#fff;">${pwMixed(ctx, p.w, p.n, p.d)}</span>`;
     }
-    // the joins: from the whole box's foot to each part box's top (0.75 pt), drawn across the part row
-    let x = 0;
-    const centres = g.parts.map((pw) => { const c = x + pw / 2; x += pw + g.gap; return c; });
-    const joins = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(g.rowW)} ${f2(g.G.drop)}" preserveAspectRatio="none" `
-        + `style="display:block;width:${L(ctx, g.rowW)};height:${L(ctx, g.G.drop)};overflow:visible;">`
-        + centres.map((c) => `<line x1="${f2(g.rowW / 2)}" y1="0" x2="${f2(c)}" y2="${f2(g.G.drop)}" stroke="${INK.ink}" stroke-width="${HAIR}"/>`).join('')
+    // the joins: from the whole box's foot to each part box's top, drawn across the part row in percent of its width
+    // (the row stretches with its cell); 1 CSS px = 0.75 pt, held at that width whatever the stretch
+    const n = g.parts.length;
+    const joins = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${f2(g.G.drop)}" preserveAspectRatio="none" `
+        + `style="display:block;width:100%;height:${L(ctx, g.G.drop)};overflow:visible;">`
+        + g.parts.map((_, i) => `<line x1="50" y1="0" x2="${f2(((i + 0.5) / n) * 100)}" y2="${f2(g.G.drop)}" stroke="${INK.ink}" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join('')
         + `</svg>`;
     // the part boxes and their labels
     const lab = (t) => `<span class="fm-pw-label" style="display:block;font-size:${P(ctx, zonePt(ctx))};line-height:1.3;margin-top:${L(ctx, 1)};white-space:nowrap;">${t}</span>`;
@@ -713,14 +730,15 @@ function pwDiagram(p, ctx) {
         const nW = g.parts.length - 1;
         for (let i = 0; i < nW; i++) {
             const id = ones ? `w${i + 1}` : 'w';
-            cols.push(`${partBox(pwSlot(ctx, id, pwVal(p, ctx, id), { w: g.wholeW - 2, h: g.partH - 2, zone: true, pt: digitPt(ctx) }), g.wholeW, false)}${lab(ones ? 'one' : 'wholes')}`);
+            cols.push(`${partBox(pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.wholeW - 2, h: g.partH - 2, zone: true, pt: digitPt(ctx) }), g.wholeW, false)}${lab(ones ? 'one' : 'wholes')}`);
         }
         cols.push(`${partBox(pwFracSlot(p, ctx, g), g.fracW, false)}${lab('fraction')}`);
     }
-    const row = `<span style="display:flex;align-items:flex-start;justify-content:space-between;width:${L(ctx, g.rowW)};">`
-        + cols.map((c, i) => `<span style="display:flex;flex-direction:column;align-items:center;width:${L(ctx, g.parts[i])};">${c}</span>`).join('') + `</span>`;
+    const row = `<span style="display:grid;grid-template-columns:repeat(${n}, minmax(0, 1fr));align-items:start;width:100%;">`
+        + cols.map((c) => `<span style="display:flex;flex-direction:column;align-items:center;">${c}</span>`).join('') + `</span>`;
     const join = twin ? ` data-mq-join="parts" data-mq-sep="${compose ? ' ' : ' + '}"` : '';
-    return `<span class="fm-pw" data-ws-slot-group="answer"${join} style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${top}${joins}${row}</span>`;
+    return `<span class="fm-pw" data-ws-slot-group="answer"${join} style="display:flex;flex-direction:column;align-items:center;box-sizing:border-box;`
+        + `width:100%;min-width:${L(ctx, g.W)};max-width:${L(ctx, g.maxW)};margin:0 auto;flex:0 1 auto;">${top}${joins}${row}</span>`;
 }
 /** The equation form: "2 3/4 = [ ] + [ ]/[ ]" (the faded form, no diagram). */
 function pwEquation(p, ctx) {
@@ -731,7 +749,7 @@ function pwEquation(p, ctx) {
     const parts = [];
     for (let i = 0; i < k; i++) {
         const id = p.ones ? `w${i + 1}` : 'w';
-        parts.push(pwSlot(ctx, id, pwVal(p, ctx, id), { w: g.wholeW - 6, h: 2 * g.hw + 2, pt: digitPt(ctx) }));
+        parts.push(pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.wholeW - 6, h: 2 * g.hw + 2, pt: digitPt(ctx) }));
     }
     parts.push(pwFracSlot(p, ctx, g));
     const join = twin ? ` data-mq-join="parts" data-mq-sep=" + "` : '';
@@ -745,11 +763,11 @@ function partitionRow(p, ctx) {
     }
     const diagram = pwDiagram(p, ctx);
     if (p.model !== 'bar') {
-        return `<div class="fm-row fm-pw-row" style="display:flex;align-items:flex-start;justify-content:center;">${diagram}</div>`;
+        return `<div class="fm-row fm-pw-row" style="display:flex;align-items:flex-start;justify-content:center;width:100%;">${diagram}</div>`;
     }
     // model on: the bars at the left, the diagram centred in the width after them (card Q10, EB-SIDE); on a narrow
     // screen card the bars stand above the diagram (flex-wrap)
-    return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:${isTwin(ctx) ? 'wrap' : 'nowrap'};align-items:center;justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
+    return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:wrap;align-items:flex-start;row-gap:${L(ctx, 4)};justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
         // the tab keep-out on paper: the bars start after the item's tab
         + `${isTwin(ctx) ? '' : `padding-left:${L(ctx, SZ(ctx).tabMm + 3)};`}">`
         + `${pwBars(p, ctx)}<span style="flex:1 1 auto;display:flex;justify-content:center;">${diagram}</span></div>`;
@@ -769,7 +787,7 @@ function partitionSize(p, ctx) {
     const bars = (Math.round(Number(p.w) || 0) + 1);
     const barsH = bars * G.barH + (bars - 1) * GAP_MM + 1;
     // a model row takes the full width (bars left, the diagram centred in the rest)
-    return { w: Math.max(G.barW + 1 + 6 + g.W, 150), h: Math.max(barsH, g.H), full: true };
+    return { w: Math.max(G.barW + 1 + 6 + g.W, 150), h: Math.max(barsH, g.H), full: true, ink: G.barW + 1 + 6 + g.W };
 }
 /** The key and inputs of a partition cell. */
 function partitionSlots(p) {
@@ -791,8 +809,20 @@ register('frac-model', {
         const twin = isTwin(ctx);
         const row = p.task === 'partition' ? partitionRow(p, ctx) : renderRow(p, ctx);
         return `<div class="k2-cell fm-cell" data-fm-task="${esc(p.task || '')}"${p.task === 'partition' ? ` data-fm-form="${esc(p.form || 'two')}"` : ''}${twin ? ' data-mq-k2="1"' : ''} `
-            + `style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;${p.task === 'partition' && p.model === 'bar' ? 'width:100%;align-self:stretch;' : ''}">${row}</div>`;
+            + `style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;${p.task === 'partition' && p.form !== 'eq' ? 'width:100%;align-self:stretch;' : ''}">${row}</div>`;
     },
+    // the Model / lesson states of a partition item: the slots the worked steps have marked, the newest in trace grey
+    hasStepState(p) { return !!p && p.task === 'partition'; },
+    // state k: the marks of steps 1..k written, step k's in trace grey (the Scripted Model's frozen states, PT-MOD-1)
+    statePayload(p, steps, k) {
+        const mk = {};
+        (steps || []).forEach((st, i) => {
+            if (i > k) return;
+            for (const x of (st && st.marks) || []) if (x && x.slot) mk[x.slot] = { value: String(x.value), ink: i < k ? 'solid' : 'trace' };
+        });
+        return { payload: { _marks: mk } };
+    },
+    stepState(p, steps, k, ctx) { return this.render(Object.assign({}, p, this.statePayload(p, steps, k).payload), ctx); },
     answerKey(p) {
         const a = p.answer || {};
         if (p.task === 'partition') {
@@ -818,7 +848,10 @@ register('frac-model', {
         if (p.task === 'partition') {
             const z = partitionSize(p, ctx);
             const wMm = Math.ceil(z.w + 8), hMm = Math.ceil(z.h + 8);
-            return { wMm, hMm, measure: true, factLike: false, maxCols: z.full ? 1 : wMm <= 88 ? 2 : 1 };
+            // (noStretch, lead ruling 2026-11-12 (b): answered in place in its own boxes, so a row is its measured height and
+            // room, never stretched to the page - ws-empty-band EB-BAND at L)
+            // inkWMm: the drawing's true width (Reason It / Error analysis choose their panel layout from it)
+            return { wMm, hMm, measure: true, factLike: false, maxCols: z.full ? 1 : wMm <= 88 ? 2 : 1, noStretch: true, inkWMm: Math.ceil(z.ink || z.w) };
         }
         const { w, h } = rowSize(p, ctx);
         const wMm = Math.ceil(w + 8), hMm = Math.ceil(h + 8);
