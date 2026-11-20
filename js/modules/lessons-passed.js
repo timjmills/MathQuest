@@ -84,3 +84,19 @@ export function passLine(id) {
     const d = passDate(id);
     return `passed the 8/10 quality check${d ? ` on ${d}` : ''}`;
 }
+/**
+ * Why a lesson waits for a re-check, read from its own `why` (critic lessons-browser r1 D3: the screen never says "fix"
+ * for a lesson that waits only because its pages changed): 'changed' (its render changed after the pass) or 'fix' (a
+ * check found something to fix). '' when the id is not pending.
+ */
+export function pendingKind(id) {
+    const e = PENDING_RECHECK.get(String(id || ''));
+    if (!e) return '';
+    return /re-?pinned|render(?:s|ed)? differently|\bstale\b|pages changed/i.test(String(e.why || '')) ? 'changed' : 'fix';
+}
+/** The reason in plain words, for the teacher screens. */
+export function pendingWords(id) {
+    const k = pendingKind(id);
+    return k === 'changed' ? 'its pages changed after the reviewer passed them, so a reviewer checks the new pages'
+        : k === 'fix' ? 'a new check found something to fix, so a reviewer checks it again after the fix' : '';
+}

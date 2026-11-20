@@ -617,3 +617,17 @@ body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-
 #teacherApp .tvw-area-chip { border-color: var(--line); color: var(--text); background: var(--surface); }
 #teacherApp .tvw-passline { margin: 0; font-size: var(--fs-14); color: var(--text); }
 #teacherApp .tvw-bempty { margin-top: var(--sp-8); }
+
+/* critic lessons-browser r1 fixes (2026-11-20). ADDITIVE.
+   D1 a detailed lesson's card shows its first page, scaled whole into the box; D6 every preview whole (never cut);
+   D7 the card keeps ONE colour band (the 4 px top band), not the Skills card's left band too; D4 48 px toggles. */
+#teacherApp .tvw-lthumb { height: 180px; }
+#teacherApp .tvw-lthumb.is-page { background: #fff; }
+#teacherApp .tvw-lthumb .tvw-lpage { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: #fff; }
+#teacherApp .tvw-lthumb-wait { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: var(--fs-14); color: var(--text); }
+#teacherApp .tvw-lthumb.is-page:has(.tvw-lpage) .tvw-lthumb-wait { display: none; }
+#teacherApp .tvw-lcard, #teacherApp .tvw-lcard:hover { border-left: var(--line-1) solid var(--line); }
+#teacherApp .tvw-lcard:hover { border-color: var(--action); }
+#teacherApp .tvw-tmu-wrap[hidden] { display: none; }
+#teacherApp .tv-btn.tvw-tmu-fold { min-height: 48px; }
+#teacherApp .tvw-pendlist { margin: var(--sp-4) 0 var(--sp-8); padding-left: var(--sp-16); display: grid; gap: var(--sp-4); font-size: var(--fs-14); color: var(--text); }

@@ -812,7 +812,7 @@ function gShellHTML() {
   <div class="ts-frow"><span class="ts-flabel" id="tsGradeL">Grade</span><div class="ts-pills" role="group" aria-labelledby="tsGradeL" id="tsGrades"></div><span class="ts-note" id="tsSearchNote"></span></div>
   <div class="ts-fdiv" role="presentation"></div>
   <div class="ts-frow" id="tsAreaRow"><span class="ts-flabel" id="tsAreaL">Maths area</span><div class="ts-pills ts-areas" role="group" aria-labelledby="tsAreaL" id="tsAreas"></div></div>
-  <div class="ts-frow"><span class="ts-flabel" id="tsOnlyL">Show</span><div id="tsOnly"></div></div>
+  <div class="ts-frow" id="tsOnlyRow"><span class="ts-flabel" id="tsOnlyL">Show</span><div id="tsOnly"></div></div>
   <div class="ts-fdiv" role="presentation"></div>
   <div class="ts-frow"><span class="ts-flabel" id="tsBrowseL">Browse by</span><div class="ts-seg ts-browse" role="group" aria-labelledby="tsBrowseL" id="tsBrowse"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsSizeL">Size</span><div class="ts-seg" role="group" aria-labelledby="tsSizeL" id="tsViews"></div>
@@ -845,6 +845,8 @@ function gSyncControls() {
         + carried.map((a) => `<button type="button" class="ts-pill ts-areabtn" data-act="area" data-arg="${a}" data-domain="${a}" ${pressedA(G.area === a)}><i class="tvw-adot" aria-hidden="true"></i><span class="ts-area-l">${esc(AREA_LABELS[a])}</span> <span class="tvw-n">${nA(a)}</span></button>`).join('');
     r.querySelector('#tsOnly').innerHTML = `<button type="button" class="tvw-only ts-only" data-act="only" ${pressedA(G.only)} aria-describedby="tsOnlyL"><span class="tvw-sw${G.only ? ' is-on' : ''}" aria-hidden="true"></span><span>Only 8/10 ✓ (${REDESIGN_PASSED.size})</span></button>`;
     r.querySelector('#tsAreaRow').hidden = G.browse !== 'area' || searching;
+    // the switch filters the Maths area view only: it is not offered where it would filter nothing (critic r1 D2)
+    r.querySelector('#tsOnlyRow').hidden = G.browse !== 'area' || searching;
     r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + gradesList().map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}"${GRADE_COLORS[g] && GRADE_COLORS[g].bg && g !== 'M' ? ` style="--gr:${GRADE_COLORS[g].bg}"` : ''} ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
     r.querySelector('#tsSearchNote').textContent = searching ? 'Searching all grades' : '';
     r.classList.toggle('ts-searching', searching);

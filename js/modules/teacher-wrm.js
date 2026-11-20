@@ -37,19 +37,19 @@ import { skillView, viewToggleHTML } from './teacher-preview.js';
 import { createPicker, liveKey, skillLabelOf, makePracticeLink, k2p } from './teacher-skillpick.js';
 import { restoreTray, syncTray, trayAddLesson, trayLessons, trayBorrow, trayReturn, trayKeys } from './teacher-tray.js';
 import { setPrintExtra, onSheetClose, printBatch } from './teacher-sheet.js';
-import { buildSheet } from './print-sheet.js';
+import { buildSheet, sheetDocument } from './print-sheet.js';
 import { printHtml } from './teacher-print.js';
 import { loadYear, loadDetailed, loadLinksData } from './links-data.js';
 import { indexDetailed, detailedOf, DETAILED_CAP } from './detailed-links.js';
 import { printDetailedLesson } from './teacher-print.js';
 import { detailedLessonFor } from './lessons/detailed/index.js';
 import { AREA_ORDER, AREA_LABELS, areaOf, areaOfCode } from './teacher-areas.js';
-import { LESSONS_PASSED, PENDING_RECHECK, passLine } from './lessons-passed.js';
+import { LESSONS_PASSED, PENDING_RECHECK, passLine, pendingWords } from './lessons-passed.js';
 import { gradeWord as gradeChipWord, gradeLong } from './grade-of.js';
 import { GRADE_COLORS } from './data.js';
 /** The grade's colour (0b: data.js GRADE_COLORS; a grade it has no colour for keeps the teacher token): a swatch only. */
 const grStyle = (g) => (GRADE_COLORS[g] && GRADE_COLORS[g].bg ? ` style="--gr:${GRADE_COLORS[g].bg}"` : '');
-import { mountCropped, croppedReady } from './teacher-chip.js';
+import { mountCropped, croppedReady, mountLessonPage } from './teacher-chip.js';
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -399,6 +399,8 @@ export function wrmOnHashChange() {
         else { drawList(); showLesson(); }
         if (v.lesson) placeFocus('none');
         else if (was) restoreScroll(was);
+        // a link into By unit / date (Back, Forward, a pasted link) brings the current unit into view (critic r1 D5)
+        else if (B.view === 'unit') scrollToNow();
     });
 }
 
@@ -471,7 +473,7 @@ function summaryHTML() {
     const year = L.schoolYearOf(todayDate());
     const dates = B.view !== 'unit' ? '' : PACING ? ` · unit dates: school pacing ${esc(year)}` : PACING === null ? ` · no unit dates for ${esc(year)} yet: units in the school's order` : '';
     return `<p class="tvw-sum-l">${part('WRM', c.wrm)}<span class="tvw-sum-sep" aria-hidden="true"></span>${part('CCSS Build', c.build)}</p>
-      <p class="tvw-sum-cap">${LESSONS_PASSED.size} lesson${LESSONS_PASSED.size === 1 ? '' : 's'} passed 8/10 · ${PENDING_RECHECK.size} pending re-check after their fixes${B.only ? ` · showing the ${shown} passed` : ''}${dates}</p>`;
+      <p class="tvw-sum-cap">${LESSONS_PASSED.size} lesson${LESSONS_PASSED.size === 1 ? '' : 's'} passed 8/10 · ${PENDING_RECHECK.size} pending re-check${B.only ? ` · showing the ${shown} passed` : ''}${dates}</p>`;
 }
 
 /** "Grade 3 • 158 lessons". */
@@ -497,9 +499,11 @@ function listHTML() {
     }).join('');
     if (out) return out;
     if (B.only) {
-        const pend = [...PENDING_RECHECK.keys()].map((id) => (detailed && detailed.all.find((r) => r.id === id)) || null).filter(Boolean).map((r) => r.title);
+        // only the pending lessons of the grade(s) on screen, each with its own reason (critic r1 D3)
+        const pend = gradeRows().filter((r) => r.pending && (!B.area || r.area === B.area));
         return `<div class="tv-card tvw-bempty" data-w-empty="only"><p class="tv-h3">No lesson here has passed 8/10 yet.</p>
-          <p class="tv-cap">${pend.length ? `Pending re-check after their fixes: ${esc(pend.join('; '))}.` : ''} Turn off "Only 8/10 ✓" to see every lesson.</p></div>`;
+          ${pend.length ? `<p class="tv-cap">Pending re-check:</p><ul class="tvw-pendlist">${pend.map((r) => `<li data-w-pend="${esc(r.pending)}"><b>${esc(r.lesson.title)}</b>: ${esc(pendingWords(r.pending))}.</li>`).join('')}</ul>` : ''}
+          <p class="tv-cap">Turn off "Only 8/10 ✓" to see every lesson.</p></div>`;
     }
     return '<p class="tv-cap tvw-pad" data-w-empty="none">No lessons match. Choose another grade or area.</p>';
 }
@@ -535,7 +539,11 @@ function rowHTML(r, n) {
 function cardHTML(r) {
     const l = r.lesson;
     const fs = r.firstSkill && liveKey(r.firstSkill.key) ? r.firstSkill : null;
-    const prev = fs
+    // a lesson with a detailed lesson shows that lesson's FIRST PAGE (card §7, critic r1 D1); the others its first skill's item
+    const dl = (r.detailed || []).find((id) => detailedLessonFor(id)) || '';
+    const prev = dl
+        ? `<span class="tvw-lthumb is-page" data-w-page="${esc(dl)}" data-w-thumb-kind="detailed" aria-hidden="true"><span class="tvw-lthumb-wait">First page…</span></span>`
+        : fs
         ? `<span class="tvw-lthumb" data-w-thumb="${esc(fs.key)}"${fs.opts ? ` data-w-thumb-opts="${esc(JSON.stringify(fs.opts))}"` : ''} aria-hidden="true"></span>`
         : `<span class="tvw-lthumb is-empty" aria-hidden="true"><span>${r.cover === 'build' ? 'To build' : 'No preview yet'}</span></span>`;
     return `<li class="ts-card tvw-lcard${r.pass ? ' is-passed' : ''}" data-domain="${r.area}" data-w-card="${esc(l.key)}">
@@ -557,17 +565,62 @@ function drawLessonThumb(host) {
     const frame = document.createElement('span');
     frame.className = 'tvp-frame ts-frame';
     host.appendChild(frame);
-    mountCropped(frame, c, s, opts, 0, 'medium');
+    // the whole item, scaled to fit (never cut: critic r1 D6)
+    mountCropped(frame, c, s, opts, 0, 'preview');
+    // after the preview path settles (mountCropped re-fits at ~950 ms), anything still outside the box is fitted again
+    setTimeout(() => fitWhole(host, frame), 1100);
+}
+/** Scale a drawn preview so every visible part of it sits inside its thumbnail box (4 px margin); marks it settled. */
+function fitWhole(host, frame) {
+    if (!host.isConnected) return;
+    const hr = host.getBoundingClientRect();
+    if (!hr.width || !hr.height) { host.dataset.wFit = '1'; return; }
+    let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+    for (const el of frame.querySelectorAll('*')) {
+        const q = el.getBoundingClientRect();
+        if (!q.width || !q.height) continue;
+        const st = getComputedStyle(el);
+        if (st.visibility === 'hidden' || st.opacity === '0') continue;
+        l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom);
+    }
+    const pad = 4;
+    if (l !== Infinity && (l < hr.left + pad - 0.5 || t < hr.top + pad - 0.5 || r > hr.right - pad + 0.5 || b > hr.bottom - pad + 0.5)) {
+        const w = r - l, h = b - t;
+        const k = Math.min((hr.width - 2 * pad) / w, (hr.height - 2 * pad) / h, 1);
+        // the frame fills the box (inset 0): move the drawing's box to the box's centre at scale k
+        const fx = hr.left, fy = hr.top;
+        const dx = (hr.width - w * k) / 2 - (l - fx) * k;
+        const dy = (hr.height - h * k) / 2 - (t - fy) * k;
+        frame.style.transformOrigin = '0 0';
+        frame.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${k.toFixed(4)})`;
+    }
+    frame.classList.remove('ts-cut-r', 'ts-cut-b');
+    host.dataset.wFit = '1';
+}
+/** The one-page sheet document of a detailed lesson (its first page, the seed every pack was built with). */
+function buildFirstPage(id) {
+    return buildSheet({ role: 'detailed-lesson', lessonId: id, paper: 'A4', seed: 4242, key: { on: true }, sections: [{ skills: [] }] }).then((res) => {
+        const html = String(res.docHtml || res.pupilHtml || '');
+        const d = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
+        const page = d.querySelector('.ws-page');
+        if (!page) return null;
+        const styles = [...d.querySelectorAll('style')].map((x) => x.outerHTML).join('');
+        return sheetDocument(`${styles}<style>@media screen { body.mq-sheet { background: #fff; padding: 0; } } .mq-sheet > .ws-page { margin: 0; }</style>${page.outerHTML}`, 'First page')
+            .replace(/<script[\s\S]*?<\/script>/g, '');
+    }).catch((e) => { console.warn('[teacher-wrm] first page', e); return null; });
 }
 function lessonThumbs() {
     const hosts = root ? root.querySelectorAll('#tvwLessons [data-w-thumb]:not([data-w-done])') : [];
-    if (!hosts.length) return;
-    if (typeof IntersectionObserver === 'undefined') { hosts.forEach(drawLessonThumb); return; }
+    const pages = root ? root.querySelectorAll('#tvwLessons [data-w-page]:not([data-w-done])') : [];
+    const drawOne = (el) => (el.dataset.wPage ? mountLessonPage(el, el.dataset.wPage, buildFirstPage) : drawLessonThumb(el));
+    if (typeof IntersectionObserver === 'undefined') { hosts.forEach(drawLessonThumb); pages.forEach(drawOne); return; }
     if (!lio) {
         lio = new IntersectionObserver((entries) => {
-            for (const en of entries) { if (!en.isIntersecting) continue; lio.unobserve(en.target); drawLessonThumb(en.target); }
+            for (const en of entries) { if (!en.isIntersecting) continue; lio.unobserve(en.target); drawOne(en.target); }
         }, { rootMargin: '0px 0px 120px 0px' });
     }
+    pages.forEach((h) => lio.observe(h));
+    if (!hosts.length) return;
     hosts.forEach((h) => {
         const [c, s] = String(h.dataset.wThumb || '').split(':');
         let opts;
@@ -700,6 +753,8 @@ function tmuWrapHTML(s) {
     }
     const rows = unitCache.get(key);
     const n = rows.length;
+    // nothing to make for this area: no toggle at all (critic r1 D4)
+    if (!n) return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}" data-w-tmu-none="1" hidden></div>`;
     const open = tmuOpen.has(key);
     const all = tmuAll.has(key);
     const shown = all ? rows : rows.slice(0, UNIT_ROWS);
@@ -763,8 +818,8 @@ function detailHTML(l) {
     const group = !core ? (L.EXTRA_KINDS.find((k) => k[0] === L.extraKind(l)) || [])[1] : '';
     // the browser's facts of this lesson (its grade, area and status chips, and the 8/10 mark from lessons-passed.js only)
     const br = l.type === 'assessment' ? null : rowsOf(l.grade).find((r) => r.key === l.key) || null;
-    const bhead = br ? `<div class="tvw-bhead" data-w-bhead="${esc(l.key)}"><span class="tvw-gbadge" data-grade="${esc(br.grade)}"${grStyle(br.grade)} title="${esc(gradeLong(br.grade))}"><i class="ts-gsw" aria-hidden="true"></i>${esc(br.grade === 'PK' ? 'Pre-K' : br.grade)}</span><span class="tvw-tag tvw-ntag tvw-area-chip" data-domain="${br.area}"><i class="tvw-adot" aria-hidden="true"></i>${esc(AREA_LABELS[br.area])}</span>${chipsHTML(br)}</div>
-        ${br.pass ? `<p class="tvw-passline" data-w-passline="${esc(br.pass)}">${br.pass === l.key ? 'This lesson' : `Its detailed lesson “${esc((detailed && detailed.all.find((x) => x.id === br.pass) || {}).title || 'this lesson')}”`} ${esc(passLine(br.pass))}.</p>` : br.pending ? '<p class="tvw-passline is-pending" data-w-passline="pending">Pending re-check: its detailed lesson passed before, and a new check found something to fix. It shows 8/10 again once a reviewer passes it after the fix.</p>' : ''}` : '';
+    const bhead = br ? `<div class="tvw-bhead" data-w-bhead="${esc(l.key)}"><span class="tvw-gbadge" data-grade="${esc(br.grade)}"${grStyle(br.grade)} title="${esc(gradeLong(br.grade))}"><i class="ts-gsw" aria-hidden="true"></i>${esc(br.grade === 'PK' ? 'Pre-K' : br.grade)}</span><span class="tvw-tag tvw-ntag tvw-area-chip" data-domain="${br.area}"><i class="tvw-adot" aria-hidden="true"></i>${esc(AREA_LABELS[br.area])}</span>${br.pending ? '<span class="tvw-tag tvw-ntag is-pending" data-w-chip="pending">Pending re-check</span>' : ''}${br.pass ? '<span class="tvw-tag tvw-ntag is-pass" data-w-chip="pass">✓ 8/10</span>' : ''}</div>
+        ${br.pass ? `<p class="tvw-passline" data-w-passline="${esc(br.pass)}">${br.pass === l.key ? 'This lesson' : `Its detailed lesson “${esc((detailed && detailed.all.find((x) => x.id === br.pass) || {}).title || 'this lesson')}”`} ${esc(passLine(br.pass))}.</p>` : br.pending ? `<p class="tvw-passline is-pending" data-w-passline="pending" data-w-pend="${esc(br.pending)}">Pending re-check: ${esc(pendingWords(br.pending))}. It shows 8/10 again once a reviewer passes it.</p>` : ''}` : '';
     return `<div class="tv-card tvw-head${br && br.pass ? ' is-passed' : ''}"${br ? ` data-domain="${br.area}"` : ''}>${br ? cornerHTML(br) : ''}${bhead}
         <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(secNameOf(l))}${group ? ` · ${esc(group)}` : ''}${l.weeks.length ? ` · <span class="tvw-week">Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}</span>` : ''}</p>
         ${legacyNoteHTML(l)}

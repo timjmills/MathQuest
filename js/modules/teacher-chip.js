@@ -317,3 +317,97 @@ export function closeChipSheet() {
     if (back && back.isConnected) { try { back.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 export function chipSheetOpen() { return !!S; }
+
+/* ================================================================= a lesson's FIRST PAGE as a thumbnail (lessons browser §7)
+ * A Lessons-screen card whose lesson has a detailed lesson shows that lesson's first printed page, scaled whole into the
+ * card (never cut). The page is built once (the caller's `build(id)` resolves to a one-page sheet document) and cached by
+ * `lessonId|renderHash` in memory and in IndexedDB, so a later view or visit draws it without building it again.
+ * renderHash: the asset stamps (index.html import map ?v=) of the modules that draw a detailed lesson, so a new render
+ * (a stamped deploy) builds the page afresh. window.__mqLessonPageBuilds counts the builds (for the checks). */
+const PAGE_MEM = new Map();
+let pageIdb = null;
+function pageDb() {
+    if (pageIdb) return pageIdb;
+    pageIdb = new Promise((res) => {
+        try {
+            const rq = indexedDB.open('mq-lesson-pages', 1);
+            rq.onupgradeneeded = () => { try { rq.result.createObjectStore('pages'); } catch (e) { /* exists */ } };
+            rq.onsuccess = () => res(rq.result);
+            rq.onerror = () => res(null);
+            rq.onblocked = () => res(null);
+        } catch (e) { res(null); }
+    });
+    return pageIdb;
+}
+async function pageGet(k) {
+    const db = await pageDb();
+    if (!db) return null;
+    return new Promise((res) => { try { const r = db.transaction('pages').objectStore('pages').get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); } catch (e) { res(null); } });
+}
+async function pagePut(k, v) {
+    const db = await pageDb();
+    if (!db) return;
+    await new Promise((res) => { try { const t = db.transaction('pages', 'readwrite'); t.objectStore('pages').put(v, k); t.oncomplete = res; t.onerror = res; t.onabort = res; } catch (e) { res(); } });
+}
+let renderHashMemo = '';
+/** The stamps of the modules that draw a detailed lesson (sheet kit, lessons, print-sheet), as a short hash. */
+export function lessonRenderHash() {
+    if (renderHashMemo) return renderHashMemo;
+    let src = '';
+    try {
+        const m = document.querySelector('script[type="importmap"]');
+        const imports = (m && JSON.parse(m.textContent).imports) || {};
+        src = Object.entries(imports).filter(([k]) => /\/(sheet|lessons)\/|print-sheet\.js$/.test(k)).map(([k, v]) => `${k}=${v}`).sort().join('|');
+    } catch (e) { src = ''; }
+    let h = 5381;
+    for (let i = 0; i < src.length; i++) h = ((h * 33) ^ src.charCodeAt(i)) >>> 0;
+    renderHashMemo = `r${h.toString(16)}`;
+    return renderHashMemo;
+}
+let pageChain = Promise.resolve();
+/** The one-page document of a lesson: memory, then IndexedDB, then a build (one at a time). */
+export function lessonPageDoc(id, build) {
+    const k = `${id}|${lessonRenderHash()}`;
+    if (PAGE_MEM.has(k)) return PAGE_MEM.get(k);
+    const p = pageGet(k).then((hit) => {
+        if (hit) return hit;
+        const run = pageChain.then(() => { window.__mqLessonPageBuilds = (window.__mqLessonPageBuilds || 0) + 1; return build(id); });
+        pageChain = run.catch(() => null);
+        return run.then((doc) => { if (doc) pagePut(k, doc); return doc; });
+    }).catch(() => null);
+    PAGE_MEM.set(k, p);
+    p.then((doc) => { if (!doc) PAGE_MEM.delete(k); });
+    return p;
+}
+/** Draw a lesson's first page into `host`, scaled whole into its box (an inert, hidden-from-readers picture). */
+export function mountLessonPage(host, id, build) {
+    if (!host || host.dataset.wDone) return;
+    host.dataset.wDone = '1';
+    host.classList.add('is-loading');
+    lessonPageDoc(id, build).then((doc) => {
+        host.classList.remove('is-loading');
+        if (!doc || !host.isConnected) { host.classList.add('is-failed'); return; }
+        const f = document.createElement('iframe');
+        f.className = 'tvw-lpage';
+        f.setAttribute('aria-hidden', 'true');
+        f.setAttribute('tabindex', '-1');
+        f.setAttribute('title', 'First page');
+        f.setAttribute('sandbox', 'allow-same-origin');
+        f.addEventListener('load', () => {
+            try {
+                const pg = f.contentDocument && f.contentDocument.querySelector('.ws-page');
+                if (!pg) return;
+                const pw = pg.offsetWidth, ph = pg.offsetHeight;
+                f.style.width = `${pw}px`;
+                f.style.height = `${ph}px`;
+                const W = host.clientWidth, H = host.clientHeight;
+                const s = Math.min(W / pw, H / ph);
+                f.style.transform = `translate(${((W - pw * s) / 2).toFixed(1)}px, ${((H - ph * s) / 2).toFixed(1)}px) scale(${s.toFixed(4)})`;
+                host.dataset.wPageScale = s.toFixed(3);
+                host.dataset.wPageReady = '1';
+            } catch (e) { /* the picture stays as drawn */ }
+        });
+        f.srcdoc = doc;
+        host.appendChild(f);
+    });
+}

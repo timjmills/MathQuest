@@ -34,7 +34,8 @@ const ROOT = process.env.MQ_ROOT ? resolve(process.env.MQ_ROOT) : resolve(dirnam
 const has = (f) => process.argv.includes(f);
 const argOf = (f, d) => { const i = process.argv.indexOf(f); return i > -1 ? process.argv[i + 1] : d; };
 const SHOTS = has('--shots');
-const WIDTHS = String(argOf('--widths', '1366,1024')).split(',').map(Number).filter(Boolean);
+// critic r1 D8: every screen width of the plan by default (FASTEST_PLAN rule 7: 1280-1366 and 820-1024; no 390)
+const WIDTHS = String(argOf('--widths', '1366,1280,1024,820')).split(',').map(Number).filter(Boolean);
 const ONLY = String(argOf('--only', '')).split(',').filter(Boolean);
 const want = (r) => !ONLY.length || ONLY.includes(r);
 const TODAY = '2026-11-20';
@@ -42,7 +43,13 @@ const OUT = join(ROOT, 'design/status/lf-checks/lessons-browser/build');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fails = {};
 const check = (rule, ok, msg) => { if (!ok) (fails[rule] = fails[rule] || []).push(msg); };
-const RULES = ['LESSON-DOMAIN', 'AREA-LABELS', 'FILTER-PASSED', 'LESSON-BROWSE', 'SCREEN'];
+const RULES = ['LESSON-DOMAIN', 'AREA-LABELS', 'FILTER-PASSED', 'LESSON-BROWSE', 'SCREEN',
+    // critic lessons-browser r1 (2026-11-20): one rule per defect, so each has its own backtest row
+    'THUMB-DETAILED-FIRST-PAGE', 'SKILLS-VIEWS', 'PENDING-WORDS', 'UNIT-NOW-ON-HASH', 'THUMB-NO-CLIP', 'HEAD-NO-REPEAT', 'ROUNDTRIP-VIEW', 'SKILLS-GRADE-PILLS'];
+// --plant <what>: plant a known-bad state in the CHECK's own reading, to prove an assertion can fail (ws-backtest args rows):
+//   roundtrip-thumbs  the "list" round trip starts from a link with no view= after the thumbnails (the r1 D9 state)
+//   drop-grade-pill   one Skills grade pill (grade 3) is removed before the pills are read (r1 D10)
+const PLANT = String(argOf('--plant', ''));
 
 if (!existsSync(join(ROOT, 'js/modules/lessons-passed.js')) || !existsSync(join(ROOT, 'js/modules/grade-of.js'))) {
     for (const r of RULES.filter(want)) console.log(`  ${r}: FAIL (no lessons browser: js/modules/lessons-passed.js / grade-of.js missing)`);
@@ -58,7 +65,9 @@ const TA = await imp('js/modules/teacher-areas.js');
 const { SKILLS } = await imp('js/modules/data.js');
 const { indexDetailed } = await imp('js/modules/detailed-links.js');
 const { LESSONS_PASSED, PENDING_RECHECK } = await imp('js/modules/lessons-passed.js');
-const { gradeWord } = await imp('js/modules/grade-of.js');
+const LP = await imp('js/modules/lessons-passed.js');
+const pendingKind = LP.pendingKind || ((id) => (/re-?pinned|render(?:s|ed)? differently|\bstale\b|pages changed/i.test(String((PENDING_RECHECK.get(id) || {}).why || '')) ? 'changed' : 'fix'));
+const { gradeWord, sortGrades } = await imp('js/modules/grade-of.js');
 const { REDESIGN_PASSED } = await imp('js/modules/redesign-passed.js');
 L.setAreaFns(TA);
 const LINKS = join(ROOT, 'data/curriculum/links');
@@ -120,16 +129,56 @@ const domRows = () => page.evaluate(() => [...document.querySelectorAll('#tvwLes
     return { key: b.dataset.wLesson, area: sec ? sec.dataset.wSecbox : '', grade: sec ? sec.dataset.wSecGrade : '', chips: [...(b.closest('li').querySelectorAll('[data-w-chip]'))].map((c) => c.dataset.wChip), pass: b.dataset.wPass || '', domain: b.dataset.wArea };
 }));
 const shot = async (name, w) => { if (SHOTS) { mkdirSync(OUT, { recursive: true }); await page.screenshot({ path: join(OUT, `${name}-${w}.png`) }); } };
+// critic r1 D4: EVERY interactive control of the active screen (not a hand list), visible and not inside an item preview,
+// is a 48 px touch target; nothing scrolls sideways
 const screenOk = async (tag) => {
     const r = await page.evaluate(() => {
         const sx = document.documentElement.scrollWidth - innerWidth;
-        const small = [...document.querySelectorAll('[data-screen="wrm"].is-active .tvw-bfilters button, [data-screen="wrm"].is-active .tvw-brow, [data-screen="wrm"].is-active .tvw-unit-h, [data-screen="wrm"].is-active .tvw-lcard-t, [data-screen="wrm"].is-active .tvw-back, [data-screen="skills"].is-active .ts-areas button, [data-screen="skills"].is-active .ts-only')]
-            .filter((b) => b.getClientRects().length && b.getBoundingClientRect().height < 47.5).map((b) => `${b.className.split(' ')[0]}:${(b.textContent || '').trim().slice(0, 20)}(${Math.round(b.getBoundingClientRect().height)})`);
-        return { sx, small: small.slice(0, 6), n: small.length };
+        const scr = document.querySelector('#teacherMain .tv-screen.is-active');
+        const sel = 'button, [role="button"], a[href], input:not([type="hidden"]), select, summary, [tabindex]:not([tabindex="-1"])';
+        const vis = (el) => el.getClientRects().length && !el.closest('[hidden], [aria-hidden="true"], .tvp-frame, .ts-thumb, .tvw-lthumb') && getComputedStyle(el).visibility !== 'hidden';
+        const small = [...(scr ? scr.querySelectorAll(sel) : [])].filter(vis).filter((b) => b.getBoundingClientRect().height < 47.5)
+            .map((b) => `${(b.className && String(b.className).split(' ')[0]) || b.tagName}:${(b.textContent || b.getAttribute('aria-label') || '').trim().slice(0, 24)}(${Math.round(b.getBoundingClientRect().height)})`);
+        return { sx, small: [...new Set(small)].slice(0, 8), n: small.length, screen: scr ? scr.dataset.screen : '' };
     });
     check('SCREEN', r.sx <= 0, `${tag}: the page scrolls sideways by ${r.sx}px`);
-    check('SCREEN', !r.n, `${tag}: ${r.n} controls under 48 px: ${r.small.join(', ')}`);
+    check('SCREEN', !r.n, `${tag} (${r.screen}): ${r.n} controls under 48 px: ${r.small.join(', ')}`);
 };
+/** Every drawn thumbnail preview is whole: no cut class, every visible part inside its box (critic r1 D6). Measured once the previews settle (8 s at most). */
+const clipProbe = async () => {
+    try { await waitFor(page, () => [...document.querySelectorAll('#tvwLessons .tvw-lthumb[data-w-thumb][data-w-done]')].every((h) => h.dataset.wFit), 8000, 'previews settled'); } catch (e) { /* the unsettled ones are reported */ }
+    return page.evaluate(() => {
+        const out = [];
+        for (const h of document.querySelectorAll('#tvwLessons .tvw-lthumb[data-w-thumb][data-w-done]')) {
+            const f = h.querySelector('.tvp-frame');
+            const card = h.closest('[data-w-card]');
+            const id = card ? card.dataset.wCard : '?';
+            const hr = h.getBoundingClientRect();
+            if (!f || !hr.width) continue;
+            const cut = f.classList.contains('ts-cut-r') || f.classList.contains('ts-cut-b');
+            let over = 0;
+            for (const el of f.querySelectorAll('*')) {
+                const r = el.getBoundingClientRect();
+                if (!r.width || !r.height) continue;
+                const st = getComputedStyle(el);
+                if (st.visibility === 'hidden' || st.opacity === '0') continue;
+                if (r.left < hr.left - 1 || r.top < hr.top - 1 || r.right > hr.right + 1 || r.bottom > hr.bottom + 1) over++;
+            }
+            if (cut || over) out.push(`${id}${cut ? ' cut' : ''}${over ? ` ${over} parts outside` : ''}`);
+        }
+        return out;
+    });
+};
+/** No status fact twice in the opened lesson's header card (critic r1 D7). */
+const headRepeats = () => page.evaluate(() => {
+    const head = document.querySelector('#tvwDetail .tvw-head');
+    if (!head) return ['no header card'];
+    const words = [...head.querySelectorAll('.tvw-tag, [data-w-chip]')].map((x) => x.textContent.trim());
+    const kinds = { ccss: /^(CCSS Build|CCSS · BUILD)$/, cover: /^(Full|Fully taught|Covers part|To build|No skill yet)$/, pass: /8\/10/, pending: /^Pending re-check$/ };
+    return Object.entries(kinds).map(([k, re]) => [k, words.filter((w) => re.test(w))]).filter(([, l]) => l.length > 1).map(([k, l]) => `${k}: ${l.join(' + ')}`);
+});
+/** The one colour band of a thumbnail card (0b: a 4 px top band; not the Skills card's left band too). */
+const cardBands = () => page.evaluate(() => [...document.querySelectorAll('#tvwLessons .tvw-lcard')].slice(0, 6).map((c) => { const st = getComputedStyle(c); return [parseFloat(st.borderTopWidth), parseFloat(st.borderLeftWidth)]; }).filter(([t, l]) => !(t >= 3.5 && l <= 1.5)));
 
 try {
     await page.evaluate((d) => {
@@ -188,15 +237,16 @@ try {
             check('AREA-LABELS', !bad.length, `@${w} Lessons: chips / headings not from AREA_LABELS: ${JSON.stringify(bad.slice(0, 4))}`);
         }
 
-        /* ---------------- the list at grade 3: shots a, screen */
-        await go('#wrm/3');
+        /* ---------------- the list at grade 3 (shots a) */
+        await go('#wrm/3?view=list');
+        await page.evaluate(() => window.scrollTo(0, 0));
         await shot('a-list-top', w);
         await page.evaluate(() => document.querySelector('#tvwSum').scrollIntoView({ block: 'start' }));
         await shot('a-list', w);
-        await screenOk(`@${w} list`);
+        if (want('SCREEN')) await screenOk(`@${w} list`);
 
-        /* ---------------- LESSON-BROWSE: thumbnails = list, lazy previews */
-        if (want('LESSON-BROWSE')) {
+        /* ---------------- LESSON-BROWSE / THUMB-NO-CLIP / HEAD-NO-REPEAT: thumbnails = list, lazy previews, whole previews */
+        if (want('LESSON-BROWSE') || want('THUMB-NO-CLIP') || want('HEAD-NO-REPEAT') || want('SCREEN')) {
             const listKeys = (await domRows()).map((r) => r.key);
             // the thumbnails are drawn at the top of the page (a view switch keeps the page where it is)
             await page.evaluate(() => window.scrollTo(0, 0));
@@ -207,25 +257,41 @@ try {
                 const cards = [...document.querySelectorAll('#tvwLessons .tvw-lcard')];
                 const rowH = cards.length ? cards[0].getBoundingClientRect().height + 16 : 0;
                 const near = cards.filter((c) => c.getBoundingClientRect().top < innerHeight + rowH).length;
-                const drawn = document.querySelectorAll('#tvwLessons [data-w-thumb][data-w-done]').length;
+                const drawn = document.querySelectorAll('#tvwLessons [data-w-thumb][data-w-done], #tvwLessons [data-w-page][data-w-done]').length;
                 return { cards: cards.length, near, drawn };
             });
             const thumbKeys = (await domRows()).map((r) => r.key);
             check('LESSON-BROWSE', JSON.stringify(thumbKeys) === JSON.stringify(listKeys), `@${w} thumbnails (${thumbKeys.length}) are not the list rows (${listKeys.length}) in order`);
             check('LESSON-BROWSE', lazy.drawn <= lazy.near && lazy.cards > lazy.near, `@${w} previews drawn on load ${lazy.drawn}, cards near the viewport ${lazy.near} of ${lazy.cards}`);
-            // scrolled to the cards, the ones on screen are drawn
-            await page.evaluate(() => document.querySelector('#tvwLessons .tvw-lcard')?.scrollIntoView({ block: 'start' }));
-            await sleep(900);
+            // scrolled down the cards, the ones on screen are drawn whole (every drawn preview probed, critic r1 D6)
+            const clipped = new Set();
+            for (const frac of [0, 0.25, 0.5, 0.75, 1]) {
+                await page.evaluate((f) => { const l = document.querySelector('#tvwLessons'); const r = l.getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top + (r.height - innerHeight) * f); }, frac);
+                await sleep(1300);
+                for (const c of await clipProbe()) clipped.add(c);
+            }
             const drawnNow = await page.evaluate(() => document.querySelectorAll('#tvwLessons [data-w-thumb][data-w-done] .tvp-frame').length);
             check('LESSON-BROWSE', drawnNow > 0, `@${w} no preview drawn when the cards are on screen`);
+            check('THUMB-NO-CLIP', drawnNow > 0 && !clipped.size, `@${w} thumbnail previews cut or spilling out of their box: ${[...clipped].slice(0, 6).join(', ')} (${drawnNow} drawn)`);
+            const bands = await cardBands();
+            check('HEAD-NO-REPEAT', !bands.length, `@${w} thumbnail cards with two colour bands (top / left width): ${JSON.stringify(bands.slice(0, 3))}`);
+            await page.evaluate(() => document.querySelector('#tvwLessons .tvw-lcard')?.scrollIntoView({ block: 'start' }));
+            await sleep(900);
+            await clipProbe();   // (waits for the previews on screen to settle before the picture)
+            await sleep(300);
             await shot('b-thumbs', w);
-            await screenOk(`@${w} thumbs`);
-            // open then "← All lessons" (thumbnails, an area, scrolled)
-            for (const [h, tag] of [['#wrm/3?a=NBT&view=thumbs', 'thumbs'], ['#wrm/3?a=OA', 'list']]) {
+            if (want('SCREEN')) await screenOk(`@${w} thumbs`);
+        }
+        if (want('LESSON-BROWSE') || want('ROUNDTRIP-VIEW') || want('HEAD-NO-REPEAT')) {
+            // open then "← All lessons": thumbnails and LIST (critic r1 D9: the list case names view=list and asserts it)
+            const trips = [['#wrm/3?a=NBT&view=thumbs', 'thumbs'], [PLANT === 'roundtrip-thumbs' ? '#wrm/3?a=OA' : '#wrm/3?a=OA&view=list', 'list']];
+            for (const [h, tag] of trips) {
                 await go(h);
-                await page.evaluate(() => window.scrollTo(0, Math.min(600, document.documentElement.scrollHeight - innerHeight)));
+                // into the list (the filter card is taller at tablet widths)
+                await page.evaluate(() => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); window.scrollTo(0, Math.min(window.scrollY + l.top + 300, document.documentElement.scrollHeight - innerHeight)); });
                 await sleep(300);
                 const before = await state();
+                check('ROUNDTRIP-VIEW', before.view === tag, `@${w} the ${tag} round trip runs in view ${before.view}`);
                 const target = await page.evaluate(() => {
                     const b = [...document.querySelectorAll('#tvwLessons [data-w-lesson]')].find((x) => { const r = x.getBoundingClientRect(); return r.top > 60 && r.bottom < innerHeight - 60; });
                     return b ? b.dataset.wLesson : '';
@@ -236,10 +302,11 @@ try {
                 await sleep(500);
                 const opened = await page.evaluate(() => ({ open: document.querySelector('#tvwGrid').classList.contains('is-open'), listShown: !!document.querySelector('#tvwLessons').getClientRects().length, back: !!document.querySelector('#tvwDetail [data-w-back]')?.getClientRects().length, backText: (document.querySelector('#tvwDetail [data-w-back]') || {}).textContent || '' }));
                 check('LESSON-BROWSE', opened.open && !opened.listShown && opened.back && /All lessons/.test(opened.backText), `@${w} ${tag}: the lesson did not open over the list with "← All lessons" ${JSON.stringify(opened)}`);
-                if (tag === 'list' && w === WIDTHS[0]) {
-                    // the opened lesson's header card: chips (+ the mark when it passed)
-                    const hc = await page.evaluate(() => !!document.querySelector('#tvwDetail .tvw-bhead [data-w-chip]'));
-                    check('LESSON-BROWSE', hc, `@${w}: the opened lesson's header card has no status chips`);
+                if (tag === 'list') {
+                    const hc = await page.evaluate(() => !!document.querySelector('#tvwDetail .tvw-bhead .tvw-gbadge'));
+                    check('LESSON-BROWSE', hc, `@${w}: the opened lesson's header card has no grade / area band`);
+                    const rep = await headRepeats();
+                    check('HEAD-NO-REPEAT', !rep.length, `@${w} ${target}: the header card says a fact twice: ${rep.join('; ')}`);
                 }
                 await page.$eval('#tvwDetail [data-w-back]', (b) => b.click());
                 await sleep(500);
@@ -247,6 +314,8 @@ try {
                 check('LESSON-BROWSE', after.grade === before.grade && after.area === before.area && after.only === before.only && after.view === before.view && Math.abs(after.y - before.y) <= 2 && after.hash === before.hash,
                     `@${w} ${tag}: "← All lessons" came back to ${JSON.stringify(after)} not ${JSON.stringify(before)}`);
             }
+        }
+        if (want('LESSON-BROWSE') && w === WIDTHS[0]) {
             // the hash round trip: a fresh load at a browser link
             await page.goto('about:blank');
             await page.evaluateOnNewDocument((d) => { window.__MQ_TODAY__ = d; }, TODAY);
@@ -257,12 +326,20 @@ try {
             await sleep(300);
             const fresh = await state();
             check('LESSON-BROWSE', fresh.grade === '3' && fresh.area === 'OA' && fresh.only && fresh.view === 'thumbs', `@${w} a fresh load of #wrm/3?a=OA&only=1&view=thumbs shows ${JSON.stringify(fresh)}`);
-            // back to defaults for the next checks
             await page.evaluate(() => { try { localStorage.removeItem('mq_teacher_lessons_browse'); } catch (e) { /* */ } });
             await go('#wrm/3?only=0&view=list');
+        }
 
-            /* By unit / date */
+        /* ---------------- By unit / date (LESSON-BROWSE), and a link into it (UNIT-NOW-ON-HASH, critic r1 D5) */
+        if (want('LESSON-BROWSE') || want('UNIT-NOW-ON-HASH') || want('SCREEN')) {
+            await go('#wrm/3?view=list');
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await sleep(150);
+            // a link (Back, Forward, a pasted address) from the List view straight into By unit / date
             await go('#wrm/3?view=unit');
+            await sleep(400);
+            const viaHash = await page.evaluate(() => { const u = document.querySelector('#tvwLessons .tvw-unit.is-now .tvw-unit-h'); if (!u) return null; const r = u.getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom) }; });
+            check('UNIT-NOW-ON-HASH', viaHash && viaHash.top >= -2 && viaHash.bottom <= 768, `@${w} #wrm/3?view=unit by a link: the Now unit header is at ${JSON.stringify(viaHash)}, not in the window`);
             await page.evaluate(() => window.scrollTo(0, 0));
             await page.$eval('.tvw-viewseg [data-w-view="list"]', (b) => b.click());
             await sleep(200);
@@ -281,25 +358,64 @@ try {
             check('LESSON-BROWSE', nowU && nowU.unit === 'D3', `@${w} the Now unit on ${TODAY} is ${nowU && nowU.unit}, want D3 (Fractions, 1 Nov - 26 Nov)`);
             check('LESSON-BROWSE', nowU && nowU.top >= -2 && nowU.bottom <= 768, `@${w} the Now unit is not in the viewport after open (${nowU && nowU.top}..${nowU && nowU.bottom})`);
             await shot('f-unit', w);
-            await screenOk(`@${w} unit`);
-            // a unit opens on a click; filters apply inside units
+            if (want('SCREEN')) await screenOk(`@${w} unit`);
             const closed = units.find((u) => !u.open);
             if (closed) {
                 await click(`.tvw-unit[data-w-unit="${closed.unit}"] .tvw-unit-h`);
                 const nowOpen = await page.$eval(`.tvw-unit[data-w-unit="${closed.unit}"] .tvw-nlist`, (o) => !o.hidden);
                 check('LESSON-BROWSE', nowOpen, `@${w} unit ${closed.unit} did not open on a click`);
+                await click(`.tvw-unit[data-w-unit="${closed.unit}"] .tvw-unit-h`);   // closed again (the next width starts as a teacher would)
             }
             await go('#wrm/3?a=NF&view=unit');
             const nfUnits = await page.$$eval('#tvwLessons .tvw-unit', (u) => u.map((x) => x.dataset.wUnit));
             const wantNf = L.unitGroups('3', ROWS['3'].filter((r) => r.area === 'NF'), PACING, today).filter((u) => u.rows.length).map((u) => u.unit);
             check('LESSON-BROWSE', JSON.stringify(nfUnits) === JSON.stringify(wantNf), `@${w} the area filter inside units: ${nfUnits} want ${wantNf}`);
+            await go('#wrm/3?a=&view=list');
+        }
+
+        /* ---------------- THUMB-DETAILED-FIRST-PAGE (critic r1 D1): a detailed lesson's card shows its first page, cached */
+        if (want('THUMB-DETAILED-FIRST-PAGE') && w === WIDTHS[0]) {
+            const buildable = new Set(await page.evaluate(() => import(new URL('js/modules/lessons/detailed/index.js', location.href).href).then((m) => Object.keys(m.DETAILED_LESSONS || {}))));
+            const withDl = ALL_ROWS.filter((r) => (r.detailed || []).some((id) => buildable.has(id)));
+            check('THUMB-DETAILED-FIRST-PAGE', withDl.length > 0, 'no lesson row has a detailed lesson to test');
+            const pageReady = async (key, tag) => {
+                await page.$eval(`#tvwLessons [data-w-card="${key}"]`, (c) => c.scrollIntoView({ block: 'center' }));
+                try { await waitFor(page, `!!document.querySelector('#tvwLessons [data-w-card="${key}"] [data-w-page-ready]')`, 90000, `first page ${key}`); } catch (e) { check('THUMB-DETAILED-FIRST-PAGE', false, `${tag}: the first page of ${key} was not drawn`); return null; }
+                return page.evaluate((k) => { const h = document.querySelector(`#tvwLessons [data-w-card="${k}"] [data-w-page]`); const f = h && h.querySelector('iframe'); const pg = f && f.contentDocument && f.contentDocument.querySelector('.ws-page'); const hr = h.getBoundingClientRect(); const fr = f.getBoundingClientRect(); return { kind: h.dataset.wThumbKind, page: !!pg, inside: fr.left >= hr.left - 1 && fr.top >= hr.top - 1 && fr.right <= hr.right + 1 && fr.bottom <= hr.bottom + 1, builds: window.__mqLessonPageBuilds || 0 }; }, key);
+            };
+            for (const g of [...new Set(withDl.map((r) => r.grade))]) {
+                await go(`#wrm/${g}?view=thumbs`);
+                const kinds = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('#tvwLessons [data-w-card]')].map((c) => [c.dataset.wCard, (c.querySelector('[data-w-thumb-kind]') || {}).dataset?.wThumbKind || ''])));
+                for (const r of withDl.filter((x) => x.grade === g)) check('THUMB-DETAILED-FIRST-PAGE', kinds[r.key] === 'detailed', `grade ${g}: ${r.key} (detailed ${r.detailed.join(', ')}) shows ${kinds[r.key] || 'an item'}, not its first page`);
+                for (const [k, v] of Object.entries(kinds)) if (v === 'detailed') check('THUMB-DETAILED-FIRST-PAGE', withDl.some((r) => r.key === k), `grade ${g}: ${k} shows a first page but has no detailed lesson`);
+            }
+            const r0 = withDl.find((r) => r.pass) || withDl[0];
+            await go(`#wrm/${r0.grade}?view=thumbs`);
+            const b0 = await page.evaluate(() => window.__mqLessonPageBuilds || 0);
+            const p1 = await pageReady(r0.key, 'first draw');
+            if (p1) check('THUMB-DETAILED-FIRST-PAGE', p1.kind === 'detailed' && p1.page && p1.inside && p1.builds === b0 + 1, `${r0.key} first draw: ${JSON.stringify(p1)} (builds before ${b0})`);
+            await page.$eval('.tvw-viewseg [data-w-view="list"]', (b) => b.click());
+            await sleep(300);
+            await page.$eval('.tvw-viewseg [data-w-view="thumbs"]', (b) => b.click());
+            await sleep(300);
+            const p2 = await pageReady(r0.key, 'second draw');
+            if (p1 && p2) check('THUMB-DETAILED-FIRST-PAGE', p2.builds === p1.builds, `${r0.key} second draw built the page again (${p1.builds} -> ${p2.builds}): not served from the cache`);
+            // a new visit (reload): served from IndexedDB, no build
+            await page.goto('about:blank');
+            await page.goto(`${app.base}/index.html#wrm/${r0.grade}?view=thumbs`, { waitUntil: 'networkidle2', timeout: 60000 });
+            await waitFor(page, () => typeof window.setUserRole === 'function' && typeof window.tvGo === 'function', 30000, 'reload');
+            await page.evaluate(() => window.setUserRole('teacher'));
+            await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active #tvwLessons [data-w-card]'), 20000, 'reload list');
+            const p3 = await pageReady(r0.key, 'after a reload');
+            if (p3) check('THUMB-DETAILED-FIRST-PAGE', p3.builds === 0 && p3.page, `${r0.key} after a reload: ${p3.builds} build(s), want 0 (IndexedDB)`);
+            await shot('b-thumbs-firstpage', w);
             await go('#wrm/3?view=list');
         }
 
-        /* ---------------- FILTER-PASSED */
-        if (want('FILTER-PASSED')) {
-            await go('#wrm/all');
-            await click('[data-w-only]');
+        /* ---------------- FILTER-PASSED / PENDING-WORDS */
+        if (want('FILTER-PASSED') || want('PENDING-WORDS') || want('HEAD-NO-REPEAT') || want('SCREEN')) {
+            await go('#wrm/all?view=list');
+            if (!(await state()).only) await click('[data-w-only]');
             const rows = await domRows();
             const wantKeys = ALL_ROWS.filter((r) => r.pass).map((r) => r.key);
             check('FILTER-PASSED', JSON.stringify(rows.map((r) => r.key).sort()) === JSON.stringify(wantKeys.slice().sort()), `@${w} Only 8/10 (all grades): rows ${rows.map((r) => r.key)} want ${wantKeys}`);
@@ -308,6 +424,9 @@ try {
             check('FILTER-PASSED', rows.every((r) => r.chips.includes('pass') && r.pass), `@${w} a row shown with the switch on has no ✓ 8/10 chip`);
             const marks = await page.$$eval('#tvwLessons .tvw-brow .ts-pass', (m) => m.length);
             check('FILTER-PASSED', marks === rows.length, `@${w} ${marks} corner marks for ${rows.length} passed rows`);
+            // PENDING-WORDS: the summary never says "fix" for every pending lesson; each words its own reason
+            const sum = await page.$eval('#tvwSum', (x) => x.textContent);
+            check('PENDING-WORDS', !/fix/i.test(sum), `@${w} the summary claims a fix for every pending lesson: "${sum.replace(/\s+/g, ' ').trim()}"`);
             for (const g of GRADES) {
                 await click(`.tvw-gradebtn[data-w-grade="${g}"]`);
                 const st = await state();
@@ -319,43 +438,62 @@ try {
                     check('FILTER-PASSED', n === e, `@${w} grade ${g} x ${a}: ${n} rows with the switch on, the registry has ${e}`);
                 }
                 if (!r.length) {
-                    const empty = await page.evaluate(() => (document.querySelector('[data-w-empty="only"]') || {}).textContent || '');
-                    check('FILTER-PASSED', /No lesson here has passed 8\/10 yet/.test(empty), `@${w} grade ${g}: no empty state with the switch on`);
-                    if (g === '2') {
-                        const t = (detailedData.lessons.find((x) => x.id === 'g2-nbt3-read-write-1000') || {}).title || '';
-                        check('FILTER-PASSED', !t || empty.includes(t) || PENDING_RECHECK.size === 0, `@${w} the empty state does not name the pending lessons ("${t}")`);
-                        if (w === WIDTHS[0]) await shot('c-only-empty', w);
+                    const em = await page.evaluate(() => { const e = document.querySelector('[data-w-empty="only"]'); return e ? { text: e.textContent, pend: [...e.querySelectorAll('[data-w-pend]')].map((li) => [li.dataset.wPend, li.textContent.replace(/\s+/g, ' ').trim()]) } : null; });
+                    check('FILTER-PASSED', em && /No lesson here has passed 8\/10 yet/.test(em.text), `@${w} grade ${g}: no empty state with the switch on`);
+                    if (em) {
+                        // only the pending lessons of the grade on screen, each with its own reason
+                        const wantPend = ROWS[g].filter((x) => x.pending).map((x) => x.pending);
+                        check('PENDING-WORDS', JSON.stringify(em.pend.map((x) => x[0]).sort()) === JSON.stringify(wantPend.slice().sort()), `@${w} grade ${g}: the empty state names ${em.pend.map((x) => x[0])} want this grade's pending ${wantPend}`);
+                        for (const [id, t] of em.pend) check('PENDING-WORDS', /fix/i.test(t) === (pendingKind(id) === 'fix'), `@${w} grade ${g}: "${t}" does not match ${id}'s reason (${pendingKind(id)})`);
+                        if (!em.pend.length) check('PENDING-WORDS', !/Pending re-check/.test(em.text), `@${w} grade ${g}: a pending line with no pending lesson in the grade`);
                     }
+                    if (g === '3' && w === WIDTHS[0]) await shot('c-only-empty', w);
                 }
             }
             await click('.tvw-gradebtn[data-w-grade="3"]');
             await click('.tvw-areabtn[data-w-area="OA"]');
             check('FILTER-PASSED', (await state()).only, `@${w} the switch went off on an area change`);
             await click('.tvw-areabtn[data-w-area=""]');
-            await page.evaluate(() => document.querySelector('#tvwSum').scrollIntoView({ block: 'start' }));
-            await shot('c-only', w);
-            // per viewer: kept across a reload of the screen
             const kept = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('mq_teacher_lessons_browse') || '{}').only === true; } catch (e) { return false; } });
             check('FILTER-PASSED', kept, `@${w} the switch is not kept for the viewer`);
-            // the opened passed lesson: header card with the mark (e-open)
-            const pk = ROWS['3'].find((r) => r.pass);
+            const pk = ALL_ROWS.find((r) => r.pass);
             if (pk) {
+                await click(`.tvw-gradebtn[data-w-grade="${pk.grade}"]`);
+                await page.evaluate(() => document.querySelector('#tvwSum').scrollIntoView({ block: 'start' }));
+                await shot('c-only', w);
                 await page.$eval(`#tvwLessons [data-w-lesson="${pk.key}"]`, (b) => b.click());
                 await sleep(500);
                 const hd = await page.evaluate(() => ({ mark: !!document.querySelector('#tvwDetail .tvw-head .ts-pass'), chip: !!document.querySelector('#tvwDetail .tvw-head [data-w-chip="pass"]'), line: (document.querySelector('#tvwDetail [data-w-passline]') || {}).textContent || '' }));
                 check('FILTER-PASSED', hd.mark && hd.chip && /passed the 8\/10 quality check/.test(hd.line), `@${w} the opened passed lesson's header card: ${JSON.stringify(hd)}`);
+                const rep = await headRepeats();
+                check('HEAD-NO-REPEAT', !rep.length, `@${w} ${pk.key}: the header card says a fact twice: ${rep.join('; ')}`);
                 await page.evaluate(() => window.scrollTo(0, 0));
                 await shot('e-open', w);
-                await screenOk(`@${w} open`);
+                if (want('SCREEN')) await screenOk(`@${w} open`);
                 await page.$eval('#tvwDetail [data-w-back]', (b) => b.click());
                 await sleep(300);
             }
             await click('[data-w-only]');
             check('FILTER-PASSED', !(await state()).only, `@${w} the switch did not turn off`);
+            // PENDING-WORDS on every opened pending lesson: its own reason
+            if (w === WIDTHS[0]) for (const r of ALL_ROWS.filter((x) => x.pending)) {
+                await go(L.lessonHash(r.lesson));
+                await sleep(300);
+                const t = await page.evaluate(() => (document.querySelector('#tvwDetail [data-w-passline="pending"]') || {}).textContent || '');
+                check('PENDING-WORDS', !!t && /fix/i.test(t) === (pendingKind(r.pending) === 'fix'), `${r.key} (${r.pending}, ${pendingKind(r.pending)}): pending line "${t}"`);
+                const rep = await headRepeats();
+                check('HEAD-NO-REPEAT', !rep.length, `${r.key}: the header card says a fact twice: ${rep.join('; ')}`);
+                await page.$eval('#tvwDetail [data-w-back]', (b) => b.click());
+                await sleep(200);
+            }
+        }
 
-            /* the Skills screen: generated grades, area chips, Only 8/10 ✓ */
+        /* ---------------- the Skills screen: generated grades, area chips, Only 8/10 ✓ (FILTER-PASSED, SKILLS-VIEWS, SKILLS-GRADE-PILLS) */
+        if (want('FILTER-PASSED') || want('SKILLS-VIEWS') || want('SKILLS-GRADE-PILLS') || want('AREA-LABELS') || want('SCREEN')) {
             await page.evaluate(() => window.tvGo('skills'));
             await waitFor(page, () => !!document.querySelector('[data-screen="skills"].is-active #tsOnly button'), 20000, 'skills screen');
+            await page.evaluate(() => { const s = document.querySelector('#tsSearch'); if (s && s.value) { s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true })); } });
+            await sleep(300);
             await page.evaluate(() => { const b = document.querySelector('#tsBrowse [data-arg="area"]'); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); });
             await sleep(300);
             const allBtn = await page.$('#tsGrades [data-arg="ALL"]');
@@ -364,8 +502,7 @@ try {
             if (!onAlready) { await page.$eval('#tsOnly button', (b) => b.click()); await sleep(500); }
             for (let i = 0; i < 6; i++) { const more = await page.$('#tsList [data-act="showall"], #tsList [data-act="more"]'); if (!more) break; await more.evaluate((b) => b.click()); await sleep(300); }
             const sk = await page.$$eval('#tsList .ts-card[data-skill]', (c) => c.map((x) => x.dataset.skill));
-            const levels = await page.evaluate(() => (window.SKILLS ? 1 : 0));
-            check('FILTER-PASSED', levels && sk.length && sk.every((k) => REDESIGN_PASSED.has(k)), `@${w} Skills with Only 8/10: ${sk.filter((k) => !REDESIGN_PASSED.has(k)).slice(0, 3)} not passed (of ${sk.length})`);
+            check('FILTER-PASSED', sk.length && sk.every((k) => REDESIGN_PASSED.has(k)), `@${w} Skills with Only 8/10: ${sk.filter((k) => !REDESIGN_PASSED.has(k)).slice(0, 3)} not passed (of ${sk.length})`);
             check('FILTER-PASSED', new Set(sk).size === REDESIGN_PASSED.size, `@${w} Skills with Only 8/10 (all grades): ${new Set(sk).size} skills, the registry has ${REDESIGN_PASSED.size}`);
             if (want('AREA-LABELS')) {
                 const bad = await page.evaluate((labels) => [...document.querySelectorAll('#tsAreas .ts-areabtn')].map((b) => [b.dataset.domain, b.querySelector('.ts-area-l').textContent])
@@ -373,16 +510,38 @@ try {
                     .filter(([a, t]) => labels[a] !== t), TA.AREA_LABELS);
                 check('AREA-LABELS', !bad.length, `@${w} Skills: chips / headings not from AREA_LABELS: ${JSON.stringify(bad.slice(0, 4))}`);
             }
+            // SKILLS-GRADE-PILLS (critic r1 D10): the pills are exactly All + the grades the skills carry (sorted) + Mixed
+            if (PLANT === 'drop-grade-pill') await page.evaluate(() => document.querySelector('#tsGrades [data-arg="3"]')?.remove());
             const gchips = await page.$$eval('#tsGrades [data-arg]', (b) => b.map((x) => x.dataset.arg));
-            const lv = [...new Set(Object.values(SKILLS).flat().filter((s) => s && s.v && !s.retired).map(() => 0))];
-            check('FILTER-PASSED', gchips[0] === 'ALL' && gchips[gchips.length - 1] === 'M' && lv, `@${w} Skills grade pills ${gchips}`);
+            const levels = await page.evaluate(() => import(new URL('js/modules/teacher-ui.js', location.href).href).then((m) => m.skillCatalogue().map((s) => s.level)));
+            const wantPills = ['ALL', ...sortGrades(levels.filter((g) => g !== 'M')), 'M'];
+            check('SKILLS-GRADE-PILLS', JSON.stringify(gchips) === JSON.stringify(wantPills), `@${w} Skills grade pills ${gchips} want ${wantPills}`);
             await page.evaluate(() => window.scrollTo(0, 0));
             await shot('d-skills', w);
-            await screenOk(`@${w} skills`);
-            await page.$eval('#tsOnly button', (b) => b.click());
+            if (want('SCREEN')) await screenOk(`@${w} skills`);
+            // SKILLS-VIEWS (critic r1 D2): in every Browse-by view and while searching, the switch is not offered, or every
+            // card shown is a passed skill
+            if (want('SKILLS-VIEWS') && w === WIDTHS[0]) {
+                const probe = () => page.evaluate(() => ({ offered: !!document.querySelector('#tsOnly button')?.getClientRects().length, on: document.querySelector('#tsOnly button')?.getAttribute('aria-pressed') === 'true', cards: [...document.querySelectorAll('#tsList .ts-card[data-skill]')].map((c) => c.dataset.skill) }));
+                for (const v of ['wrm', 'std', 'map', 'sets']) {
+                    await page.evaluate((v) => document.querySelector(`#tsBrowse [data-arg="${v}"]`)?.click(), v);
+                    await sleep(900);
+                    const r = await probe();
+                    check('SKILLS-VIEWS', !(r.offered && r.on) || r.cards.every((k) => REDESIGN_PASSED.has(k)), `@${w} Skills "${v}" view: Only 8/10 is offered and on, yet ${r.cards.filter((k) => !REDESIGN_PASSED.has(k)).length} cards shown are not passed`);
+                }
+                await page.evaluate(() => document.querySelector('#tsBrowse [data-arg="area"]')?.click());
+                await sleep(300);
+                await page.evaluate(() => { const s = document.querySelector('#tsSearch'); s.value = 'add within 20'; s.dispatchEvent(new Event('input', { bubbles: true })); });
+                await sleep(900);
+                const rs = await probe();
+                check('SKILLS-VIEWS', !(rs.offered && rs.on) || rs.cards.every((k) => REDESIGN_PASSED.has(k)), `@${w} Skills search: Only 8/10 is offered and on, yet ${rs.cards.filter((k) => !REDESIGN_PASSED.has(k)).length} cards found are not passed`);
+                await page.evaluate(() => { const s = document.querySelector('#tsSearch'); s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true })); });
+                await sleep(500);
+            }
+            await page.evaluate(() => { const b = document.querySelector('#tsOnly button'); if (b && b.getAttribute('aria-pressed') === 'true') b.click(); });
             await sleep(300);
             await page.evaluate(() => window.tvGo('wrm'));
-            await go('#wrm/3');
+            await go('#wrm/3?view=list');
         }
     }
     const errs = problems.filter((p) => !/favicon/.test(p.text));

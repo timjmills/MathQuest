@@ -570,3 +570,14 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-areabtn[aria-pressed="true"] { background: var(--a-tint); color: var(--text); border: 2px solid var(--a-deep); box-shadow: none; }
 #teacherApp .ts-only { min-height: 48px; }
 #teacherApp #tsAreaRow[hidden] { display: none; }
+/* critic lessons-browser r1 D2 / D4: the switch row is not offered where it filters nothing; every filter control of the
+   Skills screen is a 48 px touch target (tablets 820-1024 px). ADDITIVE. */
+#teacherApp #tsOnlyRow[hidden] { display: none; }
+#teacherApp .ts-filters .ts-pill, #teacherApp .ts-filters .ts-seg button, #teacherApp .ts-filters .ts-marks > summary, #teacherApp .ts-filters .ts-show-plan { min-height: 48px; }
+/* critic lessons-browser r1 D4: every control of the Skills and Lessons screens is a 48 px touch target (tablets 820-1024 px,
+   FASTEST_PLAN rule 7). The control token is 48 here, and any control that does not read it gets a 48 px floor; drawings
+   inside item previews are left as drawn. ADDITIVE. */
+#teacherApp .tv-screen:is([data-screen="skills"], [data-screen="wrm"]) { --control: 48px; }
+#teacherApp .tv-screen:is([data-screen="skills"], [data-screen="wrm"]) :is(button, [role="button"], a[href], summary, select):not(:is(.tvp-frame, .ts-thumb, .tvw-lthumb, .tvp-pop) *) { min-height: 48px; }
+#teacherApp .tv-screen:is([data-screen="skills"], [data-screen="wrm"]) :is(.tv-check, .tvp-info, .ts-tick):not(:is(.tvp-frame, .ts-thumb, .tvw-lthumb) *) { min-width: 48px; min-height: 48px; }
+#teacherApp .tv-screen[data-screen="skills"] .ts-card-name { display: flex; align-items: center; }
