@@ -12257,6 +12257,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "rr-box-frame",
+   "check": "ws-role-raster RR-BOX (critic lf-engine-rowcap-s2 F1 / F2): every dark frame edge the printed PDF draws is inked over at least 70 % of its length - a frame cut by its cell or painted over (the Say band over the Model frame) FAILS",
+   "kind": "fixture",
+   "rule": "ws-role-raster RR-BOX",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/rr-box/rr-box.fail.pdf",
+    "state": "count_by_tables Scripted Model L printed on 661965d43: the Model frame's bottom edge covered by the Say band (64 % inked), the Say line cut"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/rr-box/rr-box.pass.pdf",
+    "state": "count_by_tables Guided L printed on d8d3e9fc5: every frame edge inked"
+   },
+   "command": "node tests/lib/ws-role-raster.cjs --pdf {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -931,8 +931,8 @@ function roomOf(R, t) {
 // EB-CLIP (critic lf-engine-rowcap-s2 F1 / F2, the second side of EB-STRETCH): every print cell's ink - legacy and template-less cells
 // included (critic ruling b) - ends at least CLIP_MM above its row's rule; ink past it is clipped by the cell or lies on the next band.
 // TAB-CLEAR (F3): a cell's item-number tab stands at least 2 mm (an across fact 1 mm, CL-40) from its ink. Pure: clipTabFindings.
-const CLIP_MM = 0.5;
 function clipTabFindings(cells, where, F) {
+    const CLIP_MM = 0.5;   // (the ink's least clearance over the row's rule, mm; local: the self-test runs before module-level consts)
     for (const c of cells || []) {
         if (!c || c.noInk) continue;
         const at = `${where} p${c.page} cell ${c.label || c.cell}`;
