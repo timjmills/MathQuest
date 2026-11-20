@@ -695,7 +695,10 @@ register('function-table', {
         if (p.task === 'rule' && !merged && !p._noRuleLine) h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
         if (p.check && !p._noCheck && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);
         if (p.note) h += 1.7 + d.textMm * 1.3;
-        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3 };
+        // (`guidedTight`, patterns precritic 2026-11-20 A3a: the Guided page stretched the Model's row and the tries' rows to
+        // 109 mm at M / 156 mm at L for ~72 / ~85 mm of table, EB-BAND 31-46 % under every table; its rows keep their measured
+        // height and the spare page height stays under the grid, PAGE_TYPES 12.1 - read by roles/guided.js only)
+        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3, guidedTight: true };
     },
     inputs(p) {
         return ftSlots(p).map((s, n) => ({
