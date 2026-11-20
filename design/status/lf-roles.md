@@ -397,3 +397,10 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - Hash (ROLES=guided) changed: add_wp_20_plain S/L, add_wp_10 S/M, sub_wp_20 L, add_wp_10_plain S/M/L, add_wp_20 S/L, sub_wp_10 S/L,
   sub_wp_10_plain S/L, sub_wp_20_plain L, vocab_pick3_words S/M/L, hundreds_chart_fill M/L. Every one is a Model row that held the same sum.
 - Backtest `guided-model-hint-row` (FAIL aad74cb32 -> OK 58c90c6fe) PASS. y2 (single-word last line) not done.
+
+## Round r15 (2026-11-20): z1 vocab pick-3 Guided hint leak (critic r14)
+
+- The cue (js/modules/sheet/providers/vocabulary.js, the vocab-pick3 workedSteps step 1) picked out ONE bank word on purpose (old V14),
+  so it gave the answer. It now narrows the bank to two: the answer's first letter when another word shares it, else that
+  letter and one other bank word's letter, in alphabetical order. Check: ws-vocab-unit V14 GUIDED-HINT-LEAK (bank).
+- Hash (ROLES=guided): only vocab_pick3_words guided S/M/L changed. Backtest `vocab-hint-bank-leak` PASS. y2 deferred (lead).

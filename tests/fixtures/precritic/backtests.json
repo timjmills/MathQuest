@@ -12196,6 +12196,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-hint-bank-leak",
+   "check": "ws-vocab-unit V14 GUIDED-HINT-LEAK (bank): the pick-3 Guided hint applied to the word bank leaves at least two words, the answer among them",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V14 GUIDED-HINT-LEAK (lf-roles critic r14 z1)",
+   "fail": {
+    "commit": "76d2cd9f1",
+    "state": "Its word starts with \"f\". leaves only factor of factor / product / rule"
+   },
+   "pass": {
+    "commit": "5f202c638",
+    "state": "the cue names two bank words letters"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --only V14",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
