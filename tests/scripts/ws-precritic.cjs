@@ -1429,6 +1429,10 @@ function buildPlan(ctx) {
             // all modelled "11 × n") LESSON-EMPTY-FIRST + LESSON-OPENER-SAME on every built lesson the White Rose screen prints
             // for the grade (a --unit G<g>-<block> run: that grade, that block); blocking like the other lesson gates. Fix: lf-engine.
             for (const [g, b] of lessonPagesScopes(ctx)) add(gate(`lesson-pages-g${g}${b ? `-${b}` : ''}`, 'ws-lesson-pages (LESSON-EMPTY-FIRST: no lesson page prints only its title; LESSON-OPENER-SAME: consecutive lessons of a block never open on the same model item)', `grade ${g} WRM lessons${b ? ` of ${b}` : ''} × M`, 'browser', 'ws-lesson-pages', ['--grade', g, ...(b ? ['--blocks', b] : [])], { missingMsg: 'ws-lesson-pages is not in this tree' }));
+            // (lead via lf-engine, 2026-11-20: two_step_letter_equation's anchor chart drew its full-width story / bars / "= n" in
+            // half-width 2 x 2 panels, past the page edge into the Say band and the footer) CELL-FITS: no cell ink outside its
+            // panel or its page, on the render, on every library lesson at M and L; blocking.
+            add(gate('lesson-cellfits', 'ws-lesson-cellfits (CELL-FITS: no cell ink outside its panel or its page, judged on the render)', 'every lessons/library.js lesson × M/L', 'browser', 'ws-lesson-cellfits', ['--sizes', 'M,L'], { missingMsg: 'ws-lesson-cellfits is not in this tree' }));
             const SAMPLES = 'addition:add_facts,subtraction:sub_100_regroup,number_sense:nearest_10';
             for (const sz of ['L', 'M']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
         }

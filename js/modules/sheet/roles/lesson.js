@@ -153,9 +153,10 @@ function chartDataOf(data, example) {
     // state count alone - four states, a 2 x 2 grid - so a full-width drawing (two_step_letter_equation's story, bars and
     // "= n" equation) was squeezed into a half-width panel and ran past the page edge. A cell that needs full width gets a
     // full-width panel: such a record takes the full-width rows. A record that sets chartWide (true or false) is unchanged.
-    // (the step head above the drawing, as the fallback lesson's: beside it - chartRow - the drawing wraps at 58 % of the width
-    // and two_step_letter_equation's panel grew from 120 to 147 mm)
-    return fullM && data.chartWide === undefined ? Object.assign({}, data, { chartWide: true, chartRow: false }) : data;
+    // (`chartFull`, a CHART-only flag: one panel a row, the panel's variant still the one its state count gives - chartLayout -
+    // so the panels the host measured before the example was measured are the panels drawn; `chartWide` would also change
+    // the Guided band - we-do.js - and the panel variant, and the two-step siblings' sheets ran off the page)
+    return fullM && data.chartWide === undefined ? Object.assign({}, data, { chartFull: true }) : data;
 }
 
 /**

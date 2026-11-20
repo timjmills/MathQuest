@@ -187,7 +187,9 @@ export function stateDrawing(it, steps, groups, k, c) {
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
 export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
-    : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+    : n >= 4 ? { cols: data && data.chartFull ? 1 : 2, rows: data && data.chartFull ? n : Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+// `chartFull` (roles/lesson.js chartDataOf, CELL-FITS 2026-11-20): an authored lesson whose example needs the full width - four
+// panels one a row instead of 2 x 2; nothing else of the lesson changes.
 // `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
 // page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
 
