@@ -1019,3 +1019,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Save to My Worksheets on Print worksheets / simple print / online worksheet (teacher-only); library screen (Me menu): unit folders + own folders, tags, search, sorts, Print / Play / Send code / New mix / Edit (overwrite + Save as a copy) / Rename / Move / Duplicate / Delete + Undo; .mqsheets export/import; ?sheet= codes; 450 warn / 500 cap. Storage: new `sheets` store in mathquest_quizzes (DB v2, add-only). Look per A19 (current teacher shell; owner approved).
 - New ws-my-worksheets (13 checks) on precritic --teacher + deploy session 1. Deferred: N1 (top-bar button heights), N2 (late-deal save edge) - ledger rows exempt with their checks specified.
 - Master reds routed to lf-engine: ws-partopts-unit FILL-BT / ROWFIT-BT (row-cap drift; fix in progress).
+
+## 2026-11-20 — Deploy lesson player slice 1 (lf-hosts; critic r3 + narrow 820 r4 PASS, every width >= 8)
+- "I do" on the board for add-within-10 (?lesson=...&part=&mode=board): the anchor chart's own example drawn B&W by its stateDrawing (screen = paper), one-by-one reveal, Say band full width from step 1 (A22a), cell top-aligned with Steps, digits up to +25 % to fill the stage (A22b), read aloud on demand only, clicker keys, Leave on every stage, clickable part bar + direct part URLs (D11), unbuilt parts "coming soon".
+- New ws-lesson-player (unit/render/reveal/any-part/leave/stage-fill/hops-below) on precritic --teacher. A26b: player-only 820-portrait allowance (reserved answer + hops room, <= 47 %) scoped in the tool.
+- Next: slice 2 (We do).
