@@ -195,7 +195,9 @@ export const ROUTINES = Object.freeze({
         ],
         vocab: [
             { word: 'rule', meaning: 'what to do each time', picture: { kind: 'text', text: 'add 4' } },
-            { word: 'pattern', meaning: 'numbers made by a rule', picture: { kind: 'text', text: '3, 7, 11, 15' } },
+            // (V-AMBIG, lead 2026-11-20: any run of numbers reads as a pattern, so "pattern" beside "extend" made the extend picture
+            // mean two words in one band; the band's middle word is the gap the concepts name - a blank inside the run, not after it)
+            { word: 'gap', meaning: 'the missing number', picture: { kind: 'text', text: '7, __, 15' } },
             { word: 'extend', meaning: 'write the next numbers', picture: { kind: 'text', text: '15, 19, 23' } },
         ],
         steps: [
@@ -311,7 +313,7 @@ export const ROUTINES = Object.freeze({
         ],
         vocab: [
             { word: 'equation', meaning: 'two sides that are equal', picture: { kind: 'text', text: '5 × 9 + 13 = n' } },
-            { word: 'n', meaning: 'the unknown number', picture: { kind: 'text', text: 'n = 58' } },
+            { word: 'n', meaning: 'the unknown number', picture: { kind: 'text', text: 'n' } },   // (V-AMBIG: 'n = 58' read as the equation too)
             { word: 'brackets', meaning: 'do this part first', picture: { kind: 'text', text: '(6 + 3) × 2' } },
         ],
         steps: [
