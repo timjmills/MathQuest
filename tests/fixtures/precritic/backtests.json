@@ -13473,6 +13473,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "grow-far-band-repeat",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-print-lint L-DENSITY REPEAT on the growing_shape_patterns lesson at patTask=far: no problem printed twice on a page",
+   "rule": "L-DENSITY REPEAT (patterns precritic 2026-11-20, A8b; lead ruling: far-task default band 50)",
+   "fail": {
+    "commit": "a9fc719cb",
+    "state": "band default 20: the Term 10 task has 6 distinct patterns; lesson p4 printed items 2 = 3"
+   },
+   "pass": {
+    "commit": "3adeb4f85",
+    "state": "band default 'auto' (20, or 50 on the Term 10 task: 33 distinct)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M --skills patterns:growing_shape_patterns --opts '{\"patTask\":\"far\"}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
