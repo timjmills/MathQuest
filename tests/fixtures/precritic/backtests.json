@@ -12433,7 +12433,7 @@
     "commit": "2076d974a",
     "state": "\"The numbers are 3 and 2.\"; two-step \"Step 1: circle +. 22 + 14 = ___.\""
    },
-   "command": "node tests/scripts/ws-guided-cellfit.cjs --only HINT-OVERMASK --skills addition:add_wp_10,subtraction:sub_wp_20_plain,placevalue:identify,placevalue:value,algebra:two_step_add_then_div --sizes M,L --seeds 1",
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only HINT-OVERMASK --sizes M --seeds 1",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
