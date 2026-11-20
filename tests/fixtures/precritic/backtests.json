@@ -12061,6 +12061,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-guided-no-mid",
+   "check": "ws-two-step --guided GUIDED-NO-MID + GUIDED-MODEL-ALONE: no Guided cell prints the hidden middle question, and Guided page 1 holds the Model and a try at M (exempt by ruling: the family at L; multi_step_word (Visual) at M)",
+   "kind": "commit-pair",
+   "rule": "GUIDED-NO-MID (lead 2026-11-20, two-step card decision 6 amended)",
+   "fail": {
+    "commit": "cc17ba09a",
+    "state": "the Guided Model printed the two-line middle question, so multi_step_word_plain's Model stood alone on page 1 of every M sheet (0/10)"
+   },
+   "pass": {
+    "commit": "c09328807",
+    "state": "word-work drops the middle question on the Guided page (ctx.guided); Model + try share page 1 on 120/140 M sheets, _plain 20/20"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:multi_step_word_plain,algebra:two_step_add_then_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
