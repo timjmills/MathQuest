@@ -1,6 +1,6 @@
 # Design card: Lessons browser (lessons-passed registry, status chips, grade / area / 8/10 filters, Thumbnails | List)
 
-Status: **READY FOR SIGNATURE** (owner approved the mock 2026-11-20 with two additions, section 0b). Sections 0 and 0b govern; they override anything below that disagrees. Designer: Opus medium, 2026-11-19, branch claude/sweet-newton-c8wrv1-lf-tools-lessons.
+Status: **SIGNED** (owner, 2026-11-20, via the lead) (owner approved the mock 2026-11-20 with two additions, section 0b). Sections 0 and 0b govern; they override anything below that disagrees. Designer: Opus medium, 2026-11-19, branch claude/sweet-newton-c8wrv1-lf-tools-lessons.
 Requests: owner via the lead, 2026-11-14 to 11-19 (items 1-7 below). Mock: `design/status/lf-checks/lessons-browser/mock.html`
 (the app's teacher CSS, real lesson rows from `wrm-links.js` + `data/curriculum/links/<Y>.json`), screenshots beside it at
 1366 x 768 and 1024 x 768, DSF 2: `a-list` (colour), `b-thumbs` (colour), `c-only`, `d-skills`, `e-open`, `f-unit` (By unit / date,
@@ -264,3 +264,8 @@ back link, header mark), `js/modules/wrm-links.js` (grade via grade-of.js; `less
   under grade 2). Keep the rule, or use the school grade for site rows?
 - Q4. Extra lessons (support, projects, assessments): own last section as today, or into areas?
 - Q5. "To build" covers 93 of 142 grade-3 rows because partial rows still on the build list count. Count only "no skill"?
+
+## Pacing seed (lead, 2026-11-20)
+Seed data/curriculum/pacing/2026-27.json from the school site / wrm-sequence.json weeks where they carry dates; units without a date stay undated. The owner checks and updates the dates each year.
+
+Signed: owner, 2026-11-20
