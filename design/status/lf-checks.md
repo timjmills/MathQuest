@@ -948,3 +948,10 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   `eblast-pin` + `eblast-capacity` and deploy session 1; P2 the pin failed open on an unreadable base → fails closed;
   P3 the list's comment names which listed roles each rule actually judges (8 of the 16 are not judged today). Rows
   `eblast-pin-dropped-entry`, `eblast-pin-fails-closed`.
+
+## 2026-11-20 — ws-worksheet-reflow in deploy session 1 (lead)
+
+- It ran only on `precritic --skill`, so a master reflow regression (expand, npr) shipped. Now a session-1 browser gate on
+  the whole pinned sample (~63 s). On master today it FAILs with 17 findings (24 renders), e.g. placevalue:expand@820 cards
+  234.8 -> 227.4 px and 18 answer places moved sideways; patterns:number_patterns_rule@820 17 answer places moved. These
+  need a fix or a ruled re-pin before the gate can be green.
