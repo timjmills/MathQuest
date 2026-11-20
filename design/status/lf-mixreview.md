@@ -3,7 +3,7 @@ Title: Mixed review page type: spec card (grades x areas mix, sendable, playable
 Session: session_01HVwpAE3g6EZH8idgErP6LP
 Branch: claude/lf-mixreview
 Owner of files: design/cards/mixed-review/ (card.json, mixed-review.md); this status file
-State: build (steps 1, 1b, 2 done; lead rulings L9 / kinds / placement done; step 3 part 1 done, part 2 parked)
+State: build (steps 1, 1b, 2 done; resume rulings 1-2 done; step 3 part 2 measured layout done, print-lint density findings open; NOT ready for a critic)
 Updated: 2026-11-20
 Builder profile: mq-opus-medium
 Critic rounds: 1, card critic r1 FAIL (min 6), fixed in the card (§9c)
@@ -151,3 +151,54 @@ Card §10 deferrals done in these steps, with no re-sign (each is §10-deferred 
    so add the row and ask the lead to re-sign by hand.
 Resume order: these two rulings first, then step 3 part 2 (measured layout - the ws-grade-render --gate overflow is the
 main item), then steps 4-5, MR-SHARE-EXACT, the critic.
+
+## Resume 2026-11-20 (builder, mq-opus-medium, step 3 part 2) - PARK NOTES (latest; supersede the ones above)
+Commits: 9480b63be merge master 9ae9ccd5d; 97ff794cc rulings 1 + 2; 16b11d4b2 step 3 part 2; then this status + a master merge.
+- DONE ruling 1: V1 week() refuses a pool whose pair-only skills are more than half ("Add more skills to make a week");
+  check-v1 f + p (shared helper weekPairsMajority); WEEK FAIL `week-pairs-majority`, PASS `week-pass-pairs-minority`
+  (pools/pool-wplong-week.json); backtest `mix-review-week-pairs-majority` PASS. frozen.json re-pinned (proto + product);
+  the 20 golden codes replay unchanged (0 rows appended).
+- DONE ruling 2: card §10 L10. **The card's Signed line is now `unsigned (re-sign needed: L10 added)` - the lead must
+  re-sign by hand.** The card also gained one §7a Weekly-set bullet for ruling 1 ([P:f,p]). card.json NOT re-synced.
+- DONE step 3 part 2 (print-sheet.js buildReviewSheet + mixed-practice.js planGiven / layoutGivenPages): hostItem +
+  measureItems at the drawn k; row height = max(hMinAt, tallest measured + 1) + 4 mm key allowance; whole shelves / rows
+  spilled to continuation pages (numbers and dealt list kept); a shelf whose cell is too wide for V1's k draws at the widest
+  k' that fits (`narrow`, rows of k'); key summary under the last key grid when rows x 9 (M) / 10.5 (L) mm + 20 mm fit;
+  tab Level from the grade chips; CCSS footer codes (was [object Object]); dealReviewItems decodes ~options
+  (skill-option-codec decodeOptionPayload); count-spill-redeal and count-shelf-k-differs un-pended (layout module state,
+  backtests `mix-review-count-engine`, `mix-review-count-shelf-k` PASS).
+
+Gates (2026-11-20, after 16b11d4b2): ws-grade-render --roles mixed-review --skills addition:add_20_regroup,
+subtraction:sub_20_regroup --gate --size M,L: **OK (was FAIL 16 overflows)**; ws-mix-review --built-only --sample: OK
+(55 PASS, 63 CAUGHT, 12 PENDING: breakdown 1, hosts 5, pool 3, share 3 - steps 4-5); check-v1 OK (16 props, 55 fixtures),
+--fill OK; ws-boot-smoke OK; ws-code-snapshot OK (741 codes); ws-backtest on the 4 new / changed rows: PASS;
+ws-precritic-plan --checks-from-critics OK. **ws-print-lint --source kit --roles mixed-review (L): FAIL 26 findings**
+(below). ws-precritic --role mixed-review --strict NOT run (budget; it runs print-lint, so it would fail on the same findings).
+
+Pending (step 3, before a critic):
+1. Print-lint density: a spill leaves a continuation page with 1 item (DN-2, LONE, PG-23). Cause: V1's frozen CAP
+   (typical 8 at L) assumes cells far shorter than the live legacy / stack cells (rows of 80-100 mm), so whole-shelf spill
+   makes 1-item pages. Needs a lead ruling: either rebalance spilled rows across the V1 page and its continuation (keep
+   numbers, no re-deal) or accept spill pages as a known limitation (card §3 says spill, never re-deal).
+2. Print-lint SL-6: the key summary's score column prints "___ / n" underscores (answer-key.js reviewSummaryHtml):
+   make it a ruled line.
+3. Print-lint H13 x6: stack cells drawn at k 2 at L leave a 29 mm side band (31 %).
+4. ws-print-lint at M was not run (the tool's --size takes one size): run `--size M` too.
+5. Determinism finding: dealReviewItems run twice on the same input gave a different accepted try for one item
+   (fractions:mixed_fractions, item 16 of the grade-2 sample): a generator is not reproducible from its seed. The spill check
+   therefore checks the ladder (each seed is one of the item's own tries), not identity. Screen hosts (step 5) rely on
+   identical lists: report to the lead / the fractions lane.
+6. The k2 fraction-wall cell draws about 2 mm (M) / 3 mm (L) taller in the key than its measured answered state; covered by
+   a 4 mm row allowance (REVIEW cellHOf). The template's measurement should carry it.
+7. The DOM grid-column comparison in the layout state skips fact grids (their tracks are not k); drawn k is read from the
+   plan's shelf record.
+8. Still open from step 3 finding 1: at odd N, a day whose unseen skills are only pair skills that do not fit its room repeats
+   a skill (prop f), also on minority pools; ruling 1 covers the majority case only.
+Lane is NOT ready for a critic (items 1-3 fail print-lint).
+
+Resume:
+  node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_20_regroup,subtraction:sub_20_regroup --roles mixed-review --size L   (then M)
+  node tests/scripts/ws-grade-render.cjs --roles mixed-review --skills addition:add_20_regroup,subtraction:sub_20_regroup --gate --size M,L --out <dir>
+  node tests/scripts/ws-mix-review.mjs --check count --fixture tests/fixtures/mix-review/count/engine
+  node tests/scripts/ws-mix-review.mjs --built-only --sample tests/fixtures/precritic/mix-review-sample.json
+  node tests/scripts/ws-precritic.cjs --role mixed-review --strict
