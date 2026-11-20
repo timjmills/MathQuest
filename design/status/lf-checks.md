@@ -948,3 +948,10 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   `eblast-pin` + `eblast-capacity` and deploy session 1; P2 the pin failed open on an unreadable base → fails closed;
   P3 the list's comment names which listed roles each rule actually judges (8 of the 16 are not judged today). Rows
   `eblast-pin-dropped-entry`, `eblast-pin-fails-closed`.
+
+## 2026-11-20 — ws-content-audit module-load crash (lead, urgent)
+
+- skill-options.js began importing pupil-option-words.js; the audit loaded it from a temp copy that listed modules by hand,
+  so the gate crashed (ERR_MODULE_NOT_FOUND). Now it copies the whole js/modules tree with a {"type":"module"} package.json
+  (no new import can break it, no typeless-package warning), and --self-test loads skill-options.js and its imports. Row
+  `content-audit-module-load` (a real --skill add_facts run: crash on master, OK on the fix).
