@@ -14177,6 +14177,26 @@
     "state": "dedupeDeal() per prerequisite, seeded order"
    },
    "browser": true
+  },
+  {
+   "id": "opener-countrow-growcap",
+   "kind": "commit-pair",
+   "check": "lf-roles item 5 (lead 2026-11-20): an Opener's count-row box rows keep their measured height (no 8 mm growth of air)",
+   "rule": "ws-empty-band EB-BAND",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:follow_given_rule --roles opener --sizes M --hosts none --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "8b1974587",
+    "state": "follow_given_rule Opener M count row 33.1 mm cell, 11.5 mm band (34.6 %)"
+   },
+   "pass": {
+    "commit": "816734000",
+    "state": "GROWCAP 0 for every count row (roles/opener.js)"
+   },
+   "browser": true
   }
  ]
 }
