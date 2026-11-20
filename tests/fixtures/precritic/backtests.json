@@ -14797,6 +14797,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-wp-amodel32-under",
+   "check": "ws-cell-checks OVERFLOW on Word problems L: a 2-row, 3-part area model (3-digit x 2-digit, 148 mm with its row labels) never sits beside the answer column, where its labels ran out of the cell's left edge",
+   "kind": "commit-pair",
+   "rule": "OVERFLOW (sharded precritic 2026-11-20, lf-ops sizes: area_model_3by2 word-problems L)",
+   "browser": true,
+   "fail": {
+    "commit": "c60ff2d99",
+    "state": "sizes branch: the model beside the answer column, its '20' row label 1.5 mm left of the cell"
+   },
+   "pass": {
+    "commit": "2b1f5a455",
+    "state": "word-problems.js wideModel: a 2-row model of 3 or more parts takes the UNDER layout at L"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:area_model_3by2 --roles word-problems --size L --rules OVERFLOW 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
