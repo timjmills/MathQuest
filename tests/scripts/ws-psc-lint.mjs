@@ -3,10 +3,14 @@
 // offers a pre-skill-check page, at M and L (seed 7, the critic's), built through buildSheet and read from its PagePlan:
 //   PSC-TITLE    (D2) the page title carries no skill-id fragment: an underscore, or sub / add / mult / div followed by a digit
 //                ("Pre-skill check: subtracting sub 1k").
-//   PSC-INSTR    (D3) no two adjacent bands (in page order, across a page break too) print the same instruction ("Subtract." twice);
+//   PSC-INSTR    (D3) no two adjacent bands of one page print the same instruction ("Subtract." twice) - across a page break the
+//                new page prints its own (PG-22: a page carries its instruction; one strip cannot span two sheets);
 //                (critic d2d5 r1 D-1) and no strip carries a parenthesised tag or a skill's label ("Write the answer: subtraction
 //                number line.", "(within 10, no pictures)"): two adjacent bands of one task kind SHARE one strip instead.
 //   PSC-STRIP1   (critic d2d5 r1 L1) every strip's instruction prints on ONE line at its width (the page's heights count one line).
+//   PSC-LESSON   (critic d2d5 r1 L1) a detailed lesson's Prerequisite Check pages (pupil and key, --lessons, seeds 4242 and 1;
+//                the critic's g3-oa8-two-step-wp by default on a full run): every strip on one line, and every band's bottom
+//                above the page's footer top (the frame never overprints the footer), measured in the DOM.
 //   PSC-TWIN-MIX (critic d2d5 r1 M2) a band merged from twin pools holds items of both pools, when both have items.
 //   PSC-TWIN     (lead A10) no two bands of one plan are dealt from the same skill (twin pools merge into one band).
 //   PSC-DEAL     (D4) in one band, at most 2 items share an answer, and no turnaround pair (a + b and b + a, a x b and b x a).
@@ -14,12 +18,13 @@
 //   Forms A and B both (critic d2d5 r1 M1: Form B's shuffle broke the sign floor).
 //
 //   node tests/scripts/ws-psc-lint.mjs [--skills a:b,c:d] [--sizes M,L] [--seeds 7,1] [--form A|B|A,B] [--only PSC-TITLE,...]
+//                                      [--lessons id,id | --lessons none] [--lesson-seeds 4242,1]
 //   node tests/scripts/ws-psc-lint.mjs --self-test          # the pure judges, no browser
 import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs';
 import { execFileSync } from 'child_process';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -116,9 +121,8 @@ function pscSkills() {
 }
 
 async function main() {
-    const LIB = Object.values((await import(pathToFileURL(path.join(ROOT, 'js', 'modules', 'sheet', 'contract.js')).href)).INSTRUCTION_LIBRARY);
     const H = require(path.join(__dirname, '..', 'lib', 'ws-harness.cjs'));
-    const skills = arg('skills', null) ? arg('skills').split(',') : pscSkills();
+    const skills = arg('skills', null) === 'none' ? [] : arg('skills', null) ? arg('skills').split(',') : pscSkills();
     const sizes = arg('sizes', 'M,L').split(',');
     const seeds = String(arg('seeds', arg('seed', '7'))).split(',').map(Number);
     const forms = String(arg('form', 'A,B')).toUpperCase().split(',');
@@ -128,14 +132,17 @@ async function main() {
     const doc = await app.browser.newPage();
     await doc.setViewport({ width: 900, height: 1200 });
     await doc.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
+    // (the instruction library of the served tree)
+    const LIB = await app.page.evaluate(async () => Object.values((await import('./js/modules/sheet/contract.js')).INSTRUCTION_LIBRARY));
     const fails = [];
     for (const k of skills) for (const size of sizes) for (const seed of seeds) for (const form of forms) {
         const [c, s] = k.split(':');
         const b = await app.page.evaluate(async (a) => {
             const r = await window.buildSheet({ role: 'pre-skill-check', sections: [{ skills: [{ categoryId: a.c, skillId: a.s }] }], size: a.size, paper: 'A4', seed: a.seed, form: a.form, key: false });
             const bands = [];
-            const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bands.push({ instr: sec.instr || '', n: Number((/__\/(\d+)/.exec(sec.extra || '') || [])[1]) || 0 }); for (const p of sec.parts || []) walk(p); };
-            for (const pg of r.plan.pages) for (const sec of pg.sections) walk(sec);
+            const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bands.push({ page: pi, instr: sec.instr || '', n: Number((/__\/(\d+)/.exec(sec.extra || '') || [])[1]) || 0 }); for (const p of sec.parts || []) walk(p); };
+            let pi = 0;
+            for (const pg of r.plan.pages) { for (const sec of pg.sections) walk(sec); pi++; }
             const items = (r.items || []).map((it) => ({ pool: it.pool, skill: it.skill, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans }));
             const labelOf = (key) => { const [cc, ss] = String(key || '').split(':'); const row = ((window.SKILLS || {})[cc] || []).find((x) => x.v === ss); return row ? row.l : ''; };
             const labels = [...new Set(items.map((it) => it.skill).filter(Boolean))].map(labelOf).filter(Boolean);
@@ -149,7 +156,7 @@ async function main() {
         for (const t of twinSkills(twinSrc)) F('PSC-TWIN', `${t} is dealt by two pools (two bands of one skill)`);
         const tb = titleBad(b.title); if (tb) F('PSC-TITLE', `the title "${b.title}" carries the id fragment "${tb}"`);
         // (PSC-INSTR: the printed strips in page order - a shared strip is one band section, so it is one strip here)
-        for (const i of instrRepeats(b.bands.map((x) => x.instr))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}" (two strips of one instruction: share one)`);
+        for (const i of instrRepeats(b.bands.map((x) => (x.instr ? `p${x.page} ${x.instr}` : '')))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}" (two strips of one instruction: share one)`);
         for (const [j, bd] of b.bands.entries()) { const bad = stripTagBad(bd.instr, b.labels, LIB); if (bad) F('PSC-INSTR', `strip ${j + 1} "${bd.instr}" carries "${bad}" (a tag or a skill label means nothing to a pupil)`); }
         // (PSC-DEAL: the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
         if (metaOk && b.metaBands.every((x) => Array.isArray(x.items))) b.metaBands.forEach((bd, j) => { for (const why of dealBad(bd.items)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
@@ -164,8 +171,35 @@ async function main() {
         // (PSC-STRIP1: each strip's instruction on one line, measured)
         await doc.setContent(b.html, { waitUntil: 'load' });
         await doc.evaluate(() => document.fonts && document.fonts.ready);
-        const lines = await doc.evaluate(() => [...document.querySelectorAll('.ws-strip > span:not(.mq-quadscore)')].map((e) => ({ t: e.textContent, n: new Set([...e.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size })));
+        const lines = await doc.evaluate(() => [...document.querySelectorAll('.ws-strip > span:not(.mq-quadscore)')].map((e) => ({ t: e.textContent, n: (() => { const rg = document.createRange(); rg.selectNodeContents(e); return new Set([...rg.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size; })() })));
         for (const l of lines) if (l.n > 1) F('PSC-STRIP1', `the strip "${l.t}" wraps to ${l.n} lines (the page counts one)`);
+    }
+    // (PSC-LESSON: a lesson's check deals perQuestion, its own path - its pages are measured as printed)
+    const lessons = arg('lessons', arg('skills', null) ? 'none' : 'g3-oa8-two-step-wp');
+    if (lessons !== 'none') {
+        const conn = await require('puppeteer').connect({ browserWSEndpoint: app.browser.wsEndpoint(), protocolTimeout: 0, defaultViewport: null });
+        const lp = (await conn.pages()).find((p) => p.url() === app.page.url());
+        for (const id of lessons.split(',')) for (const seed of String(arg('lesson-seeds', '4242,1')).split(',').map(Number)) {
+            await lp.evaluate(`window.__psc = undefined; window.buildSheet({ role: 'detailed-lesson', lessonId: ${JSON.stringify(id)}, seed: ${seed}, paper: 'A4', year: 2026 }).then((r) => { window.__psc = { html: r.html }; }, (e) => { window.__psc = { error: String(e && e.message || e) }; }); 0`);
+            await lp.waitForFunction(() => window.__psc !== undefined, { timeout: 0, polling: 500 });
+            const r = await lp.evaluate(() => window.__psc);
+            const F = (rule, msg) => { if (!only || only.includes(rule)) fails.push(`  FAIL ${rule} detailed/${id} seed ${seed}: ${msg}`); };
+            if (r.error) { F('PSC-LESSON', `the lesson did not build (${r.error.slice(0, 100)})`); continue; }
+            await doc.setContent(r.html, { waitUntil: 'load' });
+            await doc.evaluate(() => document.fonts && document.fonts.ready);
+            const pgs = await doc.evaluate(() => [...document.querySelectorAll('.ws-page')].map((pg, i) => ({ i: i + 1, psc: pg.getAttribute('data-ws-role') === 'pre-skill-check', title: `${pg.classList.contains('ws-key') ? 'key' : 'pupil'} check`,
+                foot: pg.querySelector('.ws-foot') ? pg.querySelector('.ws-foot').getBoundingClientRect().top : null,
+                bottom: Math.max(0, ...[...pg.querySelectorAll('.ws-band')].map((b) => b.getBoundingClientRect().bottom)),
+                strips: [...pg.querySelectorAll('.ws-strip > span:not(.mq-quadscore)')].map((e) => ({ t: e.textContent, n: (() => { const rg = document.createRange(); rg.selectNodeContents(e); return new Set([...rg.getClientRects()].filter((q) => q.width > 0).map((q) => Math.round(q.top))).size; })() })) }))
+                .filter((pg) => pg.psc));
+            if (!pgs.length) F('PSC-LESSON', 'no Prerequisite Check page in the lesson');
+            for (const pg of pgs) {
+                for (const l of pg.strips) if (l.n > 1) F('PSC-LESSON', `page ${pg.i} "${pg.title}": the strip "${l.t}" wraps to ${l.n} lines`);
+                if (pg.foot !== null && pg.bottom > pg.foot + 0.5) F('PSC-LESSON', `page ${pg.i} "${pg.title}": the frame ends ${((pg.bottom - pg.foot) * 25.4 / 96).toFixed(1)} mm below the footer top (it overprints the footer)`);
+            }
+            console.log(`  (lesson ${id} seed ${seed}: ${pgs.length} Prerequisite Check page(s) measured)`);
+        }
+        conn.disconnect();
     }
     await doc.close();
     await app.close();
