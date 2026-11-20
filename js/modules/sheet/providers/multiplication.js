@@ -479,6 +479,16 @@ registerSkill('multiplication:mult_properties', {
     },
     misconceptions: ['turn-recount', 'turn-no-swap', 'turn-product-factor', 'split-drop-part', 'split-one-part', 'times-one', 'times-zero'],
     workedSteps: (q) => nbFacts(mpSteps(q)),
+    // lf-ops 2026-11-20 (SAYLESS, ws-hint-no-blank): the split frame "__ times __ is __ plus __." holds two answers (the parts),
+    // so the screen could fill none of it and showed no Say line on mult_break_apart. On screen the pupil says the whole
+    // fact with the product as the ONE gap; when a factor equals a part's product ("4 times 2" beside the part 4) the line
+    // names no number, so it never reads as stating a part.
+    screenHelp: (q) => {
+        const sp = splitOf(q);
+        if (!sp) return null;
+        const clash = [sp.rows, sp.cols].some((v) => v === sp.p1 || v === sp.p2);
+        return { say: clash ? 'The whole array is ___.' : `${sp.rows} times ${sp.cols} is ___.` };
+    },
     wrongAnswer: (q) => mpWrong(q),
     footprint: { kind: 'arrays-turn', factLike: false, maxCols: 2, measure: true },
 });
