@@ -138,7 +138,7 @@ const ALLOW = new Set(list(arg('allow', '')));
                 }, { cat, id, role, size });
                 if (!html) continue;
                 if (!sh.url().startsWith('http')) await sh.goto(app2.page.url(), { waitUntil: 'domcontentloaded' });
-                await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+                await sh.setContent(html, { waitUntil: 'load', timeout: 60000 });
                 await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                 await sh.emulateMediaType('print');
                 const w = await sh.evaluate(() => {
