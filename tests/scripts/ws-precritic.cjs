@@ -964,7 +964,7 @@ function buildPlan(ctx) {
         // (lf-engine row cap, critic r1 F3: a capped template's rows are counted at the height they are drawn - ROWCAP-FILL)
         add(gate('rowcap-fill', 'ws-rowcap-fill (ROWCAP-FILL: capped rows counted at drawn + room)', 'the page engine', 'node', 'ws-rowcap-fill', [], { missingMsg: 'ws-rowcap-fill is not in this tree' }));
         // (lf-roles r16 F3, lead: a Guided continuation page's cells hold their content - CELL-FITS, two-step stories M / L)
-        add(gate('guided-cellfit', 'ws-guided-cellfit (CELL-FITS: Guided pages 2+ hold their cells; GUIDED-HINT-LEAK box numbers - HINT-UNIFORM waits on lf-algebra)', 'the Guided role', 'browser', 'ws-guided-cellfit', ['--only', 'CELL-FITS,HINT-LEAK'], { missingMsg: 'ws-guided-cellfit is not in this tree' }));
+        add(gate('guided-cellfit', 'ws-guided-cellfit (CELL-FITS: Guided pages 2+ hold their cells; GUIDED-HINT-LEAK box numbers; HINT-OVERMASK given numbers stay - HINT-UNIFORM waits on lf-algebra)', 'the Guided role', 'browser', 'ws-guided-cellfit', ['--only', 'CELL-FITS,HINT-LEAK,HINT-OVERMASK'], { missingMsg: 'ws-guided-cellfit is not in this tree' }));
         // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
         // below with no overlap, TITLE-LONG never shrinks / at most two lines / cut with a warning - on every role, M and L)
         add(gate('frame-title', 'ws-frame-title (the page-title option on every role and key: TITLE-IDENT, TITLE-PLACE, TITLE-LONG)', `${scope} × every role × M/L`, 'browser', 'ws-frame-title', ['--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-frame-title.cjs' }));
