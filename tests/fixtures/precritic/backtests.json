@@ -14777,6 +14777,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-ov-notation-pin",
+   "check": "ws-options-pin --check: options-verify notation=across on the new presets mult_4by1_column and mult_3by2_standard is the pinned master class (as mult_2by2_standard), never an unpinned failure (the skipAfter pairs are the master class the shard logged; this row judges the notation pairs only)",
+   "kind": "commit-pair",
+   "rule": "options-verify pin (IMPROVEMENT_PLAN §1.4 S1; sharded precritic 2026-11-20, lf-ops sizes)",
+   "browser": true,
+   "fail": {
+    "commit": "0477f968a",
+    "state": "sizes branch: the two presets are not in the pin, so notation=across x2 fails the gate"
+   },
+   "pass": {
+    "commit": "68874df23",
+    "state": "options-verify.json pins notation=across on both presets, reason 'master bug class, logged'"
+   },
+   "command": "node tests/scripts/ws-options-pin.cjs --check --skills multiplication:mult_4by1_column,multiplication:mult_3by2_standard --slots 1 --report-only 2>&1 | grep -qE '^  multiplication:[a-z0-9_]+ notation=' && echo 'notation: FAIL' || echo 'notation: OK'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
