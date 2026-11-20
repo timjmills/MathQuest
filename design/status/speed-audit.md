@@ -1108,3 +1108,23 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 - Speed-up: --only <CHECK> on ws-hint-no-blank lets one backtest row prove one check on the same skill list in ~15 s.
 - Lost time this round: a "given value" rule widened to the picture's numbers made every clock hour "given" (ws-support-ladder
   time_quarter caught it); a widening of what counts as given needs the time and money skills in its first run.
+
+### lf-placevalue HINT-NO-BLANK critic r2 FAIL -> r3 (2026-11-20; round after the root-cause stop)
+| Finding | What would have caught it before the critic | Rule / tool fix |
+|---|---|---|
+| R2-1 a list answer's element hidden by the given-value exemption | a leak check that knows an element can equal a given value and still be the pupil's to write | STEPS-LEAK / HINT-LEAK read given-equal list elements written as operands |
+| R2-2, R2-6, R2-8 remains of a cut (lone heading, orphan number, "So 10 − 7.") | content lints of the SHOWN text that do not trust the cutter | DANGLING-HEAD, ORPHAN, BARE-STEP with So / Then / Now |
+| R2-3 one term of an expression answer | answer tokens split into terms by the gate | STEPS-LEAK / HINT-LEAK term by term |
+| R2-7 help that is the same on every item | a per-skill comparison across its dealt items | HELP-GENERIC |
+| R2-4 a graded skill passing through its pin | running the graded list with no pins | --strict-pins |
+| R2-9 PNG and text of different items | dealing the item from the seed, not from the page's RNG state | ws-hint-shots deals with generateQuestionFor and dumps every width |
+- Root cause, closed by design rather than by another token rule: help is CHOSEN whole (own steps minus only a final answer sentence
+  that adds nothing new, else screenHelp, else the clean hint, else no box). The cutter's token rules no longer decide what a pupil sees;
+  they only decide which choice is clean.
+- Lost time this round: (1) ORPHAN as first specified flagged rule constants and line labels on most skills - a number given by "is" /
+  "=" from known numbers, digits of a seen number, and the item's own number fields had to be admitted; write an orphan rule against
+  20 sampled helps BEFORE the sweep. (2) ws-support-ladder required a worked box on every item, which the ruling's step 4 (no box)
+  contradicts; a ruling that removes an output needs a grep for every gate that asserts that output (time_quarter, compare_groups).
+  (3) the strict choice rule moved our own skills to a generic hint (HELP-GENERIC): the family's screenHelp had to be written for 20
+  skills, not the 8 the brief named - a rule change that degrades help should be swept over the lane's own categories first.
+- Speed-up: ws-hint-no-blank runs every skill in ~17 s; `--lists` re-cuts every pin in one run.

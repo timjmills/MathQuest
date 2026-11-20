@@ -105,6 +105,9 @@ async function LOOK(which) {
     const fb = which.host === 'quiz' ? (document.querySelector('#quizTakeView .qt-feedback') || {}).textContent || ''
         : which.host === 'card' ? (document.getElementById('feedbackArea') || {}).textContent || '' : '';
     return {
+        // (HINT-NO-BLANK r3, lead ruling: an item whose help has no clean choice - its own steps minus a final answer sentence,
+        // its screenHelp, the clean hint - shows NO box; the worked rung is then judged as "no box", never as a missing one)
+        helpN: (() => { try { return L.workedStepsFor(q).length; } catch (e) { return -1; } })(),
         n: s.n, ids: s.ids, drawnIds: s.drawnIds, spent: s.spent, kitOn, dots, extraOn, ring, worked, leaks, red, fb: fb.trim(), fullWorked: !!q.fullWorked,
         entry: input && input.type !== 'hidden' && input.offsetParent ? input.value : null, ans: a,
         len: L.ladderOf(q) ? L.ladderOf(q).rungs.length : 0,
@@ -204,7 +207,7 @@ function judge(k, r, host, fails, tag) {
     const F = (m) => fails.push(`${tag} wrong ${k}: ${m}`);
     if (r.error) return F(r.error);
     // a short ladder (worked steps only, or one support) is spent early: the host's own behaviour
-    if (r.len && k > r.len) { if (!r.worked) F('spent without ever showing the worked steps'); if (r.n !== r.len) F(`ladder at ${r.n}, want ${r.len}`); return; }
+    if (r.len && k > r.len) { if (!r.worked && r.helpN) F('spent without ever showing the worked steps'); if (r.n !== r.len) F(`ladder at ${r.n}, want ${r.len}`); return; }
     if (r.n !== k) F(`ladder at ${r.n}, want ${k}`);
     const skillKey = String(tag).split(' ')[0];
     if (r.fullWorked && !S8_SKILLS.includes(skillKey)) F('q.fullWorked (help that states the answer) on a skill not in S8_EXCEPTIONS');
@@ -215,11 +218,12 @@ function judge(k, r, host, fails, tag) {
     const supports = r.ids.filter((x) => x !== 'worked');
     const isDrawn = (id) => r.kitOn.split(/\s+/).includes(id) || r.extraOn.split(/\s+/).includes(id) || (id === 'ring' && r.ring);
     const drawnAny = r.kitOn.trim() || r.extraOn.trim() || r.ring;
-    if (k === 1 && !(r.ids.length === 1 && (drawnAny || r.worked))) F(`nothing drawn (${JSON.stringify(r)})`);
+    if (k === 1 && !(r.ids.length === 1 && (drawnAny || r.worked || (r.ids[0] === 'worked' && r.helpN === 0)))) F(`nothing drawn (${JSON.stringify(r)})`);
     if (k === 1 && /touch/.test(r.ids[0] || '') && !r.dots) F('touch dots named but none on the digits');
     if (k === 2 && supports.length >= 2 && !(new Set(supports).size === 2)) F('the second support repeats the first');
     if (k >= 2 && !r.drawnIds.every(isDrawn)) F(`not every support is drawn: ${r.drawnIds.join(', ')} vs kit "${r.kitOn}" extra "${r.extraOn}"`);
-    if (k === 3 && !r.worked) F('no worked steps');
+    if (k === 3 && !r.worked && r.helpN) F('no worked steps');
+    if (r.worked && r.helpN === 0) F('a "Here is how" box with no help in it');
 }
 
 async function shot(page, host, skill, k, w) {
