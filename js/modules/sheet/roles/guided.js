@@ -1336,7 +1336,12 @@ export function plan(input = {}) {
         const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; const ink = Number((it.footprint || {}).inkHMm); const h = mm && mm.atLevel && Number.isFinite(mm.hMm) ? drawnMm(it, cols, use.indexOf(it) < nModels ? 3 : use.indexOf(it) < Math.max(partialEnd, nModels + 1) ? 2 : 1) : mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; return ink > 0 && tightRows([it]) ? Math.min(h, ink + CELL_PAD_MM) : h; });
         // (an ink-sized row - every item named its inkHMm and is tight - already holds no keep-out: lf-roles' koMm is not taken twice)
         const inkRow = (r) => rowItems(r).length > 0 && rowItems(r).every((it) => Number((it.footprint || {}).inkHMm) > 0 && tightRows([it]));
-        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels, span2Here ? fit.span2 : 0) : -1;
+        // (GUIDED-CONT-HINT, lf-roles r16 F3: a hinted try that runs on to a later page - a two-step story Guided L, one try a page -
+        // draws its grey hint line there too; that row takes the hint's height as page 1's does, or the line overflows the cell and
+        // its bottom rule does not print. ws-roles-unit-free browser check CELL-FITS)
+        const hintedHere = (r) => rowItems(r).some((it) => { const i = use.indexOf(it); return i >= nModels && i < partialEnd; });
+        const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels, span2Here ? fit.span2 : 0)
+            : fit.hint ? Array.from({ length: rows }, (_, r) => r).find(hintedHere) ?? -1 : -1;
         // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
         // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
         // line, side by side in one row; the sum left compare's Model row 38 mm at M for 10 mm of ink, EB-BAND)
