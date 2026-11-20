@@ -1,6 +1,6 @@
 # Spec card: My Worksheets (save and organise every sheet a teacher makes)
 
-**Status:** UNSIGNED. It waits for the lead's signature, and nothing is built before it is signed.
+**Status:** SIGNED (lead, under delegated owner approval, 2026-11-20). Build may start.
 **Lane:** lf-partopts.
 **Builder:** MEDIUM effort (a new screen).
 
@@ -144,4 +144,10 @@ Builder at MEDIUM:
 
 Then a narrow critic at MEDIUM, at the four widths. The estimate is $60–80 for the build and $20–25 for each critic round.
 
-Signed: ____________________ (lead), date: __________
+Lead rulings on the open questions (A15, 2026-11-20):
+1. Re-saving from Edit overwrites the original, with "Save as a copy" offered beside it; never a silent overwrite of a different sheet.
+2. Save is teacher-only. Pupils never see it.
+3. 500-sheet cap per device: warn from 450 ("You have N of 500 saved. Export library to keep a copy."); at 500 Save asks to delete or export.
+4. Unit folders are on by default.
+
+Signed: owner, 2026-11-20
