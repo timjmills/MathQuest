@@ -14137,6 +14137,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-expand-ws-cols-1024",
+   "check": "placevalue:expand online worksheet at a 1024 tablet lays out in at least 2 columns, its sentence on one line, every box input >= 48 x 48 (lead expand-2col 2026-11-20)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-COLS",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "1 column at 1024: 101 px boxes, card 972 px wide"
+   },
+   "pass": {
+    "commit": "72f61f850",
+    "state": "2 columns at 1024: boxes 78 x 74, card 478 px wide"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
