@@ -848,6 +848,22 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - 2026-11-19, critic merge r4 (FAIL 7/7/7/8): an --only matching nothing passed. Fixed (0 cases → FAIL; bad regex → clean
   FAIL; self-test r4 cases, 28 in all); row `merge-master-only-empty`.
 
+## 2026-11-19 - ws-key-json full sweep survives a dead browser (lf-tools-keyjson, lead urgent)
+- Symptom: since the 2026-11-15 container restart the FULL ws-key-json sweep (deploy gate) ended with an uncaught
+  "TargetCloseError: Target closed" / "Navigating frame was detached"; `--skills` subsets passed.
+- Cause: the harness, not a skill. The sweep drove ~600 skills x every role through one browser with no crash handling (it
+  restarted every 40 skills, but any renderer / browser death ended the whole gate). /dev/shm is 16 GB, so not shm.
+  A planted browser kill reproduces the exact error on d38308824.
+- Fix (same pattern as ws-tof-stem 9d7772a36): one evaluate per skill, restart every --restart-every (40) and on a
+  crash / protocol timeout (protocolTimeout 120 s, new H.open option, same edit as the tof branch), retry the skill once,
+  a skill lost twice is a finding; a `sweep:` line names restarts and retries, each retry names its skill.
+- Backtest `key-json-retry` (MQ_KEYJSON_CRASH_AT): FAIL d38308824 -> OK a9051bb03 (ws-backtest PASS). CHECKS_FROM_CRITICS row added.
+- Full sweep (fixed tree, through /tmp/mq-browser-run.sh, 2026-11-19): `ws-key-json: OK (734 skills, 9343 sheets)`, 3683 s in the gate (71 min wall incl. ~10 min slot wait), 18 planned restarts, 0 retries: no skill crashed the page this run; the unfixed d38308824 sweep also ran 24 min without crashing before it was stopped, so the crash is intermittent (browser / renderer death), not one skill.
+
+## 2026-11-14 - ws-tof-stem sweep hardening (deploy timeouts)
+- ws-tof-stem.cjs now sweeps skill by skill: browser restart every 40 skills (--restart-every) and on crash/timeout, protocolTimeout 120 s (ws-harness open() option), one retry per skill, a skill lost twice is a FAIL. Verdict lines unchanged; new `sweep:` line (restarts, retried, seconds).
+- Backtest `tof-stem-retry` (MQ_TOF_CRASH_AT=2): crash retried, 4/4 measured. CHECKS_FROM_CRITICS row added.
+- Full sweep: 728 skills measured 728, 18 restarts, 0 retries, 348 s, ws-tof-stem: OK.
 ## 2026-11-14 — EB-LASTPAGE + CAP-PARITY (lf-ops critic cbt r3 F1 root cause)
 - ws-empty-band (under --page-fill, which precritic passes by default): **EB-LASTPAGE** judges the last / only page of a
   fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test): FAIL at >= 30 % empty when its next row

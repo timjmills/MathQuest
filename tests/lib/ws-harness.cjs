@@ -57,19 +57,19 @@ function seedScript(seed) {
 // One headless-Chrome gate at a time on this machine (tests/lib/browser-lock.cjs): taken when the
 // caller passes `lock: 'name'` or MQ_BROWSER_LOCK=1, given back by close() (or when open() fails).
 // Without either, open() is exactly as before: no lock file is read or written.
-async function open({ seed = null, viewport = { width: 1280, height: 900, deviceScaleFactor: 2 }, pagePath = '/index.html', lock = null } = {}) {
+async function open({ seed = null, viewport = { width: 1280, height: 900, deviceScaleFactor: 2 }, pagePath = '/index.html', lock = null, protocolTimeout } = {}) {
   const wantLock = process.env.MQ_BROWSER_LOCK === '1' || (lock && process.env.MQ_BROWSER_LOCK !== '0');
   const release = wantLock ? await require('./browser-lock.cjs').acquire(typeof lock === 'string' ? lock : path.basename(process.argv[1] || 'gate')) : () => {};
   try {
-    return await openUnlocked({ seed, viewport, pagePath }, release);
+    return await openUnlocked({ seed, viewport, pagePath, protocolTimeout }, release);
   } catch (e) { release(); throw e; }
 }
 
-async function openUnlocked({ seed, viewport, pagePath }, release) {
+async function openUnlocked({ seed, viewport, pagePath, protocolTimeout }, release) {
   let server = null;
   let base = process.env.MQ_BASE ? process.env.MQ_BASE.replace(/\/index\.html$/, '').replace(/\/$/, '') : null;
   if (!base) ({ server, base } = await startServer());
-  const browser = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+  const browser = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'], ...(protocolTimeout ? { protocolTimeout } : {}) });
   const page = await browser.newPage();
   await page.setViewport(viewport);
   const problems = [];

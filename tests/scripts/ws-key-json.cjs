@@ -4,6 +4,10 @@
 //
 //   node tests/scripts/ws-key-json.cjs [--skills cat:skill,..] [--roles r,..] [--sizes M] [--seeds 7] [--fixture f.html]
 //   default: every live skill x every role of sheet/roles/index.js (+ independent, more-practice). MQ_ROOT=<tree> another checkout.
+// Sweep (container restart 2026-11-15: the full sweep died with "Target closed" / "Navigating frame was detached"): the
+// browser restarts every --restart-every skills (40) and on a crash / protocol timeout (protocolTimeout 120 s); a skill that
+// crashed or timed out is retried ONCE in a fresh browser, and one that fails twice is a finding ("not measured").
+// MQ_KEYJSON_CRASH_AT=<n> (read only here) kills the browser on skill n's first try - the backtest that proves the retry.
 // Last line `ws-key-json: OK (...)` / `FAIL - n finding(s)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -36,22 +40,43 @@ function scanText(text, label) {
     const ri = await import(pathToFileURL(path.join(H.ROOT, 'js/modules/sheet/roles/index.js')).href);
     const ROLES = list(arg('roles', '')).length ? list(arg('roles', '')) : ['independent', 'more-practice', ...Object.keys(ri.ROLE_MODULES)].filter((r, i, a) => a.indexOf(r) === i);
     const SIZES = list(arg('sizes', 'M')), SEEDS = list(arg('seeds', '7')).map(Number);
-    let app = await H.open({});
+    const t0 = Date.now();
+    const EVERY = Number(arg('restart-every', 40)) || 40;
+    const CRASH_AT = process.env.MQ_KEYJSON_CRASH_AT ? Number(process.env.MQ_KEYJSON_CRASH_AT) : -1;
+    let app = null, restarts = 0, used = 0, retried = 0;
+    const fresh = async () => { if (app) { try { await app.close(); } catch (e) { /* dead browser */ } restarts++; } app = await H.open({ protocolTimeout: 120000 }); used = 0; };
+    await fresh(); restarts = 0;
     const only = list(arg('skills', ''));
     const all = only.length ? only : await app.page.evaluate(() => Object.entries(window.SKILLS || {}).flatMap(([c, arr]) => (Array.isArray(arr) ? arr : []).filter((s) => s && s.v && !s.retired).map((s) => `${c}:${s.v}`)));
-    const bad = []; let built = 0, n = 0;
-    for (const k of [...new Set(all)]) {
-        if (++n % 40 === 0) { await app.close(); app = await H.open({}); }
-        const r = await app.page.evaluate(async ({ k, ROLES, SIZES, SEEDS }) => {
-            const [cat, id] = k.split(':'); const res = [];
-            for (const role of ROLES) for (const size of SIZES) for (const seed of SEEDS) {
-                try { const s = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: cat, skillId: id }], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true, anchors: 'off' }); res.push({ role, size, seed, key: s.keyHtml || '', pupil: s.pupilHtml || '' }); } catch (e) { /* role not offered */ }
+    const skills = [...new Set(all)];
+    const one = (k) => app.page.evaluate(async ({ k, ROLES, SIZES, SEEDS }) => {
+        const [cat, id] = k.split(':'); const res = [];
+        for (const role of ROLES) for (const size of SIZES) for (const seed of SEEDS) {
+            try { const s = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: cat, skillId: id }], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true, anchors: 'off' }); res.push({ role, size, seed, key: s.keyHtml || '', pupil: s.pupilHtml || '' }); } catch (e) { /* role not offered */ }
+        }
+        return res;
+    }, { k, ROLES, SIZES, SEEDS });
+    const bad = [], lost = []; let built = 0;
+    for (let i = 0; i < skills.length; i++) {
+        const k = skills[i];
+        if (used >= EVERY) await fresh();
+        let r = null;
+        for (let attempt = 0; attempt < 2 && !r; attempt++) {
+            try {
+                if (attempt === 0 && i === CRASH_AT) { const pr = app.browser.process(); if (pr) pr.kill('SIGKILL'); }
+                r = await one(k); used++;
+            } catch (e) {
+                console.log(`  retry ${k} (${attempt ? 'second failure' : 'crash/timeout'}: ${String(e.message || e).slice(0, 80)})`);
+                if (attempt === 0) retried++;
+                await fresh();
             }
-            return res;
-        }, { k, ROLES, SIZES, SEEDS });
+        }
+        if (!r) { lost.push(k); continue; }
         for (const x of r) { built++; bad.push(...scanText(x.key, `${k} ${x.role} ${x.size} key`), ...scanText(x.pupil, `${k} ${x.role} ${x.size} pupil`)); }
     }
-    await app.close();
+    try { await app.close(); } catch (e) { /* dead browser */ }
+    for (const k of lost) bad.push(`${k} not measured (crashed or timed out twice)`);
+    console.log(`  sweep: ${skills.length} skills, measured ${skills.length - lost.length}, browser restarts ${restarts}, retried ${retried}, ${((Date.now() - t0) / 1000).toFixed(1)} s`);
     const hit = [...new Set(bad.map((b) => b.split(' ')[0]))];
     for (const b of bad.slice(0, 80)) console.log('  FAIL ' + b);
     if (bad.length > 80) console.log(`  ... ${bad.length - 80} more`);
