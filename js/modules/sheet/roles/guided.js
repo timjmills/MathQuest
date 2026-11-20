@@ -821,6 +821,14 @@ export function hintOf(it, { raw = false } = {}) {
     const boxToks = new Set(answerTokens(it).filter((a) => /\d/.test(a)));
     // (a story's step boxes - operands and result of each step - are its payload's steps; the key writes them, the slots do not)
     if (it.template === 'word-work') for (const n of JSON.stringify(wp.steps || []).match(/\d+(?:\.\d+)?/g) || []) { boxToks.add(n); boxToks.add(String(Number(n))); }
+    // (lf-roles r18, lead ruling 2026-11-20: a number the try's own question prints is GIVEN, not a secret - its story numbers,
+    // a place-value cell's drawn numeral and its digits - so it stays; only the others are gaps. "The numbers are 4 and 9."
+    // stays whole; "22 + 14 = 36." keeps 22 and 14 and gaps the Step 1 result. ws-guided-cellfit HINT-OVERMASK.)
+    const pn = wp.n;
+    const asked = new Set([...(String(q.text || '').replace(/,(?=\d{3}\b)/g, '').match(/\d+(?:\.\d+)?/g) || []),
+        ...(pn != null && pn !== '' && Number.isFinite(Number(pn)) ? [String(pn), ...String(pn).replace(/\D/g, '').split('')] : [])]
+        .flatMap((n) => [n, String(Number(n))]));
+    for (const n of asked) boxToks.delete(n);
     const maskBoxes = (t) => {
         const lab = (/^\s*Step\s+\d+\s*:/.exec(t) || [''])[0];
         return lab + t.slice(lab.length).replace(/,(?=\d{3}\b)/g, '').replace(/\d+(?:\.\d+)?/g, (n) => (boxToks.has(n) || boxToks.has(String(Number(n))) ? '___' : n));
