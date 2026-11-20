@@ -543,7 +543,12 @@ export function plan(input = {}) {
         const cells = [];
         for (const k of take) { cells.push(stateItem(k)); if (cols === 2 && !across) cells.push(textItem(k)); }
         const split = across && take.length % across !== 0;
-        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        // NO-LONE-STATE (lead ruling 2026-11-20): a page before the last that holds FEWER states than fit it, because the deal split the
+        // states evenly so no page holds a lone one (critic r2 D8: 4 states, 3 fit -> 2 + 2), says so on its grid; ws-empty-band
+        // exempts exactly that page shape from EB-PAGE, by name
+        const fitsHere = Math.max(1, Math.floor((pages.length ? roomC : room1) / H));
+        const noLone = !across && i + take.length < steps.length && take.length < fitsHere && steps.length - i - take.length >= 2 ? 'mq-model-nolone' : '';
+        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none', cls: noLone });
         // (3 + 2: the full rows in `across` columns, the rest in a grid of their own count, same row height)
         const grids = split ? [gridPart(cells.slice(0, across * Math.floor(take.length / across)), { cols: across, rows: Math.floor(take.length / across), cellH: H, labels: 'none' }),
             gridPart(cells.slice(across * Math.floor(take.length / across)), { cols: take.length % across, rows: 1, cellH: H, labels: 'none' })] : null;

@@ -418,6 +418,11 @@ let ROW_ROOM = null;
 const STRETCH_ROLES = new Set(['independent', 'more-practice', 'mixed-practice', 'test', 'review', 'lesson', 'opener', 'guided', 'scripted-model', 'error-analysis', 'pre-skill-check']);
 const STRETCH_NOTES = [];
 // EB-STRETCH's named exemptions (each a lead ruling, its reason here and at the composer)
+// EB-PAGE's named exemptions (lead rulings 2026-11-20): one Scripted Model page shape each, marked on its grid by the composer
+const EB_PAGE_EXEMPT = Object.freeze({
+    'NO-LONE-STATE': 'lead 2026-11-20: the states are split evenly (e.g. 4 states, 3 fit -> 2 + 2) so no page holds a lone state; the row cap keeps the rows from filling the page (add_wp_10_plain M / L p1)',
+    FACT_MODEL_FILL: 'lead 2026-11-20 ruling B: the one-example-a-page fact Model keeps its fill rows (mult_facts L p1)',
+});
 const STRETCH_EXEMPT = Object.freeze({ FACT_MODEL_FILL: 'lead 2026-11-20: the one-example-a-page fact Scripted Model fills its page (EB-PAGE wins); roles/scripted-model.js factModel' });
 if (argv.includes('--pin-check')) {
     // the merge-base with the main branch (or --base <rev>); a base with no list yet has nothing to lose
@@ -1412,7 +1417,12 @@ async function main() {
                     // (Guided is exempt from EB-PAGE: lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1 - white under its grid is accepted)
                     if (has('page-fill') && j.role !== 'guided') {
                         const pf = await sh.evaluate(measurePageFill, 'body > section.ws-page, body > .ws-page');
-                        pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                        // EB-PAGE named exemptions (lead rulings 2026-11-20), each ONE page shape, read off the page's own grid and printed:
+                        //   NO-LONE-STATE    a Scripted Model page dealt fewer states than fit so no page holds a lone one (.mq-model-nolone)
+                        //   FACT_MODEL_FILL  the one-example-a-page fact Scripted Model under ruling B's fill rows (.mq-factmodel-fill)
+                        const shapes = await sh.evaluate((sel) => [...document.querySelectorAll(sel)].map((pg) => (pg.querySelector('.ws-grid.mq-model-nolone') ? 'NO-LONE-STATE' : pg.querySelector('.ws-grid.mq-factmodel-fill') ? 'FACT_MODEL_FILL' : '')), 'body > section.ws-page, body > .ws-page');
+                        pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30 && j.role === 'scripted-model' && EB_PAGE_EXEMPT[shapes[i]]) console.log(`  note: EB-PAGE ${shapes[i]} (not a finding) ${key} ${j.tag} p${i + 1}: ${v.pct} % empty - ${EB_PAGE_EXEMPT[shapes[i]]}`); });
+                        pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30 && !(j.role === 'scripted-model' && EB_PAGE_EXEMPT[shapes[i]])) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
                             const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp, pf.length, pf[0].rows, j.size);
