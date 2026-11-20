@@ -327,3 +327,55 @@ and key, page by page, in the DOM:
 - skip_count_grid L page 2 deals the ×2 table twice (rows 2 and 4). This is a variety nit, outside this lane's scope.
 
 X2 (two_step_add_then_div, the Model alone on page 1) is waiting on a lead ruling and was not graded here.
+
+## Critic r13 (narrow)
+
+Critic: independent (mq-opus-medium), 2026-11-20. Branch `claude/sweet-newton-c8wrv1-lf-roles-stretch` at d2ffbc7ed, compared
+with lf-engine rowcap 661965d43. Both were checked out in private worktrees. I rendered every page myself at seed 7, pupil page
+and key. For add_wp_20 and sub_wp_10 I also ran the fnv seed: same result. Renders are in `<scratchpad>/critic-r13/`.
+
+### Verdicts (C1 ease / C2 teaching / C3 spacing / C4 look)
+
+| Page | C1 / C2 / C3 / C4 | Verdict |
+|---|---|---|
+| multiplication:mult_facts Guided L | 9 / 8 / 8 / 8 | **PASS**: EB-STRETCH OK |
+| addition:add_wp_20 Guided L (passed page) | 9 / 8 / 8 / 9 | still ≥ 8; **gate still red** (Y1) |
+| subtraction:sub_wp_10 Guided L (passed page) | 9 / 8 / 8 / 9 | still ≥ 8; **gate still red** (Y1) |
+
+**Overflow and clipping.** I checked pupil page and key, page by page, in the DOM. No element passes the body bottom, and no
+cell or page overflows on any of the three. Only row 1 changed; the M pages are byte-identical to 661965d43.
+
+**mult_facts L.** Row 1 is 6.6 mm shorter (69.4 mm down to 63.8 mm).
+- The Model's worked line "Count by 6, 7 times: 6, 12, 18, 24, 30, 36, 42." wraps to 2 lines. It ends about 4 mm above the
+  cell border, so nothing is clipped.
+- The answer room under each try's bar is about 15 mm, which is enough at L.
+- `ws-empty-band --seed 7` reports EB-STRETCH clear for mult_facts. On the base it was 5.6 mm over in 3 cells.
+- Nits, not counted: the hint "10 × 11 is 10 groups of / 11." leaves "11." alone on its own line (r8b n3 class). The page
+  shows Model + 5 and about 88 mm of white under the grid; that is the fact-page ruling (option b) and was unchanged by this
+  round.
+
+**add_wp_20 L and sub_wp_10 L.** Row 1 is 6.6 mm shorter (138.2 mm down to 131.5 mm).
+- The Model's bar, number sentence, label and 4 working lines all fit, about 13 mm clear of the border. The try keeps its full
+  slots and its hint line.
+- EB-BAND on the try cell is fixed: it was 32.9 % on the base and now passes. The white under the try is about 28 %.
+- Both keys are right: 1 + 5 = 6 buttons, and 2 − 1 = 1 button.
+- Both pages stay ≥ 8.
+
+### Findings
+
+- **Y1 · add_wp_20 L and sub_wp_10 L: EB-STRETCH still fails, row 1 is 6.6 mm over drawn + 3 mm (was 13.3 mm).**
+  `ws-empty-band` reports 4 cells, the Model and the try on each page, at seed 7 and at the fnv seed. The round halved the
+  overshoot but did not close it, so these two passed pages are still not green on the lane's own gate. 6.6 mm is one L line
+  of working, so the estimate probably still adds one line to the word-work Model. That Model draws 4 lines ("… 4 + 9 = 13.
+  The answer is 13 / cookies.").
+  *Check:* existing EB-STRETCH catches it. Proposed WORK-LINES-COUNT (ws-roles-unit): the line count `workLinesMm` predicts
+  equals the line count drawn, for every Guided Model of every passed skill at M and L.
+- **y2 (nit) · Orphan last words in the worked lines.** "cookies." and "11." sit alone on a line (the r8b n3 class). The
+  proposed LINE-ORPHAN check covers it.
+
+### Hashes (pupil and key HTML, SHA-1, 661965d43 vs d2ffbc7ed, fnv seeds)
+
+addition:add_facts, placevalue:value and subtraction:sub_50_no_regroup are **identical at M and L** (6 pages, 12 documents).
+
+**Critic r13 verdict: mult_facts Guided L PASS.** add_wp_20 and sub_wp_10 L still score ≥ 8 on all four criteria, but
+EB-STRETCH (Y1) is still red on them, so they are not clean until it closes. No other passed page changed.
