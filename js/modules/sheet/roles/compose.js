@@ -628,7 +628,7 @@ export function providerWorkedSteps(it, max = 6) {
         const st = p.workedSteps(q);
         // (`short` / `draw`: a Scripted Model state's short step text and the grey marks the step draws, providers' drawStep)
         return (Array.isArray(st) ? st : []).map((s) => Object.assign({ text: String((s && s.text) || '').trim(), marks: (s && s.marks) || [] },
-            s && s.short ? { short: String(s.short) } : {}, s && Array.isArray(s.draw) ? { draw: s.draw } : {})).filter((s) => s.text).slice(0, max);
+            s && s.short ? { short: String(s.short) } : {}, s && s.hint ? { hint: String(s.hint) } : {}, s && Array.isArray(s.draw) ? { draw: s.draw } : {})).filter((s) => s.text).slice(0, max);
     } catch (e) { return []; }
 }
 

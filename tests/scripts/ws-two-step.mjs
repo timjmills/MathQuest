@@ -45,8 +45,14 @@
 //              on the online worksheet and the practice card at 820 / 1024 / 1280 / 1366
 //   GUIDED-MODEL-ALONE (--guided, browser; lf-roles critic r8b / lead 2026-11-14, PAGE_TYPES 2.3: a Guided page holds the Model AND
 //              tries) the first Guided page of a two-step skill holds the Model and at least one try, at M / L
+//   GUIDED-HINT-STEP (--guided, browser; lead 2026-11-20, live on master: "Step 1: circle −. 26 − 6 = 20." under the first try) a
+//              two-step Guided try's grey hint names the sign and the operation only - it prints no number (PAGE_TYPES 2.3)
+//   GUIDED-NO-MID (--guided, browser; lead 2026-11-20, card decision 6 amended) no Guided cell - Model or try - prints the hidden middle
+//              question (.mq-wwmid): it stays on the Opener, Scripted Model and lesson chart; its two lines held the Model alone on page 1
 //   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
 //              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
+//   STORY-WORK (critic GUIDED-NO-MID F1, 2026-11-20: two_step_add_then_mult told "Lena has 4 boxes" over 4 x 6 = 24) the numbers the
+//              story tells are exactly the work's: Step 1's two numbers and Step 2's number that is not the Step 1 answer, seeds 1-200
 //   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
 //              step, every dealt ÷ step being a fact), the bracket's top end meets the bar within 0.3 mm at M and L, print and screen
 // Skills outside the card print OK (n/a).
@@ -306,15 +312,41 @@ for (const key of mine) {
     for (const b of bad.slice(0, 6)) fail('STEP-FORM', b);
 }
 
+// STORY-WORK (critic GUIDED-NO-MID F1, 2026-11-20): the story tells the numbers the work uses - Step 1's two numbers and the Step 2
+// number that is not the Step 1 answer - and no other. A column step keeps the larger number on top, so a Step 2 whose Step 1
+// answer is the smaller factor stores it as `bottom`: a story that read `bottom` told the Step 1 answer as the box count.
+{
+    const other = (st, r1) => { const [x, y] = st.op === '*' && st.a !== undefined ? [st.a, st.b] : [st.top, st.bottom]; return x === r1 ? y : y === r1 ? x : NaN; };
+    for (const key of mine) {
+        const sk = short(key);
+        const bad = [];
+        let read = 0;
+        for (let i = 0; i < 200 && bad.length < 6; i++) {
+            const q = gen(sk, undefined, i, `story:${sk}`);
+            const p = q && q.cell && q.cell.payload;
+            if (!p || !Array.isArray(p.steps) || p.steps.length !== 2 || !Array.isArray(p.lines)) continue;
+            const [s1, s2] = p.steps;
+            const r1 = s1.op === '/' ? s1.q : s1.ans;
+            const xy = s1.op === '*' && s1.a !== undefined ? [s1.a, s1.b] : [s1.top, s1.bottom];
+            const want = [...xy, other(s2, r1)].map(Number).sort((a, b) => a - b);
+            const told = (p.lines.join(' ').match(/\d[\d,]*/g) || []).map((t) => Number(t.replace(/,/g, ''))).sort((a, b) => a - b);
+            read++;
+            if (want.some((v) => Number.isNaN(v)) || want.join() !== told.join()) bad.push(`${sk} item ${i}: the story tells ${told.join(', ')} but the work uses ${want.join(', ')} ("${p.lines.join(' ')}")`);
+        }
+        if (!read) fail('STORY-WORK', `${sk}: no two-step story read`);
+        for (const b of bad) fail('STORY-WORK', b);
+    }
+}
+
 // --rules A,B: only those rules' findings count (a backtest row proves its own rules on commits before later rules existed)
 const ONLY = String(arg('--rules', '')).split(',').map((x) => x.trim()).filter(Boolean);
 if (ONLY.length) for (let i = fails.length - 1; i >= 0; i--) if (!ONLY.includes(fails[i].split(' ')[0])) fails.splice(i, 1);
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
-for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH', 'BAND-BITES', 'STEP-FORM']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH', 'BAND-BITES', 'STEP-FORM', 'STORY-WORK']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
 for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
-console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM)`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES, STEP-FORM, STORY-WORK)`);
 process.exit(fails.length ? 1 : 0);
 
 /** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
@@ -622,7 +654,7 @@ async function guidedMode() {
                 const pages = [...d.querySelectorAll('.ws-page')];
                 const mm = (el) => (el ? Math.round(el.getBoundingClientRect().height * 25.4 / 96) : 0);
                 const c1 = top(pages[0]), c2 = top(pages[1]);
-                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')) };
+                const r = { cells: c1.length, pages: pages.length, model: mm(c1[0]), firstTry: mm(c1[1] || c2[0]), colModel: !!(c1[0] && c1[0].querySelector('.mq-wwcols, .mq-wwdiv')), mids: d.querySelectorAll('.mq-wwmid').length, hints: [...d.querySelectorAll('.mq-hintline')].map((h) => h.textContent.trim()).filter((t) => /\d/.test(t.replace(/\bStep \d\b/g, ''))) };
                 d.remove();
                 return r;
             }, { sk, size, seed });
@@ -633,7 +665,11 @@ async function guidedMode() {
             // keeps its bar - it is the skill's point; _plain's column work is taller). Reported with the measured heights.
             // (lead ruling 2026-11-14 (ii), LEAD_DECISIONS: a Model whose step is a NON-fact column / long-division step (STEP-FORM keeps
             // its frame) is exempt at M too - it cannot share the page; lf-roles' Guided role is to promote a fact-pair Model (post-reset))
-            const exempt = size === 'L' || /^multi_step_word(_plain)?$/.test(sk) || r.colModel;
+            // (lead 2026-11-20, GUIDED-NO-MID: with the middle question off the Guided page, _plain and the column-step Models share page 1
+            // at M - their exemptions end; (Visual) keeps its ruled bar at M, and L stays exempt)
+            const exempt = size === 'L' || sk === 'multi_step_word';
+            if (r.hints.length) out.push(`GUIDED-HINT-STEP ${sk} ${size} seed ${seed}: a try's hint prints numbers, the Step 1 boxes given away: "${r.hints[0]}"`);
+            if (r.mids) out.push(`GUIDED-NO-MID ${sk} ${size} seed ${seed}: the Guided page prints the hidden middle question in ${r.mids} place(s) (Opener / Scripted Model / chart only, card decision 6 amended)`);
             if (r.cells < 2) {
                 const msg = `${sk} ${size} seed ${seed}: Guided page 1 holds the Model alone (${r.colModel ? 'column-step Model, ' : ''}Model ${r.model} mm, first try ${r.firstTry} mm; ${r.pages} pages)`;
                 if (exempt) exempts.push(msg); else out.push(`GUIDED-MODEL-ALONE ${msg}`);

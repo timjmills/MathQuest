@@ -9,6 +9,15 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-20 ~01:45 Two-step Guided fit + STORY-WORK + V-AMBIG (lead 2026-11-20), branch lfa-guided2 on master 65c28ccdf:
+  GUIDED-NO-MID (lead ruling (i)): the Guided page drops the hidden middle question (check cc17ba09a, fix c09328807, row
+  two-step-guided-no-mid PASS). Model + try share page 1 at M on 120/140 sheets (67 % before); _plain 0 -> 100 %; (Visual) keeps
+  its ruled bar / lone Model. STORY-WORK (critic F1): add_then_mult told the Step 1 answer as the box count (check 6c15f17bb, fix
+  36c8fe65f, row two-step-story-work PASS). V-AMBIG: follow-given-rule band rule / gap / extend, letter_equation 'n' picture
+  (ws-vocab-unit OK). Lesson baseline re-pinned e591cf937 (48 intended pages, 3 lessons). Narrow critic r1 FAIL (F1) -> r2 PASS
+  8/8/8/8. Card decision 6 amendment: the lead applies and signs at deploy (classifier refused a lane resign). Routed: F3 L Guided
+  page-2 overflow 4-6 px (master, lf-roles), F4 hint uniformity (lf-roles), F5 letter_equation lesson Model page overflow at M
+  (master 65c28ccdf too; lesson pages). Next: patterns critic r3 (precritic pc14 partial, rerun on master).
 - 2026-11-14 ~20:10 Guided Model (owner +8 %, stop $535): master 84f8813a1 merged clean (489c8c4a2). CHECK FIRST: ws-two-step --guided
   GUIDED-MODEL-ALONE (Guided page 1 = Model + >= 1 try) FAILs 39 / 42 - every two-step skill, M and L, three seeds (only
   letter_equation M passes). Model ~143 mm + try 77-129 mm vs a 193.7 mm body at M (L: 168 + 98+). Worked lines already cover both
