@@ -11984,6 +11984,85 @@
    }
   },
   {
+   "id": "merge-master-r1",
+   "check": "ws-merge-master never loses or hides a conflict: same-id rows added on both sides and both-changed rows stay unmerged with both versions, ledger hunks merge 3-way (no duplicated keyed row, no restored deletion), outside git FAILs, --commit needs MQ_COMMIT_TRAILER, a deleted backtests.json does not crash, no regen over conflicted sources, duplicate ids FAIL (critic-merge-r1 F1-F8)",
+   "kind": "commit-pair",
+   "rule": "ws-merge-master --self-test (git fixtures run the checkout's own copy via --target)",
+   "browser": false,
+   "fail": {
+    "commit": "3354f8173",
+    "state": "10 of 22 cases fail: n=7 lost, both-changed row staged, two A1 rows, merged into the script's tree, commit without attribution, stack trace"
+   },
+   "pass": {
+    "commit": "aa404bb5c",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-merge-master.mjs --self-test --only '^(?!r2 )' --target {root}/tests/scripts/ws-merge-master.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "merge-master-crlf",
+   "check": "critic merge r2: in a CRLF ledger / status file the '=' separator line carried a \\r, so union3 never switched to master's side: master's lines were silently lost (exit 0) and a clash on the same row passed silently",
+   "kind": "commit-pair",
+   "rule": "ws-merge-master union3 judges lines without the \\r and writes the file's own line ends (self-test cases 'r2 CRLF')",
+   "browser": false,
+   "fail": {
+    "commit": "a0fc71d43",
+    "state": "self-test's r2 git CRLF cases against a0fc71d43's tool: 2 FAIL (master's appended line lost; same-row clash exit 0)"
+   },
+   "pass": {
+    "commit": "ab5878446",
+    "state": "26 of 26 OK"
+   },
+   "command": "node tests/scripts/ws-merge-master.mjs --self-test --only '^r2 ' --target {root}/tests/scripts/ws-merge-master.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "merge-master-only-empty",
+   "check": "critic merge r4: `ws-merge-master --self-test --only <regex>` that matched no case printed OK and exited 0, so a typo in a backtest row's filter would prove nothing and still pass",
+   "kind": "commit-pair",
+   "rule": "ws-merge-master --self-test: --only matching 0 cases FAILs (exit 1); a bad regex FAILs cleanly (exit 2)",
+   "browser": false,
+   "fail": {
+    "commit": "877580b42",
+    "state": "--only '^no such case$' -> OK (0 cases), exit 0"
+   },
+   "pass": {
+    "commit": "3a9b779ff",
+    "state": "--only '^no such case$' -> FAIL (matched 0 cases), exit 1"
+   },
+   "command": "node {root}/tests/scripts/ws-merge-master.mjs --self-test --only '^no such case$' > /dev/null; [ $? -ne 0 ] && echo 'only-empty: OK' || echo 'only-empty: FAIL (an empty --only passed)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-guided-model-alone",
+   "check": "ws-two-step --guided GUIDED-MODEL-ALONE: Guided page 1 of a two-step skill holds the Model and a try (exempt by ruling: the family at L; multi_step_word (Visual) / _plain at M), M / L, three seeds",
+   "kind": "commit-pair",
+   "rule": "GUIDED-MODEL-ALONE (lf-roles critic r8b X2; lead rulings 2026-11-14 a + d; two-step card decision 4 amended)",
+   "fail": {
+    "commit": "220419440",
+    "state": "the Guided Model drew the two-step bar (~143 mm at M), so page 1 held the Model alone on the five presets at M"
+   },
+   "pass": {
+    "commit": "364743ae1",
+    "state": "buildSheet marks Guided items (ctx.guided); word-work drops the bar there; the Model and a try share page 1 at M"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --skill algebra:two_step_add_then_div,algebra:two_step_mult_div_first",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "key-json-retry",
    "check": "ws-key-json sweep: the browser restarts every --restart-every skills and on a crash / protocol timeout, and a crashed skill is retried once in a fresh browser (MQ_KEYJSON_CRASH_AT kills the browser on that skill's first try)",
    "kind": "commit-pair",
