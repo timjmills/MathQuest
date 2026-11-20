@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20 15:10Z: UN-PARKED (lead: owner added budget; stop raised +$60 to $775.37; cost $680.73). Order: (1) G1 per A13 + one-page re-grade, then DEPLOY; (2) LESSON-MIXED if money is left. Builders low, critic medium.
 - 2026-11-20 15:00Z: PARKED (cost $680 of the $715.37 stop). Not for deploy; the deployed chart_120 (969306c1e) is unaffected.
   - Narrow critic r5 (critic-blanks-r5.md, b5a97830e): r4 F1 and F2 CLOSED. c120 teaching sheet and practice page, the hcf practice page and all keys pass.
   - G1 FAILS: the hcf band-100 teaching sheet at M lost its Independent section (Score /2, 22 % empty), a regression from f5bfb58dc pinning teaching windows to rows 41-70.
