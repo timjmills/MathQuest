@@ -14257,6 +14257,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-lesson-printlint",
+   "check": "the area_model_4by1 lesson pages print clean at M: no weight-900 vocab picture (TY-2), no expression wrapped after its operator (WRAP-OP), no half-empty sheet page (DN-2) - precritic print-lint lesson, lead A9 round",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-print-lint --roles lesson L-FONT / L-WRAP / L-DENSITY",
+   "fail": {
+    "commit": "b3cdc3887",
+    "state": "fact vocab picture <b> in a bold box (900), '1,599 = 1,000 + 500 + 90 + 9' wrapped after '+', sheet page 5 empty"
+   },
+   "pass": {
+    "commit": "75bbf2a3c",
+    "state": "text vocab pictures, a short part picture"
+   },
+   "command": "cd {root} && node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M --skills multiplication:area_model_4by1 2>&1 | grep -E '^ws-print-lint: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
