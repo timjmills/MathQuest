@@ -794,6 +794,10 @@ function givenNumbers(it) {
  */
 export function hintOf(it) {
     if (!it || it.template === 'stack' || countCueOf(it) || thinkCueOf(it)) return '';
+    // (GUIDED-HINT-STEP, lead 2026-11-20: a provider step may carry its own Guided hint - the two-step stories' "Step 1: circle +.
+    // Add." - when its text, shown in full on the Model and the chart, would give the try's boxes away)
+    const own0 = providerWorkedSteps(it, 6).find((st) => st.hint);
+    if (own0) return own0.hint;
     const q = it.q || {};
     const src = `${q.text || ''} ${JSON.stringify((q.cell && q.cell.payload) || {})}`;
     const own = (t) => /\d/.test(t) || (t.match(/\b[A-Z][a-z]{2,}\b/g) || []).slice(1).some((w) => src.includes(w));
