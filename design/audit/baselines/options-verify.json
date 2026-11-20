@@ -172,6 +172,8 @@
   "multiplication:mult_2by1_column",
   "multiplication:mult_3by1_column",
   "multiplication:mult_2by2_standard",
+  "multiplication:mult_4by1_column",
+  "multiplication:mult_3by2_standard",
   "multiplication:mult_chart_shade",
   "multiplication:mult_chart_pattern",
   "multiplication:mult_chart_headers",
@@ -1059,6 +1061,14 @@
    "notation=[\"across\"]",
    "notation=[\"stacked\",\"across\"]"
   ],
+  "multiplication:mult_3by2_standard": [
+   "notation=[\"across\"]",
+   "notation=[\"stacked\",\"across\"]"
+  ],
+  "multiplication:mult_4by1_column": [
+   "notation=[\"across\"]",
+   "notation=[\"stacked\",\"across\"]"
+  ],
   "multiplication:mult_chart_shade": [
    "missing=20",
    "missing=50",
@@ -1884,5 +1894,9 @@
   "vocabulary:vocab_grade_6_data": [],
   "vocabulary:vocab_grade_6_algebra": [],
   "vocabulary:vocab_grade_6_measurement": []
+ },
+ "reasons": {
+  "multiplication:mult_3by2_standard": "notation=across: master bug class, logged (the same pin as multiplication:mult_2by2_standard; lf-ops sizes fix 2026-11-20)",
+  "multiplication:mult_4by1_column": "notation=across: master bug class, logged (the same pin as multiplication:mult_2by2_standard; lf-ops sizes fix 2026-11-20)"
  }
 }
