@@ -143,6 +143,7 @@ export function goHome() {
     }
 
     // Clear any running intervals
+    { const _sri = document.getElementById('skipReturnIntro'); if (_sri) _sri.remove(); }   // lf-hosts skip
     if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
     if (state.cpuInterval) { clearInterval(state.cpuInterval); state.cpuInterval = null; }
     if (state.bossInterval) { clearInterval(state.bossInterval); state.bossInterval = null; }

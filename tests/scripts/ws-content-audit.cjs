@@ -2482,6 +2482,19 @@ function mcFixture(file) {
 // --self-test: the gate now READS NAMES, so a slipped regex would quietly change every verdict
 // without failing anything. These run in a second, with no browser.
 // ---------------------------------------------------------------------------
+/** skill-options.js loaded into node from a throwaway copy of the WHOLE js/modules tree with a {"type":"module"} package.json:
+ *  every import it (or an import of an import) makes resolves, and node prints no MODULE_TYPELESS_PACKAGE_JSON warning, so the
+ *  gate's output stays diffable. (lead 2026-11-20: the copy listed files by hand, so a new import - pupil-option-words.js -
+ *  crashed the gate with ERR_MODULE_NOT_FOUND.) The copy is fresh each run and removed after the import. */
+async function loadSkillOptions(root) {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-'));
+    try {
+        fs.cpSync(path.join(root, 'js', 'modules'), path.join(tmp, 'modules'), { recursive: true });
+        fs.writeFileSync(path.join(tmp, 'package.json'), '{"type":"module"}\n');
+        return await import(pathToFileURL(path.join(tmp, 'modules', 'skill-options.js')).href);
+    } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+}
+
 function selfTest() {
     const bad = [];
     let TESTS = 0;
@@ -2674,7 +2687,11 @@ function selfTest() {
     eq('card rulings: a skill no card rules on is untouched', crOut[1].fails.length + crOut[1].notes.length, 0);
 
     if (bad.length) { console.error(`ws-content-audit: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }
-    console.log(`ws-content-audit: OK (self-test, ${TESTS} name-reading assertions)`);
+    // skill-options.js and EVERY module it imports load in node (lead 2026-11-20: a new import crashed the gate)
+    return loadSkillOptions(ROOT).then((m) => {
+        if (typeof m.optionsFor !== 'function') { console.error('ws-content-audit: FAIL - self-test: skill-options.js loaded without optionsFor'); process.exit(1); }
+        console.log(`ws-content-audit: OK (self-test, ${TESTS} name-reading assertions; skill-options.js and its imports load)`);
+    }, (e) => { console.error(`ws-content-audit: FAIL - self-test: skill-options.js does not load in node: ${String(e && e.message || e).split('\n')[0]}`); process.exit(1); });
 }
 
 // ---------------------------------------------------------------------------
@@ -2791,13 +2808,7 @@ function foldRulings(out, j) {
     // the process id, and two runs of the same tree then differ on paper. Reading it through a
     // throwaway `.mjs` copy keeps the gate's whole output diffable, which is the point of the
     // deterministic sampling below. The copy is made fresh each run, so it cannot drift.
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-'));
-    const mjs = path.join(tmp, 'skill-options.mjs');
-    fs.writeFileSync(mjs, fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-options.js')));
-    fs.writeFileSync(path.join(tmp, 'count-rows.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'count-rows.js')));   // skill-options.js imports it (wave 1 C2)
-    fs.writeFileSync(path.join(tmp, 'skill-presets.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-presets.js')));   // and the preset table (2026-10-17)
-    const { optionsFor, pvBandFloor, pvBand } = await import(pathToFileURL(mjs).href);
-    fs.rmSync(tmp, { recursive: true, force: true });
+    const { optionsFor, pvBandFloor, pvBand } = await loadSkillOptions(ROOT);
     const withNotation = new Set(skills
         .filter(s => optionsFor(s.categoryId, s.skillId).some(o => o.id === 'notation'))
         .map(s => `${s.categoryId}:${s.skillId}`));

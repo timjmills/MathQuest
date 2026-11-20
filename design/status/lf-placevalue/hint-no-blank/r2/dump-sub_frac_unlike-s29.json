@@ -1,0 +1,17 @@
+[
+ {
+  "seed": 29,
+  "key": "fraction_operations:sub_frac_unlike",
+  "text": "Calculate: 7/12 − 1/2 = ?",
+  "ans": "1/12",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The denominators are 12 and 2. Make them the same: 12.</li><li>7/12 = 7/12 and 1/2 = 6/12.</li><li>Now: subtract the numerators. Simplify.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>7/12 minus 1/2 is ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The denominators are 12 and 2. Make them the same: 12. 2. 7/12 equals 7/12 and 1/2 equals 6/12. 3. Now: subtract the numerators. Simplify. Say: 7/12 minus 1/2 is blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe denominators are 12 and 2. Make them the same: 12.7/12 = 7/12 and 1/2 = 6/12.Now: subtract the numerators. Simplify.Say: 7/12 minus 1/2 is ___. Listen",
+  "hint": "Find LCD = 12. Convert: 7/12 = 7/12 and 1/2 = 6/12. Subtract: 7/12 − 6/12 = 1/12. Simplify.",
+  "say": "7/12 minus 1/2 is ___.",
+  "steps": [
+   "The denominators are 12 and 2. Make them the same: 12.",
+   "7/12 = 7/12 and 1/2 = 6/12.",
+   "Now: subtract the numerators. Simplify."
+  ]
+ }
+]

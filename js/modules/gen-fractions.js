@@ -1661,7 +1661,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     // The missing addend is w2 f2/den
                     const missingNum = (w2 * den + f2);
                     q.ans = _fracStr(missingNum, den);
-                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${den} = ? Convert to improper: ${totalNum}/${den} \u2212 ${w1 * den + f1}/${den} = ${missingNum}/${den} = ${_fracStr(missingNum, den)}.`;
+                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${den} — convert to improper: ${totalNum}/${den} \u2212 ${w1 * den + f1}/${den} = ${missingNum}/${den} = ${_fracStr(missingNum, den)}.`;
                 }
                 q.answerType = "text";
                 q.printFormat = "frac-add-mixed-like-nv";
@@ -1723,7 +1723,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         const diffStr = _fracStr(diffNum, den);
                         q.text = `${w1} ${f1}/${den} \u2212 ? = ${diffStr}. Find the missing number.`;
                         q.ans = _fracStr(total2, den);
-                        q.hint = `${w1} ${f1}/${den} \u2212 ${diffStr} = ? Convert to improper: ${total1}/${den} \u2212 ${diffNum}/${den} = ${total2}/${den} = ${_fracStr(total2, den)}.`;
+                        q.hint = `${w1} ${f1}/${den} \u2212 ${diffStr} — convert to improper: ${total1}/${den} \u2212 ${diffNum}/${den} = ${total2}/${den} = ${_fracStr(total2, den)}.`;
                     }
                 }
                 q.answerType = "text";
@@ -1783,7 +1783,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const totalStr = _fracStr(totalNum, lcd);
                     q.text = `${w1} ${f1}/${d1} + ? = ${totalStr}. Find the missing number.`;
                     q.ans = _fracStr(total2, lcd);
-                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${d1} = ? Convert to LCD ${lcd}: ${totalNum}/${lcd} \u2212 ${total1}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
+                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${d1} — convert to LCD ${lcd}: ${totalNum}/${lcd} \u2212 ${total1}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
                 }
                 q.answerType = "text";
                 q.printFormat = "frac-add-mixed-unlike-nv";
@@ -1884,7 +1884,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         const diffStr = _fracStr(diffNum, lcd);
                         q.text = `${w1} ${f1}/${d1} \u2212 ? = ${diffStr}. Find the missing number.`;
                         q.ans = _fracStr(total2, lcd);
-                        q.hint = `${w1} ${f1}/${d1} \u2212 ${diffStr} = ? Convert to LCD ${lcd}: ${total1}/${lcd} \u2212 ${diffNum}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
+                        q.hint = `${w1} ${f1}/${d1} \u2212 ${diffStr} — convert to LCD ${lcd}: ${total1}/${lcd} \u2212 ${diffNum}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
                     }
                 }
                 q.answerType = "text";
@@ -2196,7 +2196,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.text = `? × ${num}/${den} = ${_fracStr(prodNum, den)}. Find the missing number.`;
                     q.ans = whole;
                     q.answerType = "number";
-                    q.hint = `${_fracStr(prodNum, den)} ÷ ${num}/${den} = ? The numerator ${prodNum} ÷ ${num} = ${whole}.`;
+                    q.hint = `${_fracStr(prodNum, den)} ÷ ${num}/${den} — the numerator ${prodNum} ÷ ${num} = ${whole}.`;
                     q.printFormat = "mult-frac-whole-nv";
                     q.skillLabel = "Frac × Whole";
                     return;
@@ -2543,7 +2543,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         // Type 3: Missing dividend
                         q.text = `? ÷ 1/${den} = ${answer}. Find the missing number.`;
                         q.ans = whole;
-                        q.hint = `If ? ÷ 1/${den} = ${answer}, then ? = ${answer} × 1/${den} = ${answer}/${den} = ${whole}.`;
+                        q.hint = `${answer} × 1/${den} = ${answer}/${den} = ${whole}, so ${whole} ÷ 1/${den} = ${answer}.`;
                     }
                     q.answerType = "number";
                 } else {
@@ -2560,7 +2560,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         // Type 3: Missing divisor
                         q.text = `1/${den} ÷ ? = 1/${ansDen}. Find the missing number.`;
                         q.ans = whole;
-                        q.hint = `1/${den} ÷ ? = 1/${ansDen}. Since ${den} × ${whole} = ${ansDen}, the missing number is ${whole}.`;
+                        q.hint = `${den} × ${whole} = ${ansDen}, so 1/${den} ÷ ${whole} = 1/${ansDen}. The missing number is ${whole}.`;
                         q.answerType = "number";
                         q.printFormat = "div-unit-frac-nv";
                         q.skillLabel = "Div Unit Frac";
@@ -5447,7 +5447,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.text = `What is ${numerator}/${denominator} of ${whole}?`;
                 q.ans = (numerator * whole) / denominator;
                 q.options = buildNumericOptions(q.ans);
-                q.hint = `Step 1: ${whole} ÷ ${denominator} = ${whole/denominator}. Step 2: ${whole/denominator} × ${numerator} = ?`;
+                q.hint = `Step 1: ${whole} ÷ ${denominator} = ${whole/denominator}. Step 2: multiply ${whole/denominator} × ${numerator}.`;
 
                 q.visual = `<div style="text-align:center;">
                     <div class="frac-equation" style="margin-bottom:20px;">
@@ -6574,7 +6574,7 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                     if (wrongAns !== q.ans) wrongs.add(wrongAns);
                 }
                 q.options = shuffle([q.ans, ...wrongs]);
-                q.hint = `To convert to percent: (${numerator} ÷ ${denominator}) × 100 = ?%`;
+                q.hint = `To convert to percent: work out (${numerator} ÷ ${denominator}) × 100.`;
                 q.visual = `<div style="text-align:center;">
                     <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
                         ${fracHTML(numerator, denominator, 'xl')}

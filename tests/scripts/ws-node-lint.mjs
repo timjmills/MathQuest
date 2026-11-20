@@ -52,6 +52,19 @@
 //                   slot (`slots: {id: value}`; kind no-slot-value) and each value fits its slot (kind slot-too-long: its
 //                   digits within the slot's digit segments, its width at the cell's digit size within the slot's printed
 //                   width + 10 %, a node estimate). One-slot items stay WRONG-FITS's.
+//   PRE-QUADRANTS   (critic cbt r2 E2; opt-in) a HAND-NAMED Pre-skill check list - the provider's `preSkills`, else the
+//                   skill's print-sheet.js EARLIER_STEPS pin (read as text, so an older --root tree is judged as it was) -
+//                   names >= 3 live skills (PT-PRE-1: four quadrants; count_by_tables drew one, ~75 % of the page empty).
+//                   A provider that checks fewer on purpose says why in `preSkillsWhy`; the category-order fallback is
+//                   not judged (skipped, counted). Kinds: too-few, dead-ref.
+//   CHART-PANELS    (critic cbt r2 E7, P-1; opt-in) the lesson's anchor chart draws ONE panel per worked step under every
+//                   option value its lesson data names (byOption): a `chartMaxStates` below the step count less the tail
+//                   line (`tailLast`) and the head line (`headFirst`, lead ruling 2026-11-14 cbt r3 E7) folds two steps into
+//                   one panel: head line + panels + tail line must number every worked step. Kind: merged.
+//   ROLE-SCOPE      (critic cbt r2 E8; opt-in) an option whose help opens with the page types it is for ("Independent, More
+//                   practice and Test pages ...") is OFF on every other role: the provider's roleOpts (sheet contract
+//                   roleOptions, which buildSheet applies to every role's skills) returns the option at its default there.
+//                   count_by_tables onePage drew the lesson chart as one 13 pt line of 12 and Guided as 9 compact rows.
 //   WRONG-FILL      (lf-placevalue critic r1 F3; opt-in) what the True or False? and Reason It roles PRINT in each slot of a
 //                   false statement: each role's prepare() runs on the item with its real code, its call to the item's draw
 //                   is captured ({shown, shownSlots}) and the cell is drawn as print-sheet draws it (state wrong, wrong =
@@ -96,7 +109,7 @@ const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? S
 const ALL_RULES = ['NOTATION', 'L1', 'L3', 'L6', 'L10', 'REPEATS'];
 // Lane S1 rules: OPT-IN (run only when --rules names them), so the default sweep and its pinned baseline are unchanged;
 // ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json.
-const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'WRONG-FITS-SLOTS', 'WRONG-FILL', 'STEPS-FOLLOW-PRESET'];
+const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'WRONG-FITS-SLOTS', 'WRONG-FILL', 'PRE-QUADRANTS', 'ROLE-SCOPE', 'CHART-PANELS', 'STEPS-FOLLOW-PRESET'];
 const RULE_CITES = {
     NOTATION: 'C4; WORKSHEET_DESIGN_STANDARD TY-6, TY-7; PEDAGOGY_STANDARD 10.1 (P-14)',
     L1: 'LESSONS_LEARNED L1; WORKSHEET_DESIGN_STANDARD DN-1a',
@@ -109,6 +122,9 @@ const RULE_CITES = {
     'WRONG-FITS': 'SKILL_CELL_CONTRACT wrongAnswer (SCC 3.8); PT-ERR: the error-analysis key writes the wrong answer in the item slot',
     'WRONG-FITS-SLOTS': 'critic lf-placevalue r1 F3 (H2): a multi-slot cell takes one wrong value per slot, each fitting its slot (SCC 3.8 wrongAnswer slots)',
     'WRONG-FILL': 'critic lf-placevalue r1 F3 (H2): True or False? / Reason It write one wrong value per slot, never the whole statement in each box',
+    'CHART-PANELS': 'critic cbt r2 E7 (P-1): times each / given and 15 jumps merged chart steps 1 and 2 into one panel - one panel per worked step',
+    'ROLE-SCOPE': 'critic cbt r2 E8: an option whose help names its page types (onePage: Independent, More practice and Test) leaked into the lesson chart and Guided',
+    'PRE-QUADRANTS': 'critic cbt r2 E2 (H5, PT-PRE-1): a Pre-skill check of one quadrant left ~75 % of the page empty; a hand-named prerequisite list fills >= 3 quadrants',
 };
 const RETRIES = 12;                 // print-sheet.js generateRun: duplicate retries per item
 
@@ -749,7 +765,7 @@ const rules = wantRules.length ? wantRules : fixtures.length && subjects[0].fixt
 // Lane S1: the lesson data and the option panel, loaded only for the rules that read them (an old tree may lack one:
 // LESSON-DATA then finds every skill falling back, which is what that tree's lesson page does).
 let prereqs = null, skillOptions = null;
-if (rules.includes('LESSON-DATA') || rules.includes('OPTION-HELP')) {
+if (rules.includes('LESSON-DATA') || rules.includes('OPTION-HELP') || rules.includes('ROLE-SCOPE') || rules.includes('CHART-PANELS')) {
     mute();
     try { prereqs = await import(M('lessons/prereqs.js')); } catch (e) { prereqs = { loadError: String(e && e.message || e) }; }
     try {
@@ -1107,6 +1123,89 @@ function ruleL10(key, cells) {
     }
 }
 
+/** CHART-PANELS (critic cbt r2 E7): see the header. The lesson record's steps list is the worked steps' count (prereqs.js). */
+function ruleChartPanels(key, cat, skill) {
+    if (!prereqs || typeof prereqs.lessonFor !== 'function') { skip('CHART-PANELS', 'no lessonFor (skills)'); return; }
+    let base = null;
+    try { base = prereqs.lessonFor(cat, skill); } catch (e) { base = null; }
+    if (!base) { skip('CHART-PANELS', 'no lesson data (skills)'); return; }
+    const cases = [['defaults', null]];
+    for (const [id, table] of Object.entries(base.byOption || {})) for (const v of Object.keys(table || {})) cases.push([`${id}=${v}`, { [id]: /^\d+$/.test(v) ? Number(v) : v }]);
+    for (const [label, opts] of cases) {
+        let d = null;
+        try { d = opts ? prereqs.lessonFor(cat, skill, opts) : base; } catch (e) { d = null; }
+        if (!d) continue;
+        tick('CHART-PANELS', 1);
+        // (lead ruling 2026-11-14, cbt r3 E7: the NUMBERED steps are counted - the head line (`headFirst`, the opening look
+        // step above the panels), each panel, the tail line (`tailLast`) - against the worked steps; a step is lost only when
+        // two of them share one panel)
+        const n = Array.isArray(d.steps) ? d.steps.length : 0;
+        const head = d.headFirst && n > 1 ? 1 : 0;
+        const tail = d.tailLast && n > 1 ? 1 : 0;
+        const need = Math.min(4, n - head - tail);
+        const max = Number(d.chartMaxStates) > 0 ? Number(d.chartMaxStates) : 4;
+        const lines = head + Math.min(max, need) + tail;
+        if (n && lines < Math.min(n, 4 + head + tail)) find(key, 'CHART-PANELS', 0, 'merged', `under ${label} the anchor chart draws ${lines} numbered step line(s) (head ${head}, panels ${Math.min(max, need)}, tail ${tail}) for ${n} worked step(s) (chartMaxStates ${max}): two steps share a panel (P-1, critic cbt r2 E7)`, label);
+    }
+}
+
+/** ROLE-SCOPE (critic cbt r2 E8): see the header. The roles a page type word names, and every role buildSheet prints. */
+const ROLE_WORDS = { 'independent': ['independent'], 'more practice': ['more-practice'], 'test': ['test', 'test-a', 'test-b'], 'guided': ['guided'], 'lesson': ['lesson'], 'review': ['review'], 'mixed practice': ['mixed-practice'] };
+const ALL_ROLES = ['lesson', 'guided', 'independent', 'more-practice', 'mixed-practice', 'review', 'test', 'reason-it', 'true-false', 'error-analysis', 'pre-skill-check', 'scripted-model', 'opener', 'stretch'];
+function ruleRoleScope(key, cat, skill) {
+    if (!skillOptions || skillOptions.loadError || typeof skillOptions.offeredOptionsFor !== 'function') { skip('ROLE-SCOPE', 'no offeredOptionsFor (skills)'); return; }
+    let offered = [];
+    mute();
+    try { offered = skillOptions.offeredOptionsFor(cat, skill) || []; } catch (e) { offered = []; } finally { unmute(); }
+    for (const o of offered) {
+        const m = /^((?:(?:Independent|More practice|Test|Guided|Lesson|Review|Mixed practice)(?:, | and )?)+) pages?\b/.exec(String(o && (o.help || o.helpShort) || ''));
+        if (!m) continue;
+        const named = new Set(m[1].split(/, | and /).flatMap((w) => ROLE_WORDS[w.toLowerCase()] || []));
+        const on = o.type === 'bool' ? !o.default : (Array.isArray(o.values) ? (o.values.map((v) => (v && typeof v === 'object' && 'v' in v ? v.v : v)).find((v) => v !== o.default)) : undefined);
+        if (on === undefined) continue;
+        tick('ROLE-SCOPE', 1);
+        for (const role of ALL_ROLES.filter((r) => !named.has(r))) {
+            let out;
+            try { out = typeof kit.roleOptions === 'function' ? kit.roleOptions(role, cat, skill, { [o.id]: on }) : { [o.id]: on }; } catch (e) { out = { [o.id]: on }; }
+            const v = out ? out[o.id] : undefined;
+            if (v !== undefined && v !== o.default && v === on) find(key, 'ROLE-SCOPE', 0, 'leaks', `"${o.label || o.id}" is for ${m[1]} pages, yet the ${role} page keeps ${o.id} = ${JSON.stringify(on)} (provider roleOpts does not turn it off there; critic cbt r2 E8)`, `${o.id}@${role}`);
+        }
+    }
+}
+
+/**
+ * PRE-QUADRANTS (critic cbt r2 E2, PT-PRE-1): the hand-named Pre-skill check list fills >= 3 quadrants with live skills.
+ * The list is the provider's preSkills(ref) when it has one, else print-sheet.js EARLIER_STEPS[key] (parsed from the
+ * tree's source: print-sheet.js is a browser module node does not import). Neither: the category fallback, skipped.
+ */
+let _earlierPins = null;
+function earlierPins() {
+    if (_earlierPins) return _earlierPins;
+    _earlierPins = {};
+    try {
+        const src = readFileSync(join(ROOT, 'js', 'modules', 'print-sheet.js'), 'utf8');
+        const m = src.match(/const EARLIER_STEPS = Object\.freeze\(\{([\s\S]*?)\n\}\);/);
+        if (m) for (const line of m[1].split('\n')) {
+            const k = line.match(/^\s*'([a-z_]+:[a-z0-9_]+)'\s*:\s*\[(.*)\],?\s*$/);
+            if (k) _earlierPins[k[1]] = [...k[2].matchAll(/categoryId:\s*'([a-z_]+)',\s*skillId:\s*'([a-z0-9_]+)'/g)].map((x) => ({ categoryId: x[1], skillId: x[2] }));
+        }
+    } catch (e) { /* no print-sheet.js in this tree */ }
+    return _earlierPins;
+}
+function rulePreQuadrants(key, cat, skill) {
+    let pv = null;
+    try { pv = kit.getProvider(cat, skill); } catch (e) { pv = null; }
+    let list = null, from = '';
+    if (pv && typeof pv.preSkills === 'function') { try { list = pv.preSkills({ categoryId: cat, skillId: skill, opts: {} }); from = 'provider preSkills'; } catch (e) { list = []; from = 'provider preSkills (threw)'; } }
+    else if (earlierPins()[key]) { list = earlierPins()[key]; from = 'print-sheet EARLIER_STEPS'; }
+    if (!Array.isArray(list)) { skip('PRE-QUADRANTS', 'category-order fallback (skills)'); return; }
+    tick('PRE-QUADRANTS', 1);
+    const live = list.slice(0, 4).filter((r) => r && LIVE_KEYS.has(`${r.categoryId}:${r.skillId}`));
+    for (const r of list.slice(0, 4)) if (r && !LIVE_KEYS.has(`${r.categoryId}:${r.skillId}`)) find(key, 'PRE-QUADRANTS', 0, 'dead-ref', `${from} names ${r.categoryId}:${r.skillId}, which is not a live skill`, `${r.categoryId}:${r.skillId}`);
+    const why = pv && typeof pv.preSkillsWhy === 'string' && pv.preSkillsWhy.trim();
+    if (live.length < 3 && !why) find(key, 'PRE-QUADRANTS', 0, 'too-few', `the Pre-skill check draws ${live.length} quadrant(s) from ${from} (PT-PRE-1 wants four; one quadrant leaves ~75 % of the page empty, critic cbt r2 E2). Name >= 3 real prerequisites, or say why in the provider's preSkillsWhy`, String(live.length));
+}
+
 /**
  * LESSON-DATA (lane S1; critic pilot-su-c r1 D4): the lesson page of a skill reads js/modules/lessons/prereqs.js
  * LESSONS[category:skill] (print-sheet.js: `n.lessonData || lessonFor(...)`); with no entry, sheet/roles/lesson.js
@@ -1346,6 +1445,9 @@ for (const subject of subjects) {
     if (rules.includes('LESSON-DATA')) { if (subject.fixture) skip('LESSON-DATA', 'fixture (skills)'); else ruleLessonData(subject.key, cat, skill); }
     if (rules.includes('OPTION-HELP')) { if (subject.fixture) skip('OPTION-HELP', 'fixture (skills)'); else ruleOptionHelp(subject.key, cat, skill); }
     if (rules.includes('WRONG-FITS')) ruleWrongFits(subject.key, cat, skill, cells);
+    if (rules.includes('CHART-PANELS')) { if (subject.fixture) skip('CHART-PANELS', 'fixture (skills)'); else ruleChartPanels(subject.key, cat, skill); }
+    if (rules.includes('ROLE-SCOPE')) { if (subject.fixture) skip('ROLE-SCOPE', 'fixture (skills)'); else ruleRoleScope(subject.key, cat, skill); }
+    if (rules.includes('PRE-QUADRANTS')) { if (subject.fixture) skip('PRE-QUADRANTS', 'fixture (skills)'); else rulePreQuadrants(subject.key, cat, skill); }
     // --rule-skills a:b,c:d: the lf-placevalue opt-in rules judge only these skills (ws-precritic passes the lane's own)
     const ruleSkillOk = !RULE_SKILLS.length || RULE_SKILLS.includes(subject.key);
     if (rules.includes('WRONG-FITS-SLOTS')) { if (ruleSkillOk) ruleWrongFitsSlots(subject.key, cat, skill, cells); else skip('WRONG-FITS-SLOTS', 'not in --rule-skills (skills)'); }

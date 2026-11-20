@@ -39,6 +39,7 @@ import {
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
+import { groupByHeight, measuredH, NO_STRETCH_ROOM } from '../layout.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
 import { slotScore } from '../paginate.js';
@@ -600,6 +601,9 @@ function planMixed(input, pools) {
     });
 }
 
+/** How far past its budget a page may take a LONE last shelf (critic cbt r1 D5): the budget's own reserve. */
+const LONE_SLACK_MM = 6;
+
 export function counts(pools, input) {
     if (input.arrangement === 'mixed') return Object.assign({}, mixedPacking(pools, input).deal.counts);
     const p = packing(pools, input);
@@ -620,7 +624,12 @@ export function plan(input = {}) {
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of p.ids) {
         const sh = p.shelf[id];
-        const its = pools[id].slice(0, sh.n * sh.per);
+        // (lf-ops-props r4b, lead ruling 2026-11-12 (a) + (b): a pool of `noStretch` templates - answered in place, top-started -
+        // takes the height order with the lowest bands (layout.groupByHeight), so a shelf pairs items of one height class; the
+        // same items, the same count)
+        const its0 = pools[id].slice(0, sh.n * sh.per);
+        const noSt = its0.length > 0 && its0.every((it) => it && it.footprint && it.footprint.noStretch);
+        const its = noSt && sh.per > 1 && !sh.pairs ? groupByHeight(its0, Math.min(sh.k, 6)) : its0;
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
@@ -630,7 +639,10 @@ export function plan(input = {}) {
             // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
             const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) : sh.h;
             const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band });
+            // (ruling (b): a noStretch shelf grows to at most NO_STRETCH_ROOM x its shortest item, never below its tallest)
+            const hs = noSt ? chunk.filter((it) => !it.anchor).map((it) => measuredH(it, Math.min(sh.k, 6))) : [];
+            const growCap = hs.length && hs.every((x) => x > 0) ? Math.max(0, NO_STRETCH_ROOM * Math.min(...hs) - h) : Infinity;
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, growCap });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -666,14 +678,18 @@ export function plan(input = {}) {
         }
         return g;
     })();
+    // (critic cbt r1 D5, H5 / PG-23: a last page holding ONE shelf while an earlier page holds several - Mixed practice M
+    // printed 6 + 1 - is laid again with the shelves shared evenly over the same pages: 4 + 3, never a lone item)
+    const runShelves = (breaks, slack = 0) => {
+    pages.length = 0; cur = null; start = 1;
     for (const [i, sh] of shelves.entries()) {
-        const grow = fillShares ? fillShares[i] : growOf(sh);
+        const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), sh.growCap === undefined ? Infinity : sh.growCap);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
-        const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
+        const budget = (pages.length > 1 ? p.mCont.budget : m.budget) + slack;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
         let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
         if (joins) bandH -= m.strip;
-        if (!cur || cur.used + bandH > budget) {
+        if (!cur || cur.used + bandH > budget || breaks.has(i)) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
@@ -708,6 +724,26 @@ export function plan(input = {}) {
         cur.sections.push(band);
         start += pupil.length;
         cur.used += bandH;
+    }
+    };
+    runShelves(new Set());
+    {
+        const shelvesOn = (pg) => pg.sections.reduce((a, x) => a + (x.kind === 'band' ? (x.contents ? x.contents.filter((c) => c && c.kind === 'grid' && !/mq-anchorgrid/.test(c.cls || '')).length : 1) : 0), 0);
+        const P = pages.length, last = P > 1 ? shelvesOn(pages[P - 1]) : 0;
+        // (first: the lone shelf joins the page before when the budget's own reserve - 1.5 mm kept back, the title's second line
+        // reserved - is all it lacks: up to LONE_SLACK_MM; a 6 + 1 sheet became 7 on one page. Else: an even split.)
+        if (P > 1 && last === 1) {
+            const keep0 = pages.slice();
+            runShelves(new Set(), LONE_SLACK_MM);
+            if (pages.length === P - 1) { /* kept: one page fewer */ } else { pages.length = 0; pages.push(...keep0); }
+        }
+        if (pages.length === P && P > 1 && last === 1 && shelves.length >= 2 * P - 1) {
+            const per = Math.ceil(shelves.length / P);
+            const breaks = new Set(Array.from({ length: P - 1 }, (_, k) => (k + 1) * per));
+            const keep = pages.slice();
+            runShelves(breaks);
+            if (pages.length !== P) { pages.length = 0; pages.push(...keep); }
+        }
     }
     // `growLast` (the detailed lesson maker's Mixed page): the last band of each page takes the spare
     // height - one unruled trailing area inside the frame (V22 §8.12.4) - so the body never ends

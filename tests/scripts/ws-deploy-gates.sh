@@ -51,7 +51,7 @@
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-student-opts, ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/, plus
 #            ws-detailed-lesson --lesson <id> --check for every PASSED long lesson (data/curriculum/detailed-lessons.json
 #            critic verdict PASS: the gate-drift guard, lf-checks 2026-11-07: a kit ruling or a merge cannot silently turn a
@@ -103,6 +103,8 @@
 #            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
 #            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
 #            No pin in the tree: the gate is SKIPPED (INCOMPLETE). Backtest row lesson-baseline-deploy-gate.
+#            Also session 4: ws-lesson-pages --grade 3 --warn (owner via the lead 2026-11-19: LESSON-EMPTY-FIRST, LESSON-OPENER-SAME
+#            on every built grade-3 WRM lesson; nfn, so its exit 4 is a WARNING until lf-engine's fix lands, then it blocks).
 #            (merge 2026-11-13: ws-options-shots moved from sessions 4-5 to 5-6; session 4 is the lesson baseline)
 # Session 5  ws-options-shots (lf-partopts, from lf-algebra F8/G11, 2026-11-13): the Options panel's live sample of EVERY
 #            skill whose Sets row offers Options (725 on 2026-11-13), opened the teacher's way at 1280 and 390 px, must lie
@@ -875,6 +877,8 @@ build_list() {
   # the pupil skill explorer (owner 2026-11-05; ~30 s): by grade / by area, picks reach the bottom row, Print and Play
   browser_gate 1 ws-student-explorer ws-student-explorer.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
+  # the pupil options sheet (lf-studentopts 2026-11-19; ~4 min): CARRY / COUNT / PUPIL at 1280, 1366, 1024, 820 + the node UNIT
+  browser_gate 1 ws-student-opts ws-student-opts.cjs
   # SCREEN-INK-SIZE on every redesign-passed skill (lead 2026-11-13), against its pin: screen pictures at print size, drawings wide before tall
   browser_gate 1 "ws-screen-ink-size --passed" ws-screen-ink-size.cjs --passed
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
@@ -893,6 +897,8 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 "ws-empty-band --pin-check" ws-empty-band.cjs --pin-check   # critic eblast r4 P1: the blocking-role list may only grow (merge-base pin, fails closed)
+  node_gate 1 "ws-empty-band --capacity-check" ws-empty-band.cjs --capacity-check   # every role used by a passed skill declares its ceiling, no drift
   node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
   node_gate 1 ws-codec-registry ws-codec-registry.mjs
   node_gate 1 ws-standards ws-standards.cjs
@@ -906,6 +912,7 @@ build_list() {
   node_gate 1 ws-node-lint "$(first_of ws-node-lint.mjs ws-node-lint.cjs)"
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 "ws-precritic --self-test" ws-precritic.cjs --self-test   # its gate verdict reader (a mode line "tool --mode: OK"), mention matcher, copy-light and drawing-key cases (lf-ops 2026-11-13)
+  node_gate 1 "ws-merge-master --self-test" ws-merge-master.mjs --self-test   # the lanes' merge helper: backtests by row id, ledger / status union (lead 2026-11-14)
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
   node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
@@ -953,6 +960,11 @@ build_list() {
   # commit message names the changed lessons / pages; until then this gate FAILS - no lesson page changes unseen.
   if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
   else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-baseline --all-lessons --check" "$LESSON_BASE (the pin is not in the tree)"; fi
+  # (owner via the lead, 2026-11-19) LESSON-EMPTY-FIRST + LESSON-OPENER-SAME on every built grade-3 WRM lesson the White Rose
+  # screen prints (size M, seed 4242). A WARNING (nfn, exit 4) until lf-engine's fix lands: then drop --warn and it blocks.
+  # The browser runner is inside the command (an nfn gate runs on a node worker).
+  if [ -f tests/scripts/ws-lesson-pages.mjs ]; then add "${MQ_LESSON_BASELINE_SESSION:-4}" nfn "ws-lesson-pages --grade 3 (WARNING until lf-engine's fix)" "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" node tests/scripts/ws-lesson-pages.mjs --grade 3 --warn"
+  else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-pages --grade 3" "tests/scripts/ws-lesson-pages.mjs"; fi
   # session 5-6 (lf-partopts, sessions 4-5 before the lesson baseline took 4, from lf-algebra F8/G11, 2026-11-13): the Options panel sample of every skill with an options
   # panel (725 x 1280 / 390 px; ≈ 1.8 s a skill a width, ≈ 2,600 slot-s in all), sharded over the two browser slots, one
   # browser a shard (--workers 1: the runner's slot is one Chromium). No session 1-3 has room (27-28 of 30 min each).

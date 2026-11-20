@@ -32,7 +32,7 @@ import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearc
 // Layer 3: Skill Management
 import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend, syncSelBarHeight } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType, parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions } from './modules/skill-codes.js';
-import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill, addSelectionToQuickStart } from './modules/quick-skills.js';
+import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill, addSelectionToQuickStart, openChipOptions } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
 import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip, setAdaptiveModeEnabled, refreshAdaptiveUI } from './modules/adaptive-engine.js';
 import { selectMode, startMode } from "./modules/mode-selection.js";
@@ -42,15 +42,15 @@ import { selectMode, startMode } from "./modules/mode-selection.js";
 import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/variant-cycler.js';
 
 // Layer 4: Game Logic
-import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion } from './modules/game-control.js';
+import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion, finishPracticeRun } from './modules/game-control.js';
 import { generateQuestion, generateQuestionFor } from './modules/generate-question.js';
 import { skoPlayOpen, skoMoreOpen, skoNlineOpen, mqRows, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
 import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions } from './modules/skill-option-store.js';
 import { encodeOptionPayload, decodeOptionPayload, optionSuffix } from './modules/skill-option-codec.js';
-import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions } from './modules/skill-options.js';
+import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions, pupilOptionsFor } from './modules/skill-options.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer, unifiedOrderTileClick, unifiedOrderInputChange, unifiedOrderBoxClear, setupUnifiedOrderingHandlers, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection, wireBoxValidation } from './modules/question-render.js';
-import { updateSkipButton, isSkipAvailable, skipAfterFor, calcAllowedFor } from './modules/skip-rule.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer, widgetLadderWrong } from './modules/answer-check.js';
+import { updateSkipButton, updateSkipCount, showSkipReturnIntro, isSkipAvailable, skipAfterFor, calcAllowedFor } from './modules/skip-rule.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, dropDeferredAdaptive, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer, widgetLadderWrong } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -237,7 +237,7 @@ Object.assign(window, {
     copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType,
 
     // Quick Skills
-    addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills,
+    addQuickSkill, openChipOptions, updateQuickSkillCards, loadQuickSkills, saveQuickSkills,
     updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode,
     removeQuickSkill, removeStudentQuickSkill, addToQuickSkills,
     resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults,
@@ -262,7 +262,7 @@ Object.assign(window, {
     startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer,
     nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
     shouldShowNextButton, showNextButton, hideNextButton,
-    skipCurrentQuestion, recordQuestionStatus, renderQuestionDots,
+    skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, finishPracticeRun,
     recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion,
     promptFullscreen, acceptFullscreen, declineFullscreen,
     toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection,
@@ -277,7 +277,7 @@ Object.assign(window, {
     parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions,
     getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions,
     encodeOptionPayload, decodeOptionPayload, optionSuffix,
-    optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions,
+    optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions, pupilOptionsFor,
     renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber,
     updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer,
     unifiedOrderTileClick, unifiedOrderInputChange, unifiedOrderBoxClear, setupUnifiedOrderingHandlers,
@@ -289,8 +289,8 @@ Object.assign(window, {
 
     // Answer Checking
     checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, widgetLadderWrong,
-    skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
-    updateSkipButton, isSkipAvailable, skipAfterFor, calcAllowedFor,
+    skipCurrentItem, dropDeferredAdaptive, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
+    updateSkipButton, updateSkipCount, showSkipReturnIntro, isSkipAvailable, skipAfterFor, calcAllowedFor,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
     submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells,
     applyReviewOutcome, isReviewing, _celebrateCorrectAnswer,
@@ -494,7 +494,7 @@ const DEFERRED_NAMES = [
     'closeQuizPreview', 'switchPreviewTab', 'handleQbQuestionDragStart', 'handleQbQuestionDragEnd',
     'handleQbSectionDragOver', 'handleQbSectionDragLeave', 'handleQbSectionDrop', 'openBuilderResults',
     'openBuilderMonitor', 'quizQuestionData', 'handleQuizURL', 'startQuizTest', 'submitQuizMC',
-    'submitQuizTextAnswer', 'navigateQuizQuestion', 'jumpToQuizQuestion', 'flagQuizQuestion', 'showQuizReview',
+    'submitQuizTextAnswer', 'navigateQuizQuestion', 'jumpToQuizQuestion', 'flagQuizQuestion', 'skipQuizQuestion', 'quizReturnNext', 'showQuizReview',
     'jumpFromReview', 'backFromReview', 'submitQuiz', 'downloadQuizStudentResults', 'showQuizResults',
     'showStudentQuizDetail', 'exportQuizCSV', 'importStudentResultsFile', 'printQuizTest', 'closeQuizResults',
     'copyQuizLinkFromResults', 'tvqMenu', 'openQuizMonitor', 'stopMonitoring', 'toggleMonitorPause',
@@ -506,7 +506,7 @@ const DEFERRED_NAMES = [
     'nextMapItem', 'recordMapAnswer', 'finalizeMapSession', 'releaseMapSessionScaffold', 'skipMapItem',
     'mapJumpToItem', 'mapResumeCurrent', 'mapNavBack', 'mapNavForward', 'openMapTest', 'initMapSelector',
     'startMapFromUI', 'selectMapTier', 'toggleMapBand', 'toggleMapDomain', 'selectAllMapBands', 'clearMapBands',
-    'setMapItemCount', 'setMapMode', 'printMapFromSelector', 'generateMapShareLink', 'copyMapShareLink',
+    'setMapItemCount', 'setMapSkipAllowed', 'setMapMode', 'printMapFromSelector', 'generateMapShareLink', 'copyMapShareLink',
     'parseMapShareLink', 'loadMapShareLink', 'renderMapResults', 'printMapSession', 'restartMapSession',
     'updateMapGradeContext', 'tvGo', 'tvOpenSheet', 'openSimplePrint', 'closeSimplePrint',
 ];
@@ -582,7 +582,7 @@ const WORKSHEET_NAMES = [
     'renderWorksheetExpanded', 'checkWorksheetOrderingAnswer', 'checkWorksheetExpandedAnswer', 'advanceToNextProblem',
     'checkWorksheetAnswer', 'checkAllWorksheet', 'checkWorksheetDualAnswer', 'checkWorksheetCoordinateAnswer',
     'checkAreaModelInput', 'checkWorksheetNumberFamily', 'checkWorksheetMC', 'showWorksheetScore', 'wsMagnifyCard',
-    'wsSpeak', 'wsSkipCard', 'attachWorksheetZoom',
+    'wsSpeak', 'wsSkipCard', 'wsReturnNext', 'attachWorksheetZoom',
 ];
 const loadWorksheet = makeLazy('worksheet', (n) => (n ? import(`./modules/worksheet.js?retry=${n}`) : import('./modules/worksheet.js'))
     .then((m) => Object.fromEntries(WORKSHEET_NAMES.map((n) => [n, m[n]]))), WORKSHEET_NAMES);
@@ -594,6 +594,11 @@ const EXPLORER_NAMES = ['openStudentExplorer', 'closeStudentExplorer', 'studentE
 window.__mqLoadExplorer = makeLazy('skill explorer', (n) => (n ? import(`./modules/student-explorer.js?retry=${n}`) : import('./modules/student-explorer.js'))
     .then((m) => Object.fromEntries(EXPLORER_NAMES.map((k) => [k, m[k]]))), EXPLORER_NAMES);
 // (not in __mqLazyNames: that list is what the teacher prefetch must have made real; the explorer is pupil-only, on demand)
+
+// The pupil's options sheet (design/student-opts/CARD.md): a Quick Start card or chip tap opens it. Loaded on the first tap.
+const STUDENT_OPTS_NAMES = ['openStudentOptions', 'closeStudentOptions', 'studentOptsFold', 'studentOptsReset', 'studentOptsPlay', 'studentOptsState'];
+window.__mqLoadStudentOpts = makeLazy('student options', (n) => (n ? import(`./modules/student-options.js?retry=${n}`) : import('./modules/student-options.js'))
+    .then((m) => Object.fromEntries(STUDENT_OPTS_NAMES.map((k) => [k, m[k]]))), STUDENT_OPTS_NAMES);
 
 // Who needs the deferred half BEFORE init runs (so they see exactly what they saw before the split):
 //   a MAP or quiz link (?map= / ?quiz=), a Send link's &set=, the teacher board (?board=1 on a teacher device),

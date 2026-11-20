@@ -225,3 +225,4 @@ export {
 
 /* ------------------------------------------------------------------------ the footer hook (lane lf-vocab r3, Q-A) */
 export { applySheetTags, shortCcss } from './sheet-tags.js';
+export { ROLE_CAPACITY, roleCapacity, atCeiling, capacityGaps } from './role-capacity.js';

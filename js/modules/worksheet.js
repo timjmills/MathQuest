@@ -1,6 +1,6 @@
 import { worksheetLadderWrong, markTried, rungsFor } from './support-ladder.js';
 import { state } from './state.js';
-import { skipAfterFor } from './skip-rule.js';
+import { skipAfterFor, showSkipReturnIntro } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
 import { SKILLS, isMixedMetaSkill } from './data.js';
@@ -1002,6 +1002,52 @@ function _wsFitCard(card) {
     return cellEl.scrollWidth <= cellEl.clientWidth + 1;
 }
 
+/**
+ * A count-row train's natural width in px (critic cbt r2 E9, lead ruling 2026-11-14 - the per-card span): its widest line laid
+ * out unwrapped - the step tab and every number / jump cell (each flex:none, so its width does not depend on the card) with the
+ * gaps between them. 0 for a card with no wrapping count row.
+ */
+export function wsTrainWidth(card) {
+    const root = card && card.querySelector('.k2-countrow-wrap');
+    if (!root) return 0;
+    const shown = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && getComputedStyle(el).display !== 'none'; };
+    const gapOf = (el) => parseFloat(getComputedStyle(el).columnGap) || 0;
+    const natural = (el) => {
+        const kids = Array.from(el.children).filter(shown);
+        if (!kids.length) return el.getBoundingClientRect().width;
+        const cs = getComputedStyle(el);
+        if (el.hasAttribute('data-mq-wrapped') && !el.classList.contains('k2-countrow-line')) return kids.reduce((a, k) => a + k.getBoundingClientRect().width, 0) + gapOf(el) * (kids.length - 1);
+        if (cs.display.includes('flex') && cs.flexDirection.startsWith('row')) return kids.reduce((a, k) => a + natural(k), 0) + gapOf(el) * (kids.length - 1);
+        return Math.max(...kids.map(natural));
+    };
+    const lines = Array.from(root.querySelectorAll('.k2-countrow-line')).filter(shown);
+    const rcs = getComputedStyle(root);
+    return lines.length ? Math.max(...lines.map(natural)) + (parseFloat(rcs.paddingLeft) || 0) + (parseFloat(rcs.paddingRight) || 0) : 0;
+}
+
+/**
+ * Which count-row cards take the whole grid row (critic cbt r2 E9, lead ruling 2026-11-14): only a card whose train is wider than
+ * a column of a 2-column grid - its train could never sit in a column with >= 3 numbers a line (cbt r1 D2). A train that fits
+ * a 2-column column stays in the grid; at a wider column count it does not fit, so the grid drops a column (`_wsFitCard`)
+ * instead of spanning (number_patterns_rule at 1024 / 1280: a 4 + 4 train in the middle third of a 1130 px card).
+ */
+function _wsTrainSpans(grid, cards) {
+    const gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+    const W = grid.clientWidth;
+    const out = new Map();
+    for (const c of cards) {
+        const t = wsTrainWidth(c);
+        if (!t) continue;
+        const cell = c.querySelector('.ws-cell');
+        const cs = cell ? getComputedStyle(cell) : null;
+        const inner = cell ? cell.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) : c.clientWidth;
+        const chrome = Math.max(0, c.getBoundingClientRect().width - inner);
+        const availAt = (k) => (W - gap * (k - 1)) / k - chrome;
+        out.set(c, { train: t, availAt, span: W < 620 || t > availAt(2) + 1 });
+    }
+    return out;
+}
+
 /** Lay the worksheet grid out: the most columns (<= 3) in which every card fits. */
 export function layoutWorksheetGrid(grid) {
     grid = grid || document.getElementById('worksheetGrid');
@@ -1015,11 +1061,19 @@ export function layoutWorksheetGrid(grid) {
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
     _wsOneDigit(cards);
     _wsOneSupportPlace(cards, true);
+    // (critic cbt r2 E9: a count-row card spans the row only when its train is wider than a 2-column column - mq-train-span;
+    // css/screen-cell.css keeps every other count-row card in the grid, where it must fit its column)
+    const trains = _wsTrainSpans(grid, cards);
+    trains.forEach((t, c) => c.classList.toggle('mq-train-span', t.span));
     _wsOneAnswerPlace(cards, true);
     for (let cols = maxCols; cols >= 1; cols--) {
         grid.style.setProperty('--mq-wscols', String(cols));
         let ok = true;
-        for (const c of cards) { if (!_wsFitCard(c)) { ok = false; if (cols > 1) break; } }
+        for (const c of cards) {
+            const t = trains.get(c);
+            const trainOut = t && !t.span && cols > 1 && t.train > t.availAt(cols) + 1;
+            if (trainOut || !_wsFitCard(c)) { ok = false; if (cols > 1) break; }
+        }
         if (ok) break;
     }
     _wsOneSupportPlace(cards);
@@ -1652,7 +1706,8 @@ function _wsRenderCard(grid, q, i) {
     // Per-card Skip: grays out the card, marks q._skipped = true,
     // excluded from total in checkAllWorksheet. Universal across all
     // worksheet skills, all answer types.
-    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn" type="button" style="display:none" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
+    // (lf-hosts skip, owner request 2026-11-19: shown from the start, 48 px; skipAfter 0 = the teacher's off)
+    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn mq-skip48" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)" aria-label="Skip problem ${i + 1}">${_tl ? 'Skip' : 'Skip ⏭'}</button>`;
 
     // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
     // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
@@ -1907,6 +1962,9 @@ export function newWorksheet() {
     if (grid) grid.scrollTop = 0;
 
     state.worksheetQs = [];
+    _wsReturn = null;   // a new sheet starts with no return pass
+    { const _b = document.getElementById('wsReturnBar'); if (_b) _b.remove(); }
+    { const _g = document.getElementById('worksheetGrid'); if (_g) _g.classList.remove('mq-ws-returning'); }
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
     worksheetSoundPlayed.clear();
     worksheetBannerRecorded.clear(); // Reset banner stats tracking
@@ -2551,14 +2609,25 @@ export function wsSkipCard(idx) {
     const q = state.worksheetQs[idx];
     const card = document.getElementById(`ws_card_${idx}`);
     if (!q || !card) return;
+    // The return pass: a second Skip leaves the card "skipped" (scored as not answered) and moves on.
+    if (_wsReturn && _wsReturn.active && _wsReturn.queue[_wsReturn.pos] === idx) {
+        q._skipped = true;
+        q._finalSkip = true;
+        q._wsReturnOpen = false;
+        card.classList.add('ws-skipped');
+        card.querySelectorAll('input').forEach(el => { el.disabled = true; });
+        wsReturnNext();
+        return;
+    }
     if (q._skipped) {
         // Toggle off — un-skip and let the student answer.
         q._skipped = false;
         card.classList.remove('ws-skipped');
         const btn = card.querySelector('.ws-skip-btn');
-        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : '⏭ Skip';
+        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : 'Skip ⏭';
         // Re-enable inputs.
         card.querySelectorAll('input').forEach(el => { el.disabled = false; });
+        _wsUpdateSkipCount();
         return;
     }
     q._skipped = true;
@@ -2567,6 +2636,7 @@ export function wsSkipCard(idx) {
     if (btn) btn.textContent = _wsTeacherLaunch() ? 'Undo skip' : '↩ Undo Skip';
     // Disable inputs (CSS pointer-events also blocks, but disable is belt+braces).
     card.querySelectorAll('input').forEach(el => { el.disabled = true; });
+    _wsUpdateSkipCount();
     advanceToNextProblem(idx);
 }
 
@@ -2759,7 +2829,101 @@ function wsLogProgress(q, card, isCorrect, pre) {
     }
 }
 
+// ===== The end-of-sheet return pass (owner request via lf-hosts, 2026-11-19) =====
+// Check All (or I'm Finished) with skipped cards: "You skipped n. Let's fix them.", then each skipped
+// card - the SAME card, the same item - shows alone, un-skipped, to answer; Next moves on, Skip again
+// leaves it skipped. After the last one, Check All grades the sheet once (a skipped card stays out of
+// the total and is counted "Skipped").
+let _wsReturn = null;   // { queue: [idx], pos, active, done }
+function _wsReturnBar() {
+    let bar = document.getElementById('wsReturnBar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'wsReturnBar';
+        bar.className = 'mq-ws-return-bar';
+        const grid = document.getElementById('worksheetGrid');
+        if (grid && grid.parentNode) grid.parentNode.insertBefore(bar, grid);
+    }
+    return bar;
+}
+export function wsReturnNext() {
+    const r = _wsReturn;
+    if (!r || !r.active) return;
+    const grid = document.getElementById('worksheetGrid');
+    const prevIdx = r.queue[r.pos];
+    const prev = prevIdx != null && document.getElementById(`ws_card_${prevIdx}`);
+    if (prev) prev.classList.remove('mq-ws-return-now');
+    // The card just left: Next on a blank card is a second skip - it ends "skipped" (not answered), never Wrong
+    // (critic r1 F5); a card with work in it is answered, and only now leaves the "Skipped: n" count (F6).
+    const prevQ = prevIdx != null && state.worksheetQs[prevIdx];
+    if (prevQ && prevQ._wsReturnOpen) {
+        prevQ._wsReturnOpen = false;
+        if (prev && !wsPre(prev).touched) {
+            prevQ._skipped = true;
+            prevQ._finalSkip = true;
+            prev.classList.add('ws-skipped');
+            prev.querySelectorAll('input').forEach(el => { el.disabled = true; });
+        }
+    }
+    r.pos++;
+    if (r.pos >= r.queue.length) {
+        r.active = false;
+        r.done = true;
+        if (grid) grid.classList.remove('mq-ws-returning');
+        const bar = document.getElementById('wsReturnBar');
+        if (bar) bar.remove();
+        checkAllWorksheet();
+        return;
+    }
+    const idx = r.queue[r.pos];
+    const q = state.worksheetQs[idx];
+    const card = document.getElementById(`ws_card_${idx}`);
+    if (q && card) {
+        q._skipped = false;
+        q._wsReturnOpen = true;   // still counted "Skipped" until it is answered (critic r1 F6)
+        card.classList.remove('ws-skipped');
+        card.classList.add('mq-ws-return-now');
+        card.querySelectorAll('input').forEach(el => { el.disabled = false; });
+        const btn = card.querySelector('.ws-skip-btn');
+        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : 'Skip ⏭';
+    }
+    _wsUpdateSkipCount();
+    const bar = _wsReturnBar();
+    bar.innerHTML = `<div class="mq-skipret-banner" role="status" style="margin:0;">Skipped problem ${r.pos + 1} of ${r.queue.length}</div>`
+        + `<button type="button" class="btn btn-primary" id="wsReturnNextBtn" onclick="wsReturnNext()">${r.pos < r.queue.length - 1 ? 'Next ▶' : 'Done ▶'}</button>`;
+    try { window.scrollTo(0, 0); } catch (_) { /* non-fatal */ }
+    const first = card && card.querySelector('input:not([disabled])');
+    if (first) { try { first.focus({ preventScroll: true }); } catch (_) { /* non-fatal */ } }
+}
+/** How many cards are skipped right now (the "Skipped: n" count on the sheet header). */
+function _wsSkipCountNow() {
+    return (state.worksheetQs || []).filter((q) => q && (q._skipped || q._wsReturnOpen)).length;
+}
+function _wsUpdateSkipCount() {
+    const pill = document.getElementById('worksheetSkipCount');
+    const n = _wsSkipCountNow();
+    if (pill) { pill.textContent = `Skipped: ${n}`; pill.style.display = n > 0 ? 'inline-flex' : 'none'; }
+}
+
 export function checkAllWorksheet() {
+    if (!_wsReturn || !_wsReturn.done) {
+        if (_wsReturn && _wsReturn.active) { wsReturnNext(); return; }
+        const queue = (state.worksheetQs || []).map((q, i) => (q && q._skipped ? i : -1)).filter((i) => i >= 0);
+        if (queue.length && !_wsReturn) {
+            _wsReturn = { queue, pos: -1, active: false, done: false };
+            const grid = document.getElementById('worksheetGrid');
+            showSkipReturnIntro(queue.length, 'worksheet', () => {
+                _wsReturn.active = true;
+                if (grid) grid.classList.add('mq-ws-returning');
+                wsReturnNext();
+            });
+            return;
+        }
+    }
+    _checkAllWorksheetNow();
+}
+
+function _checkAllWorksheetNow() {
     let correct = 0;
     let skipped = 0;
     let helped = 0;
@@ -3221,7 +3385,7 @@ export function checkAllWorksheet() {
     const isPassing = percentage >= 80;
 
     // Save to session history
-    saveWorksheetToHistory(correct, total, isPassing);
+    saveWorksheetToHistory(correct, total, isPassing, skipped);
 
     // Show big flashing score (pass skipped count for breakdown).
     showWorksheetScore(correct, total, isPassing, skipped);
