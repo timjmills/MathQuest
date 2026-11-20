@@ -365,6 +365,21 @@ function _kPageDeal(key, n) {
     return _kPageHeld[key];
 }
 
+/* The band-100 lesson teaching sheet's four 3 x 5 windows (Guided, Guided, Independent, Independent), keyed by the shown Model's
+ * place (its first chart row and column, '-' for none): `row col` digit pairs. Searched offline (chart blanks r7) over every set
+ * of four windows: each window's own squares - held by no other window nor the Model - take its 5 gaps spread 2/2/1; then the
+ * best three practice rows-of-ten bands each hold 6 blanks or more spread evenly over the squares the sheet leaves fresh; then
+ * the least overlap, then the most practice blanks. */
+const HCF100_LAYOUT = Object.fromEntries(('-:01144065 00:31346174 01:14306174 02:31346174 03:31346174 04:11356174 05:31346174 10:34416471 ' +
+    '11:04356174 12:41447174 13:41447174 14:01306174 15:31446174 20:02427174 21:04345174 22:00406471 23:01456174 24:01315471 25:03437174 ' +
+    '30:01146174 31:00346174 32:01046174 33:01046174 34:00316174 35:04116174 40:01146471 41:00346471 42:01147174 43:01147174 44:00316174 ' +
+    '45:01146174 50:01043272 51:01043474 52:01143070 53:04113571 54:01043171 55:01043373 60:01043144 61:01143074 62:01043134 63:01043134 ' +
+    '64:01143071 65:01043441 70:01043144 71:01143064 72:01043144 73:01043144 74:01143061 75:01043144').split(' ').map((e) => e.split(':')));
+function hcf100Layout(key) {
+    const s = HCF100_LAYOUT[key];
+    return s ? [0, 1, 2, 3].map((i) => [Number(s[2 * i]), Number(s[2 * i + 1])]) : null;
+}
+
 /* ================================================================================ the generator */
 
 export function generateCountingQuestion(q, mappedSkill, helpers) {
@@ -935,7 +950,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // (not in a band-120 lesson packet: its windows keep to the example's edge columns, and its practice page's rows grid holds the
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
-        let _tw100 = 0, _tri100 = null, _rank100 = null;
+        let _tw100 = 0, _tri100 = null, _rank100 = null, _lay100 = null;
         const pickWin = () => {
             // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
             // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
@@ -961,7 +976,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (!_tri100) {
                     const used = new Set();
                     for (const k of kept) if (!(k.cols.length === 10 && !k.ext)) for (const r of k.rows) for (const c of k.cols) used.add(r * 10 + c + 1);
-                    const fresh = (a) => { let t = 0; for (let n = a * 10 + 1; n <= a * 10 + 30; n++) if (!used.has(n)) t++; return t; };
+                    // (chart blanks r7: a band's worth is the most blanks it can hold spread evenly over its three rows - each row its
+                    // most fresh squares no two side by side - not its fresh-square count: 3/2/0 bunched when one row had none)
+                    const rowCap = (r) => { let n = 0, last = -2; for (let c = 0; c < 10; c++) if (!used.has(r * 10 + c + 1) && c - last > 1) { n++; last = c; } return n; };
+                    const fresh = (a) => { const caps = [a, a + 1, a + 2].map(rowCap); let g = 0; for (let b = 0; b <= 3 && caps.every((x) => x >= b); b++) g = Math.max(g, 3 * b + Math.min(2, caps.filter((x) => x > b).length)); return g; };
                     const tris = [[0, 3, 6], [0, 3, 7], [0, 4, 7], [1, 4, 7]].map((tr) => ({ tr, lo: Math.min(...tr.map(fresh)), sum: tr.reduce((t, a) => t + fresh(a), 0) }));
                     tris.sort((x, y) => y.lo - x.lo || y.sum - x.sum);
                     _tri100 = tris[0].tr;
@@ -1007,17 +1025,20 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                         };
                         const order = shuffle(slots.slice());
                         _rank100 = order.map((x) => ({ x, v: score(x) })).sort((p, q) => p.v - q.v).map((o) => o.x);
-                        // (the layout that meets all three: four windows that share no square - Guided 1-25 and 26-50 on opposite halves,
-                        // Independent 51-75 and 76-100 the same, or mirrored - so only two chart rows, in different practice bands, are
-                        // printed whole and every other row keeps five fresh squares. It is laid from the first Guided
-                        // window's place; the ranked slots follow, for a deal the sheet refuses)
-                        const g1 = tw[0];
-                        let h = rng(0, 1) * 5, top = rng(0, 1) === 0;
-                        if (g1) { h = g1.cols[0]; top = g1.rows[0] < 5; }
-                        const o = 5 - h;
-                        const lay = top ? [[0, h], [2, o], [5, h], [7, o]] : [[7, h], [5, o], [2, h], [0, o]];
-                        if (!g1 || [0, 7].includes(g1.rows[0])) _rank100 = lay.concat(_rank100.filter(([a, b]) => !lay.some(([x, y]) => x === a && y === b)));
+                        // (chart blanks r7: the four teaching windows are PINNED from the sheet's shown Model - HCF100_LAYOUT, searched
+                        // offline over every Model place. Five disjoint 3 x 5 windows print 75 of the 100 squares, so at least five chart
+                        // rows are printed whole and some practice grid always has a row with nothing to blank (BLANK-COUNT bunched, the
+                        // floor of 5 unmet: the r6 sweep). The pinned windows overlap only in PRINTED squares - each window's gaps sit in
+                        // squares no other window or the Model holds (barred below), so no Guided answer is re-asked - and leave every
+                        // row of the best three practice bands two blanks or more. The ranked slots follow, for a sheet of more windows.)
+                        const md = kept.find((k) => k.shows && !k.ext && k.rows.length === 3 && k.cols.length === 5);
+                        const lay = hcf100Layout(md ? `${md.rows[0]}${md.cols[0]}` : '-');
+                        if (lay) { _lay100 = lay; _rank100 = lay.concat(_rank100.filter(([a, b]) => !lay.some(([x, y]) => x === a && y === b))); }
                     }
+                    // (chart blanks r7: the sheet deals the four pinned windows and no more. The lesson role picks its Guided cells from
+                    // the pool by kind - not by deal order - so a fifth window dealt elsewhere on the chart could be picked over a pinned
+                    // one and break the layout; with only the four in the pool, whichever two are Guided, the layout holds)
+                    if (_lay100 && _lay100.every(([a, b]) => kept.some((k) => !k.shows && !k.ext && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5))) throw new Error('hundreds chart lesson: the four pinned teaching windows are dealt');
                     const free100 = _rank100.filter(([a, b]) => !kept.some((k) => !k.shows && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5));
                     [r0, c0] = free100.length ? free100[(_tw100++) % free100.length] : slots[0];
                 }
@@ -1094,6 +1115,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (k.shows) { for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n)) barred.add(idxOf(n)); } continue; }
                 k.gaps.filter(inWin).forEach((n) => forced.add(idxOf(n)));
                 for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n) && !k.gaps.includes(n)) barred.add(idxOf(n)); }
+            }
+            // (chart blanks r7: a pinned band-100 teaching window leaves empty only its OWN squares - none another pinned window
+            // holds, dealt before or after it - so a later window never re-asks it and an earlier one never prints its answer)
+            if (_lay100 && _lay100.some(([a, b]) => a === rows[0] && b === cols[0])) {
+                for (const [a, b] of _lay100) if (a !== rows[0] || b !== cols[0]) for (let r = a; r < a + 3; r++) for (let c = b; c < b + 5; c++) { const n = r * 10 + c + 1; if (inWin(n)) barred.add(idxOf(n)); }
             }
             // (a band-120 lesson packet - chart-giveaway.js chartEdge: only the columns either side of the shown example's are left empty)
             if (_to120 && R === 3 && C === 5 && chartEdge() && kept.some((k) => k.shows && k.rows.some((x) => rows.includes(x)))) {
