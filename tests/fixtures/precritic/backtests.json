@@ -12061,6 +12061,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "hint-no-blank-every-skill",
+   "check": "ws-hint-no-blank: the screen help (Here is how steps, Say line, hint, Show Solution steps) of every live skill shows no unfilled blank (___, {n}, a gap '?'); the answer sentence is left out, never blanked (S8)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK (owner bug 2026-11-15 on placevalue:digit_value_unit_form, ws-unit-form-bank check 5; made the rule for every skill, lf-placevalue 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "65c28ccdf",
+    "state": "master: 675 of 734 skills print ___ in their help (hideAnswer blanks the answer, Say frames of given-value gaps, '= ?' hints)"
+   },
+   "pass": {
+    "commit": "2b2a03c0b",
+    "state": "the answer sentence is left out (S8), the Say line keeps at most the answer's gap, hints rewritten: 0 skills"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,division:div_facts,addition:add_wp_20,placevalue:identify,subtraction:sub_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

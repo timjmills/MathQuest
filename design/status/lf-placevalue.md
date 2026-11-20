@@ -260,3 +260,15 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
   HTML, no kit cell, provider or options); decimal_models needs the unbuilt hundred-square template and the stack's dp track. A full
   family lane (spec card, two templates, migration): not started here.
 - 2026-11-07 Lane started from 9398c3a; brief `design/lessons-first/briefs/w1-placevalue.md` written; pv card drafted and generated; owner questions sent to the lead.
+- 2026-11-20 HINT-NO-BLANK every-skill sweep (builder, medium: first build of a new check tool). New gate
+  tests/scripts/ws-hint-no-blank.cjs (every live skill x 4 seeds, generateQuestionFor; workedStepsFor, sayFor, q.hint,
+  generateSolutionSteps): master 65c28ccdf 675 / 734 skills print a blank in their screen help; fix 2b2a03c0b 0.
+  Fixes: support-ladder.js leaves the answer SENTENCE out instead of blanking it (keeps S8, ws-support-ladder OK; a sum ending
+  in the answer stops before it; a value the question gives is no leak), Say line = provider sayFill with ONE gap (the answer)
+  or not shown; '= ?' hints rewritten (word-work.js workHint, gen-operations, gen-algebraic, gen-fractions); solution-display
+  factors_identify threw. Exemptions, each named: SOL "Problem:" line (the question as asked), a worked gap filled by a later
+  step, the Say line's one answer gap. HELP-EMPTY pinned (28 legacy skills with no provider steps whose every step states the
+  answer; shrink-only). Backtest `hint-no-blank-every-skill` PASS; on precritic --skill (gate hint-no-blank); ledger row.
+  Print unchanged: ws-role-sweep 512/512 identical vs master, ws-lesson-baseline --check 2590 identical, ws-capacity-pin OK.
+  RULING ASKED: owner S8 (no answer in the ladder) vs the unit-form "help filled" precedent - kept S8; 100 skills lose the
+  Say line (frames of given-value gaps without sayValues) until their providers add sayValues.
