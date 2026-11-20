@@ -30,18 +30,21 @@
 //            its rows' TEXT is still judged (no print): "no room" only where no row fits, "the standard sheet is kept" only there.
 //   THRESHOLD BACKTESTS (A r3; design/partopts/DESIGN.md §8d - the measured plan-to-print gaps): fixed sheets on both sides of each
 //   tuned threshold, so a one-step move FAILS.
-//     FILL-BT    SHEET_FILL_MIN 0.76: planner used share reads up to 0.052 fuller than print near the floor (identify M We Do off),
-//                so >= 0.752; add_wp_10_plain L (planned 0.762) prints well, so <= 0.762; add_facts M Vocabulary off (0.712,
-//                31 % empty) stays refused. 0.75 or 0.77: FAIL.
-//     ROWFIT-BT  ROWFIT_SLACK_MM 12: the printed foot reads 1.5-15.9 mm more than the plan's free height; a row fits in print at
-//                plan gaps up to 11.4 mm (value M We Do 1: must be refused) and not at 13.5 (combine L rows 0: must be kept).
-//                (re-pinned on the lf-partopts deploy merge, 2026-11-13: master's lesson sheets moved the old pair - expand L
-//                Remember off 10.2 -> 15.9 mm, its foot no longer holds a row; value L rows 0 13.2 -> 26.4 mm.)
-//                10 or 14 mm: FAIL.
+//     FILL-PRINT the planner's used height of the sheet = the printed one within 4 mm (identify M We Do off, add_wp_10_plain L
+//                Vocabulary off + rows 0: master -6.9 / +5.0 mm, a strip-wrap blind spot - lf-engine fillfix).
+//     FILL-BT    SHEET_FILL_MIN 0.74 (fillfix sweep, 810 sheets): follow_given_rule M rows 0 (planned 0.738, 30 % foot) refused,
+//                sub_1m_no_regroup M Vocabulary off + rows 0 (0.743, 28 %) and add_wp_10_plain L (0.758, 27 %) kept; add_facts M
+//                Vocabulary off (0.705, 32 %) a regression guard. 0.73 or 0.75: FAIL.
+//     ROWFIT-BT  ROWFIT_SLACK_MM 12: a row fits in print at plan gaps up to 11.8 mm (number_patterns_rule L rows 0: must be
+//                refused) and not at 13.2 (expand L Remember off: must be kept). (re-anchored by lf-engine fillfix 2026-11-20:
+//                combine L rows 0 now prints a 31.3 mm foot that holds its row at 10.8 mm.) 11 or 14 mm: FAIL.
 //     BAND-BT    BAND_SLACK_MM 2: a planned cell band reads up to 1.0 mm narrower than printed near 30 % (div_facts M Vocabulary +
 //                Remember off, 26.8 % planned / 31.4 % printed: must be flagged, needs >= 0.8 mm); div_facts M We Do 1 prints
 //                under 30 % (must not be, needs < 2.6 mm). 0 or 3 mm: FAIL.
-//   --bt-only runs the backtests alone (21 s); --no-bt skips them; a --lessons run skips them.
+//   --bt-only runs the backtests alone (~30 s); --no-bt skips them; a --lessons run skips them. Each FILL sheet prints a FILL
+//   line: planned and printed fill, the gap, and the used height planned / printed in mm.
+//   --fill-sweep [--sweep-lessons a,b] [--sweep-out f.json]: plan vs print over every lesson x size x 9 sheet states (~45 min),
+//   one FILL line a case, the gap distribution and the floor it supports (DESIGN §8d) - how SHEET_FILL_MIN is re-derived.
 //   Sampling is deterministic (seed 4242).
 //
 // NARROW RUNS (ws-precritic's rows and the backtests, tests/fixtures/precritic/backtests.json rows partopts-*):
@@ -273,7 +276,7 @@ async function browser() {
                 return {
                     rowH, remTexts,
                     pupil: r.pupilHtml, doc: window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }), keyLen: (r.keyHtml || '').length, keyPages: r.keyPageCount, pages: r.pageCount,
-                    teach: r.lesson.teach ? { fill: r.lesson.teach.fill, freeMm: r.lesson.teach.freeMm, rowMm: r.lesson.teach.rowMm, independent: r.lesson.teach.independent, cellBands: r.lesson.teach.cellBands } : null,
+                    teach: r.lesson.teach ? { budget: r.lesson.teach.bands && r.lesson.teach.bands.budget, fill: r.lesson.teach.fill, freeMm: r.lesson.teach.freeMm, rowMm: r.lesson.teach.rowMm, independent: r.lesson.teach.independent, cellBands: r.lesson.teach.cellBands } : null,
                     fit: r.lesson.partFit, sizingOk: !r.chartSizing || r.chartSizing.ok !== false,
                     got: { prereq: r.lesson.prereqCheck ? r.lesson.prereqCheck.length : null, wedo: r.lesson.teach && r.lesson.teach.guided, rowsItems: r.lesson.teach && r.lesson.teach.independent, practice: prac.length || null, mixed: mixed.length || null },
                 };
@@ -590,8 +593,8 @@ async function browser() {
         // FILL detail lines (lf-engine fillfix): the planner's used share of the sheet's last page (res.lesson.teach.fill, used /
         // budget) beside the printed one (1 - the empty foot / the printed body, EB-PAGE's measure) and the gap, so a FILL failure
         // explains itself. gap = planned - printed: a positive gap is a plan fuller than its print.
-        const fillOf = (x) => { if (!x || !x.b || x.b.error || !x.b.teach || !x.last) return null; const f = x.b.teach.fill || []; const pl = f[f.length - 1]; const pr = 1 - x.last.emptyMm / x.last.bodyMm; return { plan: pl, print: +pr.toFixed(3), gap: +(pl - pr).toFixed(3), empty: x.last.empty }; };
-        const fillLine = (tag, x) => { const f = fillOf(x); console.log(`  FILL ${tag}: ${f ? `planned ${f.plan.toFixed(3)}, printed ${f.print.toFixed(3)} (${f.empty} % empty), gap ${f.gap >= 0 ? '+' : ''}${f.gap.toFixed(3)}` : `not built (${x && x.b && x.b.error})`}`); return f; };
+        const fillOf = (x) => { if (!x || !x.b || x.b.error || !x.b.teach || !x.last) return null; const f = x.b.teach.fill || []; const pl = f[f.length - 1]; const pr = 1 - x.last.emptyMm / x.last.bodyMm; const budget = x.b.teach.budget || 232; return { plan: pl, print: +pr.toFixed(3), gap: +(pl - pr).toFixed(3), empty: x.last.empty, usedMm: +(pl * budget).toFixed(1), printedMm: +(x.last.bodyMm - x.last.emptyMm).toFixed(1), resMm: +((x.last.bodyMm - x.last.emptyMm) - pl * budget).toFixed(1) }; };
+        const fillLine = (tag, x) => { const f = fillOf(x); console.log(`  FILL ${tag}: ${f ? `planned ${f.plan.toFixed(3)}, printed ${f.print.toFixed(3)} (${f.empty} % empty), gap ${f.gap >= 0 ? '+' : ''}${f.gap.toFixed(3)}; used ${f.usedMm} mm planned / ${f.printedMm} mm printed (${f.resMm >= 0 ? '+' : ''}${f.resMm} mm)` : `not built (${x && x.b && x.b.error})`}`); return f; };
         const sk = (id) => ({ categoryId: id.split(':')[0], skillId: id.split(':')[1] });
         const printed = async (id, size, partOpts) => {
             const b = await build(sk(id), size, partOpts); builds++;
@@ -646,37 +649,59 @@ async function browser() {
             // the judge is moving it in the engine, for these sheets.)
             if (arg('bt-k-file')) { const mv = JSON.parse(require('fs').readFileSync(path.resolve(arg('bt-k-file')), 'utf8')); Object.assign(K, mv); console.log(`(thresholds judged as moved: ${JSON.stringify(mv)})`); }
             const BT = (id, ok, msg) => { if (!ok) F(id, msg); };
-            // FILL-BT: SHEET_FILL_MIN 0.76. (1) the largest plan-to-print gap measured near the floor, placevalue:identify M We Do
-            // off (plan 0.797, printed 0.745: 0.052) - a floor under 0.70 + that gap lets a sheet planned at the floor print a
-            // 30 % foot (moved to 0.75: FAIL). (2) the lowest-planned good sheet over the floor, add_wp_10_plain L Vocabulary off
-            // and rows 0 (plan 0.762, prints 24 % empty) - a floor over it refuses a good sheet (moved to 0.77: FAIL). (3) the
-            // highest-planned bad sheet, add_facts M Vocabulary off (plan 0.712, prints 31 % empty) - refused (moved to 0.71: FAIL).
-            // (critic A r3: (3) pins nothing two-sided - any floor > 0.712 passes it, so the floor rests on (1)+(2). It is kept
-            //  as a REGRESSION GUARD: the worst swept foot (0.712) stays refused at the live floor, so a later drop below it
-            //  fails here. DESIGN §8d "8d follow-up" says this.)
-            if (runBt('FILL-BT')) {
-                const g = await printed('placevalue:identify', 'M', { wedo: { on: false } });
-                const gap = g.b.error ? NaN : g.b.teach.fill[0] - (1 - g.last.emptyMm / g.last.bodyMm);
-                BT('FILL-BT', Number.isFinite(gap) && K.FILL >= 0.70 + gap - 1e-9, `identify M We Do off: plan ${g.b.teach && g.b.teach.fill} vs printed ${g.last && (1 - g.last.emptyMm / g.last.bodyMm).toFixed(3)} (gap ${gap.toFixed(3)}) - SHEET_FILL_MIN ${K.FILL} < 0.70 + the gap`);
-                const ok = await printed('addition:add_wp_10_plain', 'L', { vocab: { on: false }, rows: { n: 0 } });
-                BT('FILL-BT', !ok.b.error && ok.b.teach.fill[0] >= K.FILL && ok.last.empty < 30, `add_wp_10_plain L Vocabulary off, rows 0: plan ${ok.b.teach && ok.b.teach.fill}, printed ${ok.last && ok.last.empty} % empty - a good sheet the floor ${K.FILL} refuses`);
-                const bad = await printed('addition:add_facts', 'M', { vocab: { on: false } });
-                BT('FILL-BT', !bad.b.error && bad.b.teach.fill[0] < K.FILL && bad.last.empty >= 30, `add_facts M Vocabulary off: plan ${bad.b.teach && bad.b.teach.fill}, printed ${bad.last && bad.last.empty} % empty - a bad sheet the floor ${K.FILL} lets through`);
-                console.log(`FILL-BT ${fails.some((x) => x.startsWith('FILL-BT ')) ? 'FAIL' : 'PASS'}: gap ${gap.toFixed(3)} (floor >= ${(0.70 + gap).toFixed(3)}), good sheet planned ${ok.b.teach && ok.b.teach.fill[0]} (floor <=), bad sheet planned ${bad.b.teach && bad.b.teach.fill[0]} (floor >) - SHEET_FILL_MIN ${K.FILL}`);
+            // FILL-PRINT (lf-engine fillfix, DESIGN §8d): the planner's used height of the sheet's last page (fill x budget) is the
+            // printed one (the body less its empty foot) within FILL_PRINT_MM, on the two sheets master's plan missed most. A row-
+            // stretch-capped sheet's bands print as planned; its strips did not - a Guided strip wrapping beside its Steps printed
+            // 5.8 mm more than planned, an Independent strip planned on two lines printed one (identify M We Do off: 207.4 mm
+            // planned, 200.5 printed, -6.9; add_wp_10_plain L Vocabulary off + rows 0: 170.3 / 175.3, +5.0). The tolerance is the
+            // fresh sweep's near-floor spread: 167 one-page sheets planned 0.66-0.86, printed - planned -3.9 .. -0.2 mm (p5 .. p95).
+            const FILL_PRINT_MM = 4;
+            if (runBt('FILL-PRINT')) {
+                let bad0 = 0;
+                for (const [id, size, st] of [['placevalue:identify', 'M', { wedo: { on: false } }], ['addition:add_wp_10_plain', 'L', { vocab: { on: false }, rows: { n: 0 } }]]) {
+                    const x = await printed(id, size, st);
+                    const f = fillLine(`${id} ${size} ${JSON.stringify(st)}`, x);
+                    if (!f || Math.abs(f.resMm) > FILL_PRINT_MM) { bad0++; BT('FILL-PRINT', false, `${id} ${size} ${JSON.stringify(st)}: planned used ${f && f.usedMm} mm, printed ${f && f.printedMm} mm (${f && f.resMm} mm, tolerance ${FILL_PRINT_MM} mm) - the plan no longer counts what prints`); }
+                }
+                console.log(`FILL-PRINT ${bad0 ? 'FAIL' : 'PASS'}: planned vs printed used height within ${FILL_PRINT_MM} mm on the anchor sheets`);
             }
-            // ROWFIT-BT: ROWFIT_SLACK_MM 12. (1) placevalue:value M We Do 1: no rows, plan free 24.8 / row 36.2 mm (11.4 apart),
-            // printed foot 35.0 >= one row and head 33.7 - the gate must refuse it (moved to 10 mm: FAIL). (2) placevalue:combine L
-            // rows 0: plan free 18.4 / row 31.9 (13.5 apart), printed foot 28.5 < 29.4 - the gate must keep it (moved to 14: FAIL).
-            // (deploy merge 2026-11-13: re-pinned from expand L Remember off / value L rows 0, which master's sheets moved to
-            //  15.9 / 26.4 mm; the pair was found by a 672-state sweep of the merged tree.)
+            // FILL-BT: SHEET_FILL_MIN 0.74, re-derived on a fresh sweep of the plan-matching planner (FILL-PRINT; DESIGN §8d): 810
+            // sheets (every live lesson x M / L x 9 sheet states, built as asked and printed), 677 of one page. No one-page sheet
+            // planned 0.74 or more prints a 30 % foot; the highest-planned that does is (1) patterns:follow_given_rule M rows 0
+            // (planned 0.738, prints 30 %) - refused (moved to 0.73: FAIL). The lowest-planned good sheets over the floor are (2)
+            // subtraction:sub_1m_no_regroup M Vocabulary off + rows 0 (planned 0.743, 28 % empty) - kept (moved to 0.75: FAIL) -
+            // and add_wp_10_plain L Vocabulary off + rows 0 (planned 0.758, 27 %: the sheet master's 0.76 refused, lf-partopts'
+            // bisect of 2c42746aa..688f755a6). (3) add_facts M Vocabulary off (0.705, 32 %) stays refused: a regression guard.
+            if (runBt('FILL-BT')) {
+                const bad = await printed('patterns:follow_given_rule', 'M', { rows: { n: 0 } });
+                fillLine('patterns:follow_given_rule M rows 0 (must refuse)', bad);
+                BT('FILL-BT', !bad.b.error && bad.b.teach.fill[0] < K.FILL && bad.last.empty >= 30, `follow_given_rule M rows 0: plan ${bad.b.teach && bad.b.teach.fill}, printed ${bad.last && bad.last.empty} % empty - a bad sheet the floor ${K.FILL} lets through`);
+                const keep = [];
+                for (const [id, size, st] of [['subtraction:sub_1m_no_regroup', 'M', { vocab: { on: false }, rows: { n: 0 } }], ['addition:add_wp_10_plain', 'L', { vocab: { on: false }, rows: { n: 0 } }]]) {
+                    const ok = await printed(id, size, st); keep.push(ok);
+                    fillLine(`${id} ${size} ${JSON.stringify(st)} (must keep)`, ok);
+                    BT('FILL-BT', !ok.b.error && ok.b.teach.fill[0] >= K.FILL && ok.last.empty < 30, `${id} ${size} ${JSON.stringify(st)}: plan ${ok.b.teach && ok.b.teach.fill}, printed ${ok.last && ok.last.empty} % empty - a good sheet the floor ${K.FILL} refuses`);
+                }
+                const guard = await printed('addition:add_facts', 'M', { vocab: { on: false } });
+                fillLine('addition:add_facts M Vocabulary off (regression guard)', guard);
+                BT('FILL-BT', !guard.b.error && guard.b.teach.fill[0] < K.FILL && guard.last.empty >= 30, `add_facts M Vocabulary off: plan ${guard.b.teach && guard.b.teach.fill}, printed ${guard.last && guard.last.empty} % empty - a bad sheet the floor ${K.FILL} lets through`);
+                const pl = (x) => (x.b.teach ? x.b.teach.fill[0] : NaN);
+                console.log(`FILL-BT ${fails.some((x) => x.startsWith('FILL-BT ')) ? 'FAIL' : 'PASS'}: bad sheet planned ${pl(bad)} (floor >), good sheets planned ${keep.map(pl).join(' / ')} (floor <=), guard ${pl(guard)} - SHEET_FILL_MIN ${K.FILL}`);
+            }
+            // ROWFIT-BT: ROWFIT_SLACK_MM 12, re-anchored on the fillfix sweep (DESIGN §8d; the plan's free height now counts its
+            // strips as printed). (1) must refuse: patterns:number_patterns_rule L rows 0 - no rows, plan free 39.3 / row 51.1 mm
+            // (11.8 apart), printed foot 50.0 >= one row and head 42.0 (moved to 11 or 10 mm: FAIL). (2) must keep:
+            // placevalue:expand L Remember off - plan free 18.7 / row 31.9 (13.2 apart), printed foot 28.2 < 29.4 (moved to 14: FAIL).
+            // (the old must-keep, placevalue:combine L rows 0, now prints a 31.3 mm foot that holds its 29.4 mm row at 10.8 mm:
+            //  the gate refuses it rightly - the anchor was stale, not the gate)
             if (runBt('ROWFIT-BT')) {
-                const a = await printed('placevalue:value', 'M', { wedo: { n: 1 } });
+                const a = await printed('patterns:number_patterns_rule', 'L', { rows: { n: 0 } });
                 const aFits = a.rowNeed && a.last.emptyMm >= a.rowNeed;
-                BT('ROWFIT-BT', !a.b.error && !(a.b.teach.independent > 0) && aFits && po.rowFits(a.b.teach.freeMm, a.b.teach.rowMm, K.ROW), `value M We Do 1: plan free ${a.b.teach && a.b.teach.freeMm} / row ${a.b.teach && a.b.teach.rowMm} mm, printed foot ${a.last && a.last.emptyMm} / row ${a.rowNeed} - margin ${K.ROW} lets a sheet whose foot holds a row through`);
-                const v = await printed('placevalue:combine', 'L', { rows: { n: 0 } });
+                BT('ROWFIT-BT', !a.b.error && !(a.b.teach.independent > 0) && aFits && po.rowFits(a.b.teach.freeMm, a.b.teach.rowMm, K.ROW), `number_patterns_rule L rows 0: plan free ${a.b.teach && a.b.teach.freeMm} / row ${a.b.teach && a.b.teach.rowMm} mm, printed foot ${a.last && a.last.emptyMm} / row ${a.rowNeed} - margin ${K.ROW} lets a sheet whose foot holds a row through`);
+                const v = await printed('placevalue:expand', 'L', { remember: { on: false } });
                 const vFits = v.rowNeed && v.last.emptyMm >= v.rowNeed;
-                BT('ROWFIT-BT', !v.b.error && !vFits && !po.rowFits(v.b.teach.freeMm, v.b.teach.rowMm, K.ROW), `combine L rows 0: plan free ${v.b.teach && v.b.teach.freeMm} / row ${v.b.teach && v.b.teach.rowMm} mm, printed foot ${v.last && v.last.emptyMm} / row ${v.rowNeed} - margin ${K.ROW} refuses a sheet whose foot holds no row`);
-                console.log(`ROWFIT-BT ${fails.some((x) => x.startsWith('ROWFIT-BT ')) ? 'FAIL' : 'PASS'}: must-refuse gap ${a.b.teach ? (a.b.teach.rowMm - a.b.teach.freeMm).toFixed(1) : '-'} mm (margin >=), must-keep gap ${v.b.teach ? (v.b.teach.rowMm - v.b.teach.freeMm).toFixed(1) : '-'} mm (margin <) - ROWFIT_SLACK_MM ${K.ROW}`);
+                BT('ROWFIT-BT', !v.b.error && !(v.b.teach.independent > 0) && !vFits && !po.rowFits(v.b.teach.freeMm, v.b.teach.rowMm, K.ROW), `expand L Remember off: plan free ${v.b.teach && v.b.teach.freeMm} / row ${v.b.teach && v.b.teach.rowMm} mm, printed foot ${v.last && v.last.emptyMm} / row ${v.rowNeed} - margin ${K.ROW} refuses a sheet whose foot holds no row`);
+                console.log(`ROWFIT-BT ${fails.some((x) => x.startsWith('ROWFIT-BT ')) ? 'FAIL' : 'PASS'}: must-refuse gap ${a.b.teach ? (a.b.teach.rowMm - a.b.teach.freeMm).toFixed(1) : '-'} mm (margin >=; printed foot ${a.last && a.last.emptyMm} / row ${a.rowNeed && a.rowNeed.toFixed(1)}), must-keep gap ${v.b.teach ? (v.b.teach.rowMm - v.b.teach.freeMm).toFixed(1) : '-'} mm (margin <; printed foot ${v.last && v.last.emptyMm} / row ${v.rowNeed && v.rowNeed.toFixed(1)}) - ROWFIT_SLACK_MM ${K.ROW}`);
             }
             // BAND-BT: BAND_SLACK_MM 2. (1) division:div_facts M Vocabulary and Remember off: We Do cells planned 24.6 mm with 6.6 mm
             // under the ink (26.8 %), printed 31.4 % - the gate must flag them (moved to 0 mm: FAIL). (2) div_facts M We Do 1: its

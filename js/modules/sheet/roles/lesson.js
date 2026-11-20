@@ -227,10 +227,13 @@ const SHEET_PARTS = ['vocab', 'remember', 'wedo', 'rows'];
 /** True when the teacher changed a part of the lesson SHEET (the chart, Practice and Mixed are other pages). */
 export const sheetChanged = (partN) => !!partN && SHEET_PARTS.some((k) => partN[k] !== undefined);
 /** The fewest share of a sheet page its blocks must use (EB-PAGE: 30 % empty fails; the last of 2+ pages: H5, half used). */
-// (the planner's used share reads 2-6 % fuller than the printed page measures - the body under the frame prints taller than the
-// plan's budget - so a floor of 0.72 printed a 30 % foot, EB-PAGE; 0.76 keeps the printed foot under 30 %: design/partopts/DESIGN.md
-// §8d has the measured gap, and ws-partopts-unit FILL-BT pins it)
-export const SHEET_FILL_MIN = 0.76;
+// (the plan's used share is read against its budget (232 mm on A4), EB-PAGE's against the printed body (239 mm), so a plan reads
+// ~0.025 fuller than its print; since lf-engine fillfix (2026-11-20) the used height itself matches print - the strips counted as
+// they print, ws-partopts-unit FILL-PRINT. Re-derived on that planner's sweep of 810 sheets (677 of one page): no sheet planned
+// 0.74 or more prints a 30 % foot (the highest-planned that does: follow_given_rule M rows 0, 0.738), and 0.74 keeps every good
+// sheet planned over it (sub_1m_no_regroup M Vocabulary off + rows 0, 0.743; add_wp_10_plain L, 0.758, which master's 0.76
+// refused). design/partopts/DESIGN.md §8d has the numbers; ws-partopts-unit FILL-BT pins 0.73 and 0.75 as FAILs.)
+export const SHEET_FILL_MIN = 0.74;
 /** The row test's plan-to-print margin (EB-ROWFIT): part-opts.js ROWFIT_SLACK_MM (DESIGN §8d; ws-partopts-unit ROWFIT-BT pins it). */
 export { ROWFIT_SLACK_MM };
 export const SHEET_LAST_FILL_MIN = 0.55;
