@@ -3,7 +3,7 @@ Title: Mixed review page type: spec card (grades x areas mix, sendable, playable
 Session: session_01HVwpAE3g6EZH8idgErP6LP
 Branch: claude/lf-mixreview
 Owner of files: design/cards/mixed-review/ (card.json, mixed-review.md); this status file
-State: build (steps 1, 1b, 2 of card §9b)
+State: build (steps 1, 1b, 2 done; lead rulings L9 / kinds / placement done; step 3 part 1 done, part 2 parked)
 Updated: 2026-11-20
 Builder profile: mq-opus-medium
 Critic rounds: 1, card critic r1 FAIL (min 6), fixed in the card (§9c)
@@ -102,11 +102,41 @@ Card §10 deferrals done in these steps, with no re-sign (each is §10-deferred 
   worktree, with the same findings. The harness's "Times 7, 8" pick reads back as every table except 7 and 8 (code
   EA~C01234569ABCDEF_NA). So the failure is not this lane's; it is reported to the lead.
 
+## Lead rulings 2026-11-20 + step 3 part 1 (builder, mq-opus-medium)
+- 4d1d6f88d L9: `word-problem-long` kind (wide, KIND_CAP m 3 / l 2), KIND_PAIR: dealt in pairs only (even room, minOn 2, a pair
+  leads a page only when it leaves no lone item, top-ups in pairs, the lone guard never splits a pair, an all-long pool refused
+  at odd N); the fill top-up now tries fresh skills first and then the others. check-v1 prop p; pool-wplong in `--fill`
+  (0 breaks over 11 pools). count-long-wp un-pended. frozen.json and the golden codes re-pinned (proto and product).
+  The same commit carries the frozen KIND_CLASS extension (family-check, choice, arrays-turn, word-work typical; count-row,
+  picture wide) and TEMPLATE_KIND (used by the next commit).
+- 18e55cd10 kinds: rows take the kind of the template the skill DRAWS (print-sheet.js drawnTemplateOf = hostItem's
+  kitCellSpec / number family; tests/scripts/ws-mix-review-templates.cjs generates js/modules/mixed-review-templates.js).
+  V1 table re-pinned with `ws-mix-review --pin --reclass`: typical 616, wide 73, compact 19. **Legacy is NOT a minority:**
+  373 of 708 rows draw no kit template (was 689 by footprint); 335 now carry a kit kind. Check pool-kind-footprint.
+- bed7dc567 placement: GRADE_CHIPS (Pre-K, K, 1 .. 6+), chipOf PK -> PK. Check pool-placement-pk.
+- af5841e32 step 3 part 1: dealReviewItems(req), buildSheet role `mixed-review` (alias of mixed-practice) laying out exactly
+  the accepted list on V1's pages / shelves / numbers, 2-up at N = 5, a week as five sheets, key = facsimile + key summary
+  (+ weekly table). Un-pended breakdown-dup-item / -wrong-area / -sum, week-table-missing, count-key-cells.
+
+## Findings for the lead (step 3)
+1. L9 vs prop f on a tiny pool: a 4-skill pool with 2 long word-problem skills at odd N must repeat a non-pair skill on a
+   day whose unseen skills are all pairs (5 = 2 + 3). case-pass-pairs-week asserts p, l, k only. A ruling is needed (f
+   exempts that case, or such pools are refused for weeks).
+2. Legacy rows stay a majority (373 / 708) even by drawn template: those generators emit no kit cell.
+3. ws-grade-render --gate on role mixed-review FAILS (16 overflow findings on a 2-skill request): buildReviewSheet does not
+   yet measure cells (no hostItem / measureItems, no cell heights), so tall cells overflow and pages are not spilled.
+
 ## PARK NOTES / next
-- Done: steps 1, 1b and 2. Next: step 3 (MR-A engine, lf-engine files) is NOT started (brief: stop after step 2).
-- Open for the lead: findings 1 (L9 vs prop l, BLOCKED) and 2 (live footprint kinds) above, and the pre-existing
-  ws-share-options FAIL.
-- Resume: `node tests/scripts/ws-mix-review.mjs --built-only --sample tests/fixtures/precritic/mix-review-sample.json`;
-  `node tests/scripts/ws-backtest.mjs --row mix-review-trace,mix-review-labels,mix-review-count,mix-review-pool,mix-review-share,mix-review-week`;
-  `node design/cards/mixed-review/proto/check-v1.mjs`. When a pending state is built, move its fixture from
-  <check>/pending/ to <check>/fail/, add its pass fixture, and drop `pending` from its backtest row.
+- Done: steps 1, 1b, 2; the three lead rulings; step 3 part 1 (above). Step 4 NOT started.
+- Pending in step 3 (part 2): measured layout in buildReviewSheet (hostItem + measureItems, `mixed-practice.js` input.plan
+  as the card says, cell heights, a short last shelf left-aligned), the whole-shelf spill to a continuation page with the
+  numbers kept (count-spill-redeal), drawn k = V1 SHELF k (count-shelf-k-differs), the key summary under the last key grid
+  when it fits (now always its own key page), input.review supports / tab `Level <grades>` from the chips, ~options payload
+  decoding (`optsFor` is a hook only), ws-print-lint and `ws-precritic --role mixed-practice --strict`, then
+  ws-grade-render --gate at M and L to green. Pending fixtures: count/pending/count-spill-redeal, count-shelf-k-differs.
+- Resume: `node tests/scripts/ws-mix-review.mjs --built-only --sample tests/fixtures/precritic/mix-review-sample.json`
+  (runs one browser state); `node design/cards/mixed-review/proto/check-v1.mjs` and `--fill`;
+  `node tests/scripts/ws-backtest.mjs --row mix-review-long-wp,mix-review-kinds,mix-review-placement,mix-review-breakdown-key,mix-review-week-table,mix-review-count-key-cells`;
+  `node tests/scripts/ws-grade-render.cjs --roles mixed-review --skills addition:add_20_regroup,subtraction:sub_20_regroup --gate --out <dir>`;
+  after a generator change: `node tests/scripts/ws-mix-review-templates.cjs --check` (regenerate without --check, then
+  `ws-mix-review --pin --reclass` while no V1 code has shipped).
