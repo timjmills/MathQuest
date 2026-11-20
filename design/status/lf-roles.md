@@ -415,3 +415,4 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - F4: hintOf gives "Step 1: …" on every two-step preset. The hint is dropped by sheetFitPlain's round-4 rule ("the hint line never
   costs page 1 its only try") when Model + hinted try does not fit page 1 (add_then_div and mult_div_first at M seed 1). Not changed:
   it needs a lead ruling (keep the hint and move the try to page 2, against GUIDED-MODEL-ALONE, or keep the rule).
+- 2026-11-20 QUEUED (lead, after F3/F4): PRE-SKILL-CHECK red on every passed skill under lf-checks rebuilt EB-LASTPAGE / CAP-PARITY (PT-PRE-1/2 underfill: add_facts / sub_facts 78 %, div_facts, placevalue:value L p2 45 %). Fix the role fill to reach its declared ceiling (role-capacity.js), checks first, keep R13 2+2 where 2 pages are needed. Park with notes if the week budget runs out.
