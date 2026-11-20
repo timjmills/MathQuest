@@ -6686,17 +6686,17 @@
   },
   {
    "id": "partopts-fill-bt-low",
-   "check": "SHEET_FILL_MIN may not drop: the plan reads up to 0.052 fuller than the print near the floor (identify M We Do off), so a floor of 0.75 lets a sheet planned at the floor print a 30 % foot (critic A r3, DESIGN §8d). The two states are the same tree with the threshold judged as moved - the backtest sheets are built as asked, not through the offer gate, so what they print does not depend on it",
+   "check": "SHEET_FILL_MIN may not drop: at 0.73 the offer gate lets patterns:follow_given_rule M rows 0 through - planned 0.738, it prints a 30 % foot (the highest-planned bad sheet of the lf-engine fillfix sweep, 810 sheets; DESIGN §8d). The two states are the same tree with the threshold judged as moved - the backtest sheets are built as asked, not through the offer gate, so what they print does not depend on it",
    "kind": "fixture",
    "rule": "ws-partopts-unit FILL-BT",
    "browser": true,
    "fail": {
-    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.75.json",
-    "state": "SHEET_FILL_MIN 0.75 - under 0.70 + the measured gap"
+    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.73.json",
+    "state": "SHEET_FILL_MIN 0.73 - under the highest-planned bad sheet (0.738)"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
-    "state": "the live 0.76"
+    "state": "the live 0.74"
    },
    "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT --bt-k-file {fixture}",
    "expect": {
@@ -6706,17 +6706,17 @@
   },
   {
    "id": "partopts-fill-bt-high",
-   "check": "SHEET_FILL_MIN may not rise either: 0.77 refuses add_wp_10_plain L (planned 0.762, prints 24 % empty - a good sheet) (DESIGN §8d)",
+   "check": "SHEET_FILL_MIN may not rise either: 0.75 refuses subtraction:sub_1m_no_regroup M Vocabulary off + rows 0 (planned 0.743, prints 28 % empty - a good sheet) (lf-engine fillfix sweep; DESIGN §8d)",
    "kind": "fixture",
    "rule": "ws-partopts-unit FILL-BT",
    "browser": true,
    "fail": {
-    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.77.json",
-    "state": "SHEET_FILL_MIN 0.77 - over the lowest-planned good sheet"
+    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.75.json",
+    "state": "SHEET_FILL_MIN 0.75 - over the lowest-planned good sheet over the floor"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
-    "state": "the live 0.76"
+    "state": "the live 0.74"
    },
    "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT --bt-k-file {fixture}",
    "expect": {
@@ -6726,7 +6726,7 @@
   },
   {
    "id": "partopts-rowfit-bt-low",
-   "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers placevalue:value M We Do 1, whose printed foot (35.0 mm) holds a whole row and its head (33.7 mm) at a plan gap of 11.4 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from expand L Remember off, which master moved to 15.9 mm)",
+   "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers patterns:number_patterns_rule L rows 0, whose printed foot (50.0 mm) holds a whole row and its head (42.0 mm) at a plan gap of 11.8 mm (DESIGN §8d; re-anchored by lf-engine fillfix 2026-11-20 from placevalue:value M We Do 1, whose plan gap the strip-counting planner reads as 8.4 mm)",
    "kind": "fixture",
    "rule": "ws-partopts-unit ROWFIT-BT",
    "browser": true,
@@ -6746,13 +6746,93 @@
   },
   {
    "id": "partopts-rowfit-bt-high",
-   "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:combine L rows 0, whose printed foot (28.5 mm) holds no row (29.4 mm needed) at a plan gap of 13.5 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from value L rows 0, which master moved to 26.4 mm)",
+   "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:expand L Remember off, whose printed foot (28.2 mm) holds no row (29.4 mm needed) at a plan gap of 13.2 mm (DESIGN §8d; re-anchored by lf-engine fillfix 2026-11-20 from placevalue:combine L rows 0, whose 31.3 mm foot now holds its row)",
    "kind": "fixture",
    "rule": "ws-partopts-unit ROWFIT-BT",
    "browser": true,
    "fail": {
     "fixture": "tests/fixtures/precritic/partopts/bt-rowfit-14.json",
     "state": "ROWFIT_SLACK_MM 14 - over the must-keep gap"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+    "state": "the live 12 mm"
+   },
+   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only ROWFIT-BT --bt-k-file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-fill-print",
+   "check": "The lesson planner's used height of the sheet is the printed one within 4 mm (FILL-PRINT): master's row-stretch-capped sheets planned their band strips on one line (the Independent strip with a 0.5 em full-width guess), so placevalue:identify M We Do off planned 207.4 mm and printed 200.5 (-6.9) and add_wp_10_plain L Vocabulary off + rows 0 planned 170.3 and printed 175.3 (+5.0) - the drift that put FILL-BT out of reach of any floor (lf-partopts bisect 2c42746aa..688f755a6). Fix: roles/lesson.js counts the strips as they print (compose.js stripWrapMm): -1.1 / -0.6 mm",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-unit FILL-PRINT",
+   "browser": true,
+   "fail": {
+    "commit": "f8164ca5d",
+    "state": "master: -6.9 / +5.0 mm"
+   },
+   "pass": {
+    "commit": "cd9261b5f",
+    "state": "the strip-counting planner: -1.1 / -0.6 mm"
+   },
+   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-PRINT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-fill-bt-floor",
+   "check": "FILL-BT green on the re-derived floor: master's 0.76 refuses add_wp_10_plain L Vocabulary off + rows 0 (planned 0.734 there, a 27 % foot - a good sheet); on the fix it plans 0.758 and SHEET_FILL_MIN 0.74 (fillfix sweep: the highest-planned bad one-page sheet 0.738, the lowest good over it 0.739 / 0.743) keeps it and refuses follow_given_rule M rows 0",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-unit FILL-BT",
+   "browser": true,
+   "fail": {
+    "commit": "f8164ca5d",
+    "state": "master: 0.76, add_wp_10_plain L planned 0.734 - refused"
+   },
+   "pass": {
+    "commit": "cd9261b5f",
+    "state": "0.74, add_wp_10_plain L planned 0.758 - kept"
+   },
+   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-rowfit-bt-anchor",
+   "check": "ROWFIT-BT AS COMMITTED is green: master's own anchor placevalue:combine L rows 0 (must keep: foot holds no row) now prints a 31.3 mm foot that holds its 29.4 mm row at a 10.8 mm plan gap - the gate refuses it rightly, the anchor was stale. The fix re-anchors on the fillfix sweep (must refuse number_patterns_rule L rows 0 at 11.8 mm, must keep expand L Remember off at 13.2 mm). This row runs EACH commit's own script ({root}), since today's script carries the new anchor",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-unit ROWFIT-BT (the committed anchor)",
+   "browser": true,
+   "fail": {
+    "commit": "f8164ca5d",
+    "state": "master's script: the stale combine L anchor - FAIL"
+   },
+   "pass": {
+    "commit": "cd9261b5f",
+    "state": "the re-anchored pair - PASS"
+   },
+   "command": "node {root}/tests/scripts/ws-partopts-unit.cjs --bt-only --only ROWFIT-BT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-rowfit-bt-11",
+   "check": "ROWFIT_SLACK_MM may not drop to 11 mm: the new must-refuse anchor number_patterns_rule L rows 0 sits at an 11.8 mm plan gap (its printed foot holds a row), so 11 mm already offers it - the re-anchored pair pins 12 within (11.8, 13.2]",
+   "kind": "fixture",
+   "rule": "ws-partopts-unit ROWFIT-BT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/partopts/bt-rowfit-11.json",
+    "state": "ROWFIT_SLACK_MM 11 - under the must-refuse gap 11.8"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/partopts/bt-live.json",

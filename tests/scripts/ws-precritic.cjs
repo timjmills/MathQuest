@@ -944,8 +944,8 @@ function addPartOpts(add, ctx) {
     add(gate('partopts-unit', 'ws-partopts-unit (lesson parts: PO-2a-e, EB-ROWFIT, PO-NOROOM, PO-REM, PO-CAP, PO-VOC + the PO-2w step walk)', sub, 'browser', 'ws-partopts-unit',
         ['--lessons', PARTOPTS_LESSONS, '--sizes', 'M,L', '--walk-depth', '1'],
         { parse: PARSE.partOpts, needFlags: ['lessons', 'walk-depth'], expect: { must: ['PO-2d', 'PO-CAP', 'PO-2w walk'] } }));
-    add(gate('partopts-bt', 'ws-partopts-unit --bt-only (the §8d thresholds two-sided: FILL-BT, ROWFIT-BT, BAND-BT)', 'fixed sheets either side of each threshold', 'browser', 'ws-partopts-unit',
-        ['--bt-only'], { parse: PARSE.partOpts, needFlags: ['bt-only'], expect: { must: ['FILL-BT', 'ROWFIT-BT', 'BAND-BT'] } }));
+    add(gate('partopts-bt', 'ws-partopts-unit --bt-only (the §8d thresholds two-sided: FILL-PRINT, FILL-BT, ROWFIT-BT, BAND-BT)', 'fixed sheets either side of each threshold', 'browser', 'ws-partopts-unit',
+        ['--bt-only'], { parse: PARSE.partOpts, needFlags: ['bt-only'], expect: { must: ['FILL-PRINT', 'FILL-BT', 'ROWFIT-BT', 'BAND-BT'] } }));
     add(gate('partopts-coverage', 'ws-partopts-unit --coverage-only (PO-2e: the We Do / Practice ranges vs their floors, the We Do floor a ratchet)', 'every library lesson × M / L', 'browser', 'ws-partopts-unit',
         ['--coverage-only'], { parse: PARSE.partOpts, needFlags: ['coverage-only'], expect: { must: ['PO-2e'] } }));
     add(gate('partopts-shots', 'ws-partopts-shots (the Print screen: F3-F10, N3 captions, N5 / R1 lock text, N6 range text, R2 clamp note, R4 no sideways scroll, 44 px)', 'Print screen at 1280 and 390', 'browser', 'ws-partopts-shots',
