@@ -9,6 +9,17 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-20 ~18:10 PARKED (budget): multiplication:multiply_three_numbers (ZK) + presets mult_three_two_ways (ZL),
+  mult_three_missing_factor (ZM), card RE-SIGNED, branch claude/sweet-newton-c8wrv1-lf-algebra-mult3 (NOT for deploy until clean).
+  Built + linked (3.OA.B.5 full; Y4.B4.S13 direct; option keys mtForm 4X / mtPair 4Y / mtBracket 4Z / mtBand 5X); div_facts byte-identical.
+  Low build hit the round cap -> medium rebuild 911b69f18 / 1b56b31d3: EB 116 -> 19 (chain top-aligned; Stretch four-factor items built;
+  Reason It L 2-up; a key defect fixed), codec-registry OK (only ours pinned: mt*, msChoose 4T, band.auto). STILL RED (next): Test M bands
+  36 %, opener M 29 %, missing-factor L EB-FOOT 54 % (needs a hold-to-ink rule Guided does not misread; tightRows breaks Guided); lesson
+  both-ways OVERFLOW M/L; two_ways EA / TF / RI KEYFIT-KEYJOIN (12, not investigated); missing-factor Review L OVERFLOW (+ frame-title,
+  capacity-pin); node-lint: the presets need prereqs.js LESSONS entries; options-verify mtBracket=false prints the default sheet.
+  Codec entries of OTHER lanes still unpinned (for the lead to route): SU-C pilot e59987029 (zeros 3N, lengths same/shorter); Lesson 6
+  2b2904a27 (tenChoice 4J); lf-placevalue a2c0e6355 (writeValue 4L); dbb3c9c2b (answerAs 4M); Lane D 25f32bea8 (amEdges 5V, amForm 5W);
+  lf-vocab 436d455a8 (vocabTask 6C, vocabGrade 6D, vocabSet 6E); t15 5e4385f60 (constant 14/15).
 - 2026-11-20 ~14:00 PATTERNS r4 PASS (narrow, critic-r4/verdict.md) on 70b163833: all 22 versions that failed r3 with fixes in this lane now
   >= 8 on every criterion. r3 (57 / 85) -> fix round (INSTR-SLOTS general check ws-instr-slots + 9 backtest rows) -> r4 PASS. Closed:
   R3-1/2/3/5/8/9/10; part: R3-6 ("Drag" fixed; doubled answer areas -> lf-roles PSC build), R3-7 (Term 10 named; chart example in
