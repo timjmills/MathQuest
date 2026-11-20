@@ -14537,6 +14537,146 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mws-save-reproduce",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "12 sheets (teacher Print independent M/L, lesson M/L, Mixed Review, fact rows, More Practice, Test + a second section; simple print x3; the interactive player) saved through each host, then reprinted from the stored record: pupil and key HTML byte-identical; New mix = other items, same settings; a page-1 thumbnail <= 25 KB; the Save button on each host, teacher-only; the 450 warning and the 500 cap (card 8 SAVE-REPRODUCE, A15 #2 #3)",
+   "rule": "ws-my-worksheets SAVE-REPRODUCE (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SAVE-REPRODUCE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "every case byte-identical, the dialog pre-filled (name, unit folder), pupils see no Save, 455 warns, 500 stops"
+   }
+  },
+  {
+   "id": "mws-library-roundtrip",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Export -> clear -> Import gives the same records (deep equal, thumbnails included); Import twice adds nothing; a version-0 record (no v, size S) loads as v1 at M and builds; Import through the screen button (a real file); Export library writes every sheet (card 8 LIBRARY-ROUNDTRIP)",
+   "rule": "ws-my-worksheets LIBRARY-ROUNDTRIP (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only LIBRARY-ROUNDTRIP --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "merge-by-id import, migrate() fills v / tags / cls and reads S as M"
+   }
+  },
+  {
+   "id": "mws-sheet-code",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "every saved sheet's ?sheet= code decodes to its request and prints the same HTML; an unknown field is ignored; a teacher device is offered Save and Print (Save stores it); a pupil window plays page 1's items (card 8 SHEET-CODE, 6)",
+   "rule": "ws-my-worksheets SHEET-CODE (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SHEET-CODE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "SH1.<base64url {v,n,h,req}>; init.js routes ?sheet= to openSheetCode"
+   }
+  },
+  {
+   "id": "mws-interactive-same",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "the card's Play (Open interactive) deals page 1's items in print order (text and answer) for a teacher Print independent sheet, a simple-print fact sheet and a lesson (card 8 INTERACTIVE-SAME, 5)",
+   "rule": "ws-my-worksheets INTERACTIVE-SAME (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only INTERACTIVE-SAME --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "state.worksheetPreset: the online worksheet deals the plan's page-1 items"
+   }
+  },
+  {
+   "id": "mws-organise",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "rename, a new folder + move, tags and class, duplicate, New mix, search (name, class), Newest first / By unit, delete with Undo after 7 s, the default unit folder, the class / tag chips; all after a reload (card 8 ORGANISE, 4)",
+   "rule": "ws-my-worksheets ORGANISE (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only ORGANISE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "every change written to the sheets store and its sheetFolders record"
+   }
+  },
+  {
+   "id": "mws-no-loss",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "a seeded version-1 mathquest_quizzes (tests / results) and My sets (mq_teacher_sets) are byte-unchanged after the DB_VERSION 2 upgrade and a save; the quiz list still lists the old quiz (card 8 NO-LOSS, 3)",
+   "rule": "ws-my-worksheets NO-LOSS (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only NO-LOSS --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "quiz-storage DB_VERSION 2 only adds the sheets store"
+   }
+  },
+  {
+   "id": "mws-touch-width",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "every control of the screen, the open menu, the Rename dialog and the Save dialog >= 48 px and hit at its centre, by a real click at 1280 x 1000 and 1366 x 768 and a real tap at 1024 x 768 and 820 x 1180; no sideways scroll; the folders fold into the Folder picker under 900 px (card 8 TOUCH / WIDTH, 7)",
+   "rule": "ws-my-worksheets TOUCH-WIDTH (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only TOUCH-WIDTH --widths 1280,1366,1024,820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "95444ab19",
+    "state": "48 px controls (#teacherApp .mws .mws-b), the 900 px fold"
+   }
   }
  ]
 }

@@ -92,6 +92,7 @@ const CASES = [
     };
 
     let saved = [];   // [{case, id, before: {pupilHtml, keyHtml}}]
+    const checkedWidths = [];
     try {
         await visit('/index.html');
         const lr = await libReady();
@@ -608,6 +609,7 @@ const CASES = [
                     if (w === 820) await shot('save-dialog-820');
                     await click('#mwsSave [data-mws-save="cancel"]', touch);
                 }
+                checkedWidths.push(w);
                 if (w === 820) {
                     await go('sheets'); await onSheets();
                     await click(`.mws-card[data-id="${first}"] [data-mws="play"]`, true);
@@ -633,6 +635,7 @@ const CASES = [
         console.log(`${id}: ${f.length ? `FAIL ${f.length}` : 'OK'}`);
         for (const x of f.slice(0, 12)) console.log(`  - ${x}`);
     }
+    for (const w of checkedWidths) console.log(`  @${w}: checked`);
     console.log(`(${saved.length} sheets saved; widths ${WIDTHS.join(',')}; ${Math.round((Date.now() - t0) / 1000)} s)`);
     console.log(fails ? `ws-my-worksheets: FAIL (${fails})` : 'ws-my-worksheets: OK');
     process.exit(fails ? 1 : 0);
