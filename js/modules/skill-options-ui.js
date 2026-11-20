@@ -18,7 +18,7 @@
 // change made in the mixed settings shows up in the share panel and in the next link. A host may
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
-import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary, isNumberLineOption, numberLineSummary } from './skill-options.js';
+import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary, isNumberLineOption, numberLineSummary, optionGroup } from './skill-options.js';
 import { normalizeRows, downStart, onePagePlan, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
@@ -41,17 +41,9 @@ export const OPTION_GROUPS = [
     // only: the option list (and so every share code) keeps its order.
     { id: 'facts', label: 'Which facts' },
 ];
-const GROUP_BY_ID = {
-    band: 'difficulty', range: 'difficulty', decimals: 'difficulty', constant: 'difficulty', regroup: 'difficulty',
-    unknown: 'difficulty', place: 'difficulty', places: 'difficulty', step: 'difficulty', dir: 'difficulty',
-    op: 'difficulty', power: 'difficulty', zeroPlace: 'difficulty', midpoint: 'difficulty', order: 'difficulty',
-    wordform: 'difficulty', simplestForm: 'difficulty',
-    level: 'support', pictures: 'support', support: 'support',
-    notation: 'layout', orientation: 'layout', response: 'layout', task: 'layout', tiles: 'layout',
-};
-export function optionGroup(def) {
-    return (def && (def.group || GROUP_BY_ID[def.id])) || 'difficulty';
-}
+// The group of an option (`group` on the def, else by id) lives in skill-options.js, so the pupil subset
+// (pupilOptionsFor) and this panel read one table.
+export { optionGroup };
 
 // The ONE line shown under a control, in plain teacher English. Long `help` strings (notation,
 // support level) stay on the control as its tooltip; the panel shows this line instead.

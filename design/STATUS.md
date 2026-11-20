@@ -940,3 +940,22 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-19 — Deploy ws-merge-master (lf-checks; critic r5 PASS 9/9/9/8)
 - Lanes merge master into their branch with `MQ_COMMIT_TRAILER="<footer>" node tests/scripts/ws-merge-master.mjs --commit`: ledger / backtests / status files unioned row by row; a both-sides row or line conflict is left for the lane (exit 1). Self-test 28 cases; backtests merge-master-r1 / -crlf / -only-empty.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy gate robustness: ws-key-json and ws-tof-stem restart / retry (lf-checks; critics 9/8/9/8 each)
+- ws-key-json and ws-tof-stem evaluate per skill with a 120 s protocol timeout, restart the browser and retry once; two failures make a finding. The full key-json sweep runs whole again (734 skills).
+- Gates (test-harness-only change): boot-smoke, code-snapshot, key-json FULL sweep, tof-stem FULL sweep, backtests key-json-retry / tof-stem-retry, backtest + precritic self-tests, precritic-plan.
+## 2026-11-20 — HOTFIX tables-15 summaries (bug fix, no critic): hidden 13-15 ticks never named at 12 x 12 / 10 x 10
+- describeOptions / optionsReadOnlyHTML no longer name 13-15 ticks hidden at band 144 or 100 (Sets summary, Quick Start card, print rows); dealing was already clamped. ws-share-options clicks its own set block. T15-HIDDEN (ws-tables15) at bands 144 / 100 incl. code round-trips; old Times codes hash-identical to pre-t15.
+- Gates: boot-smoke, code-snapshot, share-options, tables15, backtest t15-hidden, simple-print, key-json (facts), precritic-plan, capacity-pin.
+
+## 2026-11-20 — Deploy gate robustness: ws-key-json and ws-tof-stem restart / retry (lf-checks; critics 9/8/9/8 each)
+- ws-key-json and ws-tof-stem evaluate per skill with a 120 s protocol timeout, restart the browser and retry once; two failures make a finding. The full key-json sweep runs whole again (734 skills).
+- Gates (test-harness-only change): boot-smoke, code-snapshot, key-json FULL sweep, tof-stem FULL sweep, backtests key-json-retry / tof-stem-retry, backtest + precritic self-tests, precritic-plan.
+
+## 2026-11-20 — Deploy EB-LASTPAGE / CAP-PARITY rebuild (lf-checks critic r5 9/8/9/8): declared role ceilings, blocking per role
+- The rules read each role's declared ceiling (js/modules/sheet/role-capacity.js, WDS 12.1); --capacity-check fails on an undeclared or drifted role; EBLAST_BLOCKING_ROLES (16 roles, all but pre-skill-check) block, the rest advisory; --pin-check: the list only grows.
+- Gates: boot-smoke, code-snapshot, empty-band self-test / capacity-check / pin-check, backtest + precritic self-tests, precritic-plan, capacity-pin.
+
+## 2026-11-20 — Deploy STUDENT OPTIONS (owner request; lf-partopts critic r2: 8 on every criterion at 1280 / 1366 / 1024 / 820)
+- Pupil taps a skill: its options open folded with "Play this skill" / "Play all selected (N)"; "You will play N skills"; chip x deselects (48 px); teacher-fixed options greyed "Set by your teacher"; pupil wording layer (pupil-option-words.js, WORDS lint 0); every pupil start goes through playSelectedSkills. Explorer NODUP fix at plate S.
+- Gates: boot-smoke, code-snapshot, no-size-s, no-phone-width, student-opts (4 widths), student-explorer, share-options, simple-print, screen-answer, self-tests, precritic-plan, capacity-pin, lesson baseline.

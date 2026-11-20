@@ -468,15 +468,22 @@ export function showQueueFeedback(message, color) {
     }, 1200);
 }
 
-export function playSelectedSkills(mode = 'practice') {
+export function playSelectedSkills(mode = 'practice', { only = null } = {}) {
     if (window.skillQueue.length === 0) {
         alert('No skills selected. Use the search bar to add skills.');
         return;
     }
+    // `only` (the pupil's "Play this skill", student-options.js): play these selected skills alone; the selection is kept.
+    // Every pupil start comes through here, so the play is rebuilt from the selection as it is NOW (a stale
+    // state.isMixedMode made startGame skip this rebuild: design/student-opts/CARD.md §2).
+    const playList = Array.isArray(only) && only.length
+        ? window.skillQueue.filter((s) => only.some((o) => o.categoryId === s.categoryId && o.skillId === s.skillId))
+        : window.skillQueue;
+    if (!playList.length) return;
 
     // Convert skill queue to mixed mode settings format
     const selectedSkills = {};
-    window.skillQueue.forEach(skill => {
+    playList.forEach(skill => {
         if (!selectedSkills[skill.categoryId]) {
             selectedSkills[skill.categoryId] = [];
         }
@@ -495,11 +502,11 @@ export function playSelectedSkills(mode = 'practice') {
 
     state.mixedModeSettings = {
         selectedSkills: selectedSkills,
-        name: `Custom ${modeNames[mode] || 'Practice'} (${window.skillQueue.length} skills)`
+        name: `Custom ${modeNames[mode] || 'Practice'} (${playList.length} skills)`
     };
     // A loaded code that uses one skill more than once plays every use with its own options, while
     // the queue is still the set that code loaded (skill-option-store.js queueUsesInPlay).
-    const uses = queueUsesInPlay();
+    const uses = playList === window.skillQueue ? queueUsesInPlay() : null;
     if (uses) state.mixedModeSettings.uses = uses;
 
     // CRITICAL: Set state.category and state.skill DIRECTLY so startGame and generateQuestion use them
@@ -586,6 +593,13 @@ export function updateStudentSelBar() {
     for (const id of ['studentSelAddBtn', 'studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const b = document.getElementById(id); if (b) b.disabled = n === 0; }
     const c = document.getElementById('studentSelCount');
     if (c) c.textContent = n === 0 ? 'Pick skills above' : `${n} skill${n === 1 ? '' : 's'} selected`;
+    // student-opts card O-3: "You will play N skills" beside the game style cards and the bottom Play
+    for (const id of ['studentStartCount', 'studentPlayCount']) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.textContent = n ? `You will play ${n} skill${n === 1 ? '' : 's'}` : '';
+        el.hidden = !n;
+    }
     const box = document.getElementById('studentSendBox');
     if (box && !box.hidden) box.hidden = true;   // a link made for an older selection is not kept
     // owner 2026-11-04: no floating bar — the buttons sit in the bottom row next to MAP, always shown (disabled until a pick)
