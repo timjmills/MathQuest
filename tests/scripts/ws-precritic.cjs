@@ -1287,6 +1287,9 @@ function buildPlan(ctx) {
         add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
         // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: a twin fitted narrow and then wide returns to its own --mq-k2)
         add(gate('twin-fit-reset', 'ws-twin-fit-reset (TWIN-FIT-RESET: a worksheet twin narrowed and widened again is not left shrunk)', 'number_patterns_rule worksheet @1024', 'browser', 'ws-twin-fit-reset', [], { missingMsg: 'ws-twin-fit-reset is not in this tree' }));
+        // (FIT-FLOOR / FIT-RESET, lf-hosts 2026-11-20: the host twin fit never crosses the 29 px digit floor, no sideways scroll, a resize
+        // refits from the drawing's own size; a fixed twin-drawn sample on card / worksheet / quiz)
+        add(gate('fit-floor', 'ws-fit-floor (FIT-FLOOR / FIT-RESET: the host twin fit keeps digits >= 29 px and refits on a new width)', 'twin sample x card / worksheet / quiz x 820 / 1024 / 1280 / 1366', 'browser', 'ws-fit-floor', [], { missingMsg: 'ws-fit-floor is not in this tree' }));
         // lf-hosts skip (owner request 2026-11-19): Skip on the practice card, online worksheet, quiz and MAP test - the button,
         // the count, never wrong, the end-of-run return pass (same item, scored once), "skipped" in the teacher's results, the
         // teacher's off; a fixed mult_facts run, planned once per --skill run, at the widths of tests/lib/ws-screen-widths.cjs

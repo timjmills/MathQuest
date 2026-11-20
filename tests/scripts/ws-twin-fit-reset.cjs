@@ -3,6 +3,8 @@
 // worksheet grid was still settling (a briefly narrower cell) kept the smaller drawing for good: number_patterns_rule cards 2-5 at
 // 1024 printed 22.9 px digits where the drawing fits at 26.5 px (ws-worksheet-reflow WS-DIGIT). This check takes a fitted twin on the
 // worksheet, narrows its cell and fits it, restores the cell and fits it again: the twin must come back to the --mq-k2 it had before.
+// (lf-hosts 2026-11-20: the probe skill is composing:ten_frame_build - number_patterns_rule draws the count-row twin since cbt, which
+// no longer shrinks, so a 200 px cell shrank nothing and the probe exercised no fit; the ten frame still shrinks there)
 //
 //   node tests/scripts/ws-twin-fit-reset.cjs [--skill cat:skill] [--width 1024]
 //   MQ_ROOT=<tree> judges another checkout (ws-backtest commit-pair rows).
@@ -13,7 +15,7 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && i + 1 < argv.length ? argv[i + 1] : d; };
 (async () => {
     const H = require((process.env.MQ_ROOT || require('path').resolve(__dirname, '..', '..')) + '/tests/lib/ws-harness.cjs');
-    const [cat, sk] = String(arg('skill', 'patterns:number_patterns_rule')).split(':');
+    const [cat, sk] = String(arg('skill', 'composing:ten_frame_build')).split(':');
     const W = Number(arg('width', 1024));
     let app;
     try {

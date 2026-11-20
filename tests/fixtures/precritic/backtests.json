@@ -14157,6 +14157,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "fit-floor",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-fit-floor FIT-FLOOR + FIT-RESET: the host twin fit never draws a twin numeral under 29 px (or under its own size), no sideways scroll; a host resized 820 -> 1280 draws its twins at a fresh 1280 size",
+   "rule": "FIT-FLOOR / FIT-RESET (lane lf-hosts, lead / lf-algebra 2026-11-20: host fit digit floor; fit only ever lowers)",
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "fitTwinRows shrank the word-work twin 27.1 -> 25.6 px in a 300 px quiz cell, and kept the 820 fit after a resize to 1280 (sub_word_problems 27.3 vs 32 px, ten frame 51.7 vs 60.8, money 45 vs 52.8)"
+   },
+   "pass": {
+    "commit": "291eedf74",
+    "state": "the shrink stops at the 29 px floor (none under a drawing already below it) and stacks rows instead; every new fit key (width, element count, host --mq-k2 / --mq-digit) refits from the drawing own size; a shared resize listener refits the card and quiz"
+   },
+   "command": "node tests/scripts/ws-fit-floor.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
