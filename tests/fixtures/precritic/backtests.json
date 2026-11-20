@@ -12134,9 +12134,9 @@
     "state": "critic cbt r3 tree: Pre-skill check L p1 34 % empty (81.0 mm, its next 25.5 mm row fits)"
    },
    "pass": {
-    "commit": "95f64c8a3",
+    "commit": "249da1e05",
     "args": "--roles pre-skill-check",
-    "state": "lf-ops cbt r4 F1 fix: a one-page plain check fills its page with whole rows - Pre-skill check L 14 items a page (M 16, needs >= 12), 12 % empty (29.0 mm, under its 25.6 mm row + the planned row height)"
+    "state": "lf-roles' deployed Pre-skill Check fill (903f2d778, master 0d3a72067) merged into lf-ops-props 249da1e05 (lead ruling: master's fill wins; our r4 F1 hunk 95f64c8a3 dropped): count_by_tables Pre-skill check L 10 / M 16 items a page, L above its declared ceiling (role-capacity.js L 8, ruling 1c) - EB-LASTPAGE / CAP-PARITY OK"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only EB-LASTPAGE {args}",
    "expect": {
@@ -12156,9 +12156,9 @@
     "state": "critic cbt r3 tree: Pre-skill check M 16 / L 10 items a page (needs >= 12), L page not full"
    },
    "pass": {
-    "commit": "95f64c8a3",
+    "commit": "249da1e05",
     "args": "--roles pre-skill-check",
-    "state": "lf-ops cbt r4 F1 fix: a one-page plain check fills its page with whole rows - Pre-skill check L 14 items a page (M 16, needs >= 12), 12 % empty (29.0 mm, under its 25.6 mm row + the planned row height)"
+    "state": "lf-roles' deployed Pre-skill Check fill (903f2d778, master 0d3a72067) merged into lf-ops-props 249da1e05 (lead ruling: master's fill wins; our r4 F1 hunk 95f64c8a3 dropped): count_by_tables Pre-skill check L 10 / M 16 items a page, L above its declared ceiling (role-capacity.js L 8, ruling 1c) - EB-LASTPAGE / CAP-PARITY OK"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only CAP-PARITY {args}",
    "expect": {

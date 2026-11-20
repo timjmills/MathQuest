@@ -169,3 +169,26 @@ Independent critic (Opus medium), comparing 68565d00b with master eb2e26972, 64 
 - **vocab_pick3_words:** our 16 keys cannot equal master's hashes, because this lesson's pages carry the engine `<style>`.
   Dumping the lesson on both trees (master worktree at 398bb4902, whose render matches its pin) gives 52 of 52 pages identical
   once the engine style and the marker classes are removed. Master's z1 change is fully present, and the rest is class-only.
+
+### Re-pin on master 7a904fae6 (merges 249da1e05 = 0d3a72067 Pre-skill Check fill, de0eef858 = 7a904fae6 lesson first-page fix)
+
+- **Pre-skill Check (lead ruling: lf-roles' deployed fill wins).** pre-skill-check.js is master's file whole. Our r4 F1 hunk,
+  which was our only change there, is dropped. Neither the drop nor master's fill moved a lesson key: the pin written on 249da1e05
+  is identical to 79ac4cd11's, and master's pin did not move from 398bb4902 to 0d3a72067. (A lesson's check is `perQuestion`.)
+- **Written on de0eef858:** 2,738 hashes (master: 2,614).
+  - Against our previous pin, only `algebra:two_step_letter_equation` moved: 88 keys, master's own re-pin.
+  - Against master's pin, 2,226 keys differ. That is the same count as before, made of the same accounted set: 102 real pages,
+    the class-only pages, and the 124 keys of the 3 new pins.
+  - two_step_letter_equation's share of that set changed shape. 24 keys left the set because they now equal master's, and 24 new
+    keys joined it because master's first-page fix re-paged the lesson.
+  - Content check: we dumped the lesson on both trees, using a master worktree at 7a904fae6 whose render matches its pin. All 80
+    of 80 pages are identical once the engine `<style>` is stripped. 48 are raw-identical. The other 32, plus 8 whole-HTML
+    hashes, differ by the engine style only.
+- **cbt Pre-skill check on master's fill** (`ws-empty-band --roles pre-skill-check --page-fill --sizes M,L --eblast-block`):
+  EB-LASTPAGE and CAP-PARITY PASS on count_by_tables, combine, unit_form and vocab_grade_pictures.
+  - count_by_tables L is 1 page with 10 items (M: 16). Its foot is 34 % empty (81.0 mm), which is the r3 F1 state.
+  - It passes because the declared L ceiling is now 8 items (role-capacity.js, lead ruling 1c, 35465ad9c), and the page holds 10.
+- **Consequence for the backtests:** the two cbt rows no longer prove their rule. Their fail side, 3038af154 (L 10 items,
+  81 mm), is now also OK under the declared ceiling. `ws-backtest` returns FAIL on both: fail state OK, pass state OK. The pass
+  side is re-pointed to 249da1e05, master's fill on this branch. The fail side needs a lead ruling: either a new failing state
+  under ruling 1c (an L page below 8 items with a row free), or retiring both rows as superseded by ruling 1c.
