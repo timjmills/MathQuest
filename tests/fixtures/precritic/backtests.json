@@ -14537,6 +14537,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-player-any-part",
+   "check": "ws-lesson-player --any-part PLAYER-ANY-PART: every player part id (warmup, ido, wedo, youdo, exit) opens directly by ?lesson=&part= and the part bar jumps to every other part, the URL following (design/cards/lesson-player D11)",
+   "kind": "commit-pair",
+   "rule": "PLAYER-ANY-PART (lesson-player card D10 / D11, lane lf-hosts slice 1)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master before slice 1: no lesson player - a ?lesson= link opens nothing"
+   },
+   "pass": {
+    "commit": "58cadd3f8",
+    "state": "lesson player slice 1: every part opens by URL, the part bar jumps"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --any-part",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-seed-parity",
+   "check": "ws-lesson-player --unit: the I do example equals the printed anchor chart's example for the same seed on both print screens (M-LP2, D2), I do steps == the provider's workedSteps (M-LP1), the Say line holds only the example's numbers",
+   "kind": "commit-pair",
+   "rule": "M-LP1 / M-LP2 (lesson-player card D2, D10)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master before slice 1: no player plan - no I do to compare with the chart"
+   },
+   "pass": {
+    "commit": "58cadd3f8",
+    "state": "lesson player slice 1: the I do is the chart's own example (5 + 2 at seed 75513)"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --unit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

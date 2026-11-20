@@ -107,7 +107,11 @@ function checkIdo(mods, exampleQ) {
 /* ================================================================ browser */
 async function openPlayer(width, part = 'ido', extra = '') {
     const h = await H.open({ viewport: { width, height: HEIGHT(width), deviceScaleFactor: SHOTS ? 2 : 1 }, pagePath: `/index.html?lesson=${encodeURIComponent(LESSON)}&part=${part}&mode=board${extra}`, lock: TOOL });
-    await H.waitFor(h.page, () => window.lessonPlayerState && !window.lessonPlayerState.__mqStub && window.lessonPlayerState().ready, 90000, 'lesson player ready');
+    try {
+        // (fail fast where no player exists - a tree before slice 1 - then give the lesson build its time)
+        await H.waitFor(h.page, () => typeof window.openLessonPlayer === 'function' && !!document.getElementById('mqLessonPlayer'), 15000, 'lesson player opened');
+        await H.waitFor(h.page, () => window.lessonPlayerState && !window.lessonPlayerState.__mqStub && window.lessonPlayerState().ready, 90000, 'lesson player ready');
+    } catch (e) { await h.close(); throw e; }
     await new Promise((r) => setTimeout(r, 150));
     return h;
 }
