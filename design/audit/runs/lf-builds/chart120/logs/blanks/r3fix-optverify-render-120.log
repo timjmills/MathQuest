@@ -1,0 +1,4 @@
+composing:chart_to_120: 10 appearance value(s) to render: tiles=2, tiles=3, tiles=4, tiles=6, tiles=8, grid="rows", grid="whole", gaps="row", gaps="column", gaps="pattern"; not rendered: band (number size), calculator (play control), skipAfter (play control)
+  FAIL composing:chart_to_120 M gaps="row": capacity: 4 items on its fullest page where the default page prints 6 (the value costs the page items without adding a drawing; RUBRIC H13)
+  FAIL composing:chart_to_120 L gaps="row": capacity: 4 items on its fullest page where the default page prints 6 (the value costs the page items without adding a drawing; RUBRIC H13)
+ws-options-verify --render: FAIL (2 value page(s) worse than the default: chart_to_120 gaps="row" @M, chart_to_120 gaps="row" @L; 20 value page(s) (1 skill(s) x M/L) against 2 default page(s) through ws-print-lint --source kit in 66 s; 0 n/a)

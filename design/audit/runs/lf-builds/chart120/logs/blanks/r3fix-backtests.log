@@ -1,0 +1,40 @@
+ws-backtest row c120b-lesson-grid-even: PASS  fail state FAIL 11.0s, pass state OK 11.1s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-lesson-grid-even      commit-pair  FAIL 11.0s          OK 11.1s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 31.7 s
+ws-backtest: OK
+ws-backtest row c120b-lesson-side-band: PASS  fail state FAIL 9.7s, pass state OK 10.0s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-lesson-side-band      commit-pair  FAIL 9.7s           OK 10.0s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 36.1 s
+ws-backtest: OK
+ws-backtest row c120b-guided-tight: PASS  fail state FAIL 16.4s, pass state OK 16.8s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-guided-tight          commit-pair  FAIL 16.4s          OK 16.8s            PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 52.1 s
+ws-backtest: OK
+ws-backtest row c120b-model-steps-across: PASS  fail state FAIL 8.4s, pass state OK 8.2s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120b-model-steps-across    commit-pair  FAIL 8.4s           OK 8.2s             PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 35.3 s
+ws-backtest: OK
+ws-backtest row hcf-band30-pattern: PASS  fail state FAIL 11.1s, pass state OK 8.5s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+hcf-band30-pattern          commit-pair  FAIL 11.1s          OK 8.5s             PASS
+
+1 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 38.3 s
+ws-backtest: OK
