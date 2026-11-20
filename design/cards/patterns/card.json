@@ -1173,15 +1173,15 @@
       },
       {
         "key": "role:fact-probe",
-        "d": "offered",
+        "d": "out of scope",
         "skills": [
           "patterns:notice_patterns",
           "patterns:pattern_features",
           "patterns:growing_shape_patterns"
         ],
         "proposed": false,
-        "source": "brief: every page role builds and prints a key",
-        "why": "the skill's own items"
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "not a fact skill: the role reports unsupported"
       },
       {
         "key": "role:true-false",
@@ -1368,14 +1368,14 @@
       },
       {
         "key": "role:fact-probe",
-        "d": "offered",
+        "d": "out of scope",
         "skills": [
           "patterns:number_patterns_rule",
           "patterns:follow_given_rule"
         ],
         "proposed": false,
-        "source": "brief: every page role builds and prints a key",
-        "why": "the skill's own items"
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "not a fact skill: the role reports unsupported"
       },
       {
         "key": "role:true-false",
