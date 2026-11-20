@@ -27,6 +27,7 @@ const PAGES = arg('pages', 'band');
 const HTML = arg('html', null);
 const KEYHTML = arg('key', null);
 const OUT = arg('out', null);
+const OPTS = arg('opts', null) ? JSON.parse(arg('opts', null)) : undefined; // (--opts '{"band":100}': the skill's option values)
 const NAME = arg('name', LESSON ? LESSON.split(':')[1] : 'lesson');
 const BODY_MIN = 0.006, ROWS_MIN = 0.5, BAND_MIN = 0.01;
 
@@ -48,9 +49,9 @@ const BODY_MIN = 0.006, ROWS_MIN = 0.5, BAND_MIN = 0.01;
             try { if (typeof s === 'function') s = s(q); } catch (e) { s = null; }
             const iCan = s ? String(typeof s.iCan === 'function' ? s.iCan(q) : s.iCan || '') : '';
             if (a.html) return { iCan, pupil: null };
-            const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [{ categoryId: a.categoryId, skillId: a.skillId }] }], size: a.size, paper: 'A4', seed: a.seed, key: true, practicePages: 1, mixed: true });
+            const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [Object.assign({ categoryId: a.categoryId, skillId: a.skillId }, a.opts ? { opts: a.opts } : {})] }], size: a.size, paper: 'A4', seed: a.seed, key: true, practicePages: 1, mixed: true });
             return { iCan, pupil: window.sheetDocument(r.pupilHtml, 'pupil', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml || '', 'key', { paper: 'A4' }) };
-        }, { categoryId, skillId, size: SIZE, seed: SEED, html: !!HTML });
+        }, { categoryId, skillId, size: SIZE, seed: SEED, html: !!HTML, opts: OPTS });
         const want = String(built.iCan || '').trim();
         if (!want) fails.push(`LR-TITLE ${LESSON}: the skill has no provider "I Can" title to check against`);
         const docs = [['pupil', HTML ? fs.readFileSync(HTML, 'utf8') : built.pupil], ['key', KEYHTML ? fs.readFileSync(KEYHTML, 'utf8') : (HTML ? null : built.key)]].filter((d) => d[1]);

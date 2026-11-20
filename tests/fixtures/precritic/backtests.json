@@ -12481,6 +12481,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-lesson-sections",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo LESSON-SECTIONS",
+   "check": "a lesson teaching sheet keeps Guided >= 1 and, at M, Independent >= 2 (critic blanks r5 G1)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,4242 --only LESSON-SECTIONS",
+   "fail": {
+    "commit": "70c218ed7",
+    "state": "band-100 teaching windows pinned to rows 41-70 hold only two disjoint 3x5 windows: the hcf M teaching sheet lost Independent"
+   },
+   "pass": {
+    "commit": "ef388f498",
+    "state": "band-100 teaching slot list (Guided 41-65, Independent 46-70 / 61-85) with A13 given squares"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-answer-reuse-given",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo ANSWER-REUSE",
+   "check": "at most a third of a lesson practice page's answers are real re-asks; A13 given squares are not re-asks",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,777 --only ANSWER-REUSE",
+   "fail": {
+    "commit": "cbf9fa56f",
+    "state": "slot list without A13: practice rows grids forced to re-ask the teaching gaps (hcf M p3 seed 1: 7/18; seed 777: 7/17)"
+   },
+   "pass": {
+    "commit": "ef388f498",
+    "state": "lead ruling A13: the practice rows grids print the teaching gaps as given numbers, never re-asks"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
