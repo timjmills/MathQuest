@@ -969,3 +969,9 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   nfn gate, a WARNING (exit 4) until lf-engine's fix lands - then drop `--warn` and it blocks.
 - Backtests `lesson-empty-first`, `lesson-opener-same` (FAIL: master measured, fail.json; PASS: a PLANTED fixed lesson,
   pass.json - no fix exists yet; re-point when lf-engine lands it). Ledger rows: CHECKS_FROM_CRITICS 2026-11-19 x 2.
+## 2026-11-20 — ws-content-audit module-load crash (lead, urgent)
+
+- skill-options.js began importing pupil-option-words.js; the audit loaded it from a temp copy that listed modules by hand,
+  so the gate crashed (ERR_MODULE_NOT_FOUND). Now it copies the whole js/modules tree with a {"type":"module"} package.json
+  (no new import can break it, no typeless-package warning), and --self-test loads skill-options.js and its imports. Row
+  `content-audit-module-load` (a real --skill add_facts run: crash on master, OK on the fix).
