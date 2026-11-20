@@ -36,6 +36,7 @@ import {
     instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed,
 } from './compose.js';
 import { slotScore } from '../paginate.js';
+import { rowCapMm } from '../layout.js';
 import { roleCapacity } from '../role-capacity.js';
 
 export const ROLE_ID = 'pre-skill-check';
@@ -369,10 +370,14 @@ function planCheck(input, cut) {
     const quadFits = quads.length === 4 && quads.every((q) => fitsAt(q, 4, ctx));
     if (quadFits) {
         // Two rows of two quadrants; each quadrant a band over a 2 x 2 grid (PT-PRE-2 at L).
-        const quadH = (m.body - 2 - 3) / 2;
-        const cellH = (quadH - m.strip - TAG) / 2;
+        const quadH0 = (m.body - 2 - 3) / 2;
+        const cellH0 = (quadH0 - m.strip - TAG) / 2;
         const need = Math.max(...quads.map((q) => hMinAt(q, 4, ctx)));
-        if (need <= cellH) {
+        // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a quadrant's rows are held to
+        // what they draw + their writing room, and the quadrant to its rows; the spare stays at the foot of the page
+        const cellH = Math.min(cellH0, Math.max(need - 2, rowCapMm(need - 2, quads.flat())));
+        const quadH = Math.min(quadH0, m.strip + TAG + 2 * cellH);
+        if (need <= cellH0) {
             const rowPart = (a, b) => ({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow', height: `${quadH.toFixed(2)}mm`, parts: [band(a, 2, 2, cellH, 4), band(b, 2, 2, cellH, 4)] });
             pages.push({ sections: [rowPart(quads[0], quads[1]), rowPart(quads[2], quads[3])] });
         }
@@ -416,7 +421,10 @@ function planCheck(input, cut) {
             routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
         } else for (const [j, q0] of quads.entries()) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
-            const h = hMinAt(q0, cols, ctx) * grow;
+            // (ROW-STRETCH CAP stage 2: the grown row never passes what it draws + its writing room, layout.rowCapMm; hMinAt is the
+            // measure + 2 mm, the cell draws its measure)
+            const h0 = hMinAt(q0, cols, ctx);
+            const h = Math.min(h0 * grow, Math.max(h0 - 2, rowCapMm(h0 - 2, q0)));
             const share = (m.budget / quads.length - m.strip - TAG) * cut;
             const q = whole ? q0 : q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
             kept += slotScore(q);
@@ -488,7 +496,8 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         u.h0 = Math.max(...hs);
         // (a legacy cell is measured taller than it draws - its own text and answer line: it keeps its measured height)
         const legacy = u.qs.some((q) => q.some((it) => it.legacy));
-        u.cap = legacy ? u.h0 : u.h0 * ROUTE_GROW;
+        // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: and never past what it draws + its writing room, layout.rowCapMm)
+        u.cap = legacy ? u.h0 : Math.min(u.h0 * ROUTE_GROW, Math.max(u.h0 - 2, rowCapMm(u.h0 - 2, u.qs.flat())));
         u.tagLines = Math.max(...u.qi.map((qi, x) => routeTagLines(routeOf(input, qi), two ? (x ? FULL_W_MM - w : w) : FULL_W_MM)));
         u.fixed = m.strip + Math.max(0, ...u.qs.map((q, x) => extraLines(q, two ? (x ? FULL_W_MM - w : w) : FULL_W_MM))) * em * 1.25 + routeTagMm(u.tagLines);
         u.h = u.h0;

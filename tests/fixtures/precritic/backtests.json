@@ -14539,6 +14539,359 @@
    }
   },
   {
+   "id": "eb-stretch-rowcap",
+   "check": "ws-empty-band EB-STRETCH: a print row of a template that declares its writing room (layout.js ROW_ROOM_MM) is never taller than the cell's natural height (laid out with no row stretch) + that room, + 1.5 mm. Lead ruling 2026-11-14 (lf-placevalue vocabulary deploy item (d)): spare page height was shared into rows - the Match 3 practice row 57 mm for a 50 mm work, the Opener count row 31.7 -> 39.2 / 43.4 mm, the lesson Vocabulary 39.4 -> 50.7 mm",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH (lead ruling 2026-11-14, ROW-STRETCH CAP)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "EB-STRETCH fires on vocab_grade_pictures (Match 3) independent M / L: 57 mm rows for 50 mm works, 5 mm over the 52 mm cap"
+   },
+   "pass": {
+    "commit": "893d95d16",
+    "state": "0 findings: the rows are held to 52.5 mm (drawn 50 + 2 mm room); the spare height is white at the foot"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --sizes M,L --roles independent --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-fill",
+   "check": "ws-rowcap-fill ROWCAP-FILL: a capped template's section (layout.js ROW_ROOM_MM) counts its rows at the height they are drawn (rowCapMm: drawn + room), so rows x cellH leaves at most one row of the grid free. Critic lf-engine-rowcap r1 F1 / F2 / F3: Review L (master) and Match 3 L (31d41507 + fix) printed 3 rows of 52.5 mm and a ~75 mm white foot where 4 fit - the fill counted on the 48 mm footprint (58 mm asked), the cap drew 50 + 2",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL (critic rowcap r1 F3)",
+   "fail": {
+    "commit": "1b5c3b9c9",
+    "state": "Match 3 footprint 48 mm at M and L: 3 rows of 53 mm leave 68-69 mm of a 227-228 mm grid free"
+   },
+   "pass": {
+    "commit": "f5c025e4c",
+    "state": "4 rows of 53 mm: under one row free at M and L"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --r1 --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-stretch-selfbuilt",
+   "check": "ws-empty-band EB-STRETCH (stage 2, critic lf-engine-rowcap r1 F4): every template not in layout.js ROW_STRETCH_EXEMPT is capped at drawn + its room (ROW_ROOM_MM, else ROW_ROOM_DEFAULT_MM), and the self-built rows of Guided, Scripted Model, Error Analysis and Pre-skill check are a FAIL over it, not a note (on master they were 5-12 mm over)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH stage 2 (critic rowcap r1 F4)",
+   "browser": true,
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: Guided / Scripted Model / Error Analysis / Pre-skill check rows stretched past drawn + room (count_by_tables)"
+   },
+   "pass": {
+    "commit": "28e9e9d1f",
+    "state": "0 EB-STRETCH findings: those composers hold each row to layout.rowCapMm"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --sizes M,L --roles guided,scripted-model,error-analysis,pre-skill-check --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-fill-all",
+   "check": "ws-rowcap-fill ROWCAP-FILL over EVERY registered template (stage 2, critic rowcap r1 F4 (c)): rows are never drawn past drawn + room, and counted at that height, so a page never ends with more than one row free unless the deal or the role caps the count",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL every template (critic rowcap r1 F4)",
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: every unlisted template's rows stretched past the cap (e.g. add-three 57-76 mm for a 50 mm drawing), 294 findings"
+   },
+   "pass": {
+    "commit": "28e9e9d1f",
+    "state": "53 templates x 6 shapes: every row at most its cap, at most one row free"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-unlisted",
+   "check": "ws-rowcap-fill --only UNLISTED (stage 2 unit assertion): a template missing from every table is capped by the tree's rowCapMm at drawn + the default room, never Infinity; an exempt template is not capped",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill UNLISTED (critic rowcap r1 F4 (a))",
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: rowCapMm(50, an unlisted template) = Infinity"
+   },
+   "pass": {
+    "commit": "28e9e9d1f",
+    "state": "rowCapMm(50, an unlisted template) = 53"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --only UNLISTED --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-clip-guided",
+   "check": "ws-empty-band EB-CLIP (critic lf-engine-rowcap-s2 F1 / F2, the second side of EB-STRETCH): every print cell's ink - legacy and template-less cells too - ends at least 0.5 mm above its row's rule",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-CLIP",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_wp_10_plain Guided L p2: rows held under the tries' ink (the cap took a tab keep-out off rows that draw it), ink 0.2 mm off the rule"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "every Guided row at least its measured ink + 1 mm"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10_plain --sizes L --roles guided --hosts none --no-baseline --only EB-CLIP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tab-clear-ea",
+   "check": "ws-empty-band TAB-CLEAR (critic lf-engine-rowcap-s2 F3): a cell's number tab stands >= 2 mm from the text it numbers (CL-40's 1 mm from a one-line fact or a box), pupil page and key",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band TAB-CLEAR",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "fact_family_sort Error Analysis M: the tab 0.0 mm from \"Sam chose:\" (the held row no longer centred the work low enough)"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "the work keeps the tab's height + 0.75 mm over it, in its own markup"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:fact_family_sort --sizes M --roles error-analysis --hosts none --no-baseline --only TAB-CLEAR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-ink-floor",
+   "check": "ws-roles-unit GUIDED-INK-FLOOR (critic lf-engine-rowcap-s2 F2): every Guided row is at least its measured ink + 1 mm",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-INK-FLOOR",
+   "fail": {
+    "commit": "661965d43",
+    "state": "a continuation page of 93 mm tries held to 92-93 mm rows"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "rows of at least 94 mm"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-INK-FLOOR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pagefill-capped-roles",
+   "check": "ws-print-lint PAGEFILL on review / test / error-analysis / opener (critic lf-engine-rowcap-s2 F4 / F5): a strip over 20 % of the problem area is major under the role's ceiling, and over 30 % at the ceiling (a reshape fills it)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (capped roles)",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_facts Test L 4 x 3 at its ceiling of 12: a 91 mm strip, 39 %"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "3 x 4: 53 mm, 23 % (minor at the ceiling)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles test --fill-roles test --size L --lints L-DENSITY --skills addition:add_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "white-row-review",
+   "check": "ws-capacity-pin WHITE-ROW (critic lf-engine-rowcap-s2 F4): a one-page Review / Test / Error Analysis under its ceiling leaves at most one row of white under its last row",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin WHITE-ROW",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_facts Review M: 10 of 12 items under 100 mm of white (3 main columns, the earlier share's 20 % floor)"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "12 items (4 main columns): at the ceiling"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills addition:add_facts --roles review",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rr-box-frame",
+   "check": "ws-role-raster RR-BOX (critic lf-engine-rowcap-s2 F1 / F2): every dark frame edge the printed PDF draws is inked over at least 70 % of its length - a frame cut by its cell or painted over (the Say band over the Model frame) FAILS",
+   "kind": "fixture",
+   "rule": "ws-role-raster RR-BOX",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/rr-box/rr-box.fail.pdf",
+    "state": "count_by_tables Scripted Model L printed on 661965d43: the Model frame's bottom edge covered by the Say band (64 % inked), the Say line cut"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/rr-box/rr-box.pass.pdf",
+    "state": "count_by_tables Guided L printed on d8d3e9fc5: every frame edge inked"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --raster-pdf {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-pack-lesson",
+   "check": "ws-vocab-unit --browser V-PACK: each vocabulary lesson packet (practicePages 1, mixed; M / L; seeds 4242 and 1) prints its Practice on the one page asked for and its Mixed page on the pages its packing counted. Critic lf-engine-rowcap r2 F1: with the row-stretch cap the vocab_grade_pictures L lesson ran 9 -> 10 pages - Practice 4 + 2 one-across Match 3 rows (the default [6, 2] shape), and a 4th Match 3 Mixed shelf counted without its strip spilled the anchor chart (Mixed 3 -> 4 pages, one Match 3 cell alone on page 2: L-LONE / PAGEFILL)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-vocab-unit --browser V-PACK (precritic gate vocab-unit-browser); node twin ws-layout-unit MIX-PAGES",
+   "fail": {
+    "commit": "9b97befbb",
+    "state": "lf-placevalue + master + lf-engine rowcap merged: vocab_grade_pictures L packet 10 pages (Practice 2 pages, Mixed 4 pages)"
+   },
+   "pass": {
+    "commit": "fbca1a582",
+    "state": "Practice one page of 4 Match 3 rows; Mixed packing counts a page-opening shelf with its strip: L packet 8 pages"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-PACK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-pages",
+   "check": "ws-mix-pages MIX-PAGES (the node twin of ws-layout-unit MIX-PAGES, runnable on an old tree): a library lesson Mixed page dealt the counts counts() chose prints as many pages as the same page with one lead shelf fewer. Critic lf-engine-rowcap r2 F1: the packing (mixed-practice.js pagesOf) counted a lead shelf that starts a page without its strip, so a 4th Match 3 shelf joined the anchor chart page on paper only and the chart spilled: vocab_grade_pictures L Mixed 3 -> 4 pages, one Match 3 cell alone on page 2",
+   "kind": "commit-pair",
+   "rule": "ws-mix-pages MIX-PAGES (precritic node gate mix-pages; twin ws-layout-unit MIX-PAGES)",
+   "fail": {
+    "commit": "9b97befbb",
+    "state": "parent of fbca1a582: lead 4 shelves -> 4 pages, one shelf fewer -> 3 pages"
+   },
+   "pass": {
+    "commit": "fbca1a582",
+    "state": "pagesOf counts the strip: lead 3 shelves -> 3 pages"
+   },
+   "command": "node tests/scripts/ws-mix-pages.mjs --root {root} --only MIX-PAGES",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-model-onepage",
+   "check": "vocab_grade_pictures Scripted Model: no page before the last leaves 30 % or more of its body empty (EB-PAGE --page-fill). Builder vocab-blockers 2026-11-19: 3 Match 3 states dealt 2 + 1 (M p1 36 %, L p1 32 %) because roles/scripted-model.js reserves two step-text lines (textH2) on a one-line full-width state",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE (--page-fill; precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "b77b1dd9b",
+    "state": "OPEN RED: Scripted Model M p1 36 %, L p1 32 % empty (2 pages)"
+   },
+   "pass": {
+    "commit": "5054c8748",
+    "state": "MEASURED STATES: a full-width state is measured as drawn (step text, marks, wide state); the 3 Match 3 states print on one page at M and L"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles scripted-model --hosts none --page-fill --no-baseline --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-drop",
+   "check": "ws-mix-pages MIX-DROP / MIX-SHELVES: a shelf that fits is never dropped - dealt one lead item more, plan() must not lay that shelf out on the pages the chosen counts print; meta.packedPages / packedShelves equal plan()'s pages and shelves. lf-placevalue vocab deploy blocker 1: packing counted every shelf at the pool's tallest uncapped shelf (the probe's tallest item) while plan() lays each out at its own items' capped height: add_wp_10 L lesson Mixed 14 -> 12 items (p5 45 % white), two_step_letter_equation M Mixed 6 -> 5",
+   "kind": "commit-pair",
+   "rule": "ws-mix-pages MIX-DROP (precritic node gate mix-pages)",
+   "fail": {
+    "commit": "414a0e108",
+    "state": "counts 2 lead shelves; dealt 3, plan() fits all 3 on the same 2 pages"
+   },
+   "pass": {
+    "commit": "fd80e5c9d",
+    "state": "shelfRow: packing counts each shelf at plan()'s laid-out height; counts 4 lead, the 5th does not fit"
+   },
+   "command": "node tests/scripts/ws-mix-pages.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-fill",
+   "check": "ws-lesson-fill LESSON-FILL: a lesson's Practice over two pages never leaves a page more white than the next page's first item needs (+ 2 mm). lf-placevalue vocab deploy blocker 2: follow_given_rule / number_patterns_rule lesson p3-p4 at M and L - the [6, 2] shape clamped to 1 column took the 1-column target of 4 rows and was never filled (PAGE FILL skipped a clamped section and a grid under the step strip): p3 82-121 mm white, p4 2 more items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-fill LESSON-FILL (precritic gate lesson-fill)",
+   "browser": true,
+   "fail": {
+    "commit": "414a0e108",
+    "state": "Practice 2 pages at seed 4242 (M / L, both lessons): 4 FAIL"
+   },
+   "pass": {
+    "commit": "d79fb5d7d",
+    "state": "fillClamped: Practice 1 page of 6 under its step strip"
+   },
+   "command": "node tests/scripts/ws-lesson-fill.cjs --lessons patterns:follow_given_rule,patterns:number_patterns_rule --sizes M,L --seeds 4242",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-measured-states",
+   "check": "ws-empty-band EB-STRETCH / EB-PAGE on the full-width Scripted Model states: a state row is sized from the state as DRAWN (its step text over it, its marks), never a two-line text estimate. lf-engine vocabfix item 3: vocab_pick3_words Model rows 88.7 / 93 mm held cells drawn 70.1 / 73.6 mm (15.5-16.4 mm over the cap), vocab_grade_pictures 2.6-3.7 mm over and p1 36 % / 39 % empty",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH / EB-PAGE (precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "414a0e108",
+    "state": "9 EB-PAGE / EB-STRETCH findings on the vocabulary Models (M / L)"
+   },
+   "pass": {
+    "commit": "5054c8748",
+    "state": "0 findings: rows from the measured state"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words --roles scripted-model --sizes M,L --hosts none --page-fill --no-baseline --only EB-PAGE,EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-beside-clip",
+   "check": "ws-empty-band EB-CLIP on the two-column (state beside its step) Scripted Model: the beside state is measured as drawn and its row keeps that height. Critic rowcap-s2 F1 class / vocabfix resume: add_wp_10_plain L word-work states ran 0.8 mm past the row rule, fact_family_sort L family-check 0.1 mm above it (and the frame's foot covered in print, RR-BOX)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-CLIP (precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "d2306451c",
+    "state": "EB-CLIP 5 on add_wp_10_plain L / fact_family_sort L Scripted Model"
+   },
+   "pass": {
+    "commit": "dd5e01659",
+    "state": "beside states measured as drawn: EB-CLIP 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10_plain,addition:fact_family_sort --roles scripted-model --sizes L --hosts none --no-baseline --only EB-CLIP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "mws-save-reproduce",
    "kind": "commit-pair",
    "browser": true,

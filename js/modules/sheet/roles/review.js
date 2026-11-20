@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, cellWidthMm, LIVE_W_MM, capRowsToInk, isStoryWork } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, cellWidthMm, LIVE_W_MM, capRowsToInk, isStoryWork, rowCapMm, drawnRowMm } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 import { slotScore } from '../paginate.js';
 
@@ -246,6 +246,13 @@ function geometryAt(pools, input, mainCols = 0) {
     };
     let best = bands === 2 ? search(0.2, true) : search(0, false);
     if (best.n < 0 && bands === 2) best = search(0, true);
+    // ROW-STRETCH CAP refill (critic lf-engine-rowcap-s2 F4): rows are drawn at their cap, so a page under its ceiling whose plan leaves
+    // white under it takes the plan that prints MORE, the earlier share's 20 % floor giving way - only where the earlier step's rows are
+    // no taller than the main ones (a long-division earlier row of 84-94 mm flipped div_facts_long's sizes: L 11 over M 10, SIZE-ORDER)
+    if (bands === 2 && best.n > 0 && best.n < ceil && E.h <= M.h * 1.2) {
+        const used = mainAt(best.mRows).h + best.eRows * best.eh + (best.eWide || 0) * (best.ehw || 0);
+        if (availOf(mainAt(best.mRows).bands) - used > 0) { const alt = search(0, true); if (alt.n > best.n) best = alt; }
+    }
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
     // lf-ops r-review: at S a static-width earlier step (stacks) may take a 5th column - narrower cells round the same ink, as
@@ -279,7 +286,16 @@ function geometry(pools, input) {
     const main = pools.main || [];
     const xFacts = !multMain(pools) && ctx.size === 'S' && (pools.earlier || []).length > 0 && main.length > 0
         && main.every((it) => it && it.template === 'fact' && it.supportsBox && it.supportsBox.plan && /^(\*|×|x)$/.test(String(((it.q && it.q.cell && it.q.cell.payload) || {}).op || '')));
-    if (!xFacts) return g;
+    // ROW-STRETCH CAP refill (critic lf-engine-rowcap-s2 F4): rows drawn at their cap leave the page's spare height white, so a Review
+    // under its ceiling also tries ONE more main column where the problems fit it and takes it when that prints more (add_facts
+    // Review M: 3 x 3 + 2 mixed = 11 under 100 mm of white; 4 x 2 + 2 x 2 = 12)
+    if (!xFacts) {
+        if (g.n >= (CEILING[ctx.size] || 12) || !main.length) return g;
+        const c = g.cols + 1;
+        if (c > 4 || !fitsAt(main, c, ctx)) return g;
+        const alt = geometryAt(pools, input, c);
+        return alt.n > g.n ? alt : g;
+    }
     let best = g;
     for (const c of [5, 4, 3]) {
         if (c === g.cols || !fitsAt(main, c, ctx)) continue;
@@ -381,10 +397,12 @@ export function plan(input = {}) {
     // page's share: combine's two-line frames in 32-41 mm rows were 37-40 % empty under the answer line, read on the pixels, and
     // a one-line expand row at IN_PLACE_FILL still 32 % - its measured height already holds the pads; the rest stays under the grid)
     const tight = (gr, hs, c) => (tightRows(gr) && hs.length ? Math.min(c, sum(hs) / hs.length) : c);
-    const cellsM = hsM.map((hs, gi) => tight(groups[gi], hs, factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
+    // (ROW-STRETCH CAP, layout.rowCapMm: a band of declared templates stops at what its rows draw + their writing room)
+    const capped = (gr, cols, hs, c) => (hs.length ? Math.min(c, rowCapMm(drawnRowMm(gr, cols) || Math.max(...hs), gr)) : c);
+    const cellsM = hsM.map((hs, gi) => capped(groups[gi], g.cols, hs, tight(groups[gi], hs, factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM))));
     const cellM = cellsM[0] || hM;
-    const cellE = tight(useE, hsE, cellOf(hsE, hE));
-    const cellEW = tight(useEW, hsEW, cellOf(hsEW, g.ehw || hE));
+    const cellE = capped(useE, eCols, hsE, tight(useE, hsE, cellOf(hsE, hE)));
+    const cellEW = capped(useEW, 1, hsEW, tight(useEW, hsEW, cellOf(hsEW, g.ehw || hE)));
     const labels = labelStyleOf(ctx.look, input.labels);
     const shaped = (part, items, cols, rows, cellH) => {
         // Each row as tall as what IT holds (layout.rowShape).
