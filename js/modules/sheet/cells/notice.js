@@ -277,7 +277,11 @@ register(NOTICE_TEMPLATE, {
     footprint(p, ctx) {
         // (one wide cell a row at every size: two across at S left a 37 % band beside a cell whose sentences wrap
         // to more lines, H13; S still fits more rows than L, its text being smaller)
-        if (p.task === 'feature' || p.task === 'truefalse') return { wMm: 130, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true };
+        // (`hardCap`: the one column is the author's cap, not a guess the measurement may widen - layout.itemCap let the
+        // measured 92 mm fit take two across at M, so a page laid one 2-across row (56 mm of ink) beside 1-across rows
+        // (43 mm) and both grids were spread to share the page: 23-25 mm empty bands, ws-print-lint L-DENSITY H13 30 %,
+        // ws-empty-band EB-BAND 29.8 %, patterns precritic 2026-11-20 A2)
+        if (p.task === 'feature' || p.task === 'truefalse') return { wMm: 130, hMm: null, measure: true, factLike: false, maxCols: 1, hardCap: true, denseRoom: 1, inPlace: true };
         return { wMm: 60, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true };
     },
     inputs(p) {
