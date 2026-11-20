@@ -58,3 +58,55 @@ Card §10 deferrals done in these steps, with no re-sign (each is §10-deferred 
   (+ b c d), WEEK f (+ a). The same map is executable in tests/scripts/ws-mix-review.mjs `CHECKS`.
 - card.json is NOT re-synced for these text edits. The checks read only mixed-review.md, and card.json mirrors the §9b text.
   This is noted so that the lead can re-sync it when it signs the next card change.
+- Step 1 (MR-E) also adds tests/scripts/ws-mix-review.mjs. It runs `--check count|pool|share|hosts|week|breakdown|labels|trace`,
+  has ONE named fixture per FAIL state under tests/fixtures/mix-review/<check>/{fail,pass,pending}/, and the pending states
+  are named with their build step. It adds 12 backtest rows `mix-review-*` (6 pending, one per later step) and
+  ws-precritic `--role mixed-review` on the pinned filter sample tests/fixtures/precritic/mix-review-sample.json. Its Node cores
+  ARE check-v1's properties, run on the product dealer through check-v1 `configure()`.
+- Step 1b: `AREA_LABELS` in js/modules/teacher-areas.js (the 11 rows of card §7a; lessons-browser R1 55ae9d090).
+- Step 2: js/modules/mixed-review.js = proto/dealer-v1.mjs with ONLY its two import paths changed (pins re-taken in
+  tests/fixtures/mix-review/frozen.json; interleave.js and rng.js pins unchanged). js/modules/mixed-review-pool.js holds
+  poolRows, placementGrades, footprintKind, DEFAULT_FILTERS and weightsFrom. The frozen V1 table
+  tests/fixtures/mix-review/v1-registry.json (708 rows) comes from `ws-mix-review --pin`, and 20 of 20 product golden codes
+  replay. skill-codes.js delegates the V1 tokens to V1 encode / decode (one codec). design/SHARE_CODES.md has a
+  "Mixed review tokens" section.
+  - L4: rows carry `kind`, never `fc` (pool-row-fc).
+  - L5: codes are FROZEN_SKILL_CODES. Every live skill outside MIXED / NOSTD already had a frozen code, so nothing had to
+    be pinned. The one live skill with no frozen code is all_mixed:custom_mixed, a MIXED pool, which is never a row.
+  - L6: the card's order-mode text now says "the frozen V1 table's grade".
+
+## Findings for the lead (build step 2, 2026-11-20)
+1. **L9 contradicts §2 rule 5 / prop l. BLOCKED, not built.** A `word-problem-long` kind capped at 2 at L makes a lone item
+   unavoidable on a pool of long word problems at odd N at L (5 = 2 + 2 + 1). On a mixed pool (tests/fixtures/mix-review/
+   pools/pool-wplong.json) the frozen dealer leaves a lone item on 744 of 10,800 sheets: its guard cannot give one back from
+   a 2-item page. The dealer was therefore moved WITHOUT L9. The state is pinned as
+   tests/fixtures/mix-review/count/pending/count-long-wp.json ("BLOCKED, lead ruling needed"). A ruling is needed on which
+   rule yields, or on a guard change, which would ship before V1 is released.
+2. **The live footprint kinds are not the contract's 10.** 689 of 708 table rows are `legacy`, because the providers author
+   no footprint. The other 19 carry kinds outside SKILL_CELL_CONTRACT 3.5: family-check 1, arrays-turn 2, count-row 2,
+   choice 2, picture 1, word-work 7, table 4. V1's rowOf classes an unlisted kind as typical (not legacy). So almost every
+   page is GROUPED and typical: no compact fact page and no M1. The table records each kind as is, and V1 decides the class.
+   While V1 is unreleased, the lead may want the table's kinds derived from the drawn template instead. That needs a
+   browser generation pass and a table re-pin, and must be decided before the first V1 code ships.
+3. Placement chips: WRM Reception (PK) lessons place a skill under the K chip (chipOf in mixed-review-pool.js). The card
+   names no PK chip.
+
+## Gates (step 2, 2026-11-20)
+- ws-mix-review --built-only --sample: OK (48 PASS, 52 CAUGHT; 20 states PENDING: count 4 (3 engine + count-long-wp BLOCKED), pool 3,
+  share 3, week 1, hosts 5, breakdown 4). ws-backtest --row mix-review-{trace,labels,count,pool,share,week}: 6 PASS; the
+  other 6 mix-review rows are pending (steps 3-5).
+- check-v1 OK (15 props, 50 fixtures, trace 197/114/83); ws-boot-smoke OK; ws-code-snapshot OK (741 codes, nothing moved);
+  ws-standards OK; ws-search-terms OK; ws-precritic-plan --checks-from-critics OK (350 pass, 128 exempt, 0 fail);
+  ws-precritic --role mixed-review --dry-run plans the gate.
+- ws-share-options: FAIL (14) on this branch AND on the step-1b commit 2cef9e43b before skill-codes.js was touched, in a
+  worktree, with the same findings. The harness's "Times 7, 8" pick reads back as every table except 7 and 8 (code
+  EA~C01234569ABCDEF_NA). So the failure is not this lane's; it is reported to the lead.
+
+## PARK NOTES / next
+- Done: steps 1, 1b and 2. Next: step 3 (MR-A engine, lf-engine files) is NOT started (brief: stop after step 2).
+- Open for the lead: findings 1 (L9 vs prop l, BLOCKED) and 2 (live footprint kinds) above, and the pre-existing
+  ws-share-options FAIL.
+- Resume: `node tests/scripts/ws-mix-review.mjs --built-only --sample tests/fixtures/precritic/mix-review-sample.json`;
+  `node tests/scripts/ws-backtest.mjs --row mix-review-trace,mix-review-labels,mix-review-count,mix-review-pool,mix-review-share,mix-review-week`;
+  `node design/cards/mixed-review/proto/check-v1.mjs`. When a pending state is built, move its fixture from
+  <check>/pending/ to <check>/fail/, add its pass fixture, and drop `pending` from its backtest row.
