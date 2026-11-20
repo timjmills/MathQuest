@@ -401,3 +401,163 @@ Every list may only shrink: a skill joining FAILs, and on a full sweep a pinned 
 
 
 - 2026-11-20 expand-2col (claude/lf-placevalue-expand-2col): expand online worksheet at 1024 back to 2 columns (boxes 101 -> 78 x 74 on #worksheetView at 960-1279 px, sentence one line, digit 29 px, input >= 48 x 48); 820 1 / 1280 2 / 1366 2 unchanged; ws-pv-screen-numeral WS-COLS (backtest pv-expand-ws-cols-1024 FAIL 9ae9ccd5d -> OK 72f61f850); reflow re-pinned for the 4 expand keys only; PNGs design/status/lf-placevalue/reflow-expand/2col/.
+
+- 2026-11-20 HINT-NO-BLANK critic r2 FAIL -> r3 rebuild (fresh builder, medium: the one round after the root-cause stop, cap rule 4).
+  Lead ruling r3, built narrow: the help is CHOSEN whole, never cut into shape (support-ladder.js workedStepsFor):
+  (1) the skill's own steps, only when leaving the answer out drops nothing but the FINAL sentence, that sentence adds no number the
+  pupil has not seen ("so add 3 back: 38 + 3 = 41" is a step, not an answer sentence), and what is left is whole (no gap, no bare or
+  repeated step, no lone heading, no orphan number, no pronoun opening); (2) else the skill's screenHelp steps; (3) else the clean hint
+  (hintFor: screenHelp.hint, else q.hint; also what the hint popup shows) when it states no answer and has no gap; (4) else no box.
+  The Say fallback is unchanged. The one S8 exception (digit_value_unit_form, q.fullWorked) shows its steps as written: help
+  md5-identical to master 9ae9ccd5d (ws-hint-shots --dump, seeds 3, 7, 11, 19, 42, 77).
+  screenHelp (screen only, never printed) on our skills: expanded_notation / expand, compare, digit_value_notation, value,
+  ten_times_story, round_nl_* (3), nearest_* (6), round_sort_* (8), estimate_* (compute), rounding_table, combine,
+  number_word_names, order_* (2), place_value_10x; make_a_ten, doubles_near_doubles (and its preset near_doubles) and compensation
+  are registered with screenHelp ONLY (no other member, so getProvider fills the rest from the default adapters as before).
+  Checks first, each FAILS on master 9ae9ccd5d and passes on bffa4010a (ws-backtest 7/7 PASS, rows hint-no-blank-r3-*):
+  R2-1 list operand, R2-2 DANGLING-HEAD, R2-3 expression terms, R2-6 ORPHAN, R2-7 HELP-GENERIC, R2-8 BARE-STEP So/Then/Now,
+  --strict-pins. Then 74b85094f: a one-value answer equal to a given number is still stated as a result ("= 3 inches",
+  volume_missing_edge's hint; same class as R2-1). ws-hint-shots deals the item from the seed (generateQuestionFor), so every width
+  shows the same item, and dumps every width (R2-9). ws-support-ladder judges a hidden box as the ruling's step 4 (a worked rung
+  with no help is "no box", never "missing worked steps"; a box with no help FAILs).
+  Pins (lf-placevalue skills on none of them except the 18 pre-existing SAYLESS entries): HINT-LEAK 168 -> 159 (13 off: our 8 +
+  5 via pools / the choice rule; 4 joined from the new operand / result reading), STEPS-LEAK 12 -> 0, BARE-STEP 1 -> 0,
+  SAYLESS 133 -> 115, EMPTY_PIN 25 -> 132 and HELP-THIN 5 -> 18 (GREW: the ruling hides the box where no clean choice exists -
+  107 other-lane skills that showed cut remains now show no box), new DANGLING-HEAD 0, ORPHAN 61, HELP-GENERIC 138.
+  Print unchanged: ws-role-sweep 528/528 identical (redesign-passed) + 312/312 (the 20 touched skills) vs master 9ae9ccd5d,
+  ws-capacity-pin --check OK, ws-lesson-baseline --all-lessons M,L seeds 4242,1: 2738/2738 hashes identical to a master 9ae9ccd5d render
+  (--check against the pinned phase-0 file reports 84 MISSING size-S keys, because that file also pins S and this run is M,L).
+  Gates: ws-hint-no-blank OK (734 skills), ws-support-ladder OK (default and --wide), ws-unit-form-bank OK, ws-boot-smoke OK,
+  ws-code-snapshot OK (741), ws-redesign-passed OK (33), ws-precritic-plan OK (484 rows), ws-backtest 7/7 PASS.
+  Renders: design/status/lf-placevalue/hint-no-blank/r3/ (1280 and 820, seed 3, card / hint / solution, dump.json).
+### HINT-NO-BLANK r3 hand-off (2026-11-20): pins by owner lane
+
+These replace the r2 tables. Every list is shrink-only from here (tests/scripts/ws-hint-no-blank.cjs EMPTY_PIN / SAYLESS_PIN; tests/fixtures/hint-no-blank-pins.json). STEPS-LEAK, BARE-STEP and DANGLING-HEAD pins are empty.
+
+**HELP-EMPTY (EMPTY_PIN) (132) - no clean choice, so no box: write a screenHelp (or steps whose only answer sentence is the last):**
+
+| Lane | Skills |
+|---|---|
+| data lane | `data_analysis:mad`, `data_analysis:mixed_data_analysis`, `graphs:pictograph_how_many_more` |
+| fractions lane | `conversions:d_to_p`, `conversions:f_to_d`, `conversions:find_whole_from_pct`, `conversions:mixed_conversions`, `decimals:mixed_decimals`, `decimals:round_decimals`, `frac_dec_mixed:conversions_all`, `frac_dec_mixed:decimals_all`, `frac_dec_mixed:fdp_all`, `fraction_operations:add_frac_like_nv`, `fraction_operations:add_frac_unlike`, `fraction_operations:add_frac_unlike_nv`, `fraction_operations:add_fractions_like`, `fraction_operations:add_mixed_like_nv`, `fraction_operations:add_mixed_unlike_nv`, `fraction_operations:decompose_frac_nv`, `fraction_operations:decompose_fractions`, `fraction_operations:div_unit_frac_nv`, `fraction_operations:div_unit_fraction`, `fraction_operations:estimate_frac_ops`, `fraction_operations:frac_10_100`, `fraction_operations:frac_10_100_nv`, `fraction_operations:frac_as_div_nv`, `fraction_operations:frac_as_div_word`, `fraction_operations:frac_as_division`, `fraction_operations:frac_mult_word`, `fraction_operations:frac_mult_word_plain`, `fraction_operations:frac_word_mixed`, `fraction_operations:frac_word_mixed_plain`, `fraction_operations:frac_word_problems`, `fraction_operations:frac_word_problems_plain`, `fraction_operations:mixed_fraction_ops`, `fraction_operations:mult_frac_frac`, `fraction_operations:mult_frac_frac_nv`, `fraction_operations:mult_frac_whole_nv`, `fraction_operations:mult_scaling_nv`, `fraction_operations:sub_frac_like_nv`, `fraction_operations:sub_frac_unlike`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_like_nv`, `fraction_operations:unit_frac_div_whole`, `fraction_operations:whole_div_unit_frac`, `fractions:equiv_frac_nv`, `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`, `fractions:fraction_of_set`, `fractions:fraction_of_set_hard`, `fractions:fraction_of_set_hard_nv`, `fractions:fraction_of_set_nv`, `fractions:graph_fractions`, `fractions:mixed_fractions`, `fractions:order_fractions`, `fractions:shade_fraction` |
+| geometry lane | `angles_lines:additive_angles`, `angles_lines:angles_around_point`, `angles_lines:angles_in_right_angle`, `angles_lines:angles_on_straight_line`, `angles_lines:identify_angles`, `angles_lines:identify_lines`, `angles_lines:measure_angles`, `angles_lines:mixed_angles_lines`, `area_perimeter:area`, `area_perimeter:area_distributive_visual`, `area_perimeter:area_missing_side`, `area_perimeter:area_polygon_decompose`, `area_perimeter:area_unit_squares`, `area_perimeter:mixed_area_perimeter`, `area_perimeter:perimeter_grid`, `area_perimeter:volume`, `area_perimeter:volume_composite`, `area_perimeter:volume_missing_edge`, `coordinates:coord_distance_q1`, `coordinates:coord_polygon`, `coordinates:mixed_coordinates`, `coordinates:net_surface_area`, `geo_mixed:geo_meas_all`, `geo_mixed:geometry_all`, `shapes_classify:classify_triangles`, `shapes_classify:cross_section_3d`, `shapes_classify:mixed_shapes`, `shapes_classify:net_identify`, `shapes_early:compose_rect_from_squares`, `shapes_early:mixed_shapes_early`, `shapes_early:name_3d_shapes` |
+| k2 (counting) lane | `comparing:compare_groups`, `comparing:mixed_comparing`, `composing:mixed_composing`, `composing:odd_even`, `composing:whole_as_fraction` |
+| lead (mixed reviews) | `all_mixed:grade_5_mixed`, `all_mixed:grade_k_mixed` |
+| lf-algebra | `algebra:build_expr_multdiv`, `algebra:combine_like_terms`, `algebra:distributive_expr`, `algebra:factor_out_gcf`, `algebra:two_step_add_then_div`, `algebra:two_step_estimate_check`, `algebra:two_step_mult_div_first`, `algebra_mixed:number_theory_all`, `patterns:notice_patterns` |
+| lf-ops | `addition:add_5_pictures`, `addition:comparison_word`, `addition:number_families_add`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_3by2_long`, `division:div_4by1_long`, `division:div_fix_estimate`, `division:mixed_division`, `multiplication:equal_or_unequal_groups`, `multiplication:mixed_multiplication`, `multiplication:mult_by_hundred`, `multiplication:mult_by_ten`, `multiplication:mult_chart_shade`, `multiplication:mult_facts`, `multiplication:mult_facts_15`, `multiplication:mult_missing_digit`, `multiplication:mult_zeros`, `multiplication:number_families_mult`, `number_theory:list_multiples`, `number_theory:missing_multiples`, `number_theory:multiples`, `subtraction:sub_5_pictures` |
+| lf-vocab | `vocabulary:vocab_pick3_words` |
+| time-money / measurement lane | `measurement:capacity`, `measurement:pictograph_intro`, `measurement:time_half_hour`, `measurement:time_hour`, `measurement:time_quarter` |
+
+**SAYLESS (SAYLESS_PIN) (115) - add a screen Say line (screenHelp.say, or sayValues of given values):**
+
+| Lane | Skills |
+|---|---|
+| fractions lane | `decimals:decimal_nl_drag`, `fraction_operations:add_frac_unlike`, `fraction_operations:add_fractions_like`, `fraction_operations:add_mixed_like`, `fraction_operations:add_mixed_unlike`, `fraction_operations:div_unit_fraction`, `fraction_operations:mult_frac_whole`, `fraction_operations:sub_frac_unlike`, `fraction_operations:sub_fractions_like`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_unlike`, `fractions:compare`, `fractions:compare_fractions_nl`, `fractions:compare_to_half`, `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`, `fractions:identify`, `fractions:identify_fraction_nl`, `fractions:mixed_nl_drag`, `fractions:shade_fraction`, `fractions:write_fraction`, `fractions:write_fraction_nl` |
+| k2 (counting) lane | `comparing:compare_groups`, `composing:base10_build`, `composing:base10_build_hundreds`, `composing:chart_to_120`, `composing:compose_whole`, `composing:fraction_number_line`, `composing:hundreds_chart_fill`, `composing:odd_even`, `composing:ten_frame_build_teen`, `composing:whole_as_fraction` |
+| lf-algebra | `algebra:function_table_easy`, `algebra:function_table_find_inputs`, `algebra:function_table_find_rule`, `algebra:function_table_hard`, `algebra:two_step_estimate_check`, `algebra:two_step_letter_equation`, `patterns:follow_given_rule`, `patterns:notice_patterns`, `patterns:number_patterns_rule`, `patterns:skip_count_grid`, `patterns:skip_count_line` |
+| lf-ops | `addition:add_sub_fact_family`, `addition:cloze_addition`, `addition:fact_family_sort`, `addition:nl_add`, `division:div_remainders`, `integers:integer_nl_drag`, `multiplication:arrays_groups`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_tables`, `multiplication:dot_array_mult`, `multiplication:mult_arrays`, `multiplication:mult_break_apart`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:mult_chart_headers`, `multiplication:mult_chart_pattern`, `multiplication:mult_chart_shade`, `multiplication:mult_comparison`, `multiplication:mult_comparison_plain`, `multiplication:mult_equal_groups`, `multiplication:mult_properties`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `subtraction:sub_5_pictures` |
+| lf-placevalue | `number_sense:between_tens`, `number_sense:estimate_products`, `number_sense:estimate_quotient`, `number_sense:reasonable_quotients`, `number_sense:round_sort_10`, `number_sense:round_sort_100`, `number_sense:round_sort_1000`, `number_sense:round_sort_10000`, `number_sense:round_sort_100000`, `number_sense:round_sort_hundredths`, `number_sense:round_sort_million`, `number_sense:round_sort_tenths`, `number_sense:rounding_table`, `number_sense:rounding_visual`, `placevalue:one_tenth_value`, `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:ten_times_value` |
+| lf-vocab | `vocabulary:vocab_grade_pictures` |
+| time-money / measurement lane | `measurement:clock_parts`, `measurement:coin_value`, `measurement:count_notes_and_coins`, `measurement:elapsed_15min`, `measurement:elapsed_30min`, `measurement:elapsed_find_duration`, `measurement:elapsed_find_start`, `measurement:elapsed_hour`, `measurement:elapsed_mixed`, `measurement:elapsed_visual_easy`, `measurement:elapsed_visual_hard`, `measurement:elapsed_visual_medium`, `measurement:enough_money`, `measurement:minutes_by_fives_all`, `measurement:money`, `measurement:money_change`, `measurement:money_compare`, `measurement:time_fives_ring`, `measurement:time_sense` |
+
+**HINT-LEAK (159) - rewrite the hint popup (or a screenHelp.hint) to give the route without the result:**
+
+| Lane | Skills |
+|---|---|
+| data lane | `data_analysis:mad`, `data_analysis:mixed_data_analysis`, `graphs:pictograph_how_many_more` |
+| fractions lane | `conversions:d_to_p`, `conversions:f_to_d`, `conversions:find_whole_from_pct`, `conversions:mixed_conversions`, `conversions:p_to_d`, `conversions:percent_of_number`, `decimals:mixed_decimals`, `decimals:round_decimals`, `frac_dec_mixed:conversions_all`, `frac_dec_mixed:decimals_all`, `frac_dec_mixed:fdp_all`, `fraction_operations:add_frac_like_nv`, `fraction_operations:add_frac_unlike`, `fraction_operations:add_frac_unlike_nv`, `fraction_operations:add_fractions_like`, `fraction_operations:add_mixed_like_nv`, `fraction_operations:add_mixed_unlike_nv`, `fraction_operations:decompose_frac_nv`, `fraction_operations:decompose_fractions`, `fraction_operations:div_unit_frac_nv`, `fraction_operations:div_unit_fraction`, `fraction_operations:estimate_frac_ops`, `fraction_operations:frac_10_100`, `fraction_operations:frac_10_100_nv`, `fraction_operations:frac_as_div_nv`, `fraction_operations:frac_as_div_word`, `fraction_operations:frac_as_division`, `fraction_operations:frac_mult_word`, `fraction_operations:frac_mult_word_plain`, `fraction_operations:frac_word_mixed`, `fraction_operations:frac_word_mixed_plain`, `fraction_operations:frac_word_problems`, `fraction_operations:frac_word_problems_plain`, `fraction_operations:mixed_fraction_ops`, `fraction_operations:mult_frac_frac`, `fraction_operations:mult_frac_frac_nv`, `fraction_operations:mult_frac_whole_nv`, `fraction_operations:mult_scaling_nv`, `fraction_operations:sub_frac_like_nv`, `fraction_operations:sub_frac_unlike`, `fraction_operations:sub_frac_unlike_nv`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_like_nv`, `fraction_operations:unit_frac_div_whole`, `fraction_operations:whole_div_unit_frac`, `fractions:equiv_frac_nv`, `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`, `fractions:fraction_of_set`, `fractions:fraction_of_set_hard`, `fractions:fraction_of_set_hard_nv`, `fractions:fraction_of_set_nv`, `fractions:graph_fractions`, `fractions:identify_nv`, `fractions:mixed_fractions`, `fractions:order_fractions`, `fractions:shade_fraction` |
+| geometry lane | `angles_lines:additive_angles`, `angles_lines:angles_around_point`, `angles_lines:angles_in_right_angle`, `angles_lines:angles_on_straight_line`, `angles_lines:identify_angles`, `angles_lines:identify_lines`, `angles_lines:measure_angles`, `angles_lines:mixed_angles_lines`, `area_perimeter:area`, `area_perimeter:area_distributive_visual`, `area_perimeter:area_missing_side`, `area_perimeter:area_polygon_decompose`, `area_perimeter:area_unit_squares`, `area_perimeter:composite_shapes`, `area_perimeter:mixed_area_perimeter`, `area_perimeter:perimeter`, `area_perimeter:perimeter_grid`, `area_perimeter:perimeter_missing_side`, `area_perimeter:volume`, `area_perimeter:volume_composite`, `area_perimeter:volume_missing_edge`, `coordinates:coord_distance_q1`, `coordinates:coord_polygon`, `coordinates:mixed_coordinates`, `coordinates:net_surface_area`, `geo_mixed:geo_meas_all`, `geo_mixed:geometry_all`, `shapes_classify:classify_triangles`, `shapes_classify:cross_section_3d`, `shapes_classify:mixed_shapes`, `shapes_early:compose_rect_from_squares`, `shapes_early:compose_shapes`, `shapes_early:measure_nonstandard`, `shapes_early:mixed_shapes_early`, `shapes_early:name_3d_shapes` |
+| k2 (counting) lane | `composing:make_ten`, `composing:mixed_composing`, `composing:odd_even`, `composing:whole_as_fraction` |
+| lead (mixed reviews) | `all_mixed:custom_mixed`, `all_mixed:grade_3_mixed`, `all_mixed:grade_4_mixed`, `all_mixed:grade_5_mixed`, `all_mixed:grade_6_mixed` |
+| lf-algebra | `algebra:algebra_word_mixed_plain`, `algebra:build_expr_addsub`, `algebra:build_expr_multdiv`, `algebra:combine_like_terms`, `algebra:distributive_expr`, `algebra:factor_out_gcf`, `algebra:two_step_add_then_div`, `algebra:two_step_estimate_check`, `algebra:two_step_mult_div_first`, `algebra:write_equation`, `algebra:write_equation_story`, `algebra_mixed:number_theory_all`, `patterns:count_by_fill`, `patterns:notice_patterns` |
+| lf-ops | `addition:add_10_regroup`, `addition:add_5_pictures`, `addition:add_sub_100s`, `addition:add_sub_10s`, `addition:add_three`, `addition:comparison_word`, `addition:number_families_add`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_3by2_long`, `division:div_4by1_long`, `division:div_fix_estimate`, `division:mixed_division`, `division:mixed_mult_div`, `integers:abs_value`, `integers:mixed_integers`, `integers:ordering_rationals`, `multiplication:equal_or_unequal_groups`, `multiplication:mixed_multiplication`, `multiplication:mult_by_hundred`, `multiplication:mult_by_ten`, `multiplication:mult_div_fact_family`, `multiplication:mult_facts`, `multiplication:mult_facts_15`, `multiplication:mult_missing_digit`, `multiplication:mult_multiples_of_ten`, `multiplication:mult_zeros`, `multiplication:number_families_mult`, `number_ops_mixed:missing_factor_or_addend`, `number_ops_mixed:number_families_mixed`, `number_theory:list_multiples`, `number_theory:missing_multiples`, `number_theory:multiples`, `number_theory:prime_composite`, `subtraction:sub_10_regroup`, `subtraction:sub_5_pictures`, `subtraction:unknown_start_wp` |
+| lf-vocab | `vocabulary:vocab_pick3_words` |
+| time-money / measurement lane | `measurement:capacity`, `measurement:pictograph_intro`, `measurement:unit_conversions` |
+
+**HELP-THIN (18) - the shown help ends on no instruction:**
+
+| Lane | Skills |
+|---|---|
+| data lane | `graphs:bar_graph`, `graphs:bar_graph_how_many_more` |
+| fractions lane | `decimals:decimal_nl_drag`, `fractions:fraction_nl_drag`, `fractions:identify`, `fractions:mixed_nl_drag` |
+| k2 (counting) lane | `composing:base10_build`, `composing:base10_build_hundreds`, `composing:chart_to_120`, `composing:hundreds_chart_fill`, `composing:number_chart_fill` |
+| lf-algebra | `patterns:growing_shape_patterns` |
+| lf-ops | `addition:add_sub_fact_family`, `addition:cloze_addition`, `division:div_facts_15`, `multiplication:mult_chart_shade` |
+| time-money / measurement lane | `measurement:clock_hands`, `measurement:money_notation` |
+
+**ORPHAN (61) - a shown step names a number the pupil has not seen, or opens with a pronoun:**
+
+| Lane | Skills |
+|---|---|
+| data lane | `data_analysis:box_plot_quartiles`, `data_analysis:mean` |
+| fractions lane | `conversions:p_to_f`, `conversions:percent_visual`, `conversions:ratio_intro`, `frac_dec_mixed:fractions_all`, `fraction_operations:add_frac_like_nv`, `fraction_operations:add_frac_unlike_nv`, `fraction_operations:add_mixed_unlike`, `fraction_operations:add_mixed_unlike_nv`, `fraction_operations:frac_as_div_nv`, `fraction_operations:mult_frac_frac_nv`, `fraction_operations:mult_frac_whole`, `fraction_operations:sub_frac_like_nv`, `fraction_operations:sub_frac_unlike_nv`, `fraction_operations:sub_fractions_like`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_unlike`, `fraction_operations:sub_mixed_unlike_nv`, `fractions:benchmark_fractions`, `fractions:compare`, `fractions:compare_frac_lcd`, `fractions:equiv_frac_nv`, `fractions:equiv_frac_visual`, `fractions:equivalent_or_not`, `fractions:identify_nv`, `fractions:mixed_fractions`, `fractions:order_fractions`, `fractions:round_fractions`, `fractions:select_equiv_frac`, `fractions:simplify` |
+| geometry lane | `angles_lines:identify_angles`, `angles_lines:identify_lines`, `coordinates:geo_rotate`, `coordinates:mixed_coordinates`, `coordinates:rotate_half_turn`, `coordinates:rotate_three_quarter_turn`, `geo_mixed:geometry_all`, `shapes_classify:classify_triangles`, `shapes_classify:net_identify`, `shapes_early:compose_hexagon`, `shapes_early:mixed_shapes_early`, `shapes_early:name_2d_shapes`, `shapes_early:shape_attributes` |
+| k2 (counting) lane | `composing:base10_regroup` |
+| lead (mixed reviews) | `all_mixed:grade_5_mixed` |
+| lf-algebra | `algebra_mixed:patterns_all`, `order_of_operations:compare_expressions`, `order_of_operations:exponents_simple`, `order_of_operations:mixed_order_ops`, `patterns:seq_5` |
+| lf-ops | `addition:add_sub_fact_family`, `division:div_remainders`, `integers:order_negatives`, `multiplication:arrays_groups`, `multiplication:mult_arrays`, `multiplication:mult_chart_shade`, `multiplication:mult_facts`, `multiplication:mult_facts_15`, `number_theory:divisibility_sort`, `number_theory:factor_tchart_hard` |
+
+**HELP-GENERIC (138) - every item shows the same help word for word:**
+
+| Lane | Skills |
+|---|---|
+| data lane | `data_analysis:histogram_read`, `data_analysis:statistical_question`, `graphs:bar_graph`, `graphs:bar_graph_how_many_more`, `graphs:build_bar_graph`, `graphs:build_pictograph`, `graphs:line_plot`, `graphs:line_plot_fractions`, `graphs:line_plot_g2`, `graphs:pictograph_how_many_more`, `graphs:pie_chart`, `graphs:tally_chart`, `graphs:tally_how_many_more` |
+| fractions lane | `conversions:order_fdp`, `conversions:p_to_d`, `conversions:ratio_equivalent_or_not`, `conversions:ratio_tables`, `decimals:add_decimal`, `decimals:compare_decimal`, `decimals:compare_thousandths`, `decimals:div_by_decimal`, `decimals:div_decimal`, `decimals:div_decimal_by_whole`, `decimals:round_to_hundredth`, `decimals:round_to_tenth`, `decimals:sub_decimal`, `fraction_operations:sub_frac_unlike`, `fractions:compare_fractions_nl`, `fractions:simplify_with_gcf` |
+| geometry lane | `angles_lines:place_symmetry_lines`, `area_perimeter:composite_area_perimeter`, `area_perimeter:composite_shapes`, `area_perimeter:perimeter_intro`, `coordinates:coordinates_plot_all`, `coordinates:coordinates_plot_q1`, `coordinates:coordinates_read_all`, `coordinates:coordinates_read_q1`, `coordinates:reflect_x_axis`, `coordinates:reflect_y_axis`, `coordinates:rotate_half_turn`, `coordinates:rotate_quarter_turn`, `coordinates:rotate_three_quarter_turn`, `shapes_classify:hotspot_quads`, `shapes_early:compose_hexagon`, `shapes_early:compose_shapes`, `shapes_early:order_objects_length`, `shapes_early:shape_corners_count` |
+| k2 (counting) lane | `composing:chart_to_120`, `composing:hundreds_chart_fill`, `composing:make_ten`, `composing:number_chart_fill`, `composing:tens_foundation_visual`, `counting:count_objects` |
+| lf-algebra | `algebra:combine_like_terms`, `algebra:function_table_easy`, `algebra:function_table_find_inputs`, `algebra:write_expression`, `order_of_operations:cube_numbers`, `order_of_operations:square_numbers`, `patterns:count_by_powers_of_10` |
+| lf-ops | `addition:add`, `addition:add_10_mixed`, `addition:add_10_no_regroup`, `addition:add_10_regroup`, `addition:add_20_mixed`, `addition:add_20_regroup`, `addition:add_sub_fact_family`, `integers:abs_value`, `integers:add_int`, `integers:number_line_int`, `integers:order_negatives`, `integers:ordering_rationals`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:mult_chart_headers`, `multiplication:mult_div_fact_family`, `number_ops_mixed:which_sign`, `number_theory:sort_prime_composite`, `subtraction:mixed_subtraction`, `subtraction:sub_100_no_regroup`, `subtraction:sub_100k_mixed`, `subtraction:sub_100k_regroup`, `subtraction:sub_10_no_regroup`, `subtraction:sub_10_regroup`, `subtraction:sub_10k_mixed`, `subtraction:sub_10k_regroup`, `subtraction:sub_1k_mixed`, `subtraction:sub_1k_regroup`, `subtraction:sub_1m_mixed`, `subtraction:sub_1m_regroup`, `subtraction:sub_20_regroup`, `subtraction:sub_2d_1d`, `subtraction:sub_50_mixed`, `subtraction:sub_50_no_regroup`, `subtraction:sub_across_zeros`, `subtraction:sub_check_by_adding`, `subtraction:sub_missing_digit`, `subtraction:subtract` |
+| lf-vocab | `vocabulary:vocab_grade_3_fractions`, `vocabulary:vocab_grade_6_data`, `vocabulary:vocab_grade_6_measurement` |
+| time-money / measurement lane | `measurement:bar_graph_intro`, `measurement:clock_hands`, `measurement:count_notes`, `measurement:count_notes_and_coins`, `measurement:elapsed_find_start`, `measurement:elapsed_mixed`, `measurement:elapsed_visual_easy`, `measurement:elapsed_visual_hard`, `measurement:elapsed_visual_medium`, `measurement:make_change_least_coins`, `measurement:money`, `measurement:money_change`, `measurement:money_compare`, `measurement:money_count`, `measurement:order_clocks_analog_asc`, `measurement:order_clocks_analog_desc`, `measurement:order_notes`, `measurement:pictograph_intro`, `measurement:reading_ruler`, `measurement:temperature`, `measurement:time_1min`, `measurement:time_5min`, `measurement:time_analog_digital`, `measurement:time_half_hour`, `measurement:time_hour`, `measurement:time_quarter` |
+
+### 2026-11-20 — HINT-NO-BLANK r3 + lead ruling A12 (guard)
+
+Head `claude/lf-placevalue-hint-r3` (r3 b5e2205e6 + guard df3899387). The r3 choice rule (own steps if only the final answer
+sentence is cut, else screenHelp, else a clean hint, else no box) applies only to skills WITH screenHelp and to placevalue;
+every other skill keeps master's r2 help (`workedStepsR2`, verbatim). Pins: EMPTY 25, HELP-THIN 5, HINT-LEAK 159, SAYLESS 115;
+the r3 checks on the kept r2 help are pinned as their baseline (STEPS-LEAK 43, BARE-STEP 4, DANGLING-HEAD 6, ORPHAN 145,
+HELP-GENERIC 82), shrink-only. Check R2-KEEP (`hint-no-blank-a12-r2-keep`, FAIL b5e2205e6 -> OK df3899387).
+
+**Routed next week (owner: each family lane, lead A12): write `screenHelp` for these 107 skills** - under the r3 rule
+they would show no box; once a family has screenHelp the r3 rule covers it (and the skill drops off the pins).
+
+- `addition` (3): add_5_pictures, comparison_word, number_families_add
+- `algebra` (6): combine_like_terms, distributive_expr, factor_out_gcf, two_step_add_then_div, two_step_estimate_check, two_step_mult_div_first
+- `algebra_mixed` (1): number_theory_all
+- `all_mixed` (2): grade_5_mixed, grade_k_mixed
+- `angles_lines` (6): additive_angles, angles_around_point, angles_in_right_angle, angles_on_straight_line, identify_lines, measure_angles
+- `area_perimeter` (10): area, area_distributive_visual, area_missing_side, area_polygon_decompose, area_unit_squares, mixed_area_perimeter, perimeter_grid, volume, volume_composite, volume_missing_edge
+- `comparing` (2): compare_groups, mixed_comparing
+- `composing` (3): mixed_composing, odd_even, whole_as_fraction
+- `conversions` (2): d_to_p, f_to_d
+- `coordinates` (3): coord_distance_q1, coord_polygon, mixed_coordinates
+- `data_analysis` (2): mad, mixed_data_analysis
+- `decimals` (2): mixed_decimals, round_decimals
+- `division` (6): div_2by1_long, div_3by1_long, div_3by2_long, div_4by1_long, div_fix_estimate, mixed_division
+- `frac_dec_mixed` (3): conversions_all, decimals_all, fdp_all
+- `fraction_operations` (24): add_frac_like_nv, add_frac_unlike, add_frac_unlike_nv, add_fractions_like, add_mixed_like_nv, add_mixed_unlike_nv, decompose_frac_nv, decompose_fractions, div_unit_fraction, frac_10_100, frac_10_100_nv, frac_as_div_nv, frac_as_div_word, frac_as_division, frac_word_mixed, frac_word_problems, frac_word_problems_plain, mult_frac_frac, mult_frac_frac_nv, mult_scaling_nv, sub_frac_like_nv, sub_frac_unlike, sub_mixed_like, sub_mixed_like_nv
+- `fractions` (9): equiv_frac_visual, fraction_nl_drag, fraction_of_set, fraction_of_set_hard, fraction_of_set_hard_nv, fraction_of_set_nv, graph_fractions, mixed_fractions, shade_fraction
+- `geo_mixed` (2): geo_meas_all, geometry_all
+- `graphs` (1): pictograph_how_many_more
+- `measurement` (4): pictograph_intro, time_half_hour, time_hour, time_quarter
+- `multiplication` (8): equal_or_unequal_groups, mult_by_hundred, mult_by_ten, mult_chart_shade, mult_facts, mult_facts_15, mult_zeros, number_families_mult
+- `number_theory` (3): list_multiples, missing_multiples, multiples
+- `patterns` (1): notice_patterns
+- `shapes_early` (2): mixed_shapes_early, name_3d_shapes
+- `subtraction` (1): sub_5_pictures
+- `vocabulary` (1): vocab_pick3_words
+
+### 2026-11-20 — HINT-NO-BLANK r3 critic + stop (budget)
+
+Critic r3 (`design/audit/runs/lf-placevalue/critic-hint-no-blank-r3.md`): change 2 expand-2col PASS (9/9/8/9 at 1024).
+Change 1 FAIL. Lane skills on the choice rule now score >= 8 (expanded_notation 9/9/8/9; identify, expand, compare, make_a_ten,
+round_nl 9s; add_facts 9s and sub_facts 8s keep their r2 steps). Findings:
+- R3-2 compensation (cut own steps, no "Now add"): FIXED here, check PREFER-SH (`hint-no-blank-r3-prefer-sh`).
+- R3-1 factors_identify "1 × 30 = 30" + lone "Factor pairs:" - number_theory (not ours), kept r2 under A12, same as master. Routed:
+  its lane writes screenHelp (then the r3 rule hides the leak). Check: --strict-pins on a critic-named skill.
+- R3-3 round_sort_* Show Solution "Answer: [object Object]" (OURS, pre-existing on master) - NEXT WEEK; check SOL-OBJECT.
+- R3-4 expand / expanded_notation / round_nl_* Show Solution "Problem:" line garbled ("673 + ? + ___") from the generic
+  fallback at solution-display.js:894 (OURS, pre-existing) - NEXT WEEK; check SOL-PROBLEM (drop the Problem-line exemption).
+- Minor: R3-5 nearest_10000 box wording vs card scaffold ("Four or less: round down" / "4 or less -> keep it", "cut line");
+  R3-6 sub_facts Show Solution uses column borrow (lf-ops). Expand-2col: start the rule at ~1000 px (960-1000 stays 1 column).
+Stopped at the budget stop; the round cap is reached for HINT-NO-BLANK, so R3-3 / R3-4 start next week with their checks first.

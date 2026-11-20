@@ -14950,6 +14950,186 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "hint-no-blank-r3-list-operand",
+   "check": "ws-hint-no-blank STEPS-LEAK (R2-1): a given-equal element of a LIST answer is stated when a step writes it as an operand",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: factors_identify \"1 × 80 = 80\" fills the box beside 1"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: the help is the hint \"a × b = 80 ... divide 80 by it\""
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_theory:factors_identify --only STEPS-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-dangling-head",
+   "check": "ws-hint-no-blank DANGLING-HEAD (R2-2): a shown step ending in \":\" with no continuation row",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: factors_identify (24) \"Factor pairs:\" then the hint"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: no heading: the hint alone"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_theory:factors_identify --only DANGLING-HEAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-expr-terms",
+   "check": "ws-hint-no-blank STEPS-LEAK (R2-3): an expression answer is read term by term",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: expanded_notation \"The 9 is in the ones place: 9 × 1.\"; combine_like_terms \"6x + 2x = 8x\""
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: expanded_notation screenHelp \"The hundreds digit goes in the box before × 100.\"; combine_like_terms no box"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill placevalue:expanded_notation,algebra:combine_like_terms --only STEPS-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-orphan",
+   "check": "ws-hint-no-blank ORPHAN (R2-6): a number neither seen nor worked; a first step opening with a pronoun; x − x = 0",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: volume_missing_edge \"How many times does 20 go into 80?\"; round_nl_ten_thousands \"Is it before or after the halfway point ...\""
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: round_nl screenHelp \"Put a dot for 88,208 on the line.\" ...; volume_missing_edge no box"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill area_perimeter:volume_missing_edge,number_sense:round_nl_ten_thousands --only ORPHAN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-help-generic",
+   "check": "ws-hint-no-blank HELP-GENERIC (R2-7): every item of a skill shows the same help word for word",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: compare \"Both have three digits. | Now: count the digits ...\" on every item"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: compare screenHelp names the item's two numbers"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill placevalue:compare --only HELP-GENERIC",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-bare-so",
+   "check": "ws-hint-no-blank BARE-STEP (R2-8): a leading So / Then / Now does not make an expression a step",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: sub_facts \"So 15 − 9.\""
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: sub_facts shows its clean hint"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill subtraction:sub_facts --only BARE-STEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-strict-pins",
+   "check": "ws-hint-no-blank --strict-pins (R2-4): a --skill run is never satisfied by a pin",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: make_a_ten passes only through its HINT-LEAK pin (\"... = 10 + 4 = 14\")"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: make_a_ten screenHelp hint \"Make 10 first: 9 + 1 = 10. Then add what is left of 5.\""
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_sense:make_a_ten --strict-pins",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-a12-r2-keep",
+   "check": "ws-hint-no-blank R2-KEEP: a skill with no screenHelp keeps master's r2 'Here is how' box (add_facts / sub_facts keep their own steps, not a one-line hint)",
+   "kind": "commit-pair",
+   "rule": "lead ruling A12 (2026-11-20): the r3 choice rule applies only to skills with screenHelp plus this lane's; pins only shrink",
+   "browser": true,
+   "fail": {
+    "commit": "b5e2205e6",
+    "state": "r3 app-wide: add_facts shows 1 step (its hint)"
+   },
+   "pass": {
+    "commit": "df3899387",
+    "state": "guard: r2 steps kept"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,subtraction:sub_facts --only R2-KEEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-prefer-sh",
+   "check": "ws-hint-no-blank PREFER-SH: a skill with screenHelp whose own steps had to be cut shows its screenHelp, never the cut steps (critic r3 R3-2, compensation ended without 'Now add')",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r3 FAIL (design/audit/runs/lf-placevalue/critic-hint-no-blank-r3.md R3-2)",
+   "browser": true,
+   "fail": {
+    "commit": "4fadf6e5b",
+    "state": "compensation: 'Add 3 to 7 to make 10. Subtract 3 from 29 to get 26.'"
+   },
+   "pass": {
+    "commit": "41a5e20f0",
+    "state": "compensation shows its screenHelp ending 'Now add ...'"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_sense:compensation --only PREFER-SH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
