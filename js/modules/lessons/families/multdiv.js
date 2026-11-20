@@ -90,8 +90,10 @@ export const ROUTINES = Object.freeze({
             { word: 'row', meaning: 'a line going across', picture: { kind: 'array', rows: 1, cols: 4, mark: 'row' } },
         ],
         steps: [
+            // (lf-placevalue W1: the provider's steps read the bank first, then name the picture's feature; each panel's name is
+            // short, its words the provider's sentence, so no sentence prints twice - ws-vocab-unit MODEL-STEP-NOT-CUE)
+            { icon: 'say', text: 'Read the words.' },
             { icon: 'look', text: 'Look at the picture.' },
-            { icon: 'say', text: 'Read the three words in the box.' },
             { icon: 'write', text: 'Write its word on the line.' },
         ],
         chant: '',

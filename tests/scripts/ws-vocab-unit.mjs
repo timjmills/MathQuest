@@ -582,10 +582,29 @@ else {
 {
     const prov = K.getProvider('vocabulary', 'vocab_grade_pictures');
     for (const r of runs) for (const q of deal('vocab_pick3_words', r.opts, 8, 7900)) {
-        const p = q.cell.payload, t = String(((prov.workedSteps(q) || [])[0] || {}).text || '');
+        // (W1: the cue is step 1's `hint`, the Guided-only field; a tree before W1 still carries it as step 1's text)
+        const s0 = (prov.workedSteps(q) || [])[0] || {};
+        const p = q.cell.payload, t = String(s0.hint || s0.text || '');
         const letters = [...t.matchAll(/"(.)"/g)].map((m) => m[1].toLowerCase());
         const hits = letters.length && /starts with/.test(t) ? p.bank.filter((w) => letters.includes(String(w).charAt(0).toLowerCase())) : [p.word];
         if (hits.length < 2 || !hits.includes(p.word)) fail(`V14 GUIDED-HINT-LEAK ${JSON.stringify(r.opts)} "${p.word}": the hint "${t}" leaves ${hits.length} of the bank (${p.bank.join(', ')}): ${hits.join(', ')}`);
+    }
+}
+// MODEL-STEP-NOT-CUE (lf-placevalue W1, lf-roles critic r15, 2026-11-20): the Scripted Model and the Lesson print the worked
+// steps, so no worked step's TEXT may be a hint cue (a letter cue, "starts with", "ends with", "has N letters": it teaches a
+// letter-elimination trick, not the word's meaning), the steps are distinct, the bank is read FIRST, and the middle step names
+// the picture's feature without naming the answer word. The cue lives on `hint` (Guided only). The printed pages: --browser.
+const CUE_RE = /starts with|ends with|has \d+ letters|\bletters?\b|"[a-z]"/i;
+{
+    const prov = K.getProvider('vocabulary', 'vocab_grade_pictures');
+    for (const r of runs) for (const q of deal('vocab_pick3_words', r.opts, 8, 7900)) {
+        const p = q.cell.payload, st = (prov.workedSteps(q) || []).map((x) => String(x.text || ''));
+        const tag = `MODEL-STEP-NOT-CUE ${JSON.stringify(r.opts)} "${p.word}"`;
+        st.forEach((t, i) => { if (CUE_RE.test(t)) fail(`${tag}: worked step ${i + 1} "${t}" is a hint cue`); });
+        if (new Set(st).size !== st.length) fail(`${tag}: a worked step repeats (${st.join(' | ')})`);
+        if (!/^Read the three words/.test(st[0] || '')) fail(`${tag}: step 1 is not "Read the three words in the box." (${st[0]})`);
+        const mid = (st[1] || '').toLowerCase();
+        if (!mid || mid.includes(String(p.word).toLowerCase())) fail(`${tag}: the feature step "${st[1]}" is missing or names the answer`);
     }
 }
 // V15 (write-line length, critic r3 #7): the 1 picture, 3 words answer line is >= 1.2 x the widest bank word at the answer
@@ -859,6 +878,8 @@ async function browserChecks() {
         if (ONLY && ONLY.every((k) => ['V-PAGE'].includes(k))) { await pageRepeatChecks(page, fail); return; }
         if (ONLY && ONLY.every((k) => r16List().includes(k))) { await r16Checks(page, fail, sheet, build); return; }
         if (ONLY && ONLY.every((k) => ['V23', 'V25', 'V26', 'V27'].includes(k))) { await r7Checks(page, fail, sheet); return; }
+        if (ONLY && ONLY.every((k) => ['MODEL-STEP-NOT-CUE'].includes(k))) { await modelCueChecks(build, sheet, fail); return; }
+        await modelCueChecks(build, sheet, fail);
         await pageRepeatChecks(page, fail);
         await packChecks(page, fail);
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
@@ -945,6 +966,23 @@ async function browserChecks() {
 // of each vocabulary lesson (practicePages 1, mixed; M / L; seeds 4242 and 1) prints its Practice on the ONE page it was asked for
 // (the default [6, 2] dealt 6 one-across Match 3 rows: 4 + 2, page 2 a third used) and its Mixed page on the pages its packing
 // counted (a 4th Match 3 shelf spilled the anchor chart: Mixed 3 -> 4 pages, page 2 one Match 3 cell alone - L-LONE / PAGEFILL).
+// MODEL-STEP-NOT-CUE, the printed pages: the 1 picture, 3 words Scripted Model and Lesson pages at M and L print no letter cue,
+// and no worked-step sentence twice on one page (critic r15 W1: "Read the three words in the box." printed twice on the Lesson).
+async function modelCueChecks(build, sheet, fail) {
+    for (const role of ['scripted-model', 'lesson']) for (const size of ['M', 'L']) for (const seed of [7, 4242]) {
+        const b = await build('vocab_pick3_words', role, size, null, seed);
+        if (b.error) { fail(`MODEL-STEP-NOT-CUE ${role} ${size}: not composed (${b.error})`); continue; }
+        const pages = await sheet(b.html, () => [...document.querySelectorAll('body > section.ws-page, body > .ws-page')].map((pg) => pg.innerText));
+        pages.forEach((txt, i) => {
+            const at = `MODEL-STEP-NOT-CUE ${role} ${size} seed ${seed} page ${i + 1}`;
+            const cue = /(starts with|ends with|has \d+ letters)[^\n]*/i.exec(txt);
+            if (cue) fail(`${at}: prints the hint cue "${cue[0].trim()}"`);
+            const n = (txt.match(/Read the three words in the box\./g) || []).length;
+            if (n > 1) fail(`${at}: "Read the three words in the box." prints ${n} times`);
+        });
+    }
+}
+
 async function packChecks(page, fail) {
     for (const skillId of ['vocab_grade_pictures', 'vocab_pick3_words']) for (const size of ['M', 'L']) for (const seed of [4242, 1]) {
         const tag = `V-PACK ${skillId} ${size} seed ${seed}`;

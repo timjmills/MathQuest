@@ -75,6 +75,60 @@ export function vocabPreSkills(sk = {}) {
     return out.length ? out.slice(0, 2) : [ref('pick3', g, true)];
 }
 
+/**
+ * W1 (lf-placevalue, 2026-11-20; lf-roles critic r15): the Model's middle step for 1 picture, 3 words names what the picture
+ * SHOWS - the feature that defines its word - never the word itself and never a letter cue (ws-vocab-unit MODEL-STEP-NOT-CUE).
+ */
+export const PICK_FEATURE = Object.freeze({
+    even: 'Every dot has a partner.',
+    odd: 'A dot has no partner.',
+    product: 'The box is around the answer of the times.',
+    factor: 'The boxes are around the numbers we times.',
+    row: 'The line goes across.',
+    column: 'The line goes down.',
+    multiple: 'We land on this number counting in threes.',
+    input: 'The box is around the In column.',
+    output: 'The box is around the Out column.',
+    rule: 'We do the same to every number.',
+    pattern: 'The numbers change the same way each time.',
+    array: 'The dots are in equal rows.',
+    commutative: 'The numbers swap. The answer stays the same.',
+    identity: 'Times 1. The number stays the same.',
+    distributive: 'The array is split into two parts.',
+    step: 'The work is in order: 1, then 2.',
+    total: 'The bar shows all of them together.',
+    left: 'Some go away. Some stay.',
+    'equal groups': 'Each group has the same number of dots.',
+    unknown: 'The ? is the number to find.',
+    'count on': 'The numbers go on from the start.',
+    'one more': 'A dot is added.',
+    'one less': 'A dot is crossed out.',
+    before: 'The box is just behind the number.',
+    after: 'The box is just ahead of the number.',
+    'hundred chart': 'The numbers are in rows.',
+    hundred: 'The rods make a big square.',
+    ten: 'Small squares make a long rod.',
+    one: 'It is a single small square.',
+    digit: 'The box is around one single number, 0 to 9.',
+    'expanded form': 'The number is split by its places.',
+    'number name': 'The number is written in words.',
+    'ones digit': 'The box is around the number in the ones place.',
+    repeat: 'The same part comes again and again.',
+    sequence: 'The numbers are in order, one after another.',
+    cycle: 'It goes round and back to the start.',
+    grow: 'It gets bigger each time.',
+    term: 'The box is around one number in the list.',
+    'first term': 'The box is around the number at the start.',
+    'times as many': 'One bar is 3 times as long.',
+    compare: 'We find which bar is longer, and by how much.',
+    equation: 'The two sides are equal.',
+    remainder: 'Some are left over after the groups.',
+    quotient: 'The box is around the answer of the divide.',
+    divisor: 'The box is around the number we divide by.',
+    dividend: 'The box is around the number we divide up.',
+    'round up': 'An extra group holds what is left.',
+});
+
 registerSkill('vocabulary:vocab_grade_pictures', {
     supports: Object.freeze([]),
     preSkills: vocabPreSkills,
@@ -97,9 +151,12 @@ registerSkill('vocabulary:vocab_grade_pictures', {
             const other = bank.find((w) => w !== p.word && ini(w) !== first);
             const shared = bank.filter((w) => ini(w) === first).length >= 2 || !other;
             const cue = shared ? `Its word starts with "${first}".` : `Its word starts with "${[first, ini(other)].sort().join('" or "')}".`;
+            // W1: the cue is the Guided hint ONLY (`hint` on step 1, read by guided.js hintOf when present); the Model and the
+            // Lesson read the steps: read the bank once, name the picture's defining feature, choose (MODEL-STEP-NOT-CUE)
+            const feature = PICK_FEATURE[p.word] || 'Look at what the picture shows.';
             return clampSteps([
-                step(cue),
-                step('Read the three words in the box.'),
+                { ...step('Read the three words in the box.'), hint: cue },
+                step(feature),
                 step(`Write "${p.word}" on the line.`, [{ slot: 'answer', value: p.word }]),
             ]);
         }
