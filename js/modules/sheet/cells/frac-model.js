@@ -604,8 +604,8 @@ function rowSize(p, ctx) {
  */
 const PW = Object.freeze({
     // whole box, part drop, part gap (mm); the bars of the model (WDS 11.2 minimums)
-    M: { topW: 34, topH: 22, drop: 12, gap: 22, onesGap: 8, barW: 52, barH: 16 },
-    L: { topW: 40, topH: 26, drop: 12, gap: 22, onesGap: 8, barW: 56, barH: 18 },
+    M: { topW: 34, topH: 22, drop: 12, gap: 22, onesGap: 6, barW: 52, barH: 16 },
+    L: { topW: 40, topH: 26, drop: 12, gap: 22, onesGap: 6, barW: 56, barH: 18 },
 });
 const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
 /** The part boxes' geometry at the ctx size (mm). */
