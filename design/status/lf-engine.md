@@ -9,6 +9,184 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+
+- **2026-11-20 24:00 UTC: fillfix 00cb625d5 is being deployed by the lead. lf-engine PARKED** at about $1,516 (stop $1,546.55).
+  - Lead rulings A27:
+    - SHEET_FILL_MIN 0.74 is accepted.
+    - The 4 newly exposed partopts findings are routed: mult_properties L Vocab-off sizing to lf-ops; PO-CAP on function_table_easy L and notice_patterns M to lf-algebra.
+- **Next week, for lf-engine (ROWFIT, the row planner):**
+  - Plan a sheet's foot by the REAL height of the next row, not by a fixed 12 mm margin.
+    - Some sheets with no rows leave a foot that holds a row at gaps above 12 mm: identify L Vocabulary off 12.7 mm, growing_shape_patterns M 12.7 mm, two_step_estimate_check L 15.9 mm.
+    - Others hold no row at a 6.3 mm gap.
+    - No single margin separates the two groups.
+  - Also take back the six good sheets planned 0.728–0.739 that the 0.74 floor still refuses (28–29 % feet).
+  - Check first: a sweep with `ws-partopts-unit --fill-sweep`, plus EB-ROWFIT judged by the measured next-row height.
+
+- **2026-11-20 14:40 UTC: rowcap + vocabfix PASSED the round-cap critic r1 and are with the lead for DEPLOY.**
+  - Head: claude/sweet-newton-c8wrv1-lf-engine-vocabfix @ 19e2fc9fe (code 4ecba079c, merged with master 9ae9ccd5d). Report: design/audit/runs/lf-engine-vocabfix-r1/REPORT.md.
+  - At deploy: run ws-merge-master (master has moved to 2c42746aa), re-pin 1,284 lesson hashes (row cap), stamp the CSS.
+  - Minor findings to fix next week:
+    - m1 Guided tries keep a tab indent with no number (check GUIDED-TAB); lf-engine.
+    - m2 vocab_grade_pictures Model content (state progression, sentence case, Say 1 mm high); vocab lane.
+    - m3 Error Analysis name tag about 8 pt (MIN-PT ≥ 10 pt at M).
+  - PT-PRE-3 comes from master (903f2d778); routed to lf-roles.
+  - Parked at about $1,460 (stop $1,506.55). Nothing running.
+
+- **2026-11-20: week stop.** Spend is about $1,435 of the $1,481.60 stop.
+  - **Lesson first page: SHIP as a strict improvement** (lead ruling).
+    - Branch: claude/sweet-newton-c8wrv1-lf-engine-lessonfirst. The critic r1 report is at 4fd22cf49.
+    - Fixed: blank first pages 59 → 0; each times table models its own table; OPENER-SAME pairs 22 → 6; two_step_letter_equation no longer overflows (its 4-page chart is accepted for now, and the content fix goes to lf-algebra).
+    - New gate CELL-FITS, with a shrink-only KNOWN list of 28 pages that already overflowed (design/audit/baselines/cellfits-known.json, each page owned by its lane).
+  - **rowcap and vocabfix are PARKED** at vocabfix d2306451c. Resume steps are at the end of design/audit/runs/lf-engine-vocabfix/CRITIC-READY.md:
+    1. Measure the two-column Scripted Model state as it is drawn, and fix the print foot.
+    2. Add the named note for ROLE-CAPPED ERROR-ANALYSIS.
+    3. Run one round-cap critic.
+  - **Next week, in order:**
+    1. Finish rowcap and vocabfix (the three resume steps above).
+    2. The detailed-lesson defects (1c): g2-nbt3 seed 17, g3-oa9 seed 25 placeholder, g1-oa1 P6 overflow; a 25-seed sweep gate goes in first.
+    3. -roles: the F1 WRAP check plus a full-width Model at M; SPILL-P1 reserve read from the constant plus a boundary backtest; lf-placevalue's mixed_placevalue Opener (a) placed-items sizing and (b) the iMax cap; critic on ≥ 20 Openers.
+    4. -pc r6.
+- **Next week, lesson-pages engine items from lf-algebra (lead, 2026-11-20). Check first for each.**
+  - **number_patterns_rule lesson L p3** (places [1], pattern = [all]): the body overflows by 1.9 mm with 6 count-row cells on one page. Every cell fits its content, so the fault is the page's packing.
+    - Check: the lesson page body must not overflow. It must FAIL on master.
+  - **follow_given_rule lesson M p3 / p4**: about 28.3 % of each page is left empty. The fixed `mq-spread` grid (4 × 1fr in 122.5 mm) causes it.
+    - Check: EB-BAND / LESSON-FILL on those pages. It must FAIL on master.
+- **function_table_easy lesson VOCAB picture gives the match away** (from lf-algebra's patterns critic r3, via the lead, 2026-11-20).
+  - The picture shows "In: 3 / Out: 10", which is a value the pupil has to match. A vocab picture must never show it.
+  - Check first: VOCAB-GIVEAWAY. It fails when a lesson vocab picture's text contains a number or answer the vocab item asks the pupil to supply. It must FAIL on master.
+  - Then the fix: draw the picture without the matched value, or with a value that isn't asked.
+- **A standard lesson's practice can repeat the chart's own example, whose answer is printed on the chart** (from lf-algebra's patterns r3, R3-7, via the lead, 2026-11-20).
+  - Check first: PRACTICE-NOT-CHART. No practice, Mixed or Warm-up item in a lesson may equal an anchor-chart example. It must FAIL on master.
+  - Fix: give standard lessons the same exclusion detailed lessons already have (avoidKeys), in print-sheet buildLesson.
+- **Next week's lesson-content list, per lane** (from the lessonfirst critic r1; already on master, exposed once the blank page was dropped):
+  - **Lesson / curriculum lane (WRM records):**
+    - Lessons with no library record open with no model ("I do") and an empty Steps column: Y4.B4.S11, Y4.B5.S1, Y4.B6.S3, Y3.B12.S4, Y4.B12.S2 and the other recordless WRM steps. Planned check: LESSON-NO-MODEL (0 chart states, or a Steps zone with no ink).
+    - Ten consecutive WRM step pairs share identical skills and options in their links. Planned check: LESSON-STEP-SAME-REQ (warn).
+    - Y4.B14.S4/S5 deal the same geo_rotate figure, because both steps have identical skills and options.
+  - **Multiplication / lesson sheet (Y4.B4.S11):**
+    - "Look at the array. Write two facts." is printed with no array and only one fact.
+    - "What is 1 × 7?" prints 7 × 1 = ?.
+    - Planned checks: instruction noun vs cell template; question text vs equation operand order.
+  - **Area / perimeter (Y4.B6.S3):**
+    - Doubled answer slots ("Area = ?", "Area = ___" and "Answer:"). Planned check: H16 slot count.
+    - A blue hint box. Planned check: H4 colour scan on lesson sheets.
+    - A Warm-up that deals area in a perimeter lesson. Planned check: content audit on the Warm-up pool.
+  - **Factors (Y4.B5.S1):** extra "Answer:" lines under the factor-pair slots (H16).
+  - **Graphs (Y3.B12.S4 Guided):** decimal axis ticks (1.8, 3.7 …); "Draw a bar…" overlaps the category labels; tiny axis text. Planned checks: integer ticks; text overlap.
+  - **Chart engine (lf-engine):** the times-table anchor-chart panels are about 50 % empty. Planned check: H13 on chart panels.
+  - **lf-checks:**
+    - OPENER-SAME misfires: build the signature from numbers plus the drawing, and skip the one-swap mask when only one number varies.
+    - CELL-FITS gaps: the key, WRM packets, ink outside cells, nested cells, a single seed.
+
+- **2026-11-19 22:30 UTC: new week, resumed. Budget stop is cost_usd $1,481.60 ($1,181.60 + $300).**
+  - (0) lf-placevalue's pagesOf fix (fbca1a582) is APPROVED.
+    - It counts the strip of a further shelf that opens a page, as plan() does.
+    - Conditions: hash-proof every changed page (only vocab_grade_pictures L Mixed should move), plus a MIX-PAGES backtest row and a ledger row.
+  - (1) rowcap stage 2 (F4) is RUNNING on claude/sweet-newton-c8wrv1-lf-engine-rowcap. Every template is capped by default, the self-built roles fail EB-STRETCH, and ROWCAP-FILL covers every template.
+  - (2) -roles comes next: the F1 WRAP check plus a full-width Model at M; SPILL-P1 reads its reserve from the budget constant and gets a boundary backtest; a critic on ≥ 20 Openers.
+  - (3) -pc r6 after that.
+- **Skill defects for the lead to route** (from -roles critic r4, 2026-11-14; not engine work):
+  - **fractions:fraction_of_set** (legacy cell), Opener Model at M:
+    - colour emoji in the drawing (H4);
+    - two "Answer:" labels (H16);
+    - the Model is a different problem kind from the Guided.
+    - Checks: an L-INK emoji/colour scan on legacy cells; the Model and the Guided must be the same problem kind.
+  - **coordinates:coordinates_plot_q1** (legacy cell), M and L:
+    - the label "C(6,9)" overlaps "Answer:" (H2);
+    - the Model is not worked (no answer ink).
+    - Checks: text bounding boxes inside a cell must not intersect; a Model cell must show answer ink.
+
+- **2026-11-14 21:10 UTC: -roles r4 FAILED; the lane is PARKED.**
+  - Code head eb17fe01a; report c32855f68.
+  - r3's add_wp_10k M blocker is fixed (1 page, 90 %).
+  - New blocker, F1: placevalue expand M and combine M put the Model at half width beside Steps, so the equation wraps and a 52 % / 44 % band is left empty (H13).
+  - On resume, check first: EB-BAND for `--roles opener --size M` plus a WRAP rule, with a backtest that FAILs on 1b7280c88. Then the full-width Model at M. Then a critic on at least 20 Openers.
+  - SPILL-P1 follow-ups: read the reserve from the engine constant, and add a boundary backtest.
+- **After the reset, in order:** rowcap stage 2 (F4), then -roles F1, then -pc r6.
+- Parked at about $1,185 (stop $1,240).
+
+- **2026-11-14 19:50 UTC: row-stretch cap stage 1 PASSED re-critic r2.**
+  - Branch claude/sweet-newton-c8wrv1-lf-engine-rowcap @ 3b0fdbcbb (code 174c839be).
+  - The head is with lf-placevalue and the lead.
+  - Open: the vocab_grade_pictures L lesson grows from 9 to 10 pages, and pages 9–10 have not been seen.
+- **First item after the reset: stage 2 (F4).**
+  - Invert ROW_ROOM_MM, so every template is capped by default with explicit exceptions.
+  - EB-STRETCH becomes a FAIL for Guided, Scripted Model, Error Analysis and Pre-skill check.
+  - Wide critic.
+- **Then:** -roles SPILL-P1, then -pc r6, then the queue below.
+- Parked at about $1,170 (owner stop $1,200).
+
+- **2026-11-14 09:00 UTC: lf-engine is PARKED (budget stop, about $1,135).**
+  - The chart Name/Date line is LIVE (master 7f2ca5e39).
+  - -roles r3 is HELD by the lead at 1b7280c88; the critic r3 report is at 421a78fed. It scored C3 6 on add_wp_10k M, and its change set covers 263 Openers but the graded sample was only 10 pages.
+  - At the reset, in this order:
+    1. Add the SPILL-P1 render check to ws-print-lint: measured page-1 white against page 2's first band, through spillP1Ok. It must FAIL on 1b7280c88.
+    2. Fix the opener.js p1WhiteMm estimate (lines 153–156). It runs at least 13 mm short of the render.
+    3. One critic on a WIDER sample of the 263 changed Openers.
+  - -pc r6 is parked at 6668f1732. The rest of the queue is below.
+
+- **2026-11-14 02:35 UTC: OWNER BUDGET STOP.** Hard stop at session cost_usd $1,140.
+  - -pc r6 is parked at 6668f1732 (WIP, ungated). Resume note in its status file: precritic --role lesson --strict, confirm master's reds, re-pin.
+  - -roles r3 is parked at b64203f29 (WIP, ungated; code is ahead of its checks).
+    - On resume, write OPN-SPLIT and L-DENSITY and key the overflow ratchet by (lint, rule, page) first, and show they FAIL on 27b8e540c.
+    - Then fix the side-by-side gate in opener.js geometry(): add_wp_10k goes side by side but does not fit.
+  - The chart Name/Date line is the one lane still running.
+- **Queue after the reset, in this order:**
+  1. -roles r3: checks first; no round 4.
+  2. -pc r6: finish, critic r6.
+  3. Slot stretch:
+     - Opener EB-BAND: grow's 8 mm cap.
+     - Lesson-vocab EB-BAND / EB-VOCAB: capIfEmpty's spare-height share.
+  4. placeSections 4-item sub-sections: PAGEFILL on Sections L p6 and p7.
+  5. Lesson-pack key stamp row (lf-roles L-KEY, lead 2026-11-14).
+     - In the LESSON PACK only, the key's "Answer:" line overlaps a 2-row word bank by 7–19 px (shape_name_match_3d).
+     - The pack does not reserve the stamp row that print-sheet readCell stampH reads. Independent and Test are fine.
+     - Planned check: ws-lesson-samples KEY-STAMP. On every lesson-pack key page at M and L, the stamp/Answer line's box must not intersect any cell content box, measured with the same rule as L-OVERLAP.
+     - The backtest must FAIL on master. A CHECKS_FROM_CRITICS row is added with the check (the ledger lives on master, not on this branch).
+  6. div_facts chart and CHART-FILL (chart critic r1 F1).
+  7. Then the earlier items: (e) twoState, G7, (d) live round, (c) vocab Mixed.
+- **Lead rulings 2026-11-14:**
+  - Chart Name/Date type follows the chart's own size (L).
+  - mixed_placevalue Guided 2 + Independent 0 is correct (PT-OPN-6).
+  - F5 (raw JSON on keys) goes to lf-roles.
+  - The fraction_of_set_hard harness leak is its own ledger row for lf-checks.
+- QUEUED (OWNER request via lead 19:49), HIGH, after -pc / -roles deploy and BEFORE G7: anchor charts print the Name / Date header line like other pupil pages, via the shared frame (sheet/frame.js), honouring lf-roles' new title option (custom title text above or below the Name / Date line). Checks first: anchor chart has a Name / Date line at M / L, no overflow, chart still fits its page. Lesson pages change -> re-pin the baseline (M,L) naming the pages. Queue order now: -pc r6 -> -roles -> anchor Name/Date -> (e) two-step twoState -> G7 (+div_facts, mult_facts) -> live lesson round -> vocab Mixed continuation.
+- OWNER FASTEST PLAN (lead 17:59): round cap 2 (escalate, no r7), no 390 px, deploy train 11:00 / 19:00 UTC, round-1 units only, long lessons paused. Lead ruling on the queue - all KEEP (round 1 or live): ORDER after -pc and -roles deploy: (e) two-step chart twoState routing (high) -> (a)+(b) G7 resume (growing, div_facts chart, mult_facts M sheet) -> (d) live lesson round -> (c) vocab_grade_pictures Mixed continuation. Then round-1 short lessons as their skills pass.
+- QUEUED with G7 (lead 17:17): vocab_grade_pictures L lesson Mixed continuation 72 % blank is ours (lesson Mixed engine: lead-half rule + full-page mult-grid shelf; if the fix belongs in the shelf's footprint, ask lf-vocab). Checks first: PM-CONT over all lessons (Mixed continuation >= 50 % blank = FAIL). fact_family_sort L Mixed: lead confirms on lf-partopts' deploy tree (it merges master).
+- G7 PAUSED (FOCUS rule) at -g7 f5d61e7f9 (WIP, ungated); proof branch -g7-proof 5d022c783 (backtest PASS state only, never merge). Checks built: LS-WARM, LS-FILL, PM-CONT --practice-pages; rows lesson-g7-growing, lesson-div-chart-fill, lesson-mult-facts-sheet-fill, lesson-ffs-mixed-pp2. M2 (fact_family_sort L Mixed) is ALREADY fixed on master (de8eec183): lf-partopts branched from d34311d - they must merge master. Resume at the builder's "Remains" item 1 (all-lessons L/M/S re-run with the 27 % Warm-up margin). Route: vocab_grade_pictures L Mixed continuation 72 % (pre-existing, full-page mult-grid shelf) -> mixed engine / lf-vocab.
+- QUEUED low priority after G7 (lead 16:58, lf-partopts sweep): placevalue:identify L lesson sheet (We Do off, rows 0) foot would hold another row at a 12.4 mm gap (> partopts' 12 mm margin) - fill the row or confirm the foot is under H13 / PAGEFILL. Same class as ROWFIT (queued for the live round): fold together.
+- BUDGET (lead 16:58, owner cap 70 % ≈ $1,960 this week): lf-engine allocation $280 above the session cost_usd baseline $777.61 → stop starting agents at $1,057.61. Checkpoint 16:58 UTC: $784.45 (+$6.84). Report spend each report; high effort on lesson design only.
+- 2026-11-13 ~16:00 UTC STOPPED: weekly usage limit hit (resets 2026-11-19 22:00 UTC). All work pushed. Resume points:
+  - -pc @ 79ea333b8: round 6 (critic r5 R1-R5 + P1). Step 0 master merge done (dd2a4aff7); then a WIP mixed-practice.js commit (UNGATED, do not deploy). Next: checks first (PC-PV pattern on/off, PG-LR6/LR67 check-off all lessons, live PC-PVHEADS + value-slot instruction, part page-count vs pin, Mixed foot <= 15 %), fixes, live diff + re-pin, spread proof PNGs (Practice + Mixed per family, S and L - lead condition), then critic r6.
+  - -roles @ a8ec3f2ac: fix round done except the coordinate_q1 opener L regression (fix side-by-side / ruled, check: no opener skill gains PG-12 / PG-21 / PG-13 vs master) and scoping capacity-pin to mixed-practice; then re-critic.
+  - -g7 @ af038f3d6: G7 + div_facts chart + mult_facts M sheet + fact_family_sort L Mixed (widen PM-CONT over lf-partopts' part options) in progress; Warm-up ink cap done.
+  - -ledger 2bc53d85f: lesson-baseline deploy gate, waiting for the lead's merge.
+  - Queued: two-step chart twoState routing (high), live lesson round (item 6, ROWFIT, PG-TURN 64 seeds + 4 live turnarounds, item-7 minors, PM-H13 / LIVE-PART all-lessons).
+- QUEUED after G7 (lead 13:42, from lf-algebra two-step build, -lf-algebra @ 8438ca59d), HIGH: lesson-pages/chart.js routes only x/÷-first stories to twoState; +/−-first, add-first, letter and estimate two-step stories fall back to the whole cell in 92 mm panels (~146 mm overflow, illegible) -> every two-step item through twoState; plus section LONE / PAGEFILL on those lessons. Checks first (chart panel overflow / legibility floor; LONE / PAGEFILL on the lesson), backtests FAIL on master.
+- 2026-11-13 13:30 UTC: check r5 root-cause round built (-pc e212524df; near-twins.js module, pv bank right of the number, hard route floors; 13 new backtest rows; LIVE diff 176 / 1556 in f18533dd7 + 4095d2e83: sub chart panels centred, pv heads dropped on Mixed partners, L pv shelves no longer cut at the frame). Lead ruling: identify's OWN lesson Mixed keeps heads (taught support); Review / Test / Check / other lessons' Mixed print none (Review/Test routed to lf-placevalue). Critic r5 approved once the chained gates (ws-backtest 13 rows, boot-smoke, precritic --role lesson --strict) are green; it grades the 176 live pages too.
+- 2026-11-13 12:40 UTC engine roles critic FAIL min 5 (-roles 8266326ba): B1 one-cell Guided on one-column Openers (PT-OPN-6; unit_form S 47 % used), N2 combine S inner rule short, N3 sweep under-reported; loosening ruled legitimate + DN-2 fill guard. Fix round running (medium). OWNER RULE audit (every finding = check + backtest + precritic-plan + CHECKS_FROM_CRITICS row before its fix): -roles ledger rows added (23acf0ec3); OPEN without all four, each assigned: item-7 minors, live-pm2 re-critic checks (sheet TAB-CLEAR, stricter SHEET-2PG), ROWFIT, PG-TURN 64 seeds, PM-H13 / LIVE-PART all-lessons on lesson-samples-all -> live round; r4 N1-N9 + PC-PVHEADS -> check builder; G7 + div_facts -> G7 builder. tape_diagram pronoun / sliver (critic N4) routed to the lead.
+- COST (lead 12:13): lf-engine session cost_usd $581.53 total at 12:13 UTC (≈ 20.8 % of the weekly limit at $28 ≈ 1 %). Running: check r5 root-cause builder (-pc), engine-roles critic (-roles 2d7a7f158; on PASS send head + report to the lead for deploy with opener / Mixed before-after PNGs), G7 + div_facts chart builder at high (-g7). From now on: log the session figure before and after each round here and in metrics.md.
+- OWNER RULE (lead 10:45): lesson builders / fixers at HIGH (`mq-opus-high`, model opus); critics stay medium. Running check rebuild (≈ 1 h 45 in) finishes at medium; next lesson builders (G7 + div_facts chart; live lesson round) at high. Profile was NOT in master 57cde3664 (.claude/ is gitignored) - created locally; lead told.
+- QUEUED after the engine roles round (lead 09:26, lf-algebra critic r2 G7): "growing" lesson p2 Warm-up 54 % band (H13) and p4 43-46 % used; precritic r9's lesson print-lint PASSED them (lint gap). Fix the pages; make print-lint lesson catch both (H13 on Warm-up cells, page-used floor); backtest on lf-algebra's renders at HEAD d20c8a003. + (lead 10:12, lf-partopts critic r3) division:div_facts anchor chart 49 % empty at M and L on master: fix with G7 and add to the page-used lint backtest (div_facts chart M/L on current master = FAIL).
+- 2026-11-13 09:10 UTC: Prerequisite Check critic r4 FAIL min 6 (report design/audit/runs/lf-engine-pc-r4/ on -pc 62bd326e5: N1 route floors soft on the last try, N2 pv word bank aligned = answer, N3 chart H13 32 %, N4/N5 one-number near twins, N6 lopsided grown band). §1.7 stop approved: fresh builder, 6 checks first (PC-RANGE floors, PC-PV both ways, H13 chart cells, PG-LR6 every page 64 seeds, lopsided bands, chart-grey index), one near-twin module, hard floors. Lead N9 ruling: place heads kept on Practice, dropped on Mixed / Review / Test / Check for "name the place" items (check PC-PVHEADS; live change on round Mixed). Then critic r5.
+- QUEUED for the live lesson round (lead 08:57): the 4 live same-page turnarounds on add packets (sheet seeds 1481 / 1851, Mixed 1703 / 1888); widen PG-TURN's sweep to >= 64 seeds so the gate finds them; backtest on those seeds. Check fix round done (-pc 6a9c268ce: PG-TURN, PG-LR67; ws-lesson-check forced 354 -> 118, unforced 428); critic r4 running; engine round (opener EB-BAND, PG-23, DN-2) running on claude/sweet-newton-c8wrv1-lf-engine-roles.
+- LEAD ORDER 08:16 (no budget limit, all agents Opus medium): (1) finish check fix round + critic r4; (2) WHILE r4 runs: engine round opener EB-BAND, PG-23 last-page rebalance, DN-2 worked-example balancing, each with a backtested check, passed skills proven unchanged or changed pages listed - ahead of the live lesson round (blocks compare); tell lf-placevalue the commit; (3) then the live lesson round.
+- QUEUED (lf-placevalue via lead, 08:16; branch claude/lf-placevalue-w2, report design/audit/runs/lf-placevalue/precritic-compare-r2.md): placevalue:compare engine findings owned by lf-engine: (1) opener EB-BAND S 10 / M 4 / L 4 - opener layout stretches cells that inPlace + tightRows hold to ink (`mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill placevalue:compare --roles opener --hosts none --no-baseline`); (2) PG-23 mixed-practice/defaults L "last page 2 holds 2 items, < 1/3 of 10" x2 - row rebalancing; (3) DN-2 ex-each / ex-group L "page 2 holds 4 while page 3 follows, fullest 10" - multi-section worked-example balancing (`ws-precritic --skill placevalue:compare --strict`). (2) and (3) pre-date compare's changes (a837b8d4). Order: ask the lead (after check r4; beside or after the $30 live round). Base: master once lf-placevalue-w2 lands (keepCols 7248041b, spreadMax 83471706); if earlier, w2 @ fb20febe then rebase. lf-placevalue will say when w2 merges.
+- 2026-11-13 07:20 UTC g3-oa8 drift DIAGNOSED (lead 06:35 item): not a flake, not master drift. Two serial master baselines (69a6560b5, all-lessons L,S, 4242+1) 0 / 1598 differ; lf-builds-stories' logs show g3-oa8 html + p06 + p09 changed at both seeds (html is font-independent); cause = that branch's story changes (lesson-arch/story.js sentenceState bar-big / bar-diff slots, columnPanel, word-work provider). Routed to lf-builds via the lead; lf-checks told ws-lesson-baseline needs no ws-fonts.
+- FYI (lf-placevalue 06:40, cc): claude/lf-placevalue-w2 (e8371e69) adds opt-in footprint flags keepCols (print-sheet.js) and spreadMax (practice.js; a tightRows section may spread up to the cap) - merge watch for the live round, which also touches print-sheet.js / practice.js; new rulings WORKSHEET_DESIGN_STANDARD CL-2c and PAGE_TYPES PT-ENG-6 (teacher-set columns, middle-page strips <= 25 %). Engine findings on placevalue:compare went to lf-roles (design/audit/runs/lf-placevalue/precritic-compare-r2.md).
+- QUEUED after the Prerequisite Check critic r4 (lead 06:35, from lf-builds): lesson g3-oa8 differs on 6 / 1556 baseline pages with or without lf-builds' change (logs in lf-builds' logs/lb/) - flake (font-load race? same class as the E2 bug logged for lf-checks) or master drift; lf-engine owns the diagnosis: rerun the baseline twice on clean master serially, compare hashes, then decide.
+- QUEUED for the $30 live round (lead 06:20, from lf-partopts): placevalue:identify STANDARD lesson sheet at M leaves a 37.8 mm foot against a 36.5 mm shortest row yet says "no room" — add the row or fit it (ROWFIT: no sheet foot >= the shortest row's height; same class as item 6). Also queued from the item 7 critic (de8eec183, PASS min 8): story first-line y aligned across a shelf (2 px); no two adjacent word problems share object + frame; a section split over 2 pages has fills within 10 %.
+- 2026-11-13 04:30 UTC lead rulings: live-pm2 split approved (revert item 6, add_wp_10 PNGs, deploy items 1-5 + 7); TAB-CLEAR 1 mm for one-line across facts confirmed (CL-40). Order: (1) Prerequisite Check critic r4 -> flip on PASS; (2) live round cap $30: 40 dead carry boxes on sub_*_no_regroup Mixed keys FIRST, then item 6 (Y4.B1.S14 L sheet) with TAB-CLEAR on sheet blocks + stricter SHEET-2PG, then ~15 pv / sub_no_regroup PM-H13 bands. live-pm2 re-critic: design/audit/runs/lf-engine-live-pm2/ (items 1-5 PASS, item 6 FAIL worse, item 7 ungraded).
+- 2026-11-13 04:50 UTC: Prerequisite Check r3 fix round done on -pc 7ff8a87ab: F1-F4 fixed with gates PC-PV, PC-CLIP (ink), PC-FRAME, PC-LR5 (forced, 8 seeds), PC-H13P; backtests lesson-check-pv-heads, lesson-check-clip-ink, lesson-frame-closure, lesson-lr5-forced; live baseline 0 / 1556. Open: F13 (near-twin itemNumberKey); `ws-lesson-check --force-check` 194 findings to triage against unforced. Next: merge -live-pm2 (after its re-critic) into -pc, F13 + triage, precritic, critic r4, flip prereqsLive on PASS.
+- 2026-11-13 03:05 UTC: live-pm narrow critic FAIL min 5, NO regression (every changed page equal or better; every sub-8 is pre-existing on master; report design/audit/runs/lf-engine-live-pm/ on -live-pm 9135190b9). Lead ruling (a): deploy -live-pm as a strict improvement; next live round approved $18: (1) equation / missing-factor centring, (2) word-problem S band, (3) Mixed continuation pages never >= 50 % blank, (4) rounding Mixed centring + tab clearance, (5) div_facts S Practice p3; each with a check, then a re-critic on the same spot sample.
+- BUG FOR lf-checks (slot / load contention, 2026-11-13): ws-detailed-lesson E2 fails under parallel load. Seven lessons run in parallel on -live-pm 9135190b9: g2-nbt3 and g4-nbt1 FAIL E2 "700/28px false, 400/15px false" (Andika not yet loaded when `document.fonts.check` runs at line 72; `document.fonts.ready` at line 904 resolves before the web-font fetch finishes); g3-oa8 passed this time; each passes alone (byte-identical HTML). Earlier batch flakes on g2-nbt3 / g3-oa8 are the same class. Fix: await `document.fonts.load('700 28px Andika')` + `('400 15px Andika')` with a bounded retry before measuring, and report a font that never loads as ERROR (infra), not a page FAIL. Other lines in that run: g1-oa1 E9 / E35 (known), the rest OK.
+- QUEUED (lf-algebra r7 47b1f2a86, lead ruling (a) 2026-11-13), after the check work: routines may carry `stepsBy: {<option>: {<value>: [steps]}}` (e.g. function-table-use-rule stepsBy.ftTask['rule-check'], 5 steps); lesson-pages/common.js namedSteps reads it; new check ROUTINE-STEPS (routine step count == provider workedSteps count for every option value) + backtest row. Symptom: function_table_easy ftTask=rule-check lesson overflows 2.4 mm (provider 5 steps vs routine 4; namedSteps falls back; 2x2 chart merges steps 1-2).
+- 2026-11-13 01:40 UTC: Prerequisite Check critic r3 FAIL min 6 (`-pc` 316102081, report design/audit/runs/lf-engine-pc-r3/). Check pages near-miss 7 (F1 pv heads give the answer; F2 sub S Q6-8 clip); fails on Mixed (F5 55 % band, F6 dead hundreds carry box) and round Practice (F7 49 %) - probably LIVE on master too, verify first. prereqsLive stays off. Backtest tool fix on `-bt` 602c9aa6b (139/12/12/0/0) sent for deploy. Session $383.65.
+- QUEUED (from lf-algebra precritic, via the lead 2026-11-13; see design/status/lf-algebra.md 'Red, by owner'), after the Prerequisite Check critic: (1) chartWide packing (print-lint lesson); (2) lesson pages for count-row option values; (3) pre-skill-check pages overflowing the sheet (likely fixed by the -pc branch's one-page rule - re-check on lf-algebra's skills).
+- OWNER RULING 2026-11-12 (via the lead): the long detailed V22 lessons are ON HOLD; build the SHORT lessons first all the way through (Prerequisite Check, anchor chart, lesson sheet with vocabulary / Remember / We Do, Practice, Mixed). Lesson 2 E9 / E35 dropped for now. Next round: the Prerequisite Check (LR-17, critic r2 FAIL min 6) to a pass so prereqsLive can be switched on, then compiling short lessons unit by unit from the queue.
+- LIVE: lessons phase 0 is on master ec61b069 (fa7b66a0 + stamp + STATUS; lead's gates match master). Lanes now edit lessons in lessons/families/*.js and lesson-pages/*. Full ws-backtest re-run on -land HUNG (no rows printed; killed at 7,000 s; last checkout pv-expand-card-kit-fail; suspected browser-lock wait) - 69 rows still un-run on the landed tree; proposal: per-row runs with a timeout + streaming output. PARKED (session $291.59 ≈ 14.6 %).
+- 2026-11-09 15:05 UTC: PHASE 0 READY TO LAND - `claude/sweet-newton-c8wrv1-lf-engine-land` fa7b66a0 (FF of master 4c5de5a2): --all-lessons proof 0 of 1,556 vs master 1fedbb55 and vs 4c5de5a2; L1 vocabZoom / L2 roundOneNum opt-in behind phase0On (prereqsLive); gates as master (precritic same 5 reds, detailed lessons same lines); full ws-backtest incomplete (69 rows unrun after a disk fill; tool fixed c3245504). Sent to the lead. Session $285.16 ≈ 14.3 %.
+- 2026-11-09 11:30 UTC: phase-0 LANDING stopped (lead's stop rule): `claude/sweet-newton-c8wrv1-lf-engine-land` 3bf3ef5c (contains master f6216420); --all-lessons baseline on master 1fedbb55 = 1,556 hashes; land differs on 80 (L1 the lane's N1 vocab zoom adds Independent items on 8 live sheets; L2 nearest_10 Practice +1 row); all 7 detailed lessons, add/sub samples (LR-17 switch proven) and 15 more live lessons identical. Decision asked of the lead: (A, suggested) make L1/L2 opt-in on the phase-0 samples only, re-prove 0 diffs, full gates (≈ $10-15). Session $253.93 ≈ 12.7 %.
 - 2026-11-09: lesson 2 P0 drift FIXED on the lane (b1e30155: print-sheet.js pageLr6 also on a perQuestion pre-skill-check, master's lf-placevalue line). Diff `ws-lesson-deal-diff.cjs`: dcdb50d4 seed 1 P0 dealt 11 + 5 / 2 + 11 (twins 16, 13) where master deals 2 + 13; after the fix lane P0 == master P0 at seeds 1, 2, 4242. E24b + E31 PASS at seeds 1-5 + 4242; E9 / E35 unchanged (deferred by the lead). New check `ws-lesson-unit --only p0-overlap` + backtest row p0-overlap. Not ported (other lanes', not P0): warmItemKey (lf-placevalue), factSections (facts-print-fix). Not pushed.
 - LIVE: lesson 2 E24b every-seed fix is master 198d437e9 (lead's gates green). PAUSED. Next week, in order: (1) node P0-deal diff lane vs master at fixed seeds (the lane's extracted engine deals P0 twin answers at 5 of 6 seeds); (2) the P0 answer-overlap check; (3) lesson 2 E9 (+5 mm) / E35.
 - 2026-11-08 20:10 UTC: lesson 2 E24b at every seed on `claude/sweet-newton-c8wrv1-lf-engine-live-l2b` (80b189e1, 4b0f79b5 on master 8573c66a): E24b + E31 PASS at seeds 1-5 + 4242; gates green; sent to the lead. LANE still red: same data on the extracted engine deals P0 twin answers at 5 of 6 seeds (drift in lane pre-skill-check / detailed-lesson vs master; next: node P0-deal diff lane vs master). Session $224.69 ≈ 11.2 %.
