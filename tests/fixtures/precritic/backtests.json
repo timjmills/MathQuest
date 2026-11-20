@@ -14717,6 +14717,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-lesson-overflow-tiles",
+   "check": "ws-cell-checks OVERFLOW on the long-multiplication lesson for every tiles value the card prints: tiles=41 (a 4 x 1 item's five steps under the 2-digit routine's four names - steps 1 and 2 shared panel 1, 7.1 mm out) and tiles=null (the tables facts' stack, the chart grown to zoom 1.6, 0.6 mm out of panel 3)",
+   "kind": "commit-pair",
+   "rule": "OVERFLOW (sharded precritic 2026-11-20, lf-ops sizes: mult_2by2_standard 6+6, mult_3by2_standard 2+2)",
+   "browser": true,
+   "fail": {
+    "commit": "67e19eedf",
+    "state": "sizes branch: lesson M/L OVERFLOW 12 on mult_2by2_standard (tiles=41, tiles=null) and 4 on mult_3by2_standard (tiles=null)"
+   },
+   "pass": {
+    "commit": "3d3faa8b9",
+    "state": "mult-column-2digit byOption: tiles 41 takes the 1-digit column routine (tailLast), tiles null caps the chart at zoom 1.3 (chart.js chartMaxZoom; prereqs optionLesson reads a 'null' entry)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_2by2_standard,multiplication:mult_3by2_standard --card --card-opts --opt-roles lesson --rules OVERFLOW 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
