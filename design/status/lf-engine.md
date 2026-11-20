@@ -10,6 +10,18 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-20 24:00 UTC: fillfix 00cb625d5 is being deployed by the lead. lf-engine PARKED** at about $1,516 (stop $1,546.55).
+  - Lead rulings A27:
+    - SHEET_FILL_MIN 0.74 is accepted.
+    - The 4 newly exposed partopts findings are routed: mult_properties L Vocab-off sizing to lf-ops; PO-CAP on function_table_easy L and notice_patterns M to lf-algebra.
+- **Next week, for lf-engine (ROWFIT, the row planner):**
+  - Plan a sheet's foot by the REAL height of the next row, not by a fixed 12 mm margin.
+    - Some sheets with no rows leave a foot that holds a row at gaps above 12 mm: identify L Vocabulary off 12.7 mm, growing_shape_patterns M 12.7 mm, two_step_estimate_check L 15.9 mm.
+    - Others hold no row at a 6.3 mm gap.
+    - No single margin separates the two groups.
+  - Also take back the six good sheets planned 0.728–0.739 that the 0.74 floor still refuses (28–29 % feet).
+  - Check first: a sweep with `ws-partopts-unit --fill-sweep`, plus EB-ROWFIT judged by the measured next-row height.
+
 - **2026-11-20 14:40 UTC: rowcap + vocabfix PASSED the round-cap critic r1 and are with the lead for DEPLOY.**
   - Head: claude/sweet-newton-c8wrv1-lf-engine-vocabfix @ 19e2fc9fe (code 4ecba079c, merged with master 9ae9ccd5d). Report: design/audit/runs/lf-engine-vocabfix-r1/REPORT.md.
   - At deploy: run ws-merge-master (master has moved to 2c42746aa), re-pin 1,284 lesson hashes (row cap), stamp the CSS.
