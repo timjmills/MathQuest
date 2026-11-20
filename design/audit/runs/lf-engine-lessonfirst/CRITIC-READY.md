@@ -93,6 +93,12 @@ about 45 % blank** (`png/algebra_two_step_letter_equation-after-*`). That is the
 The real fix is content: a chart that prints the story once, as the detailed two-step lesson does (`chartWide` + `chartRow` +
 `tailRead`, its own data). That belongs to the algebra lesson lane, not the engine.
 
+**CHART-HEAD (lf-engine chart-name, 2026-11-14) conflict, for the lead:** that rule says every anchor chart prints on ONE page.
+two_step_letter_equation's chart now prints on 4 (M and L: 2 findings). On master the same chart broke the rule worse: 16
+findings (body and page overflow, a bar row outside the page). The gate counts 58 on this head against master's 72. Every chart
+page now carries the chart's full header, so the header findings are gone. "One page", "nothing shrinks" and "full width" cannot
+all hold for a 4-panel chart of 120 mm panels. The content fix above resolves it; I did not loosen either rule.
+
 **Lesson baseline:** 64 of 2590 hashes changed, all `algebra:two_step_letter_equation` (M, L × seeds 4242, 1 × pupil-p1..p7,
 key-p1..p7, pupilHtml, keyHtml): the chart grew from 1 page to 4, so every later page shifted. Re-pinned in the same commit.
 Every other lesson is identical.
@@ -127,4 +133,10 @@ Name pattern: `<id>-<before|after>-<M|L>-<pupil|key>-p1.png` (80 files).
 - ws-lesson-cellfits (every library lesson × M/L): 28 pages, the base's 30 minus two_step_letter_equation M and L (the list above).
 - ws-layout-unit: **crashes on master and on the base 0983c6791 the same way** (`ws-layout-unit.mjs:918 reading 'inkMm'`, the
   fact-rows mixed-facts block). It is not this lane's code, so the known Guided fail is not reached.
-- ws-precritic --role lesson --strict: see `design/status/lf-engine-lessonfirst.md` (each red named and compared with master).
+- ws-precritic --role lesson --strict (head before the CHART-HEAD header commit; the reds are master's, compared finding by finding
+  with master): lesson-unit 4/320 (= master; D13, N3, D18 ×2) · raster-fit 21 (= master) · print-lint L and M ratchet 28 (= master)
+  · cell-checks 87 (= master) · lesson-samples-check 2 and -all 13 (= master) · lesson-samples-key-L 12 (= master) ·
+  partopts-coverage 1 (= master) · no-size-s GATE-TOKEN 1 (= master a98297951: ws-empty-band.cjs:597) · empty-band 148 (master 166,
+  fewer) · lesson-samples-chart (CHART-HEAD) 58 after the header fix (master 72; the 2 left are the one-page conflict above) ·
+  lesson-pages-g3 6 (the 5 misfires and 1 real pair above; the gate is not on master) · lesson-cellfits 28 (new gate; the list
+  above, the same 28 as the base). teacher-wrm PASS (master FAIL on 65c28ccdf).
