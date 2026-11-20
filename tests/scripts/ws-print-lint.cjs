@@ -1031,10 +1031,15 @@ function wsLintPage(cfg) {
                    CL-40 / CL-41); a write-above cell (data-ws-writeabove:
                    a regroup stack, a division bracket) is centred down the cell within 2 mm. Cells whose
                    visual is the workspace (CL-4) and legacy pictures are not judged. */
+                const CENTRED_ROLES = ['error-analysis', 'reason-it'];   // CL-4b owner 2026-11-12
                 const tmpl = c.getAttribute('data-ws-cell') || '';
                 const wa = c.hasAttribute('data-ws-writeabove') || !!c.querySelector('[data-ws-writeabove], .ws-stack-legacy i[data-ws-seg]');
                 const workspace = ['clock', 'frac-model', 'nl-place', 'number-line', 'hop-line', 'chartwindow', 'mult-chart', 'tenframe'].includes(tmpl) || (c.hasAttribute('data-ws-legacy') && !!c.querySelector('svg'));
-                const judged = (cfg.mode === 'pack' ? !!tmpl : c.hasAttribute('data-ws-cell')) && !workspace && !c.closest('[data-ws-topstart="off"]');
+                // (CENTRED_ROLES, CL-4b owner 2026-11-12 - lead ruling 2026-11-20, area-model-div round 2: an Error Analysis or
+                // Reason It page centres the shown work down its cell by design, the white split above and below; those two roles'
+                // cells are not judged for the top of the box. Every other role still is.)
+                const centredRole = !!c.closest(CENTRED_ROLES.map((r) => `.ws-page[data-ws-role="${r}"]`).join(', '));
+                const judged = (cfg.mode === 'pack' ? !!tmpl : c.hasAttribute('data-ws-cell')) && !workspace && !c.closest('[data-ws-topstart="off"]') && !(centredRole && !wa);
                 const fits = (box.b - box.t) < (inner.b - inner.t) - 4 * PX;
                 // the first PRINTED row: ink (text, a drawing, a stroked box), never an empty spacer
                 let inkTop = Infinity, inkBot = -Infinity;
@@ -3053,6 +3058,19 @@ const SELF_TESTS = [
         const c = document.querySelector('.ws-page [data-ws-cell]');
         c.setAttribute('data-ws-cell', 'stack');
         c.style.justifyContent = 'center';
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    // (CL-4b owner 2026-11-12, lead ruling 2026-11-20: Error Analysis and Reason It centre the work by design - only those roles)
+    { name: 'centred cell on an Error Analysis page (role exemption)', expect: [], absent: ['L-TOPSTART', 'CL-4b'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.closest('.ws-page').setAttribute('data-ws-role', 'error-analysis');
+        c.setAttribute('data-ws-cell', 'stack'); c.style.justifyContent = 'center';
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'centred cell on a Guided page still fires (role exemption scoped)', expect: ['L-TOPSTART', 'CL-4b'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.closest('.ws-page').setAttribute('data-ws-role', 'guided');
+        c.setAttribute('data-ws-cell', 'stack'); c.style.justifyContent = 'center';
         c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
     } },
     { name: 'regroup stack pinned to the top (L-TOPSTART)', expect: ['L-TOPSTART', 'CL-4b'], fn: () => {
