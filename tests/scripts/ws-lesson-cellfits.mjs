@@ -50,9 +50,28 @@ export function judge(lessons) {
         if (!f.length) continue;
         const panel = f.filter((x) => x.kind === 'panel'), page = f.filter((x) => x.kind === 'page');
         const worst = Math.max(...f.flatMap((x) => x.sides.map((s) => s.mm)));
-        out.push({ id: l.id, size: l.size, page: pg.n, sheet: pg.sheet, msg: `${l.id} ${l.size} ${pg.sheet || ''} p${pg.n}: ${panel.length} ink piece(s) outside their panel${page.length ? `, ${page.length} outside the page` : ''} (worst ${worst} mm; e.g. "${String(f[0].what).slice(0, 40)}" ${f[0].sides.map((s) => `${s.side} ${s.mm} mm`).join(', ')} in ${f[0].box})` });
+        out.push({ id: l.id, size: l.size, page: pg.n, sheet: pg.sheet, key: knownKey(l.id, l.size, pg.sheet, pg.n), pieces: f.length, worst, msg: `${l.id} ${l.size} ${pg.sheet || ''} p${pg.n}: ${panel.length} ink piece(s) outside their panel${page.length ? `, ${page.length} outside the page` : ''} (worst ${worst} mm; e.g. "${String(f[0].what).slice(0, 40)}" ${f[0].sides.map((s) => `${s.side} ${s.mm} mm`).join(', ')} in ${f[0].box})` });
     }
     return out;
+}
+
+/* ------------------------------------------------------------------ the shrink-only KNOWN list (lead 2026-11-20) */
+// The pages that overflowed when CELL-FITS landed are pinned in design/audit/baselines/cellfits-known.json, each owned by its
+// lane, so the gate blocks NEW overflows without blocking every deploy. A pinned page passes as KNOWN only while it does not
+// get worse (no more ink pieces outside, worst overflow no deeper); a page that no longer overflows is reported "fixed - drop
+// it from the list". The list may only shrink: --write-known rewrites it from the current findings and refuses to ADD a page.
+export const knownKey = (id, size, sheet, n) => `${id} ${size} ${sheet || ''} p${n}`;
+export const KNOWN_FILE = 'design/audit/baselines/cellfits-known.json';
+export function applyKnown(found, known) {
+    const fail = [], kept = [];
+    for (const f of found) {
+        const k = known[f.key];
+        if (k && f.pieces <= k.pieces && f.worst <= k.worst + 0.05) kept.push(Object.assign({}, f, { owner: k.owner }));
+        else fail.push(Object.assign({}, f, k ? { worse: `was ${k.pieces} piece(s), worst ${k.worst} mm (owner ${k.owner})` } : {}));
+    }
+    const seen = new Set(found.map((f) => f.key));
+    const fixed = Object.keys(known).filter((k) => !seen.has(k));
+    return { fail, kept, fixed };
 }
 
 /* ------------------------------------------------------------------ the self-test */
@@ -67,6 +86,15 @@ function selfTest() {
         ['ink past the page fails twice (panel and page)', pg([{ l: 10, t: 10, r: 230, b: 20, what: '= n' }]), 2],
     ];
     const bad = [];
+    {   // the shrink-only KNOWN list
+        const kn = { 'a M lesson-mixed p4': { pieces: 2, worst: 1.8, owner: 'lf-x' } };
+        const f = (pieces, worst, key = 'a M lesson-mixed p4') => [{ key, pieces, worst, msg: key }];
+        const r1 = applyKnown(f(2, 1.8), kn); if (r1.fail.length || r1.kept.length !== 1) bad.push('a pinned page at its pinned size passes as KNOWN');
+        const r2 = applyKnown(f(3, 1.8), kn); if (r2.fail.length !== 1) bad.push('a pinned page with MORE pieces fails');
+        const r3 = applyKnown(f(2, 2.5), kn); if (r3.fail.length !== 1) bad.push('a pinned page with a DEEPER overflow fails');
+        const r4 = applyKnown(f(1, 0.7, 'b L lesson-sheet p2'), kn); if (r4.fail.length !== 1) bad.push('an unpinned page fails');
+        const r5 = applyKnown([], kn); if (r5.fixed.length !== 1) bad.push('a pinned page that no longer overflows is reported fixed');
+    }
     for (const [name, p, want] of cases) { const got = judgePage(p).length; if (got !== want) bad.push(`${name}: ${got}, want ${want}`); }
     for (const b of bad) console.log(`  FAIL ${b}`);
     console.log(bad.length ? `${TOOL} --self-test: FAIL (${bad.length} of ${cases.length})` : `${TOOL} --self-test: OK (${cases.length} cases)`);
@@ -145,7 +173,20 @@ async function main() {
         lessonIds: arg('lessons') ? arg('lessons').split(',') : null, skills: arg('skills') ? arg('skills').split(',') : null,
         sizes: (arg('sizes', 'M,L')).split(','), seed: Number(arg('seed', '4242')), withKey: has('key'),
     });
-    const found = judge(lessons.filter((l) => !l.error));
+    const found0 = judge(lessons.filter((l) => !l.error));
+    const knownPath = path.join(ROOT, KNOWN_FILE);
+    const known = has('no-known') || !fs.existsSync(knownPath) ? {} : (JSON.parse(fs.readFileSync(knownPath, 'utf8')).pages || {});
+    // A partial run (--lessons / --skills / --sizes / --fixture) judges only what it built: 'fixed' is reported on a full run only.
+    const full = !arg('lessons') && !arg('skills') && !arg('fixture') && arg('sizes', 'M,L') === 'M,L';
+    const { fail: found, kept, fixed } = applyKnown(found0, known);
+    if (has('write-known')) {
+        const add = found.filter((f) => !known[f.key]);
+        if (add.length && !has('allow-add')) { console.log(`${TOOL}: FAIL (--write-known refuses to ADD ${add.length} page(s); the list only shrinks: ${add.map((f) => f.key).join('; ')})`); return 1; }
+        const pages = {};
+        for (const f of found0) pages[f.key] = { pieces: f.pieces, worst: f.worst, owner: (known[f.key] || {}).owner || arg('owner', 'unassigned') };
+        fs.writeFileSync(knownPath, JSON.stringify({ about: `${TOOL} shrink-only KNOWN list (lead 2026-11-20): pages that overflowed when CELL-FITS landed, each owned by its lane. A page passes only while it does not get worse; remove it once fixed.`, pages }, null, 1) + '\n');
+        console.log(`${TOOL}: wrote ${KNOWN_FILE} (${Object.keys(pages).length} page(s))`);
+    }
     const errs = lessons.filter((l) => l.error);
     if (arg('dump')) {
         // (a dump keeps only the boxes with ink outside, and that ink: small enough to commit as a fixture)
@@ -153,11 +194,13 @@ async function main() {
         fs.writeFileSync(path.resolve(arg('dump')), JSON.stringify({ about: `${TOOL} measured boxes (overflowing ink only)`, lessons: slim }) + '\n');
     }
     for (const e of errs) console.log(`  ERROR ${e.id} ${e.size}: ${e.error}`);
-    for (const f of found) console.log(`  FAIL CELL-FITS ${f.msg}`);
+    for (const f of kept) console.log(`  KNOWN CELL-FITS ${f.msg} [owner ${f.owner}; shrink-only list]`);
+    for (const f of found) console.log(`  FAIL CELL-FITS ${f.msg}${f.worse ? ` - WORSE than its pin: ${f.worse}` : ''}`);
+    if (full) for (const k of fixed) console.log(`  FIXED CELL-FITS ${k}: no longer overflows - drop it from ${KNOWN_FILE}`);
     const pages = lessons.reduce((a, l) => a + (l.pages || []).length, 0);
     const boxes = lessons.reduce((a, l) => a + (l.pages || []).reduce((b, p) => b + (p.boxes || []).length, 0), 0);
     const n = found.length + errs.length;
-    console.log(n ? `${TOOL}: FAIL (${found.length} page(s) with ink outside, ${errs.length} error(s); ${lessons.length} lesson builds)` : `${TOOL}: OK (${lessons.length} lesson builds, ${pages} pages, ${boxes} boxes)`);
+    console.log(n ? `${TOOL}: FAIL (${found.length} page(s) with ink outside, ${errs.length} error(s); ${lessons.length} lesson builds)` : `${TOOL}: OK (${lessons.length} lesson builds, ${pages} pages, ${boxes} boxes${kept.length ? `; ${kept.length} KNOWN on the shrink-only list` : ''})`);
     return n && !has('report-only') ? 1 : 0;
 }
 main().then((c) => process.exit(c), (e) => { console.log(`${TOOL}: FAIL (${e && e.stack || e})`); process.exit(1); });
