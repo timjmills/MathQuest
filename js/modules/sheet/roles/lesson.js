@@ -50,7 +50,7 @@
 // (lesson-pages/index.js), so a new page job registers itself there without editing this file. The
 // role's earlier exports are re-exported below, unchanged.
 
-import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf, stringsOf } from './compose.js';
+import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf, stringsOf, stripWrapMm, stripExtraMm } from './compose.js';
 import { workedStepsOf } from '../anchors.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { hopsSvg } from '../lesson-arch/fact.js';
@@ -66,7 +66,7 @@ import { stripHtml, stripItem, independentBand } from '../lesson-pages/practice.
 import { sheetBands, lessonPart } from '../lesson-pages/index.js';
 import { VOCAB_MIN, ROWFIT_SLACK_MM, BAND_SLACK_MM, rowFits, bandFails } from '../part-opts.js';
 import { slotScore } from '../paginate.js';
-import { rowCapMm } from '../layout.js';
+import { rowCapMm, LIVE_W_MM } from '../layout.js';
 
 // (The role's earlier exports, now homed in the builders.)
 export { reflowsAt, winShare, CASE_TESTS, pickExample, pickSecond, otherExamples, pickWeDo, stateGroups, hopsSvg, roundLineSvg, roundLineMm, roundLinePad };
@@ -466,6 +466,22 @@ function planOnce(input = {}) {
         }
     }
 
+    /* ---- what each sheet page's band strips PRINT past the heights the bands were planned with (lf-engine fillfix, 2026-11-20):
+       the bands are laid out with one-line strips (the Independent band with compose.js stripExtraMm's full-width guess), so a
+       Guided strip that wraps beside its Steps printed 5.8 mm more than planned and an Independent strip planned on two lines
+       printed on one, 5.7 mm less (identify M We Do off: planned 0.894, printed 0.839). The sheet's USED height - the offer gate's
+       fill and free height, sheetOffers - counts the strips as stripWrapMm reads them on the printed page; the layout is unchanged.
+       (ws-partopts-unit FILL-PRINT: plan vs print over the partopts cases; DESIGN §8d) */
+    const fullW = LIVE_W_MM - 1;
+    const rowW = (widths, i) => { const mm = (widths || []).map((w) => (/mm$/.test(String(w)) ? parseFloat(w) : null)); return mm[i] !== null && mm[i] !== undefined ? mm[i] : fullW - mm.reduce((a, v) => a + (v || 0), 0); };
+    const stripErr = (sec, w) => (sec && sec.kind === 'band' && sec.label
+        ? stripWrapMm(ctx, sec.label, sec.instr || '', w) - (sec.label === 'Independent Practice:' ? stripExtraMm(ctx, sec.label, sec.instr || '') : 0) : 0);
+    for (const pg of pages) {
+        pg.stripErr = pg.sections.reduce((a, sec) => a + (sec && sec.kind === 'row' && Array.isArray(sec.parts)
+            ? Math.max(0, ...sec.parts.map((p, i) => stripErr(p, rowW(sec.widths, i)))) : stripErr(sec, fullW)), 0);
+    }
+    const usedOf = (pg) => pg.used + (pg.grown || 0) + (pg.stripErr || 0);
+
     const score = warmCount + slotScore(indep);   // (answer slots: a chart window its empty squares - critic r1 F6)
     const frame = frameOf({ skills: target, input, tabId, score, footerLeft: lesson.tagLine });
     const out = [];
@@ -508,9 +524,9 @@ function planOnce(input = {}) {
             example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
             // (lf-partopts: each part's own fit before the teacher's counts - print-sheet.js reports it as res.lesson.partFit)
             // (lf-partopts: each sheet page's used share after the bands grew - sheetOffers reads it; We Do's ink check)
-            sheetFill: part === 'chart' ? [] : pages.map((pg) => +((pg.used + (pg.grown || 0)) / pg.budget).toFixed(3)), weDoSideOk: env.weDoSideOk, weDoStretch: env.weDoStretch,
+            sheetFill: part === 'chart' ? [] : pages.map((pg) => +(usedOf(pg) / pg.budget).toFixed(3)), weDoSideOk: env.weDoSideOk, weDoStretch: env.weDoStretch,
             // (critic A r2 N1: the last sheet page's free height and the height one Independent row with its head takes)
-            sheetFreeMm: part === 'chart' || !pages.length ? null : +Math.max(0, pages[pages.length - 1].budget - pages[pages.length - 1].used - (pages[pages.length - 1].grown || 0)).toFixed(1),
+            sheetFreeMm: part === 'chart' || !pages.length ? null : +Math.max(0, pages[pages.length - 1].budget - usedOf(pages[pages.length - 1])).toFixed(1),
             indepRowMm: pages.length ? pages[pages.length - 1].indepRowMm || null : null,
             // (A r3: every We Do and lesson-row cell as planned - its height and the empty band its measured ink leaves, EB-BAND)
             cellBands: part === 'chart' ? [] : cellBandsOf([env.weDoCells, ...pages.flatMap((pg) => pg.bandCells || [])]),

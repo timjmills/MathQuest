@@ -241,7 +241,8 @@ async function browser() {
             lessons = lessons.filter((l) => want.some((x) => l.id === x || l.id.startsWith(x + ' ') || (!exact(x) && l.id.startsWith(x))));
             if (!lessons.length) errors.push(`--lessons ${arg('lessons')}: no such lesson`);
         }
-        if (has('bt-only')) lessons = [];   // (only the threshold backtests)
+        const allLessons = lessons;   // (the FILL sweep's lessons, before --bt-only empties the walk's)
+        if (has('bt-only') || has('fill-sweep')) lessons = [];   // (only the threshold backtests / the FILL sweep)
         const sizes = arg('sizes', 'M,L').split(',');
         const onlyParts = arg('parts') ? arg('parts').split(',') : null;
         const onlyCombos = has('combos-only');
@@ -586,25 +587,64 @@ async function browser() {
         // measured; the planner's figures (res.lesson.teach) and the printed page are read side by side.
         // (with --only, a backtest block runs only when it is asked)
         const runBt = (id) => !ONLY || ONLY.includes(id);
-        if (!has('no-bt') && !arg('lessons') && !has('coverage-only') && !STATE) {
+        // FILL detail lines (lf-engine fillfix): the planner's used share of the sheet's last page (res.lesson.teach.fill, used /
+        // budget) beside the printed one (1 - the empty foot / the printed body, EB-PAGE's measure) and the gap, so a FILL failure
+        // explains itself. gap = planned - printed: a positive gap is a plan fuller than its print.
+        const fillOf = (x) => { if (!x || !x.b || x.b.error || !x.b.teach || !x.last) return null; const f = x.b.teach.fill || []; const pl = f[f.length - 1]; const pr = 1 - x.last.emptyMm / x.last.bodyMm; return { plan: pl, print: +pr.toFixed(3), gap: +(pl - pr).toFixed(3), empty: x.last.empty }; };
+        const fillLine = (tag, x) => { const f = fillOf(x); console.log(`  FILL ${tag}: ${f ? `planned ${f.plan.toFixed(3)}, printed ${f.print.toFixed(3)} (${f.empty} % empty), gap ${f.gap >= 0 ? '+' : ''}${f.gap.toFixed(3)}` : `not built (${x && x.b && x.b.error})`}`); return f; };
+        const sk = (id) => ({ categoryId: id.split(':')[0], skillId: id.split(':')[1] });
+        const printed = async (id, size, partOpts) => {
+            const b = await build(sk(id), size, partOpts); builds++;
+            if (b.error) return { b };
+            const m = await measure(b.doc);
+            const sheets = m.pages.filter((x) => x.sheet === 'lesson-sheet');
+            const last = sheets[sheets.length - 1];
+            const perRow = (b.fit.rows && b.fit.rows.perRow) || 1;
+            const rowNeed = b.rowH[perRow] ? b.rowH[perRow] + last.stripMm : null;
+            const sheetPg = new Set(m.pages.map((x, i) => (x.sheet === 'lesson-sheet' ? i + 1 : 0)));
+            const bands = m.cells.filter((c) => sheetPg.has(c.page) && !/^lesson/.test(c.tmpl) && c.hMm >= 10).map((c) => c.belowMm / c.hMm);
+            return { b, last, rowNeed, maxBand: bands.length ? Math.max(...bands) : 0 };
+        };
+        // ---------------------------------------------------------------- --fill-sweep (lf-engine fillfix, DESIGN §8d)
+        // Plan vs print over the partopts cases: every live lesson (or --sweep-lessons a,b) x M / L x the sheet states below, each
+        // built AS ASKED (no settle loop - the gate's refused values are measured too) and printed. One FILL line a case, then
+        // the gap distribution and the floor it supports: SHEET_FILL_MIN must be >= 0.70 + the largest gap of a sheet planned
+        // near the floor (a sheet planned at the floor then prints under a 30 % foot) and <= the lowest plan of a sheet that
+        // prints well. The ROWFIT columns (no lesson rows printed: plan free / one row, printed foot / one row) are the pairs
+        // ROWFIT-BT anchors from. --sweep-out <file> writes every case as JSON.
+        if (has('fill-sweep')) {
+            const STATES = [{}, { vocab: { on: false } }, { remember: { on: false } }, { wedo: { on: false } }, { wedo: { n: 1 } }, { rows: { n: 0 } }, { vocab: { on: false }, rows: { n: 0 } }, { wedo: { on: false }, rows: { n: 0 } }, { remember: { on: false }, rows: { n: 0 } }];
+            const want = arg('sweep-lessons') ? arg('sweep-lessons').split(',') : null;
+            const ls = allLessons.filter((l) => !/\(sample\)/.test(l.id) && (!want || want.includes(l.id)));
+            const rows = [];
+            for (const l of ls) for (const size of arg('sizes', 'M,L').split(',')) for (const st of STATES) {
+                const x = await printed(l.id, size, Object.keys(st).length ? st : undefined);
+                const f = fillOf(x);
+                const tag = `${l.id} ${size} ${JSON.stringify(st)}`;
+                if (!f) { console.log(`  FILL ${tag}: not built (${x.b && x.b.error})`); continue; }
+                const t = x.b.teach;
+                const r = { id: l.id, size, st, plan: f.plan, print: f.print, gap: f.gap, empty: f.empty, pages: (t.fill || []).length, independent: t.independent, freeMm: t.freeMm, rowMm: t.rowMm, footMm: x.last.emptyMm, rowNeed: x.rowNeed };
+                rows.push(r);
+                console.log(`  FILL ${tag}: planned ${f.plan.toFixed(3)}, printed ${f.print.toFixed(3)} (${f.empty} % empty), gap ${f.gap >= 0 ? '+' : ''}${f.gap.toFixed(3)}${r.pages > 1 ? ` [last of ${r.pages} pages]` : ''}${!(t.independent > 0) ? ` | no rows: plan free ${t.freeMm} / row ${t.rowMm} (gap ${(t.rowMm - t.freeMm).toFixed(1)}), printed foot ${x.last.emptyMm} / row ${x.rowNeed}` : ''}`);
+            }
+            if (arg('sweep-out')) require('fs').writeFileSync(path.resolve(arg('sweep-out')), JSON.stringify(rows, null, 1));
+            const gaps = rows.map((r) => r.gap).sort((a, b) => a - b);
+            const q = (p) => gaps[Math.min(gaps.length - 1, Math.floor(p * gaps.length))];
+            const one = rows.filter((r) => r.pages === 1);   // (a one-page sheet: the 0.70 rule; a last page of 2+ is H5's half)
+            const near = one.filter((r) => r.plan >= 0.66 && r.plan <= 0.86);
+            const good = one.filter((r) => r.empty < 30), bad = one.filter((r) => r.empty >= 30);
+            const maxNear = near.length ? Math.max(...near.map((r) => r.gap)) : NaN;
+            const lowGood = good.length ? Math.min(...good.map((r) => r.plan)) : NaN;
+            console.log(`FILL-SWEEP ${rows.length} cases: gap min ${gaps[0]} / p10 ${q(0.1)} / median ${q(0.5)} / p90 ${q(0.9)} / max ${gaps[gaps.length - 1]}; near the floor (planned 0.66-0.86, ${near.length}): largest gap ${maxNear.toFixed(3)} -> floor >= ${(0.70 + maxNear).toFixed(3)}; lowest-planned good sheet ${lowGood} -> floor <= ${lowGood}; bad sheets ${bad.length}, highest planned ${bad.length ? Math.max(...bad.map((r) => r.plan)) : '-'}`);
+            for (const r of near.sort((a, b) => b.gap - a.gap).slice(0, 5)) console.log(`   largest gaps: ${r.id} ${r.size} ${JSON.stringify(r.st)} planned ${r.plan} printed ${r.print} gap ${r.gap}`);
+            for (const r of good.sort((a, b) => a.plan - b.plan).slice(0, 5)) console.log(`   lowest good: ${r.id} ${r.size} ${JSON.stringify(r.st)} planned ${r.plan} printed ${r.print} (${r.empty} % empty)`);
+        }
+        if (!has('no-bt') && !arg('lessons') && !has('coverage-only') && !STATE && !has('fill-sweep')) {
             const K = await page.evaluate(async () => { const L = await import('./js/modules/sheet/roles/lesson.js'); const P = await import('./js/modules/sheet/part-opts.js'); return { FILL: L.SHEET_FILL_MIN, ROW: P.ROWFIT_SLACK_MM, BAND: P.BAND_SLACK_MM }; });
             // (--bt-k-file <json>: judge as if a threshold had moved, e.g. {"FILL": 0.75} - the mutation backtest. The BT sheets are
             // built as asked, never through the offer gate, so what they print does not depend on the threshold: moving it in
             // the judge is moving it in the engine, for these sheets.)
             if (arg('bt-k-file')) { const mv = JSON.parse(require('fs').readFileSync(path.resolve(arg('bt-k-file')), 'utf8')); Object.assign(K, mv); console.log(`(thresholds judged as moved: ${JSON.stringify(mv)})`); }
-            const sk = (id) => ({ categoryId: id.split(':')[0], skillId: id.split(':')[1] });
-            const printed = async (id, size, partOpts) => {
-                const b = await build(sk(id), size, partOpts); builds++;
-                if (b.error) return { b };
-                const m = await measure(b.doc);
-                const sheets = m.pages.filter((x) => x.sheet === 'lesson-sheet');
-                const last = sheets[sheets.length - 1];
-                const perRow = (b.fit.rows && b.fit.rows.perRow) || 1;
-                const rowNeed = b.rowH[perRow] ? b.rowH[perRow] + last.stripMm : null;
-                const sheetPg = new Set(m.pages.map((x, i) => (x.sheet === 'lesson-sheet' ? i + 1 : 0)));
-                const bands = m.cells.filter((c) => sheetPg.has(c.page) && !/^lesson/.test(c.tmpl) && c.hMm >= 10).map((c) => c.belowMm / c.hMm);
-                return { b, last, rowNeed, maxBand: bands.length ? Math.max(...bands) : 0 };
-            };
             const BT = (id, ok, msg) => { if (!ok) F(id, msg); };
             // FILL-BT: SHEET_FILL_MIN 0.76. (1) the largest plan-to-print gap measured near the floor, placevalue:identify M We Do
             // off (plan 0.797, printed 0.745: 0.052) - a floor under 0.70 + that gap lets a sheet planned at the floor print a
