@@ -2168,7 +2168,7 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:4px;">Shape names:</div>
                         <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">${legend}</div>
                     </div>
-                    <div style="font-size:0.85rem;color:var(--text-dim);">Type missing shapes separated by commas (e.g. circle, star)</div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);">Write the missing shapes, separated by commas (e.g. circle, star)</div>
                 </div>`;
 
                 q.patternData = {
