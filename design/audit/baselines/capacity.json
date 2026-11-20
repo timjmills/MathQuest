@@ -3557,6 +3557,18 @@
   "algebra:multi_step_word test L": {
    "items": 1,
    "reason": "lead 2026-11-13 r9: two-step A-over-B pair 150-200 mm / R1"
+  },
+  "division:area_model_div_2by1 reason-it L": {
+   "items": 1,
+   "reason": "area-model-div A-over-B at L: each item is the two area models stacked (about 2 x 55 mm) plus the response row, so 1 a page is the measured capacity (lead ruling 2026-11-20, amdiv template round 2)"
+  },
+  "division:area_model_div_3by1 reason-it L": {
+   "items": 1,
+   "reason": "area-model-div A-over-B at L: each item is the two area models stacked (about 2 x 55 mm) plus the response row, so 1 a page is the measured capacity (lead ruling 2026-11-20, amdiv template round 2)"
+  },
+  "division:area_model_div_4by2 reason-it L": {
+   "items": 1,
+   "reason": "area-model-div A-over-B at L: each item is the two area models stacked (about 2 x 55 mm) plus the response row, so 1 a page is the measured capacity (lead ruling 2026-11-20, amdiv template round 2)"
   }
  },
  "sizeOrderOpts": [

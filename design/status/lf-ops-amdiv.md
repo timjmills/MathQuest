@@ -36,3 +36,16 @@ card capacity line not changed, no re-sign asked). 3by1 (live) shows the same te
   Practice page; next round must re-fit it. ws-no-size-s GATE-TOKEN and ws-chromebook-fit (aborted module requests) look
   master / environment-side: unverified.
 - 3by1 / 2by1 precritic and the master comparison were not run this round (slot contention: the 4by2 run alone hit 2 h).
+
+## PARKED after template round 2 (rule 7, lead 2026-11-20): resume after the reset
+Head 22630d732, plus the capacity ruling below. Not merged toward master; there is no critic yet.
+- **Lead ruling (2026-11-20):** Reason It L is 1 a page for the area-model-div A-over-B layout (its measured capacity). Pinned in capacity.json `ruled` for 2by1, 3by1 and 4by2.
+- **Round 3 starts with two root-cause tools:**
+  1. a template print-gap change re-runs lesson PAGEFILL / EB-BAND in the same lane step;
+  2. sharded foreground precritic runs (lf-checks' tool; the lead is asking them).
+- **Then fix:**
+  - the lesson Practice re-fit after the gap change (PAGEFILL M p3 59 mm; lesson EB-BAND M p2/p3, L p2);
+  - TOUCH-HIT on the side-length inputs (q-0 / q-1): a live probe, since a tap inside the edge focuses body;
+  - Reason It L CL40-INK x3 under some option value;
+  - pre-skill-check L DN-2 (the role's prerequisite-section paging).
+- **Then:** precritic on 4by2, 3by1 and 2by1 with master comparisons, the control hash proof, and the full critic.
