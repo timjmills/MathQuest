@@ -20,3 +20,14 @@ own cbt r4 hash proof on lf-ops-props, 40150d7c3).
 
 For a critic: add_facts (PASSED) Pre-skill check M / L — new prerequisites (facts to 10, make 10, number bonds to 10);
 its title reads "Pre-skill check: adding facts to 10" (the topic of its first source).
+
+## 2026-11-20 finish (lead: backtests, precritic vs master)
+- ws-backtest (outside the browser runner): ldiv-kit-divide, label-gap-add-int, eb-lastpage-add-facts-pre-skill-check all PASS (FAIL → OK).
+- ws-precritic-plan after the master merge: OK (403 rows on the path).
+- precritic --skill division:divide --strict: 11 FAIL. Same on master 65c28ccdf (re-run gate by gate with MQ_ROOT): empty-band (227 both),
+  print-lint lesson L / M (CL-4b 0 -> 12, PAGEFILL 0 -> 1 both), screen-support-eq (N/A both), worksheet-reflow (same WS-REFLOW both),
+  dealer-uniform (FAIL 1 both), node-lint-s1 (FAIL 1 both). options-render: the same 7 value pages fail on both, but BRANCH-CAUSED
+  findings on notation="bracket": H13 0 -> 8 (M) / 0 -> 2 (L) and capacity 12 -> 6 a page, because the bracket items now draw the kit
+  division template, whose 33 % side band master already shows on tiles=21 and regroup=mixed (a division-template H13 defect; open, for
+  the ldiv owner). role-cover 1/2 and sibling-compare were not compared (long).
+- precritic --skill addition:add_facts --role pre-skill-check --strict: stopped at the budget cap before its verdict (partial log only).
