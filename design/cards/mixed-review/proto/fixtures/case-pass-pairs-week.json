@@ -1,0 +1,53 @@
+{
+ "note": "card \u00a710 L9: a week on pool-wplong keeps the pairs on every day (p, l, k). Prop f is NOT asserted here: on this 4-skill pool (2 pair skills) an odd-N day whose unseen skills are all pair skills must repeat a non-pair skill (5 = 2 + 3), so f's fresh-first and no-consecutive rules cannot both hold with L9; reported to the lead (build step 3 finding).",
+ "expect": "pass",
+ "props": [
+  "p",
+  "l",
+  "k"
+ ],
+ "input": {
+  "pool": "pool-wplong",
+  "N": 15,
+  "seed": 3,
+  "size": "l",
+  "order": "mixed",
+  "week": 2
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20
+  ]
+ }
+}

@@ -2197,7 +2197,7 @@
    ]
   },
   {
-   "code": "?c=YB6-Y83-LZ2-WZ3-KN2-V82-XG3-BT3-MU5-HT3-QZ2-EK2-PC3-MZ5-NM3-Y92-FX2-CX3-E22-K23-HC2-WK2-UV3-JS2-F33-RH2-SG2|V1-N15-S16V8-Oa-Y13-Zl",
+   "code": "?c=YB6-Y83-LZ2-WZ3-KN2-V82-XG3-BT6-HT2-MU3-QZ2-EK2-PC3-MZ5-NM3-Y92-FX2-CX3-E22-K23-HC2-WK2-UV3-JS2-F33-RH2-SG2|V1-N15-S16V8-Oa-Y13-Zl",
    "pages": [
     [
      8,
@@ -2205,7 +2205,8 @@
     ],
     [
      8,
-     7
+     3,
+     4
     ],
     [
      8,
@@ -2331,14 +2332,14 @@
     [
      [
       1,
-      "patterns:skip_count_grid",
+      "addition:add_1k_regroup",
       "",
       3752316682,
       1
      ],
      [
       2,
-      "patterns:skip_count_grid",
+      "addition:add_1k_regroup",
       "",
       4255792347,
       1
@@ -2352,14 +2353,14 @@
      ],
      [
       4,
-      "addition:add_1k_regroup",
+      "coordinates:reflect_y_axis",
       "",
       3785724825,
       1
      ],
      [
       5,
-      "addition:add_1k_regroup",
+      "coordinates:reflect_y_axis",
       "",
       2141076878,
       1
@@ -2373,66 +2374,66 @@
      ],
      [
       7,
-      "coordinates:reflect_y_axis",
+      "decimals:div_decimal",
       "",
       4221104276,
       1
      ],
      [
       8,
-      "coordinates:reflect_y_axis",
+      "decimals:div_decimal",
       "",
       1637601213,
       1
      ],
      [
       9,
-      "multiplication:area_model_mult",
+      "patterns:skip_count_grid",
       "",
       4290480418,
       2
      ],
      [
       10,
-      "multiplication:area_model_mult",
+      "patterns:skip_count_grid",
       "",
       1572756403,
       2
      ],
      [
       11,
-      "decimals:div_decimal",
+      "patterns:skip_count_grid",
       "",
       1238129673,
       2
      ],
      [
       12,
-      "decimals:div_decimal",
+      "multiplication:area_model_mult",
       "",
       600433056,
-      2
+      3
      ],
      [
       13,
-      "decimals:div_decimal",
+      "multiplication:area_model_mult",
       "",
       2781964811,
-      2
+      3
      ],
      [
       14,
       "vocabulary:vocab_grade_K_counting",
       "",
       1204721530,
-      2
+      3
      ],
      [
       15,
       "vocabulary:vocab_grade_K_counting",
       "",
       3384973357,
-      2
+      3
      ]
     ],
     [
@@ -2580,21 +2581,21 @@
      ],
      [
       6,
-      "patterns:skip_count_grid",
+      "addition:add_1k_regroup",
       "",
       536231658,
       1
      ],
      [
       7,
-      "patterns:skip_count_grid",
+      "addition:add_1k_regroup",
       "",
       2717071865,
       1
      ],
      [
       8,
-      "patterns:skip_count_grid",
+      "addition:add_1k_regroup",
       "",
       3153142864,
       1

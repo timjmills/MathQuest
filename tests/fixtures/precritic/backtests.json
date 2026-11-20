@@ -12313,6 +12313,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mix-review-long-wp",
+   "check": "card §10 L9 (lead ruling 2026-11-20): long word problems (kind word-problem-long) are wide, capped at 2 a page at L and dealt in PAIRS only (check-v1 prop p: an even count >= 2 on every page, an even sheet total; a long-word-problem-only pool refused at odd N), with no lone item (prop l)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check count",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/count/fail/count-long-wp.json",
+    "state": "the 95f13b7b dealer (no pairs: mutate noPairs) on pools/pool-wplong.json: odd long word-problem counts and the all-long pool dealt at N = 5"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/count/pass/count-pass-long-wp.json",
+    "state": "the pair dealer on pool-wplong, every N x M, L x 3 orders x 40 seeds"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check count --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

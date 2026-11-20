@@ -6,7 +6,7 @@
   "registry": "design/cards/mixed-review/proto/fixtures/v1-registry.json"
  },
  "sha256": {
-  "dealer": "a50ea40ce1de52c7f48826a15d59804a51f51a1d108942c483156f4df79c81b0",
+  "dealer": "5e97c66aecfc97caa732dc32989e99c3936af248fa86835de8a3af2d9f297f63",
   "interleave": "8066c12c9e3d21e56e7549986fff31f5a286319b0a1841a945896480551fe966",
   "rng": "6b60dcb07a01b1de991455f1ea0598ab985fe2d874a80070ab00e1545692c130",
   "registry": "b2917ff91f66d7e6bcc3506e4ae7de4d9dfdf495cfa5d50c4c314116aeb0c8bb"

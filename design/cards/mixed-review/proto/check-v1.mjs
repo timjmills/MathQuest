@@ -53,8 +53,12 @@ const J = (x) => JSON.stringify(x);
 const OWN_CAP = { m: { compact: 12, typical: 12, wide: 4 }, l: { compact: 10, typical: 8, wide: 3 } };
 /** 12.1: plain word-problem rows 3 / 3 and long division (L 4) are wide; fact / equation compact; legacy typical. */
 const OWN_KIND_CLASS = { fact: 'compact', equation: 'compact', stack: 'typical', 'visual-half': 'typical', table: 'typical',
-    text: 'typical', legacy: 'typical', 'visual-full': 'wide', division: 'wide', 'word-problem': 'wide' };
-const OWN_KIND_CAP = { 'word-problem': { m: 3, l: 3 } };
+    text: 'typical', legacy: 'typical', 'visual-full': 'wide', division: 'wide', 'word-problem': 'wide',
+    'word-problem-long': 'wide',                                    // L9: 12.1 plain rows "2 if 4-5 lines" at L
+    'family-check': 'typical', choice: 'typical', 'arrays-turn': 'typical', 'word-work': 'typical', 'count-row': 'wide', picture: 'wide' };
+const OWN_KIND_CAP = { 'word-problem': { m: 3, l: 3 }, 'word-problem-long': { m: 3, l: 2 } };
+/** L9 (lead ruling 2026-11-20): long word problems are dealt in PAIRS only. */
+const OWN_KIND_PAIR = ['word-problem-long'];
 const clsOfRow = (r) => (r.kind ? OWN_KIND_CLASS[r.kind] : r.fc);
 const capOfRow = (r, size, cap = OWN_CAP) => Math.min(cap[size][clsOfRow(r)], r.kind && OWN_KIND_CAP[r.kind] ? OWN_KIND_CAP[r.kind][size] : Infinity);
 const rowIn = (input, id) => poolOf(input.pool).find((x) => x.id === id);
@@ -276,7 +280,27 @@ function propJ2(input, out) {
     return v;
 }
 /** k FILL (lead ruling 2026-11-20): no page but a sheet's LAST is under half full; fill recomputed from the shelves. */
-export const FILL_POOLS = ['pool-large', 'pool-compact', 'pool-typical', 'pool-wide', 'pool-2mix', 'pool-3mix', 'pool-2', 'pool-6', 'pool-kinds', 'pool-legacy'];
+export const FILL_POOLS = ['pool-large', 'pool-compact', 'pool-typical', 'pool-wide', 'pool-2mix', 'pool-3mix', 'pool-2', 'pool-6', 'pool-kinds', 'pool-legacy', 'pool-wplong'];
+/** p PAIRS (lead ruling 2026-11-20, card §10 L9): a long word-problem skill holds an EVEN count (>= 2) on every page it is on,
+ *  so its sheet total is even; recomputed from the shelves with this file's own pair list. */
+function propP(input, out, mut = {}) {
+    const v = [];
+    const pairs = poolOf(input.pool).filter((r) => OWN_KIND_PAIR.includes(r.kind));      // a pool of long word problems alone
+    if (pairs.length >= 2 && !D.deal({ pool: pairs, N: 5, seed: input.seed, size: input.size }, mut).error) v.push('a pool of long word problems alone is dealt at the odd N = 5 (it must be refused)');
+    for (const sh of sheetsOf(out)) {
+        const tot = {};
+        sh.pages.forEach((p, i) => {
+            for (const [id, c] of Object.entries(pageFacts(input, p, sh.size).by)) {
+                const r = rowIn(input, id);
+                if (!r || !OWN_KIND_PAIR.includes(r.kind)) continue;
+                tot[id] = (tot[id] || 0) + c;
+                if (c % 2 || c < 2) v.push(`day ${sh.day} page ${i + 1}: long word problem ${id} holds ${c} (dealt in pairs only)`);
+            }
+        });
+        for (const [id, c] of Object.entries(tot)) if (c % 2) v.push(`day ${sh.day}: long word problem ${id} totals ${c}, not even`);
+    }
+    return v;
+}
 function propK(input, out) {
     const v = [];
     for (const sh of sheetsOf(out)) sh.pages.forEach((p, i) => {
@@ -318,8 +342,8 @@ function propN(input, out) {
     for (const sh of sheetsOf(out)) for (const it of sh.items) if (!ids.has(it.skill)) { v.push(`day ${sh.day}: ${it.skill} is not in the filtered pool`); break; }
     return v;
 }
-export const PROPS = { a: propA, b: propB, c: propC, d: propD, e: propE, f: propF, g: propG, h: propH, i: propI, j: propJ, j2: propJ2, k: propK, l: propL, m: propM, n: propN };
-const NEEDS_OUT = new Set(['n', 'b', 'c', 'd', 'e', 'f', 'g', 'j', 'j2', 'k', 'l', 'm']);
+export const PROPS = { a: propA, b: propB, c: propC, d: propD, e: propE, f: propF, g: propG, h: propH, i: propI, j: propJ, j2: propJ2, k: propK, l: propL, m: propM, n: propN, p: propP };
+const NEEDS_OUT = new Set(['n', 'b', 'c', 'd', 'e', 'f', 'g', 'j', 'j2', 'k', 'l', 'm', 'p']);
 
 /* ------------------------------------------------------------------------------------------------- the trace */
 // r3 ROOT CAUSE: the card stated deal rules no property asserted. --trace reads the card and FAILS on any normative
@@ -460,10 +484,10 @@ if (args[0] === '--table') {
     return void process.exit(0);
 }
 if (args[0] === '--fill') {      // props k, l, j2 over every pool x N x size x order x 300 seeds (+ 40 weeks a cell)
-    const mut = args.includes('--separate-pages') ? { separatePages: true } : args.includes('--no-lone-guard') ? { noLoneGuard: true, flatOne: true } : {};
+    const mut = args.includes('--separate-pages') ? { separatePages: true } : args.includes('--no-lone-guard') ? { noLoneGuard: true, flatOne: true } : args.includes('--no-pairs') ? { noPairs: true } : {};
     let badAll = 0;
     for (const ref of FILL_POOLS) {
-        let pages = 0, under = 0, notLast = 0, lone = 0, flat1 = 0, lastUnder = 0;
+        let pages = 0, under = 0, notLast = 0, lone = 0, flat1 = 0, lastUnder = 0, odd = 0, refused = 0;
         const input0 = { pool: ref };
         const look = (o) => o.pages.forEach((p, i) => {
             pages++;
@@ -471,16 +495,18 @@ if (args[0] === '--fill') {      // props k, l, j2 over every pool x N x size x 
             if (f.fill * 2 < 1 - 1e-9) { under++; if (i !== o.pages.length - 1) notLast++; else lastUnder++; }
             if (f.n < 2) lone++;
             for (const [id, c] of Object.entries(f.by)) if (clsOfRow(rowIn(input0, id)) !== 'wide' && c < 2) flat1++;
+            for (const [id, c] of Object.entries(f.by)) if (OWN_KIND_PAIR.includes(rowIn(input0, id).kind) && c % 2) odd++;
         });
         for (const N of D.COUNTS) for (const size of ['m', 'l']) for (const order of ['mixed', 'easyhard', 'area']) for (let seed = 1; seed <= 300; seed++) {
             const o = D.deal({ pool: poolOf(ref), N, seed, size, order }, mut);
+            if (o.error) { refused++; continue; }
             if (!o.twoUp) look(o);
             if (seed <= 40 && order === 'mixed') D.week({ pool: poolOf(ref), N, seed, size, order, week: 1 }, mut).days.forEach((d) => { if (!d.twoUp) look(d); });
         }
-        badAll += notLast + lone + flat1;
-        console.log(`  ${ref}: of ${pages} pages, ${notLast} non-last under half full, ${lone} with one item, ${flat1} flat skills with one item (${lastUnder} last pages under half, allowed)`);
+        badAll += notLast + lone + flat1 + odd + refused;
+        console.log(`  ${ref}: of ${pages} pages, ${notLast} non-last under half full, ${lone} with one item, ${flat1} flat skills with one item, ${odd} odd long word-problem counts, ${refused} refused (${lastUnder} last pages under half, allowed)`);
     }
-    console.log(badAll ? `check-v1 --fill: FAIL (${badAll} pages break k, l or j2)` : 'check-v1 --fill: OK (0 non-last pages under half full, 0 one-item pages, 0 one-item flat skills)');
+    console.log(badAll ? `check-v1 --fill: FAIL (${badAll} pages break k, l, j2 or p)` : 'check-v1 --fill: OK (0 non-last pages under half full, 0 one-item pages, 0 one-item flat skills, 0 odd long word-problem counts)');
     return void process.exit(badAll ? 1 : 0);
 }
 if (args[0] === '--pin') {       // re-take the pins and regenerate the golden codes (only while V1 is unreleased: card stage)

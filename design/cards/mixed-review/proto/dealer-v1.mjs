@@ -56,9 +56,38 @@ const GRADE_RANK = { K: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, M: 7 };
  *  Word-problem rows and long division are WIDE (12.1: plain word-problem rows 3 / 3, long division L 4); legacy cells
  *  are typical and never take the M1 arrangement (mixedClass refuses M1 for them, critic M1 r1 D2). Append-only. */
 export const KIND_CLASS = Object.freeze({ fact: 'compact', equation: 'compact', stack: 'typical', 'visual-half': 'typical',
-    table: 'typical', text: 'typical', legacy: 'typical', 'visual-full': 'wide', division: 'wide', 'word-problem': 'wide' });
+    table: 'typical', text: 'typical', legacy: 'typical', 'visual-full': 'wide', division: 'wide', 'word-problem': 'wide',
+    // L9 (lead ruling 2026-11-20): long word problems (12.1 plain rows, 2 a page at L if 4-5 lines) are wide, dealt in pairs.
+    'word-problem-long': 'wide',
+    // The live kinds outside SKILL_CELL_CONTRACT 3.5 (lead ruling 2026-11-20, "footprint kinds"), each by its 12.1 row:
+    // a fact-family check and a choice item are short decision items (typical); an array turn and word work are half-width
+    // cells (typical); a count row and a picture word problem run the cell's width (Wide-visual rows / K picture word problem).
+    'family-check': 'typical', choice: 'typical', 'arrays-turn': 'typical', 'word-work': 'typical', 'count-row': 'wide', picture: 'wide' });
+/** THE FROZEN TEMPLATE -> KIND TABLE (lead ruling 2026-11-20): a pool row's kind is the kind of the cell template its skill's
+ *  generator DRAWS (print-sheet.js drawnTemplateOf; js/modules/mixed-review-templates.js), never the provider footprint.
+ *  Each template by its 12.1 row: number lines, coin rows, charts, rulers and growing patterns are wide visuals
+ *  (visual-full); place-value, fraction, clock, counter, array, area-model and base-10 cells are half-width (visual-half);
+ *  facts and one-line equations compact; columns stack; long division division. A template with no row reads as legacy.
+ *  Append-only. */
+export const TEMPLATE_KIND = Object.freeze({ legacy: 'legacy', fact: 'fact', equation: 'equation', compare: 'equation', remainder: 'equation',
+    stack: 'stack', 'money-columns': 'stack', 'add-three': 'stack', 'short-division': 'stack', division: 'division',
+    'number-family': 'text', 'fact-family': 'text', notice: 'text', 'function-table': 'table',
+    pv: 'visual-half', 'pv-times': 'visual-half', 'pv-support': 'visual-half', 'frac-model': 'visual-half', clock: 'visual-half',
+    counters: 'visual-half', 'mult-grid': 'visual-half', 'area-model': 'visual-half', 'area-model-div': 'visual-half', arrays: 'visual-half',
+    parity: 'visual-half', 'perimeter-shape': 'visual-half', base10: 'visual-half', bond: 'visual-half', tenframe: 'visual-half', thermometer: 'visual-half',
+    coins: 'visual-full', timeline: 'visual-full', 'number-line': 'visual-full', 'nl-place': 'visual-full', 'hop-line': 'visual-full',
+    chartwindow: 'visual-full', 'bar-graph': 'visual-full', pictograph: 'visual-full', 'tally-chart': 'visual-full', ruler: 'visual-full',
+    'frac-wall': 'visual-full', 'growing-pattern': 'visual-full',
+    'count-row': 'count-row', seqstrip: 'count-row', 'family-check': 'family-check', 'arrays-turn': 'arrays-turn',
+    'word-work': 'word-work', words: 'word-work', 'cloze-bank': 'word-work', 'vocab-match3': 'word-work', 'vocab-pick3': 'word-work' });
+/** A drawn template's V1 kind ('legacy' for a template the frozen table lacks). */
+export const kindOfTemplate = (t) => TEMPLATE_KIND[t] || 'legacy';
 /** Per-kind ceilings below the class CAP (12.1 "Word problems, plain rows": 3 at M, 3 at L). */
-export const KIND_CAP = Object.freeze({ 'word-problem': Object.freeze({ m: 3, l: 3 }) });
+export const KIND_CAP = Object.freeze({ 'word-problem': Object.freeze({ m: 3, l: 3 }), 'word-problem-long': Object.freeze({ m: 3, l: 2 }) });
+/** Kinds dealt in PAIRS only (lead ruling 2026-11-20, card §10 L9): a long word problem (12.1 "2 if 4-5 lines" at L) holds an
+ *  EVEN count on every page it is on (2 at L), so its counts are always even and no long word problem is ever alone. */
+export const KIND_PAIR = Object.freeze(['word-problem-long']);
+const isPair = (s, mut = {}) => !mut.noPairs && !!s.kind && KIND_PAIR.includes(s.kind);
 /** A pool row as V1 reads it: its class from KIND_CLASS when the row names a kind (a row with `fc` only is a test row). */
 export function rowOf(s, mut = {}) {
     const kc = mut.kindClass ? { ...KIND_CLASS, ...mut.kindClass } : KIND_CLASS;
@@ -133,7 +162,8 @@ function dealSheet(input, cycle, day, ws, mut) {
     const seen = ws ? ws.seen : new Set();
     const prev = ws ? ws.prevDay : new Set();
     const uses = ws ? ws.uses : new Map();
-    const room = (s) => (mut.noCeil ? Infinity : half - (total.get(s.id) || 0));
+    const room0 = (s) => (mut.noCeil ? Infinity : half - (total.get(s.id) || 0));
+    const room = (s) => { const r = room0(s); return isPair(s, mut) && Number.isFinite(r) ? r - (r % 2) : r; };   // L9: an even room
     const fresh = (s) => !(mut.noFresh && ws) && !pagesUsed.has(s.id) && !seen.has(s.id);
     const p0 = (s) => (appear.has(s.id) ? appear.get(s.id) : 1e6 + pos.get(s.id));
     // The choice order: fresh first, then not on yesterday's sheet, then least used on this sheet, then least used this
@@ -147,11 +177,14 @@ function dealSheet(input, cycle, day, ws, mut) {
     const capS = (s) => capOf(s, size, CAPT, mut);
     const fillOf = (pg) => pg.chosen.reduce((a, s) => a + pg.counts[s.id] / capS(s), 0);
     // A FLAT skill always takes at least 2 items on a page (card r3 D3, prop j2); a wide skill may take 1 (a wide shelf of 1).
-    const minOn = (s) => (groupOf(s) === 'wide' || mut.flatOne ? 1 : 2);
+    const minOn = (s) => (isPair(s, mut) ? 2 : groupOf(s) === 'wide' || mut.flatOne ? 1 : 2);
     const shelvesOf = (pg) => pg.chosen.reduce((a, s) => a + Math.ceil(pg.counts[s.id] / SHELF[size][s.fc]), 0);
     const pages = []; let R = mut.ignoreN ? Infinity : N;
     for (let guard = 0; R > 0 && guard < 200; guard++) {
-        let cands = cycle.filter((s) => room(s) >= minOn(s)).sort((a, b) => sortKeyCmp(key(a), key(b)));
+        // L9: a pair skill leads a page only when its pair leaves no lone item behind (R >= 2 and R != 3), unless nothing else can
+        const pairOk = (s) => !isPair(s, mut) || (R >= 2 && R !== 3);
+        let cands = cycle.filter((s) => room(s) >= minOn(s) && pairOk(s)).sort((a, b) => sortKeyCmp(key(a), key(b)));
+        if (!cands.length) cands = cycle.filter((s) => room(s) >= minOn(s)).sort((a, b) => sortKeyCmp(key(a), key(b)));
         if (!cands.length) cands = cycle.filter((s) => room(s) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
         if (forced) cands = [forced, ...cands.filter((s) => s !== forced)];
         if (!cands.length) break;
@@ -170,14 +203,15 @@ function dealSheet(input, cycle, day, ws, mut) {
             const s2 = Math.min(chosen.length, clampS(n, maxS));
             if (s2 < chosen.length) chosen = chosen.slice(0, s2); else break;
         }
+        if (isPair(first, mut) && chosen.length === 1) n = Math.min(n, 2 * Math.floor(Math.min(C, room(first)) / 2));   // L9: one pair
         // The even split: dealCounts (equal weights, min 2) over the page's skills, the lowest sheet totals first.
         const bySplit = chosen.map((s, i) => ({ s, i })).sort((a, b) => (total.get(a.s.id) || 0) - (total.get(b.s.id) || 0) || a.i - b.i).map((x) => x.s);
         const w = Object.fromEntries(bySplit.map((s) => [s.id, mut.adaptCounts && input.adapt ? (Number(input.adapt[s.id]) || 1) : 1]));
         const counts = dealCounts(w, n, { min: 2 }).counts;
         for (const s of bySplit) {                       // a count over its skill's room moves to the skill with most room
-            let over = counts[s.id] - room(s);
+            let over = isPair(s, mut) ? 0 : counts[s.id] - room(s);
             while (over > 0) {
-                const to = bySplit.filter((t) => t !== s && room(t) - counts[t.id] > 0).sort((a, b) => (room(b) - counts[b.id]) - (room(a) - counts[a.id]))[0];
+                const to = bySplit.filter((t) => t !== s && !isPair(t, mut) && room(t) - counts[t.id] > 0).sort((a, b) => (room(b) - counts[b.id]) - (room(a) - counts[a.id]))[0];
                 if (!to) break;
                 counts[s.id]--; counts[to.id]++; over--;
             }
@@ -190,11 +224,14 @@ function dealSheet(input, cycle, day, ws, mut) {
             const pg = { chosen: chosen.slice(), counts };
             for (let k = 0; k < 6 && fillOf(pg) * 2 < 1 && R - n > 0 && pg.chosen.length < maxS; k++) {
                 let more = cycle.filter((t) => !pg.chosen.includes(t) && room(t) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
-                if (more.some(fresh)) more = more.filter(fresh);
+                // fresh skills first; the others after them (L9: a fresh pair skill may not fit where a seen one does)
+                if (more.some(fresh)) more = mut.noPairs ? more.filter(fresh) : [...more.filter(fresh), ...more.filter((t) => !fresh(t))];
                 let took = null;
                 for (const t of more) {                    // the first skill in the choice order that fits with >= minOn items
+                    const st = isPair(t, mut) ? 2 : 1;          // L9: a pair skill tops up in pairs, never leaving 1 item behind
                     let c = Math.min(room(t), R - n, Math.floor((1 - fillOf(pg)) * capS(t) + 1e-9));
-                    while (c >= minOn(t)) { pg.counts[t.id] = c; pg.chosen.push(t); if (shelvesOf(pg) <= SHELF_MAX[size]) break; pg.chosen.pop(); delete pg.counts[t.id]; c--; }
+                    if (st === 2) { c -= c % 2; if (R - n - c === 1) c -= 2; }
+                    while (c >= minOn(t)) { pg.counts[t.id] = c; pg.chosen.push(t); if (shelvesOf(pg) <= SHELF_MAX[size]) break; pg.chosen.pop(); delete pg.counts[t.id]; c -= st; }
                     if (c >= minOn(t)) { took = { t, c }; break; }
                 }
                 if (!took) break;
@@ -218,13 +255,13 @@ function dealSheet(input, cycle, day, ws, mut) {
         // of a skill on the page, or one item of a new WIDE skill (a wide shelf of 1; at most 3 skills), the fill and the
         // shelf ceiling kept; failing both it gives one back (the page keeps >= 2 items and each skill its minOn).
         if (!mut.noLoneGuard && !mut.ignoreN && R - n === 1) {
-            const up = chosen.filter((s) => room(s) - counts[s.id] >= 1).sort((a, b) => counts[a.id] - counts[b.id]).find(fitsPlus);
-            const add = up || chosen.length >= maxS ? null : cycle.filter((t) => !chosen.includes(t) && groupOf(t) === 'wide' && room(t) >= 1)
+            const up = chosen.filter((s) => !isPair(s, mut) && room(s) - counts[s.id] >= 1).sort((a, b) => counts[a.id] - counts[b.id]).find(fitsPlus);
+            const add = up || chosen.length >= maxS ? null : cycle.filter((t) => !chosen.includes(t) && !isPair(t, mut) && groupOf(t) === 'wide' && room(t) >= 1)
                 .sort((a, b) => sortKeyCmp(key(a), key(b))).find(fitsPlus);
             if (up) { counts[up.id]++; n++; }
             else if (add) { chosen.push(add); counts[add.id] = 1; topUp.push(add.id); n++; }
             else {
-                const down = chosen.filter((s) => counts[s.id] - 1 >= minOn(s)).sort((a, b) => counts[b.id] - counts[a.id])[0];
+                const down = chosen.filter((s) => !isPair(s, mut) && counts[s.id] - 1 >= minOn(s)).sort((a, b) => counts[b.id] - counts[a.id])[0];
                 if (down && n - 1 >= 2) { counts[down.id]--; n--; }
             }
         }
@@ -315,6 +352,7 @@ function eligibleOf(input, mut) {
     if (input.adapt && input.listed && !mut.adaptFullPool) { const L = new Set(input.listed); el = el.filter((s) => L.has(s.code)); }
     if (el.length < (mut.allowOne ? 1 : 2)) return { error: el.length ? 'The pool holds one skill: a mixed review needs at least 2.' : 'No skill matches these filters.' };
     if (!COUNTS.includes(input.N)) return { error: `N must be one of ${COUNTS.join(', ')}.` };
+    if (input.N % 2 && el.every((s) => isPair(s, mut))) return { error: 'Long word problems are dealt in pairs: choose an even number of problems or add another skill.' };
     return el;
 }
 

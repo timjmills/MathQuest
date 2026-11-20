@@ -14,7 +14,7 @@
 //
 // The Node cores ARE check-v1's properties (design/cards/mixed-review/proto/check-v1.mjs), run on the PRODUCT dealer
 // js/modules/mixed-review.js through check-v1's `configure()` (card §9b step 1, §10 L8):
-//   COUNT b c d e h j j2 k l · POOL g n (+ b c d) · SHARE a i m · WEEK f (+ a for the day codes) · HOSTS, BREAKDOWN browser.
+//   COUNT b c d e h j j2 k l p · POOL g n (+ b c d) · SHARE a i m · WEEK f (+ a for the day codes) · HOSTS, BREAKDOWN browser.
 // A state whose product code is not built reports PENDING, never PASS: a props fixture while js/modules/mixed-review.js is
 // missing, a module state while its module or export is missing, and every fixture under pending/ (named with its build step).
 // A FAIL fixture must be CAUGHT, and when it names `catchText`, caught for that reason.
@@ -35,7 +35,7 @@ const quiet = async (url) => { const log = console.log; console.log = () => {}; 
 const mod = async (rel) => (existsSync(join(ROOT, rel)) ? quiet(pathToFileURL(join(ROOT, rel)).href) : null);
 
 export const CHECKS = {
-    count: { core: ['b', 'c', 'd', 'e', 'h', 'j', 'j2', 'k', 'l'] },
+    count: { core: ['b', 'c', 'd', 'e', 'h', 'j', 'j2', 'k', 'l', 'p'] },
     pool: { core: ['g', 'n', 'b', 'c', 'd'], failCore: ['g', 'n'] },
     share: { core: ['a', 'i', 'm'] },
     week: { core: ['f', 'a'], failCore: ['f'] },
