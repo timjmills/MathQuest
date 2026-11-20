@@ -241,11 +241,12 @@ Signed: owner, 2026-11-20
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (14 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (16 lines; 0 undecided)
 
 - `tiles=null` Digits × digit [difficulty], default on area_model_mult, area_model_mult_hard, multiply (all 8) [offered]
 - `tiles=21` Digits × digit [difficulty], default on area_model_2by1, mult_2by1_column (area_model_2by1, area_model_3by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
 - `tiles=31` Digits × digit [difficulty], default on area_model_3by1, mult_3by1_column (area_model_2by1, area_model_3by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
+- `tiles=41` Digits × digit [difficulty] (area_model_2by1, area_model_3by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
 - `amEdges=given` Numbers around the box [support], default (area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard) [offered]
 - `amEdges=blank` Numbers around the box [support] (area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard) [offered]
 - `amEdges=mixed` Numbers around the box [support] (area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard) [offered]
@@ -257,6 +258,7 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `notation=stacked` How it is written, default (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
 - `notation=across` How it is written (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [hidden: mult_2by1_column, mult_2by2_standard, mult_3by1_column; offered: multiply]
 - `tiles=11` Digits × digits [difficulty] (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
+- `tiles=32` Digits × digits [difficulty] (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
@@ -294,7 +296,7 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `amEdges` Numbers around the box: given / blank / mixed (2)
 - `tiles` Digits × digits: (Both grids, dealt) / 22 / 23 (2)
 - `notation` How it is written: stacked / across (1)
-- `tiles` Digits × digit: (Both sizes, dealt) / 21 / 31 (1)
+- `tiles` Digits × digit: (Both sizes, dealt) / 21 / 31 / 41 (1)
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): `multiplication:area_model_2by1` → `multiplication:area_model_mult` {"tiles":21}; `multiplication:area_model_3by1` → `multiplication:area_model_mult` {"tiles":31}; `multiplication:mult_2by1_column` → `multiplication:multiply` {"tiles":21}; `multiplication:mult_2by2_standard` → `multiplication:multiply` {"tiles":22}; `multiplication:mult_3by1_column` → `multiplication:multiply` {"tiles":31}
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `multiplication:area_model_2by1` → `multiplication:area_model_mult` {"tiles":21}; `multiplication:area_model_2by2` → `multiplication:area_model_mult_hard` {"tiles":22}; `multiplication:area_model_3by1` → `multiplication:area_model_mult` {"tiles":31}; `multiplication:area_model_3by2` → `multiplication:area_model_mult_hard` {"tiles":23}; `multiplication:area_model_4by1` → `multiplication:area_model_mult` {"tiles":41}; `multiplication:mult_2by1_column` → `multiplication:multiply` {"tiles":21}; `multiplication:mult_2by2_standard` → `multiplication:multiply` {"tiles":22}; `multiplication:mult_3by1_column` → `multiplication:multiply` {"tiles":31}; `multiplication:mult_3by2_standard` → `multiplication:multiply` {"tiles":32}; `multiplication:mult_4by1_column` → `multiplication:multiply` {"tiles":41}
 <!-- /informational -->

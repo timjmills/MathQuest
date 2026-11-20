@@ -37,6 +37,9 @@ const NOWRAP = 'area-model-total-row';
 const partialsOf = (p) => p.parts.map((v) => Number(p.multiplier) * Number(v));
 const productOf = (p) => (p.product !== undefined ? Number(p.product) : partialsOf(p).reduce((s, n) => s + n, 0));
 const multiplicandOf = (p) => p.parts.reduce((s, n) => s + Number(n), 0);
+// A 4-digit part or factor prints with its thousands comma (3,000; 3,456): lf-ops sizes, area_model_4by1. Numbers under
+// 1,000 print as before, so no 2 x 1 / 3 x 1 page moves.
+const grp = (n) => (Math.abs(Number(n)) >= 1000 ? Number(n).toLocaleString('en-US') : String(n));
 
 function keySlots(p) {
     const k = {};
@@ -190,7 +193,7 @@ register('area-model', {
         // are one size and none of them tells the pupil how long its answer is (L-LEAK).
         const partDigits = Math.max(...partials.map((v) => String(v).length));
         const bw = boxMm(g, partDigits);
-        const colMm = Math.max(bw + 6, ...parts.map((v) => String(v).length * 0.62 * g.E + 4));
+        const colMm = Math.max(bw + 6, ...parts.map((v) => grp(v).length * 0.62 * g.E + 4));
         const hMm = g.stripMm + 8;
         const twin = g.twin;
         const uid = esc(p.uid || 'am');
@@ -202,7 +205,7 @@ register('area-model', {
             ? `<input type="text" class="area-model-input" inputmode="numeric" autocomplete="off" data-area-idx="${uid}-part-${i}" data-answer="${partials[i]}" data-ws-slot="part-${i}" data-ws-shape="box" aria-label="area of part ${i + 1}" `
                 + `style="box-sizing:border-box;width:${g.em(bw)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
             : box(g, `part-${i}`, { wMm: bw, hMm: g.stripMm, value: vAt(`part-${i}`), ink: iAt(`part-${i}`), mark: null }));
-        const labels = parts.map((v) => `<span style="flex:0 0 ${g.em(colMm)};text-align:center;font-weight:700">${esc(v)}</span>`).join('');
+        const labels = parts.map((v) => `<span style="flex:0 0 ${g.em(colMm)};text-align:center;font-weight:700">${esc(grp(v))}</span>`).join('');
         const rects = parts.map((v, i) => `<span class="${NOWRAP}" style="flex:0 0 ${g.em(colMm)};height:${g.em(hMm)};box-sizing:border-box;display:flex;align-items:center;justify-content:center;`
             + `${i ? `border-left:${HAIR} solid ${INK.ink};` : ''}">${partSlot(i)}</span>`).join('');
         const mulMm = String(p.multiplier).length * 0.62 * g.E + 5;
@@ -232,7 +235,7 @@ register('area-model', {
             + `<span class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;border:${HAIR} solid ${INK.ink}">${rects}</span></div>`
             + workRow
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">`
-            + `<span>${esc(p.multiplier)}</span><span style="font-weight:700;width:1em;text-align:center">×</span><span>${esc(multiplicandOf(p))}</span>`
+            + `<span>${esc(p.multiplier)}</span><span style="font-weight:700;width:1em;text-align:center">×</span><span>${esc(grp(multiplicandOf(p)))}</span>`
             + `<span style="font-weight:700;width:1em;text-align:center">=</span>${totalSlot}</div></div>`;
         return root(g, 'area-model', model, 'text-align:center;white-space:nowrap;', this.footprint(p, ctx).wMm);
     },

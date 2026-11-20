@@ -12121,6 +12121,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mult-size-presets",
+   "check": "every multiplication size pair is a preset of its host (tiles 21/31/41/22/32 on multiply, 21/31/41 on area_model_mult, 22/23 on area_model_mult_hard), each item deals its size, multiply 2-digit multipliers draw the kit long-multiplication cell, and area_model_3by2 writes the 3-digit factor first (lead 2026-11-19; card mult-sizes Q2 / Q3)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-presets-unit SIZE_PRESETS + tiles predicates (area hosts, long-multiplication)",
+   "fail": {
+    "commit": "9e51e550c",
+    "state": "the five size presets missing; mult_2by2_standard prints the legacy column-mult (no q.cell)"
+   },
+   "pass": {
+    "commit": "2e152b8e4",
+    "state": "five presets ZK-ZP, tiles 41 / 32, long-multiplication cell, 3-digit factor first"
+   },
+   "command": "node tests/scripts/ws-presets-unit.mjs --no-baseline 2>&1 | grep -E '^ws-presets-unit: (OK|FAIL)' | head -1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

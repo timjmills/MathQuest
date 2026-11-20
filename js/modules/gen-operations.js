@@ -5078,7 +5078,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 
                 const product = multiplier * multiplicand;
                 q.ans = product;
-                q.text = `Use the area model to find ${multiplier} × ${multiplicand}`;
+                q.text = `Use the area model to find ${multiplier} × ${multiplicand >= 1000 ? multiplicand.toLocaleString("en-US") : multiplicand}`;
                 q.hint = `Break ${multiplicand} into parts: ${parts.map(p => p.value).join(' + ')}. Multiply each part by ${multiplier}, then add the results.`;
                 q.answerType = "area-model";
                 q.areaModelData = { multiplier, multiplicand, parts, product };
