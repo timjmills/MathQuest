@@ -14930,6 +14930,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-player-leave",
+   "check": "ws-lesson-player --leave: a visible [data-act=leave] >= 64 px (board) / 48 px (tablet) on every part stage and on the 'No such lesson' stage, which shows no dead part pills; Leave closes the player as Esc does (also F6 name escaped once, F7 pupil -> Board, F8 tick after the last step)",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F1 (+F6, F7, F8)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: no Leave control; the message stage leaves 5 dead pills; '<b>x' shown as '&lt;b&gt;x'; I do tick after any visit"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "Leave on every stage, closes the player; pills hidden on the message stage"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --leave",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-ink-still",
+   "check": "ws-lesson-player --reveal: every black mark of the I do drawing (digits, rule, ring, dots, hops) keeps its box (+-1 px) from step k to k+1 at 1280 / 1920 / 820",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F3 (ink never moves)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: the sum's digits shift left 61-69 px from step 1 to step 2 (the drawing re-centred when the dot card appeared)"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "every box at its largest state's size from step 1: no mark moves"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --reveal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-stage-h13-digits",
+   "check": "ws-lesson-player --render: the cell keeps one height from step 1, the board digits are >= the signed size (156 px at 1920, 104 at 1280 / 1366, 83 on tablets) and the stage keeps no empty band >= 30 % (rows or columns), 820 portrait included",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F4 (cell grows, wasted stage, digits under the signed size)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: cell 521 -> 751 px at 1920, digits 130 px of 156, 820 portrait stage band 53.6 %"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "fixed cell at its largest state, digits 156 / 104 px, stage band <= 21 %"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --render --widths 1920,820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-dot-card",
+   "check": "ws-lesson-player --reveal: on every I do state the digits sit where the printed anchor chart panel of the same state puts them, measured from the dot card's centre in card heights (the chart drawn in its own sheetDocument), within 0.35",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F2 (dot card beside its addend, as on paper; +F5 chart step notes on screen)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: the 2-dot card under the answer, below the '+', not beside the addend 2 (no engine stylesheet on screen)"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "the engine stylesheet on screen: the card beside the addend as on the chart"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --reveal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

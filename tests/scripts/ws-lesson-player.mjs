@@ -17,6 +17,9 @@
 //                the last step); the Say band is absent before the last step and == "Say: " + sayLineOf after it; Esc leaves
 //   --any-part   PLAYER-ANY-PART: every part id opens directly by URL (?part=) at that part; the part bar jumps to every
 //                other part and the URL follows; Next / Back step across parts (a not-yet-built part is navigable)
+//   --leave      (critic r1 F1, F6-F8) Leave >= 64 / 48 px on every part stage and on the 'No such lesson' stage (no live
+//                pills there), Leave closes as Esc does; the unknown name shown literally; mode=pupil -> Board; the I do tick
+//                only after its last step
 //   --hints / --exit / --sheet-to-play / packet page ids: later slices (2, 3, 5 / 4) - reported NOT IN SLICE 1, never passed
 //
 //   --widths 1280,1920   override the widths (default SCREEN_WIDTHS + 1920)   --shots <dir>  write PNGs (dsf 2)
@@ -38,7 +41,7 @@ const SW = require(join(HERE, '..', 'lib', 'ws-screen-widths.cjs'));
 const TOOL = 'ws-lesson-player';
 const argv = process.argv.slice(2);
 const arg = (k, d = null) => { const i = argv.indexOf(k); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
-const MODES = ['unit', 'render', 'reveal', 'any-part'];
+const MODES = ['unit', 'render', 'reveal', 'any-part', 'leave'];
 const LATER = { hints: 'slice 2 (We do)', exit: 'slice 3 (Exit ticket)', 'sheet-to-play': 'slice 5 (D12 itemsFor)' };
 let modes = MODES.filter((m) => argv.includes(`--${m}`));
 const later = Object.keys(LATER).filter((m) => argv.includes(`--${m}`));
@@ -508,14 +511,14 @@ const leaveBox = (page) => page.evaluate(() => {
 async function leaveAndMarks() {
     const leaveOk = async (page, tag, minPx) => {
         const b = await leaveBox(page);
-        if (!b) { fail('any-part', `${tag}: F1 no visible Leave control`); return false; }
-        if (b.w < minPx - 0.5 || b.h < minPx - 0.5) fail('any-part', `${tag}: F1 Leave ${Math.round(b.w)}x${Math.round(b.h)} under ${minPx} px`);
+        if (!b) { fail('leave', `${tag}: F1 no visible Leave control`); return false; }
+        if (b.w < minPx - 0.5 || b.h < minPx - 0.5) fail('leave', `${tag}: F1 Leave ${Math.round(b.w)}x${Math.round(b.h)} under ${minPx} px`);
         return true;
     };
     // every built / not-yet-built part stage, at the board (64) and on a tablet (48)
     for (const [w, minPx] of [[1280, 64], [820, 48]]) {
         let h;
-        try { h = await openPlayer(w, 'ido'); } catch (e) { fail('any-part', `${w}: the player did not open`); continue; }
+        try { h = await openPlayer(w, 'ido'); } catch (e) { fail('leave', `${w}: the player did not open`); continue; }
         try {
             const { page } = h;
             for (const part of ['warmup', 'ido', 'wedo', 'youdo', 'exit']) {
@@ -529,8 +532,8 @@ async function leaveAndMarks() {
                 await page.click('#mqLessonPlayer [data-act="leave"]');
                 await new Promise((r) => setTimeout(r, 200));
                 const gone = await page.evaluate(() => !document.getElementById('mqLessonPlayer') && !/lesson=/.test(location.search) && !document.body.classList.contains('mq-lp-open'));
-                if (!gone) fail('any-part', `${w}: F1 Leave did not close the player (as Esc does)`);
-                else ok('any-part', `${w}: F1 Leave on every part stage (>= ${minPx} px); Leave closes the player`);
+                if (!gone) fail('leave', `${w}: F1 Leave did not close the player (as Esc does)`);
+                else ok('leave', `${w}: F1 Leave on every part stage (>= ${minPx} px); Leave closes the player`);
             }
         } finally { await h.close(); }
     }
@@ -540,7 +543,7 @@ async function leaveAndMarks() {
         const h = await H.open({ viewport: { width: 1280, height: 900 }, pagePath: `/index.html?lesson=${encodeURIComponent(raw)}&mode=board`, lock: TOOL });
         try {
             const { page } = h;
-            try { await H.waitFor(page, () => !!document.querySelector('#mqLessonPlayer .mq-lp-stage-msg'), 15000, 'message stage'); } catch (e) { fail('any-part', 'unknown lesson: no message stage'); }
+            try { await H.waitFor(page, () => !!document.querySelector('#mqLessonPlayer .mq-lp-stage-msg'), 15000, 'message stage'); } catch (e) { fail('leave', 'unknown lesson: no message stage'); }
             const m = await page.evaluate((rawArg) => {
                 const r = document.getElementById('mqLessonPlayer');
                 if (!r) return null;
@@ -548,36 +551,36 @@ async function leaveAndMarks() {
                 const live = [...r.querySelectorAll('.mq-lp-pill')].filter((b) => b.offsetParent !== null && getComputedStyle(b).visibility !== 'hidden' && !b.disabled);
                 return { literal: msg.includes(`“${rawArg}”`), entity: /&lt;|&gt;|&amp;/.test(msg), injected: !!r.querySelector('.mq-lp-stage b'), livePills: live.length, msg: msg.trim().slice(0, 120) };
             }, raw);
-            if (!m) fail('any-part', 'unknown lesson: no player');
+            if (!m) fail('leave', 'unknown lesson: no player');
             else {
-                if (!m.literal || m.entity || m.injected) fail('any-part', `F6 unknown lesson name not shown literally: "${m.msg}"`);
-                else ok('any-part', `F6 the unknown lesson name shows literally ("${raw}"), escaped once, no markup`);
-                if (m.livePills) fail('any-part', `F1 the message stage shows ${m.livePills} live part pills that do nothing`);
+                if (!m.literal || m.entity || m.injected) fail('leave', `F6 unknown lesson name not shown literally: "${m.msg}"`);
+                else ok('leave', `F6 the unknown lesson name shows literally ("${raw}"), escaped once, no markup`);
+                if (m.livePills) fail('leave', `F1 the message stage shows ${m.livePills} live part pills that do nothing`);
             }
             if (await leaveOk(page, 'unknown lesson', 64)) {
                 await page.click('#mqLessonPlayer [data-act="leave"]');
                 await new Promise((r) => setTimeout(r, 200));
-                if (await page.evaluate(() => !!document.getElementById('mqLessonPlayer'))) fail('any-part', 'F1 Leave did not close the "No such lesson" stage');
-                else ok('any-part', 'F1 the "No such lesson" stage: Leave shown and closes it; no dead pills');
+                if (await page.evaluate(() => !!document.getElementById('mqLessonPlayer'))) fail('leave', 'F1 Leave did not close the "No such lesson" stage');
+                else ok('leave', 'F1 the "No such lesson" stage: Leave shown and closes it; no dead pills');
             }
         } finally { await h.close(); }
     }
     // mode=pupil (not built in slice 1): Board, with no Pupil pill
     {
         let h;
-        try { h = await openPlayer(1280, 'ido', '&mode=pupil'); } catch (e) { fail('any-part', 'mode=pupil: the player did not open'); h = null; }
+        try { h = await openPlayer(1280, 'ido', '&mode=pupil'); } catch (e) { fail('leave', 'mode=pupil: the player did not open'); h = null; }
         if (h) {
             try {
                 const m = await h.page.evaluate(() => { const r = document.getElementById('mqLessonPlayer'); return { mode: r.dataset.mode, pill: (r.querySelector('.mq-lp-mode') || {}).textContent || '', url: location.search }; });
-                if (m.mode !== 'board' || /pupil/i.test(m.pill)) fail('any-part', `F7 mode=pupil shows "${m.pill}" in the ${m.mode} layout (pupil mode is not built: Board, no Pupil pill)`);
-                else ok('any-part', 'F7 mode=pupil opens the Board (pupil mode not built), no Pupil pill');
+                if (m.mode !== 'board' || /pupil/i.test(m.pill)) fail('leave', `F7 mode=pupil shows "${m.pill}" in the ${m.mode} layout (pupil mode is not built: Board, no Pupil pill)`);
+                else ok('leave', 'F7 mode=pupil opens the Board (pupil mode not built), no Pupil pill');
             } finally { await h.close(); }
         }
     }
     // the I do tick only after its last step has been reached
     {
         let h;
-        try { h = await openPlayer(1280, 'ido'); } catch (e) { fail('any-part', 'tick: the player did not open'); h = null; }
+        try { h = await openPlayer(1280, 'ido'); } catch (e) { fail('leave', 'tick: the player did not open'); h = null; }
         if (h) {
             try {
                 const { page } = h;
@@ -592,9 +595,9 @@ async function leaveAndMarks() {
                 await page.click('.mq-lp-pill[data-part="wedo"]');
                 await new Promise((r) => setTimeout(r, 100));
                 const late = await tick();
-                if (early) fail('any-part', 'F8 the I do pill shows its tick after a visit that never reached the last step');
-                if (!late) fail('any-part', 'F8 the I do pill shows no tick after its last step was reached');
-                if (!early && late) ok('any-part', 'F8 the I do tick appears only once its last step has been reached');
+                if (early) fail('leave', 'F8 the I do pill shows its tick after a visit that never reached the last step');
+                if (!late) fail('leave', 'F8 the I do pill shows no tick after its last step was reached');
+                if (!early && late) ok('leave', 'F8 the I do tick appears only once its last step has been reached');
             } finally { await h.close(); }
         }
     }
@@ -643,7 +646,6 @@ async function anyPart() {
         if (s.part !== 'ido' || s.step !== 1) fail('any-part', `a jump back to I do did not keep its step (step ${s.step + 1}, want 2)`);
         ok('any-part', 'PLAYER-ANY-PART: every part opens by ?part=, the part bar jumps to every part (URL follows), Next / Back cross parts, I do keeps its step');
     } finally { await h.close(); }
-    await leaveAndMarks();
     notes.push('PLAYER-ANY-PART packet page ids (anchor chart, Guided, Independent ...): slice 4, not in slice 1');
 }
 
@@ -656,6 +658,7 @@ async function anyPart() {
         if (modes.includes('render') && !fails.some((f) => /player did not open|no js\/modules\/lesson-player/.test(f))) await render();
         if (modes.includes('reveal')) await reveal();
         if (modes.includes('any-part')) await anyPart();
+        if (modes.includes('leave')) await leaveAndMarks();
     } catch (e) { fail('run', e.stack || String(e)); }
     for (const n of notes) console.log(`  note ${n}`);
     console.log(fails.length ? `${TOOL}: FAIL (${fails.length})` : `${TOOL}: OK`);
