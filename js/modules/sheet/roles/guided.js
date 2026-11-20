@@ -1387,7 +1387,15 @@ export function plan(input = {}) {
         // (a fact Model's think cue reserves THINK_CUE_MM in the plan (extra); it draws one boxed text line and its gap - the rest of
         // the reserve is not drawn, so the cap is reckoned without it)
         const cueSlack = (r) => (pi === 0 && r === 0 && nModels === 1 && use[0] && thinkCueOf(use[0]) ? Math.max(0, THINK_CUE_MM - (((ctx.s && ctx.s.textPt) || 14) * 1.2 * (25.4 / 72) + 4.7)) : 0);
-        Hr = Hr.map((x, r) => { const d = w[r] - 1 - koCap - cueSlack(r); return Math.min(x, Math.max(d, rowCapMm(d, rowItems(r)))); });
+        // (critic rowcap-s2 F2, add_wp_10_plain Guided L p2 cut 1.3 mm short: the keep-out comes off the CAP only - every row stays at
+        // least its measured ink + 1 mm (hsOf: the measure + 1, at its drawn level), since a cell
+        // may draw the keep-out the measure holds. An exempt row (layout.rowCapMm Infinity) keeps the height planned for it.)
+        Hr = Hr.map((x, r) => {
+            // (the measured ink: the items' own measure - the Model's lines and the hint line are reserves the cap reckons in d)
+            const ink = Math.max(1, ...hsOf(r));
+            const d = w[r] - 1 - koCap - cueSlack(r);
+            return Math.min(x, Math.max(ink, d, rowCapMm(d, rowItems(r))));
+        });
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

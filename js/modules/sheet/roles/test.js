@@ -90,7 +90,41 @@ function fillToCeiling(L, size, columns, opts = {}) {
     return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
 }
 
+/**
+ * ROW-STRETCH CAP reshape (critic lf-engine-rowcap-s2 F5): a Test at its 12.1 ceiling whose rows, held to their cap, leave more than
+ * one row of white under the grid takes FEWER columns and more rows of the same count where they fit - the same problems, the page
+ * filled by rows (add_facts Test L: 4 x 3 at 45.6 mm left 94.7 mm white; 3 x 4 leaves about 49). The ceiling is never raised.
+ */
+function reshape(L, items, input) {
+    if (!L || L.split || !(L.perPage > 0) || !(L.cols > 2) || !(L.cellH > 0) || (input.columns && input.columns !== 'auto')) return L;
+    const ctx = ctxOf(input);
+    const G = L.gridH;
+    const white = (rows, h) => G - SAFETY_H_MM - rows * h;
+    if (!(white(L.rows, L.cellH) > L.cellH)) return L;
+    let best = null;
+    for (let c = L.cols - 1; c >= 2; c--) {
+        if (L.perPage % c) continue;
+        const r = L.perPage / c;
+        const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
+        const Lc = resolveSectionLayout({ role: 'test', columns: c, count: L.perPage, target: { cols: c, rows: r }, ceiling: { S: L.perPage, M: L.perPage, L: L.perPage }, floor: (input.floors || {}).main },
+            items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+        if (!Lc || Lc.cols !== c || Lc.clamped || !(Lc.hMin > 0)) continue;
+        const h = Math.min((G - SAFETY_H_MM) / r, Math.max(Lc.hMin, rowCapMm(Lc.hMin, items)));
+        if (r * Lc.hMin > G - SAFETY_H_MM) continue;
+        const w = white(r, h);
+        if (!best || w < best.w) best = { c, r, h, w, Lc };
+        if (w <= h) break;
+    }
+    if (!best || !(best.w < white(L.rows, L.cellH))) return L;
+    return Object.assign({}, L, { cols: best.c, rows: best.r, cellH: Math.round(best.h * 1000) / 1000, hMin: best.Lc.hMin, fill: false, filledTest: true,
+        note: [L.note, `Test: ${L.perPage} problems as ${best.c} x ${best.r}, the rows filling the page (row cap).`].filter(Boolean).join(' ') });
+}
+
 function layout(items, input, count) {
+    return reshape(layoutBase(items, input, count), items, input);
+}
+
+function layoutBase(items, input, count) {
     const ctx = ctxOf(input);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
     // 12.1: "12; procedures 4" - a long algorithm tests on the 2 x 2 grid of its practice page.

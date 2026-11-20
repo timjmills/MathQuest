@@ -246,6 +246,18 @@ function geometryAt(pools, input, mainCols = 0) {
     };
     let best = bands === 2 ? search(0.2, true) : search(0, false);
     if (best.n < 0 && bands === 2) best = search(0, true);
+    // ROW-STRETCH CAP refill (critic lf-engine-rowcap-s2 F4): rows are drawn at their cap, so a page whose plan leaves more than one
+    // main row of white under it while under the ceiling takes the plan that prints MORE - the earlier share's 20 % floor gives way
+    // (add_facts Review M: 6 + 4 = 10 with 100 mm white; 9 + 2 = 11 fits), and the earlier band may take the main band's columns
+    if (bands === 2 && best.n > 0 && best.n < ceil) {
+        const usedOf = (b) => mainAt(b.mRows).h + b.eRows * b.eh + (b.eWide || 0) * (b.ehw || 0);
+        const whiteOf = (b) => availOf(mainAt(b.mRows).bands) - usedOf(b);
+        if (whiteOf(best) > M.h) {
+            const wider = !split && M.cols > E.cols && fitsAt(earlier, M.cols, ctx) ? [{ c: M.cols, h: hMinAt(earlier, M.cols, ctx), hw: 0, nMax: Infinity, wMax: 0 }] : [];
+            const alt = search(0, true, eOpts.concat(wider.filter((o) => Number.isFinite(o.h) && o.h > 0)));
+            if (alt.n > best.n) best = alt;
+        }
+    }
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
     // lf-ops r-review: at S a static-width earlier step (stacks) may take a 5th column - narrower cells round the same ink, as
@@ -279,7 +291,16 @@ function geometry(pools, input) {
     const main = pools.main || [];
     const xFacts = !multMain(pools) && ctx.size === 'S' && (pools.earlier || []).length > 0 && main.length > 0
         && main.every((it) => it && it.template === 'fact' && it.supportsBox && it.supportsBox.plan && /^(\*|×|x)$/.test(String(((it.q && it.q.cell && it.q.cell.payload) || {}).op || '')));
-    if (!xFacts) return g;
+    // ROW-STRETCH CAP refill (critic lf-engine-rowcap-s2 F4): rows drawn at their cap leave the page's spare height white, so a Review
+    // under its ceiling also tries ONE more main column where the problems fit it and takes it when that prints more (add_facts
+    // Review M: 3 x 3 + 2 mixed = 11 under 100 mm of white; 4 x 2 + 2 x 2 = 12)
+    if (!xFacts) {
+        if (g.n >= (CEILING[ctx.size] || 12) || !main.length) return g;
+        const c = g.cols + 1;
+        if (c > 4 || !fitsAt(main, c, ctx)) return g;
+        const alt = geometryAt(pools, input, c);
+        return alt.n > g.n ? alt : g;
+    }
     let best = g;
     for (const c of [5, 4, 3]) {
         if (c === g.cols || !fitsAt(main, c, ctx)) continue;
