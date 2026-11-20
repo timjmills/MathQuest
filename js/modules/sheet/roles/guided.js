@@ -939,12 +939,41 @@ export function modelMarks(html, it) {
     try { return f(html, it); } catch (e) { return html; }
 }
 
+// WORK-LINES-MEASURED (lf-roles r13, ws-empty-band EB-STRETCH): a Model's worked lines are reckoned as they DRAW - Andika's own
+// advance widths (em, read off the font in the browser at 100 px; ANDIKA_EM, any other character 0.6 em, wider than every
+// listed glyph but W / M / m / w / @ / %), broken at spaces as the browser breaks them, in the column the lines draw in: the
+// cell's 186 / cols less its 4.5 mm of side pads and rules (measured 57.5 mm at 3 columns, M and L). The old flat 0.5 em a
+// character in 186 / cols - 8 reckoned mult_facts Guided L's "Count by 6, 7 times: 6, 12, 18, 24, 30, 36, 42." (111 mm, 2
+// drawn lines) as 3, so the Model row stood 5.6 mm past its room. A 2 % margin keeps the reckoning off the ink's edge.
+const ANDIKA_EM = (() => {
+    const t = { ' ': 0.27, '!': 0.37, '"': 0.5, "'": 0.3, '(': 0.39, ')': 0.39, ',': 0.32, '-': 0.42, '.': 0.31, '/': 0.49, ':': 0.31, ';': 0.32, '?': 0.51, '_': 0.62, '%': 0.75, '&': 0.6, '@': 0.83, '–': 0.52, '…': 0.84 };
+    for (const c of '0123456789#$+<=>×÷−') t[c] = 0.59;
+    const up = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', upW = [0.68, 0.63, 0.66, 0.7, 0.57, 0.56, 0.69, 0.72, 0.48, 0.47, 0.64, 0.53, 0.88, 0.73, 0.71, 0.58, 0.72, 0.64, 0.57, 0.62, 0.7, 0.67, 1.02, 0.65, 0.64, 0.6];
+    const lo = 'abcdefghijklmnopqrstuvwxyz', loW = [0.56, 0.56, 0.5, 0.58, 0.53, 0.32, 0.55, 0.57, 0.28, 0.29, 0.51, 0.28, 0.82, 0.58, 0.56, 0.57, 0.55, 0.43, 0.47, 0.41, 0.58, 0.52, 0.76, 0.53, 0.52, 0.51];
+    [...up].forEach((c, i) => { t[c] = upW[i]; });
+    [...lo].forEach((c, i) => { t[c] = loW[i]; });
+    return t;
+})();
+const emOf = (str) => [...str].reduce((a, c) => a + (ANDIKA_EM[c] || 0.6), 0);
+const WORK_SIDE_MM = 4.5;
+/** The lines one worked line wraps to in a column colW mm wide at em mm a 1 em (greedy, at spaces). */
+function wrappedLines(t, colW, em) {
+    const max = (colW / em) * 0.98;
+    let n = 1, cur = 0;
+    for (const w of String(t).split(' ')) {
+        const ww = emOf(w);
+        if (cur === 0) cur = ww;
+        else if (cur + ANDIKA_EM[' '] + ww <= max) cur += ANDIKA_EM[' '] + ww;
+        else { n += 1; cur = ww; }
+    }
+    return n;
+}
 function workLinesMm(lines, cols, m) {
     if (!lines.length) return 0;
-    const colW = 186 / Math.max(1, cols) - 8;
-    const charMm = 0.5 * m.textPt * (25.4 / 72);
+    const colW = 186 / Math.max(1, cols) - WORK_SIDE_MM;
+    const em = m.textPt * (25.4 / 72);
     const lineMm = m.textPt * 1.25 * (25.4 / 72);
-    const n = lines.reduce((a, t) => a + Math.max(1, Math.ceil((t.length * charMm) / colW)), 0);
+    const n = lines.reduce((a, t) => a + wrappedLines(t, colW, em), 0);
     return n * lineMm + 4;
 }
 
