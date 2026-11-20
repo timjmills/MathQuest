@@ -73,7 +73,8 @@ async function runInf(page) {
         await typeEnter(page, await page.evaluate(() => String(window.state.currentQ.ans)));
     }
     await waitQ(page, 4);                       // the 4th item is on screen, never answered
-    await page.evaluate(() => window.finishPracticeRun());
+    // the round modal's Finish button: finishPracticeRun() since lf-hosts skip, endGame() before it (master 65c28ccdf)
+    await page.evaluate(() => (typeof window.finishPracticeRun === 'function' ? window.finishPracticeRun() : window.endGame()));
     await waitFor(page, () => (window.state.sessionHistory || []).length > 0, 10000, 'end row').catch(() => {});
     await sleep(1500);
     const rows = await page.evaluate(() => (window.state.sessionHistory || []).map((h) => h.score));
