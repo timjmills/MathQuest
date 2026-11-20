@@ -1,0 +1,31 @@
+{
+ "note": "r2 N7: adapt samples the whole filtered pool, not the code's list",
+ "expect": "fail",
+ "catch": "g",
+ "props": [
+  "g"
+ ],
+ "mutate": {
+  "adaptFullPool": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 21,
+  "size": "m",
+  "order": "mixed",
+  "listed": [
+   "AA",
+   "AB",
+   "AE",
+   "AF",
+   "AI",
+   "AU"
+  ],
+  "adapt": {
+   "counting:count_to_20": 4,
+   "ratios:unit_rate": 4,
+   "shapes:name_2d": 4
+  }
+ }
+}

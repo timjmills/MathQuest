@@ -1,0 +1,19 @@
+{
+ "note": "r1 WEEK: five days dealt from one seed",
+ "expect": "fail",
+ "catch": "f",
+ "props": [
+  "f"
+ ],
+ "mutate": {
+  "oneSeed": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 12,
+  "size": "m",
+  "order": "mixed",
+  "week": 12
+ }
+}

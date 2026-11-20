@@ -1,0 +1,18 @@
+{
+ "note": "r2 N2: a V1 code without Z cannot rebuild the page split",
+ "expect": "fail",
+ "catch": "a",
+ "props": [
+  "a"
+ ],
+ "mutate": {
+  "dropSizeToken": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 20,
+  "seed": 4242,
+  "size": "l",
+  "order": "mixed"
+ }
+}

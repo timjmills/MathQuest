@@ -1,0 +1,44 @@
+[
+ {
+  "id": "facts:g0",
+  "code": "AA",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:g1",
+  "code": "AB",
+  "grade": "2",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:g2",
+  "code": "AC",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:g3",
+  "code": "AD",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:g4",
+  "code": "AE",
+  "grade": "2",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "facts:g5",
+  "code": "AF",
+  "grade": "3",
+  "area": "OA",
+  "fc": "compact"
+ }
+]

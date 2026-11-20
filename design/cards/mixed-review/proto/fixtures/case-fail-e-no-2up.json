@@ -1,0 +1,18 @@
+{
+ "note": "r1 D12 / ruling 7: N = 5 printed as one short page when the 5 fit a half page",
+ "expect": "fail",
+ "catch": "e",
+ "props": [
+  "e"
+ ],
+ "mutate": {
+  "noTwoUp": true
+ },
+ "input": {
+  "pool": "pool-compact",
+  "N": 5,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ }
+}

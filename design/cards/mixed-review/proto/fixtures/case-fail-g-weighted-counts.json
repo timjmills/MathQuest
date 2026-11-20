@@ -1,0 +1,30 @@
+{
+ "note": "r1 D2: adapt weights reach dealCounts",
+ "expect": "fail",
+ "catch": "g",
+ "props": [
+  "g"
+ ],
+ "mutate": {
+  "adaptCounts": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 21,
+  "size": "m",
+  "order": "mixed",
+  "listed": [
+   "AA",
+   "AB",
+   "AE",
+   "AF",
+   "AI",
+   "AU"
+  ],
+  "adapt": {
+   "addition:within_20": 4,
+   "multiplication:facts_2_5_10": 4
+  }
+ }
+}

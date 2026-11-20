@@ -1,0 +1,19 @@
+{
+ "note": "capacityTable equals the pinned table; the dealer's pages equal it on one-class pools",
+ "expect": "pass",
+ "props": [
+  "h"
+ ],
+ "input": {
+  "pool": "pool-compact",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "tableCheck": {
+   "compact": "pool-compact",
+   "typical": "pool-typical",
+   "wide": "pool-wide"
+  }
+ }
+}

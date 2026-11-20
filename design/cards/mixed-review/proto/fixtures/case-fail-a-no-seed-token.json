@@ -1,0 +1,18 @@
+{
+ "note": "r1 SHARE: a codec that drops the S token",
+ "expect": "fail",
+ "catch": "a",
+ "props": [
+  "a"
+ ],
+ "mutate": {
+  "dropSeedToken": true
+ },
+ "input": {
+  "pool": "pool-large",
+  "N": 10,
+  "seed": 4242,
+  "size": "m",
+  "order": "mixed"
+ }
+}

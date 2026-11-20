@@ -1,0 +1,18 @@
+{
+ "note": "r2 N3: a skill's short shelf printed first, not last",
+ "expect": "fail",
+ "catch": "j",
+ "props": [
+  "j"
+ ],
+ "mutate": {
+  "shortFirst": true
+ },
+ "input": {
+  "pool": "pool-typical",
+  "N": 15,
+  "seed": 6,
+  "size": "l",
+  "order": "easyhard"
+ }
+}

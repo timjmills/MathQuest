@@ -1,0 +1,24 @@
+{
+ "note": "N = 5 at M and at L compact prints 2-up, each half 1-5; L typical does not",
+ "expect": "pass",
+ "props": [
+  "e"
+ ],
+ "input": {
+  "pool": "pool-compact",
+  "N": 5,
+  "seed": 4,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   4,
+   8
+  ]
+ }
+}

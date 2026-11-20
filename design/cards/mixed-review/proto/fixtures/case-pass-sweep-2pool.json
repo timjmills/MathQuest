@@ -1,0 +1,37 @@
+{
+ "note": "a 2-skill pool (one class): ceil(N/2) and exact N at every N",
+ "expect": "pass",
+ "props": [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "j"
+ ],
+ "input": {
+  "pool": "pool-2",
+  "N": 10,
+  "seed": 3,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   3,
+   9
+  ]
+ }
+}

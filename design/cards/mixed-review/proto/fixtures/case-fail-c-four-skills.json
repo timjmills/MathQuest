@@ -1,0 +1,18 @@
+{
+ "note": "r1 D7: a page-aware deal that allows 4 skills a page (12 compact skills, N = 10 at M)",
+ "expect": "fail",
+ "catch": "c",
+ "props": [
+  "c"
+ ],
+ "mutate": {
+  "maxSkills4": true
+ },
+ "input": {
+  "pool": "pool-compact",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ }
+}

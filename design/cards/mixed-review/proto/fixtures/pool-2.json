@@ -1,0 +1,16 @@
+[
+ {
+  "id": "addition:within_10",
+  "code": "AA",
+  "grade": "K",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "subtraction:within_10",
+  "code": "AB",
+  "grade": "K",
+  "area": "OA",
+  "fc": "compact"
+ }
+]

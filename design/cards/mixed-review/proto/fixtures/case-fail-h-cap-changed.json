@@ -1,0 +1,25 @@
+{
+ "note": "r1 D6 / r2 N2: L typical raised to 10 a page (pages no longer match the table)",
+ "expect": "fail",
+ "catch": "h",
+ "props": [
+  "h"
+ ],
+ "mutate": {
+  "cap": {
+   "l": {
+    "typical": 10
+   }
+  }
+ },
+ "input": {
+  "pool": "pool-compact",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "tableCheck": {
+   "typical": "pool-typical"
+  }
+ }
+}
