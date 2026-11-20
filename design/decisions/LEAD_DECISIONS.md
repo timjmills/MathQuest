@@ -88,3 +88,8 @@ answers; every such decision is listed here so the owner can review it and ask f
 | 2026-11-20 | EBLAST-ADVISORY: EB-LASTPAGE and CAP-PARITY (ws-empty-band --page-fill) REPORT only ("ADVISORY (not critic-passed)", never blocking; --eblast-block for the backtest rows) after critic eblast r2 (false reds on passed skills, round cap). Root-cause rebuild next: every role used by a passed skill declares its capacity ceiling (machine check first), the rules read the declared ceiling, then critic r3; blocking only after r3 passes | lead, delegated (round cap) | lf-tools-eblast 6a378c6c1; critic-eblast-r2.md; row eblast-advisory-fixture |
 
 - **GUIDED-HINT-DROP-P1 (lead 2026-11-20, lf-roles F4):** on a Guided page the first tries' grey hint line is DROPPED where the Model plus a HINTED try do not fit page 1 (guided.js sheetFitPlain, round-4 rule "the hint never costs page 1 its only try"): a try on page 1 beats a uniform hint. So the first-try hint may differ between presets of one family (two_step_add_then_div / mult_div_first at M seed 1 drop it; multi_step_word_plain / add_then_mult keep it). A GUIDED-HINT-UNIFORM check exempts exactly this case (page 1 holds Model + one try, and the hinted try would not fit).
+
+- **PSC-QUADRANT-16 (lead 2026-11-20, lf-roles PSC item 2, option iii):** a Pre-skill Check QUADRANT page (one 2 x 2 block per
+  prerequisite, four prerequisites) may hold 16 items on one page, above the 12 M / 8 L ceiling: a declared exception in
+  js/modules/sheet/role-capacity.js that EB-PSCCAP (ws-empty-band) reads. Every other PSC page is trimmed to its ceiling. Built
+  with next week's Quick review build (card design/cards/psc-review).

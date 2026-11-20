@@ -471,3 +471,12 @@ on master, queued for next week's PSC layout pass (with the trim to the ceiling 
 - D2 sub_1k PSC title "Pre-skill check: subtracting sub 1k" (skill id leaks): check = PSC title lint for id fragments.
 - D3 sub_wp_20 M p1: two adjacent bands with the same "Subtract." instruction, ragged 8 / 4: check = adjacent-band identical-instruction lint.
 - D4 add_facts M seed 7: three items answer 12, a turnaround pair in one band: check = deal-diversity (<= 2 share an answer, no turnaround pair per band).
+- 2026-11-20 PSC layout round (branch claude/sweet-newton-c8wrv1-lf-roles-psc2). DO NOT DEPLOY THIS BRANCH before next week's
+  build: its checks are red on purpose until then - item 1 EB-PAGE on every PSC page (6e130f36f, 9 master findings), item 2
+  EB-PSCCAP (1f11f3c1e, 10 master findings; its ws-empty-band self-test rule coverage stays red until its backtest row lands),
+  PSC-REVIEW-DOMAINS / PSC-SCORES (ws-psc-review, 12 master findings). Card design/cards/psc-review/PSC_REVIEW_CARD.md (signed
+  by the lead) committed. A / B layout measurements: see the round report (A capped at fillLimit: 20 % / 45 % white with
+  37 % EB-BAND; B rows of 3: 38 % / 63 %); the owner's ruling fills the white with a Quick review band instead.
+- NEXT WEEK'S QUEUE (lead ruling on item 2, option iii, 2026-11-20): a QUADRANT page (one 2 x 2 block per prerequisite, 4
+  prerequisites) may hold 16 items on one page - a declared exception in role-capacity.js that EB-PSCCAP reads; every other PSC
+  page is trimmed to its ceiling (12 M / 8 L). Folds into the Quick review build.
