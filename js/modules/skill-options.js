@@ -1110,7 +1110,9 @@ const P11_OPS_OPTIONS = {
         id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty', ownsNumbers: true,
         values: [{ v: null, l: 'Tables facts to 12 × 12 (follows Max Number)' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
             { v: 21, l: '2-digit × 1-digit (34 × 6)' }, { v: 31, l: '3-digit × 1-digit (215 × 4)' },
-            { v: 22, l: '2-digit × 2-digit (34 × 26)' }],
+            { v: 22, l: '2-digit × 2-digit (34 × 26)' },
+            // lf-ops sizes (2026-11-20, card mult-sizes): appended, so old codes decode unchanged
+            { v: 41, l: '4-digit × 1-digit (3,456 × 7)' }, { v: 32, l: '3-digit × 2-digit (215 × 36)' }],
         help: 'The size of the two numbers you multiply. The first choice deals the times-table facts '
             + '(products to 144), or bigger numbers when the Max Number setting is 1,000 or more.',
     }],
@@ -2214,10 +2216,11 @@ const P12_OPTIONS = {
             help: 'The largest factor of an Order item: the product is at most 25, 36 or 81. The arrays stay at 5 × 5 (6 × 6 at 6); 9 reaches the facts-only items.' }),
     ],
     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
-        { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
-    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).'), _amEdgesOpt()],
+        { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' },
+        { v: 41, l: '4-digit × 1-digit (7 × 3,456)' }],
+    null, 'The size of the number split into parts: two parts (tens, ones), three (hundreds, tens, ones) or four (thousands to ones). Dealt mixes only the first two.'), _amEdgesOpt()],
     'multiplication:area_model_mult_hard': [_p12Enum('tiles', 'Digits × digits', [
-        { v: null, l: 'Both grids, dealt' }, { v: 22, l: '2-digit × 2-digit (a 2 × 2 grid)' }, { v: 23, l: '2-digit × 3-digit (a 2 × 3 grid)' }],
+        { v: null, l: 'Both grids, dealt' }, { v: 22, l: '2-digit × 2-digit (a 2 × 2 grid)' }, { v: 23, l: '3-digit × 2-digit (a 2 × 3 grid)' }],
     null, 'The grid the pupil fills: four partial products, or six.'), _amEdgesOpt()],
     'multiplication:repeated_add_to_mult': [
         _opsBand([25, 36, 100], 36, { label: 'Groups and group size to', labels: { 25: '5', 36: '6', 100: '10' },

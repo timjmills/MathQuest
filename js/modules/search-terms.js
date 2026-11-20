@@ -550,6 +550,12 @@ export const SKILL_TERMS = {
     'multiplication:mult_break_apart': ['break apart a fact', 'distributive property', 'break apart strategy', 'split a multiplication fact', 'decompose a factor', '6 x 7 = 6 x 5 + 6 x 2', 'distributive property of multiplication'],
     'multiplication:area_model_2by1': ['area model 2 digit by 1 digit', 'box method 2 digit by 1 digit', 'area model multiplication', 'grid method', 'partial products 2 digit by 1 digit', 'multiply 2 digit by 1 digit area model'],
     'multiplication:area_model_3by1': ['area model 3 digit by 1 digit', 'box method 3 digit by 1 digit', 'area model multiplication', 'grid method', 'partial products 3 digit by 1 digit', 'multiply 3 digit by 1 digit area model'],
+    // PRESET skills, 2026-11-20 (lane lf-ops sizes).
+    'multiplication:area_model_4by1': ['area model 4 digit by 1 digit', 'box method 4 digit by 1 digit', 'grid method 4 digit by 1 digit', 'partial products 4 digit by 1 digit', 'multiply 4 digit by 1 digit area model', 'thousands area model'],
+    'multiplication:area_model_2by2': ['area model 2 digit by 2 digit', 'box method 2 digit by 2 digit', 'grid method 2 digit by 2 digit', 'partial products 2 digit by 2 digit', 'multiply 2 digit by 2 digit area model', 'four partial products'],
+    'multiplication:area_model_3by2': ['area model 3 digit by 2 digit', 'box method 3 digit by 2 digit', 'grid method 3 digit by 2 digit', 'partial products 3 digit by 2 digit', 'multiply 3 digit by 2 digit area model', 'six partial products'],
+    'multiplication:mult_4by1_column': ['4 digit by 1 digit', '4 digit by 1 digit multiplication', 'multiply 4 digit by 1 digit', 'multiply thousands by one digit', 'short multiplication 4 digit', 'column multiplication 4 digit by 1 digit'],
+    'multiplication:mult_3by2_standard': ['3 digit by 2 digit', '3 digit by 2 digit multiplication', 'multiply 3 digit by 2 digit', 'long multiplication 3 digit by 2 digit', 'standard algorithm 3 digit by 2 digit', 'partial products rows placeholder zero'],
     'multiplication:mult_arrays': ['arrays', 'rows and columns', 'rows of dots', 'array multiplication', 'multiplication arrays', 'repeated addition array'],
     'multiplication:mult_equal_groups': ['equal groups', 'groups of', 'rings of dots', 'equal groups multiplication', 'how many groups', 'make equal groups'],
     'multiplication:mult_by_ten': ['multiply by 10', 'times 10', 'x 10', 'multiplying by ten', 'ten times bigger', 'multiply by tens'],

@@ -3486,22 +3486,27 @@
   },
   "Y5.B5.S1": {
    "title": "Multiply up to a 4-digit number by a 1-digit number",
-   "direct": [],
-   "partial": [
+   "direct": [
     {
-     "key": "multiplication:area_model_mult",
-     "opts": {
-      "tiles": 31
-     },
-     "missing": "4-digit × 1-digit: sizes stop at 3-digit × 1-digit"
+     "key": "multiplication:mult_4by1_column"
+    },
+    {
+     "key": "multiplication:area_model_4by1"
     }
    ],
-   "verdict": "partial",
-   "missing": "multiplying a 4-digit number by a 1-digit number (column method and area model)",
-   "build": [
-    "mult_4x1"
-   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_3by1_column",
+     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (the size below: one digit fewer)"
+    },
+    {
+     "key": "multiplication:area_model_3by1",
+     "why": "Y4.B5.S10 the area model with three parts (the size below)"
+    },
     {
      "key": "multiplication:multiply",
      "opts": {
@@ -3579,10 +3584,7 @@
    "title": "Multiply a 2-digit number by a 2-digit number (area model)",
    "direct": [
     {
-     "key": "multiplication:area_model_mult_hard",
-     "opts": {
-      "tiles": 22
-     }
+     "key": "multiplication:area_model_2by2"
     }
    ],
    "partial": [],
@@ -3590,6 +3592,10 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "multiplication:area_model_2by1",
+     "why": "Y4.B5.S9 the area model of 2-digit x 1-digit (one row; here the second factor splits too)"
+    },
     {
      "key": "multiplication:area_model_mult",
      "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (prior learning wk W11)"
@@ -3633,6 +3639,10 @@
     {
      "key": "number_sense:estimate_products",
      "why": "estimate the product"
+    },
+    {
+     "key": "multiplication:mult_2by2_standard",
+     "why": "the same product in the column (Y5.B5.S3)"
     }
    ],
    "note": "The legacy area-model drawing moves to the kit with vis_area_model_rows; content is complete."
@@ -3641,10 +3651,7 @@
    "title": "Multiply a 2-digit number by a 2-digit number",
    "direct": [
     {
-     "key": "multiplication:multiply",
-     "opts": {
-      "tiles": 22
-     }
+     "key": "multiplication:mult_2by2_standard"
     }
    ],
    "partial": [
@@ -3661,11 +3668,12 @@
    "build": [],
    "pre": [
     {
-     "key": "multiplication:multiply",
-     "opts": {
-      "tiles": 21
-     },
-     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea)"
+     "key": "multiplication:area_model_2by2",
+     "why": "Y5.B5.S2 the four partial products of the 2 x 2 area model (previous step)"
+    },
+    {
+     "key": "multiplication:mult_2by1_column",
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (each partial-product row)"
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3707,7 +3715,14 @@
   },
   "Y5.B5.S4": {
    "title": "Multiply a 3-digit number by a 2-digit number",
-   "direct": [],
+   "direct": [
+    {
+     "key": "multiplication:mult_3by2_standard"
+    },
+    {
+     "key": "multiplication:area_model_3by2"
+    }
+   ],
    "partial": [
     {
      "key": "multiplication:mult_placeholder_zero",
@@ -3715,41 +3730,26 @@
       "tiles": 32
      },
      "missing": "the full long multiplication: only the placeholder 0 of row two is asked"
-    },
-    {
-     "key": "multiplication:area_model_mult_hard",
-     "opts": {
-      "tiles": 23
-     },
-     "missing": "3-digit × 2-digit by the area model only; the column (long) multiplication layout is not dealt"
     }
    ],
-   "verdict": "partial",
-   "missing": "the whole column (long) multiplication of a 3-digit by a 2-digit number (multiply tiles stop at 2-digit × 2-digit)",
-   "build": [
-    "long_mult"
-   ],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
+    {
+     "key": "multiplication:mult_2by2_standard",
+     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step: here the top number has one more digit)"
+    },
+    {
+     "key": "multiplication:area_model_2by2",
+     "why": "Y5.B5.S2 the 2 x 2 area model (here one more column)"
+    },
     {
      "key": "multiplication:mult_placeholder_zero",
      "opts": {
       "tiles": 22
      },
      "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step)"
-    },
-    {
-     "key": "multiplication:multiply",
-     "opts": {
-      "tiles": 22
-     },
-     "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step)"
-    },
-    {
-     "key": "multiplication:area_model_mult_hard",
-     "opts": {
-      "tiles": 22
-     },
-     "why": "Y5.B5.S2 Multiply a 2-digit number by a 2-digit number (area model) (earlier Y5 step)"
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3807,8 +3807,16 @@
    ],
    "pre": [
     {
-     "key": "multiplication:area_model_mult_hard",
+     "key": "multiplication:mult_3by2_standard",
      "why": "Y5.B5.S4 Multiply a 3-digit number by a 2-digit number (previous step)"
+    },
+    {
+     "key": "multiplication:mult_4by1_column",
+     "why": "Y5.B5.S1 Multiply a 4-digit number by a 1-digit number (each partial-product row)"
+    },
+    {
+     "key": "multiplication:area_model_3by2",
+     "why": "Y5.B5.S4 the 3-digit by 2-digit area model (previous step)"
     },
     {
      "key": "multiplication:multiply",

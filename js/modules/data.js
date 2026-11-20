@@ -288,6 +288,8 @@ export const SKILL_GRADES = {
     'compare_to_half': 4, 'near_doubles': 1, 'expanded_notation': 4,     // 4.NF.A.2; 1.OA.C.6; 4.NBT.A.2
     // PRESET skills, batch 2 (2026-10-17): the grade of the lesson the preset IS.
     'mult_break_apart': 3, 'area_model_2by1': 4, 'area_model_3by1': 4, 
+    // PRESET skills, 2026-11-20 (lane lf-ops sizes): 4.NBT.B.5 (4 x 1, 2 x 2); 5.NBT.B.5 (3 x 2)
+    'mult_4by1_column': 4, 'mult_3by2_standard': 5, 'area_model_4by1': 4, 'area_model_2by2': 4, 'area_model_3by2': 5,
     'mult_arrays': 2, 'mult_equal_groups': 3, 'mult_by_ten': 3, 'mult_by_hundred': 4, 'count_by_2s': 2,
     'count_by_3s': 3, 'count_by_4s': 3, 'count_by_5s': 2, 'count_by_6s': 3, 'count_by_7s': 3,
     'count_by_8s': 3, 'count_by_9s': 3, 'count_by_10s': 2, 'count_by_11s': 3, 'count_by_12s': 3,
@@ -834,6 +836,12 @@ export const SKILLS = {
         { v: "count_by_12s", l: "Count by 12s", presetOf: "count_by_tables" },
         // APPENDED 2026-11-14 — PRESET (owner, lane lf-ops t15): the times tables on to 15 x 15 (mult_facts, Tables to 15 x 15).
         { v: "mult_facts_15", l: "Multiplication Facts to 15 × 15", presetOf: "mult_facts" },
+        // APPENDED 2026-11-20 (lane lf-ops sizes, card mult-sizes) — PRESET skills: the missing size pairs.
+        { v: "mult_4by1_column", l: "Multiply 4-Digit by 1-Digit Numbers (Column)", presetOf: "multiply" },
+        { v: "mult_3by2_standard", l: "Multiply 3-Digit by 2-Digit Numbers (Standard Algorithm)", presetOf: "multiply" },
+        { v: "area_model_4by1", l: "Area Model: Multiply 4-Digit by 1-Digit", presetOf: "area_model_mult" },
+        { v: "area_model_2by2", l: "Area Model: Multiply 2-Digit by 2-Digit", presetOf: "area_model_mult_hard" },
+        { v: "area_model_3by2", l: "Area Model: Multiply 3-Digit by 2-Digit", presetOf: "area_model_mult_hard" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (÷1 to ÷12)" },

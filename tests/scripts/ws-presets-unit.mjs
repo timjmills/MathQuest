@@ -38,6 +38,20 @@ const check = (ok, msg) => { if (!ok) failures.push(msg); };
 const J = JSON.stringify;
 const entries = Object.entries(presets.SKILL_PRESETS);
 check(entries.length >= 10, `only ${entries.length} presets`);
+// lf-ops sizes (lead 2026-11-19, card design/cards/mult-sizes): every multiplication size pair is a preset of its host.
+const SIZE_PRESETS = {
+    'multiplication:mult_2by1_column': ['multiply', 21], 'multiplication:mult_3by1_column': ['multiply', 31],
+    'multiplication:mult_4by1_column': ['multiply', 41], 'multiplication:mult_2by2_standard': ['multiply', 22],
+    'multiplication:mult_3by2_standard': ['multiply', 32],
+    'multiplication:area_model_2by1': ['area_model_mult', 21], 'multiplication:area_model_3by1': ['area_model_mult', 31],
+    'multiplication:area_model_4by1': ['area_model_mult', 41],
+    'multiplication:area_model_2by2': ['area_model_mult_hard', 22], 'multiplication:area_model_3by2': ['area_model_mult_hard', 23],
+};
+for (const [key, [host, tiles]] of Object.entries(SIZE_PRESETS)) {
+    const p = presets.SKILL_PRESETS[key];
+    check(p && p.skill === host && p.opts && p.opts.tiles === tiles && Object.keys(p.opts).length === 1,
+        `${key}: the size preset must open ${host} with {tiles: ${tiles}} (got ${J(p)})`);
+}
 
 for (const [key, p] of entries) {
     const [cat, id] = key.split(':');
@@ -109,7 +123,25 @@ function makeObey() {
     const nd = (n) => String(Math.abs(Math.trunc(n))).length;
     return {
         // `tiles` on multiply / divide: "21" = a 2-digit number by a 1-digit one (the dividend for ÷)
-        tiles: (q, v, host) => { if (!['multiply', 'divide'].includes(host)) return null; const o = rd(q); return o ? nd(o[0]) === Math.floor(+v / 10) && nd(o[1]) === +v % 10 : null; },
+        // lf-ops sizes (2026-11-20): multiply sizes with a 2-digit multiplier are drawn on the kit long-multiplication cell
+        // (lead Q3); the area hosts read the item's areaModelData: area_model_mult "41" = a 4-digit number split into parts
+        // times a 1-digit multiplier; area_model_mult_hard "23" = the 3-digit factor written FIRST (lead Q2: "135 × 24").
+        tiles: (q, v, host) => {
+            const da = Math.floor(+v / 10), db = +v % 10, am = q.areaModelData;
+            if (host === 'area_model_mult') return am ? nd(am.multiplicand) === da && nd(am.multiplier) === db : null;
+            if (host === 'area_model_mult_hard') {
+                if (!am) return null;
+                const m = /([\d,]+)\s*×\s*([\d,]+)/.exec(String(q.text || ''));
+                if (!m) return false;
+                const f = +m[1].replace(/,/g, ''), s = +m[2].replace(/,/g, '');
+                return +v === 23 ? nd(f) === 3 && nd(s) === 2 : nd(f) === da && nd(s) === db;
+            }
+            if (!['multiply', 'divide'].includes(host)) return null;
+            const o = rd(q);
+            if (!o) return null;
+            if (host === 'multiply' && db >= 2 && !(q.cell && q.cell.template === 'long-multiplication')) return false;
+            return nd(o[0]) === da && nd(o[1]) === db;
+        },
         lengths: (q, v) => { const o = rd(q); if (!o) return null; return v === 'shorter' ? nd(o[1]) < nd(o[0]) : v === 'same' ? nd(o[1]) === nd(o[0]) : null; },
         // "within N" bounds the answer: the sum / product, the minuend / dividend
         band: (q, v, host, cat) => { const o = rd(q); if (!o || !Number.isFinite(+v)) return null; const named = cat === 'addition' || cat === 'multiplication' ? Number(String(q.ans).replace(/,/g, '')) : o[0]; return Number.isFinite(named) ? named <= +v : null; },
@@ -136,7 +168,13 @@ if (process.argv.includes('--self-test')) {
     t(O.tiles({ a: 47, b: 6 }, 21, 'multiply') === true, 'tiles 21: 47 × 6 obeys');
     t(O.tiles({ a: 47, b: 36 }, 21, 'multiply') === false, 'tiles 21: 47 × 36 (a 2 × 2 item) breaks it');
     t(O.tiles({ text: '96 ÷ 4 = ?' }, 21, 'divide') === true, 'tiles 21 ÷: read from the text');
-    t(O.tiles({ a: 4, b: 3 }, 21, 'area_model_mult') === null, 'tiles on another host: no predicate');
+    t(O.tiles({ a: 4, b: 3 }, 21, 'add') === null, 'tiles on another host: no predicate');
+    t(O.tiles({ areaModelData: { multiplier: 7, multiplicand: 3456 } }, 41, 'area_model_mult') === true, 'area 41: 7 × 3,456 obeys');
+    t(O.tiles({ areaModelData: { multiplier: 4, multiplicand: 215 } }, 41, 'area_model_mult') === false, 'area 41: 4 × 215 breaks it');
+    t(O.tiles({ text: 'Use the area model to find 135 × 24', areaModelData: {} }, 23, 'area_model_mult_hard') === true, 'area 23: 3-digit first');
+    t(O.tiles({ text: 'Use the area model to find 24 × 135', areaModelData: {} }, 23, 'area_model_mult_hard') === false, 'area 23: 2-digit first breaks it');
+    t(O.tiles({ a: 215, b: 36, cell: { template: 'long-multiplication' } }, 32, 'multiply') === true, 'multiply 32 on long-multiplication');
+    t(O.tiles({ a: 47, b: 36 }, 22, 'multiply') === false, 'multiply 22 off the long-multiplication cell breaks it');
     t(O.lengths({ cell: { payload: { operands: [57, 3] } } }, 'shorter') === true && O.lengths({ a: 57, b: 23 }, 'shorter') === false, 'lengths shorter');
     t(O.band({ a: 7, b: 5, ans: 12 }, 10, 'add', 'addition') === false && O.band({ a: 9, b: 4, ans: 5 }, 10, 'sub', 'subtraction') === true, 'band bounds the sum / the minuend');
     t(O.band({ text: 'no numbers' }, 10, 'x', 'addition') === null, 'band: unreadable is null');
@@ -146,7 +184,7 @@ if (process.argv.includes('--self-test')) {
     t(O._spread(subs(21, 99), 'subtraction').ok === true, 'spread: minuends 21-99 span the class');
     t(O._spread([{ a: 12, b: 3, ans: 36 }, { a: 98, b: 7, ans: 686 }].concat(subs(10, 99).map((x) => ({ a: x.a, b: 2, ans: x.a * 2 }))), 'multiplication') === null, 'spread: a product of several lengths is not judged');
     for (const b of bad) console.error('  - ' + b);
-    console.log(bad.length ? `ws-presets-unit: FAIL - self-test (${bad.length})` : 'ws-presets-unit: OK (self-test, 10 predicate cases)');
+    console.log(bad.length ? `ws-presets-unit: FAIL - self-test (${bad.length})` : 'ws-presets-unit: OK (self-test, 16 predicate cases)');
     process.exit(bad.length ? 1 : 0);
 }
 

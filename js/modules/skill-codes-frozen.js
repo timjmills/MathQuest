@@ -384,6 +384,10 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-11-14 lane lf-ops t15 presets (mult_facts / div_facts at "Tables to 15 x 15"). ZH and ZJ (no I or O in a code), the next free codes
     // after ZG. APPEND ONLY. ----
     "multiplication:mult_facts_15": "ZH", "division:div_facts_15": "ZJ",
+    // ---- 2026-11-20 lane lf-ops sizes presets (card mult-sizes: the missing multiplication size pairs). ZK-ZP, the next free
+    // codes after ZJ (NOT the auto assigner's VH, a dropped draft). APPEND ONLY. ----
+    "multiplication:mult_4by1_column": "ZK", "multiplication:mult_3by2_standard": "ZL", "multiplication:area_model_4by1": "ZM",
+    "multiplication:area_model_2by2": "ZN", "multiplication:area_model_3by2": "ZP",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

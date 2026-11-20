@@ -2809,10 +2809,19 @@ function _generateSizedMultDiv(q, skill, helpers) {
             q.notation = 'stacked';
             if (notationFor('×') === 'across') q.notationClampedFrom = 'across';
             const payload = { operands: [a, b], op: '*', ansDigits: String(hi(da) * hi(db)).length };
-            q.visual = _kitStackTwin(payload);
-            // 2-digit × 2-digit needs its partial-product rows on paper: the column-mult cell.
-            if (db >= 2) q.printFormat = 'column-mult';
-            else { q.cell = { template: 'stack', v: 1, payload }; q.printFormat = 'column-mult'; }
+            if (db >= 2) {
+                // lf-ops sizes (lead Q3, card mult-sizes): a 2-digit multiplier (22, 32) is drawn on the kit
+                // long-multiplication cell: two partial-product rows, the placeholder place outlined and the carry
+                // boxes (support 1: structural, they stay), the answer strip the only graded places. The legacy
+                // column-mult format stays as the printFormat so the legacy path still renders it.
+                const lm = { a, b, level: 1 };
+                q.cell = { template: 'long-multiplication', v: 1, payload: lm };
+                q.visual = _kitTwin('long-multiplication', lm, { join: '' });
+                q.printFormat = 'column-mult';
+            } else {
+                q.visual = _kitStackTwin(payload);
+                q.cell = { template: 'stack', v: 1, payload }; q.printFormat = 'column-mult';
+            }
         }
         q.skillLabel = 'Multiply';
         return true;
@@ -5034,7 +5043,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // LRU rotation across the two problem-size variants.
                 // P12: `tiles` 21 / 31 fixes the size (2- or 3-digit × 1-digit); unset, both rotate.
                 const _amT = Number(_opt('tiles'));
-                const problemType = _amT === 21 ? '2digit' : _amT === 31 ? '3digit'
+                // lf-ops sizes: `tiles` 41 (a 4-digit number in four parts) only when chosen; the default never deals it.
+                const problemType = _amT === 21 ? '2digit' : _amT === 31 ? '3digit' : _amT === 41 ? '4digit'
                     : (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('area_model_mult', ['2digit', '3digit'], [3, 2])
                     : (Math.random() < 0.6 ? '2digit' : '3digit');
@@ -5048,6 +5058,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const ones = rng(1, 9);
                     multiplicand = tens + ones;
                     parts = [{ value: tens }, { value: ones }];
+                } else if (problemType === '4digit') {
+                    // 4-digit × 1-digit (Y5.B5.S1): one more part than 3 × 1, the multiplier 2-6 like 3 × 1
+                    multiplier = rng(2, 6);
+                    const thousands = rng(1, 9) * 1000;
+                    const hundreds = rng(1, 9) * 100;
+                    const tens = rng(1, 9) * 10;
+                    const ones = rng(1, 9);
+                    multiplicand = thousands + hundreds + tens + ones;
+                    parts = [{ value: thousands }, { value: hundreds }, { value: tens }, { value: ones }];
                 } else {
                     multiplier = rng(2, 6);
                     const hundreds = rng(1, 3) * 100;
@@ -5121,7 +5140,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 
                 const product = num1 * num2;
                 q.ans = product;
-                q.text = `Use the area model to find ${num1} × ${num2}`;
+                // lf-ops sizes (lead Q2): the 2 × 3 grid IS 3-digit × 2-digit: the 3-digit factor is written first
+                const colsFirst = problemType === '2x3';
+                q.text = colsFirst ? `Use the area model to find ${num2} × ${num1}` : `Use the area model to find ${num1} × ${num2}`;
                 q.hint = `Break ${num1} into ${rowParts.join(' + ')} and ${num2} into ${colParts.join(' + ')}. Find each rectangle's area, then add them all.`;
                 q.answerType = "area-model";
                 q.areaModelData = { 
@@ -5129,12 +5150,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     isGrid: true,
                     gridType: problemType
                 };
+                if (colsFirst) q.areaModelData.colsFirst = true;
                 q.printFormat = "area-model-mult-hard";
                 
                 // r12b: the kit's grid (black line art, every box keyed) for every edges choice.
                 const _amhE = _amEdges('area_model_mult_hard');
                 {   // r12b: every item draws the kit grid (defaults too: black and white, the design contract)
                     const _amhPayload = { multiplier: num1, rows: rowParts.slice(), parts: colParts.slice(), product, uid: `amh${num1}x${num2}` };
+                    if (colsFirst) _amhPayload.colsFirst = true;
                     if (_amhE === 'blank') _amhPayload.edges = 'blank';
                     q.cell = { template: 'area-model', v: 1, payload: _amhPayload };
                     q.visual = _kitTwin('area-model', _amhPayload);

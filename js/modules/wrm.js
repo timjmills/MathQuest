@@ -1122,6 +1122,12 @@ export const SKILL_WRM = {
     'multiplication:mult_break_apart': [{ step: 'Y4.B5.S15', partial: 'breaking a fact apart into two easier facts' }],
     'multiplication:area_model_2by1': ['Y3.B4.S4', 'Y4.B5.S9'],
     'multiplication:area_model_3by1': ['Y4.B5.S10'],
+    // PRESET skills, 2026-11-20 (lane lf-ops sizes, card mult-sizes): each the lesson of its step in G4-Y5.B5.
+    'multiplication:mult_4by1_column': ['Y5.B5.S1'],
+    'multiplication:area_model_4by1': [{ step: 'Y5.B5.S1', partial: 'the area model with four parts (the column method is mult_4by1_column)' }],
+    'multiplication:area_model_2by2': ['Y5.B5.S2'],
+    'multiplication:mult_3by2_standard': ['Y5.B5.S4'],
+    'multiplication:area_model_3by2': [{ step: 'Y5.B5.S4', partial: 'the area model, a 2 x 3 grid (the column method is mult_3by2_standard)' }],
     'multiplication:mult_arrays': ['Y1.B9.S6', 'Y2.B5.S6', 'Y3.B3.S2'],
     'multiplication:mult_equal_groups': ['Y1.B9.S5', 'Y2.B5.S3', 'Y3.B3.S1'],
     'multiplication:mult_by_ten': ['Y3.B4.S1', 'Y4.B5.S3'],
@@ -2385,8 +2391,8 @@ export const WRM_PROPOSALS = {
         teaches: 'long multiplication of a 4-digit by a 2-digit number, short division of a 4-digit number, and choosing an efficient division method',
         representation: 'a column grid with carry boxes and the placeholder row; option: short division bus stop with exchange boxes',
         family: 'operations',
-        steps: ['Y5.B5.S1', 'Y5.B5.S5', 'Y5.B5.S8', 'Y5.B5.S10'],
-        improves: ['Y6.B2.S7'],
+        steps: ['Y5.B5.S5', 'Y5.B5.S8', 'Y5.B5.S10'],   // Y5.B5.S1 covered 2026-11-20 (mult_4by1_column, area_model_4by1)
+        improves: ['Y6.B2.S7', 'Y5.B5.S1'],
     },
     div_factors: {
         kind: 'new', skill: 'division:divide_using_factors',

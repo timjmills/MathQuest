@@ -167,6 +167,13 @@ export const SKILL_PRESETS = Object.freeze({
     // mult_facts and div_facts ("Tables to 15 x 15").
     'multiplication:mult_facts_15': { skill: 'mult_facts', opts: { band: 225 } },
     'division:div_facts_15': { skill: 'div_facts', opts: { band: 225 } },
+    // 2026-11-20 (lead, lane lf-ops sizes, card design/cards/mult-sizes): the missing multiplication size pairs, each its own
+    // lesson in unit G4-Y5.B5 (Y5.B5.S1 / S2 / S4).
+    'multiplication:mult_4by1_column': { skill: 'multiply', opts: { tiles: 41 } },
+    'multiplication:mult_3by2_standard': { skill: 'multiply', opts: { tiles: 32 } },
+    'multiplication:area_model_4by1': { skill: 'area_model_mult', opts: { tiles: 41 } },
+    'multiplication:area_model_2by2': { skill: 'area_model_mult_hard', opts: { tiles: 22 } },
+    'multiplication:area_model_3by2': { skill: 'area_model_mult_hard', opts: { tiles: 23 } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

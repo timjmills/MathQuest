@@ -22,9 +22,9 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
+- Covered 514 (59%), partial only 150 (17%), gap 208 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 404 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 409 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -33,9 +33,9 @@ Sources:
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 19 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
-| Year 5 | 4 | 15 | 136 | 81 (60%) | 23 | 32 |
+| Year 5 | 4 | 15 | 136 | 82 (60%) | 22 | 32 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **151** | **208** |
+| **All** | | **97** | **872** | **514 (59%)** | **150** | **208** |
 
 ## Source disagreements
 
@@ -468,7 +468,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B2.S4 Rules of divisibility  
   _proposal id: divisibility_rules_
 
-### operations (27 proposals, 54 steps)
+### operations (27 proposals, 53 steps)
 
 - **Share and Make Groups** — new skill `division:share_and_group_early`. Teaches sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly. Representation: counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair.  
   Closes (13): R.B9.S6 Make pairs-odd and even; R.B9.S8 Double to 8 (make a double); R.B11.S10 Bonds to 10 (3 parts); R.B11.S12 Doubles to 10 (make a double); R.B11.S13 Explore even and odd; R.B14.S2 How many did I add; R.B14.S4 How many did I take away; R.B16.S1 Explore sharing; R.B16.S2 Sharing; R.B16.S3 Explore grouping; R.B16.S5 Even and odd sharing; Y1.B9.S9 Make equal groups - sharing; Y2.B5.S8 Make equal groups – sharing  
@@ -484,8 +484,8 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (4): Y3.B3.S15 The 2, 4 and 8 times-tables; Y4.B4.S6 The 3, 6 and 9 times-tables; Y4.B5.S7 Related facts – multiplication and division; Y4.B5.S15 Efficient multiplication  
   _proposal id: tables_links_
 - **Long Multiplication and Division (4-digit)** — new skill `multiplication:long_multiplication_4x2`. Teaches long multiplication of a 4-digit by a 2-digit number, short division of a 4-digit number, and choosing an efficient division method. Representation: a column grid with carry boxes and the placeholder row; option: short division bus stop with exchange boxes.  
-  Closes (4): Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number; Y5.B5.S5 Multiply a 4-digit number by a 2-digit number; Y5.B5.S8 Divide a 4-digit number by a 1-digit number; Y5.B5.S10 Efficient division  
-  Strengthens: Y6.B2.S7  
+  Closes (3): Y5.B5.S5 Multiply a 4-digit number by a 2-digit number; Y5.B5.S8 Divide a 4-digit number by a 1-digit number; Y5.B5.S10 Efficient division  
+  Strengthens: Y6.B2.S7, Y5.B5.S1  
   _proposal id: long_mult_
 - **Bonds to 100** — new skill `addition:bonds_to_100`. Teaches pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10. Representation: a hundred square or bead string with part shaded; part-whole diagram; write the missing part.  
   Closes (2): Y2.B2.S4 Bonds to 100 (tens); Y3.B2.S19 Complements to 100  
@@ -3048,18 +3048,21 @@ whatever happens to the WRM gaps.
 
 #### Y5.B5 Spring Block 1: Multiplication and division B
 
-- **Y5.B5.S1** Multiply up to a 4-digit number by a 1-digit number — PARTIAL. _4.NBT.B.5_  
+- **Y5.B5.S1** Multiply up to a 4-digit number by a 1-digit number — covered. _4.NBT.B.5_  
+  Skills: Multiply 4-Digit by 1-Digit Numbers (Column) (`multiplication:mult_4by1_column`)  
   Partial: Basic Multiplication (`multiplication:multiply`), missing 4-digit × 1-digit (the largest size is 3-digit × 1-digit)  
+  Partial: Area Model: Multiply 4-Digit by 1-Digit (`multiplication:area_model_4by1`), missing the area model with four parts (the column method is mult_4by1_column)  
   Proposal: Long Multiplication and Division (4-digit)  
   Vocabulary: column, exchange, estimate  
 - **Y5.B5.S2** Multiply a 2-digit number by a 2-digit number (area model) — covered. _4.NBT.B.5_  
-  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 2}  
+  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 2}; Area Model: Multiply 2-Digit by 2-Digit (`multiplication:area_model_2by2`)  
   Vocabulary: partition, area model, partial product, total product  
 - **Y5.B5.S3** Multiply a 2-digit number by a 2-digit number — covered. _4.NBT.B.5_  
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 2-digit}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`); Multiply 2-Digit by 2-Digit Numbers (Standard Algorithm) (`multiplication:mult_2by2_standard`)  
   Vocabulary: partial product, place holder, exchange  
 - **Y5.B5.S4** Multiply a 3-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
-  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 3}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
+  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 3}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`); Multiply 3-Digit by 2-Digit Numbers (Standard Algorithm) (`multiplication:mult_3by2_standard`)  
+  Partial: Area Model: Multiply 3-Digit by 2-Digit (`multiplication:area_model_3by2`), missing the area model, a 2 x 3 grid (the column method is mult_3by2_standard)  
   Vocabulary: place holder, exchange  
 - **Y5.B5.S5** Multiply a 4-digit number by a 2-digit number — PARTIAL. _5.NBT.B.5, M.EE.5.NBT.5_  
   Partial: Write the Placeholder Zero (`multiplication:mult_placeholder_zero`), missing a 4-digit by 2-digit long multiplication worked to the end  

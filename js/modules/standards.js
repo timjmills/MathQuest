@@ -729,6 +729,12 @@ export const SKILL_STANDARDS = {
     'multiplication:mult_break_apart': { ccss: ['3.OA.B.5'], ee: [] }, // Break Apart a Fact (Distributive Property)
     'multiplication:area_model_2by1': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 2-Digit by 1-Digit
     'multiplication:area_model_3by1': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 3-Digit by 1-Digit
+    // PRESET skills, 2026-11-20 (lane lf-ops sizes, card mult-sizes): the missing size pairs.
+    'multiplication:mult_4by1_column': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Multiply 4-Digit by 1-Digit Numbers (Column)
+    'multiplication:mult_3by2_standard': { ccss: ['5.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Multiply 3-Digit by 2-Digit Numbers (Standard Algorithm)
+    'multiplication:area_model_4by1': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 4-Digit by 1-Digit
+    'multiplication:area_model_2by2': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 2-Digit by 2-Digit
+    'multiplication:area_model_3by2': { ccss: ['5.NBT.B.5', '4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 3-Digit by 2-Digit
     'multiplication:mult_arrays': { ccss: ['2.OA.C.4', '3.OA.A.1'], ee: ['M.EE.2.OA.4', 'M.EE.3.OA.1'] }, // Arrays: Rows of Dots
     'multiplication:mult_equal_groups': { ccss: ['3.OA.A.1', '2.OA.C.4'], ee: ['M.EE.3.OA.1'] }, // Equal Groups: Rings of Dots
     'multiplication:mult_by_ten': { ccss: ['3.NBT.A.3', '4.NBT.A.1'], ee: ['M.EE.3.NBT.3'] }, // Multiply by 10

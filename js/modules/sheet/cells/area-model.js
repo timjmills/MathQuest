@@ -162,7 +162,9 @@ function renderExt(p, ctx, wMm) {
         + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(sideMm)};margin-bottom:0.1em">${top}</div>`
         + rowHtml + workRow
         + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">`
-        + `<span>${esc(A)}</span><span style="font-weight:700;width:1em;text-align:center">×</span><span>${esc(B)}</span>`
+        // payload.colsFirst (lf-ops sizes, lead Q2): the equation reads the top factor first ("135 × 24" for a 3-digit
+        // by 2-digit grid); the grid itself is unchanged.
+        + `<span>${esc(p.colsFirst ? B : A)}</span><span style="font-weight:700;width:1em;text-align:center">×</span><span>${esc(p.colsFirst ? A : B)}</span>`
         + `<span style="font-weight:700;width:1em;text-align:center">=</span>${totalSlot}</div></div>`;
     return root(g, 'area-model', model, 'text-align:center;white-space:nowrap;', wMm);
 }

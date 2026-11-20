@@ -205,6 +205,9 @@ function areaModel(q) {
     if (Array.isArray(d.rowParts) && Array.isArray(d.colParts)) {
         const rows = d.rowParts.map(num);
         const cols = d.colParts.map(num);
+        // colsFirst (lf-ops sizes, lead Q2): "135 × 24" - the top factor is read first, so the Model and the Say band
+        // name it first; the grid's rows and columns do not move.
+        if (d.colsFirst) return { grid: true, colsFirst: true, a: num(d.num2), b: num(d.num1), rows, cols, product: num(d.product) };
         return { grid: true, a: num(d.num1), b: num(d.num2), rows, cols, product: num(d.product) };
     }
     if (Array.isArray(d.parts)) {
@@ -219,7 +222,8 @@ function areaSteps(q) {
     const M = areaModel(q);
     if (!M) return [];
     const out = [];
-    if (M.grid) out.push(step(`Split ${M.a} into ${M.rows.join(' + ')}. Split ${M.b} into ${M.cols.join(' + ')}.`));
+    if (M.grid && M.colsFirst) out.push(step(`Split ${M.a} into ${M.cols.join(' + ')}. Split ${M.b} into ${M.rows.join(' + ')}.`));
+    else if (M.grid) out.push(step(`Split ${M.a} into ${M.rows.join(' + ')}. Split ${M.b} into ${M.cols.join(' + ')}.`));
     else out.push(step(`Split ${M.b} into ${M.cols.join(' + ')}.`));
     const partials = [];
     M.rows.forEach((r, i) => {
