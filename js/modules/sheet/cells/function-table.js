@@ -187,6 +187,10 @@ export function ftAnswerMatches(value, p) {
 /* ================================================================== geometry */
 
 const BOX_MIN_MM = { S: 14, M: 14, L: 16 };
+/** The least a screen answer slot measures, both ways (RUBRIC H6: 48 px touch targets for tablets, owner 2026-11-13). */
+const TARGET_PX = 48;
+/** The slot's own size that leaves its input TARGET_PX inside the hairline border (box-sizing: border-box). */
+const TARGET_MIN = `calc(${TARGET_PX}px + 2 * ${HAIR})`;
 
 function dims(p, g) {
     const rowH = g.writeMm + 4;                         // XP-D-15: cell height Hw + 4 mm
@@ -248,9 +252,12 @@ function tableWidth(p, d) {
 
 /* ================================================================== drawing */
 
-/** A text run at the text size (relative to the digit-size root). */
+/** A text run at the text size (relative to the digit-size root). On a screen twin never under its print pt: the online
+ *  worksheet's root (its --mq-digit) drew "In" / "Out" at 15.5 px against the print 13 pt (ws-screen-ink-size TEXT-SIZE
+ *  label, patterns precritic 2026-11-20 A3b); a host whose root is larger keeps the em. */
+const fsOf = (g, em) => (g.twin ? `max(${em.toFixed(3)}em, ${(em * g.pt).toFixed(2)}pt)` : `${em.toFixed(3)}em`);
 const txt = (g, s, { bold = false, em = null } = {}) =>
-    `<span style="font-size:${(em || g.textEm).toFixed(3)}em;font-weight:${bold ? 700 : 400};white-space:nowrap">${s}</span>`;
+    `<span style="font-size:${fsOf(g, em || g.textEm)};font-weight:${bold ? 700 : 400};white-space:nowrap">${s}</span>`;
 
 /** The variable n: upright (TY-2 allows no italic). Never x, which reads as the times sign (R3). */
 const X = '<span style="font-weight:400">n</span>';
@@ -279,7 +286,7 @@ function machine(p, g, d, wMm, merged = null) {
     }
     // (`machineText` {text, grey}: an anchor-chart step state writes the rule it is trying in the box - detailed lesson 5)
     const mt = p.machineText;
-    const inner = mt ? `<span style="font-size:${g.textEm.toFixed(3)}em;font-weight:700;white-space:nowrap;color:${mt.grey ? INK.grey : INK.ink}">${esc(mt.text)}</span>`
+    const inner = mt ? `<span style="font-size:${fsOf(g, g.textEm)};font-weight:700;white-space:nowrap;color:${mt.grey ? INK.grey : INK.ink}">${esc(mt.text)}</span>`
         : given ? txt(g, ruleHtml(p.rule), { bold: true }) : txt(g, 'rule');
     const boxH = d.machineH;
     // (`machineTried`: the wrong try of a chart's whole example, crossed, on a line above the machine - lesson 5 r2)
@@ -300,6 +307,9 @@ function slotBox(g, s, d, vals, ink, extra = {}) {
     const shape = s.kind === 'sign' ? 'circle' : s.kind === 'rule' ? 'line' : 'box';
     const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink: typeof ink === 'function' ? ink(s.id) : ink, mark: 'cell', shape, ...extra };
     if (s.kind === 'sign') { o.wMm = extra.hMm || d.signW; o.hMm = extra.hMm || d.signW; o.extra = 'border-radius:50%;'; }
+    // (a screen twin's answer slot is a 48 px target both ways, whatever the host's root: the online worksheet at 820 / 1024
+    // drew 48 x 42 px, ws-grade-render TARGET H6, patterns precritic 2026-11-20 A3b; later declarations win in the style)
+    if (g.twin) o.extra = `${o.extra || ''}width:max(${g.em(o.wMm)}, ${TARGET_MIN});height:max(${g.em(o.hMm)}, ${TARGET_MIN});`;
     let html = box(g, s.id, o);
     if (s.kind === 'rule') {
         // a writing LINE, not a box: the bottom rule only (the design standard's line slot)
@@ -337,7 +347,8 @@ function fixOf(p, ctx, vals, key) {
 function fixBox(g, d, fx, ids, { wMm = null, value = null } = {}) {
     const wrong = fx.keyed && ids.some((id) => String(fx.vals[id] === undefined ? '' : fx.vals[id]) !== String(fx.key[id]));
     const v = wrong ? (value !== null ? value : String(fx.key[ids[0]])) : '';
-    let html = box(g, `x${fx.idx(ids[0])}`, { wMm: wMm || d.boxW, hMm: d.boxH, value: '', ink: null, mark: g.twin ? 'cell' : null });
+    let html = box(g, `x${fx.idx(ids[0])}`, { wMm: wMm || d.boxW, hMm: d.boxH, value: '', ink: null, mark: g.twin ? 'cell' : null,
+        extra: g.twin ? `width:max(${g.em(wMm || d.boxW)}, ${TARGET_MIN});height:max(${g.em(d.boxH)}, ${TARGET_MIN});` : '' });
     // The key's fix is the TEACHER's ink: the solid mark sits on the fix slot itself, so the role
     // never restyles it as the pupil's shown work (its pupil-ink pass skips x<k> slots).
     if (v) html = html.replace(/(data-ws-slot="x\d+")/, '$1 data-ws-ink="solid"').replace(/><\/span>$/, `><span style="color:${INK.ink};font-weight:700;${KEY_FEATURES}">${esc(v)}</span></span>`);
