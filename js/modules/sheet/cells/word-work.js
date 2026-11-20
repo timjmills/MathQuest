@@ -434,7 +434,10 @@ export function tellTwoStep(s1, s2, k = 0) {
     // story's order (groups, each / total, friends); the change is the Step 2 number.
     // A + or − first step, then × or ÷ (msOps addmult / adddiv, brackets): parts in each group / a total shared.
     if ((s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/')) {
-        const n = s2.bottom;
+        // (STORY-WORK, critic GUIDED-NO-MID F1: a × column keeps the larger number on top, so when the Step 1 answer is the smaller
+        // factor it is `bottom` - the story then told it as the box count, "4 boxes" over 4 × 6 = 24; the boxes are the other number)
+        const r1 = s1.op === '/' ? s1.q : s1.ans;
+        const n = s2.op === '*' && s2.bottom === r1 && s2.top !== r1 ? s2.top : s2.bottom;
         if (s2.op === '*') {
             const C = pickAt(WW_CONTAINERS, k * 5 + 1);
             const L = s1.op === '+'
@@ -1094,7 +1097,10 @@ function shownSteps(p, ctx) {
     if (w && p.steps.length === 2 && (w0 || wfrom !== null)) {
         const [s1, s2] = p.steps;
         const n1 = w0 ? (w0 === '-' ? makeStep(Math.max(s1.top, s1.bottom), '-', Math.min(s1.top, s1.bottom)) : makeStep(s1.top, w0, s1.bottom)) : s1;
-        const n2 = n1 ? makeStep(wfrom !== null ? wfrom : (n1.op === '/' ? n1.q : n1.ans), s2.op, s2.bottom) : null;
+        // (STORY-WORK: a × Step 2 whose Step 1 answer is the smaller factor stores it as `bottom`; the story's number is the other)
+        const r1 = s1.op === '/' ? s1.q : s1.ans;
+        const c2 = s2.op === '*' && s2.bottom === r1 && s2.top !== r1 ? s2.top : s2.bottom;
+        const n2 = n1 ? makeStep(wfrom !== null ? wfrom : (n1.op === '/' ? n1.q : n1.ans), s2.op, c2) : null;
         if (n1 && n2) return { steps: [n1, n2], picks: [n1.op, n2.op], ans: wv !== null ? wv : String(n2.op === '/' ? n2.q : n2.ans) };
     }
     if (!wop) return { steps: p.steps, picks: p.steps.map((s) => s.op), ans: wv !== null ? wv : String(p.ans) };
@@ -1404,7 +1410,9 @@ function twoStepBarFor(p, ctx) {
  * a practice page) and never on the screen; marked `data-ws-hint="fade"` so a host that hides hints drops it.
  */
 function midQuestion(p, ctx, wMm = 50, k = 0, minLines = 0) {
-    if (!p || !p.mid || isTwin(ctx) || !(Number(ctx.scaffoldLevel) >= 2)) return '';
+    // (GUIDED-NO-MID, lead 2026-11-20: the Guided page - its Model and its tries, `ctx.guided` - drops it with the bar, so the Model
+    // and its first try share page 1 at M; it stays on the Opener, the Scripted Model and the lesson chart)
+    if (!p || !p.mid || isTwin(ctx) || ctx.guided || !(Number(ctx.scaffoldLevel) >= 2)) return '';
     // (Step 2's line is the story's own question, so both step columns carry a question line and stand level, P-WP-11)
     const t = k === 0 ? p.mid : String(p.lines[p.lines.length - 1] || '');
     return `<div class="mq-wwmid" data-ws-hint="fade" style="max-width:${L(ctx, Math.max(56, wMm))};font-size:${P(ctx, zonePt(ctx))};font-weight:400;line-height:1.25;${minLines ? `min-height:${minLines * 1.25}em;` : ''}">${esc(t)}</div>`;

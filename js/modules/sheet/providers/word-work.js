@@ -57,7 +57,9 @@ export function wordWorkSteps(q) {
         const [s1, s2] = p.steps;
         return [
             step('Read the story two times.', [{ slot: 'ms-read', value: '1' }]),
-            step(`Step 1: ${fmt(s1.a)} ${GLYPH[s1.op]} ${fmt(s1.b)} = ${fmt(s1.ans)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]),
+            // (`hint`, GUIDED-HINT-STEP lead 2026-11-20: the Guided try's grey hint names the sign and the operation only - the full
+            // line gave the try's Step 1 boxes away; the Model, the chart and the Steps band keep the text)
+            withHint(step(`Step 1: ${fmt(s1.a)} ${GLYPH[s1.op]} ${fmt(s1.b)} = ${fmt(s1.ans)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]), opHint(s1.op)),
             step(`Step 2: ${fmt(s2.top)} ${GLYPH[s2.op]} ${fmt(s2.bottom)} = ${fmt(s2.ans)}.`, [{ slot: 'op1', value: GLYPH[s2.op] }]),
             // (no marks: the unit word is written in the Step 2 panel - the chart's closing line, three panels)
             step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`),
@@ -99,6 +101,9 @@ export function wordWorkSteps(q) {
 }
 
 const r10 = (n) => Math.round(n / 10) * 10;
+/** A step's Guided hint (GUIDED-HINT-STEP): the sign and the operation, no number - "Step 1: circle +. Add." */
+const opHint = (op) => `Step 1: circle ${GLYPH[op]}. ${VERB[op]}.`;
+const withHint = (st, hint) => Object.assign(st, { hint });
 /** The x / ÷ step written in the story's order (groups x each; total ÷ friends). */
 const stepText = (st) => (st.op === '*' ? `${fmt(st.a)} × ${fmt(st.b)} = ${fmt(st.ans)}` : st.op === '/' ? `${fmt(st.top)} ÷ ${fmt(st.bottom)} = ${fmt(st.q)}` : `${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} = ${fmt(st.ans)}`);
 
@@ -115,7 +120,7 @@ function twoStepSteps(p) {
         const eq = `${brk ? '(' : ''}${fmt(x(s1))} ${GLYPH[s1.op]} ${fmt(y(s1))}${brk ? ')' : ''} ${GLYPH[s2.op]} ${fmt(s2.bottom)} = n`;
         return [
             step('Read the story two times.'),
-            step(`My equation is ${eq}.`, [{ slot: 'op0', value: GLYPH[s1.op] }, { slot: 'op1', value: GLYPH[s2.op] }]),
+            withHint(step(`My equation is ${eq}.`, [{ slot: 'op0', value: GLYPH[s1.op] }, { slot: 'op1', value: GLYPH[s2.op] }]), 'Write one equation with n.'),
             step(`Work it out: ${stepText(s1)}, then ${stepText(s2)}.`),
             step(`n = ${fmt(p.ans)}.`, [{ slot: 'answer', value: String(p.ans) }]),
         ];
@@ -123,7 +128,7 @@ function twoStepSteps(p) {
     if (p.check) {
         const c = p.check;
         return [
-            step(`Solve: ${stepText(s1)}. ${stepText(s2)}.`, [{ slot: 'answer', value: String(p.ans) }]),
+            withHint(step(`Solve: ${stepText(s1)}. ${stepText(s2)}.`, [{ slot: 'answer', value: String(p.ans) }]), 'Solve both steps. Then estimate.'),
             step(`Round each number: ${fmt(s1.top)} is about ${fmt(c.a)}, ${fmt(s1.bottom)} is about ${fmt(c.b)}, ${fmt(s2.bottom)} is about ${fmt(c.c)}.`),
             step(`Estimate: ${fmt(c.a)} ${GLYPH[s1.op]} ${fmt(c.b)} ${GLYPH[s2.op]} ${fmt(c.c)} = ${fmt(c.est)}.`, [{ slot: 'es-r', value: String(c.est) }]),
             step(`${fmt(p.ans)} is close to ${fmt(c.est)}. Yes.`),
@@ -132,7 +137,7 @@ function twoStepSteps(p) {
     const add = s1.op === '+' || s1.op === '-';
     return [
         step('Read the story two times.', [{ slot: 'ms-read', value: '1' }]),
-        step(`Step 1: ${add ? `circle ${GLYPH[s1.op]}. ` : ''}${stepText(s1)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]),
+        withHint(step(`Step 1: ${add ? `circle ${GLYPH[s1.op]}. ` : ''}${stepText(s1)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]), opHint(s1.op)),
         step(`Step 2: use ${fmt(s1.op === '/' ? s1.q : s1.ans)}. ${stepText(s2)}.`, [{ slot: 'op1', value: GLYPH[s2.op] }]),
         // (no marks, as the x / ÷-first moves: the unit word is written in the Step 2 panel - the chart's closing line, three
         // panels; sheet/lesson-arch/story.js twoState draws the parts)
