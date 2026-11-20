@@ -935,6 +935,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // (not in a band-120 lesson packet: its windows keep to the example's edge columns, and its practice page's rows grid holds the
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
+        let _tw100 = 0;
         const pickWin = () => {
             // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
             // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
@@ -963,7 +964,14 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 }
                 // (critic blanks r4 F2 + PAGEFILL follow-up: band 100's teaching windows sit on rows 41-70, so 1-30 and 71-100 stay fresh and
                 // the practice page's third rows-of-ten grid, 31-60, re-asks only the teaching gaps on 41-60 - ANSWER-REUSE under a third)
-                if (band === 100) r0 = 4;
+                // (critic blanks r5 G1: rows 41-70 alone hold only two disjoint 3x5 windows, so the sheet lost Independent. Guided on
+                // 41-65; Independent on 46-70 and 61-85)
+                if (band === 100) {
+                    // (each call takes the next slot no earlier teaching window holds, so a refused deal moves on and never drops a section)
+                    const slots = [[4, 0], [4, 5], [6, 0], [6, 5], [5, 0], [5, 5], [2, 0], [2, 5]];
+                    const free100 = slots.filter(([a, b]) => !kept.some((k) => !k.shows && k.rows[0] === a && k.cols[0] === b && k.cols.length === 5));
+                    [r0, c0] = free100.length ? free100[(_tw100++) % free100.length] : slots[0];
+                }
             }
             return { rows: Array.from({ length: R }, (_, k) => r0 + k), cols: Array.from({ length: C }, (_, k) => c0 + k) };
         };
