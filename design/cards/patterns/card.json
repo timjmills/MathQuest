@@ -771,14 +771,15 @@
         "values": [
           "10",
           "20",
-          "50"
+          "50",
+          "auto"
         ],
         "d": "offered",
         "skills": [
           "patterns:growing_shape_patterns"
         ],
         "source": "§5.3",
-        "why": "the biggest answer count (Term 4, or Term 10 on far)",
+        "why": "the biggest answer count (Term 4, or Term 10 on far); auto (the default) = 20, or 50 on the Term 10 far task (lead ruling A8b 2026-11-20)",
         "proposed": false
       },
       {
