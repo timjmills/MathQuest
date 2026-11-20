@@ -259,7 +259,7 @@ Each runs as `node tests/scripts/<script> …`.
 10. **The model row leaves white right of the diagram at M (EB-SIDE risk). Fix?** Recommended: Centre the diagram in the width after the bars (as on the mock) and measure EB-SIDE; if a side still passes 30 %, widen the part-whole spacing (gap 22 -> 30 mm) rather than shrink anything.
 11. **The four new instruction strings and the iCan as worded in section 3?** Recommended: Yes.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-20
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)

@@ -255,7 +255,7 @@ Each runs as `node tests/scripts/<script> …`.
 9. **The four instruction strings and the iCan as worded in section 3?** Recommended: Yes.
 10. **Fact rows and fact probe: offer the three-factor items there?** Recommended: No: out of scope (fact layouts draw two-number facts; this is not a fact skill).
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-20
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
