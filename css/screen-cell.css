@@ -2236,3 +2236,23 @@ html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-c
 .mq-placebank .mq-placetile { min-width: 96px; min-height: 48px; padding: 0 12px; font: inherit; font-size: 1.4rem; font-weight: 700;
     background: #fff; color: #000; border: 1px solid #000; border-radius: 6px; cursor: pointer; }
 .mq-placebank .mq-placetile[aria-pressed="true"] { box-shadow: inset 0 0 0 3px #000; }
+
+/* lf-placevalue critic (lead-routed, lf-hosts 2026-11-20; owner 2026-11-13: 48 px touch targets on a tablet). (1) The practice
+   card's tool buttons - Hint, Read, Skip, Calculator, Solution and Check in the tool row, and the open hint's Listen, close and
+   Got it! - drew 44 px tall (46 px in the short-screen compact bar at 1024 x 768): they are 48 px now, on every width. The row
+   keeps its one line at 820 (the buttons only grow 4 px taller; Check was already 52 px). (2) The sentence frame's sign circle
+   (add_wp_20's working sign) drew 46 x 46 on the online worksheet's grid at 820 / 1024: its box is at least 48 px, its centre
+   held, and an equal negative margin keeps every neighbour where it was (the sentence does not reflow). ADDITIVE.
+   ws-phone-card TOUCH-TARGET (the TOOLS rule and the tablet working-box floor) is the check. */
+html body :is(#gameView, #mapSessionView) #questionCard#questionCard > .mq-qactions.mq-qactions > :is(.btn, button),
+html body.student-mode :is(#gameView, #mapSessionView) #questionCard#questionCard > .next-btn-container.next-btn-container > .btn { min-height: 48px !important; min-width: 48px !important; }
+html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn,
+html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .next-btn-container > #nextBtn { height: 48px !important; }
+html body #questionCard .mq-hint-inline :is(.mq-hint-inline-btn, .mq-hint-inline-got, .hint-speak-btn),
+html body #questionCard button.mq-lw-speak { min-height: 48px !important; min-width: 48px !important; box-sizing: border-box; }
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-gl-sentence > input.mq-gl-sign {
+    --mq-sd: max(44px, calc(var(--mq-k2, 3.4px) * 11));
+    --mq-sg: max(48px, var(--mq-sd));
+    width: var(--mq-sg) !important; height: var(--mq-sg) !important; min-width: 48px !important; min-height: 48px !important;
+    margin: calc((var(--mq-sd) - var(--mq-sg)) / 2) !important;
+}
