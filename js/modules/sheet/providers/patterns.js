@@ -59,7 +59,7 @@ const NOTICE_BY_TASK = {
         iCan: 'I Can find what a number pattern shows',
         instructionKey: 'pattern-true-one',
         // (r8: the lesson's step names, 'pattern-features')
-        steps: ['Read the rule. Write the numbers.', 'Test a sentence.', 'Test the next one.', 'Check the true one.'],
+        steps: ['Read the rule. Find each number.', 'Test a sentence.', 'Test the next one.', 'Check the true one.'],
         say: 'I notice that __.',
         sayValues: (q) => { const p = noticeOf(q); return p && p.task === 'feature' ? [lowerFirst((p.choices || [])[p.correct])] : null; },
         stepsFor: (q) => {
@@ -100,7 +100,10 @@ const NOTICE_STRINGS = Object.fromEntries(Object.entries(NOTICE_BY_TASK).map(([k
 
 function noticeStrings(ref = {}) {
     const p = noticeOf(ref && ref.q);
-    const task = p && NOTICE_STRINGS[p.task] ? p.task : (presetTask(ref) || 'parity');
+    // (critic r3 R3-1: a page's title and instruction are read with no item and, off the few TITLE_FROM_OPTS skills, no
+    // options - only the first item's printFormat - so the generator names its task there: notice-pattern-<task>)
+    const fmt = /^notice-pattern-(\w+)$/.exec(String((ref && ref.printFormat) || ''));
+    const task = p && NOTICE_STRINGS[p.task] ? p.task : (presetTask(ref) || (fmt && NOTICE_STRINGS[fmt[1]] ? fmt[1] : 'parity'));
     return NOTICE_STRINGS[task](ref);
 }
 noticeStrings.def = NOTICE_STRINGS.parity.def;
@@ -220,7 +223,8 @@ const growSayValues = (q) => {
 const GROW_STRINGS = Object.fromEntries(Object.entries(GROW_BY_TASK).map(([k, d]) => [k, strings({ ...d, say: GROW_SAY, sayValues: growSayValues, vocabulary: ['term', 'pattern', 'rule'] })]));
 function growStrings(ref = {}) {
     const p = growOf(ref && ref.q);
-    const t = p && GROW_STRINGS[p.ask] ? p.ask : (ref && ref.opts && GROW_STRINGS[ref.opts.patTask] ? ref.opts.patTask : 'next');
+    const fmt = /^growing-pattern-(\w+)$/.exec(String((ref && ref.printFormat) || ''));   // (R3-1 / R3-7: the task, as notice's)
+    const t = p && GROW_STRINGS[p.ask] ? p.ask : (ref && ref.opts && GROW_STRINGS[ref.opts.patTask] ? ref.opts.patTask : fmt && GROW_STRINGS[fmt[1]] ? fmt[1] : 'next');
     return GROW_STRINGS[t](ref);
 }
 growStrings.def = GROW_STRINGS.next.def;
