@@ -210,10 +210,12 @@ function geomRaw(p, ctx) {
     // the lesson chart's state panels and the We Do rows, which pass `cellLiveMm` - took two lines of four 23 mm tiles where its
     // band reaches "1,057", and the second line ran 14 mm out of the panel. Before such a row wraps, its tiles give up their
     // spare air (never their digits: the digit size is the one the standard tile set, `ptFix`) down to the widest number's
-    // glyph plus TRAIN_AIR_MM; only a row that still cannot stand on one line wraps, as before. Other sheets keep their tiles.)
+    // glyph plus TRAIN_AIR_MM; only a row that still cannot stand on one line wraps, as before.)
     const ptOf = (w) => Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18, (w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
     const ptFix = ptOf(boxW);
-    if (shape === 'box' && !isTwin(ctx) && ctx && Number(ctx.cellLiveMm) > 0 && n * boxW + (n - 1) * gap > live - tab + 1e-6) {
+    // (critic r3 R3-8, AX-4: every paper sheet, not only a cellLiveMm panel - the practice rows wrapped 4 + 4 under a chart that
+    // stood the same 8 tiles on one line; ws-patterns-cells TRAIN-PARITY)
+    if (shape === 'box' && !isTwin(ctx) && n * boxW + (n - 1) * gap > live - tab + 1e-6) {
         const tight = Math.max(14, trainGlyphMm(p, ptFix) + TRAIN_AIR_MM);
         if (tight < boxW && n * tight + (n - 1) * gap <= live - tab + 1e-6) boxW = tight;
     }
