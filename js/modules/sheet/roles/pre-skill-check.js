@@ -357,6 +357,18 @@ function planCheck(input, cut) {
         extra0.push(more);
         return its;
     });
+    // (lead A10, 2026-11-20, PSC-TWIN: two pools that deal ONE skill - a preset and its host, vocab_pick3_words and
+    // vocab_grade_pictures - are one band: the later pool's items join the first's, its counts summed; a lesson's routed
+    // check keeps one question per route)
+    if (!input.perQuestion) {
+        const keyOf = (q) => (q[0] && q[0].skill) || '';
+        for (let i = 0; i < quads0.length; i++) for (let j = i + 1; j < quads0.length; j++) {
+            if (!quads0[i].length || !quads0[j].length || keyOf(quads0[i]) !== keyOf(quads0[j])) continue;
+            quads0[i] = dedupeDeal(quads0[i].concat(quads0[j]));
+            extra0[i] = dedupeDeal((extra0[i] || []).concat(extra0[j] || []));
+            quads0[j] = []; extra0[j] = [];
+        }
+    }
     const quads = quads0.filter((q) => q.length);
     // (each band's question index, for its route; a route's tag takes TAG mm of its band)
     const qIndex = quads0.map((q, i) => (q.length ? i : -1)).filter((i) => i >= 0);
@@ -494,8 +506,8 @@ function planCheck(input, cut) {
         const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bs.push(sec); for (const x of sec.parts || []) walk(x); };
         for (const pg of pages) for (const sec of pg.sections) walk(sec);
         distinctInstrs(bs.map((b) => Object.assign(b, { label: b.pscLabel, _l: b.label })));
-        pscBands = bs.map((b) => ({ instr: b.instr, items: b.pscItems || [] }));
-        for (const b of bs) { b.label = b._l; delete b._l; delete b.pscLabel; delete b.pscItems; }
+        pscBands = bs.map((b) => ({ instr: b.instr, skill: b.pscSkill || '', items: b.pscItems || [] }));
+        for (const b of bs) { b.label = b._l; delete b._l; delete b.pscLabel; delete b.pscItems; delete b.pscSkill; }
     }
     const n = kept || slotScore(all);
     const finalFrame = n === slotScore(all) ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),

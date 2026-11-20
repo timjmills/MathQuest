@@ -91,7 +91,9 @@ async function main() {
             return { title: (r.plan.header && r.plan.header.title) || '', bands, metaBands: (r.plan.meta && r.plan.meta.bands) || null, items: (r.items || []).map((it) => ({ pool: it.pool, skill: it.skill, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans })) };
         }, { c, s, size, seed });
         const F = (rule, msg) => { if (!only || only.includes(rule)) fails.push(`  FAIL ${rule} ${k} pre-skill-check ${size}: ${msg}`); };
-        for (const t of twinSkills(b.items)) F('PSC-TWIN', `${t} is dealt by two pools (two bands of one skill)`);
+        // (the bands as the role lists them, when it does; else the dealt pools)
+        const twinSrc = Array.isArray(b.metaBands) && b.metaBands.length && b.metaBands.every((x) => 'skill' in x) ? b.metaBands.map((x, i) => ({ pool: `b${i}`, skill: x.skill })) : b.items;
+        for (const t of twinSkills(twinSrc)) F('PSC-TWIN', `${t} is dealt by two pools (two bands of one skill)`);
         const tb = titleBad(b.title); if (tb) F('PSC-TITLE', `the title "${b.title}" carries the id fragment "${tb}"`);
         for (const i of instrRepeats(b.bands.map((x) => x.instr))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}"`);
         // (the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
