@@ -113,7 +113,8 @@ function scratch(labelText, small = false, touch = false) {
     // `touch` (critic r3 D8, H6): the input is a 44 px touch target centred over its small drawn
     // box, transparent, so the box keeps its size and its column; the drawn box stays the outline
     const size = touch
-        ? 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px)!important;height:max(100%,44px)!important;'
+        // (touch === 48: the long-multiplication twin's carry boxes, H6 48 px; short division keeps 44)
+        ? `position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,${touch === 48 ? 48 : 44}px)!important;height:max(100%,${touch === 48 ? 48 : 44}px)!important;`
         : 'display:block!important;width:100%!important;height:100%!important;';
     return `<input type="text" class="mq-work mq-opswork${touch ? ' mq-opswork-touch' : ''}" inputmode="numeric" maxlength="1" autocomplete="off" spellcheck="false" tabindex="-1" `
         // inline !important: the hosts' generic input rules (a 44-50 px minimum, a white fill) would
@@ -194,9 +195,10 @@ register('long-multiplication', {
             // would say where the carries are)
             for (const pl of places) {
                 const v = showWork && carries[pl] ? String(carries[pl]) : '';
-                const inner = g.twin ? scratch(`carry, ${id}, place ${pl}`, true)
+                // fix r1 (H6): on screen the carry box carries a transparent touch input over it, >= 48 px (screen-cell.css)
+                const inner = g.twin ? scratch(`carry, ${id}, place ${pl}`, true, 48)
                     : (v ? `<span style="font-size:0.6em;line-height:1">${inked(v, ink)}</span>` : '');
-                html += at(inner, colOf(pl), r, `box-sizing:border-box;height:${slimH};width:${g.em(tr * 0.62)};justify-self:center;`
+                html += at(inner, colOf(pl), r, `${g.twin ? 'position:relative;' : ''}box-sizing:border-box;height:${slimH};width:${g.em(tr * 0.62)};justify-self:center;`
                     + `border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm * 0.7)};background:#fff;`);
             }
         };
@@ -269,7 +271,11 @@ register('long-multiplication', {
     answerKey(p) {
         const { w, slots: ks } = lmKey(p);
         const slots = {};
-        for (const [id, v] of Object.entries(ks)) slots[id] = { value: v, graded: v !== '' };
+        // fix r1 (lf-ops sizes, cell-checks KEYFIT): the strip's digits are ONE answer, graded as `answer` (the screen joins
+        // its boxes, data-mq-join); listed per digit, a role that splits a wrong answer by part (error analysis) wrote a
+        // 3-digit wrong product into the last digit box when its length differed from the strip's. The template splits
+        // the wrong value itself (slotValues), right-aligned.
+        for (const [id, v] of Object.entries(ks)) slots[id] = { value: v, graded: false, digit: v !== '' };
         slots.answer = { value: S(w.total), graded: true };
         return { value: w.total, display: S(w.total), slots };
     },

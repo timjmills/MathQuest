@@ -26,7 +26,12 @@
    "multiplication:mult_3by1_column",
    "multiplication:mult_2by2_standard",
    "multiplication:area_model_2by1",
-   "multiplication:area_model_3by1"
+   "multiplication:area_model_3by1",
+   "multiplication:mult_4by1_column",
+   "multiplication:mult_3by2_standard",
+   "multiplication:area_model_4by1",
+   "multiplication:area_model_2by2",
+   "multiplication:area_model_3by2"
   ]
  },
  "excerptChars": 140,
@@ -260,7 +265,9 @@
      "multiplication:multiply",
      "multiplication:mult_2by1_column",
      "multiplication:mult_3by1_column",
-     "multiplication:mult_2by2_standard"
+     "multiplication:mult_2by2_standard",
+     "multiplication:mult_4by1_column",
+     "multiplication:mult_3by2_standard"
     ]
    },
    {
@@ -346,13 +353,15 @@
     "values": [
      "across"
     ],
-    "d": "hidden",
-    "why": "the size presets are always stacked; the control does not show at tiles 21 and up",
-    "source": "skill-options.js _ap4Patch multiply appliesTo",
+    "d": "offered",
+    "why": "offered (facts only): the size presets inherit the host control (a preset offers its host's controls), but it applies only at tiles null / 11; at 21 and up the item is always stacked and the control has no effect (skill-options.js _ap4Patch multiply appliesTo); graded on the facts card",
+    "source": "skill-options.js _ap4Patch multiply appliesTo; lead fix r1 (b), 2026-11-20",
     "skills": [
      "multiplication:mult_2by1_column",
      "multiplication:mult_3by1_column",
-     "multiplication:mult_2by2_standard"
+     "multiplication:mult_2by2_standard",
+     "multiplication:mult_4by1_column",
+     "multiplication:mult_3by2_standard"
     ]
    },
    {

@@ -1,14 +1,13 @@
 <!-- spec-card
-{"card":"mult-sizes","kind":"family","template":"area-model","families":["multiplication"],"match":{"templates":["area-model","stack","long-multiplication"]},"config":"design/cards/mult-sizes/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"c7e35d680528c0c2","format":2,"configSha":"229a73183369"}
-{"cited":"AK-2 AX-4 AX-9 C1 CL-9 H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 PG-12 PT-FRM-6 PT-GDP-1 PT-REV-3 RP-1 SL-1 SL-3a SP-20 TY-10a VA-10 WRM-rule-18","rules":"VA-1 12d322 SL-1 e3b064 12 3cbafa AK-1 a0cc12 P-1 5a3076 AK-2 d4709f TY-20 8964d2 21 53ed7d H13 36f579 L25 1b158f 26 bbd4cc SCC-01 8aa70b LS-8 59531d PG-12 8e75fd DN-1a 6ecf1e AX-4 2eb6c1 9 74e9a4 C1 a670d9 CL-9 accb97 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 e90105 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 L1 4f7d0c 6 6e19d8 PT-FRM-6 daac17 PT-GDP-1 a0e2cc PT-REV-3 d5e0d9 RP-1 d529bd SL-3a b8219f SP-20 cfb11a TY-10a 5e59f3 VA-10@WDS 9d9099 INK-1 0e2b59 P-LC-9 bc47bd PG-20 9c7999 SL-11 fc569a","entries":"D%3Atiles%3Dnull bcefeb D%3Atiles%3D11%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amultiply bcefeb D%3Atiles%3D21 bcefeb D%3Atiles%3D31 bcefeb D%3Atiles%3D22 bcefeb D%3Atiles%3D23 bcefeb D%3Atiles%3D41 bcefeb D%3Atiles%3D32 bcefeb D%3AamEdges%3Dgiven bcefeb D%3AamEdges%3Dblank bcefeb D%3AamEdges%3Dmixed bcefeb D%3Anotation%3Dstacked bcefeb D%3Anotation%3Dacross%40multiplication%3Amultiply bcefeb D%3Anotation%3Dacross%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column f9f1d8 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+{"card":"mult-sizes","kind":"family","template":"area-model","families":["multiplication"],"match":{"templates":["area-model","stack","long-multiplication"]},"config":"design/cards/mult-sizes/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"717b475f66f1edbe","format":2,"configSha":"0e1e5d81a171"}
+{"cited":"AK-2 AX-4 AX-9 C1 CL-9 H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 PG-12 PT-FRM-6 PT-GDP-1 PT-REV-3 RP-1 SL-1 SL-3a SP-20 TY-10a VA-10 WRM-rule-18","rules":"VA-1 12d322 SL-1 e3b064 12 3cbafa AK-1 a0cc12 P-1 5a3076 AK-2 d4709f TY-20 8964d2 21 53ed7d H13 36f579 L25 1b158f 26 bbd4cc SCC-01 8aa70b LS-8 59531d PG-12 8e75fd DN-1a 6ecf1e AX-4 2eb6c1 9 74e9a4 C1 a670d9 CL-9 accb97 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 e90105 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 L1 4f7d0c 6 6e19d8 PT-FRM-6 daac17 PT-GDP-1 a0e2cc PT-REV-3 d5e0d9 RP-1 d529bd SL-3a b8219f SP-20 cfb11a TY-10a 5e59f3 VA-10@WDS 9d9099 INK-1 0e2b59 P-LC-9 bc47bd PG-20 9c7999 SL-11 fc569a","entries":"D%3Atiles%3Dnull bcefeb D%3Atiles%3D11%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amult_3by2_standard%2Cmultiplication%3Amult_4by1_column%2Cmultiplication%3Amultiply bcefeb D%3Atiles%3D21 bcefeb D%3Atiles%3D31 bcefeb D%3Atiles%3D22 bcefeb D%3Atiles%3D23 bcefeb D%3Atiles%3D41 bcefeb D%3Atiles%3D32 bcefeb D%3AamEdges%3Dgiven bcefeb D%3AamEdges%3Dblank bcefeb D%3AamEdges%3Dmixed bcefeb D%3Anotation%3Dstacked bcefeb D%3Anotation%3Dacross%40multiplication%3Amultiply bcefeb D%3Anotation%3Dacross%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amult_3by2_standard%2Cmultiplication%3Amult_4by1_column bcefeb D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
 {"v": 1, "card": "mult-sizes",
-"skills": ["multiplication:area_model_2by1","multiplication:area_model_3by1","multiplication:area_model_mult","multiplication:area_model_mult_hard","multiplication:mult_2by1_column","multiplication:mult_2by2_standard","multiplication:mult_3by1_column","multiplication:multiply"],
+"skills": ["multiplication:area_model_2by1","multiplication:area_model_2by2","multiplication:area_model_3by1","multiplication:area_model_3by2","multiplication:area_model_4by1","multiplication:area_model_mult","multiplication:area_model_mult_hard","multiplication:mult_2by1_column","multiplication:mult_2by2_standard","multiplication:mult_3by1_column","multiplication:mult_3by2_standard","multiplication:mult_4by1_column","multiplication:multiply"],
 "rulings": [
 ],
 "notOffered": [
- {"id":"N-D-notation-1","source":"§7a (decision: skill-options.js _ap4Patch multiply appliesTo)","option":"notation","skills":["multiplication:mult_2by1_column","multiplication:mult_2by2_standard","multiplication:mult_3by1_column"],"values":["across"]}
 ],
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"A distinct option is ALSO a findable skill: a distinct size class is a preset skill (ow..."},
@@ -33,15 +32,15 @@ Five new PRESET skills, each a host skill opened with its size value (CLAUDE.md:
 
 4.NBT.B.5 (multiply up to four digits by one digit; two two-digit numbers, by place value, the area model and equations) and 5.NBT.B.5 (the standard algorithm, here 3-digit x 2-digit); EE M.EE.5.NBT.5. WRM Y5.B5.S1 (4 x 1, column and area model), Y5.B5.S2 (2 x 2 area model), Y5.B5.S4 (3 x 2). Each preset is its own lesson in unit G4-Y5.B5 (Multiplication and division B).
 
-**Skills on this family** (8; listed in card.json + 8 listed):
+**Skills on this family** (13; listed in card.json + 13 listed):
 
-- **multiplication** (8): `area_model_{2by1,3by1,mult,mult_hard}`, `mult_2by1_column`, `mult_2by2_standard`, `mult_3by1_column`, `multiply`
+- **multiplication** (13): `area_model_{2by1,2by2,3by1,3by2,4by1,mult,mult_hard}`, `mult_2by1_column`, `mult_2by2_standard`, `mult_3by1_column`, `mult_3by2_standard`, `mult_4by1_column`, `multiply`
 
 **CCSS** (SKILL_STANDARDS of those skills): 3.OA.C.7, 4.NBT.B.5, 5.NBT.B.5
 
 **Essential Elements:** M.EE.3.OA.6, M.EE.5.NBT.5
 
-**WRM small steps** (SKILL_WRM): Y3.B4 S4, S4 (part), S5, S5 (part); Y4.B5 S8, S8 (part), S9, S9 (part), S10, S10 (part); Y5.B5 S1 (part), S2 (part), S3, S3 (part), S4 (part); Y6.B2 S7
+**WRM small steps** (SKILL_WRM): Y3.B4 S4, S4 (part), S5, S5 (part); Y4.B5 S8, S8 (part), S9, S9 (part), S10, S10 (part); Y5.B5 S1, S1 (part), S2, S2 (part), S3, S3 (part), S4, S4 (part); Y6.B2 S7
 
 ## 2. Problem types and progression
 
@@ -167,7 +166,7 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 **Option values (offeredOptionsFor)**
 
 - `tiles=null` — **offered** — the hosts' default ('Tables facts' on multiply, 'Both sizes / grids, dealt' on the area hosts); unchanged by this card: it never deals 41 or 32 (skill-options.js)
-- `tiles=11` — **offered** on `multiply`, `mult_2by1_column`, `mult_3by1_column`, `mult_2by2_standard` — 1-digit x 1-digit on multiply; the facts end of the size ladder, graded on the facts card (skill-options.js multiply)
+- `tiles=11` — **offered** on `multiply`, `mult_2by1_column`, `mult_3by1_column`, `mult_2by2_standard`, `mult_4by1_column`, `mult_3by2_standard` — 1-digit x 1-digit on multiply; the facts end of the size ladder, graded on the facts card (skill-options.js multiply)
 - `tiles=21 | 31` — **offered** — existing sizes; default on area_model_2by1 / mult_2by1_column and area_model_3by1 / mult_3by1_column; the step below each new preset (skill-presets.js)
 - `tiles=22` — **offered** — 2 x 2: multiply (mult_2by2_standard) and area_model_mult_hard (the NEW preset area_model_2by2); on multiply moves to the long-multiplication cell (open question 3) (skill-presets.js; this card §7)
 - `tiles=23` — **offered** — the 2 x 3 grid = the NEW preset area_model_3by2; the 3-digit factor written first (open question 2) (skill-options.js area_model_mult_hard; this card §7)
@@ -176,7 +175,7 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `amEdges=given | blank | mixed` — **offered** — the area-model hint scaffold (the place-value split on the edges); given -> mixed -> blank fades it; every value at 4 x 1, 2 x 2 and 3 x 2 (skill-options.js _amEdgesOpt)
 - `notation=stacked` — **offered** — the default; from 2-digit x 1-digit up the item is always stacked (skill-options.js _ap4Patch multiply)
 - `notation=across` — **offered** on `multiply` — facts only (tiles null / 11: the control shows only then); never on a size preset (skill-options.js _ap4Patch multiply appliesTo)
-- `notation=across` — **hidden** on `mult_2by1_column`, `mult_3by1_column`, `mult_2by2_standard` — the size presets are always stacked; the control does not show at tiles 21 and up (skill-options.js _ap4Patch multiply appliesTo)
+- `notation=across` — **offered** on `mult_2by1_column`, `mult_3by1_column`, `mult_2by2_standard`, `mult_4by1_column`, `mult_3by2_standard` — offered (facts only): the size presets inherit the host control (a preset offers its host's controls), but it applies only at tiles null / 11; at 21 and up the item is always stacked and the control has no effect (skill-options.js _ap4Patch multiply appliesTo); graded on the facts card (skill-options.js _ap4Patch multiply appliesTo; lead fix r1 (b), 2026-11-20)
 - `calculator=true | false` — **out of scope** (PROPOSED) — a play control on every skill; graded by ws-options-verify BEHAVIOUR (skill-options.js play controls)
 - `skipAfter=*` — **out of scope** (PROPOSED) — a play control on every skill; graded by ws-options-verify BEHAVIOUR (skill-options.js play controls)
 
@@ -234,7 +233,7 @@ Each runs as `node tests/scripts/<script> …`.
 4. **G4-Y5.B5 is queue round 4, not the current round (FASTEST_PLAN rule 1). Build now?** Recommended: Lead decision; the lead requested it 2026-11-19. If built now, ship the five presets as one unit with their lessons.
 5. **MW4K / IXL research is from public pages only (no logins). Sign now?** Recommended: Yes: the size classes and responses agree across four sources; a logged-in pass can add item counts later without changing the card.
 
-Signed: owner, 2026-11-20
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
@@ -243,53 +242,53 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 **Option values (offeredOptionsFor)** (16 lines; 0 undecided)
 
-- `tiles=null` Digits × digit [difficulty], default on area_model_mult, area_model_mult_hard, multiply (all 8) [offered]
-- `tiles=21` Digits × digit [difficulty], default on area_model_2by1, mult_2by1_column (area_model_2by1, area_model_3by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
-- `tiles=31` Digits × digit [difficulty], default on area_model_3by1, mult_3by1_column (area_model_2by1, area_model_3by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
-- `tiles=41` Digits × digit [difficulty] (area_model_2by1, area_model_3by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
-- `amEdges=given` Numbers around the box [support], default (area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard) [offered]
-- `amEdges=blank` Numbers around the box [support] (area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard) [offered]
-- `amEdges=mixed` Numbers around the box [support] (area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard) [offered]
-- `calculator=true` Calculator [play] (all 8) [out of scope, PROPOSED]
-- `calculator=false` Calculator [play], default (all 8) [out of scope, PROPOSED]
-- `skipAfter=*` Skip appears after [play] (all 8) [out of scope, PROPOSED]
-- `tiles=22` Digits × digits [difficulty], default on mult_2by2_standard (area_model_mult_hard, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
-- `tiles=23` Digits × digits [difficulty] (area_model_mult_hard) [offered]
-- `notation=stacked` How it is written, default (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
-- `notation=across` How it is written (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [hidden: mult_2by1_column, mult_2by2_standard, mult_3by1_column; offered: multiply]
-- `tiles=11` Digits × digits [difficulty] (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
-- `tiles=32` Digits × digits [difficulty] (mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) [offered]
+- `tiles=null` Digits × digit [difficulty], default on area_model_mult, area_model_mult_hard, multiply (all 13) [offered]
+- `tiles=21` Digits × digit [difficulty], default on area_model_2by1, mult_2by1_column (area_model_2by1, area_model_3by1, area_model_4by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `tiles=31` Digits × digit [difficulty], default on area_model_3by1, mult_3by1_column (area_model_2by1, area_model_3by1, area_model_4by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `tiles=41` Digits × digit [difficulty], default on area_model_4by1, mult_4by1_column (area_model_2by1, area_model_3by1, area_model_4by1, area_model_mult, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `amEdges=given` Numbers around the box [support], default (area_model_2by1, area_model_2by2, area_model_3by1, area_model_3by2, area_model_4by1, area_model_mult, area_model_mult_hard) [offered]
+- `amEdges=blank` Numbers around the box [support] (area_model_2by1, area_model_2by2, area_model_3by1, area_model_3by2, area_model_4by1, area_model_mult, area_model_mult_hard) [offered]
+- `amEdges=mixed` Numbers around the box [support] (area_model_2by1, area_model_2by2, area_model_3by1, area_model_3by2, area_model_4by1, area_model_mult, area_model_mult_hard) [offered]
+- `calculator=true` Calculator [play] (all 13) [out of scope, PROPOSED]
+- `calculator=false` Calculator [play], default (all 13) [out of scope, PROPOSED]
+- `skipAfter=*` Skip appears after [play] (all 13) [out of scope, PROPOSED]
+- `tiles=22` Digits × digits [difficulty], default on area_model_2by2, mult_2by2_standard (area_model_2by2, area_model_3by2, area_model_mult_hard, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `tiles=23` Digits × digits [difficulty], default on area_model_3by2 (area_model_2by2, area_model_3by2, area_model_mult_hard) [offered]
+- `notation=stacked` How it is written, default (mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `notation=across` How it is written (mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `tiles=11` Digits × digits [difficulty] (mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
+- `tiles=32` Digits × digits [difficulty], default on mult_3by2_standard (mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) [offered]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
-- `role:independent` — the skill's own items (all 8) [offered, PROPOSED]
-- `role:more-practice` — the skill's own items (all 8) [offered, PROPOSED]
-- `role:opener` (also lesson-opener) — provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply); provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply); provider misconceptions: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:test` (also test-a, test-b) — provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 8) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:fact-rows` — provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [out of scope, PROPOSED]
-- `role:fact-probe` — the skill's own items (all 8) [out of scope, PROPOSED]
-- `role:mixed-practice` (also mixed) — provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply); provider wrongAnswer: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply); provider stories: real 4/8 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
-- `role:stretch` — the skill's own items (all 8) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 0/8 (FALLBACK, warm-up from the earlier skills in data.js order, on area_model_2by1, area_model_3by1, area_model_mult, area_model_mult_hard, mult_2by1_column, mult_2by2_standard, mult_3by1_column, multiply) (all 8) [offered, PROPOSED]
+- `role:independent` — the skill's own items (all 13) [offered, PROPOSED]
+- `role:more-practice` — the skill's own items (all 13) [offered, PROPOSED]
+- `role:opener` (also lesson-opener) — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider misconceptions: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:test` (also test-a, test-b) — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 13) [offered, PROPOSED]
+- `role:word-problems` — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:fact-rows` — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [out of scope, PROPOSED]
+- `role:fact-probe` — the skill's own items (all 13) [out of scope, PROPOSED]
+- `role:mixed-practice` (also mixed) — provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider wrongAnswer: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply); provider stories: real 7/13 (default on mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
+- `role:stretch` — the skill's own items (all 13) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 0/13 (FALLBACK, warm-up from the earlier skills in data.js order, on area_model_2by1, area_model_2by2, area_model_3by1, area_model_3by2, area_model_4by1, area_model_mult, area_model_mult_hard, mult_2by1_column, mult_2by2_standard, mult_3by1_column, mult_3by2_standard, mult_4by1_column, multiply) (all 13) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
-- `host:boss` — driven by ws-chromebook-fit (all 8) [out of scope, PROPOSED]
-- `host:map` — driven by ws-screen-slots (all 8) [out of scope, PROPOSED]
-- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 8) [out of scope, PROPOSED]
-- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 8) [out of scope, PROPOSED]
-- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 8) [offered]
-- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 8) [offered]
-- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 8) [offered]
-- `host:race` — driven by ws-chromebook-fit (all 8) [out of scope, PROPOSED]
+- `host:boss` — driven by ws-chromebook-fit (all 13) [out of scope, PROPOSED]
+- `host:map` — driven by ws-screen-slots (all 13) [out of scope, PROPOSED]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 13) [out of scope, PROPOSED]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 13) [out of scope, PROPOSED]
+- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 13) [offered]
+- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 13) [offered]
+- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 13) [offered]
+- `host:race` — driven by ws-chromebook-fit (all 13) [out of scope, PROPOSED]
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 

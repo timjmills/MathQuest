@@ -5060,8 +5060,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     parts = [{ value: tens }, { value: ones }];
                 } else if (problemType === '4digit') {
                     // 4-digit × 1-digit (Y5.B5.S1): one more part than 3 × 1, the multiplier 2-6 like 3 × 1
+                    // fix r1: the thousands part times the multiplier stays under 10,000 (thousands digit x multiplier <= 9),
+                    // so every partial product is at most 4 digits and the four-part model fits one column at L with the
+                    // edge boxes blank (a 5-digit partial box made the row 192 mm). The total can still reach 5 digits.
                     multiplier = rng(2, 6);
-                    const thousands = rng(1, 9) * 1000;
+                    const thousands = rng(1, Math.floor(9 / multiplier)) * 1000;
                     const hundreds = rng(1, 9) * 100;
                     const tens = rng(1, 9) * 10;
                     const ones = rng(1, 9);

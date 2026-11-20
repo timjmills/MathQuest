@@ -81,7 +81,8 @@ function extGeom(p, g) {
     const bw = boxMm(g, Math.max(...partials.map((v) => String(v).length)));
     // One edge-box width for every edge of the item, so no box tells the length of its part (L-LEAK).
     const ew = boxMm(g, Math.max(...R.concat(C).map((v) => String(v).length)));
-    const colMm = Math.max(bw + 4, blank ? ew + 3 : 0, ...C.map((v) => String(v).length * 0.62 * g.E + 4));
+    // fix r1: four columns take a 2 mm margin (fewer keep 4: no 2 x 2 / 2 x 3 page moves); labels measured with their comma
+    const colMm = Math.max(bw + (C.length >= 4 ? 2 : 4), blank ? ew + 3 : 0, ...C.map((v) => grp(v).length * 0.62 * g.E + 4));
     const sideMm = blank ? ew + 3 : Math.max(...R.map((v) => String(v).length)) * 0.62 * g.E + 5;
     // A grid's rows are shorter (box + 2.5 mm a side): two rows and two work lines still fit a
     // half page at L (r12b: a 2 x 3 grid overflowed its half-page cell on the Test role).
@@ -93,8 +94,9 @@ function extFootprint(p, ctx) {
     const g = geo(ctx);
     const G = extGeom(p, g);
     const labelH = G.blank ? g.stripMm + 1 : g.E * 1.2;
-    const workH = G.work ? G.R.length * (g.stripMm + 0.45 * g.E) + 3 : 0;
-    const workW = G.work ? G.C.length * G.bw + (G.C.length) * g.E : 0;
+    const four = G.C.length >= 4;
+    const workH = G.work ? G.R.length * (four ? 2 : 1) * (g.stripMm + 0.45 * g.E) + 3 : 0;
+    const workW = G.work ? (four ? 2 : G.C.length) * G.bw + (four ? 2 : G.C.length) * g.E : 0;
     return {
         wMm: Math.ceil(Math.max(G.C.length * G.colMm, workW) + G.sideMm + 6),
         hMm: Math.ceil(labelH + G.R.length * G.hMm + workH + g.stripMm + 10 + (g.twin ? 0 : 3)),
@@ -137,7 +139,7 @@ function renderExt(p, ctx, wMm) {
             + `style="box-sizing:border-box;width:${g.em(w)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
         : box(g, id, { wMm: w, hMm: g.stripMm, value: vAt(id), ink: iAt(id), mark: null }));
     const top = C.map((v, c) => `<span class="${NOWRAP}" style="flex:0 0 ${g.em(colMm)};display:flex;justify-content:center;text-align:center;font-weight:700">`
-        + `${blank ? slot(`top-${c}`, 'area-model-input', v, ew, `top part ${c + 1}`) : esc(v)}</span>`).join('');
+        + `${blank ? slot(`top-${c}`, 'area-model-input', v, ew, `top part ${c + 1}`) : esc(grp(v))}</span>`).join('');
     const rowHtml = R.map((rv, r) => {
         const side = blank ? slot(`side-${r}`, 'area-model-input', rv, ew, `side part ${r + 1}`) : esc(rv);
         const rects = C.map((_, c) => {
@@ -150,8 +152,11 @@ function renderExt(p, ctx, wMm) {
             + `<span class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;border:${HAIR} solid ${INK.ink};${r ? 'border-top:0;' : ''}">${rects}</span></div>`;
     }).join('');
     // The work row (R3): one line per grid row, every area on its own line to add.
-    const workRow = !G.work ? '' : R.map((_, r) => `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:0.45em;margin-left:${g.em(sideMm - (r ? g.E * 1.28 : 0))}">`
-        + C.map((_, c) => {
+    // fix r1: four columns split each row's work line in two (c 0-1, then "+" c 2-3), so it never runs wider than the grid
+    const lines = [];
+    R.forEach((_, r) => { const cs = C.map((_, c) => c); if (C.length >= 4) { lines.push([r, cs.slice(0, 2)], [r, cs.slice(2)]); } else lines.push([r, cs]); });
+    const workRow = !G.work ? '' : lines.map(([r, cs], li) => `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:${C.length >= 4 && li % 2 ? '0.2em' : '0.45em'};margin-left:${g.em(sideMm - (li ? g.E * 1.28 : 0))}">`
+        + cs.map((c) => {
             const i = r * C.length + c;
             const v = sv ? '' : vAt(`part-${i}`);
             const wink = iAt(`part-${i}`);
@@ -193,7 +198,9 @@ register('area-model', {
         // are one size and none of them tells the pupil how long its answer is (L-LEAK).
         const partDigits = Math.max(...partials.map((v) => String(v).length));
         const bw = boxMm(g, partDigits);
-        const colMm = Math.max(bw + 6, ...parts.map((v) => grp(v).length * 0.62 * g.E + 4));
+        // lf-ops sizes fix r1: four parts (area_model_4by1) take a 2 mm column margin instead of 6, so the model fits one
+        // column at L (it ran 185 mm in a 1-column cell); fewer parts keep 6 mm (no 2 x 1 / 3 x 1 page moves). Digits never shrink.
+        const colMm = Math.max(bw + (parts.length >= 4 ? 2 : 6), ...parts.map((v) => grp(v).length * 0.62 * g.E + 4));
         const hMm = g.stripMm + 8;
         const twin = g.twin;
         const uid = esc(p.uid || 'am');
@@ -218,7 +225,19 @@ register('area-model', {
         // "___ + ___ + ___" with one line per part - so the pupil has somewhere to add the
         // partial products before writing the total (the key writes them in). The screen twin
         // keeps its own total input and no work row.
-        const workRow = twin || parts.length < 2 ? '' : `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:0.45em;margin-left:${g.em(mulMm)}">`
+        // Four parts: the work row is two lines of two ("___ + ___" / "+ ___ + ___"), as the grid model's rows are, so it
+        // never runs wider than the model (it ran 207 mm at L on one line).
+        const workLine = (idx, lead) => `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:${lead ? '0.2em' : '0.45em'};margin-left:${g.em(mulMm)}">`
+            + idx.map((i, j) => {
+                const v = sv ? '' : vAt(`part-${i}`);
+                const wink = iAt(`part-${i}`);
+                const fill = v && wink ? `<span data-ws-ink="${wink}" style="font-weight:${wink === 'trace' ? 400 : 700};color:${wink === 'trace' ? INK.grey : INK.ink}">${esc(v)}</span>` : '';
+                return `${j || lead ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
+                    + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
+            }).join('') + '</div>';
+        const workRow = twin || parts.length < 2 ? '' : parts.length >= 4
+            ? workLine(parts.map((_, i) => i).slice(0, 2), false) + workLine(parts.map((_, i) => i).slice(2), true)
+            : `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:0.45em;margin-left:${g.em(mulMm)}">`
             + parts.map((_, i) => {
                 // A step-by-step anchor (stepVals) fills the part boxes one step at a time; its
                 // work row stays empty so each step shows one new value.
@@ -251,10 +270,12 @@ register('area-model', {
         const g = geo(ctx);
         const partials = partialsOf(p);
         const bw = boxMm(g, Math.max(...partials.map((v) => String(v).length)));
-        const colMm = bw + 6;
-        const work = !g.twin && p.parts.length >= 2 ? g.stripMm + 0.45 * g.E + 3 : 0;   // R3: the work row + top pad
+        const four = p.parts.length >= 4;
+        const colMm = bw + (four ? 2 : 6);
+        // R3: the work row + top pad (four parts: two lines)
+        const work = !g.twin && p.parts.length >= 2 ? (four ? 2 * (g.stripMm + 0.45 * g.E) + 6 : g.stripMm + 0.45 * g.E + 3) : 0;
         return {
-            wMm: Math.ceil(Math.max(p.parts.length * colMm, p.parts.length * (bw + g.E)) + String(p.multiplier).length * 0.62 * g.E + 12),
+            wMm: Math.ceil((four ? p.parts.length * colMm : Math.max(p.parts.length * colMm, p.parts.length * (bw + g.E))) + String(p.multiplier).length * 0.62 * g.E + 12),
             hMm: Math.ceil(g.E * 1.2 + g.stripMm + 8 + g.stripMm + 10 + work),
             measure: true, factLike: false, maxCols: 2,
         };
