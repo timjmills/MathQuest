@@ -139,3 +139,20 @@ Gate reruns (touched skills, one at a time; scratchpad `rerun/`):
   EB-GDPCAP 0, EB-PAGE 0.
 - ws-hint-no-blank (the six skills + mult_break_apart + mult_properties): OK. ws-roles-unit: OK (113).
 - ws-backtest: the six new rows PASS one by one.
+
+## 2026-11-20 critic r1: FAIL, parked at the budget stop
+Report: design/audit/runs/lf-ops/critic-sizes-r1.md (146b9a4b8, graded on 87d658b44 with A9c applied).
+One fix round did not fit the $1,618.37 stop (≈ $58 left against 15 findings, 7 critical), so the branch is parked. This is round 1 of 2.
+
+**Next week, in this order.** Every item is check-first, as the critic proposed.
+1. **F1:** scripted-model draws no step marks for stack, long-multiplication or area-model. Shared engine; also check the presets already on master (mult_2by1 / 3by1). Proposed check: the Model's states change step by step.
+2. **F2 / F12:** area-model error-analysis and true-false wrong work is incoherent (the total is split on its comma). Proposed check: wrong work is coherent.
+3. **F3 / F4:** `multiplication:multiply` has no wrongAnswer of its own, and 4by1 uses only "added instead of multiplied". Add misconceptions M-S1 to M-S5 per the card.
+4. **F5:** area-model Reason It at L overprints and runs off the page. Rule: a capacity ruling never clears an overflow. area_model_4by1 reason-it L has no ruling.
+5. **F6:** area_model_4by1 is clipped on screen (quiz at 820 / 1024 / 1280; card at 820). Proposed check: screen clipping.
+6. **F8:** the area_model_2by2 / 3by2 lesson anchor chart overflows 22 mm at M and L.
+7. **F7 / F11:** blank lesson and Model pages (a Practice spill, the area_model_3by2 8-page lesson).
+8. **F9:** the pre-skill check must test the size below each preset.
+9. **F10:** the tiles=null Model step text is garbled.
+10. **F13–F15:** story sense, commas, host title.
+11. **A9c item 1:** area-model Reason It + word-problems at M, 2 a page (measurements above).
