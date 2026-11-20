@@ -1,0 +1,557 @@
+{
+ "id": "mult-sizes",
+ "kind": "family",
+ "title": "Multiplication by size: the size-pair presets (area model and column, 4 x 1, 2 x 2, 3 x 2)",
+ "template": {
+  "id": "area-model",
+  "source": "js/modules/sheet/cells/area-model.js",
+  "also": "the `stack` cell (`js/modules/sheet/cells/stack.js`) for multiply 21 / 31 / 41, and the `long-multiplication` cell (`js/modules/sheet/cells/long-multiplication.js`) proposed for multiply 22 / 32 (today 22 prints the LEGACY `column-mult` format with no q.cell); generator `_generateSizedMultDiv` (multiply) and the `area_model_mult` / `area_model_mult_hard` branches of `js/modules/gen-operations.js`; options `js/modules/skill-options.js` (`multiplication:multiply` tiles, `_p12Enum('tiles')` on the two area-model hosts); presets `js/modules/skill-presets.js`; skills `js/modules/data.js` (appended, `presetOf`)."
+ },
+ "families": [
+  "multiplication"
+ ],
+ "findingsMatch": {
+  "templates": [
+   "area-model",
+   "stack",
+   "long-multiplication"
+  ]
+ },
+ "skills": {
+  "include": [
+   "multiplication:multiply",
+   "multiplication:area_model_mult",
+   "multiplication:area_model_mult_hard",
+   "multiplication:mult_2by1_column",
+   "multiplication:mult_3by1_column",
+   "multiplication:mult_2by2_standard",
+   "multiplication:area_model_2by1",
+   "multiplication:area_model_3by1"
+  ]
+ },
+ "excerptChars": 140,
+ "sourceChars": 90,
+ "summary": "Five new PRESET skills, each a host skill opened with its size value (CLAUDE.md: a distinct new difficulty is also a findable skill): area_model_4by1 (area_model_mult, NEW tiles 41), mult_4by1_column (multiply, NEW tiles 41), area_model_2by2 (area_model_mult_hard, existing tiles 22), area_model_3by2 (area_model_mult_hard, existing tiles 23), mult_3by2_standard (multiply, NEW tiles 32). They copy the pattern of area_model_2by1 / area_model_3by1 / mult_2by1_column / mult_3by1_column / mult_2by2_standard exactly: an appended data.js entry with presetOf, a SKILL_PRESETS row, SKILL_STANDARDS, SKILL_WRM, SKILL_TERMS, an appended share code, and the direct / pre / related links. Not a copy of the generator: the preset swaps to its host for the call. The new skills are not yet in data.js, so the card lists the hosts and the five existing presets; the build adds the five ids to skills.include and regenerates.",
+ "teaches": "4.NBT.B.5 (multiply up to four digits by one digit; two two-digit numbers, by place value, the area model and equations) and 5.NBT.B.5 (the standard algorithm, here 3-digit x 2-digit); EE M.EE.5.NBT.5. WRM Y5.B5.S1 (4 x 1, column and area model), Y5.B5.S2 (2 x 2 area model), Y5.B5.S4 (3 x 2). Each preset is its own lesson in unit G4-Y5.B5 (Multiplication and division B).",
+ "research": "Public pages only (no logins on this machine), design/research/mult_size_presets.md: Math-Drills long multiplication by size class 2x1, 2x2, 3x1, 3x2, 4x1 (grid support with and without regrouping boxes; a place-value-split set in 2x1, 3x1, 4x1, 2x2, 3x2); MathWorksheets4Kids area / box model by size (index only; partial products blank in the boxes); K5 Learning grade 4 4-digit x 1-digit and 2x2, grade 5 3x2; IXL skill names (4-digit by 1-digit; 2x2 and 3x2 using area models; type each partial product then the sum). Every source makes each size class its own page set: the size is the lesson.",
+ "problemTypes": [
+  "Area model 4 x 1 (area_model_4by1): 7 x 3,456 as one row of four boxes 3,000 | 400 | 50 | 6; write the four partial products, then the total.",
+  "Column 4 x 1 (mult_4by1_column): 3,456 x 7 in the stack, carry boxes over the columns, the product (up to 5 digits) in the answer strip.",
+  "Area model 2 x 2 (area_model_2by2): 34 x 26 as a 2 x 2 grid (30 | 4 by 20 | 6); four partial products, then the total.",
+  "Area model 3 x 2 (area_model_3by2): 135 x 24 as a 2 x 3 grid; six partial products, then the total.",
+  "Column 3 x 2 (mult_3by2_standard): 215 x 36, two partial-product rows (215 x 6, 215 x 30 with the placeholder 0), then the sum.",
+  "Every preset also reaches error analysis (a worked column or grid with one misconception), true or false and reason-it through its host's provider."
+ ],
+ "progression": [
+  "Size ladder, ONE new thing a step (P-1): area 2x1 -> 3x1 -> 4x1 (one more part each); area 2x1 -> 2x2 (the second factor splits) -> 3x2 (one more column); column 2x1 -> 3x1 -> 4x1 (one more column, a 5-digit product); column 2x2 -> 3x2 (each partial row one digit longer).",
+  "Inside a preset: no carry -> carries -> a zero digit (3,045 x 6), each its own section (the O2 ladder of the build-list entries mult_4x1 and mult_standard).",
+  "Structural scaffolds stay: digit tracks, carry boxes, partial-product rows, placeholder-zero box, the area model's boxes and work row. Hints fade: the given place-value split on the edges (`edges`), the traced first digit / partial, the row names on long multiplication (support 2 -> 1 -> 0)."
+ ],
+ "drawing": {
+  "sizes": "Two print sizes M and L (owner 2026-11-13; S is an alias of M). Measured with the kit footprints on 2026-11-20 (A4 live width 186 mm, body 236 mm): area model 2x1 73 / 89 mm wide, 3x1 100 / 124, 4x1 128 / 159 (M / L), 63 / 74 mm tall -> 4x1 is ONE column, 3 cells a page at M and L (3x1 is already one column). Stack 3x1 29 / 35 mm, 4x1 40 / 49 mm wide, 31 / 38 mm tall, 6 tracks -> still 3 columns at M and L (62 mm each). Column 3x2: 6 tracks (VA-1 m + n + 1), 44 / 56 mm wide, four rows tall (two partials, carries, sum) -> 2 columns x 3 rows at M and L, measured by the builder (L26). Area 2x2 and 2x3 grids: the existing measured grid (maxCols 2), unchanged.",
+  "notes": [
+   "A preset never shrinks content to fit: 4x1 area takes one column, never a smaller digit.",
+   "The 3x2 column cell is the existing `long-multiplication` kit cell (support levels 2 / 1 / 0), not a new legacy column-mult handler (CLAUDE.md: do not extend the legacy path).",
+   "Keys print every partial product, carry and the total (AK-1, AK-2)."
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "Size, tracks and slots (quoted)",
+   "core": true,
+   "chars": 260,
+   "rules": [
+    "VA-1",
+    "SL-1",
+    "SL-12",
+    "AK-1",
+    "P-1"
+   ]
+  },
+  {
+   "title": "Cells, pages and lessons learned",
+   "chars": 120,
+   "rules": [
+    "AK-2",
+    "TY-20",
+    "TY-21",
+    "H13",
+    "L25",
+    "L26",
+    "SCC-01",
+    "LS-8",
+    "PG-12",
+    "DN-1a"
+   ]
+  },
+  {
+   "title": "Cited by critics on this family's and templates' findings (ids only)",
+   "chars": 80,
+   "rules": [
+    "AX-4",
+    "AX-9",
+    "C1",
+    "CL-9",
+    "H1@RUBRIC",
+    "H2@RUBRIC",
+    "H3@RUBRIC",
+    "H4@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "H10",
+    "H11",
+    "H12",
+    "L1",
+    "L6",
+    "PT-FRM-6",
+    "PT-GDP-1",
+    "PT-REV-3",
+    "RP-1",
+    "SL-3a",
+    "SP-20",
+    "TY-10a",
+    "VA-10@WDS"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-10-17",
+   "ruling": "A distinct option is ALSO a findable skill: a distinct size class is a preset skill (own label, grade, standards, WRM, search terms, appended share code) that opens the host with its option values.",
+   "source": "owner rule, CLAUDE.md"
+  },
+  {
+   "date": "2026-10-23",
+   "ruling": "Every new skill is linked in the same change: SKILL_WRM, the year record lists it direct, pre and related links.",
+   "source": "owner rule, CLAUDE.md"
+  },
+  {
+   "date": "2026-11-13",
+   "ruling": "Two print sizes M and L; no phone width.",
+   "source": "owner, FASTEST_PLAN_2026-11-13"
+  },
+  {
+   "date": "2026-11-19",
+   "ruling": "Add the missing multiplication size-pair presets, each with its own lesson.",
+   "source": "lead request, lf-ops brief"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M-S1",
+   "error": "drops the zeros of a place-value part",
+   "wrong": "7 x 3,000 written 21 in the area box; 30 x 20 = 60"
+  },
+  {
+   "id": "M-S2",
+   "error": "forgets the last carry, so the new top place is missing",
+   "wrong": "3,456 x 7 = 4,192 (for 24,192)"
+  },
+  {
+   "id": "M-S3",
+   "error": "multiplies only tens x tens and ones x ones",
+   "wrong": "34 x 26 = 600 + 24 = 624"
+  },
+  {
+   "id": "M-S4",
+   "error": "leaves out the placeholder zero in the second row",
+   "wrong": "215 x 36: second row 645 under 1,290 -> 1,935 (for 7,740)"
+  },
+  {
+   "id": "M-S5",
+   "error": "treats a zero digit as 1 or skips its part",
+   "wrong": "3,045 x 6 = 18,276 (for 18,270)"
+  }
+ ],
+ "options": [
+  "tiles on multiplication:multiply: NEW values 41 (4-digit x 1-digit (3,456 x 7)) and 32 (3-digit x 2-digit (215 x 36)), appended after 22; default null unchanged; old codes decode unchanged (ws-code-snapshot: count only rises).",
+  "tiles on multiplication:area_model_mult: NEW value 41 (4-digit x 1-digit (7 x 3,456)); the default 'Both sizes, dealt' keeps dealing only 2x1 and 3x1, so no lesson packet moves.",
+  "tiles on multiplication:area_model_mult_hard: values 22 and 23 exist; 23 writes the 3-digit factor first under the preset (open question 2).",
+  "Presets (skill-presets.js): mult_4by1_column -> multiply {tiles: 41}; mult_3by2_standard -> multiply {tiles: 32}; area_model_4by1 -> area_model_mult {tiles: 41}; area_model_2by2 -> area_model_mult_hard {tiles: 22}; area_model_3by2 -> area_model_mult_hard {tiles: 23}. Each also gets data.js presetOf, SKILL_PRESET grade, standards, WRM, SKILL_TERMS and an appended share code.",
+  "Build-list: mult_4x1 is closed by mult_4by1_column + area_model_4by1 (delete the entry); mult_standard's remaining ['4x1', '3x2'] are closed by mult_4by1_column and mult_3by2_standard."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --skill multiplication:multiply --strict",
+   "note": "and each of the five presets and both area-model hosts; rule 0b"
+  },
+  {
+   "cmd": "node tests/scripts/ws-presets-unit.mjs",
+   "note": "each preset opens its host with its values"
+  },
+  {
+   "cmd": "node tests/scripts/ws-content-audit.cjs --category multiplication",
+   "note": "4-digit by 1-digit deals 4-digit x 1-digit; 3-digit by 2-digit deals the 3-digit factor"
+  },
+  {
+   "cmd": "node tests/scripts/ws-search-terms.cjs",
+   "note": "each preset findable"
+  },
+  {
+   "cmd": "node tests/scripts/ws-standards.cjs",
+   "note": "SKILL_STANDARDS for each preset"
+  },
+  {
+   "cmd": "node tests/scripts/ws-wrm.cjs --report-only",
+   "note": "Y5.B5.S1 / S2 / S4 tags"
+  },
+  {
+   "cmd": "node tests/scripts/ws-wrm-page-unit.mjs",
+   "note": "direct, pre and related links"
+  },
+  {
+   "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+   "note": "share codes decode; count only rises"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --check",
+   "note": "no live packet moves (defaults unchanged)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/mult-sizes/mult-sizes.md",
+   "note": "build-start gate"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "No card covered area_model_mult / area_model_mult_hard, and the stack card has no decisions yet. Is this new family card (mult-sizes) the card for the five presets, rather than extending stack?",
+   "recommended": "Yes. The presets span three cells (area-model, stack, long-multiplication); one family card decides them together. The stack card keeps the add / sub stack and 1-digit x."
+  },
+  {
+   "q": "area_model_3by2 on tiles 23: the item today reads '24 x 135' (2-digit first). Write the 3-digit factor first, or add a value 32?",
+   "recommended": "Reuse 23 and write the 3-digit factor first ('135 x 24'), label the value '3-digit x 2-digit (a 2 x 3 grid)'. Same grid, same answers; one value, not two. The builder checks ws-lesson-baseline for packets that deal tiles 23 and re-pins them if any move."
+  },
+  {
+   "q": "mult_3by2_standard: multiply tiles 22 prints through the legacy column-mult format today. Build 32 there too, or move 22 and 32 to the kit long-multiplication cell?",
+   "recommended": "Move both to the long-multiplication kit cell (support 2 / 1 / 0), so 3x2 is never built on the legacy path; mult_2by2_standard is re-graded on the new cell with it."
+  },
+  {
+   "q": "G4-Y5.B5 is queue round 4, not the current round (FASTEST_PLAN rule 1). Build now?",
+   "recommended": "Lead decision; the lead requested it 2026-11-19. If built now, ship the five presets as one unit with their lessons."
+  },
+  {
+   "q": "MW4K / IXL research is from public pages only (no logins). Sign now?",
+   "recommended": "Yes: the size classes and responses agree across four sources; a logged-in pass can add item counts later without changing the card."
+  }
+ ],
+ "decisions": {
+  "options": [
+   {
+    "option": "tiles",
+    "values": [
+     "null"
+    ],
+    "d": "offered",
+    "why": "the hosts' default ('Tables facts' on multiply, 'Both sizes / grids, dealt' on the area hosts); unchanged by this card: it never deals 41 or 32",
+    "source": "skill-options.js"
+   },
+   {
+    "option": "tiles",
+    "values": [
+     "11"
+    ],
+    "d": "offered",
+    "why": "1-digit x 1-digit on multiply; the facts end of the size ladder, graded on the facts card",
+    "source": "skill-options.js multiply",
+    "skills": [
+     "multiplication:multiply",
+     "multiplication:mult_2by1_column",
+     "multiplication:mult_3by1_column",
+     "multiplication:mult_2by2_standard"
+    ]
+   },
+   {
+    "option": "tiles",
+    "values": [
+     "21",
+     "31"
+    ],
+    "d": "offered",
+    "why": "existing sizes; default on area_model_2by1 / mult_2by1_column and area_model_3by1 / mult_3by1_column; the step below each new preset",
+    "source": "skill-presets.js"
+   },
+   {
+    "option": "tiles",
+    "values": [
+     "22"
+    ],
+    "d": "offered",
+    "why": "2 x 2: multiply (mult_2by2_standard) and area_model_mult_hard (the NEW preset area_model_2by2); on multiply moves to the long-multiplication cell (open question 3)",
+    "source": "skill-presets.js; this card §7"
+   },
+   {
+    "option": "tiles",
+    "values": [
+     "23"
+    ],
+    "d": "offered",
+    "why": "the 2 x 3 grid = the NEW preset area_model_3by2; the 3-digit factor written first (open question 2)",
+    "source": "skill-options.js area_model_mult_hard; this card §7"
+   },
+   {
+    "option": "tiles",
+    "values": [
+     "41"
+    ],
+    "d": "offered",
+    "why": "NEW (to build) on multiply and area_model_mult: the presets mult_4by1_column and area_model_4by1; --check-signed NOTEs it until the build lands",
+    "source": "build-list mult_4x1; this card §3"
+   },
+   {
+    "option": "tiles",
+    "values": [
+     "32"
+    ],
+    "d": "offered",
+    "why": "NEW (to build) on multiply: the preset mult_3by2_standard on the long-multiplication cell",
+    "source": "build-list mult_standard; this card §3"
+   },
+   {
+    "option": "amEdges",
+    "values": [
+     "given",
+     "blank",
+     "mixed"
+    ],
+    "d": "offered",
+    "why": "the area-model hint scaffold (the place-value split on the edges); given -> mixed -> blank fades it; every value at 4 x 1, 2 x 2 and 3 x 2",
+    "source": "skill-options.js _amEdgesOpt"
+   },
+   {
+    "option": "notation",
+    "values": [
+     "stacked"
+    ],
+    "d": "offered",
+    "why": "the default; from 2-digit x 1-digit up the item is always stacked",
+    "source": "skill-options.js _ap4Patch multiply"
+   },
+   {
+    "option": "notation",
+    "values": [
+     "across"
+    ],
+    "d": "offered",
+    "why": "facts only (tiles null / 11: the control shows only then); never on a size preset",
+    "source": "skill-options.js _ap4Patch multiply appliesTo",
+    "skills": [
+     "multiplication:multiply"
+    ]
+   },
+   {
+    "option": "notation",
+    "values": [
+     "across"
+    ],
+    "d": "hidden",
+    "why": "the size presets are always stacked; the control does not show at tiles 21 and up",
+    "source": "skill-options.js _ap4Patch multiply appliesTo",
+    "skills": [
+     "multiplication:mult_2by1_column",
+     "multiplication:mult_3by1_column",
+     "multiplication:mult_2by2_standard"
+    ]
+   },
+   {
+    "option": "calculator",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "out of scope",
+    "proposed": true,
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+    "source": "skill-options.js play controls"
+   },
+   {
+    "option": "skipAfter",
+    "values": [
+     "*"
+    ],
+    "d": "out of scope",
+    "proposed": true,
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+    "source": "skill-options.js play controls"
+   }
+  ],
+  "roles": [
+   {
+    "key": "role:independent",
+    "d": "offered",
+    "why": "the pass bar",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:more-practice",
+    "d": "offered",
+    "why": "the pass bar",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:test",
+    "d": "offered",
+    "why": "the pass bar",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:lesson",
+    "d": "offered",
+    "why": "the pass bar; each preset is its own lesson in G4-Y5.B5 (Y5.B5.S1 / S2 / S4); lesson data is the FALLBACK today (prereqs.js 0/8): the build gives each preset its prereqs.js warm-up (the size below)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:scripted-model",
+    "d": "offered",
+    "why": "workedSteps per size (the Say band names every part / row); real on multiply, default on the area hosts: the build writes the area-model steps",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:guided",
+    "d": "offered",
+    "why": "workedSteps per size; the first item's first partial traced",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:opener",
+    "d": "offered",
+    "why": "any skill on any page type",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:error-analysis",
+    "d": "offered",
+    "why": "wrongAnswer per size from M-S1..M-S5",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:review",
+    "d": "offered",
+    "why": "any skill on any page type",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:pre-skill-check",
+    "d": "offered",
+    "why": "the size below each preset",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:mixed-practice",
+    "d": "offered",
+    "why": "any skill on any page type; one size per section",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:true-false",
+    "d": "offered",
+    "why": "a worked column or grid, true or false, from M-S1..M-S5",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:reason-it",
+    "d": "offered",
+    "why": "workedSteps and wrongAnswer real",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:stretch",
+    "d": "offered",
+    "why": "the next size up (4 x 2 is out of this card)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:word-problems",
+    "d": "offered",
+    "why": "the provider's stories at the preset size (e.g. 4 x 1 stories)",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
+    "proposed": true
+   },
+   {
+    "key": "role:fact-rows",
+    "d": "out of scope",
+    "why": "a multi-digit written method, not a fact layout: the 5-10 column fact layouts are for tiles 11 / facts, graded on the facts card",
+    "source": "CLAUDE.md: fact skills additionally get the fact layouts",
+    "proposed": true
+   },
+   {
+    "key": "role:fact-probe",
+    "d": "out of scope",
+    "why": "a multi-digit written method, not a fact layout: the 5-10 column fact layouts are for tiles 11 / facts, graded on the facts card",
+    "source": "CLAUDE.md: fact skills additionally get the fact layouts",
+    "proposed": true
+   }
+  ],
+  "hosts": [
+   {
+    "key": "host:practice-card",
+    "d": "offered",
+    "why": "one drawing with print; the pass bar (1280-1366 and 820-1024 px)",
+    "source": "RUBRIC (every screen host); FASTEST_PLAN 7"
+   },
+   {
+    "key": "host:online-worksheet",
+    "d": "offered",
+    "why": "one drawing with print; the pass bar (1280-1366 and 820-1024 px)",
+    "source": "RUBRIC (every screen host); FASTEST_PLAN 7"
+   },
+   {
+    "key": "host:quiz",
+    "d": "offered",
+    "why": "one drawing with print; the pass bar (1280-1366 and 820-1024 px)",
+    "source": "RUBRIC (every screen host); FASTEST_PLAN 7"
+   },
+   {
+    "key": "host:boss",
+    "d": "out of scope",
+    "why": "the same card in a game host / display mode; graded by ws-chromebook-fit, not by this card's critic",
+    "source": "ws-chromebook-fit",
+    "proposed": true
+   },
+   {
+    "key": "host:race",
+    "d": "out of scope",
+    "why": "the same card in a game host / display mode; graded by ws-chromebook-fit, not by this card's critic",
+    "source": "ws-chromebook-fit",
+    "proposed": true
+   },
+   {
+    "key": "host:map",
+    "d": "out of scope",
+    "why": "the same card in a game host / display mode; graded by ws-screen-slots, not by this card's critic",
+    "source": "ws-screen-slots",
+    "proposed": true
+   },
+   {
+    "key": "host:mode-dark",
+    "d": "out of scope",
+    "why": "the same card in a game host / display mode; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic",
+    "source": "ws-chromebook-fit, ws-screen-slots",
+    "proposed": true
+   },
+   {
+    "key": "host:mode-bigboard",
+    "d": "out of scope",
+    "why": "the same card in a game host / display mode; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic",
+    "source": "ws-chromebook-fit, ws-screen-slots",
+    "proposed": true
+   }
+  ]
+ }
+}
