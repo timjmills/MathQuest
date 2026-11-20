@@ -12201,6 +12201,106 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-lesson-grid-even",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN (lesson practice page)",
+   "check": "a chart-window page dealt short of whole rows (band 120's lesson practice: 5 windows, a sixth would give an answer away) keeps one cell width: its last window is not re-laid 185 mm wide (precritic r3, chart blanks)",
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills composing:chart_to_120 --roles lesson --size M --lints L-DENSITY",
+   "fail": {
+    "commit": "6f397027c",
+    "state": "the fifth practice window was re-laid across the whole last row (grid.js relaid): cells 92.3 to 184.9 mm"
+   },
+   "pass": {
+    "commit": "417177a60",
+    "state": "grid.js centerLast (practice.js on chart-window grids): the last window keeps the lattice, centred, paper either side"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-lesson-side-band",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-empty-band EB-SIDE (lesson practice page)",
+   "check": "no chart window sits in a cell far wider than its ink on the lesson practice page (same root as GRID-EVEN: the re-laid fifth window)",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:chart_to_120 --roles lesson --sizes M --hosts none --no-baseline --margin 2 --only EB-SIDE",
+   "fail": {
+    "commit": "6f397027c",
+    "state": "lesson M p3 cell 5: 52.3 mm empty beside the ink of a 184.9 mm wide cell"
+   },
+   "pass": {
+    "commit": "417177a60",
+    "state": "the fifth window is one column wide, centred"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-guided-tight",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-empty-band EB-BAND (Guided, chart windows)",
+   "check": "a Guided page of chart windows (3 blanks a window: the answer ceiling leaves the Model and 2 tries) holds its rows to their measured height, the spare under the grid",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:chart_to_120 --roles guided --sizes M --hosts none --no-baseline --margin 2 --only EB-BAND",
+   "fail": {
+    "commit": "6f397027c",
+    "state": "guided M p1: Model 35.7 %, cell 2 36.1 %, cell 3 42.3 % empty bands - the rows stretched to the page"
+   },
+   "pass": {
+    "commit": "417177a60",
+    "state": "chartwindow footprint guidedTight: rows at their measure"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-model-steps-across",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-empty-band EB-BAND / EB-PAGE (Scripted Model, 4+ gap chart window)",
+   "check": "a chart window of four or more gaps writes Scripted Model steps of two lines at most, so its states stand across with the step over each - never a one-line step text cell beside a 63 mm state",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:chart_to_120 --roles scripted-model --sizes L --hosts none --no-baseline --margin 2 --page-fill --only EB-BAND,EB-PAGE",
+   "fail": {
+    "commit": "6f397027c",
+    "state": "scripted-model L: step text cells 60-70 % empty, page 1 43 % empty (the 'along the row' / 'Check: across ...' steps wrapped to three lines)"
+   },
+   "pass": {
+    "commit": "417177a60",
+    "state": "k2 chartSteps: 'From 91 to 100, count on by 1. Write ...' and 'Check: each number is 1 more across and 10 more down.'"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hcf-band30-pattern",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-empty-band EB-BAND (independent, band 30 windows)",
+   "check": "a band whose 3-row windows all sit on the same rows (band 30, band 120) deals the five-column gap pattern, so a page holds its six windows and no cell is stretched round a lone few",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill --opts '{\"band\":30}' --roles independent --sizes L --hosts none --no-baseline --margin 2 --only EB-BAND",
+   "fail": {
+    "commit": "6f397027c",
+    "state": "independent L band 30: four windows dealt (the rest gave answers away), cells 106.6 mm, 44.5 % bands"
+   },
+   "pass": {
+    "commit": "417177a60",
+    "state": "gen-counting _sameRows: the per-five pattern on band 30 too; six windows a page"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
