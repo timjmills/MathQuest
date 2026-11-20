@@ -36,10 +36,11 @@ const SHOTS = arg('--shots', '');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = {};
 const finding = (id, msg) => { (results[id] = results[id] || []).push(msg); };
-const want = (id) => ONLY.includes(id);
+let current = 'RUN';   // the check running now: an exception inside it fails IT (and the run), never passes it
+const want = (id) => { const on = ONLY.includes(id); if (on) current = id; return on; };
 
 // The sheets every check uses (card §8: across hosts and page types, M and L)
-const ADD = { categoryId: 'addition', skillId: 'add_within_20' };
+const ADD = { categoryId: 'addition', skillId: 'add_10_mixed' };
 const CASES = [
     { id: 'tp-independent-M', host: 'tp', ui: { size: 'M', sections: [{ role: 'independent', skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: {} }] }] } },
     { id: 'tp-independent-L', host: 'tp', ui: { size: 'L', sections: [{ role: 'independent', skills: [{ categoryId: 'subtraction', skillId: 'sub_facts', opts: {} }] }] } },
@@ -60,6 +61,8 @@ const CASES = [
     const app = await open({ seed: 7, viewport: { width: 1280, height: 1000, deviceScaleFactor: 1 }, lock: 'ws-my-worksheets', protocolTimeout: 600000 });
     const { page, browser, base, problems } = app;
     page.setDefaultTimeout(120000);
+    const notFound = [];
+    page.on('response', (r) => { if (r.status() === 404) notFound.push(r.url().replace(base, '')); });
     const shot = async (name) => { if (!SHOTS) return; fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `${name}.png`) }); };
     const ready = async () => { for (let i = 0; i < 120 && !(await page.evaluate(() => typeof window.tvGo === 'function' && typeof window.setUserRole === 'function' && !!window.tvGo && !window.tvGo.__mqStub).catch(() => false)); i++) await sleep(250); };
     const visit = async (url, teacher = true) => {
@@ -99,7 +102,7 @@ const CASES = [
 
         /* ---------------------------------------------------------------- NO-LOSS (first: it seeds the old database) */
         if (want('NO-LOSS')) {
-            await page.goto(base + '/tests/fixtures/', { waitUntil: 'domcontentloaded' }).catch(() => {});
+            await page.goto(base + '/css/base.css', { waitUntil: 'domcontentloaded' }).catch(() => {});   // the origin, without the app
             const seeded = await page.evaluate(async () => {
                 await new Promise((r) => { const q = indexedDB.deleteDatabase('mathquest_quizzes'); q.onsuccess = q.onerror = q.onblocked = () => r(); });
                 const db = await new Promise((res, rej) => {
@@ -139,8 +142,9 @@ const CASES = [
         }
 
         /* ---------------------------------------------------------------- SAVE-REPRODUCE */
-        const needSaved = want('SAVE-REPRODUCE') || want('SHEET-CODE') || want('LIBRARY-ROUNDTRIP') || want('INTERACTIVE-SAME') || want('ORGANISE') || want('TOUCH-WIDTH');
+        const needSaved = ['SAVE-REPRODUCE', 'SHEET-CODE', 'LIBRARY-ROUNDTRIP', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH'].some((k) => ONLY.includes(k));
         if (needSaved) {
+            current = ONLY.includes('SAVE-REPRODUCE') ? 'SAVE-REPRODUCE' : ONLY.find((k) => k !== 'NO-LOSS');
             await L(async (L) => L.clearSheets());
             for (const c of CASES) {
                 const r = await page.evaluate(async (c) => {
@@ -362,8 +366,8 @@ const CASES = [
             if (!offer.save || !offer.print) finding('SHEET-CODE', `a teacher opening ?sheet= is not offered Save and Print (${JSON.stringify(offer)})`);
             else {
                 await click('#mwsCodeOpen [data-mws-code="save"]');
-                await sleep(1500);
-                const n1 = await L(async (L) => (await L.listSheets()).length);
+                let n1 = n0;
+                for (let i = 0; i < 40 && n1 === n0; i++) { await sleep(500); n1 = await L(async (L) => (await L.listSheets()).length); }
                 if (n1 !== n0 + 1) finding('SHEET-CODE', `Save to My Worksheets from a code stored ${n1 - n0} sheets`);
             }
             // as a pupil (a fresh window, no teacher role): the sheet plays, page 1's items
@@ -616,10 +620,10 @@ const CASES = [
             }
         }
     } catch (e) {
-        if (String(e.message) !== 'no library') finding('RUN', String(e.stack || e).slice(0, 400));
+        if (String(e.message) !== 'no library') { finding(current, `stopped: ${String(e.stack || e).slice(0, 400)}`); const RUN_ORDER = ['NO-LOSS', 'SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH']; for (const id of RUN_ORDER.slice(RUN_ORDER.indexOf(current) + 1).filter((k) => ONLY.includes(k))) finding(id, `not run: ${current} stopped the gate`); }
     } finally {
         const errs = (problems || []).filter((p) => !/favicon|ERR_ABORTED|net::ERR_FAILED.*(fonts|gsi|jsdelivr)|accounts\.google|cdn\.jsdelivr/.test(p.text));
-        if (errs.length) finding('CONSOLE', `${errs.length} console / page errors: ${errs.slice(0, 3).map((p) => p.text.slice(0, 160)).join(' | ')}`);
+        if (errs.length) finding('CONSOLE', `${errs.length} console / page errors: ${errs.slice(0, 3).map((p) => p.text.slice(0, 160)).join(' | ')}${notFound.length ? ` (404: ${notFound.slice(0, 4).join(', ')})` : ''}`);
         await app.close();
     }
     let fails = 0;

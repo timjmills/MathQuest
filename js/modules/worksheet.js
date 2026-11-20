@@ -11,6 +11,7 @@ import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
 import { chartSeen, chartGivesAway } from './chart-giveaway.js';
 import { syncWorksheetRefLine } from './refline-screen.js';
+import { getSetOptions } from './skill-option-store.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
@@ -1976,10 +1977,15 @@ export function newWorksheet() {
     worksheetWrongTimers.forEach(timer => clearTimeout(timer));
     worksheetWrongTimers.clear();
     state.problemCount = state.problemCount || parseInt(document.getElementById('problemCountSelect')?.value || '20', 10);
-    const isUnlimited = state.problemCount === 0;
+    // My Worksheets (design/my-worksheets/CARD.md §5): a saved sheet opened interactive deals the items its page 1 prints,
+    // in print order (state.worksheetPreset, set once by my-worksheets.js); "New" afterwards deals a fresh sheet as before.
+    const preset = Array.isArray(state.worksheetPreset) && state.worksheetPreset.length ? state.worksheetPreset : null;
+    state.worksheetPreset = null;
+    if (!preset) state.worksheetSheet = null;
+    const isUnlimited = !preset && state.problemCount === 0;
     // Safety cap: worksheet mode should never generate more than 50 problems at once
     // to prevent browser freeze. For unlimited mode, start with 10 and use "Load More".
-    const total = isUnlimited ? 10 : Math.min(state.problemCount, 50);
+    const total = preset ? Math.min(preset.length, 50) : isUnlimited ? 10 : Math.min(state.problemCount, 50);
 
     console.log(`newWorksheet: problemCount=${state.problemCount}, total=${total}, isUnlimited=${isUnlimited}`);
     console.log(`newWorksheet: category=${state.category}, skill=${state.skill}`);
@@ -2000,16 +2006,65 @@ export function newWorksheet() {
     // on paper. Mixed pools still mix: the mixed category / skill ids route inside the dispatcher.
     state.worksheetSeed = (Math.random() * 0x100000000) >>> 0;
     for (let i = 0; i < total; i++) {
-        const q = _wsGenerate(i);
+        const q = preset ? Object.assign({}, preset[i]) : _wsGenerate(i);
         state.worksheetQs.push(q);
         _wsRenderCard(grid, q, i);
     }
     _wsScheduleLayout(grid);
     _wsHeaderPill();
+    _wsSyncSaveButton();
     // Wave 5.2: the skill's number line above the sheet, covering every item on it.
     try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint: never block the sheet */ }
 
     document.getElementById("worksheetResult").innerText = "";
+}
+
+// My Worksheets: Save on the online worksheet, for a teacher only (card S-1, A15 #2). The button is made here, so the
+// pupil page's markup is unchanged.
+function _wsSyncSaveButton() {
+    const bar = document.querySelector('#worksheetView .game-header > div:last-child');
+    if (!bar) return;
+    let b = document.getElementById('wsSaveSheet');
+    if (!b) {
+        b = document.createElement('button');
+        b.type = 'button';
+        b.id = 'wsSaveSheet';
+        b.className = 'btn btn-sm btn-secondary';
+        b.textContent = 'Save';
+        b.setAttribute('aria-label', 'Save to My Worksheets');
+        b.addEventListener('click', () => {
+            if (!document.body.classList.contains('teacher-mode')) return;
+            import('./my-worksheets.js').then((m) => m.openSaveDialog(playerSaveDraft())).catch((e) => console.warn('[worksheet] save failed', e));
+        });
+        bar.insertBefore(b, bar.firstChild);
+    }
+    b.hidden = !document.body.classList.contains('teacher-mode');
+}
+
+/**
+ * What Save keeps on the online worksheet: the saved sheet it was opened from, else the skills being played as an
+ * Independent sheet (the Print screen's request shape, its own seed), so it reprints and replays the same.
+ */
+export function playerSaveDraft() {
+    if (state.worksheetSheet && state.worksheetSheet.req) return JSON.parse(JSON.stringify(state.worksheetSheet));
+    let skills = [];
+    const sel = state.mixedModeSettings && state.isMixedMode ? state.mixedModeSettings.selectedSkills : null;
+    if (sel) {
+        for (const [categoryId, ids] of Object.entries(sel)) for (const skillId of ids || []) {
+            let opts = {};
+            try { opts = getSetOptions(categoryId, skillId) || {}; } catch (e) { opts = {}; }
+            skills.push({ categoryId, skillId, opts });
+        }
+    } else if (state.category && state.skill) skills = [{ categoryId: state.category, skillId: state.skill, opts: state.skillOptions || {} }];
+    const seed = 100000 + ((state.worksheetSeed >>> 0) % 900000);
+    const part = {
+        role: 'independent', sections: [{ skills, columns: 'auto' }], size: 'M', look: 'auto', paper: 'A4',
+        header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy', newSheet: false }, seed,
+    };
+    return {
+        host: 'player', req: { paper: 'A4', parts: [part], idx: [0] },
+        ui: { size: 'M', seed, sections: [{ role: 'independent', skills: skills.map((k) => Object.assign({ weight: 1 }, k)) }] },
+    };
 }
 
 // Add more problems for unlimited mode
