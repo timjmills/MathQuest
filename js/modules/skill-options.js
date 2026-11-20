@@ -4077,7 +4077,8 @@ const LF_ALGEBRA_MIXED_OPTIONS = {
             help: 'The parts the fraction is made of. Start with halves and quarters, then thirds, fifths, sixths and eighths.',
         },
         {
-            id: 'mnWholes', label: 'Most wholes', type: 'enum', default: 2, group: 'difficulty',
+            // (default 3: halves and quarters to 3 wholes are 12 mixed numbers, a page of 12 with no repeat - ws-node-lint REPEATS)
+            id: 'mnWholes', label: 'Most wholes', type: 'enum', default: 3, group: 'difficulty',
             values: [{ v: 1, l: '1 (1 1/2, 1 3/4)' }, { v: 2, l: '2' }, { v: 3, l: '3' }, { v: 5, l: '5 (no bar model past 3 wholes)' }],
             help: 'The biggest whole number part. At 5 the items with 4 or 5 wholes have no bar model: six bars do not fit a cell.',
         },

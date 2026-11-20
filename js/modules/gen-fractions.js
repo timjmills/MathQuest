@@ -130,7 +130,7 @@ function _mnOpts() {
     const o = state.skillOptions || {};
     const task = ['partition', 'ones', 'compose'].includes(o.mnTask) ? o.mnTask : 'partition';
     const denoms = _MN_DENOMS[o.mnDenoms] ? o.mnDenoms : 'halves-quarters';
-    const wholes = [1, 2, 3, 5].includes(Number(o.mnWholes)) ? Number(o.mnWholes) : 2;
+    const wholes = [1, 2, 3, 5].includes(Number(o.mnWholes)) ? Number(o.mnWholes) : 3;
     const model = o.model === 'none' ? 'none' : 'bar';
     const form = o.mnForm === 'eq' && task !== 'compose' ? 'eq' : 'diagram';
     return { task, denoms, wholes, model, form };

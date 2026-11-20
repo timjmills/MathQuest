@@ -654,13 +654,14 @@ function pwVal(p, ctx, id) {
     return key === undefined || key === null ? '' : String(key);
 }
 /** One writing place: a rounded box (or, `zone`, a fraction-bar writing zone) holding a written value. */
-function pwSlot(ctx, id, v, { w, h, zone = false, pt, marks = null }) {
+function pwSlot(ctx, id, v, { w, h, zone = false, pt, marks = null, bare = false }) {
     const st = marks && marks[id];
     const ink = v !== '' ? (st ? (st.ink === 'trace' ? 'trace' : 'solid') : inkOf(ctx)) : null;
     const twin = isTwin(ctx);
     const hook = twin ? ` data-mq-cell="1" data-mq-w="2" data-mq-pk="${id.replace(/\d+$/, '')}" data-mq-label="${id === 'n' ? 'numerator' : id === 'd' ? 'denominator' : 'wholes'}"` : '';
     // a zone is a writing place on the bar (no outline on paper); on screen it is a 48 px touch target with a hairline
-    const border = zone && !twin ? 'border:0;' : `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[pwSize(ctx)])};`;
+    // (`bare`: the slot IS its part box - the box draws the outline, on screen too)
+    const border = (zone && !twin) || bare ? 'border:0;' : `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[pwSize(ctx)])};`;
     const height = twin ? `max(48px, ${L(ctx, h)})` : L(ctx, h);
     return `<span class="fm-pw-slot" data-ws-slot="${id}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${hook} `
         + `style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${height};${border}`
@@ -730,7 +731,7 @@ function pwDiagram(p, ctx) {
         const nW = g.parts.length - 1;
         for (let i = 0; i < nW; i++) {
             const id = ones ? `w${i + 1}` : 'w';
-            cols.push(`${partBox(pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.wholeW - 2, h: g.partH - 2, zone: true, pt: digitPt(ctx) }), g.wholeW, false)}${lab(ones ? 'one' : 'wholes')}`);
+            cols.push(`${partBox(pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.wholeW - 2, h: g.partH - 2, zone: true, bare: true, pt: digitPt(ctx) }), g.wholeW, false)}${lab(ones ? 'one' : 'wholes')}`);
         }
         cols.push(`${partBox(pwFracSlot(p, ctx, g), g.fracW, false)}${lab('fraction')}`);
     }
@@ -813,7 +814,7 @@ register('frac-model', {
     },
     // the Model / lesson states of a partition item: the slots the worked steps have marked, the newest in trace grey
     hasStepState(p) { return !!p && p.task === 'partition'; },
-    // state k: the marks of steps 1..k written, step k's in trace grey (the Scripted Model's frozen states, PT-MOD-1)
+    // state k: the marks of steps 1..k written, step k's in trace grey (the Scripted Model's frozen states)
     statePayload(p, steps, k) {
         const mk = {};
         (steps || []).forEach((st, i) => {
