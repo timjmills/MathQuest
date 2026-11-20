@@ -1034,6 +1034,8 @@ function buildPlan(ctx) {
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));
         // critic 2026-10-30 (WRM Y4 lessons F1, GATE-DRIFT): a skill, option or preset change can turn a site-lesson claim false;
         // every year's lessonfit runs on any skill scope (node, about a minute)
+        // PSC-TITLE / PSC-INSTR / PSC-DEAL (lf-roles critic D2-D4): the run's skills' Pre-skill Check pages
+        if (scriptPath('ws-psc-lint')) add(gate('psc-lint-skills', 'ws-psc-lint (PSC-TITLE, PSC-INSTR, PSC-STRIP1, PSC-TWIN(-MIX), PSC-DEAL on the run\'s skills, M / L, Forms A and B; PSC-LESSON on g3-oa8-two-step-wp)', scope, 'browser', 'ws-psc-lint', ['--skills', keys.join(',')], { missingMsg: 'ws-psc-lint is not in this tree' }));
         // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
         // at S / M / L, its option variants, and the screen hosts (card 1280 / 1366 / 820 / 1024, worksheet, quiz; owner 2026-11-13: no phone width), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
@@ -1477,6 +1479,9 @@ function buildPlan(ctx) {
             const rk = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
             add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
             if (ctx.role === 'error-analysis') add(gate('ea-stem-fixture', 'ws-ea-stem --fixture (EA-STEM guard: a correct story sentence is true of its numbers)', 'planted key', 'node', 'ws-ea-stem', ['--fixture', 'tests/fixtures/precritic/ea-stem.pass.html'], { missingMsg: 'ws-ea-stem is not in this tree' }));
+            // PSC-TITLE / PSC-INSTR / PSC-DEAL (lf-roles critic D2-D4, 2026-11-20): the Pre-skill Check's title, instructions and deal
+            if (ctx.role === 'pre-skill-check' && scriptPath('ws-psc-lint')) { add(gate('psc-lint-self', 'ws-psc-lint --self-test (PSC-TITLE / PSC-INSTR / PSC-TWIN-MIX / PSC-DEAL judges)', 'planted cases', 'node', 'ws-psc-lint', ['--self-test'], { missingMsg: 'ws-psc-lint is not in this tree' }));
+                add(gate('psc-lint', 'ws-psc-lint (PSC-TITLE, PSC-INSTR, PSC-STRIP1, PSC-TWIN(-MIX), PSC-DEAL on every passed PSC skill, M / L, Forms A and B; PSC-LESSON on g3-oa8-two-step-wp)', 'passed PSC skills', 'browser', 'ws-psc-lint', [], { missingMsg: 'ws-psc-lint is not in this tree' })); }
             if (ctx.role === 'true-false') add(gate('tof-stem-role', 'ws-tof-stem (TOF-STEM) on the role sample', `role true-false × ${rk.length} skill(s)`, 'browser', 'ws-tof-stem', ['--skills', rk.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }
