@@ -163,6 +163,9 @@ const BLOCKING = new Set(EBLAST_BLOCKING_ROLES);
 // page is held to EB-PAGE's 30 % too - EB-LASTPAGE excuses a page AT its ceiling (add_facts M: 12 items, 3 rows of 4, ~40 % white),
 // but a short check at its ceiling must still lay its items over the page. Roles listed here: EB-PAGE judges every page. Pure.
 const EBPAGE_ALL_PAGES_ROLES = new Set(['pre-skill-check']);
+// EB-PSCCAP (lf-roles PSC layout item 2, lead 2026-11-20): a Pre-skill Check page never holds more items than its declared
+// ceiling (role-capacity.js, 12 M / 8 L) - the fill only adds, so a base of 4 a prerequisite kept 16 on one page. Pure.
+const pscCapBad = (role, size, items, table) => { if (String(role || '').split(' ')[0] !== 'pre-skill-check' || !table) return null; const c = table['pre-skill-check']; const cap = c && (c[size] || c.M); return cap && Number(items) > cap ? cap : null; };
 const pageAllBad = (role, pct) => EBPAGE_ALL_PAGES_ROLES.has(String(role || '').split(' ')[0]) && Number(pct) >= 30;
 /** 'finding' or 'advisory': an EB-LASTPAGE / CAP-PARITY red on `role` (blockAll: --eblast-block). Pure. */
 const eblastMode = (role, blockAll, list = BLOCKING) => (blockAll || list.has(String(role || '').split(' ')[0]) ? 'finding' : 'advisory');
@@ -305,7 +308,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY'];
+const RULES = ['EB-PSCCAP', 'EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -606,6 +609,9 @@ if (argv.includes('--self-test')) {
             ['blocking: an unlisted role red is advisory', eblastMode('not-a-role', false), 'advisory'],
             ['blocking: --eblast-block makes every red a finding', eblastMode('not-a-role', true), 'finding'],
             ['blocking: a role key with columns reads its role', eblastMode('review cols 3', false), 'finding'],
+            ['EB-PSCCAP: PSC M 16 items (ceiling 12): FAIL', pscCapBad('pre-skill-check', 'M', 16, { 'pre-skill-check': { M: 12, L: 8 } }), 12],
+            ['EB-PSCCAP: PSC L 8 items: OK', pscCapBad('pre-skill-check', 'L', 8, { 'pre-skill-check': { M: 12, L: 8 } }), null],
+            ['EB-PSCCAP: test M 16: not judged', pscCapBad('test', 'M', 16, { 'pre-skill-check': { M: 12, L: 8 } }), null],
             ['EB-PAGE-LAST: PSC last page 40 % (add_facts M at its 12 ceiling): FAIL', pageAllBad('pre-skill-check', 40), true],
             ['EB-PAGE-LAST: PSC last page 25 %: OK', pageAllBad('pre-skill-check', 25), false],
             ['EB-PAGE-LAST: independent last page 60 % (teacher count): not judged', pageAllBad('independent', 60), false],
@@ -1215,6 +1221,7 @@ async function main() {
                     if (has('page-fill') && j.role !== 'guided') {
                         const pf = await sh.evaluate(measurePageFill, 'body > section.ws-page, body > .ws-page');
                         pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                        pf.forEach((v, i) => { const cap = pscCapBad(j.role, j.size, v.items, CAPK && CAPK.ROLE_CAPACITY); if (cap) F('EB-PSCCAP', `${key} ${j.tag} p${i + 1}`, `${v.items} items on the page, above its declared ${j.size} ceiling of ${cap} (role-capacity.js)`); });
                         if (pf.length && pageAllBad(j.role, pf[pf.length - 1].pct)) F('EB-PAGE', `${key} ${j.tag} p${pf.length}`, `${pf[pf.length - 1].pct} % of the last page body is empty under its last block (a Pre-skill Check is one short page: every page judged, at its ceiling too; limit 30 %)`);
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
