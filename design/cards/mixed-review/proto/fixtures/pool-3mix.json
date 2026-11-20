@@ -1,0 +1,23 @@
+[
+ {
+  "id": "wide:nl",
+  "code": "AA",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "wide"
+ },
+ {
+  "id": "facts:add",
+  "code": "AB",
+  "grade": "1",
+  "area": "OA",
+  "fc": "compact"
+ },
+ {
+  "id": "stack:sub",
+  "code": "AC",
+  "grade": "2",
+  "area": "NBT",
+  "fc": "typical"
+ }
+]

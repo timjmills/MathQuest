@@ -1,0 +1,39 @@
+{
+ "note": "the old dealer (wide and flat on separate pages, no fill top-up): a non-last page under half full",
+ "expect": "fail",
+ "catch": "k",
+ "props": [
+  "k"
+ ],
+ "mutate": {
+  "separatePages": true
+ },
+ "input": {
+  "pool": "pool-2mix",
+  "N": 30,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ }
+}

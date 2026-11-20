@@ -1,5 +1,5 @@
 {
  "file": "dealer-v1.mjs",
- "sha256": "49b35683d3d0063dfb3fb0e9a0b73c57c507527de03d11472e3ffdc4fce58a09",
+ "sha256": "4fb82ccf1d33e08c17749ce39ecf45db30a2747a64d14e72e39b2155768b793f",
  "note": "V1 freeze: a change to what dealer-v1.mjs deals ships as V2 in a new file; this pin moves with the file to js/modules/mixed-review.js (re-taken on the import-path diff only)"
 }

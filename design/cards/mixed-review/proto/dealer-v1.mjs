@@ -120,6 +120,9 @@ function dealSheet(input, cycle, day, ws, mut) {
         : [fresh(s) ? 0 : 1, (prev.has(s.id) && !mut.allowConsecutive) ? 1 : 0, pagesUsed.get(s.id) || 0, mut.allowConsecutive ? 0 : (uses.get(s.id) || 0), p0(s)]);
     const maxS = mut.maxSkills4 ? 4 : MAX_SKILLS_PAGE;
     let forced = ws && ws.comeback ? cycle.find((s) => s.id === ws.comeback) || null : null;
+    // fill: each item is 1 / CAP[size][its class] of a page, so wide and flat items can share a page while the sum is <= 1.
+    const fillOf = (pg) => pg.chosen.reduce((a, s) => a + pg.counts[s.id] / CAPT[size][s.fc], 0);
+    const shelvesOf = (pg) => pg.chosen.reduce((a, s) => a + Math.ceil(pg.counts[s.id] / SHELF[size][s.fc]), 0);
     const pages = []; let R = mut.ignoreN ? Infinity : N;
     for (let guard = 0; R > 0 && guard < 200; guard++) {
         let cands = cycle.filter((s) => room(s) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
@@ -152,12 +155,32 @@ function dealSheet(input, cycle, day, ws, mut) {
                 counts[s.id]--; counts[to.id]++; over--;
             }
         }
+        // THE FILL TOP-UP (lead ruling 2026-11-20): a page that would be under half full while items remain beyond it takes
+        // more skills of EITHER class (wide or flat) by fill, in the choice order (fresh first), each up to its room, the
+        // page's free fill and the shelf ceiling, until the page is at least half full or nothing fits. At most 3 skills.
+        const topUp = [];
+        if (!mut.separatePages && !mut.ignoreN) {
+            const pg = { chosen: chosen.slice(), counts };
+            for (let k = 0; k < 6 && fillOf(pg) * 2 < 1 && R - n > 0 && pg.chosen.length < maxS; k++) {
+                let more = cycle.filter((t) => !pg.chosen.includes(t) && room(t) > 0).sort((a, b) => sortKeyCmp(key(a), key(b)));
+                if (more.some(fresh)) more = more.filter(fresh);
+                const t = more[0];
+                if (!t) break;
+                let c = Math.min(room(t), R - n, Math.floor((1 - fillOf(pg)) * CAPT[size][t.fc] + 1e-9));
+                while (c > 0) { pg.counts[t.id] = c; pg.chosen.push(t); if (shelvesOf(pg) <= SHELF_MAX[size]) break; pg.chosen.pop(); delete pg.counts[t.id]; c--; }
+                if (c < 1) break;
+                if (c < 2 && SHELF[size][t.fc] > 1 && R - n - c > 0) { pg.chosen.pop(); delete pg.counts[t.id]; break; }   // one item of a skill only as a wide shelf of 1
+                topUp.push(t.id); n += c;
+            }
+            chosen = pg.chosen;
+            if (topUp.length) C = Math.min(...chosen.filter((s) => s.fc !== 'wide').map((s) => CAPT[size][s.fc]), C);
+        }
         for (const s of chosen) {
             total.set(s.id, (total.get(s.id) || 0) + counts[s.id]);
             pagesUsed.set(s.id, (pagesUsed.get(s.id) || 0) + 1);
             if (!appear.has(s.id)) appear.set(s.id, appear.size);
         }
-        pages.push({ n, cap: C, cls: [...new Set(chosen.map((s) => s.fc))], skills: chosen.map((s) => s.id), counts, chosen });
+        pages.push({ n, cap: C, cls: [...new Set(chosen.map((s) => s.fc))], skills: chosen.map((s) => s.id), counts, chosen, topUp });
         forced = null;
         R -= n;
         if (mut.ignoreN && pages.length >= Math.ceil(input.N / C)) break;
@@ -165,8 +188,6 @@ function dealSheet(input, cycle, day, ws, mut) {
     // THE TAIL MERGE: a last page under half full joins the latest earlier page it fits beside: the two pages' fill (each item
     // 1 / CAP[size][its class], so a wide item at M is a quarter page) is at most one page, with at most 3 skills and the
     // shelf ceiling kept. Counts never change; only the page split does. A page may then hold wide and flat skills together.
-    const fillOf = (pg) => pg.chosen.reduce((a, s) => a + pg.counts[s.id] / CAPT[size][s.fc], 0);
-    const shelvesOf = (pg) => pg.chosen.reduce((a, s) => a + Math.ceil(pg.counts[s.id] / SHELF[size][s.fc]), 0);
     while (!mut.noTailMerge && pages.length > 1) {
         const L = pages[pages.length - 1];
         if (fillOf(L) * 2 >= 1) break;
@@ -212,7 +233,7 @@ function dealSheet(input, cycle, day, ws, mut) {
         const shelves = seq.map((t) => ({ skill: t.key, items: cellsOf(t) }));
         const k1 = arrangement === 'm1' ? SHELF[size][pg.cls[0]] : null;
         const rows = arrangement === 'm1' ? Math.ceil(pg.n / k1) : shelves.length;
-        return { n: pg.n, cap: pg.cap, fill: Math.round(pg.fill * 1e4) / 1e4, cls: pg.cls, arrangement, skills: sk.map((s) => s.id), shelves, rows };
+        return { n: pg.n, cap: pg.cap, topUp: pg.topUp || [], fill: Math.round(pg.fill * 1e4) / 1e4, cls: pg.cls, arrangement, skills: sk.map((s) => s.id), shelves, rows };
     });
     const twoUp = !mut.noTwoUp && input.N === 5 && out.length === 1 && pages[0].fill <= 0.5 + 1e-9;   // the 5 fit a half page
     // `dealt`: the skills in the order the deal first PICKED them (not print order). The code lists them in this order, so a

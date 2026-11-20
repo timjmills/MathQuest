@@ -6,12 +6,13 @@
 //   node design/cards/mixed-review/proto/check-v1.mjs           # every fixture; prints `check-v1: OK (n props, m fixtures)`
 //   node design/cards/mixed-review/proto/check-v1.mjs --table   # print the card §3 capacity table (generated)
 //   node design/cards/mixed-review/proto/check-v1.mjs --show <case>   # print one fixture's deal
-//   node design/cards/mixed-review/proto/check-v1.mjs --fill    # INFORMATIONAL: pages under half full (card §3 open H5 item)
+//   node design/cards/mixed-review/proto/check-v1.mjs --fill    # prop k over every pool x N x size x 300 seeds (exit 1 on any non-last page under half)
 //
 // Properties: a determinism + code round trip · b no skill over ceil(N/2) · c at most 3 skills a page · d no avoidable
 // adjacency (a single-skill page exempt) · e exact N (2-up: each half 1..5) · f the week · g adapt · h the size table and
-// the ceilings · i the V1 freeze (sha256 of dealer-v1.mjs) · j shelves (a short shelf only last, never over k).
-// In the product these become MIX-REVIEW-SHARE (a, i), -COUNT (b, c, d, e, h, j), -POOL (b, c, d, g) and -WEEK (f).
+// the ceilings · i the V1 freeze (sha256 of dealer-v1.mjs) · j shelves (a short shelf only last, never over k) · k FILL (no
+// page but a sheet's last under half full).
+// In the product these become MIX-REVIEW-SHARE (a, i), -COUNT (b, c, d, e, h, j, k), -POOL (b, c, d, g) and -WEEK (f).
 // Exit 0 on OK, 1 on FAIL.
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -129,7 +130,7 @@ function propG(input, out) {
     const L = new Set(input.listed || []);
     for (const it of out.items) if (!L.has(it.code)) v.push(`adapt dealt ${it.skill} (${it.code}), not on the code's list`);
     out.pages.forEach((p, i) => {
-        const c = {}; for (const s of p.shelves) c[s.skill] = (c[s.skill] || 0) + s.items.length;
+        const c = {}; for (const s of p.shelves) if (!p.topUp.includes(s.skill)) c[s.skill] = (c[s.skill] || 0) + s.items.length;   // the page's own skills; a fill top-up is sized by fill, not weight
         const ns = Object.values(c);
         if (Math.max(...ns) - Math.min(...ns) > 1) v.push(`page ${i + 1}: counts ${ns.join(' + ')} are weighted, not the even deal`);
     });
@@ -178,8 +179,18 @@ function propJ(input, out) {
     });
     return v;
 }
-const PROPS = { a: propA, b: propB, c: propC, d: propD, e: propE, f: propF, g: propG, h: propH, i: propI, j: propJ };
-const NEEDS_OUT = new Set(['b', 'c', 'd', 'e', 'f', 'g', 'j']);
+/** k FILL (lead ruling 2026-11-20): no page but a sheet's LAST is under half full (fill = sum of 1 / CAP[size][class]). */
+export const FILL_POOLS = ['pool-large', 'pool-compact', 'pool-typical', 'pool-wide', 'pool-2mix', 'pool-3mix'];
+function propK(input, out) {
+    const v = [];
+    for (const sh of sheetsOf(out)) sh.pages.forEach((p, i) => {
+        if (i === sh.pages.length - 1) return;      // the last page of an exact-N sheet may be under half (the teacher chose N)
+        if (p.fill * 2 < 1 - 1e-9) v.push(`day ${sh.day} page ${i + 1} of ${sh.pages.length}: fill ${p.fill} < 1/2 (${p.n} items, ${p.cls.join('/')})`);
+    });
+    return v;
+}
+const PROPS = { k: propK, a: propA, b: propB, c: propC, d: propD, e: propE, f: propF, g: propG, h: propH, i: propI, j: propJ };
+const NEEDS_OUT = new Set(['b', 'c', 'd', 'e', 'f', 'g', 'j', 'k']);
 
 /* ------------------------------------------------------------------------------------------------- the runner */
 const run = (input, mut = {}) => (input.week && !input.day ? D.week(input, mut) : D.deal(input, mut));
@@ -188,7 +199,7 @@ function expand(fx) {
     const sw = fx.sweep;
     if (!sw) return [base];
     const out = [];
-    for (const N of sw.N || [base.N]) for (const size of sw.size || [base.size]) for (const order of sw.order || [base.order]) for (const seed of sw.seed || [base.seed]) out.push({ ...base, N, size, order, seed });
+    for (const pool of fx.pools || [base.pool]) for (const N of sw.N || [base.N]) for (const size of sw.size || [base.size]) for (const order of sw.order || [base.order]) for (const seed of sw.seed || [base.seed]) out.push({ ...base, pool, N, size, order, seed });
     return out;
 }
 function runFixture(fx) {
@@ -196,7 +207,6 @@ function runFixture(fx) {
     if (mut.cap) mut.cap = Object.fromEntries(['m', 'l'].map((k) => [k, { ...D.CAP[k], ...(mut.cap[k] || {}) }]));
     const viol = [];
     for (const input of expand(fx)) {
-        input.pool = fx.input.pool;
         const inp = { ...input, pool: poolOf(input.pool) };
         const out = fx.props.some((p) => NEEDS_OUT.has(p) || p === 'h') && !input.tableOnly ? run(inp, mut) : null;
         if (out && out.error) { viol.push(`refused: ${out.error}`); continue; }
@@ -217,17 +227,21 @@ if (args[0] === '--table') {
     for (const N of D.COUNTS) console.log(`| ${N} | ${cell('m', 'typical', N)} | ${cell('m', 'wide', N)} | ${cell('l', 'compact', N)} | ${cell('l', 'typical', N)} | ${cell('l', 'wide', N)} |`);
     process.exit(0);
 }
-if (args[0] === '--fill') {      // INFORMATIONAL (not a gate): pages under half full, the open H5 item of card §3
-    for (const ref of ['pool-large', 'pool-compact', 'pool-typical', 'pool-wide', 'pool-2mix']) {
+if (args[0] === '--fill') {      // prop k over every pool, 300 seeds: 0 NON-LAST pages under half full, or exit 1
+    const mut = args.includes('--separate-pages') ? { separatePages: true } : {};
+    let badAll = 0;
+    for (const ref of FILL_POOLS) {
         let pages = 0, under = 0, notLast = 0;
         for (const N of D.COUNTS) for (const size of ['m', 'l']) for (let seed = 1; seed <= 300; seed++) {
-            const o = D.deal({ pool: poolOf(ref), N, seed, size, order: 'mixed' });
+            const o = D.deal({ pool: poolOf(ref), N, seed, size, order: 'mixed' }, mut);
             if (o.twoUp) continue;
-            o.pages.forEach((p, i) => { pages++; if (p.fill * 2 < 1) { under++; if (i !== o.pages.length - 1) notLast++; } });
+            o.pages.forEach((p, i) => { pages++; if (p.fill * 2 < 1 - 1e-9) { under++; if (i !== o.pages.length - 1) notLast++; } });
         }
-        console.log(`  ${ref}: ${under} of ${pages} pages under half full (${notLast} not the sheet's last page)`);
+        badAll += notLast;
+        console.log(`  ${ref}: ${notLast} non-last pages under half full of ${pages} (${under - notLast} last pages under half, allowed)`);
     }
-    process.exit(0);
+    console.log(badAll ? `check-v1 --fill: FAIL (${badAll} non-last pages under half full)` : 'check-v1 --fill: OK (0 non-last pages under half full)');
+    process.exit(badAll ? 1 : 0);
 }
 const files = readdirSync(FIX).filter((f) => /^case-.*\.json$/.test(f)).sort();
 if (args[0] === '--show') {

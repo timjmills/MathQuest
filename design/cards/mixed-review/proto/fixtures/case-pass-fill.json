@@ -1,0 +1,64 @@
+{
+ "note": "lead ruling 2026-11-20: wide and flat share a page by fill; no non-last page under half full, every pool",
+ "expect": "pass",
+ "props": [
+  "k",
+  "b",
+  "c",
+  "d",
+  "e",
+  "h",
+  "j"
+ ],
+ "input": {
+  "pool": "pool-2mix",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed"
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20
+  ]
+ },
+ "pools": [
+  "pool-large",
+  "pool-compact",
+  "pool-typical",
+  "pool-wide",
+  "pool-2mix",
+  "pool-3mix"
+ ]
+}
