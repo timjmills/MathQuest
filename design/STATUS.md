@@ -985,3 +985,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - L Pre-skill page per lead ruling 1c (10 items, lf-roles fill; re-grade queued after reset).
 - Lesson re-pin with proof (design/status/lf-ops-cbt-proof.md): 102 pages in 8 lessons changed for real (lf-ops -props work; passed sub_2d_1d / sub_50_no_regroup L p2 graded by a narrow critic, PASS); the rest class/style-only, pixel-identical sample.
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Bug fix: ws-content-audit loads the whole js/modules tree (lf-checks; no critic)
+- The audit's temp copy now carries every module (a new import can no longer crash it); self-test loads skill-options.js and its imports; backtest content-audit-module-load.
+- Known red surfaced by the restored audit (was masked by the crash): mc-all NEW all_mixed:grade_4_mixed [legacy/text] offers a written answer as buttons (P-29); grade_5_mixed's pinned pair no longer occurs. Routed to lf-checks to bisect next week.
