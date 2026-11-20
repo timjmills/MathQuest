@@ -990,3 +990,12 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   pinned pages of the 3 detailed lessons after the critic's d38308824 stamp (its message: class-only lint markers
   mq-tofblank / mq-smstate). With `--baseline-ref d38308824` the gate is OK. Either a narrow critic re-stamps the 3 on
   the current render, or they move to PENDING_RECHECK until then.
+- Results on the lane tree: ws-boot-smoke OK, ws-code-snapshot OK (741 codes), ws-lessons-browse OK (1366 + 1024),
+  ws-pacing OK, ws-teacher-wrm OK and --fallback OK (expectations moved to the browser: area sections, no Extra lessons,
+  the lesson over the list with "← All lessons"), ws-teacher-library OK, ws-teacher-tokens OK, ws-plain-words --check OK
+  ("assessments" appended to plain-words-hand.txt: its only screen text was the removed Extra lessons caption),
+  ws-backtest on the 7 new rows PASS, ws-precritic-plan --checks-from-critics OK. ws-lessons-passed FAIL (stale, above).
+- Not built as the card says: detailed-lesson first-page previews with an IndexedDB cache (§7) - every card shows its first
+  teaching skill's real item (lazy, teacher-chip mountCropped) or a plain "To build" card; teacher-chip.js unchanged.
+  The "Only 8/10 ✓" switch on the Skills screen filters the Maths area view (the other Browse-by views ignore it).
+  Screenshots: design/status/lf-checks/lessons-browser/build/.

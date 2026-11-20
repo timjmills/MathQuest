@@ -14137,6 +14137,150 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lessons-browse-domain",
+   "check": "LESSON-DOMAIN (card design/cards/lessons-browser Checks + R3/R4/R5): every lesson of every school grade once under its maths area and its school grade, area chip counts = the data, grade chips generated, no Extra lessons section, CCSS Build chip on every type != wr row, exactly one coverage chip",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse LESSON-DOMAIN",
+   "browser": true,
+   "fail": {
+    "commit": "7f22d8855",
+    "state": "merged tree before the lessons browser: no lessons-passed.js / grade-of.js (the domain list with an Extra lessons section)"
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "lessons browser build (lf-checks, signed card design/cards/lessons-browser)"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only LESSON-DOMAIN --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-area-labels",
+   "check": "AREA-LABELS (card R1): both screens label every area chip and heading from teacher-areas.js AREA_LABELS; no area label string in another teacher screen",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse AREA-LABELS",
+   "browser": true,
+   "fail": {
+    "commit": "7f22d8855",
+    "state": "merged tree before the lessons browser: no lessons-passed.js / grade-of.js (the domain list with an Extra lessons section)"
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "lessons browser build (lf-checks, signed card design/cards/lessons-browser)"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only AREA-LABELS --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-filter-passed",
+   "check": "FILTER-PASSED (card §4, R2): Only 8/10 shows exactly the LESSONS_PASSED rows (grade x area counts), survives grade / area changes and a reload, the empty state names the pending lessons; the Skills screen's switch shows exactly REDESIGN_PASSED",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse FILTER-PASSED",
+   "browser": true,
+   "fail": {
+    "commit": "7f22d8855",
+    "state": "merged tree before the lessons browser: no lessons-passed.js / grade-of.js (the domain list with an Extra lessons section)"
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "lessons browser build (lf-checks, signed card design/cards/lessons-browser)"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only FILTER-PASSED --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-browse",
+   "check": "LESSON-BROWSE (card §7, 0b): thumbnails = list rows, previews only near the viewport, open then All lessons restores grade / area / switch / view / scroll, hash round trip; By unit / date: unit rows, the Now unit for 2026-11-20 in view, others collapsed",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse LESSON-BROWSE",
+   "browser": true,
+   "fail": {
+    "commit": "7f22d8855",
+    "state": "merged tree before the lessons browser: no lessons-passed.js / grade-of.js (the domain list with an Extra lessons section)"
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "lessons browser build (lf-checks, signed card design/cards/lessons-browser)"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only LESSON-BROWSE --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-passed-registry",
+   "check": "ws-lessons-passed (card §1, R2): the ONE registry of whole lessons at 8/10 exists, every id live, every evidence line names a lane, a critic round, an existing file and a date, every stamp equals the render the critic graded",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-passed LP-LIVE / LP-EVIDENCE / LP-STAMP",
+   "browser": false,
+   "fail": {
+    "commit": "7f22d8855",
+    "state": "no js/modules/lessons-passed.js",
+    "args": "--baseline-ref d38308824"
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "the registry with the 3 re-check passes, read against the render the critic graded (lesson-baseline.json at d38308824)",
+    "args": "--baseline-ref d38308824"
+   },
+   "command": "node tests/scripts/ws-lessons-passed.mjs {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-passed-stamp-stale",
+   "check": "LP-STAMP (card R2): a pass is bound to the render the critic graded; a later render change makes it STALE and the gate fails until a critic grades the new render (same commit both sides: the fail state is the current pinned render, re-pinned by master e7c418bd4 after the critic's d38308824 stamp; the pass state is the graded render)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-passed LP-STAMP",
+   "browser": false,
+   "fail": {
+    "commit": "5b4fb8db3",
+    "state": "current lesson-baseline.json (re-pinned e7c418bd4): the 3 stamps are stale",
+    "args": ""
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "lesson-baseline.json at d38308824, the render the critic graded",
+    "args": "--baseline-ref d38308824"
+   },
+   "command": "node tests/scripts/ws-lessons-passed.mjs {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pacing-file",
+   "check": "PACING-FILE (card 0b): data/curriculum/pacing/<YYYY-YY>.json parses, schoolYear = file name, grades and units are the school's, every unit once, start <= end, no overlap, teaching order by start week, dates inside the school year; index.json lists the files",
+   "kind": "commit-pair",
+   "rule": "ws-pacing PACING-FILE",
+   "browser": false,
+   "fail": {
+    "commit": "7f22d8855",
+    "state": "no data/curriculum/pacing/"
+   },
+   "pass": {
+    "commit": "5b4fb8db3",
+    "state": "lessons browser build (lf-checks, signed card design/cards/lessons-browser)"
+   },
+   "command": "node tests/scripts/ws-pacing.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

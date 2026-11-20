@@ -198,8 +198,10 @@ try {
         /* ---------------- LESSON-BROWSE: thumbnails = list, lazy previews */
         if (want('LESSON-BROWSE')) {
             const listKeys = (await domRows()).map((r) => r.key);
-            await go('#wrm/3?view=thumbs');
+            // the thumbnails are drawn at the top of the page (a view switch keeps the page where it is)
             await page.evaluate(() => window.scrollTo(0, 0));
+            await sleep(100);
+            await go('#wrm/3?view=thumbs');
             await sleep(700);
             const lazy = await page.evaluate(() => {
                 const cards = [...document.querySelectorAll('#tvwLessons .tvw-lcard')];

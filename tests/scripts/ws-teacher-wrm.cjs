@@ -1423,7 +1423,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     /* ==================================================== round 7: site lessons at 390 with touch */
     await step('site lessons 390 touch', async () => {
       await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
-      for (const l of [siteTagged || siteBuild, assessLesson, supportLesson]) {
+      // (an assessment is not a list row since the lessons browser, R4: it opens from its link, checked at 1366)
+      for (const l of [siteTagged || siteBuild, supportLesson]) {
         await freshLoad(`#wrm/${l.grade}/${secOf(l)}`, `[data-screen="wrm"].is-active .tvw-nrow[data-w-lesson="${l.key}"]`);
         await page.$eval(`.tvw-nrow[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
         await sleep(80);
