@@ -1036,7 +1036,10 @@ export function sayFor(q, ctx = {}) {
     // never the answer itself. Otherwise the frame is not shown (SAYLESS, ws-hint-no-blank).
     const shown = givenValues(q);
     const ansT = answerTokens(q, []);
-    if (blanks > 1 && /__\s*[.!]?\s*$/.test(frame) && shown.length === blanks - 1 && !shown.some((v) => ansT.includes(v))) {
+    // (lead ruling 2026-11-20, smaller head; critic r2 R2-5) only when the answer is ONE number - the value the last gap
+    // stands for. A word or sign answer ("1/4 is 1/2 ___." on fractions:compare) means the gaps are not in that order.
+    const ansNum = q && q.ans != null && typeof q.ans !== 'object' && /^-?\d[\d,]*(?:\.\d+)?(?:\/\d+)?$/.test(String(q.ans).trim());
+    if (ansNum && blanks > 1 && /__\s*[.!]?\s*$/.test(frame) && shown.length === blanks - 1 && !shown.some((v) => ansT.includes(v))) {
         let k = 0;
         return frame.replace(/__/g, () => (k < blanks - 1 ? fmtShown(shown[k++]) : '___'));
     }

@@ -77,7 +77,12 @@ const EMPTY_PIN = ['algebra:build_expr_multdiv', 'angles_lines:identify_angles',
 
 // (filled from the first run of the option-3 fix, 2026-11-20; owner lanes in design/status/lf-placevalue.md. r2 2026-11-20: 131 -> 126;
 // fractions:shade_fraction joined - its Say line filled the 3 of "2/3", which SAY-FILL forbids)
-const SAYLESS_PIN = ['addition:add_sub_fact_family', 'addition:cloze_addition', 'addition:fact_family_sort', 'addition:nl_add',
+// (smaller head, lead ruling 2026-11-20, critic r2 R2-5) the in-order fallback fills only when the answer is ONE number:
+// these 7 lost a Say line that guessed the gap order (fractions:compare printed "1/4 is 1/2 ___."); their providers need
+// sayValues (round 3 / family lanes)
+const SAYLESS_SMALLER_HEAD = ['fraction_operations:div_unit_fraction', 'fraction_operations:mult_frac_whole', 'fractions:compare',
+    'fractions:compare_to_half', 'placevalue:compare', 'placevalue:digit_value_notation', 'placevalue:expand'];
+const SAYLESS_PIN = [...SAYLESS_SMALLER_HEAD, 'addition:add_sub_fact_family', 'addition:cloze_addition', 'addition:fact_family_sort', 'addition:nl_add',
     'algebra:function_table_easy', 'algebra:function_table_find_inputs', 'algebra:function_table_find_rule',
     'algebra:function_table_hard', 'algebra:two_step_estimate_check', 'algebra:two_step_letter_equation',
     'comparing:compare_groups', 'composing:base10_build', 'composing:base10_build_hundreds', 'composing:chart_to_120',
@@ -250,6 +255,14 @@ function exitAfterFlush(code) {
                         const frame = pv && typeof pv.strings === 'function' ? String(pv.strings({ q }).say || '') : '';
                         if (frame && !q.sayText && !sl.sayFor(q, ctx)) sayless.add(key);
                     } catch (e) { /* no provider */ }
+                    // SAY-ORDER (critic r2 R2-5, fractions:compare "1/4 is 1/2 ___."): a Say line whose gap is its LAST word, right
+                    // after a number, stands for a number; when the answer is a word or a sign the given values were put in the
+                    // answer's place
+                    try {
+                        const s0 = sl.sayFor(q, ctx);
+                        const ansNum = q.ans != null && typeof q.ans !== 'object' && /^-?\d[\d,]*(?:\.\d+)?(?:\/\d+)?$/.test(String(q.ans).trim());
+                        if (s0 && !ansNum && /\d\s+_{2,}\s*[.!?]?\s*$/.test(s0)) F('SAY-ORDER', key, i, s0);
+                    } catch (e) { /* judged below */ }
                     try { const s = sl.sayFor(q, ctx); if (s) paths.push(['SAY', 'say', s]); } catch (e) { errors.push(`${key} seed ${i}: sayFor threw ${e && e.message}`); }
                     if (!firstSayless.has(key) && paths.some((x) => x[0] === 'STEPS') && !paths.some((x) => x[0] === 'SAY')) firstSayless.set(key, q);
                     if (q.hint) paths.push(['HINT', 'hint', plain(q.hint)]);
@@ -399,7 +412,7 @@ function exitAfterFlush(code) {
         const FULL = !SKILL && !CATEGORY;
         const byCheck = {};
         for (const f of res.findings) (byCheck[f.check] = byCheck[f.check] || new Map()).set(f.key, f);
-        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'HELP-THIN', 'LISTEN'];
+        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'HELP-THIN', 'LISTEN'];
         const lists = {};
         for (const c of CHECKS) {
             const m = byCheck[c] || new Map();
