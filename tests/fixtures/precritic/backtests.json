@@ -14217,6 +14217,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-a9-ri-under",
+   "check": "mult_3by2_standard Reason It L: the long-multiplication grid stays inside its A/B panel (UNDER layout, ruled 1 a page at L; M keeps 2) - lead ruling A9 (1)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-cell-checks OVERFLOW / LONE-PAGE (ruled)",
+   "fail": {
+    "commit": "b3cdc3887",
+    "state": "52.8 mm grid in a 45.4 mm panel beside a 78 mm response column: OVERFLOW 4"
+   },
+   "pass": {
+    "commit": "f48cc27ef",
+    "state": "UNDER layout at L, ruled 1 a page; M 2 a page"
+   },
+   "command": "cd {root} && node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_3by2_standard,multiplication:mult_2by2_standard --roles reason-it --size M,L 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sizes-a9-wp-amodel4",
+   "check": "area_model_4by1 word-problems L: the 4-part area model (150 mm) never runs out of the cell (UNDER layout under its story) - lead ruling A9 (2)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-cell-checks OVERFLOW",
+   "fail": {
+    "commit": "b3cdc3887",
+    "state": "the model in the 117 mm work space beside the answer column, 7.6 mm out of the cell"
+   },
+   "pass": {
+    "commit": "f48cc27ef",
+    "state": "mq-wpunder: the model full width, the answer row under it"
+   },
+   "command": "cd {root} && node tests/scripts/ws-cell-checks.cjs --skills multiplication:area_model_4by1 --roles word-problems,true-false --size M,L 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
