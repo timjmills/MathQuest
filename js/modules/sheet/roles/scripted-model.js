@@ -127,8 +127,14 @@ function measuredStates(it) {
     const marks = marksFor(it, steps);
     const ans = answerOf(it);
     const base = it.render;
+    const drawn = !!drawnSteps(it);
     const render = (c, o = {}) => {
-        if (!o || o.cols !== 1) return base(c, o);
+        // (beside / across: the state alone, every state stacked - the step text is its own cell or a fixed band over it. A fact
+        // model's items - drawn steps - keep their own measure: factModel adds its text and jots itself)
+        if (!o || o.cols !== 1) {
+            if (drawn) return base(c, o);
+            return `<div style="display:grid">${steps.map((_, i) => `<div style="grid-area:1/1;min-width:0">${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`).join('')}</div>`;
+        }
         const one = (i) => `<div style="grid-area:1/1;min-width:0"><div class="mq-steptop">${stepTextHtml(steps, i)}</div>${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`;
         return `<div style="display:grid">${steps.map((_, i) => one(i)).join('')}</div>`;
     };
@@ -488,7 +494,9 @@ export function plan(input = {}) {
     const acrossRows = across ? Math.ceil(steps.length / across) : 0;
     // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4, layout.rowCapMm): a state row is held to what it draws + its writing
     // room - hMinAt is the measure + 2 mm and the measure holds a tab keep-out a Model state does not draw (CL-14)
-    if (!laid) { const off = 2 + koMm(ctx.size); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
+    // (a MEASURED beside state - measuredStates draws every state for the host - is drawn at its measure: only hMinAt's 2 mm come off,
+    // not the tab keep-out; taken off too, the word-work state's ink ran 0.8 mm past its rule at L and covered the frame's foot in print)
+    if (!laid) { const off = 2 + (it.statesMeasured && cols === 2 && !across ? 0 : koMm(ctx.size)); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
