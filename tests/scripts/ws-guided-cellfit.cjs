@@ -23,6 +23,7 @@ const SKILLS = arg('skills', 'algebra:multi_step_word_plain,algebra:two_step_add
 const SIZES = arg('sizes', 'M,L').split(',');
 const SEEDS = arg('seeds', '1,2,591220').split(',').map(Number);
 const ONLY = arg('only', '');
+const on = (r) => !ONLY || ONLY.split(',').includes(r);
 const FIXTURE = arg('fixture', '');
 const PRESETS = ['algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult', 'algebra:two_step_add_then_div'];
 /** Judge GUIDED-HINT-LEAK rows [{key, hint, boxes}]: a hint number token that is a box value. */
@@ -70,8 +71,8 @@ if (FIXTURE) {
             d.remove();
         }
         return out;
-    }, ONLY === 'HINT-UNIFORM' ? [] : SKILLS, SIZES, SEEDS);
-    if (!ONLY || ONLY === 'HINT-UNIFORM') {
+    }, on('CELL-FITS') ? SKILLS : [], SIZES, SEEDS);
+    if (on('HINT-UNIFORM')) {
         const rows = await app.page.evaluate(async (P, SIZES, SEEDS) => {
             const out = [];
             for (const k of P) for (const size of SIZES) for (const seed of SEEDS) {
@@ -92,7 +93,7 @@ if (FIXTURE) {
         notes.forEach((x) => console.log('  NOTE ' + x));
         bad.push(...ub);
     }
-    if (!ONLY || ONLY === 'HINT-LEAK') {
+    if (on('HINT-LEAK')) {
         const LK = argv.includes('--skills') ? SKILLS : PRESETS;
         const rows = await app.page.evaluate(async (P, SIZES, SEEDS) => {
             const out = [];

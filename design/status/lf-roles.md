@@ -404,3 +404,29 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
   so it gave the answer. It now narrows the bank to two: the answer's first letter when another word shares it, else that
   letter and one other bank word's letter, in alphabetical order. Check: ws-vocab-unit V14 GUIDED-HINT-LEAK (bank).
 - Hash (ROLES=guided): only vocab_pick3_words guided S/M/L changed. Backtest `vocab-hint-bank-leak` PASS. y2 deferred (lead).
+
+## Round r16 (2026-11-20): F3 continuation-cell overflow; F4 returned to the lead
+
+- F3: the two-step stories' Guided L page 2 hinted try overflowed its cell by 13 px. `hintRow` was set on page 1 only, so a
+  continuation row never took the hint height. Fix GUIDED-CONT-HINT (guided.js, the `hintRow` / `hintedHere` lines): the row holding the
+  hinted tries on any page takes the hint. New check ws-guided-cellfit CELL-FITS, now a precritic browser gate. Backtest
+  `guided-cont-hint-cellfit` (FAIL ead49fcce -> OK dd4942463). Hash ROLES=guided: no passed page changed. No refill: pages 2 + 3 are
+  116 + 104 mm, more than one L body. Unrelated, already on the base: EB-STRETCH 2-3 mm on the page-1 Model of the three two-step skills.
+- F4: hintOf gives "Step 1: …" on every two-step preset. The hint is dropped by sheetFitPlain's round-4 rule ("the hint line never
+  costs page 1 its only try") when Model + hinted try does not fit page 1 (add_then_div and mult_div_first at M seed 1). Not changed:
+  it needs a lead ruling (keep the hint and move the try to page 2, against GUIDED-MODEL-ALONE, or keep the rule).
+- 2026-11-20 QUEUED (lead, after F3/F4): PRE-SKILL-CHECK red on every passed skill under lf-checks rebuilt EB-LASTPAGE / CAP-PARITY (PT-PRE-1/2 underfill: add_facts / sub_facts 78 %, div_facts, placevalue:value L p2 45 %). Fix the role fill to reach its declared ceiling (role-capacity.js), checks first, keep R13 2+2 where 2 pages are needed. Park with notes if the week budget runs out.
+
+## Round r17 (2026-11-20): HINT-UNIFORM guard, W2 hint box-number mask
+
+- Checks (commit 8533a8b48, red before the fix): ws-guided-cellfit HINT-UNIFORM (one hint kind on the two-step presets' first tries;
+  the ruled GUIDED-HINT-DROP-P1 drop is now a plan note) and GUIDED-HINT-LEAK box numbers (no hint prints a number a box of the same
+  try expects; the circled sign may stay).
+- Fix (174348717, guided.js hintOf): every box number is masked (answer, key slots, a story's step boxes); a hint left with only its
+  label and gaps is dropped. lf-algebra's `st.hint` preference line is theirs to add; the mask applies to it as well.
+- Hash: Guided 30 passed pages changed (add_wp_10 / add_wp_20 / add_wp_10_plain / add_wp_20_plain / sub_wp_10 / sub_wp_20 /
+  sub_wp_10_plain / sub_wp_20_plain, placevalue identify / value, S/M/L each); Scripted Model 0 / 96, lesson 0 / 96 changed.
+- Open: HINT-UNIFORM red on two_step_mult_div_first (Step 1 "5 x 2 = 10." masks to blanks and is dropped) until lf-algebra's
+  provider hint lands. The precritic gate runs CELL-FITS,HINT-LEAK only. Passed sweep: placevalue:compare seed 2 "Every digit is the
+  same: 932 and 932." flagged (probably the key repeating the given number); reported, not fixed.
+- Pre-skill Check fill: EB-LASTPAGE / CAP-PARITY are not on origin/master, so stopped as briefed.
