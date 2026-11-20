@@ -7,6 +7,43 @@
 // A lesson lane never edits generators, providers, options or the engine; ids are never deleted.
 // Pure data.
 
+// The 1-digit column routine (lane lf-ops sizes): its own routine, and the `tiles: 41` option entry of the 2-digit
+// routine (a 4-digit x 1-digit item has five worked steps, one per place and the product; under the 2-digit routine's four
+// step names, steps 1 and 2 shared panel 1 and ran 7 mm out of it - ws-cell-checks OVERFLOW, lesson tiles=41).
+const MULT_COLUMN_1DIGIT = Object.freeze({
+    archetype: 'column',
+    casesPending: 'Lane lf-ops sizes (card mult-sizes): the 4-digit column lesson; its cases (a place with no regrouping, a regrouped place, a 0 digit) are declared when unit G4-Y5.B5 is carded.',
+    concepts: [
+        { id: 'ones-first', text: 'Multiply the ones first, then each place to the left.' },
+        { id: 'regroup', text: '10 or more? Write the ones digit. Regroup the tens into the next place.' },
+        { id: 'add-on', text: 'Multiply first, then add the regrouped number.' },
+    ],
+    vocab: [
+        { word: 'multiply', meaning: 'the × sign: equal groups', picture: { kind: 'glyph', text: '×' } },
+        { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
+        { word: 'regroup', meaning: '10 ones become 1 ten', picture: { kind: 'trade' } },
+    ],
+    // (one step per place of the 4-digit number, then the product: shortMultSteps' five worked steps)
+    steps: [
+        { icon: 'start', text: 'Multiply the ones.' },
+        { icon: 'regroup', text: 'Multiply the tens. Add on.' },
+        { icon: 'count', text: 'Multiply the hundreds. Add on.' },
+        { icon: 'write', text: 'Multiply the thousands. Add on.' },
+        { icon: 'check', text: 'Read the product.' },
+    ],
+    chant: 'Multiply, then add the regrouped number!',
+    format: {
+        kind: 'numbered steps with icons + a chant',
+        why: 'The error pupils make is adding the regrouped number before multiplying (or not at all); the chant says the order at step 2.',
+    },
+    example: { match: 'regroup' },
+    // (five worked steps in a 2 x 2 chart: the drawing may go down to LR-15's 0.8 floor rather than past the Say band)
+    chartMinZoom: 0.8,
+    // (the product step writes nothing new - the thousands step already wrote every digit: the line under the four panels,
+    // so no panel holds two steps; print-lint OVERFLOW 22 mm / L-OVERLAP "Say:" when steps 1 and 2 shared panel 1)
+    tailLast: true,
+});
+
 export const ROUTINES = Object.freeze({
     // ------------------------------------------------------------- Division facts (3)
     // Ported from master's lessons/prereqs.js (Lane D R4 prep, node-lint LESSON-DATA): div_facts divides by thinking
@@ -288,39 +325,7 @@ export const ROUTINES = Object.freeze({
     // multiplication.js) - split, one step per part (1-digit multiplier) or per row (2-digit), add the parts - and, for the
     // column methods, multiplication:multiply's own (shortMultSteps: one step per place, then the product; longMultSteps:
     // the ones row, the tens row with its placeholder 0, the sum).
-    'mult-column-1digit': {
-        archetype: 'column',
-        casesPending: 'Lane lf-ops sizes (card mult-sizes): the 4-digit column lesson; its cases (a place with no regrouping, a regrouped place, a 0 digit) are declared when unit G4-Y5.B5 is carded.',
-        concepts: [
-            { id: 'ones-first', text: 'Multiply the ones first, then each place to the left.' },
-            { id: 'regroup', text: '10 or more? Write the ones digit. Regroup the tens into the next place.' },
-            { id: 'add-on', text: 'Multiply first, then add the regrouped number.' },
-        ],
-        vocab: [
-            { word: 'multiply', meaning: 'the × sign: equal groups', picture: { kind: 'glyph', text: '×' } },
-            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
-            { word: 'regroup', meaning: '10 ones become 1 ten', picture: { kind: 'trade' } },
-        ],
-        // (one step per place of the 4-digit number, then the product: shortMultSteps' five worked steps)
-        steps: [
-            { icon: 'start', text: 'Multiply the ones.' },
-            { icon: 'regroup', text: 'Multiply the tens. Add on.' },
-            { icon: 'count', text: 'Multiply the hundreds. Add on.' },
-            { icon: 'write', text: 'Multiply the thousands. Add on.' },
-            { icon: 'check', text: 'Read the product.' },
-        ],
-        chant: 'Multiply, then add the regrouped number!',
-        format: {
-            kind: 'numbered steps with icons + a chant',
-            why: 'The error pupils make is adding the regrouped number before multiplying (or not at all); the chant says the order at step 2.',
-        },
-        example: { match: 'regroup' },
-        // (five worked steps in a 2 x 2 chart: the drawing may go down to LR-15's 0.8 floor rather than past the Say band)
-        chartMinZoom: 0.8,
-        // (the product step writes nothing new - the thousands step already wrote every digit: the line under the four panels,
-        // so no panel holds two steps; print-lint OVERFLOW 22 mm / L-OVERLAP "Say:" when steps 1 and 2 shared panel 1)
-        tailLast: true,
-    },
+    'mult-column-1digit': MULT_COLUMN_1DIGIT,
     'mult-column-2digit': {
         archetype: 'column',
         casesPending: 'Lane lf-ops sizes (card mult-sizes): the long-multiplication lesson; its cases (regrouping in a row / in the sum, a multiplier ending in 0) are declared when unit G4-Y5.B5 is carded.',
@@ -352,6 +357,11 @@ export const ROUTINES = Object.freeze({
         // on one page at zoom 1 (118.5 mm a panel row, 195 mm free at M): it ran over the Say band. chart.js chartPage may draw
         // it down to LR-15's floor, 0.8)
         chartMinZoom: 0.8,
+        // (`byOption`, prereqs.js optionLesson - lane lf-ops sizes fix 2026-11-20: the card prints this lesson for every `tiles` value;
+        // a 4-digit x 1-digit item is taught with the 1-digit column routine - five steps, the product line under the panels)
+        // ... and the tables facts (tiles null: 11 x 11 in the stack, no long-multiplication grid) keep the panels at most 1.3 up,
+        // so the measure's millimetre has room (OVERFLOW 0.6 mm on the third panel at zoom 1.6)
+        byOption: { tiles: { 41: MULT_COLUMN_1DIGIT, null: { chartMaxZoom: 1.3 } } },
     },
     'mult-area-1digit': {
         archetype: 'groups',

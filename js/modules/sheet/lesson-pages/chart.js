@@ -447,7 +447,11 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         const panelW = lay.variant === 'row' ? 186 * 0.42 : 186 / cols - 8;
         return panelW / boundW;
     });
-    const zMax = Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
+    // (`chartMaxZoom`, lesson data - lane lf-ops sizes fix 2026-11-20: the panels grow to fill the page exactly, so a drawing the
+    // measure under-reads by a millimetre - a times fact in the stack, tiles=null on the long-multiplication lesson - ran out of
+    // its panel by 0.6 mm. A lesson may cap the growth; never under 1, absent nothing moves.)
+    const zCap = data && Number(data.chartMaxZoom) >= 1 ? Number(data.chartMaxZoom) : Infinity;
+    const zMax = Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, zCap, ...zW));
     const H = (z) => Math.max(...states.map((st, k) => base[k] + (z - 1) * dH[k]));
     // The largest zoom in [lo, hi] at which `total(z)` fits `room`; 0 when not even `lo` does.
     const solve = (total, room, lo, hi) => {

@@ -67,7 +67,9 @@ export function optionLesson(data, opts) {
     let out = data;
     for (const [id, table] of Object.entries(data.byOption)) {
         let v = opts[id];
-        if (v === undefined || v === null) continue;
+        // (lane lf-ops sizes fix 2026-11-20: a null value - `tiles: null`, the tables facts - picks the table's 'null' entry;
+        // a table with none takes no entry, as before)
+        if (v === undefined || (v === null && !table.null)) continue;
         const list = Array.isArray(v) ? [...new Set(v.map(String))] : [String(v)];
         const hit = list.length === 1 && table[list[0]] ? table[list[0]]
             : table.unit && list.length && list.every((x) => x === '2' || x === '3') ? table.unit
