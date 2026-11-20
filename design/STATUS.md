@@ -989,3 +989,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-20 — Bug fix: ws-content-audit loads the whole js/modules tree (lf-checks; no critic)
 - The audit's temp copy now carries every module (a new import can no longer crash it); self-test loads skill-options.js and its imports; backtest content-audit-module-load.
 - Known red surfaced by the restored audit (was masked by the crash): mc-all NEW all_mixed:grade_4_mixed [legacy/text] offers a written answer as buttons (P-29); grade_5_mixed's pinned pair no longer occurs. Routed to lf-checks to bisect next week.
+
+## 2026-11-20 — Deploy patterns r4 PASS (lf-algebra)
+- notice / pattern-features / growing-shape / number-rule / follow-given-rule layout fixes; new INSTR-SLOTS check (ws-instr-slots.cjs).
+- patterns card: fact-probe out of scope (not a fact skill); growing_shape_patterns band=auto decided (A8b). patterns + function-table cards re-signed (owner, 2026-11-20).
+- Gates: conflict-markers, boot-smoke, code-snapshot (741), no-size-s, roles-unit, two-step, instr-slots self-test, check-signed ×2, key-json (6 skills, 78 sheets), simple-print, precritic-plan, capacity-pin, lesson-baseline (2738 identical) — all OK.

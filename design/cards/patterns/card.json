@@ -771,14 +771,15 @@
         "values": [
           "10",
           "20",
-          "50"
+          "50",
+          "auto"
         ],
         "d": "offered",
         "skills": [
           "patterns:growing_shape_patterns"
         ],
         "source": "§5.3",
-        "why": "the biggest answer count (Term 4, or Term 10 on far)",
+        "why": "the biggest answer count (Term 4, or Term 10 on far); auto (the default) = 20, or 50 on the Term 10 far task (lead ruling A8b 2026-11-20)",
         "proposed": false
       },
       {
@@ -1173,15 +1174,15 @@
       },
       {
         "key": "role:fact-probe",
-        "d": "offered",
+        "d": "out of scope",
         "skills": [
           "patterns:notice_patterns",
           "patterns:pattern_features",
           "patterns:growing_shape_patterns"
         ],
         "proposed": false,
-        "source": "brief: every page role builds and prints a key",
-        "why": "the skill's own items"
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "not a fact skill: the role reports unsupported"
       },
       {
         "key": "role:true-false",
@@ -1368,14 +1369,14 @@
       },
       {
         "key": "role:fact-probe",
-        "d": "offered",
+        "d": "out of scope",
         "skills": [
           "patterns:number_patterns_rule",
           "patterns:follow_given_rule"
         ],
         "proposed": false,
-        "source": "brief: every page role builds and prints a key",
-        "why": "the skill's own items"
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "not a fact skill: the role reports unsupported"
       },
       {
         "key": "role:true-false",

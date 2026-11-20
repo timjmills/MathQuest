@@ -68,7 +68,7 @@ export const ROUTINES = Object.freeze({
         steps: [
             { icon: 'look', text: 'Look at the jumps.' },
             { icon: 'decide', text: 'Name the rule.' },
-            { icon: 'write', text: 'Use the rule at the gap.' },
+            { icon: 'write', text: 'Write the number at the gap.' },   // (critic r3 INSTR-SLOTS: the step names its box)
             { icon: 'check', text: 'Every gap. Check each jump.' },
         ],
         chant: '',
@@ -130,7 +130,7 @@ export const ROUTINES = Object.freeze({
             { word: 'ones digit', meaning: 'the last digit', picture: { kind: 'text', text: '1(5)' } },
         ],
         steps: [
-            { icon: 'start', text: 'Read the rule. Write the numbers.' },
+            { icon: 'start', text: 'Read the rule. Find each number.' },   // (critic r3 R3-2: the tiles are printed below Level 0)
             { icon: 'check', text: 'Test a sentence.' },
             { icon: 'check', text: 'Test the next one.' },
             { icon: 'decide', text: 'Check the true one.' },
@@ -356,6 +356,29 @@ export const ROUTINES = Object.freeze({
         example: { match: 'Estimate:' },
     },
 });
+
+// (lf-algebra critic r3 R3-1 / R3-7, INSTR-SLOTS: a lesson printed for an option value teaches THAT task - its Steps name its
+// slots. notice_patterns at patTask=feature is the pattern_features lesson (the preset's own routine); growing at patTask=far
+// names the Term 10 slot. prereqs.js optionLesson merges the entry the opts pick.)
+{
+    const pf = ROUTINES['pattern-features'];
+    ROUTINES['notice-parity'].byOption = {
+        patTask: { feature: { concepts: pf.concepts, vocab: pf.vocab, steps: pf.steps, chant: pf.chant, chartWide: pf.chartWide, chartRow: pf.chartRow, guidedRows: pf.guidedRows, format: pf.format, example: pf.example } },
+    };
+    ROUTINES['growing-shape-patterns'].byOption = {
+        patTask: {
+            far: {
+                steps: [
+                    { icon: 'count', text: 'Count.' },
+                    { icon: 'look', text: 'Find the more.' },
+                    { icon: 'start', text: 'Draw Term 4.' },
+                    { icon: 'write', text: 'Count on to Term 10.' },
+                ],
+                chant: 'Count, find the more, count on to Term 10.',
+            },
+        },
+    };
+}
 
 export const LESSONS = Object.freeze({
     'skill:algebra:function_table_easy': {

@@ -187,6 +187,10 @@ export function ftAnswerMatches(value, p) {
 /* ================================================================== geometry */
 
 const BOX_MIN_MM = { S: 14, M: 14, L: 16 };
+/** The least a screen answer slot measures, both ways (RUBRIC H6: 48 px touch targets for tablets, owner 2026-11-13). */
+const TARGET_PX = 48;
+/** The slot's own size that leaves its input TARGET_PX inside the hairline border (box-sizing: border-box). */
+const TARGET_MIN = `calc(${TARGET_PX}px + 2 * ${HAIR})`;
 
 function dims(p, g) {
     const rowH = g.writeMm + 4;                         // XP-D-15: cell height Hw + 4 mm
@@ -203,7 +207,10 @@ function dims(p, g) {
     const boxH = g.screen ? Math.max(g.writeMm + 1, 1.25 * g.E) : g.writeMm + 1;
     // (the 'make' head "In: 1–10" is bold text-size: its column is at least as wide as the head)
     const textMm0 = g.pt * g.textEm * PT_MM;
-    const colW = Math.max(boxW + 4, 16, p.inHead ? String(p.inHead).length * 0.56 * textMm0 + 3 : 0);
+    // (`insetMm`, a payload flag - critic r3 R3-10, the g3-oa9 exit slip's three tables across a half met their cell borders: each
+    // column gives up that much of its 4 mm air, digits unchanged, and the table stands that far in from both cell borders)
+    const inset = insetOf(p);
+    const colW = Math.max(boxW + 4 - inset, 16 - inset, p.inHead ? String(p.inHead).length * 0.56 * textMm0 + 3 : 0);
     // The rule column (task 'outputs' with the frame): "12 × 2 + 1" at the text size.
     const textMm = g.pt * g.textEm * PT_MM;              // one em of the text size, in mm
     const exprChars = Math.max(ruleText(p.rule).length, ...(p.rows || []).map((r) => ruleOn(p.rule, r.x).length));
@@ -242,15 +249,22 @@ function ruleInMachine(p, g, d, ctx) {
     return mergedW(g, d) <= (ctx && ctx.ftMerge ? MERGE_CHART_MAX_MM : MERGE_MAX_MM);
 }
 
+/** The payload's inner margin (mm, 0-2.5): an exit slip's table kept off its cell borders (R3-10). */
+const insetOf = (p) => Math.max(0, Math.min(2.5, Number(p && p.insetMm) || 0));
+const insetCss = (p, g) => (insetOf(p) ? `;padding-left:${g.em(insetOf(p))};padding-right:${g.em(insetOf(p))};box-sizing:content-box` : '');
+
 function tableWidth(p, d) {
     return d.colW * 2 + (hasExprCol(p) ? d.exprW : 0);
 }
 
 /* ================================================================== drawing */
 
-/** A text run at the text size (relative to the digit-size root). */
+/** A text run at the text size (relative to the digit-size root). On a screen twin never under its print pt: the online
+ *  worksheet's root (its --mq-digit) drew "In" / "Out" at 15.5 px against the print 13 pt (ws-screen-ink-size TEXT-SIZE
+ *  label, patterns precritic 2026-11-20 A3b); a host whose root is larger keeps the em. */
+const fsOf = (g, em) => (g.twin ? `max(${em.toFixed(3)}em, ${(em * g.pt).toFixed(2)}pt)` : `${em.toFixed(3)}em`);
 const txt = (g, s, { bold = false, em = null } = {}) =>
-    `<span style="font-size:${(em || g.textEm).toFixed(3)}em;font-weight:${bold ? 700 : 400};white-space:nowrap">${s}</span>`;
+    `<span style="font-size:${fsOf(g, em || g.textEm)};font-weight:${bold ? 700 : 400};white-space:nowrap">${s}</span>`;
 
 /** The variable n: upright (TY-2 allows no italic). Never x, which reads as the times sign (R3). */
 const X = '<span style="font-weight:400">n</span>';
@@ -279,7 +293,7 @@ function machine(p, g, d, wMm, merged = null) {
     }
     // (`machineText` {text, grey}: an anchor-chart step state writes the rule it is trying in the box - detailed lesson 5)
     const mt = p.machineText;
-    const inner = mt ? `<span style="font-size:${g.textEm.toFixed(3)}em;font-weight:700;white-space:nowrap;color:${mt.grey ? INK.grey : INK.ink}">${esc(mt.text)}</span>`
+    const inner = mt ? `<span style="font-size:${fsOf(g, g.textEm)};font-weight:700;white-space:nowrap;color:${mt.grey ? INK.grey : INK.ink}">${esc(mt.text)}</span>`
         : given ? txt(g, ruleHtml(p.rule), { bold: true }) : txt(g, 'rule');
     const boxH = d.machineH;
     // (`machineTried`: the wrong try of a chart's whole example, crossed, on a line above the machine - lesson 5 r2)
@@ -300,6 +314,9 @@ function slotBox(g, s, d, vals, ink, extra = {}) {
     const shape = s.kind === 'sign' ? 'circle' : s.kind === 'rule' ? 'line' : 'box';
     const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink: typeof ink === 'function' ? ink(s.id) : ink, mark: 'cell', shape, ...extra };
     if (s.kind === 'sign') { o.wMm = extra.hMm || d.signW; o.hMm = extra.hMm || d.signW; o.extra = 'border-radius:50%;'; }
+    // (a screen twin's answer slot is a 48 px target both ways, whatever the host's root: the online worksheet at 820 / 1024
+    // drew 48 x 42 px, ws-grade-render TARGET H6, patterns precritic 2026-11-20 A3b; later declarations win in the style)
+    if (g.twin) o.extra = `${o.extra || ''}width:max(${g.em(o.wMm)}, ${TARGET_MIN});height:max(${g.em(o.hMm)}, ${TARGET_MIN});`;
     let html = box(g, s.id, o);
     if (s.kind === 'rule') {
         // a writing LINE, not a box: the bottom rule only (the design standard's line slot)
@@ -337,7 +354,8 @@ function fixOf(p, ctx, vals, key) {
 function fixBox(g, d, fx, ids, { wMm = null, value = null } = {}) {
     const wrong = fx.keyed && ids.some((id) => String(fx.vals[id] === undefined ? '' : fx.vals[id]) !== String(fx.key[id]));
     const v = wrong ? (value !== null ? value : String(fx.key[ids[0]])) : '';
-    let html = box(g, `x${fx.idx(ids[0])}`, { wMm: wMm || d.boxW, hMm: d.boxH, value: '', ink: null, mark: g.twin ? 'cell' : null });
+    let html = box(g, `x${fx.idx(ids[0])}`, { wMm: wMm || d.boxW, hMm: d.boxH, value: '', ink: null, mark: g.twin ? 'cell' : null,
+        extra: g.twin ? `width:max(${g.em(wMm || d.boxW)}, ${TARGET_MIN});height:max(${g.em(d.boxH)}, ${TARGET_MIN});` : '' });
     // The key's fix is the TEACHER's ink: the solid mark sits on the fix slot itself, so the role
     // never restyles it as the pupil's shown work (its pupil-ink pass skips x<k> slots).
     if (v) html = html.replace(/(data-ws-slot="x\d+")/, '$1 data-ws-ink="solid"').replace(/><\/span>$/, `><span style="color:${INK.ink};font-weight:700;${KEY_FEATURES}">${esc(v)}</span></span>`);
@@ -580,7 +598,9 @@ const SIDE_MACHINE_MM = 54;
  * the drawing starts below the keep-out. Down, not right: a wider drawing pushed a lesson model's steps past its cell
  * (ws-detailed-lesson E40). A cell without a tab (a twin, a chart) keeps its top.
  */
-const koPad = (g) => (g.screen ? '' : ';padding-top:max(0mm, calc(var(--ws-ko, 0mm) - 4.5mm))');
+// (Error analysis - `options.fix` - places its own "<Name> wrote:" tag above the work, clear of the tab: the pad there pushed
+// the table 5 mm under that tag at L, ws-cell-checks PUPILTAG x8, PT-ERR-4 2-4 mm; patterns precritic 2026-11-20 A7)
+const koPad = (g, ctx) => (g.screen || fixMode(ctx) ? '' : ';padding-top:max(0mm, calc(var(--ws-ko, 0mm) - 4.5mm))');
 const WIDE_GAP_MM = 8;
 const WIDE_MAX_MM = 132;
 function sideWidth(p, g, d, ctx) {
@@ -646,7 +666,7 @@ register('function-table', {
             inner = `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(WIDE_GAP_MM)}">`
                 + `<div>${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
                 + `<div style="display:flex;flex-direction:column;align-items:center">${sideHtml}</div></div>`;
-            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g, ctx)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
         }
         const merged = ruleInMachine(p, g, d, ctx);
         if (merged) inner += machine(p, g, d, wMm, ruleAnswer(p, g, d, vals, ink, slots, ctx, fx, 'merged'));
@@ -668,7 +688,7 @@ register('function-table', {
             if (p.check && slotsById.chk && !p._noCheck) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(1.2)};text-align:center;line-height:1.2">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
-        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g, ctx)}${insetCss(p, g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const slots = ftSlots(p);
@@ -695,7 +715,10 @@ register('function-table', {
         if (p.task === 'rule' && !merged && !p._noRuleLine) h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
         if (p.check && !p._noCheck && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);
         if (p.note) h += 1.7 + d.textMm * 1.3;
-        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3 };
+        // (`guidedTight`, patterns precritic 2026-11-20 A3a: the Guided page stretched the Model's row and the tries' rows to
+        // 109 mm at M / 156 mm at L for ~72 / ~85 mm of table, EB-BAND 31-46 % under every table; its rows keep their measured
+        // height and the spare page height stays under the grid, PAGE_TYPES 12.1 - read by roles/guided.js only)
+        return { wMm: Math.ceil(w + 4 + 2 * insetOf(p)), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3, guidedTight: true };
     },
     inputs(p) {
         return ftSlots(p).map((s, n) => ({
