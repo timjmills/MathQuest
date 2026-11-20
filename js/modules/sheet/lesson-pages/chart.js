@@ -69,8 +69,8 @@ export function pickExample(items, data, opt = {}) {
     // LESSON-OPENER-SAME (lf-engine, owner's grade-3 review 2026-11-19): a times-table lesson (every fact of the pool shares
     // one factor - mult_facts {constant: [6]}) is modelled on an ordinary fact of ITS OWN table. The widest-operands rule below
     // is a column skill's; on a fixed table it picked 10 / 11 / 12 x the table for every lesson ("11 x 6", "11 x 9": the edge
-    // fact, and 11 is another lesson's table). The other factor is one of 3-9 and, with the orientation, moves with the
-    // lesson's `variant` (its WRM step number), so two consecutive steps never open on the same model.
+    // fact, and 11 is another lesson's table). The other factor is one of 3-9 and moves with the lesson's `variant` (its WRM
+    // step number), so two consecutive steps do not open on the same fact.
     const tableX = fixedTableOf(pool);
     if (tableX) return tableX;
     const sorted = pool.slice().sort((a, b) => easeScore(a.it.q) - easeScore(b.it.q) || a.i - b.i);
@@ -91,11 +91,12 @@ export function pickExample(items, data, opt = {}) {
         const ORD = [3, 4, 5, 6, 7, 8, 9].filter((f) => f !== table);
         const v = Number.isFinite(Number(opt.variant)) ? Math.abs(Math.floor(Number(opt.variant))) : 0;
         const want = ORD[v % ORD.length];
-        const tableFirst = v % 2 === 1;
+        // the table SECOND: "5 × 6 is 5 groups of 6", and the worked steps count by 6 (the provider counts by the second
+        // factor - "6 × 7" counted by 7, the 7 table, in a 6 times-table lesson)
         const score = (o) => {
-            const other = o[0] === table ? o[1] : o[0];
+            const other = o[1] === table ? o[0] : o[1];
             const edge = other < 3 || other > 9 ? 100 : 0;
-            return edge + Math.abs(other - want) * 2 + ((o[0] === table) === tableFirst ? 0 : 1);
+            return edge + (o[1] === table ? 0 : 50) + Math.abs(other - want) * 2;
         };
         let best = 0;
         for (let k = 1; k < facts.length; k++) if (score(ops[k]) < score(ops[best])) best = k;
