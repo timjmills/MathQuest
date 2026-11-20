@@ -12141,6 +12141,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "amdiv-long-rows",
+   "check": "ws-options-verify --render H13 (area-model-div round 2, 2026-11-20): the long and fraction forms printed 6 a page at M in 76.5 mm cells for 52 mm of ink (3 rows; EB-BAND 28.2 % on independent / more-practice) where the sign form prints 8; the forms' second line is the problem, not working room, so they pack at their measured height (footprint denseRoom 1) and print 4 rows, 8 a page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render capacity (RUBRIC H13); ws-empty-band EB-BAND",
+   "browser": true,
+   "fail": {
+    "commit": "86f63e822",
+    "state": "amForm long / fraction @M: 6 items on the fullest page where the default prints 8"
+   },
+   "pass": {
+    "commit": "91ee8eaa8",
+    "state": "8 a page at M (4 rows of 57.8 mm), L unchanged (6 for every form)"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill division:area_model_div_4by2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
