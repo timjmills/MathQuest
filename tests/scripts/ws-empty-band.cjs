@@ -147,6 +147,10 @@ const ONE_PAGE_ROLES = new Set(['pre-skill-check']);
 // EBLAST-BLOCKING (lead 2026-11-20, after critic eblast r3): the rules stay ADVISORY globally, but are FINDINGS on these roles.
 // The list is PINNED: it may only GROW (`--pin-check` fails when an entry of the merge-base copy is gone, as no-dropped-row does for
 // backtests). Seeded with every role green on all passed skills (sweep 2026-11-20); pre-skill-check is out until its owner fixes it.
+// Which listed roles each rule can actually judge (critic eblast r4 P3): EB-LASTPAGE judges only FIXED_CAP_ROLES (pre-skill-check,
+// true-false, reason-it, error-analysis, test); CAP-PARITY only roles whose count the role sets (guided, error-analysis, review, test,
+// pre-skill-check, mixed-practice, true-false, reason-it, word-problems). independent, more-practice, stretch, scripted-model,
+// opener, lesson, fact-probe and fact-rows are listed so a future rule on them blocks at once, but today neither rule judges them.
 // EBLAST-BLOCKING-BEGIN
 const EBLAST_BLOCKING_ROLES = [
     'independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'mixed-practice', 'true-false', 'reason-it',
@@ -405,8 +409,11 @@ const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE
 if (argv.includes('--pin-check')) {
     // the merge-base with the main branch (or --base <rev>); a base with no list yet has nothing to lose
     const i = argv.indexOf('--base'); let base = i > -1 ? argv[i + 1] : null; let src = null;
+    // fail CLOSED (critic eblast r4 P2): a base that cannot be resolved, or whose copy of this file cannot be read, is a FAIL;
+    // only a base that resolves to a copy with no EBLAST-BLOCKING markers yet has nothing to lose
     try { if (!base) base = execFileSync('git', ['merge-base', 'HEAD', 'origin/master'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-        src = execFileSync('git', ['show', `${base}:tests/scripts/ws-empty-band.cjs`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 26 }); } catch (e) { src = null; }
+        src = execFileSync('git', ['show', `${base}:tests/scripts/ws-empty-band.cjs`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 26 }); } catch (e) {
+        console.log(`ws-empty-band --pin-check: FAIL (the base ${base || '(merge-base with origin/master)'} cannot be resolved or read: ${String(e.message || e).split('\n')[0].slice(0, 120)})`); process.exit(1); }
     const fi = argv.indexOf('--file'); const cur = fi > -1 ? blockingOf(fs.readFileSync(path.resolve(argv[fi + 1]), 'utf8')) : EBLAST_BLOCKING_ROLES;
     const lost = pinLost(blockingOf(src), cur);
     for (const r of lost) console.log(`  FAIL EBLAST_BLOCKING_ROLES lost '${r}' (in ${base}; the list may only grow)`);
