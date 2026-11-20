@@ -12022,6 +12022,166 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "skip-end-gate",
+   "check": "ws-skip SKIP-END-GATE: no end screen or session-history row while the return-pass intro or the pass is up; exactly one of each after it (real typing + Enter, wrong try then Skip, Skip on the last item)",
+   "kind": "commit-pair",
+   "rule": "SKIP-END-GATE (lf-hosts skip critic r1 F1)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a stray advance from an earlier item finished the run under the intro: 'Completed 5 problems! Score: 2', row 2/6, the pass then ran on a finished game"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "nextQuestion is a no-op while a pass exists; the run ends once, through _endRun, after the pass"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card --rules SKIP-END-GATE",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-total",
+   "check": "ws-skip SKIP-TOTAL: the session row is correct / totalProblems after a return pass",
+   "kind": "commit-pair",
+   "rule": "SKIP-TOTAL (lf-hosts skip critic r1 F2)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "qCount = totalProblems + 1 at the end: 4 right of 4 read 4/5"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "qCount = totalProblems: the row reads 4/5 for 4 of 5 (80 %)"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card --rules SKIP-TOTAL",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-timer",
+   "check": "ws-skip SKIP-TIMER: a timer that expires under the return-pass intro ends the run cleanly (intro gone, still-skipped items 'skipped', not wrong) on the card and the quiz",
+   "kind": "commit-pair",
+   "rule": "SKIP-TIMER (lf-hosts skip critic r1 F3)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "the intro stayed over the end modal / the submitted quiz; a tap threw TypeError setting 'active'"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "endGame / submitQuiz clear the intro and the pass; every intro / pass callback is guarded"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card,quiz --rules SKIP-TIMER",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-count-match",
+   "check": "ws-skip SKIP-COUNT-MATCH: the intro's n equals the Skipped: n shown; the quiz pass is the skipped questions only; the worksheet count drops on answer, not on show; the card header reads 'Fixing k of n'",
+   "kind": "commit-pair",
+   "rule": "SKIP-COUNT-MATCH (lf-hosts skip critic r1 F4, F6 worksheet, ruling R3)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "quiz pill 'Skipped: 1' vs intro 'You skipped 3' (flagged-and-answered and never-skipped blanks in the pass); the worksheet count dropped when a card was shown; header 'Q5/5'"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "the pass is exactly the skipped items; counts agree; header 'Fixing 1 of 3'"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card,worksheet,quiz --rules SKIP-COUNT-MATCH",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-blank",
+   "check": "ws-skip SKIP-BLANK: a blank Next in the return pass ends the item skipped / not answered on the worksheet and the quiz",
+   "kind": "commit-pair",
+   "rule": "SKIP-BLANK (lf-hosts skip critic r1 F5)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a blank Next was graded Wrong (worksheet 3/4) / 'incorrect' in the quiz results"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "a blank Next is a second skip: skipped, out of the total"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts worksheet,quiz --rules SKIP-BLANK",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-keep-wrong",
+   "check": "ws-skip SKIP-KEEP-WRONG: a skip after a wrong try reads 'Incorrect, then skipped' (dot, session row skippedAfterWrong, dashboard)",
+   "kind": "commit-pair",
+   "rule": "SKIP-KEEP-WRONG (lf-hosts skip critic r1 F6)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "the skip overwrote 'incorrect': the teacher saw only 'Skipped'"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "the wrong try stays visible to the teacher"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts card --rules SKIP-KEEP-WRONG",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-map-rit",
+   "check": "ws-skip SKIP-MAP-RIT: in the MAP test an item still skipped after the return pass scores as incorrect for RIT and still reads 'skipped'",
+   "kind": "commit-pair",
+   "rule": "SKIP-MAP-RIT (lead ruling 2026-11-19, lf-hosts skip)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a twice-skipped item never moved RIT"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "MAP_STILL_SKIPPED_SCORES_WRONG scores it wrong for RIT at finalize; the row stays skipped"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts map --rules SKIP-MAP-RIT",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-map-redo",
+   "check": "ws-skip SKIP-MAP-REDO: a navigator-dot redo of a skipped MAP item does not clear 'skipped'",
+   "kind": "commit-pair",
+   "rule": "SKIP-MAP-REDO (lf-hosts skip ruling R4)",
+   "fail": {
+    "commit": "ac3fecb0e",
+    "state": "a correct dot redo cleared 'skipped', so the item never came back"
+   },
+   "pass": {
+    "commit": "85297248a",
+    "state": "the dot redo leaves 'skipped'; the return pass scores it"
+   },
+   "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280 --hosts map --rules SKIP-MAP-REDO",
+   "browser": true,
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
