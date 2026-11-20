@@ -14283,20 +14283,20 @@
    }
   },
   {
-   "id": "lessons-browse-thumb-first-page",
-   "check": "critic lessons-browser r1 D1: a card whose lesson has a detailed lesson shows that lesson's FIRST PAGE (card §7), cached by lessonId|renderHash (a second draw and a reload build nothing)",
+   "id": "lessons-browse-thumb-detailed-item",
+   "check": "critic lessons-browser r2 D11 + lead ruling A20 (replaces r1 D1's first-page thumbnail): a card whose lesson has a detailed lesson shows its first teaching skill's item card, and no first-page build starts on load or scroll",
    "kind": "commit-pair",
-   "rule": "ws-lessons-browse THUMB-DETAILED-FIRST-PAGE",
+   "rule": "ws-lessons-browse THUMB-DETAILED-ITEM",
    "browser": true,
    "fail": {
-    "commit": "6d0d8ff4a",
-    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+    "commit": "1c8bb3aa2",
+    "state": "critic lessons-browser r2 tree (first page built as the thumbnail on scroll)"
    },
    "pass": {
-    "commit": "610885593",
-    "state": "lf-checks fix round for critic lessons-browser r1"
+    "commit": "d744efeeb",
+    "state": "lf-checks D11 revert (lead ruling A20)"
    },
-   "command": "node tests/scripts/ws-lessons-browse.mjs --only THUMB-DETAILED-FIRST-PAGE --widths 1366",
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only THUMB-DETAILED-ITEM --widths 1366",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -14461,6 +14461,26 @@
     "args": ""
    },
    "command": "node tests/scripts/ws-lessons-browse.mjs --only SKILLS-GRADE-PILLS --widths 1366 {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-thumb-no-freeze",
+   "check": "critic lessons-browser r2 D11: at CPU x4 with a cold cache, the grade 3 Thumbnails at 1024 scrolled through has no long task over 200 ms and no frame gap over 500 ms (measured from the moment the Lessons screen is shown)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse THUMB-NO-FREEZE",
+   "browser": true,
+   "fail": {
+    "commit": "1c8bb3aa2",
+    "state": "critic lessons-browser r2 tree (84 s first-page build on the main thread)"
+   },
+   "pass": {
+    "commit": "d744efeeb",
+    "state": "lf-checks D11 revert (lead ruling A20)"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only THUMB-NO-FREEZE --widths 1024",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

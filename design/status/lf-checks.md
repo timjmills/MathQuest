@@ -1011,3 +1011,4 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   D7 header card: grade, area and pass / pending only (the old tag row keeps CCSS · BUILD and the verdict); cards one top band.
   D8-D10 gate: four default widths, round trip asserts view=list, exact Skills grade pills; one rule per defect.
 - Pre-existing, not this lane: ws-teacher-shell FAILs 3 on 6d0d8ff4a as well (popover summary / sample / board code).
+- 2026-11-20 lf-checks: critic r2 D11 reverted (lead ruling A20: item card thumbnails, no first-page build), THUMB-NO-FREEZE + THUMB-DETAILED-ITEM rules and backtests, D12 explicit pending kind; card waiver A20.
