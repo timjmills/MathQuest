@@ -34,3 +34,14 @@ footprint-kind -> class table (12.1 word-problem / long-division rows, legacy M1
 6 props c / e / k trust the dealer's report; 7 the no-S fixture is caught by luck; 8 two codecs (prototype vs skill-codes.js).
 Root cause (the r2 class again): a normative card sentence with no property asserting it. Proposed check: every deal rule
 sentence in §2 / §3 / §7a carries a property id, and check-v1 fails on a rule sentence without one (rule -> property trace).
+
+## Card critic r4 FAIL (min 5, K2) - final round, STOPPED per lead (2026-11-20)
+check-v1 OK in all four modes, but the critic's sweep found the identical-mix claim false: 501 of 108,000 single-sheet
+codes re-deal a different sheet (replay deals from the dealt list alone, so the dealer chooses with a smaller cycle; up
+to 17 % on kind pools). Prop a was never swept, so check-v1 could not see it. Also: props f / g / h / j still trust the
+dealer (comeback, top-ups, SHELF tables); the trace detector misses common rule wordings (18 untagged rules found); step 2
+builds rows with fc not kind and codes from data.js not FROZEN_SKILL_CODES; "placement grade" vs the table grade; §9b
+step 3 seed wording; step 1 property map incomplete; 12.1 long word problems at L.
+Proposed next (if the lead reopens): deal() returns the replay of its own code (deal -> encode -> replay, one pass, stable
+in every case checked) and assert deal(replay(code(x))) == deal(x) swept in --fill; every property recomputes; the trace
+inverts its default (every bullet sentence normative unless [I]). All fixes are local to the dealer, its check and the card text.
