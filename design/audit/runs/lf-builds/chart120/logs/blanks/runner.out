@@ -1,0 +1,17 @@
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-boot-smoke.log
+r2-code-snapshot.log: (Use `node --trace-warnings ...` to show where the warning was created)
+r2-content-120.log: ws-content-audit: OK (1 chart_to_120 skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 3 notes)
+r2-content-hcf.log: ws-content-audit: OK (1 hundreds_chart_fill skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 0 notes)
+r2-providers-120.log: (Use `node --trace-warnings ...` to show where the warning was created)
+r2-providers-hcf.log: (Use `node --trace-warnings ...` to show where the warning was created)
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-optverify-120.log
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-optverify-hcf.log
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-guided-echo.log
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-guided-echo-lesson6.log
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-backtest-c120.log
+skip design/audit/runs/lf-builds/chart120/logs/blanks/r2-precritic-plan.log
+r2-pc-c120.log: ws-precritic: FAIL: 9 FAIL, 52 PASS (1 on the baseline), 2 N/A, 0 SKIPPED-NOT-BUILT, 2 SKIPPED / INCOMPLETE (no or partial rulings) of 65 (FAIL: empty-band, print-lint-lesson-L, print-lint-lesson-M, role-cover-1, role-cover-2, screen-support-eq, sibling-compare, worksheet-reflow, options-render; N/A (ran, nothing to check): dealer-uniform, spec-card-signed; SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): card-rulings, card-not-offered)
+r2-pc-hcf.log: ws-precritic: FAIL: 6 FAIL, 57 PASS (1 on the baseline), 1 N/A, 0 SKIPPED-NOT-BUILT, 1 SKIPPED / INCOMPLETE (no or partial rulings) of 65 (FAIL: empty-band, role-cover-1, role-cover-2, screen-support-eq, sibling-compare, worksheet-reflow; N/A (ran, nothing to check): dealer-uniform; SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): card-rulings)
+write: ws-lesson-baseline: wrote 2588 hashes to design/audit/runs/lf-builds/chart120/logs/blanks/r2-master-lesson-baseline.json
+r2-lesson-baseline-check.log: ws-lesson-baseline: OK (2588 hashes identical)
+ALLDONE
