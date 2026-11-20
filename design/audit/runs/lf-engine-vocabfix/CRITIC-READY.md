@@ -27,6 +27,50 @@ lf-placevalue's pagesOf fix and without this lane.
 PNG sets: rowcap round 2 `design/audit/runs/lf-engine-rowcap/proof-s2r2/` (before 661965d43); vocabfix `design/audit/runs/lf-engine-vocabfix/` (this folder,
 before 414a0e108). Rowcap's notes: `design/audit/runs/lf-engine-rowcap/CRITIC-READY-s2.md`.
 
+### Resume round (dd5e01659): the Scripted Model foot and the beside states
+- **Fix (dd5e01659).**
+  - Two-column ("state beside its step") states are now measured as drawn. measuredStates stacks every state for the host at 2+
+    columns; a fact model's items keep their own measure.
+  - A measured beside row takes off only hMinAt's 2 mm, not the tab keep-out.
+  - The Say band paints over the band above it (`css/sheet-kit.css`, additive).
+- **ROLE-CAPPED ERROR-ANALYSIS (lead 2026-11-20).** ws-print-lint prints `PAGEFILL ROLE-CAPPED ERROR-ANALYSIS (lead 2026-11-20; not
+  a finding)` on every Error Analysis page with more than 20 % white:
+  - count_by_tables EA M: 60 mm (26 %), 2 items;
+  - fact_family_sort EA M: 103 mm (44 %), 4 items.
+
+**Checks** (Scripted Model, M and L):
+
+| Check | Before (d2306451c) | After (dd5e01659) |
+|---|---|---|
+| RR-BOX (`ws-grade-render --raster-fit`; count_by_tables, add_wp_10_plain, fact_family_sort; pupil + key) | FAIL 16 | OK: "6 role sheet(s) printed to PDF and rasterised: pages as planned, no ink at the edge, no clipped text" |
+| EB-CLIP (the three above plus vocab_grade_pictures, vocab_pick3_words, mult_facts) | FAIL 5 | 0 |
+| EB-STRETCH (same six skills) | 0 | 0 |
+| count_by_tables L Say-band clip | clipped | cleared (RR-BOX clean) |
+| print-lint-fill-M (review, test, EA, opener on the three skills) | FAIL 2 | OK |
+| Backtest `model-beside-clip` (EB-CLIP) | FAIL d2306451c | OK dd5e01659 |
+
+The RR-BOX fixture row is rowcap's.
+
+**Still red: EB-PAGE, 3. Lead call.**
+- **add_wp_10_plain M p1 36 %, L p1 30 %.** The Model has 4 states. 3 fit page 1, so they are dealt 2 + 2 to avoid a lone
+  state (critic r2 D8). The row cap keeps page 1's two rows from filling the page. So no-lone-state, the row cap and EB-PAGE
+  conflict here, the same class as ruling B.
+- **mult_facts L p1 34 %.** Unchanged since before ruling B. Ruling B kept the fill rows, and the page is still 34 % empty.
+
+**Gates on dd5e01659 / bd7f55c27:**
+
+| Gate | Result |
+|---|---|
+| ws-roles-unit | OK (115) |
+| ws-boot-smoke | OK |
+| ws-precritic-plan | OK (423 rows on the lane's path; checks-from-critics OK) |
+| ws-capacity-pin --check | OK (785 pinned pages, 50 rises, 0 falls) |
+| ws-lesson-baseline --check | OK (2556 identical; no re-pin) |
+| ws-backtest model-beside-clip | PASS |
+
+**PNGs:** `model-foot/` holds the Scripted Model pages (pupil + key, M/L) of count_by_tables, add_wp_10_plain and
+fact_family_sort. They are named `-before-d2306451c` and `-after`.
+
 ### Checks on the merged head (Scripted Model, M and L: count_by_tables, add_wp_10_plain, fact_family_sort, vocab_grade_pictures, vocab_pick3_words, mult_facts)
 - **ws-empty-band `--only EB-CLIP,EB-STRETCH,EB-PAGE --page-fill`:** FAIL 8.
   - EB-CLIP 5: add_wp_10_plain L p1 / p2 cells 1 and 3 (word-work), ink 0.8 mm past the rule; fact_family_sort L p1 cell 5
@@ -188,7 +232,7 @@ changed, before = 414a0e108, after = this head (buildSheet role lesson, practice
 - `vocabpics-L-lesson-mixed-*` (p6–p7)
 - `countbytables-L-model-*` (p1)
 
-## PARKED (2026-11-20, owner budget stop): resume here
+## PARKED (2026-11-20, owner budget stop): resumed in dd5e01659 (see "Resume round" above); the critic has not run yet
 
 **State.** Head 3744c25d5 is merged with rowcap 19666510e and master. Its gates are green: boot, roles-unit, precritic-plan, capacity-pin (0 falls) and the lesson baseline (2556 identical). layout-unit shows only its known fails. The critic has NOT run, because the machine checks below are still red. That critic is rowcap's round cap: if it fails, stop and report.
 
