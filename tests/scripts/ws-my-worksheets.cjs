@@ -20,6 +20,17 @@
 //   NO-LOSS            a seeded version-1 database (tests / results) and My sets are unchanged after the upgrade and a save.
 //   TOUCH-WIDTH        every control of the screen, the ⋯ menu and the Save dialog ≥ 48 px and hit by a real tap / click at
 //                      its centre; no sideways scroll; at 1280 × 1000, 1366 × 768 (mouse), 1024 × 768, 820 × 1180 (touch).
+//   KEYS               (critic r1 F1) on each Save host (Print worksheets, simple print, online worksheet): after every
+//                      Tab and Shift+Tab focus stays in the Save dialog; Esc closes only the dialog, the host stays open,
+//                      and focus returns to that host's Save button.
+//   MENU-REACH         (critic r1 F2) the ⋯ menu of the LAST card, opened by a real tap at 1024 × 768, 1366 × 768 and
+//                      820 × 1180 with the page scrolled to the bottom: every item inside the viewport and hit by
+//                      elementFromPoint at its centre (no scroll needed).
+//   CARD-BOX           (critic r1 F3) every element of every card lies inside the card's box (1 px), at every width.
+//   SAVE-LABEL         (critic r1 F7) the Save control reads "Save to My Worksheets" on every host, at 1280 and 820.
+//   CARD-CONFORM       (critic r1 F8, F9) card S-3: Print, Play, Send code and ⋯ are visible buttons on the card face;
+//                      every record with a thumbnail has a page count (New mix included); a card's meta line never
+//                      repeats a phrase of its name (the date, the page type).
 //   THEME              the current app look (lead ruling A19, owner 2026-11-20: "the purple theme looks like the old website"):
 //                      css/my-worksheets.css and the screen's markup write no colour literal (only var(--…) tokens), and the
 //                      screen's primary button computes the same colours, font and corners as the Print worksheets primary.
@@ -31,11 +42,14 @@ const { open } = require('../lib/ws-harness.cjs');
 
 const argv = process.argv.slice(2);
 const arg = (f, d) => { const i = argv.indexOf(f); return i >= 0 && i + 1 < argv.length ? argv[i + 1] : d; };
-const ALL = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME'];
+const ALL = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME', 'KEYS', 'MENU-REACH', 'CARD-BOX', 'SAVE-LABEL', 'CARD-CONFORM'];
 const ONLY = arg('--only', '') ? arg('--only', '').split(',').map((s) => s.trim().toUpperCase().replace(/^TOUCH\/WIDTH$|^TOUCH$/, 'TOUCH-WIDTH')) : ALL;
 const WIDTHS = String(arg('--widths', '1280,1366,1024,820')).split(',').map(Number).filter(Boolean);
 const SIZE = { 1280: [1280, 1000, false], 1366: [1366, 768, false], 1024: [1024, 768, true], 820: [820, 1180, true] };
 const SHOTS = arg('--shots', '');
+// --inject <file.js>: a script run in the page before ORGANISE's "Send as a set" (a backtest mutation: the check must
+// catch a Send as a set that loses or changes the other sets)
+const INJECT = arg('--inject', '') ? fs.readFileSync(path.resolve(arg('--inject', '')), 'utf8') : '';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = {};
 const finding = (id, msg) => { (results[id] = results[id] || []).push(msg); };
@@ -94,6 +108,20 @@ const CASES = [
         await sleep(250);
     };
 
+    // the three Save hosts, opened as a teacher (KEYS, SAVE-LABEL)
+    const SAVE_HOSTS = [
+        { id: 'print', btn: '#teacherMain .tv-screen.is-active[data-screen="print"] [data-act="save-sheet"]', alive: '#teacherMain .tv-screen.is-active[data-screen="print"]',
+            open: () => page.evaluate(async () => { const TP = await import('/js/modules/teacher-print.js'); TP.loadPrintUi({ seed: 5, size: 'M', sections: [{ role: 'independent', skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: {} }] }] }); window.tvGo('print'); await TP.printBuiltNow(); }),
+            close: async () => {} },
+        { id: 'simple', btn: '#spRoot [data-sp="save"]', alive: '#spRoot .sp-foot',
+            open: () => page.evaluate(async () => { const SP = await import('/js/modules/simple-print.js'); SP.openSimplePrint([{ categoryId: 'multiplication', skillId: 'mult_facts' }, { categoryId: 'addition', skillId: 'add_facts' }], { from: 'tray' }); await SP.simpleBuiltNow(); }),
+            close: () => page.evaluate(async () => { const SP = await import('/js/modules/simple-print.js'); SP.closeSimplePrint(); }) },
+        { id: 'online', btn: '#worksheetView #wsSaveSheet', alive: '#worksheetView.active',
+            open: async () => { await page.evaluate(() => { window.UnifiedSkills.clear(); window.UnifiedSkills.add({ domainId: window.getDomainByCategory('addition'), categoryId: 'addition', skillId: 'add_facts', skillLabel: 'add_facts' }); window.playSelectedSkills('worksheet'); }); await sleep(2500); },
+            close: () => page.evaluate(() => window.showView('homeView')) },
+    ];
+    const visibleIn = (sel) => page.evaluate((sel) => { const n = document.querySelector(sel); if (!n) return false; const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(n).visibility !== 'hidden'; }, sel);
+
     let saved = [];   // [{case, id, before: {pupilHtml, keyHtml}}]
     const checkedWidths = [];
     try {
@@ -146,7 +174,7 @@ const CASES = [
         }
 
         /* ---------------------------------------------------------------- SAVE-REPRODUCE */
-        const needSaved = ['SAVE-REPRODUCE', 'SHEET-CODE', 'LIBRARY-ROUNDTRIP', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH', 'THEME'].some((k) => ONLY.includes(k));
+        const needSaved = ['SAVE-REPRODUCE', 'SHEET-CODE', 'LIBRARY-ROUNDTRIP', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH', 'THEME', 'MENU-REACH', 'CARD-BOX', 'CARD-CONFORM'].some((k) => ONLY.includes(k));
         if (needSaved) {
             current = ONLY.includes('SAVE-REPRODUCE') ? 'SAVE-REPRODUCE' : ONLY.find((k) => k !== 'NO-LOSS');
             await L(async (L) => L.clearSheets());
@@ -232,6 +260,29 @@ const CASES = [
             await sleep(800);
             const n1 = await L(async (L) => (await L.listSheets()).length);
             if (n1 !== n0 + 1) finding('SAVE-REPRODUCE', `Save in the dialog stored ${n1 - n0} sheets`);
+            // player-fresh (critic r1 F4): Save on a freshly played online worksheet keeps the sheet on screen: the on-screen
+            // items are page 1 of the saved sheet, in order
+            {
+                const ids0 = await L(async (L) => (await L.listSheets()).map((r) => r.id));
+                await SAVE_HOSTS[2].open();
+                await sleep(1500);
+                const shown = await page.evaluate(async () => { const { state } = await import('/js/modules/state.js'); return (state.worksheetQs || []).map((q) => `${q.text}=${q.ans}`); });
+                await click('#worksheetView #wsSaveSheet');
+                await page.waitForSelector('#mwsSave', { timeout: 15000 }).catch(() => {});
+                await sleep(300);
+                await click('#mwsSave [data-mws-save="save"]');
+                let rec = null;
+                for (let i = 0; i < 30 && !rec; i++) { await sleep(400); rec = await L(async (L, ids0) => (await L.listSheets()).find((r) => !ids0.includes(r.id)) || null, ids0); }
+                if (!shown.length) finding('SAVE-REPRODUCE', 'player-fresh: the online worksheet showed no items');
+                else if (!rec) finding('SAVE-REPRODUCE', 'player-fresh: Save on the online worksheet stored no sheet');
+                else {
+                    const p1 = await L(async (L, id) => (await L.pageOneItems(await L.getSheet(id))).map((q) => `${q.text}=${q.ans}`), rec.id);
+                    if (JSON.stringify(p1) !== JSON.stringify(shown)) finding('SAVE-REPRODUCE', `player-fresh: the saved sheet is not the one on screen (page 1 ${p1.length} items: ${p1.slice(0, 2).join(' | ')}; on screen ${shown.length}: ${shown.slice(0, 2).join(' | ')})`);
+                    await L(async (L, id) => L.deleteSheet(id), rec.id);
+                }
+                await SAVE_HOSTS[2].close();
+                await sleep(300);
+            }
             // pupils never see Save (card A15 #2)
             const pupil = await page.evaluate(async () => {
                 window.setUserRole('student');
@@ -401,7 +452,22 @@ const CASES = [
 
         /* ---------------------------------------------------------------- INTERACTIVE-SAME */
         if (want('INTERACTIVE-SAME')) {
-            for (const cid of ['tp-independent-M', 'sp-facts-L', 'tp-lesson-M']) {
+            // a detailed lesson (critic r1 F5): Play deals page 1's items, or says plainly what it opens
+            const PLAY_LESSON_MSG = 'Play opens the practice pages of this lesson.';
+            const dl = await page.evaluate(async () => {
+                const TP = await import('/js/modules/teacher-print.js');
+                const L = await import('/js/modules/sheet-library.js');
+                const { detailedLessonList } = await import('/js/modules/lessons/detailed/index.js');
+                const id = (detailedLessonList()[0] || {}).id;
+                if (!id || !TP.printDetailedLesson(id)) return { error: 'no detailed lesson' };
+                window.tvGo('print');
+                await TP.printBuiltNow();
+                const rec = await L.saveSheet(Object.assign(TP.printSaveDraft(), { name: 'Detailed lesson check' }));
+                return { id: rec.id };
+            }).catch((e) => ({ error: String(e.message || e).slice(0, 200) }));
+            if (dl.error) finding('INTERACTIVE-SAME', `tp-detailed: ${dl.error}`);
+            else saved.push({ case: 'tp-detailed', id: dl.id, lessonMsg: true });
+            for (const cid of ['tp-independent-M', 'sp-facts-L', 'tp-lesson-M', 'tp-detailed']) {
                 const s = saved.find((x) => x.case === cid);
                 if (!s) { finding('INTERACTIVE-SAME', `${cid}: not saved`); continue; }
                 // the gate's own page-1 walk over the rebuilt plans (independent of the screen's play path)
@@ -419,6 +485,7 @@ const CASES = [
                     return [];
                 }, s.id);
                 await go('sheets'); await onSheets();
+                await page.evaluate(() => { window.__mwsSaw = ''; const ob = new MutationObserver(() => { const t = document.body.innerText || ''; if (t.includes('Play opens the practice pages of this lesson.')) window.__mwsSaw = 'yes'; }); ob.observe(document.body, { subtree: true, childList: true, characterData: true }); window.__mwsOb = ob; });
                 await click(`.mws-card[data-id="${s.id}"] [data-mws="play"]`);
                 let got = null;
                 for (let i = 0; i < 80; i++) {
@@ -429,6 +496,16 @@ const CASES = [
                     });
                     if (got && got.length) break;
                     await sleep(250);
+                }
+                await sleep(600);
+                const saw = await page.evaluate(() => { if (window.__mwsOb) window.__mwsOb.disconnect(); return window.__mwsSaw === 'yes' || (document.body.innerText || '').includes('Play opens the practice pages of this lesson.'); });
+                if (s.lessonMsg) {
+                    // either the same items as page 1, or the plain message (silence is the failure)
+                    const same = page1.length && got && JSON.stringify(got) === JSON.stringify(page1);
+                    if (!same && !saw) finding('INTERACTIVE-SAME', `${cid}: Play deals other items than page 1 (${(got || []).length} vs ${page1.length}) and does not say "${PLAY_LESSON_MSG}"`);
+                    await page.evaluate(() => window.showView('homeView'));
+                    await sleep(400);
+                    continue;
                 }
                 if (cid === 'tp-independent-M') { await sleep(1500); await shot('interactive-1280'); }
                 if (!page1.length) finding('INTERACTIVE-SAME', `${cid}: page 1 has no items to compare`);
@@ -496,6 +573,28 @@ const CASES = [
             const mix = all2.find((r) => !all1.some((x) => x.id === r.id));
             const strip = (rq) => JSON.stringify(rq, (k, v) => (k === 'seed' || k === 'lessonSeeds' ? undefined : v));
             if (!mix || strip(mix.req) !== strip(tg.req) || JSON.stringify(mix.req) === JSON.stringify(tg.req)) finding('ORGANISE', 'New mix did not make a sheet with the same settings and a new seed');
+            // Send as a set (critic r1 F6): one new set first in My sets, holding the sheet's de-duplicated skills and their
+            // options; every other set byte-identical
+            {
+                const setsBefore = await page.evaluate(() => {
+                    const old = [{ id: 'set_keep1', name: 'Keep one', skills: [{ categoryId: 'addition', skillId: 'add_facts' }], createdAt: 1 }, { id: 'set_keep2', name: 'Keep two', skills: [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { tables: [2, 5] } }], createdAt: 2 }];
+                    localStorage.setItem('mq_teacher_sets', JSON.stringify(old));
+                    return old;
+                });
+                if (INJECT) await page.evaluate(INJECT);
+                await click(`${card} [data-mws="menu"]`);
+                await click(`${card} [data-mws="set"]`);
+                await sleep(500);
+                const want = await L(async (L, id) => { const r = await L.getSheet(id); return [...new Map(L.skillsOf(r.host, r.req).map((k) => [`${k.categoryId}:${k.skillId}`, k])).values()].map((k) => Object.assign({ categoryId: k.categoryId, skillId: k.skillId }, k.opts && Object.keys(k.opts).length ? { opts: k.opts } : {})); }, tp.id);
+                const after = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('mq_teacher_sets') || '[]'); } catch (e) { return null; } });
+                const nm = (await recOf(tp.id)).name;
+                if (!Array.isArray(after) || after.length !== setsBefore.length + 1) finding('ORGANISE', `Send as a set: My sets has ${after ? after.length : 'no'} sets, want ${setsBefore.length + 1}`);
+                else {
+                    const s0 = after[0];
+                    if (!s0 || s0.name !== nm.slice(0, 60) || JSON.stringify(s0.skills) !== JSON.stringify(want)) finding('ORGANISE', `Send as a set: the new set is not first with the sheet's skills (${JSON.stringify(s0 && { name: s0.name, skills: s0.skills }).slice(0, 160)})`);
+                    if (JSON.stringify(after.slice(1)) !== JSON.stringify(setsBefore)) finding('ORGANISE', 'Send as a set changed the other sets');
+                }
+            }
             // search
             await page.focus('#mwsSearch'); await page.keyboard.type('Renamed sheet Q');
             await sleep(500);
@@ -565,6 +664,168 @@ const CASES = [
                 const only = await page.evaluate(() => [...document.querySelectorAll('.mws-card')].map((c) => c.dataset.id));
                 if (!only.length || !only.includes(tp.id) || only.length > 3) finding('ORGANISE', `the #homework chip shows ${only.length} cards`);
                 await click('#teacherMain [data-mws="chip"][data-v="tag:homework"]');
+            }
+        }
+
+        /* ---------------------------------------------------------------- KEYS (critic r1 F1) */
+        if (want('KEYS')) {
+            await page.setViewport({ width: 1280, height: 1000, deviceScaleFactor: 1 });
+            await visit('/index.html');
+            for (const h of SAVE_HOSTS) {
+                await h.open();
+                if (!(await visibleIn(h.btn))) { finding('KEYS', `${h.id}: no Save button`); await h.close(); continue; }
+                await click(h.btn);
+                await page.waitForSelector('#mwsSave', { timeout: 15000 }).catch(() => {});
+                await sleep(300);
+                const out = [];
+                for (const [key, n] of [['Tab', 12], ['Shift+Tab', 12]]) {
+                    for (let i = 0; i < n; i++) {
+                        if (key === 'Shift+Tab') { await page.keyboard.down('Shift'); await page.keyboard.press('Tab'); await page.keyboard.up('Shift'); } else await page.keyboard.press('Tab');
+                        const where = await page.evaluate(() => { const a = document.activeElement; return a && a.closest && a.closest('.mws-dialog') ? '' : ((a && (a.getAttribute('aria-label') || a.textContent || a.tagName)) || 'nothing').trim().slice(0, 30); });
+                        if (where) { out.push(`${key} #${i + 1} leaves the dialog (to "${where}")`); break; }
+                    }
+                }
+                if (h.id === 'simple') await shot('keys-simple-1280');
+                await page.keyboard.press('Escape');
+                await sleep(500);
+                const after = await page.evaluate((btn, alive) => {
+                    const a = document.activeElement, b = document.querySelector(btn);
+                    return { dlg: !!document.querySelector('#mwsSave'), alive: !!document.querySelector(alive), back: !!b && (a === b || b.contains(a)), at: ((a && (a.getAttribute('aria-label') || a.id || a.tagName)) || '').slice(0, 30) };
+                }, h.btn, h.alive);
+                if (after.dlg) out.push('Esc did not close the Save dialog');
+                if (!after.alive) out.push('Esc closed the host under the dialog');
+                if (after.alive && !after.dlg && !after.back) out.push(`focus did not return to the Save button (on "${after.at}")`);
+                for (const x of out) finding('KEYS', `${h.id}: ${x}`);
+                await page.evaluate(() => { const o = document.querySelector('#mwsSave'); if (o) o.remove(); });
+                await h.close();
+                await sleep(300);
+            }
+        }
+
+        /* ---------------------------------------------------------------- MENU-REACH (critic r1 F2) */
+        if (want('MENU-REACH')) {
+            for (const w of [1024, 1366, 820]) {
+                const [W, H] = SIZE[w];
+                await page.setViewport({ width: W, height: H, deviceScaleFactor: 1, hasTouch: true, isMobile: false });
+                await visit('/index.html');
+                await go('sheets');
+                if (!(await onSheets())) { finding('MENU-REACH', `${w}: the screen did not open`); continue; }
+                await sleep(500);
+                // the page scrolled to the bottom, as a teacher would; no programmatic centring of the button
+                const last = await page.evaluate(() => {
+                    const cards = [...document.querySelectorAll('.mws-card')];
+                    const card = cards[cards.length - 1];
+                    if (!card) return '';
+                    for (let n = card.parentElement; n; n = n.parentElement) if (n.scrollHeight > n.clientHeight + 1) n.scrollTop = n.scrollHeight;
+                    window.scrollTo(0, document.scrollingElement.scrollHeight);
+                    return card.dataset.id;
+                });
+                await sleep(400);
+                if (!last) { finding('MENU-REACH', `${w}: no card`); continue; }
+                const b = await (await page.$(`.mws-card[data-id="${last}"] [data-mws="menu"]`)).boundingBox();
+                if (!b || b.y < 0 || b.y + b.height > H) { finding('MENU-REACH', `${w}: the last card's ⋯ is off screen at the bottom of the page`); continue; }
+                await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+                await sleep(500);
+                const r = await page.evaluate((id) => {
+                    const m = document.querySelector(`.mws-card[data-id="${id}"] .mws-menu`);
+                    if (!m || m.hidden) return { open: false };
+                    const bad = [];
+                    for (const it of m.querySelectorAll('[role="menuitem"]')) {
+                        const q = it.getBoundingClientRect();
+                        const name = it.textContent.trim();
+                        if (q.top < 0 || q.bottom > innerHeight || q.left < 0 || q.right > innerWidth) { bad.push(`${name} outside the viewport (${Math.round(q.top)}–${Math.round(q.bottom)} of ${innerHeight})`); continue; }
+                        const hit = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2);
+                        if (!hit || !(hit === it || it.contains(hit))) bad.push(`${name} not hit (under ${hit ? hit.className || hit.tagName : 'nothing'})`);
+                    }
+                    return { open: true, bad };
+                }, last);
+                if (!r.open) finding('MENU-REACH', `${w}: the last card's ⋯ did not open on a tap`);
+                else if (r.bad.length) finding('MENU-REACH', `${w}: ${r.bad.length} menu items cannot be reached: ${r.bad.slice(0, 3).join('; ')}`);
+                await shot(`menu-last-${w}`);
+                await page.keyboard.press('Escape');
+                await sleep(200);
+            }
+        }
+
+        /* ---------------------------------------------------------------- CARD-BOX (critic r1 F3) */
+        if (want('CARD-BOX')) {
+            for (const w of WIDTHS) {
+                const [W, H, touch] = SIZE[w] || [w, 900, w < 1100];
+                await page.setViewport({ width: W, height: H, deviceScaleFactor: 1, hasTouch: touch, isMobile: false });
+                await visit('/index.html');
+                await go('sheets');
+                if (!(await onSheets())) { finding('CARD-BOX', `${w}: the screen did not open`); continue; }
+                await sleep(500);
+                const out = await page.evaluate(() => {
+                    const bad = [];
+                    for (const c of document.querySelectorAll('.mws-card')) {
+                        const cr = c.getBoundingClientRect();
+                        for (const e of c.querySelectorAll('*')) {
+                            if (e.closest('.mws-menu')) continue;   // the ⋯ menu is a pop-up over the page
+                            const r = e.getBoundingClientRect();
+                            if (!r.width || !r.height) continue;
+                            if (r.left < cr.left - 1 || r.right > cr.right + 1 || r.top < cr.top - 1 || r.bottom > cr.bottom + 1) bad.push(`${(e.getAttribute('data-mws') || e.className || e.tagName).toString().slice(0, 24)} sticks out by ${Math.round(Math.max(cr.left - r.left, r.right - cr.right, cr.top - r.top, r.bottom - cr.bottom))} px`);
+                        }
+                    }
+                    return [...new Set(bad)];
+                });
+                if (out.length) finding('CARD-BOX', `${w}: ${out.slice(0, 4).join(', ')}`);
+                if (w === 1366) await shot('cards-1366');
+            }
+        }
+
+        /* ---------------------------------------------------------------- SAVE-LABEL (critic r1 F7) */
+        if (want('SAVE-LABEL')) {
+            for (const w of [1280, 820]) {
+                const [W, H, touch] = SIZE[w];
+                await page.setViewport({ width: W, height: H, deviceScaleFactor: 1, hasTouch: touch, isMobile: false });
+                await visit('/index.html');
+                for (const h of SAVE_HOSTS) {
+                    await h.open();
+                    const t = await page.evaluate((sel) => { const b = document.querySelector(sel); return b ? b.innerText.replace(/\s+/g, ' ').trim() : null; }, h.btn);
+                    if (t === null) finding('SAVE-LABEL', `${w}: ${h.id}: no Save button`);
+                    else if (t !== 'Save to My Worksheets') finding('SAVE-LABEL', `${w}: ${h.id}: the Save button reads "${t}" (want "Save to My Worksheets")`);
+                    await h.close();
+                    await sleep(300);
+                }
+            }
+        }
+
+        /* ---------------------------------------------------------------- CARD-CONFORM (critic r1 F8, F9) */
+        if (want('CARD-CONFORM')) {
+            await page.setViewport({ width: 1280, height: 1000, deviceScaleFactor: 1 });
+            await visit('/index.html');
+            await go('sheets'); await onSheets();
+            await sleep(400);
+            // New mix (a copy with a new seed) gets its thumbnail and its page count back
+            const first = await page.$eval('.mws-card', (c) => c.dataset.id).catch(() => '');
+            const ids0 = await L(async (L) => (await L.listSheets()).map((r) => r.id));
+            if (first) {
+                await click(`.mws-card[data-id="${first}"] [data-mws="menu"]`);
+                await click(`.mws-card[data-id="${first}"] [data-mws="newmix"]`);
+                let mix = null;
+                for (let i = 0; i < 40; i++) { await sleep(500); mix = await L(async (L, ids0) => (await L.listSheets()).find((r) => !ids0.includes(r.id)) || null, ids0); if (mix && mix.thumb) break; }
+                if (!mix) finding('CARD-CONFORM', 'New mix made no sheet');
+                else if (!mix.thumb) finding('CARD-CONFORM', 'New mix: no thumbnail after 20 s');
+            }
+            await go('sheets'); await onSheets();
+            await sleep(400);
+            const recs = await L(async (L) => (await L.listSheets()).map((r) => ({ id: r.id, name: r.name, thumb: !!r.thumb, pages: r.pages || 0 })));
+            for (const r of recs) if (r.thumb && !r.pages) finding('CARD-CONFORM', `"${r.name}": a thumbnail but no page count`);
+            const cards = await page.evaluate(() => [...document.querySelectorAll('.mws-card')].map((c) => {
+                const vis = (n) => { if (!n) return false; const q = n.getBoundingClientRect(); return q.width > 0 && q.height > 0 && !n.closest('[hidden]'); };
+                const face = [...c.querySelectorAll('button')].filter((b) => !b.closest('.mws-menu') && vis(b));
+                const has = (re) => face.some((b) => re.test(`${b.textContent} ${b.getAttribute('aria-label') || ''}`));
+                const meta = c.querySelector('.mws-meta > span');
+                return { id: c.dataset.id, name: (c.querySelector('.mws-name') || {}).textContent || '', meta: meta ? meta.textContent : '', print: has(/\bPrint\b/), play: has(/\bPlay\b|Open interactive/), send: has(/Send code/), more: !!c.querySelector('[data-mws="menu"]') && vis(c.querySelector('[data-mws="menu"]')) };
+            }));
+            const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            for (const c of cards) {
+                const miss = ['print', 'play', 'send', 'more'].filter((k) => !c[k]);
+                if (miss.length) finding('CARD-CONFORM', `"${c.name}": not a visible button on the card face: ${miss.join(', ')} (card S-3: Print, Open interactive, Send code, ⋯)`);
+                for (const seg of c.meta.split(' · ').map((x) => x.trim()).filter(Boolean)) {
+                    if (new RegExp(`(^|[^\\p{L}\\p{N}])${esc(seg)}($|[^\\p{L}\\p{N}])`, 'iu').test(c.name)) finding('CARD-CONFORM', `"${c.name}": the meta line repeats "${seg}" from the name`);
+                }
             }
         }
 
@@ -674,6 +935,17 @@ const CASES = [
                     if (w === 820) await shot('save-dialog-820');
                     await click('#mwsSave [data-mws-save="cancel"]', touch);
                 }
+                // the Save buttons of the simple print and the online worksheet (critic r1 F10): ≥ 48 × 48 on a tablet
+                if (w === 820 || w === 1024) {
+                    for (const h of SAVE_HOSTS.slice(1)) {
+                        await h.open();
+                        const r = await page.evaluate((sel) => { const b = document.querySelector(sel); if (!b) return null; const q = b.getBoundingClientRect(); return { w: Math.round(q.width), h: Math.round(q.height) }; }, h.btn);
+                        if (!r) finding('TOUCH-WIDTH', `${w}: no Save button on the ${h.id} host`);
+                        else if (r.w < 47.5 || r.h < 47.5) finding('TOUCH-WIDTH', `${w}: the ${h.id} Save button is ${r.w}×${r.h} (want ≥ 48 × 48)`);
+                        await h.close();
+                        await sleep(300);
+                    }
+                }
                 checkedWidths.push(w);
                 if (w === 820) {
                     await go('sheets'); await onSheets();
@@ -687,7 +959,7 @@ const CASES = [
             }
         }
     } catch (e) {
-        if (String(e.message) !== 'no library') { finding(current, `stopped: ${String(e.stack || e).slice(0, 400)}`); const RUN_ORDER = ['NO-LOSS', 'SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'THEME', 'TOUCH-WIDTH']; for (const id of RUN_ORDER.slice(RUN_ORDER.indexOf(current) + 1).filter((k) => ONLY.includes(k))) finding(id, `not run: ${current} stopped the gate`); }
+        if (String(e.message) !== 'no library') { finding(current, `stopped: ${String(e.stack || e).slice(0, 400)}`); const RUN_ORDER = ['NO-LOSS', 'SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'THEME', 'TOUCH-WIDTH', 'KEYS', 'MENU-REACH', 'CARD-BOX', 'SAVE-LABEL', 'CARD-CONFORM']; for (const id of RUN_ORDER.slice(RUN_ORDER.indexOf(current) + 1).filter((k) => ONLY.includes(k))) finding(id, `not run: ${current} stopped the gate`); }
     } finally {
         // (the NO-LOSS step opens the origin on a stylesheet, whose page asks for /favicon.ico: that 404 is the harness's own)
         const favOnly = notFound.length > 0 && notFound.every((u) => /^\/favicon\.ico/.test(u));
