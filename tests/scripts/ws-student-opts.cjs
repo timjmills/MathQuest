@@ -187,7 +187,8 @@ async function browser() {
             await atWidth(page, w, !!vp.touch);
             console.log(`  @${w}: checked (${fails.length - before} finding(s))`);
         }
-        const errs = app.problems.filter((p) => !/favicon/.test(p.text));
+        // (a request the next width's reload aborts, net::ERR_ABORTED, is not a page error)
+        const errs = app.problems.filter((p) => !/favicon/.test(p.text) && !(p.type === 'requestfailed' && /ERR_ABORTED/.test(p.text)));
         if (errs.length) F(`PUPIL ${errs.length} page error(s): ${errs.slice(0, 3).map((p) => p.type + ' ' + p.text).join(' | ')}`);
     } finally { await app.close(); }
 }
@@ -608,7 +609,7 @@ async function toastAndNames(page, w, touch) {
         }, i);
         if (got.sheet !== name || got.chip !== name) bad.push(`${got.key}: card "${name}", sheet "${got.sheet}", chip "${got.chip}" (selected: ${got.q || 'none'})`);
         await page.evaluate(() => { window.closeStudentOptions && window.closeStudentOptions({ focus: false }); window.UnifiedSkills.clear(); });
-        await sleep(120);
+        await sleep(450);   // (two touch taps closer than this read as one double tap)
     }
     if (!n) F(`NAME ${at} no Quick Start cards`);
     if (bad.length) F(`NAME ${at} ${bad.length} of ${n} Quick Start card(s) name the skill differently on the card, sheet and chip: ${bad.slice(0, 4).join('; ')}`);
