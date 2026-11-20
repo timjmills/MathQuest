@@ -12242,6 +12242,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "eblast-pin-dropped-entry",
+  "check": "critic eblast r4 P1: EBLAST_BLOCKING_ROLES may only grow: a copy that drops a later-added entry ('stretch') must FAIL against a base that has it",
+  "kind": "fixture",
+  "rule": "ws-empty-band --pin-check (merge-base pin)",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/page-fill/blocking-dropped.cjs.txt",
+   "state": "the list without 'stretch' against base 4292106c4 (which has it): FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/page-fill/blocking-full.cjs.txt",
+   "state": "the full list: OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --pin-check --base 4292106c4 --file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ },
+ {
+  "id": "eblast-pin-fails-closed",
+  "check": "critic eblast r4 P2: an unresolvable pin base (a bad --base, a shallow clone, no origin/master) reported OK ('has no list'): the pin failed open",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band --pin-check fails closed on a base it cannot read",
+  "browser": false,
+  "fail": {
+   "commit": "3714ea89d",
+   "state": "--pin-check --base deadbeef0 -> OK (exit 0)"
+  },
+  "pass": {
+   "commit": "4292106c4",
+   "state": "--pin-check --base deadbeef0 -> FAIL (exit 1)"
+  },
+  "command": "node {root}/tests/scripts/ws-empty-band.cjs --pin-check --base deadbeef0 > /dev/null; [ $? -ne 0 ] && echo 'pin-closed: OK' || echo 'pin-closed: FAIL (an unreadable base passed)'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ }
  ]
 }

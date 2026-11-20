@@ -928,3 +928,7 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   all of them pre-skill-check (one-row pages at 78-82 %, spills to p2 at L, CAP-PARITY below its 16-item L ceiling). Its owner
   must fix the role composer (PT-PRE-1 four quadrants on one page) before it joins the list. These rules cannot block it until then.
 - Rows: CHECKS_FROM_CRITICS +2; backtests `eblast-role-capacity-declared`, `-drift`, `eblast-blocking-pin` PASS.
+- 2026-11-20, critic eblast r4 (FAIL 8/7/9/8): P1 the pin / capacity checks were on no gate path → now precritic gates
+  `eblast-pin` + `eblast-capacity` and deploy session 1; P2 the pin failed open on an unreadable base → fails closed;
+  P3 the list's comment names which listed roles each rule actually judges (8 of the 16 are not judged today). Rows
+  `eblast-pin-dropped-entry`, `eblast-pin-fails-closed`.

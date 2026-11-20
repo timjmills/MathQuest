@@ -1468,12 +1468,12 @@ function buildPlan(ctx) {
     // restore path (stored defaults, sheet, simple print, saved set, &set= link, tray snapshot, quick print), opens every Size
     // control and asserts M, and checks the one compact layout's single label (browser, ~15 s)
     add(gate('no-size-s-browser', 'ws-no-size-s --browser (S seeded in every restore path reads M; every Size control M / L with M checked)', 'teacher Print, worksheet sheet, simple print, Settings, Library, &set= links', 'browser', 'ws-no-size-s', ['--browser'], { needFlags: ['browser'] }));
-    // (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" 7) no screen gate default, critic brief or RUBRIC host
-    // holds the phone width 390 px: the screens are 1280 / 1366 and the tablets 820 / 1024 - on EVERY precritic run (node, < 1 s)
     // EBLAST-BLOCKING pin + capacity declarations (critic eblast r4 P1): the blocking-role list may only grow (merge-base pin,
     // fails closed) and every role a passed skill uses declares its ceiling, matching the role's own constant (node, < 2 s)
     add(gate('eblast-pin', 'ws-empty-band --pin-check (EBLAST_BLOCKING_ROLES may only grow; merge-base pin)', 'tests/scripts/ws-empty-band.cjs', 'node', 'ws-empty-band', ['--pin-check'], { needFlags: ['pin-check'] }));
     add(gate('eblast-capacity', 'ws-empty-band --capacity-check (every role used by a passed skill declares its ceiling; no drift from the role constant)', 'js/modules/sheet/role-capacity.js', 'node', 'ws-empty-band', ['--capacity-check'], { needFlags: ['capacity-check'] }));
+    // (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" 7) no screen gate default, critic brief or RUBRIC host
+    // holds the phone width 390 px: the screens are 1280 / 1366 and the tablets 820 / 1024 - on EVERY precritic run (node, < 1 s)
     add(gate('no-phone-width', 'ws-no-phone-width (no 390 px default in a screen gate, brief or RUBRIC host; owner 2026-11-13)', 'screen gates + RUBRIC + brief template', 'node', 'ws-no-phone-width', [], { missingMsg: 'ws-no-phone-width is not in this tree' }));
     // (owner rule 2026-11-13, lf-checks) every finding row of design/lessons-first/CHECKS_FROM_CRITICS.md names a backtest id
     // that is in backtests.json and on precritic's path, or a reasoned exemption - on EVERY precritic run (node, ~5 s)
