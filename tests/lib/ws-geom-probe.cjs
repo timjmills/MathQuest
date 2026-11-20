@@ -155,7 +155,9 @@ function GEOM_PROBE(cfg) {
                 // operator whose left operand ends the line above)
                 for (let i = 1; i + 1 < glyphs.length; i++) {
                     const pv = glyphs[i - 1], g = glyphs[i];
-                    if (!OPS.includes(g.ch) || !/[0-9A-Za-z)]/.test(pv.ch)) continue;
+                    // (the left operand: a digit, ")" or a one-letter variable - "n / + 6"; a sign named after a word, "try / −.", is no expression)
+                    const pp = glyphs[i - 2];
+                    if (!OPS.includes(g.ch) || !(/[0-9)]/.test(pv.ch) || (/[A-Za-z]/.test(pv.ch) && !(pp && /[A-Za-z]/.test(pp.ch) && pp.r.top < pv.r.top + pv.r.height / 2 && pv.r.left - pp.r.right < 1)))) continue;
                     if (g.r.top < pv.r.top + pv.r.height / 2) continue;
                     if (seen.has(b)) continue;
                     seen.add(b);
