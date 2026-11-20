@@ -2246,8 +2246,10 @@ html body .qt-question-card .visual-aid:has(> .k2-twin > .k2-chartwindow > .k2-c
    ws-phone-card TOUCH-TARGET (the TOOLS rule and the tablet working-box floor) is the check. */
 html body :is(#gameView, #mapSessionView) #questionCard#questionCard > .mq-qactions.mq-qactions > :is(.btn, button),
 html body.student-mode :is(#gameView, #mapSessionView) #questionCard#questionCard > .next-btn-container.next-btn-container > .btn { min-height: 48px !important; min-width: 48px !important; }
-html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn,
-html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .next-btn-container > #nextBtn { height: 48px !important; }
+@media screen and (max-height: 860px) and (min-width: 700px) {
+    html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn,
+    html.mq-play body.student-mode :is(#gameView, #mapSessionView) #questionCard > .next-btn-container > #nextBtn { height: 48px !important; }
+}
 html body #questionCard .mq-hint-inline :is(.mq-hint-inline-btn, .mq-hint-inline-got, .hint-speak-btn),
 html body #questionCard button.mq-lw-speak { min-height: 48px !important; min-width: 48px !important; box-sizing: border-box; }
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-gl-sentence > input.mq-gl-sign {
