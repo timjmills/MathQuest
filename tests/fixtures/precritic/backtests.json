@@ -14697,6 +14697,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "hint-no-blank-r3-prefer-sh",
+   "check": "ws-hint-no-blank PREFER-SH: a skill with screenHelp whose own steps had to be cut shows its screenHelp, never the cut steps (critic r3 R3-2, compensation ended without 'Now add')",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r3 FAIL (design/audit/runs/lf-placevalue/critic-hint-no-blank-r3.md R3-2)",
+   "browser": true,
+   "fail": {
+    "commit": "4fadf6e5b",
+    "state": "compensation: 'Add 3 to 7 to make 10. Subtract 3 from 29 to get 26.'"
+   },
+   "pass": {
+    "commit": "41a5e20f0",
+    "state": "compensation shows its screenHelp ending 'Now add ...'"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_sense:compensation --only PREFER-SH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
