@@ -12123,6 +12123,227 @@
    }
   },
   {
+   "id": "eb-lastpage-cbt-pre-skill-check",
+   "check": "the last (or only) page of a fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test) is measured: FAIL at >= 30 % of its body empty when its next row fits (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check L, one page, 84 mm empty foot; EB-PAGE skipped a role's last page, so a one-page role was never measured)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check L p1 34 % empty (81.0 mm, its next 25.5 mm row fits)"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "INTERIM stand-in, not a fix (critic eblast r1 F4): the same commit, its other fixed-capacity roles, every last page full. The fixed state of the same role is the fixture row eb-lastpage-fixture-pre-skill-check; re-point this pass side to the fixing commit when cbt resumes"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only EB-LASTPAGE {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cap-parity-cbt-pre-skill-check",
+   "check": "for the same skill, role and seed, items a page at L >= ceil(0.7 x items a page at M) unless the L page is full (no room for another row) (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check 10 items at L against 16 at M, the L page not full)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band CAP-PARITY",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check M 16 / L 10 items a page (needs >= 12), L page not full"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "INTERIM stand-in, not a fix (critic eblast r1 F4): the same commit, its other fixed-capacity roles, L below 0.7 x M only where the L page is full. The flip on one page is the fixture row cap-parity-fixture-row-gap; re-point this pass side when cbt resumes"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only CAP-PARITY {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-lastpage-fixture-pre-skill-check",
+   "check": "the last (or only) page of a role that fixes its count is judged: FAIL at >= 30 % empty when its next row AND its row gap fit (critic eblast r1 F4: the cbt rows pass on other roles of the same commit; this pair flips the SAME role from the page as rendered to the page filled)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/pre-skill-check.fail.html",
+    "state": "planted page modelled on add_facts Pre-skill check M as rendered (one row, ~80 % empty, 42.6 mm rows + 4 mm gap); no fix has landed (routed to lf-ops), so the pass side is a fixture"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/pre-skill-check.pass.html",
+    "state": "the same page with its missing rows (5 rows fill the 236 mm body): a planted page that meets the rule, not a commit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only EB-LASTPAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cap-parity-fixture-row-gap",
+   "check": "CAP-PARITY judges \"the L page is full\" by a row PLUS its rendered row gap (critic eblast r1 F1: placevalue:value mixed-practice L, 39.8 mm white against a 37.2 mm row, failed with no room for the gap)",
+   "kind": "fixture",
+   "rule": "ws-empty-band CAP-PARITY",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/cap-parity.fail.html",
+    "state": "M 15 a page (full); L 8 in 4 rows of 44 mm + 3 mm gaps, 51 mm white: a row and its gap fit, 8 < 11"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/cap-parity.pass.html",
+    "state": "planted F1 boundary page: L 8 in 4 rows of 44 mm + 5 mm gaps, 45 mm white - a row alone fits, a row and its gap (49 mm) does not: full, OK (the r1 row-only rule failed it)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only CAP-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-lastpage-fixture-test-pg23",
+   "check": "a MULTI-page fixed-count role is judged on its last page by PG-23 (fewer than one third of a full page's rows is a missed rebalance; a rebalanced last page is legal however white), not by a flat 30 % (critic eblast r1 F3)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/test-pg23.fail.html",
+    "state": "planted 2-page Test: 5 rows then 1 row on the last page (1 < 5/3)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/test-pg23.pass.html",
+    "state": "the same Test rebalanced 3 + 3 rows: last page ~45 % empty, legal under PG-23 (the r1 flat 30 % failed it)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only EB-LASTPAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-advisory-fixture",
+   "check": "lead EBLAST-ADVISORY (2026-11-20; critic eblast r2: false reds on passed skills): EB-LASTPAGE / CAP-PARITY must not block a run until critic r3 passes the rebuilt rules; the planted too-empty pre-skill-check page FAILed the gate at 7c7d487c1",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band: EB-LASTPAGE / CAP-PARITY print 'ADVISORY (not critic-passed)' and never fail without --eblast-block",
+   "browser": true,
+   "fail": {
+    "commit": "7c7d487c1",
+    "state": "the planted fail page -> ws-empty-band: FAIL (EB-LASTPAGE)"
+   },
+   "pass": {
+    "commit": "6a378c6c1",
+    "state": "the same page -> ADVISORY line printed, ws-empty-band: OK"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --html {root}/tests/fixtures/precritic/page-fill/pre-skill-check.fail.html --page-fill --only EB-LASTPAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-role-capacity-declared",
+   "check": "lead EBLAST-ADVISORY root cause (critic eblast r2 G1/G2, round cap): EB-LASTPAGE / CAP-PARITY inferred capacity from white space, so pages full by design (Mixed practice L at its 5-row WDS §12.1 ceiling; Scripted Model frames) read red; every page role a passed skill renders must DECLARE its ceiling per size (js/modules/sheet/role-capacity.js) and the rules read it",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --capacity-check: every role used by a skill in redesign-passed.js declares its capacity ceiling (EB-LASTPAGE / CAP-PARITY read it)",
+   "fail": {
+    "commit": "a55ce281f",
+    "state": "no declared capacity table; the check does not exist -> role-capacity: FAIL"
+   },
+   "pass": {
+    "commit": "7fb4a0659",
+    "state": "17 roles used by 32 passed skills all declare a ceiling -> role-capacity: OK"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --capacity-check 2>/dev/null | tail -1 | grep -q '^ws-empty-band --capacity-check: OK' && echo 'role-capacity: OK' || echo 'role-capacity: FAIL (a role used by a passed skill declares no ceiling)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-role-capacity-drift",
+   "check": "critic eblast r3 G1 (drift): role-capacity.js copies 8 ceilings the role modules hold as their own constants (CEILING, ROWS, PER_PAGE, MAX_SHELVES); --capacity-check reads each role's own constant and fails when the two differ, naming role, size, both values and file",
+   "kind": "fixture",
+   "rule": "ws-empty-band --capacity-check: role-capacity.js agrees with each role module's own ceiling constant",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/role-capacity/guided.drift.js",
+    "state": "guided CEILING M 9 against the table's 8 -> FAIL guided M: role-capacity.js says 8, ... CEILING says 9"
+   },
+   "pass": {
+    "fixture": "js/modules/sheet/roles/guided.js",
+    "state": "the real guided.js CEILING {S 10, M 8, L 6} -> OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --capacity-check --role-src guided={fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-blocking-pin",
+   "check": "lead EBLAST-BLOCKING (2026-11-20): EB-LASTPAGE / CAP-PARITY are findings on an allow-list of roles that may only GROW; --pin-check fails when an entry of the base copy is gone",
+   "kind": "fixture",
+   "rule": "ws-empty-band --pin-check: EBLAST_BLOCKING_ROLES never loses an entry against the merge-base copy",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/eblast-pin/dropped-test.cjs",
+    "state": "the list with 'test' removed, against a2fddf4c7 (16 roles) -> FAIL lost 'test'"
+   },
+   "pass": {
+    "fixture": "tests/scripts/ws-empty-band.cjs",
+    "state": "the live list (16 roles) -> OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --pin-check --base a2fddf4c7 --file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-pin-dropped-entry",
+   "check": "critic eblast r4 P1: EBLAST_BLOCKING_ROLES may only grow: a copy that drops a later-added entry ('stretch') must FAIL against a base that has it",
+   "kind": "fixture",
+   "rule": "ws-empty-band --pin-check (merge-base pin)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/blocking-dropped.cjs.txt",
+    "state": "the list without 'stretch' against base 4292106c4 (which has it): FAIL"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/blocking-full.cjs.txt",
+    "state": "the full list: OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --pin-check --base 4292106c4 --file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-pin-fails-closed",
+   "check": "critic eblast r4 P2: an unresolvable pin base (a bad --base, a shallow clone, no origin/master) reported OK ('has no list'): the pin failed open",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --pin-check fails closed on a base it cannot read",
+   "browser": false,
+   "fail": {
+    "commit": "3714ea89d",
+    "state": "--pin-check --base deadbeef0 -> OK (exit 0)"
+   },
+   "pass": {
+    "commit": "4292106c4",
+    "state": "--pin-check --base deadbeef0 -> FAIL (exit 1)"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --pin-check --base deadbeef0 > /dev/null; [ $? -ne 0 ] && echo 'pin-closed: OK' || echo 'pin-closed: FAIL (an unreadable base passed)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "two-step-guided-no-mid",
    "check": "ws-two-step --guided GUIDED-NO-MID + GUIDED-MODEL-ALONE: no Guided cell prints the hidden middle question, and Guided page 1 holds the Model and a try at M (exempt by ruling: the family at L; multi_step_word (Visual) at M)",
    "kind": "commit-pair",
