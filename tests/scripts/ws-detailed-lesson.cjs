@@ -226,6 +226,9 @@ function measure(LIBRARY) {
         P.perRowXs = [...pg.querySelectorAll('svg[data-per-row]')].map((e) => { const cs = [...e.querySelectorAll('circle')]; if (!cs.length) return []; const y0 = cs[0].getAttribute('cy'); return cs.filter((c) => c.getAttribute('cy') === y0).map((c) => +c.getAttribute('cx')); });
         P.halfW = pg.classList.contains('dl-land') ? [...pg.querySelectorAll('.dl-halves > .mq-rowcol')].filter((x) => x.querySelector('.dl-half')).map((x) => Math.round(x.getBoundingClientRect().width / MM * 10) / 10) : [];
         P.sizeMm = [Math.round(pg.getBoundingClientRect().width / MM), Math.round(pg.getBoundingClientRect().height / MM)];
+        // E43 EDGE (critic r3 R3-10): a drawn table's side gap to the border of the cell that holds it (mm, the smallest on the page)
+        P.edge = [...pg.querySelectorAll('.ws-cell table')].map((t) => { const c = t.closest('.ws-cell').getBoundingClientRect(), r = t.getBoundingClientRect();
+            return { gap: Math.round(Math.min(r.left - c.left, c.right - r.right) / MM * 10) / 10, w: Math.round(c.width / MM) }; });
         // E26: chart step panels (the lesson role's state cells) each show a grey mark
         P.panels = /^P2[a-z]?(-key)?$/.test(id) ? [...pg.querySelectorAll('.mq-cstatecell')].map((c) => [...c.querySelectorAll('*')].some((e) => {
             const cs = getComputedStyle(e); if (cs.display === 'none') return false;
@@ -787,6 +790,13 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         const named = pages.filter((x) => x.teacher).flatMap((p) => [...String(p.text || '').matchAll(/\b[Pp]anels? (\d+)(?:\s*(?:–|-|and|to)\s*(\d+))?/g)].flatMap((m) => [Number(m[1]), m[2] ? Number(m[2]) : null].filter((v) => v !== null).map((v) => ({ id: p.id, v }))));
         const bad = named.filter((x) => x.v > nPanels || x.v < 1);
         row('E42', 'Every chart panel a teacher page names is printed (SCRIPT-PANEL)', `${named.length} panel reference(s), chart ${nPanels} panel(s)${bad.length ? `; missing: ${bad.map((x) => `${x.id} panel ${x.v}`).join(', ')}` : ''}`, !bad.length);
+    }
+    // E43 EDGE (lf-algebra patterns critic r3 R3-10): a table never runs edge to edge with its cell (doubled rules) - every drawn
+    // table on a pupil page stands at least 1.5 mm in from both side borders of its cell (a 2 mm inner margin less the border)
+    {
+        const tight = pupil.flatMap((p) => (p.edge || []).filter((e) => e.gap < 1.5).map((e) => `${p.id} ${e.gap} mm (cell ${e.w} mm)`));
+        const n = pupil.reduce((a, p) => a + (p.edge || []).length, 0);
+        row('E43', 'Every table stands at least 1.5 mm in from its cell side borders (EDGE)', tight.length ? [...new Set(tight)].slice(0, 6).join('; ') : `${n} table(s), all clear`, !tight.length);
     }
     row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === `${p.id}-key`)));
     return rows;
