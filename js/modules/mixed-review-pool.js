@@ -22,8 +22,14 @@ import { DRAWN_TEMPLATES } from './mixed-review-templates.js';
 /** The panel's defaults: 10 problems, order mixed, week off, from my lessons off, only 8/10 OFF (§9.6, §9.15). */
 export const DEFAULT_FILTERS = Object.freeze({ grades: [], areas: [], onlyPassed: false, untick: [], fromLessons: false, count: 10, order: 'mixed', week: false });
 
-/** A lesson's grade as a chip: PK (WRM Reception) sits under K; 6 and above under 6+ ('6'). */
-const chipOf = (g) => (g === 'PK' || g === 'K' ? 'K' : Number(g) >= 6 ? '6' : String(g));
+/** The grade chips of the panel, in order (lead ruling 2026-11-20: US grade = UK Year - 1, so a WRM Reception lesson is
+ *  Pre-K and places its skills under the Pre-K chip, never K). `id` is the placement value the dealer's filter reads. */
+export const GRADE_CHIPS = Object.freeze([
+    Object.freeze({ id: 'PK', label: 'Pre-K' }), Object.freeze({ id: 'K', label: 'K' }), Object.freeze({ id: '1', label: '1' }),
+    Object.freeze({ id: '2', label: '2' }), Object.freeze({ id: '3', label: '3' }), Object.freeze({ id: '4', label: '4' }),
+    Object.freeze({ id: '5', label: '5' }), Object.freeze({ id: '6', label: '6+' })]);
+/** A lesson's grade as a chip id: PK (WRM Reception) under Pre-K; 6 and above under 6+ ('6'). */
+export const chipOf = (g) => (g === 'PK' ? 'PK' : g === 'K' ? 'K' : Number(g) >= 6 ? '6' : String(g));
 
 let PLACEMENT = null;
 /** id -> [chip grades] from the school pacing: every sequenced lesson's direct skills (curated, else SKILL_WRM). */
@@ -41,9 +47,9 @@ function placementMap() {
     }
     return PLACEMENT;
 }
-/** A skill's school placement grades (sorted K, 1 .. 6), or [] when no pacing lesson links it. */
+/** A skill's school placement grades (sorted Pre-K, K, 1 .. 6), or [] when no pacing lesson links it. */
 export function placementGrades(id) {
-    const order = ['K', '1', '2', '3', '4', '5', '6'];
+    const order = GRADE_CHIPS.map((c) => c.id);
     return [...(placementMap().get(id) || [])].sort((a, b) => order.indexOf(a) - order.indexOf(b));
 }
 

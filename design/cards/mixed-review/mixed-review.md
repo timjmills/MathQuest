@@ -132,7 +132,7 @@ The options belong to the **page type** (job / section scope, PAGE_TYPES 9), not
 
 | Option | Values | Default | Decision |
 |---|---|---|---|
-| `grades` | chips K, 1, 2, 3, 4, 5, 6+ (multi) and All | the Skills screen's grade selection (`mq_teacher_skills_ui`), else Grade 2 | **offered** — a skill's chips = its **school placement** (the school grades whose pacing lessons link it: `allLessons()` of `wrm-links.js` (rows with `grade`, `seq`, `weeks`) → step → curated `direct` skills + `SKILL_WRM`) ∪ its `data.js` grade; 6+ = grade 6; M skills §9.5; each chip shows its pool count; a 0 chip shows greyed with its count [X:MIX-REVIEW-POOL] |
+| `grades` | chips Pre-K, K, 1, 2, 3, 4, 5, 6+ (multi) and All (Pre-K: lead ruling 2026-11-20, US grade = UK Year − 1, so a WRM Reception lesson places its skills under Pre-K, never K; `GRADE_CHIPS`) | the Skills screen's grade selection (`mq_teacher_skills_ui`), else Grade 2 | **offered** — a skill's chips = its **school placement** (the school grades whose pacing lessons link it: `allLessons()` of `wrm-links.js` (rows with `grade`, `seq`, `weeks`) → step → curated `direct` skills + `SKILL_WRM`) ∪ its `data.js` grade; 6+ = grade 6; M skills §9.5; each chip shows its pool count; a 0 chip shows greyed with its count [X:MIX-REVIEW-POOL] |
 | `areas` | 9 chips: CC, OA, NBT, NF, MEAS, DATA, G, RPNS, WORDS | all on | **offered** — from `areaOf`; each chip labelled from `AREA_LABELS` (table below, built by this lane, §9.1); MIXED and NOSTD skills are never in the pool [P:n] |
 | `onlyPassed` | on / off | **off** (while the passed pool is small; §9.6) | **offered** — the toggle stays visible with its live count, "Only 8/10 ✓ (32)" = the filtered pool ∩ `REDESIGN_PASSED`; every passed skill in the picker shows a ✓ beside its name whatever the toggle; on = the id is in `REDESIGN_PASSED`, read live [X:MIX-REVIEW-POOL] |
 | `skills` (untick) | one tick per pool skill | all ticked | **offered** — stored as the unticked ids, so a skill that joins the pool later arrives ticked [X:MIX-REVIEW-POOL] |
@@ -362,7 +362,7 @@ The lead ruled on the 16 open questions on 2026-11-19 (via the coordinator). Eac
 +| 25 | 3 (9 + 8 + 8) | 7 (4 + 4 + 4 + 4 + 3 + 3 + 3) | 3 (9 + 8 + 8) | 4 (7 + 6 + 6 + 6) | 9 (3 + 3 + 3 + 3 + 3 + 3 + 3 + 2 + 2) |
 +| 30 | 3 (10 + 10 + 10) | 8 (4 + 4 + 4 + 4 + 4 + 4 + 3 + 3) | 3 (10 + 10 + 10) | 4 (8 + 8 + 7 + 7) | 10 (3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3) |
 +
-+**Teacher options.** Grades (chips K to 6+); areas (9 chips, `AREA_LABELS`); Only 8/10 ✓ (default off, with its count); untick skills; From my lessons (unit, 4
++**Teacher options.** Grades (chips Pre-K to 6+); areas (9 chips, `AREA_LABELS`); Only 8/10 ✓ (default off, with its count); untick skills; From my lessons (unit, 4
 +weeks, year); problems; order; week; New mix; size M / L; key. **Skill supplies.** Nothing new: `renderCell` level 1,
 +`footprint`, `strings.instruction`. **Screen.** Mixed review mode (PT-SCR-8): practice card, online worksheet, quiz,
 +boss, race; feedback on Check; results by area.

@@ -137,7 +137,7 @@ async function statePool(fx) {
     if (defs.onlyPassed !== false) v.push(`pool-default-on: DEFAULT_FILTERS.onlyPassed = ${J(defs.onlyPassed)} (lead ruling §9.6: off while the passed pool is small)`);
     if (defs.count !== 10 || defs.order !== 'mixed' || defs.week || defs.fromLessons) v.push(`pool-default-on: defaults ${J(defs)} are not 10 problems, order mixed, week off, from my lessons off (§9.15)`);
     // 200 seeded filter sets through V1 deal alone: every dealt skill matches the filters, is passed when only-8/10 is on
-    const grades = ['K', '1', '2', '3', '4', '5', '6']; const areas = ['CC', 'OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G', 'RPNS', 'WORDS'];
+    const grades = ['PK', 'K', '1', '2', '3', '4', '5', '6']; const areas = ['CC', 'OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G', 'RPNS', 'WORDS'];
     const { rng } = await mod('js/modules/sheet/rng.js');
     let dealt = 0, refused = 0;
     for (let s = 1; s <= 200 && v.length < 6; s++) {
@@ -231,7 +231,34 @@ async function stateTrace(fx) {
     if (fx.insert) { const lines = md.split('\n'); const at = lines.findIndex((l) => l.startsWith(fx.insert.after)); lines.splice(at + 1, 0, fx.insert.text); md = lines.join('\n'); }
     return C.trace(md).bad.map((b) => `trace: ${b}`);
 }
-const MODULE_STATES = { labels: stateLabels, pool: statePool, share: stateShare, 'week-days': stateWeekDays, trace: stateTrace };
+// lead ruling 2026-11-20 (placement): US grade = UK Year - 1, so a WRM Reception (PK) lesson places its skills under the
+// Pre-K chip, never K; the chips start with Pre-K and every placement value is a chip. Recomputed from allLessons() here.
+async function statePlacement(fx) {
+    const c = await poolCtx(); if (c.pending || c.error) return c.pending ? c : [c.error];
+    const { P } = c;
+    if (!P.GRADE_CHIPS) return ['pool-placement-pk: mixed-review-pool.js exports no GRADE_CHIPS (the Pre-K chip)'];
+    const L = await mod('js/modules/wrm-links.js');
+    const v = [];
+    const chips = P.GRADE_CHIPS.map((x) => x.id);
+    if (chips[0] !== 'PK' || (P.GRADE_CHIPS[0].label !== 'Pre-K')) v.push(`pool-placement-pk: the grade chips ${J(chips)} do not start with Pre-K`);
+    const placement = fx.replace && fx.replace.placement === 'pk-as-k'
+        ? (id) => P.placementGrades(id).map((g) => (g === 'PK' ? 'K' : g)) : P.placementGrades;
+    const want = new Map(); const kOnly = new Map();
+    for (const lesson of L.allLessons()) {
+        if (!lesson || !lesson.seq || (lesson.grade !== 'PK' && lesson.grade !== 'K')) continue;
+        for (const d of (L.linksFor(lesson) || {}).direct || []) (lesson.grade === 'PK' ? want : kOnly).set(d.key, true);
+    }
+    let n = 0;
+    for (const id of want.keys()) {
+        const got = placement(id); n++;
+        if (!got.includes('PK')) { v.push(`pool-placement-pk: ${id} is linked by a Reception (Pre-K) lesson but places under ${J(got)}`); break; }
+    }
+    for (const id of want.keys()) if (!kOnly.has(id) && placement(id).includes('K')) { v.push(`pool-placement-pk: ${id} is linked by no K lesson but places under K`); break; }
+    for (const r of P.poolRows()) for (const g of r.placement || []) if (!chips.includes(g)) { v.push(`pool-placement-pk: ${r.id} places under ${g}, not a grade chip`); break; }
+    if (n < 10) v.push(`pool-placement-pk: only ${n} skills are linked by Reception lessons: the check proves too little`);
+    return v;
+}
+const MODULE_STATES = { placement: statePlacement, labels: stateLabels, pool: statePool, share: stateShare, 'week-days': stateWeekDays, trace: stateTrace };
 
 /* ---------------------------------------------------------------------------------------------------- runner */
 let C1 = null;

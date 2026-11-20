@@ -12353,6 +12353,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mix-review-placement",
+   "check": "lead ruling 2026-11-20 (placement): US grade = UK Year - 1, so a WRM Reception lesson places its skills under the Pre-K chip, never K; GRADE_CHIPS start with Pre-K and every row's placement is a chip (recomputed from allLessons() + linksFor)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check pool",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/pool/fail/pool-placement-pk.json",
+    "state": "the 95f13b7b chipOf: PK lessons under the K chip"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/pool/pass/pool-pass-placement.json",
+    "state": "Reception lessons under Pre-K"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check pool --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
