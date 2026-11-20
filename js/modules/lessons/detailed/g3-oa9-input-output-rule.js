@@ -101,7 +101,7 @@ export default {
             return r && s0 ? `In ${r.x}, out ${r.y}. ${r.x} ${{ '+': '+', '-': '−', x: '×' }[s0.op]} ${s0.n} = ${r.y}. I test every row.` : ''; },
         growAll: true,
         // (Guided: one table of each rule the chart modelled, in its order: +, −, ×)
-        guided: ['ftAdd', 'ftSub', 'ftTimes'],
+        guided: ['ftAddNeighbour', 'ftSub', 'ftTimes'],   // (Guided 1's T6 row names its "down the Out column" wrong answer)
         practiceShape: [4, 2],
         format: {
             kind: 'numbered steps with icons',
@@ -141,7 +141,7 @@ export default {
         // (r3, critic D4: the lesson's own task - the story's table printed, find the rule, the rule frame; a + rule
         // that makes sense: Ann is always the same number of years older than Ben)
         ref: FT({ ftRules: ['+'], support: 'frame-bare' }),
-        want: 'ftAdd',
+        want: 'ftAddNeighbour',   // (T6 names its "down the Out column" wrong answer)
         tableItem: true,
         panelRows: [{ icon: 'read', text: 'Read it two times.' }, { icon: 'ringnum', text: 'Circle the numbers.' }, { icon: 'underline', text: 'Underline the question.' },
             { icon: 'read', text: 'Read the table.' }, { icon: 'check', text: 'Test every row.' }, { icon: 'write', text: 'Write the rule.' }],
@@ -158,7 +158,7 @@ export default {
     exit: [
         // Three tables one row across a half (four tall tables do not fit two rows of a 132.5 mm half; never shrunk):
         // a + rule, a − rule, and the Critical Atom's × table whose row 1 also fits + (it is the × item too).
-        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
+        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread', 'ftNeighbour'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
         { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
         { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
     ],
