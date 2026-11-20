@@ -15130,6 +15130,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sol-object",
+   "check": "ws-solution-text SOL-OBJECT: no Show Solution step prints \"[object\", \"undefined\" or \"NaN\"",
+   "kind": "commit-pair",
+   "rule": "SOL-OBJECT (HINT-NO-BLANK critic r3 R3-3, lf-placevalue 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master: round_sort_* \"Answer: [object Object]\" (89 skills, 209 items app-wide)"
+   },
+   "command": "node tests/scripts/ws-solution-text.cjs --skill number_sense:round_sort_10,number_sense:round_sort_1000,number_sense:round_sort_100000 --only SOL-OBJECT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pass": {
+    "commit": "a55a7aaaa",
+    "state": "object answers read as text (\"70: 73, 74 · 80: 78, 75\"); broken lines left out: 0 skills"
+   }
+  },
+  {
+   "id": "sol-problem",
+   "check": "ws-solution-text SOL-PROBLEM: the Show Solution \"Problem:\" line restates the question (no gap \"?\", no \"__\", \"=\" kept)",
+   "kind": "commit-pair",
+   "rule": "SOL-PROBLEM (HINT-NO-BLANK critic r3 R3-4, lf-placevalue 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master: \"675 + ? + ___\", \"770 × 100 + ? × 10 + ___ × 1\", \"mark 7,207: ? Round it ...: ___\" (54 skills, 172 items app-wide)"
+   },
+   "command": "node tests/scripts/ws-solution-text.cjs --skill placevalue:expand,placevalue:expanded_notation,number_sense:round_nl_thousands --only SOL-PROBLEM",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pass": {
+    "commit": "a55a7aaaa",
+    "state": "a broken Problem line becomes the question as asked: 0 skills"
+   }
   }
  ]
 }
