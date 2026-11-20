@@ -1,0 +1,561 @@
+{
+ "id": "multiply-three",
+ "kind": "template",
+ "title": "Multiply three numbers: a three-factor equation chain on the passed `equation` template, with the easy pair bracketed (multiplication:multiply_three_numbers, NEW)",
+ "template": {
+  "id": "equation",
+  "source": "js/modules/sheet/cells/equation.js",
+  "also": "A COPY on the passed `equation` template (horizontal number sentences, the unknown in any position, TY-25 / DN-22; passed with division:div_facts' Standard and Fraction forms, redesign-passed.js OPS_DF, and with the fact family on the same equation frame). WHY equation and not `fact`: `fact` is the vertical two-operand stack (VA-70, TY-22: one operand over the other under a sum rule); 'a × b × c' with a bracket choice is a horizontal sentence with brackets, which is the equation frame's grammar (WDS 6 'Equation frame': lines for numbers, boxes for a missing number inside an expression). WHAT THE COPY CHANGES (and only this): (1) the payload takes three factors `terms: [a, b, c]` and `group: 'left' | 'right' | null` (equationParts today builds a op b = c); brackets are printed glyphs at the working digit size, weight 400, in a 0.4 em track each (a new literal in equation(); TY-6 lists no bracket glyph - add one line); (2) a CHAIN layout of up to three lines with the '=' signs in one column: line 1 the problem '(2 × 5) × 7', line 2 '= [ ] × 7' (the inner product in a box: a WORKING place, ungraded, data-ws-graded=0 on paper, input.mq-wwork on screen), line 3 '= ____' (the ONE graded answer, a line right of '=', CL-6); with group null line 2 is '= [ ] × [ ]' (the pupil chooses the pair); (3) form 'both' prints two chains side by side (the two groupings), each with its own graded answer line; (4) form 'missing' is one line '3 × [ ] × 2 = 30' with the unknown a box (SL-3: every blank of that section a box). Generator: gen-operations.js (new multiply_three_numbers branch); provider js/modules/sheet/providers/ (operations: strings, workedSteps, wrongAnswer, footprint); screen-cell.js draws the same chain on the practice card, online worksheet and quiz. No new drawing, so no mock (the lead asked for a mock on the new drawing only)."
+ },
+ "families": [
+  "multiplication"
+ ],
+ "findingsMatch": {
+  "templates": [
+   "equation"
+  ]
+ },
+ "skills": {
+  "include": [
+   "multiplication:multiply_three_numbers"
+  ]
+ },
+ "excerptChars": 140,
+ "sourceChars": 300,
+ "summary": "ONE new skill, multiplication:multiply_three_numbers 'Multiply Three Numbers' (WRM Y4.B4.S13; school grade 3; 3.OA.B.5 associative property). Each cell is a short equation chain: the three factors with the easy pair bracketed '(2 × 5) × 7', then '= [10] × 7' (the inner product, a working box), then '= ___' (the product, the one graded answer). The printed bracket is the hint that fades; the chain's three lines and the inner box are structural and stay. Later steps: the pupil picks the pair ('= [ ] × [ ]'), shows the two groupings give one product (two chains), and finds a missing factor. Products within 100 (the answer bounds the band, never the factors). Paper, key and the three screen hosts are one drawing.",
+ "teaches": "3.OA.B.5 (apply properties of operations as strategies to multiply: 3 × 5 × 2 = 15 × 2 = 30 or 3 × 10 = 30, associative property). EE: none - 3.OA.B.5 has no Essential Element (data/standards/ee-math.json lists it under notApplicable; multiplication:mult_properties carries ee: [] for the same code). WRM: Y4.B4.S13 'Multiply three numbers' (verdict gap; build list mult_three; Y4.json missing: 'multiplying three 1-digit numbers, choosing the order (associative property: 2 × 5 × 7 = 10 × 7)'); improves Y4.B5.S2 (Y4.json: 'reusing mult_three: its associative regrouping (a × b × c) is the same move'). The proposal also lists Y4.B4.S12 'Divide a number by 1 and itself' - a numbering slip already flagged in Y4.json (Q3). standards-audit.js 3.OA.B.5 is partial with mult_three as its closing proposal.",
+ "research": "Searched 2026-11-20 (WebSearch; no logins - a WebFetch cannot hold a session, so the MathWorksheets4Kids and IXL member pages were not opened; nothing was copied). MathWorksheets4Kids (primary): its properties-of-multiplication pages (associative: 'regroup and multiply', 'complete the equation' with a missing factor in the second grouping, 'true or false' groupings) - the search returned no MW4K page, so the content model is taken from its known public index and the sites below. IXL (secondary): grade 3 'Multiply three numbers', 'Properties of multiplication' and 'Solve using properties of multiplication' (public skill names: write the product, fill the missing factor in '(a × b) × c = a × (b × __)', choose the property). Super Teacher Worksheets 'Associative Property of Multiplication' (three numbers a problem, regroup them, answer key); Education.com associative-property sheets (the product is the same however the factors are grouped); Illustrative Mathematics task 'You can multiply three numbers in any order'; StudyPug grade 3 'multiplying with 3 numbers or more'; Fishtank grade 3 unit lesson 5; CPALMS / HCPSS 3.OA.5 notes (factors within the facts; three-factor products, students need not name the property). Sequence taken (not pacing): a pair that makes 10 bracketed -> the pair apart (5 × 7 × 2) -> any 1-digit pair bracketed -> choose the pair -> both groupings agree -> missing factor. Where our standards override: one chain a cell with a structural work line (sites print one bare line), 6-8 a page (sites 15-30), no property names to circle (P-21: the move is taught, not the label), black and white, Andika, brackets printed not coloured.",
+ "problemTypes": [
+  "solve (default): '(2 × 5) × 7 = [ ] × 7 = ___' as a three-line chain, the easy pair bracketed (mtGroup printed); write the inner product (working) and the product (graded).",
+  "choose (mtBracket off): '2 × 5 × 7' then '= [ ] × [ ]' then '= ___': the pupil writes the inner product and the factor left over, so the chosen pair shows in the work (no ring-a-pair choice: the work is the production, SL-7).",
+  "both (mtForm 'both', the associative property shown): two chains side by side, '(2 × 3) × 4' and '2 × (3 × 4)', each with its inner box and its product; two graded answers; the key writes the same product twice.",
+  "missing (mtForm 'missing'): '3 × [ ] × 2 = 30' or '(4 × 2) × [ ] = 40' - one box, the unknown factor (2-9); products within the band.",
+  "equality true or false? (true-false / reason-it pages only, from the provider): '(3 × 5) × 2 = 3 × (5 × 2)' true; '(3 × 5) × 2 = 3 × 5 + 2' false."
+ ],
+ "progression": [
+  "1 a pair that makes 10 (2 × 5), side by side and bracketed: (2 × 5) × 7 -> 2 the pair makes 10 but sits apart (5 × 7 × 2): the chain gains a printed 'turn it round' line '= 5 × 2 × 7' before the bracket (Q6; the page never silently reorders the factors) -> 3 any 1-digit pair that is a known fact, bracketed where it stands (product <= 100) -> 4 bracket faded: the pupil picks the pair ('= [ ] × [ ]'), the scaffold change alone on step-3 numbers (P-1) -> 5 both groupings (two chains) -> 6 missing factor.",
+  "Number size (mtBand, one change at a time): products within 30 -> within 60 -> within 100; factors 1-9, never 0 (× 0 is mult_properties forms 3); 1 as a factor only on the 'within 30' band.",
+  "Structural (every item, every step): the chain's lines with '=' in one column, the inner-product box, the answer line. Hint (fades first): the printed bracket; on Guided the bracket is traced grey on the tries before it goes (INK-3)."
+ ],
+ "drawing": {
+  "sizes": "Working digits 22 / 28 pt (M / L) on the horizontal-equation ladder (DN-11: L 28 / 24 / 22, M 22 / 20 / 18 / 16 by columns; content never shrinks below the ladder floor), 1 em slots for × and = (TY-25), brackets 0.4 em tracks; inner box B(3) x (Hw + 2) = 20 x 10 mm (M) / 25 x 12 mm (L) - sized for the widest inner product the band allows (SL-2: 100 at the 100 band needs 3 digits; 2 digits = 14 / 17 mm on the 30 and 60 bands); answer line B(3) = 20 / 25 mm (2 digits 14 / 17 on the lower bands), 0.75 pt; lines 1.15 x digit apart plus 2 mm (M chain about 3 x 8.9 + 4 = 31 mm tall, L about 3 x 11.3 + 4 = 38 mm). Widest line '(9 × 9) × 1' about 32 mm (M) / 41 mm (L); widest work line '= [ ] × [ ]' about 50 / 62 mm.",
+  "notes": [
+   "Capacity (PROPOSED Q8, measured at build by ws-empty-band and the DN-22 fit; content never shrinks): solve / choose 2 across: M 8 (2 x 4) / L 6 (2 x 3); both (two chains a cell, full width): M 4 / L 3; missing (one line): M 10 (2 x 5) / L 8 (2 x 4). Independent default 6 is the WDS 12.1 ceiling for standard problems; DN-1a dense packing allows 20 / 12 at M / L, we stay well under.",
+   "Item guards: three factors 1-9 (no 0); the product within the band; the bracketed pair's product a known fact (<= 100) and, on steps 1-2, exactly 10; no two items with the same multiset of factors on a page; the factor order and the group position each a separate seeded draw (L10: 'left' / 'right' must vary, never alternate); the answer never equals a printed number; on 'both' the two inner products differ (else both chains are the same).",
+   "Answer slots (VQ-2): solve / choose - ONE graded answer (the product line); the inner box (and the left-over factor box on 'choose') are working places, marked as typed on screen, never scored; both - two graded answers (one per chain); missing - one graded box.",
+   "Key (AK-1, AK-2): the same chain with the inner product, the left-over factor and the product written in place, in key ink.",
+   "Screen twin: the same chain in --mq-k2 px; the boxes are typed inputs (48 px targets); '=' column kept; at 820 px the 'both' form stacks its two chains.",
+   "Instruction strings (contract.js library, NEW, <= 8 words, PROPOSED Q9): 'mult3' 'Multiply the pair in brackets first.'; 'mult3-choose' 'Pick an easy pair. Multiply it first.'; 'mult3-both' 'Multiply both ways. Write each product.'; 'mult3-missing' 'Write the missing factor.'. iCan: 'I can multiply three numbers.'",
+   "Say frame (the model's Say: band, oral): '2 times 5 is 10. 10 times 7 is 70.' / 'I multiply the easy pair first.' / both: 'Both ways make 24.' Lesson routine (PROPOSED, prereqs.js): 1 Find an easy pair (a 10, or a fact I know). 2 Multiply the pair. 3 Multiply by the last number. 4 Say it. Chant: 'Easy pair first, then the last one.'",
+   "Files the build touches: js/modules/gen-operations.js (the multiply_three_numbers branch); js/modules/sheet/cells/equation.js (the terms / group / chain payload, the bracket literal) and css/sheet-kit.css (ADDITIVE rules only); the operations provider under js/modules/sheet/providers/ (strings, workedSteps, wrongAnswer, footprint, misconceptions); js/modules/sheet/contract.js (the four strings); js/modules/screen-cell.js only if the chain twin needs a branch; js/modules/data.js (APPEND { v: 'multiply_three_numbers', l: 'Multiply Three Numbers' } to the END of SKILLS.multiplication, grade 3 in the grade map, SKILL_PRINT_SIZE 'standard'); js/modules/skill-options.js (mtBand, mtBracket, mtPair, mtForm); js/modules/skill-presets.js + data.js (the two presets, Q5); js/modules/standards.js (SKILL_STANDARDS 'multiplication:multiply_three_numbers': {ccss: ['3.OA.B.5'], ee: []}); js/modules/wrm.js (SKILL_WRM ['Y4.B4.S13', {step: 'Y4.B5.S2', partial: true}]; delete mult_three from WRM_PROPOSALS); data/curriculum/links/Y4.json (Y4.B4.S13 direct; its pre list kept (mult_properties forms 0, mult_facts band 100, arrays_groups, add_three, mult_zeros) ; the skill added to the pre of Y4.B5.S2 and of the cuboid / volume step that multiplies three dimensions, and to related of Y4.B4.S11 / S3 (mult_properties) and number_theory:factor_links_easy; the S12 slip fixed); js/modules/search-terms.js (CONCEPT_RULES 'three numbers' / 'associative' + SKILL_TERMS); js/modules/build-list.js / build-specs.js (delete mult_three; the visual entry vis_array_options keeps multiply_three_numbers as a host for the R33 array-of-arrays option); js/modules/standards-audit.js (3.OA.B.5 associative clause -> full when built; drop mult_three from its proposals); design/wrm-visuals/year-4.md R33 stays GAP (array of arrays is vis_array_options, not this card). Share codes: the new skill id and the two presets are APPENDED to SKILLS.multiplication and option keys appended to skill-option-keys.js; never inserted or spliced (four share-code systems index by position; ws-code-snapshot must show only a rising count)."
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "Key and the one answer place (quoted)",
+   "core": true,
+   "chars": 400,
+   "rules": [
+    "AK-1",
+    "AK-2",
+    "H13"
+   ]
+  },
+  {
+   "title": "The equation frame (quoted)",
+   "core": true,
+   "chars": 380,
+   "rules": [
+    "TY-25",
+    "TY-6",
+    "SL-3",
+    "DN-22"
+   ]
+  },
+  {
+   "title": "Visual quality bar",
+   "chars": 160,
+   "rules": [
+    "VQ-1",
+    "VQ-2",
+    "VQ-3",
+    "VQ-4",
+    "VQ-9",
+    "VQ-10"
+   ]
+  },
+  {
+   "title": "Slots, cells and ink",
+   "chars": 140,
+   "rules": [
+    "SL-2",
+    "SL-4",
+    "SL-7",
+    "SL-11",
+    "CL-4",
+    "CL-5",
+    "CL-6",
+    "INK-1",
+    "INK-3",
+    "INK-10",
+    "DN-11",
+    "P-35"
+   ]
+  },
+  {
+   "title": "Pedagogy and screen",
+   "chars": 120,
+   "rules": [
+    "P-1",
+    "P-7",
+    "P-10",
+    "P-21",
+    "SCC-01",
+    "SCC-T15"
+   ]
+  },
+  {
+   "title": "Cited by critics (rubric caps)",
+   "chars": 100,
+   "rules": [
+    "H1@RUBRIC",
+    "H2@RUBRIC",
+    "H3@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H8",
+    "H14",
+    "H15",
+    "H16",
+    "H17",
+    "L1",
+    "L2",
+    "L3",
+    "L6",
+    "L10",
+    "AX-4",
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+   ]
+  },
+  {
+   "title": "Cited by critics on the multiplication family and equation (coverage)",
+   "chars": 100,
+   "rules": [
+    "H4",
+    "H7",
+    "H9",
+    "H10",
+    "H11",
+    "H12",
+    "L5",
+    "PG-12",
+    "PG-14",
+    "PT-FRM-6",
+    "PT-FRW-5",
+    "PT-FRW-6",
+    "PT-REV-3",
+    "RP-1",
+    "SL-1",
+    "DN-1a",
+    "SL-3a",
+    "TY-10a"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-10-17",
+   "ruling": "A distinct option is ALSO a findable skill (a preset of the host with those option values).",
+   "source": "CLAUDE.md governing rules"
+  },
+  {
+   "date": "2026-10-02",
+   "ruling": "'Within N' bounds the answer, never the operands; a skill's NAME is its declaration.",
+   "source": "CLAUDE.md governing rules"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "No owner sign-off of skill cards in the lessons-first program: lanes decide from the standards, the lead signs on the recommended answers under the owner's delegation.",
+   "source": "lead brief 2026-11-07; design/STATUS.md"
+  },
+  {
+   "date": "2026-11-13",
+   "ruling": "Two print sizes, M and L; S dropped. Screens: print, computer 1280-1366 px and tablet 820-1024 px; no 390 px. Copy-light review: a later skill on an already-passed template gets the machine gates plus a narrow critic on its own content.",
+   "source": "CLAUDE.md fastest-implementation plan items 2, 7 and 9"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "WRM Year 4 = school grade 3: this skill is built for grade 3 in lane lf-algebra; the card names the passed template it copies (lead brief).",
+   "source": "lead brief 2026-11-20 (lf-algebra spec cards)"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M-MT1",
+   "error": "adds the third number instead of multiplying (mt-add-last)",
+   "wrong": "(2 × 5) × 7: writes 10 + 7 = 17"
+  },
+  {
+   "id": "M-MT2",
+   "error": "multiplies the pair and stops (mt-stop-pair)",
+   "wrong": "(2 × 5) × 7: writes 10"
+  },
+  {
+   "id": "M-MT3",
+   "error": "reuses a factor of the pair with the inner product (mt-reuse)",
+   "wrong": "(2 × 5) × 7: writes 10 × 5 = 50"
+  },
+  {
+   "id": "M-MT4",
+   "error": "thinks a different grouping gives a different product (the property not seen)",
+   "wrong": "(2 × 3) × 4 = 24 but 2 × (3 × 4) 'must be bigger'; marks the equality false"
+  }
+ ],
+ "options": [
+  "Options (skill-options.js, keys APPENDED to skill-option-keys.js at build, PROPOSED): mtBand (O2 number size: products within 30 | 60 | 100, default 100 - the band bounds the PRODUCT); mtPair (complexity: 'ten' a pair makes 10 | 'any' a known fact, default ten); mtBracket (O3 fading support: true printed bracket | false the pupil picks the pair, default true); mtForm (task: 'solve' default | 'both' | 'missing'); O6 appearance: none offered - one chain look (a reason: the chain IS the representation; the array-of-arrays picture is vis_array_options, R33).",
+  "The 2026-10-17 check, option by option (Q5): mtForm 'both' is a distinct task (show two groupings give one product: the associative property itself, IXL's 'properties of multiplication') -> ALSO a preset skill 'Multiply Three Numbers Two Ways (Associative Property)' {mtForm: both}; mtForm 'missing' is a distinct task kind (an unknown factor) -> ALSO a preset 'Missing Factor with Three Numbers' {mtForm: missing}; mtBracket false is a scaffold fade -> plain; mtPair and mtBand are number-size / complexity controls -> plain.",
+  "addsDrawingValues (PROPOSED): mtForm=both adds a second chain (a page holds 4 / 3).",
+  "Search terms (search-terms.js, same change; ws-search-terms gate): host - 'multiply three numbers', 'three factors', 'associative property', 'grouping factors', 'brackets multiply', 'easy pair first', 'times three numbers'; presets - 'associative property two ways', 'regroup factors', 'same product', 'missing factor three numbers', 'unknown factor'. CONCEPT_RULES: 'associative' and 'three numbers' + multiply -> the three."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --skill multiplication:multiply_three_numbers --strict",
+   "note": "and the two presets"
+  },
+  {
+   "cmd": "node tests/scripts/ws-content-audit.cjs --skill multiplication:multiply_three_numbers",
+   "note": "x only; the product within the band"
+  },
+  {
+   "cmd": "node tests/scripts/ws-visual-quality.mjs --skill multiplication:multiply_three_numbers",
+   "note": "VQ-ONEANSWER / VQ-LIVE / VQ-NOLEGACY"
+  },
+  {
+   "cmd": "node tests/scripts/ws-empty-band.cjs --skill multiplication:multiply_three_numbers",
+   "note": "EB-BAND on the chain cells"
+  },
+  {
+   "cmd": "node tests/scripts/ws-options-verify.cjs --render --skill multiplication:multiply_three_numbers",
+   "note": "every value changes print and screen"
+  },
+  {
+   "cmd": "node tests/scripts/ws-presets-unit.mjs",
+   "note": "each preset opens the host with its values"
+  },
+  {
+   "cmd": "node tests/scripts/ws-standards.cjs",
+   "note": "SKILL_STANDARDS entry"
+  },
+  {
+   "cmd": "node tests/scripts/ws-wrm.cjs --report-only",
+   "note": "and ws-wrm-page-unit.mjs: Y4.B4.S13 direct, pre / related links"
+  },
+  {
+   "cmd": "node tests/scripts/ws-search-terms.cjs",
+   "note": "findable host and presets"
+  },
+  {
+   "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+   "note": "append only: the count rises, nothing moved"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/multiply-three/multiply-three.md",
+   "note": "build-start gate"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "Accept every role, host and option decision marked PROPOSED in section 7a?",
+   "recommended": "Yes, all as proposed."
+  },
+  {
+   "q": "Which passed template does it copy?",
+   "recommended": "`equation` (horizontal sentences, passed with div_facts' Standard / Fraction forms): the copy adds three factors with a bracket group, the three-line '=' chain with a working inner box, the two-chain 'both' form and the missing-factor box (template.also). Not `fact` (a two-operand vertical stack). The first chain build is a copy on a passed template, so Opus low builds it, with the narrow copy-light critic (plan item 2) - unless the lead rules the chain layout a new drawing (then medium and a full critic)."
+  },
+  {
+   "q": "The proposal lists Y4.B4.S12 (Divide by 1 and itself) as well as S13. Tag it?",
+   "recommended": "No: a numbering slip (already flagged in Y4.json); SKILL_WRM is Y4.B4.S13, plus Y4.B5.S2 partial (the 'improves' step); drop S12 from the proposal record."
+  },
+  {
+   "q": "Grade?",
+   "recommended": "3 (3.OA.B.5 is a grade-3 standard and the school's WRM Year 4 is grade 3)."
+  },
+  {
+   "q": "Which options are ALSO findable preset skills (10-17 rule)?",
+   "recommended": "Two presets: mtForm 'both' -> multiplication:mult_three_two_ways 'Multiply Three Numbers Two Ways (Associative Property)' and mtForm 'missing' -> multiplication:mult_three_missing_factor 'Missing Factor with Three Numbers'; both grade 3, 3.OA.B.5, WRM Y4.B4.S13 (part). mtBracket, mtPair and mtBand stay plain."
+  },
+  {
+   "q": "A pair that makes 10 but sits apart (5 × 7 × 2): reorder the factors on the page, or add a 'turn it round' line?",
+   "recommended": "Add the line: the chain starts '5 × 7 × 2', then '= 5 × 2 × 7' (printed on steps 1-2, the commutative move shown), then the bracketed line; the page never silently reorders the factors. From step 3 the pair is always bracketed where it stands."
+  },
+  {
+   "q": "Band values and default?",
+   "recommended": "30 / 60 / 100, default 100 (the G3 fact range); the band caps the product; 1 as a factor only on the 30 band; 0 never."
+  },
+  {
+   "q": "Capacity per page before measurement?",
+   "recommended": "solve / choose M 8 / L 6; both M 4 / L 3; missing M 10 / L 8 (section 3); measured at build; the card is resigned only if a number falls."
+  },
+  {
+   "q": "The four instruction strings and the iCan as worded in section 3?",
+   "recommended": "Yes."
+  },
+  {
+   "q": "Fact rows and fact probe: offer the three-factor items there?",
+   "recommended": "No: out of scope (fact layouts draw two-number facts; this is not a fact skill)."
+  }
+ ],
+ "decisions": {
+  "options": [
+   {
+    "option": "mtBand",
+    "values": [
+     "30",
+     "60",
+     "100"
+    ],
+    "d": "offered",
+    "source": "this card section 7 (new option, PROPOSED)",
+    "why": "the number-size ladder; caps the product",
+    "proposed": true
+   },
+   {
+    "option": "mtPair",
+    "values": [
+     "ten",
+     "any"
+    ],
+    "d": "offered",
+    "source": "this card section 7 (new option, PROPOSED)",
+    "why": "complexity: a pair making 10, then any known fact",
+    "proposed": true
+   },
+   {
+    "option": "mtBracket",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "offered",
+    "source": "this card section 7 (new option, PROPOSED)",
+    "why": "the fading support (the printed bracket)",
+    "proposed": true
+   },
+   {
+    "option": "mtForm",
+    "values": [
+     "solve",
+     "both",
+     "missing"
+    ],
+    "d": "offered",
+    "source": "this card section 7 (new option, PROPOSED)",
+    "why": "the task; both and missing are ALSO preset skills (Q5)",
+    "proposed": true
+   },
+   {
+    "option": "calculator",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "out of scope",
+    "source": "skill-options.js play controls",
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card",
+    "proposed": true
+   },
+   {
+    "option": "skipAfter",
+    "values": [
+     "*"
+    ],
+    "d": "out of scope",
+    "source": "skill-options.js play controls",
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+    "proposed": true
+   }
+  ],
+  "roles": [
+   {
+    "key": "role:independent",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar",
+    "proposed": true
+   },
+   {
+    "key": "role:more-practice",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar",
+    "proposed": true
+   },
+   {
+    "key": "role:test",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar; hints off (no bar model / no printed bracket)",
+    "proposed": true
+   },
+   {
+    "key": "role:opener",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": true
+   },
+   {
+    "key": "role:scripted-model",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "provider workedSteps to write: find the easy pair, bracket it, multiply it, then the third; Say",
+    "proposed": true
+   },
+   {
+    "key": "role:guided",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "provider workedSteps; the printed bracket on the Model, faded on the tries after step 3",
+    "proposed": true
+   },
+   {
+    "key": "role:error-analysis",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "provider wrongAnswer to write: M-MT1..M-MT4",
+    "proposed": true
+   },
+   {
+    "key": "role:review",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": true
+   },
+   {
+    "key": "role:pre-skill-check",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "earlier skills in data.js order: mult_facts, mult_properties forms 0, mult_zeros (the build checks the list)",
+    "proposed": true
+   },
+   {
+    "key": "role:mixed-practice",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": true
+   },
+   {
+    "key": "role:true-false",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "provider wrongAnswer and the equality '(3 × 5) × 2 = 3 × (5 × 2)' items",
+    "proposed": true
+   },
+   {
+    "key": "role:reason-it",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "'Which pair would you multiply first? Why?' from workedSteps; the two-ways form",
+    "proposed": true
+   },
+   {
+    "key": "role:stretch",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "four factors; a 2-digit factor with a pair making 10 (2 × 13 × 5)",
+    "proposed": true
+   },
+   {
+    "key": "role:lesson",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar; lesson data 0/1 (FALLBACK): the build writes prereqs.js lesson data with the routine in section 3",
+    "proposed": true
+   },
+   {
+    "key": "role:word-problems",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "no stories in this skill (stories 0/1); three-factor stories belong to the cuboid / equal-groups-of-arrays work (R33), not this card",
+    "proposed": true
+   },
+   {
+    "key": "role:fact-rows",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "not a fact skill (fact rows draw two-number facts): the role reports unsupported",
+    "proposed": true
+   },
+   {
+    "key": "role:fact-probe",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "fact-probe is for fact skills only: the role reports unsupported",
+    "proposed": true
+   }
+  ],
+  "hosts": [
+   {
+    "key": "host:practice-card",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "one drawing with print; the pass bar (1280 / 1366 / 820 / 1024 px)",
+    "proposed": true
+   },
+   {
+    "key": "host:online-worksheet",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "one drawing with print; the pass bar",
+    "proposed": true
+   },
+   {
+    "key": "host:quiz",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "one drawing with print; the pass bar",
+    "proposed": true
+   },
+   {
+    "key": "host:boss",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic",
+    "proposed": true
+   },
+   {
+    "key": "host:race",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic",
+    "proposed": true
+   },
+   {
+    "key": "host:map",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "game / display hosts draw the same card; graded by ws-screen-slots, not by this card's critic",
+    "proposed": true
+   },
+   {
+    "key": "host:mode-dark",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic",
+    "proposed": true
+   },
+   {
+    "key": "host:mode-bigboard",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type, every page prints a key); RUBRIC scope notes 2026-09-26",
+    "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic",
+    "proposed": true
+   }
+  ]
+ }
+}

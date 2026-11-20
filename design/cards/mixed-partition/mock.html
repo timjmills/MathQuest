@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixed Partition Mock</title>
+<!-- MOCK for the spec card design/cards/mixed-partition (fractions:mixed_numbers_intro, WRM Y4.B7.S3).
+     Not app code. Values are copied from js/modules/sheet/tokens.js (SIZES M / L, INK, STROKE, SLOT) and
+     WORKSHEET_DESIGN_STANDARD.md (3.2 sizes, 4.1 ink, 4.2 strokes, 6 slots, 11.2 fraction bar 52 x 16 / 56 x 18,
+     11.8 part-whole RP-60, 11.11 RP-90 / RP-92 / RP-93). Open with ?size=M or ?size=L. -->
+<link rel="stylesheet" href="../../../css/fonts/andika.css">
+<style>
+:root { --ink: #000; --paper: #fff; --grey: #949494; --key: #C2410C; }
+html, body { margin: 0; background: var(--paper); }
+body { font-family: Andika, sans-serif; font-synthesis: none; color: var(--ink); font-feature-settings: "cv04" 1; }
+.sheet { width: 186mm; padding: 4mm 0; }
+.instr { font-size: var(--text); line-height: 1.3; margin: 0 0 2mm 0; }
+.cap { font-size: 9pt; margin: 3mm 0 1mm; color: var(--ink); }
+.frame { border: 1.5pt solid var(--ink); }
+.cell { position: relative; border-top: 0.75pt solid var(--ink); padding: 3mm; display: flex; align-items: flex-start; gap: 12mm; }
+.cell:first-child { border-top: 0; }
+.tab { position: absolute; left: 0; top: 0; min-width: var(--tabmm); height: var(--tabmm); background: var(--ink); color: var(--paper);
+  font-size: var(--tabnum); font-weight: 700; line-height: var(--tabmm); text-align: center; padding: 0 .6mm; }
+.model { margin-left: calc(var(--tabmm) + 3mm); display: flex; flex-direction: column; gap: 3mm; }
+.bar { display: flex; width: var(--barw); height: var(--barh); border: 1.5pt solid var(--ink); box-sizing: border-box; }
+.bar span { flex: 1; border-left: 0.75pt solid var(--ink); }
+.bar span:first-child { border-left: 0; }
+.bar span.sh { background: var(--grey); }
+.pw { position: relative; width: var(--pww); height: var(--pwh); }
+.pw svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.box { position: absolute; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.whole { border: 1.5pt solid var(--ink); }
+.part { border: 0.75pt solid var(--ink); border-radius: var(--slotr); }
+.digit { font-size: var(--digit); line-height: 1.15; }
+.mixed { display: inline-flex; align-items: center; gap: 0.12em; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; font-size: var(--frac); line-height: 1.15; }
+.frac > span:first-child { border-bottom: 1.5pt solid var(--ink); padding: 0 .15em; }
+.fslot { display: flex; flex-direction: column; align-items: center; width: var(--fbar); }
+.fslot .zone { height: var(--hw); width: 100%; display: flex; align-items: flex-end; justify-content: center; font-size: var(--frac); line-height: 1; }
+.fslot .zone.lo { align-items: flex-start; }
+.fslot .vb { width: 100%; border-top: 1.5pt solid var(--ink); margin: 1mm 0; }
+.lbl { position: absolute; font-size: var(--zone); text-align: center; }
+.key { color: var(--key); font-weight: 700; }
+.eqrow { margin-left: calc(var(--tabmm) + 3mm); display: flex; align-items: center; gap: 2mm; font-size: var(--digit); }
+.eqline { display: inline-flex; align-items: center; gap: 2mm; }
+.o { width: 1em; text-align: center; }
+</style>
+</head>
+<body>
+<div class="sheet" id="sheet"></div>
+<script>
+// Tokens (sheet/tokens.js SIZES; WDS 11.2 fraction bar minimums; SL-11 slot radius; CL-31 tab ladder).
+const T = {
+  M: { digit: 22, frac: 16, text: 13, zone: 10, hw: 8, slotr: 1.25, tab: 5, tabnum: 10, barw: 52, barh: 16, B1: 14, B2: 14 },
+  L: { digit: 28, frac: 20, text: 15, zone: 12, hw: 10, slotr: 1.5, tab: 6, tabnum: 11, barw: 56, barh: 18, B1: 14, B2: 17 },
+};
+const size = (new URLSearchParams(location.search).get('size') || 'M').toUpperCase() === 'L' ? 'L' : 'M';
+const t = T[size];
+const R = document.documentElement.style;
+R.setProperty('--digit', t.digit + 'pt'); R.setProperty('--frac', t.frac + 'pt'); R.setProperty('--text', t.text + 'pt');
+R.setProperty('--zone', t.zone + 'pt'); R.setProperty('--hw', t.hw + 'mm'); R.setProperty('--slotr', t.slotr + 'mm');
+R.setProperty('--tabmm', t.tab + 'mm'); R.setProperty('--tabnum', t.tabnum + 'pt');
+R.setProperty('--barw', t.barw + 'mm'); R.setProperty('--barh', t.barh + 'mm'); R.setProperty('--fbar', t.B2 + 'mm');
+
+const mixed = (w, n, d) => `<span class="mixed"><span class="digit">${w}</span><span class="frac"><span>${n}</span><span>${d}</span></span></span>`;
+const bars = (w, n, d) => {
+  let h = '';
+  for (let i = 0; i < w + 1; i++) {
+    const shaded = i < w ? d : n;
+    h += `<div class="bar">${Array.from({ length: d }, (_, k) => `<span class="${k < shaded ? 'sh' : ''}"></span>`).join('')}</div>`;
+  }
+  return `<div class="model">${h}</div>`;
+};
+// The part-whole diagram (RP-60): the printed mixed number in the whole box (1.5 pt, square: printed, not a writing place),
+// two part boxes below (0.75 pt, slot radius: writing places), joined by 0.75 pt lines. Part 1 = the wholes (a digit
+// box B(1) x (2 Hw + 2), the mixed-number whole box of WDS 6); part 2 = the fraction (a fraction slot in a box).
+function partWhole(w, n, d, key, indent) {
+  const hw = t.hw, partH = 2 * hw + 2 + 6, wholeW = t.B1 + 6, fracW = t.B2 + 6;
+  const topW = 34 + (size === 'L' ? 6 : 0), topH = 2 * hw + 6;
+  const gapY = 12, gapX = 22;
+  const W = Math.max(topW, wholeW + gapX + fracW), H = topH + gapY + partH + 1.5 + t.zone * 0.42 + 1;
+  const topX = (W - topW) / 2, p1X = (W - (wholeW + gapX + fracW)) / 2, p2X = p1X + wholeW + gapX, pY = topH + gapY;
+  const ans = (v) => key ? `<span class="key">${v}</span>` : '';
+  const svg = `<svg width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}"><g stroke="#000" stroke-width="${0.75 * 0.3528}" fill="none">
+     <line x1="${W / 2}" y1="${topH}" x2="${p1X + wholeW / 2}" y2="${pY}"/><line x1="${W / 2}" y1="${topH}" x2="${p2X + fracW / 2}" y2="${pY}"/></g></svg>`;
+  return `<div class="pw" style="--pww:${W}mm;--pwh:${H}mm;${indent ? `margin-left:calc(var(--tabmm) + 3mm)` : ''}">${svg}
+    <div class="box whole" style="left:${topX}mm;top:0;width:${topW}mm;height:${topH}mm">${mixed(w, n, d)}</div>
+    <div class="box part" style="left:${p1X}mm;top:${pY}mm;width:${wholeW}mm;height:${partH}mm"><span class="digit">${ans(w)}</span></div>
+    <div class="box part" style="left:${p2X}mm;top:${pY}mm;width:${fracW}mm;height:${partH}mm"><div class="fslot">
+       <div class="zone">${ans(n)}</div><div class="vb"></div><div class="zone lo">${ans(d)}</div></div></div>
+    <div class="lbl" style="left:${p1X - 4}mm;width:${wholeW + 8}mm;top:${pY + partH + 1}mm">wholes</div>
+    <div class="lbl" style="left:${p2X - 4}mm;width:${fracW + 8}mm;top:${pY + partH + 1}mm">fraction</div></div>`;
+}
+const cell = (no, inner, half) => `<div class="cell"${half ? ' style="flex:1;border-top:0"' : ''}><span class="tab">${no}</span>${inner}</div>`;
+const pwWrap = (h) => `<div style="flex:1;display:flex;justify-content:center">${h}</div>`;
+const items = [
+  { w: 2, n: 3, d: 4, model: true },
+  { w: 1, n: 2, d: 5, model: true },
+  { w: 3, n: 1, d: 6, model: false },
+  { w: 4, n: 5, d: 8, model: false },
+];
+const page = (key) => `<div class="instr">Split the mixed number into wholes and a fraction.</div>
+  <div class="frame">${items.filter((it) => it.model).map((it, i) => cell(i + 1, bars(it.w, it.n, it.d) + pwWrap(partWhole(it.w, it.n, it.d, key, false)))).join('')}
+  <div style="display:flex;border-top:0.75pt solid #000">${items.filter((it) => !it.model).map((it, i) => cell(i + 3, pwWrap(partWhole(it.w, it.n, it.d, key, false)), true)).join('<div style="border-left:0.75pt solid #000"></div>')}</div></div>`;
+document.getElementById('sheet').innerHTML =
+  `<div class="cap">Size ${size}. Pupil page (items 1-2: the bar model step; items 3-4: the model faded, part-whole only, two across)</div>${page(false)}
+   <div class="cap">Size ${size}. Answer key: the same cells, answers in the pupil's own boxes (AK-1)</div>${page(true)}`;
+</script>
+</body>
+</html>
