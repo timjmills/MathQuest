@@ -12072,8 +12072,8 @@
     "state": "no return pass: Skip appears only after 5 wrong tries; skipped items never come back; quiz has no Skip; the teacher results read a blank as Wrong"
    },
    "pass": {
-    "commit": "515d9f54a",
-    "state": "every host returns the skipped items at the end (same item object), scores each once, and shows a second-pass skip as skipped"
+    "commit": "96f23a96c",
+    "state": "(re-pointed from 515d9f54a, lf-hosts skip critic r2 F2: SKIP-RESULTS now also judges the pupil breakdown, which 515d9f54a showed as a red cross) every host returns the skipped items at the end (same item object), scores each once, and shows a second-pass skip as skipped"
    },
    "command": "node tests/scripts/ws-skip.cjs --root {root} --widths 1280,820 --rules SKIP-RETURN,SKIP-RESULTS",
    "browser": true,
