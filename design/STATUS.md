@@ -930,3 +930,17 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - mult_facts / div_facts: "Tables to" offers 15 x 15 (band 225); the 13-15 ticks show only under it; new preset skills mult_facts_15 / div_facts_15 (codes, standards, WRM, search terms); "How it is written" leads the options panel. Facts card signed 2026-11-15.
 - D1 fixed: the preset pages' I Can line reads "to 15" (mult_facts I Can follows the page options like div_facts); ws-tables15 T15-PRESET compares rendered titles (backtest t15-preset-ican).
 - Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-19 — Deploy ws-merge-master (lf-checks; critic r5 PASS 9/9/9/8)
+- Lanes merge master into their branch with `MQ_COMMIT_TRAILER="<footer>" node tests/scripts/ws-merge-master.mjs --commit`: ledger / backtests / status files unioned row by row; a both-sides row or line conflict is left for the lane (exit 1). Self-test 28 cases; backtests merge-master-r1 / -crlf / -only-empty.
+## 2026-11-19 — Deploy two-step Guided (lf-algebra; lead ruling 2026-11-14: the two-step bar drops on Guided via ctx.guided)
+- Two-step family Guided pages: cells read ctx.guided and drop the bar scaffold on Guided Models / tries; ws-two-step --guided / --align / --screen-align / --ldiv / --print / --ea OK on the lane head; lesson baseline identical.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-19 — Deploy ws-merge-master (lf-checks; critic r5 PASS 9/9/9/8)
+- Lanes merge master into their branch with `MQ_COMMIT_TRAILER="<footer>" node tests/scripts/ws-merge-master.mjs --commit`: ledger / backtests / status files unioned row by row; a both-sides row or line conflict is left for the lane (exit 1). Self-test 28 cases; backtests merge-master-r1 / -crlf / -only-empty.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, roles-unit, tof-stem, key-json, pv-words-pages, frame-title, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest + precritic self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — HOTFIX tables-15 summaries (bug fix, no critic): hidden 13-15 ticks never named at 12 x 12 / 10 x 10
+- describeOptions / optionsReadOnlyHTML no longer name 13-15 ticks hidden at band 144 or 100 (Sets summary, Quick Start card, print rows); dealing was already clamped. ws-share-options clicks its own set block. T15-HIDDEN (ws-tables15) at bands 144 / 100 incl. code round-trips; old Times codes hash-identical to pre-t15.
+- Gates: boot-smoke, code-snapshot, share-options, tables15, backtest t15-hidden, simple-print, key-json (facts), precritic-plan, capacity-pin.

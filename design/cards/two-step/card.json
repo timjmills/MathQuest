@@ -44,7 +44,7 @@
  "progression": [
   "1 G2: add then take away, answers to 30 (band 30), two step columns with sign rows, bar model on the teaching pages -> 2 all four + / − orders mixed (forms) -> 3 answers to 50 -> 4 answers to 100 (one change a step: the order kind OR the number size)",
   "5 G3: x first then + / − (msOps mult) -> 6 ÷ first (div) -> 7 x or ÷ first mixed (multdiv = two_step_mult_div_first) -> 8 + / − first then x (addmult) -> 9 + / − first then ÷ (adddiv) -> 10 one equation with a letter, x / ÷ first (two_step_letter_equation) -> 11 the letter with brackets (msLetter + addmult / adddiv) -> 12 estimate to check (two_step_estimate_check, + / − stories to 100)",
-  "Fade within each step (P-1: the scaffold changes alone, never with the content): bar model drawn (teaching pages) -> bar off, column boxes (independent) -> frames (wpFrames: the pupil still produces every number and sign); the printed middle question (P-WP-11 v1, PROPOSED Q6) and the grey Step 1 sign trace are hints that go first; the two titled step columns, the sign rows, the answer row with its unit bank are structural and stay",
+  "Fade within each step (P-1: the scaffold changes alone, never with the content): bar model drawn (Opener, Scripted Model, the lesson chart) -> bar off on the Guided page (its Model and tries: the first fade step, lead ruling 2026-11-14) -> bar off, column boxes (independent) -> frames (wpFrames: the pupil still produces every number and sign); the printed middle question (P-WP-11 v1, PROPOSED Q6) and the grey Step 1 sign trace are hints that go first; the two titled step columns, the sign rows, the answer row with its unit bank are structural and stay",
   "G4 4.OA.A.3 continues on the division family (remainder_interpret) and on the build entry multi_step_four_ops (G4-Y5.B3, G5-Y6.B2 parts not on this card)"
  ],
  "drawing": {
@@ -198,6 +198,11 @@
    "date": "2026-11-13",
    "ruling": "Card signed by the lead under the owner's delegation: decisions 1-12 as recommended, decision 3 amended (wpBar findable as multi_step_word '(Visual)'; msChoose read in the code: a response mode on the same task, so a plain option, no preset).",
    "source": "design/decisions/LEAD_DECISIONS.md (2026-11-13, two-step card)"
+  },
+  {
+   "date": "2026-11-14",
+   "ruling": "Decision 4 amended (lead ruling 2026-11-14, GUIDED-MODEL-ALONE): the two-step bar model is drawn on the Opener, the Scripted Model and the lesson chart; the Guided page drops it from its Model (and its tries) - a scaffold fade (P-1) - so the Model and one try share the Guided page at M. At L the Model still stands alone on its page: the ruled lone-Model exception, recorded as an exempt GUIDED-MODEL-ALONE row for the two-step family at L only.",
+   "source": "lead ruling 2026-11-14 (lf-algebra GUIDED-MODEL-ALONE options a + d)"
   }
  ],
  "misconceptions": [

@@ -4325,7 +4325,10 @@ export function describeOptions(categoryId, skillId, opts) {
         if (def.type === 'bool') { parts.push(v ? def.label : `No ${def.label.toLowerCase()}`); continue; }
         if (def.type === 'rows') { parts.push(`${def.label}: ${typeof def.summary === 'function' ? def.summary(v) : (Array.isArray(v) ? v.length : 0)}`); continue; }
         if (def.type === 'set') {
-            const all = (def.values || []);
+            // hotfix t15fix: a tick the other options hide (the 13-15 of the x / ÷ fact sets under "Tables to" 10 x 10 or
+            // 12 x 12, `valueHide`) is neither drawn nor dealt, so the summary does not name it either (ws-tables15 T15-HIDDEN).
+            const hide = typeof def.valueHide === 'function' ? new Set(def.valueHide(normalizeOptions(categoryId, skillId, opts)) || []) : null;
+            const all = (def.values || []).filter(x => !(hide && hide.has(x.v)));
             const labels = all.filter(x => v.includes(x.v)).map(x => x.l);
             // Every box ticked reads better as the one phrase the option names it by
             // ("All three ways, mixed") than as the whole list spelled out on a dialog row.
