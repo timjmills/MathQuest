@@ -750,7 +750,7 @@ function partitionRow(p, ctx) {
     // model on: the bars at the left, the diagram centred in the width after them (card Q10, EB-SIDE); on a narrow
     // screen card the bars stand above the diagram (flex-wrap)
     return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:${isTwin(ctx) ? 'wrap' : 'nowrap'};align-items:center;justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
-        // the tab keep-out (CL-31) on paper: the bars start after the item's tab
+        // the tab keep-out on paper: the bars start after the item's tab
         + `${isTwin(ctx) ? '' : `padding-left:${L(ctx, SZ(ctx).tabMm + 3)};`}">`
         + `${pwBars(p, ctx)}<span style="flex:1 1 auto;display:flex;justify-content:center;">${diagram}</span></div>`;
 }
