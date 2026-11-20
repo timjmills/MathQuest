@@ -283,3 +283,25 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
   HTML, no kit cell, provider or options); decimal_models needs the unbuilt hundred-square template and the stack's dp track. A full
   family lane (spec card, two templates, migration): not started here.
 - 2026-11-07 Lane started from 9398c3a; brief `design/lessons-first/briefs/w1-placevalue.md` written; pv card drafted and generated; owner questions sent to the lead.
+
+### 2026-11-20 — PARKED until next week (lead: lf-engine vocab fixes parked for budget)
+
+Head `claude/lf-placevalue-vocab-deploy` @ 497243186 (master 65c28ccdf merged; lf-roles z1 5f202c638 and the guided.js /
+compose.js lines of lf-algebra ddabf985a cherry-picked; W1 fixed). NOT deploy-clean. Resume in this order:
+1. Merge lf-engine's vocabfix commits when they land (claude/sweet-newton-c8wrv1-lf-engine-vocabfix): (1) pagesOf drops a
+   shelf that fits (add_wp_10 L 4242 Mixed 14 -> 12 items, two_step_letter_equation M 6 -> 5); (2) rowcap patterns lesson p3
+   40-55 % white; (3) scripted-model.js textH2 on a one-line step (EB-PAGE D3; arm backtest `vocab-model-onepage`).
+   The 62 held lesson-baseline keys (patterns / add_wp_10 / two_step) stay unpinned until then.
+2. W1 regression: ws-grade-render OVERFLOW 0.5 mm on the lesson M p4 packet Guided page (pupil + key): the two-word z1 cue
+   makes the hint row taller. Fix, check FAILs on 497243186.
+3. Compare the other precritic --strict reds with 8cae05dbd (role-cover AK-2 / CL-4b, screen-slots, screen-support-eq,
+   sibling-compare PENDING, content-audit "no skill matched"); logs /tmp/mq-precritic/20261120-031727-6730/ (ephemeral).
+4. ws-merge-master --commit; the worksheet-reflow expand re-pin (4e9df2e47) arrives with master.
+5. ONE narrow critic: vocab_grade_pictures lesson + V23 pages; vocab_pick3_words Guided / Scripted Model / Lesson (W1, incl.
+   PICK_FEATURE wording - some name a fixed number: multiple "counting in threes", times as many "3 times"); the pagesOf
+   Mixed pages (add_wp_10 L 4242 p4-p5, two_step_letter_equation M p6-p7; lf-engine: page count must not rise past master);
+   the rowcap pages of master's newer lessons. Renders: design/status/lf-placevalue/{vocab-blockers,w1}/.
+6. Then ONE deploy head to the lead; the moved-page list to lf-engine.
+Also queued for next week: HINT-NO-BLANK round 3 (narrow: box-level choice + screenHelp on our skills + R2 checks);
+expand worksheet 2 columns at 1024 (~80 px boxes); mixed_placevalue Opener (waits on lf-engine opener.js (a)(b), then our
+pv.js inPool (c)); pixel EB pass.
