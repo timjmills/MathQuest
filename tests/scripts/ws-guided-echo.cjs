@@ -184,6 +184,9 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     if (i === j) continue;
                     const a = ws[i], b = ws[j];
                     if (a.shows) continue;
+                    // (lead ruling A13: in a lesson PACKET a band-100 practice rows-of-ten grid printed LATER than a teaching window
+                    // prints that window's gaps as given - asked and answered on the earlier page; every other case still fails)
+                    if (/lesson packet/.test(label) && j > i && !b.shows && a.cols.length !== 10 && b.cols.length === 10 && b.rows.length === 3 && Math.max(...b.rows) <= 9) continue;
                     const hit = a.gaps.filter((n) => printsN(b, n) || (b.shows && b.gaps.includes(n)));
                     if (!hit.length) continue;
                     const twin = a.rows.join() === b.rows.join() && a.cols.join() === b.cols.join();

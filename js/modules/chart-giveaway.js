@@ -43,11 +43,18 @@ export function chartGivesAway(q, seen, { same = false } = {}) {
         // pages than band 120 has windows repeats one; a shown window, or a twin on the same run, is never repeated)
         if (twin && b.ext && !b.shows && a.gaps.join('.') === b.gaps.join('.')) continue;
         if (same) { if (twin) return true; continue; }
+        // (lead ruling A13: a band-100 lesson practice rows-of-ten grid prints an EARLIER part's teaching gaps as given - asked and
+        // answered there; never a gap of its own part, a shown window's, or one not yet asked, and it still never blanks a printed one)
+        if (a13Given(a, b)) { if (b.gaps.some((n) => cwPrints(a, n)) && !a.gaps.some((n) => cwPrints(b, n))) continue; }
         if (a.gaps.some((n) => (b.shows ? cwHas(b, n) : cwPrints(b, n))) || (!b.shows && b.gaps.some((n) => cwPrints(a, n)))) return true;
     }
     return false;
 }
 
+/** A13: is `a` the band-100 lesson practice rows grid (3 x 10, rows 1-100) and `b` a teaching window of another part (ext, not shown)? */
+function a13Given(a, b) {
+    return LESSON && PAGE_GRID === 'rows' && b.ext && !b.shows && b.cols.length !== 10 && a.cols.length === 10 && a.rows.length === 3 && Math.max(...a.rows) <= 9;
+}
 /** The `cw:` keys of the chart windows among `items` (questions), for `chartGivesAway(q, seen)`. */
 export function chartSeen(items) {
     const seen = new Set();

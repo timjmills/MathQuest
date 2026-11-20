@@ -1036,6 +1036,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             if (kept.some((k) => k.rows.join() === rows.join() && k.cols.join() === cols.join() && (!k.ext || k.shows || (chartLesson() && !_lessonRows)))) continue;
             const forced = new Set(), barred = new Set();
             for (const k of kept) {
+                // (lead ruling A13: the band-100 lesson practice rows grid prints the teaching sheet's gaps as GIVEN numbers - the pupil
+                // wrote them on the earlier page - never re-asks them; a square it prints is still never left empty here)
+                if (_lessonRows && band === 100 && k.ext && !k.shows && k.cols.length !== 10) { for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n)) barred.add(idxOf(n)); } continue; }
                 // (a SHOWN window - the worked Model - prints every square, its traced answers too: none is left empty here)
                 if (k.shows) { for (const r of k.rows) for (const c of k.cols) { const n = r * 10 + c + 1; if (inWin(n)) barred.add(idxOf(n)); } continue; }
                 k.gaps.filter(inWin).forEach((n) => forced.add(idxOf(n)));
