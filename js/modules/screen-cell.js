@@ -2265,7 +2265,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // ("2 + 3/4", "1 + 1 + 3/4", or "2 3/4" for the whole box); an empty box reads "?", so a part never reads as right
     const parts = join === 'parts';
     const sepOf = parts ? (joinEl.getAttribute('data-mq-sep') || ' + ') : '';
-    const splitParts = (v) => String(v || '').split(sepOf.trim() ? sepOf.trim() : /\s+/).map((t) => t.trim()).filter(Boolean)
+    const splitParts = (v) => String(v || '').split(/\s*[=+]\s*|\s+/).map((t) => t.trim()).filter(Boolean)
         .flatMap((t) => t.split('/')).map((t) => (t === '?' ? '' : t));
     let saved = mixed ? splitMixed(baseValue) : parts ? splitParts(baseValue) : baseValue.split(join.trim() || ',').map((t) => t.trim());
     // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
@@ -2308,12 +2308,15 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         const v = boxes.map((b) => (b.value || '').trim());
         if (parts) {
             if (v.every((x) => !x)) return '';
-            const terms = [];
+            // (a slot's data-mq-after names what follows its term: task 'name' writes "2 3/4 = 2 + 3/4", the top box first)
+            let out = '';
             for (let k = 0; k < v.length; k++) {
                 const pk = slots[k].getAttribute('data-mq-pk');
-                if (pk === 'n' && k + 1 < v.length) { terms.push(`${v[k] || '?'}/${v[k + 1] || '?'}`); k++; } else terms.push(v[k] || '?');
+                let last = k;
+                if (pk === 'n' && k + 1 < v.length) { out += `${v[k] || '?'}/${v[k + 1] || '?'}`; last = ++k; } else out += v[k] || '?';
+                if (k < v.length - 1) { const after = slots[last].getAttribute('data-mq-after'); out += after !== null ? after : sepOf; }
             }
-            return terms.join(sepOf);
+            return out;
         }
         if (!mixed) return v.join(join);
         const [w, n, d] = v;

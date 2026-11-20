@@ -128,11 +128,12 @@ const _MN_DENOMS = Object.freeze({ 'halves-quarters': [2, 4], 'to-8': [2, 3, 4, 
 /** The option values of a mixed_numbers_intro item, its defaults filled in. */
 function _mnOpts() {
     const o = state.skillOptions || {};
-    const task = ['partition', 'ones', 'compose'].includes(o.mnTask) ? o.mnTask : 'partition';
+    const task = ['partition', 'ones', 'compose', 'name'].includes(o.mnTask) ? o.mnTask : 'partition';
     const denoms = _MN_DENOMS[o.mnDenoms] ? o.mnDenoms : 'halves-quarters';
     const wholes = [1, 2, 3, 5].includes(Number(o.mnWholes)) ? Number(o.mnWholes) : 3;
     const model = o.model === 'none' ? 'none' : 'bar';
-    const form = o.mnForm === 'eq' && task !== 'compose' ? 'eq' : 'diagram';
+    // (compose and name read the bars: no equation form, A18)
+    const form = o.mnForm === 'eq' && task !== 'compose' && task !== 'name' ? 'eq' : 'diagram';
     return { task, denoms, wholes, model, form };
 }
 /**
@@ -144,14 +145,17 @@ function _mnOpts() {
 function _mnItem(q) {
     const o = _mnOpts();
     const dens = _MN_DENOMS[o.denoms];
-    const [w, n, d] = freshDeal(`mn:${o.denoms}:${o.wholes}`, () => {
-        const ww = randInt(1, o.wholes);
+    // compose and name read the number from the bars (A18): the bars are always drawn, so at most 3 wholes (four bars)
+    const reads = o.task === 'compose' || o.task === 'name';
+    const most = reads ? Math.min(3, o.wholes) : o.wholes;
+    const [w, n, d] = freshDeal(`mn:${o.denoms}:${most}`, () => {
+        const ww = randInt(1, most);
         const dd = dens[Math.floor(Math.random() * dens.length)];
         return [ww, randInt(1, dd - 1), dd];
     }, { sig: (v) => v.join(':'), window: 12 });
     const onPage = Number.isFinite(state.itemIndex);
-    const model = o.model === 'bar' && o.form !== 'eq' && w <= 3 && (!onPage || state.itemIndex < 2) ? 'bar' : 'none';
-    const form = o.form === 'eq' ? 'eq' : o.task === 'ones' ? 'ones' : o.task === 'compose' ? 'compose' : 'two';
+    const model = reads || (o.model === 'bar' && o.form !== 'eq' && w <= 3 && (!onPage || state.itemIndex < 2)) ? 'bar' : 'none';
+    const form = o.form === 'eq' ? 'eq' : o.task === 'ones' ? 'ones' : o.task === 'compose' ? 'compose' : o.task === 'name' ? 'name' : 'two';
     const payload = { task: 'partition', w, n, d, form, model, answer: { w, n, d } };
     if (o.form === 'eq' && o.task === 'ones') payload.ones = true;
     const ones = o.task === 'ones';
@@ -162,7 +166,12 @@ function _mnItem(q) {
     // the boxes compose the answer exactly as written (screen-cell.js wireCellSlots, data-mq-join="parts"): an equivalent
     // fraction or the improper fraction is not the partition asked for
     q.noSimplify = true;
-    if (o.task === 'compose') {
+    if (o.task === 'name') {
+        q.text = 'Write the mixed number. Then split it into wholes and a fraction.';
+        q.screenInstr = 'Type the mixed number. Then split it into wholes and a fraction.';
+        q.ans = `${w} ${frac} = ${w} + ${frac}`;
+        q.hint = `Count the full bars: ${w} wholes. The last bar shows ${frac}. The mixed number is ${w} ${frac}.`;
+    } else if (o.task === 'compose') {
         q.text = 'Write the mixed number.';
         q.screenInstr = 'Type the mixed number.';
         q.ans = `${w} ${frac}`;

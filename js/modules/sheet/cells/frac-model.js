@@ -624,8 +624,9 @@ function pwGeom(p, ctx) {
     const rowW = colW * parts.length;
     const maxW = Math.max(rowW, parts.length > 2 ? parts.length * (Math.max(wholeW, fracW) + 14) : 110);
     // compose: the whole box is the writing place - a wholes zone beside the fraction slot
-    const topW = p.form === 'compose' ? Math.max(G.topW, wholeW + 2 + fracW) : G.topW;
-    const topH = p.form === 'compose' ? partH : G.topH;
+    const writeTop = p.form === 'compose' || p.form === 'name';
+    const topW = writeTop ? Math.max(G.topW, wholeW + 2 + fracW) : G.topW;
+    const topH = writeTop ? partH : G.topH;
     const lab = zonePt(ctx) * PT_MM * 1.35;
     const W = Math.max(topW, rowW);
     return { k, G, hw, wholeW, fracBar, fracW, partH, parts, gap, colW, rowW, maxW, topW, topH, lab, W, H: topH + G.drop + partH + 1.5 + lab };
@@ -636,12 +637,16 @@ function pwVal(p, ctx, id) {
     if (p._marks) { const st = p._marks[id]; return st && st.value !== undefined && st.value !== null ? String(st.value) : ''; }
     if (ctx.state === 'blank') return '';
     const a = p.answer || {};
-    const key = /^w\d+$/.test(id) ? '1' : id === 'w' ? a.w : id === 'n' ? a.n : id === 'd' ? a.d : '';
+    const k0 = id.replace(/^m(?=[wnd]$)/, '');
+    const key = /^w\d+$/.test(id) ? '1' : k0 === 'w' ? a.w : k0 === 'n' ? a.n : k0 === 'd' ? a.d : '';
     if (ctx.state === 'wrong') {
         const wr = ctx.wrong || {};
         if (wr.slots && wr.slots[id] !== undefined && wr.slots[id] !== null) return String(wr.slots[id]);
         // a shown answer given as its text ("2 + 3/4", "1 + 1 + 3/4", "2 3/4"): its parts in the boxes' order
-        const t = String(wr.value === undefined || wr.value === null ? '' : wr.value).trim();
+        const halves = String(wr.value === undefined || wr.value === null ? '' : wr.value).split('=');
+        const top = /^m[wnd]$/.test(id);
+        const t = (top ? halves[0] : halves[halves.length - 1]).trim();
+        if (top) { const mm = /^(\d+)\s+(\d+)\s*\/\s*(\d+)$/.exec(t); return mm ? { mw: mm[1], mn: mm[2], md: mm[3] }[id] : ''; }
         const m = /^(.*?)\s*(\d+)\s*\/\s*(\d+)$/.exec(t);
         if (!m) return '';
         if (id === 'n') return m[2];
@@ -658,7 +663,11 @@ function pwSlot(ctx, id, v, { w, h, zone = false, pt, marks = null, bare = false
     const st = marks && marks[id];
     const ink = v !== '' ? (st ? (st.ink === 'trace' ? 'trace' : 'solid') : inkOf(ctx)) : null;
     const twin = isTwin(ctx);
-    const hook = twin ? ` data-mq-cell="1" data-mq-w="2" data-mq-pk="${id.replace(/\d+$/, '')}" data-mq-label="${id === 'n' ? 'numerator' : id === 'd' ? 'denominator' : 'wholes'}"` : '';
+    // (the top box of task 'name' writes the mixed number: slots mw / mn / md, composed "2 3/4 = " before the parts)
+    const base = id.replace(/\d+$/, '').replace(/^m(?=[wnd]$)/, '');
+    const label = { n: 'numerator', d: 'denominator', w: 'wholes' }[base] || 'wholes';
+    const after = id === 'mw' ? ' data-mq-after=" "' : id === 'md' ? ' data-mq-after=" = "' : '';
+    const hook = twin ? ` data-mq-cell="1" data-mq-w="2" data-mq-pk="${base}" data-mq-label="${/^m[wnd]$/.test(id) ? `mixed number ${label}` : label}"${after}` : '';
     // a zone is a writing place on the bar (no outline on paper); on screen it is a 48 px touch target with a hairline
     // (`bare`: the slot IS its part box - the box draws the outline, on screen too)
     const border = (zone && !twin) || bare ? 'border:0;' : `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[pwSize(ctx)])};`;
@@ -669,9 +678,9 @@ function pwSlot(ctx, id, v, { w, h, zone = false, pt, marks = null, bare = false
         + `${ink ? esc(v) : ''}</span>`;
 }
 /** The fraction writing place: a zone over a 1.5 pt bar over a zone (n / d slots). */
-function pwFracSlot(p, ctx, g) {
+function pwFracSlot(p, ctx, g, pre = '') {
     const pt = SZ(ctx).fracPt;
-    const z = (id) => pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.fracBar, h: g.hw, zone: true, pt });
+    const z = (id0) => { const id = pre + id0; return pwSlot(ctx, id, pwVal(p, ctx, id), { marks: p._marks, w: g.fracBar, h: g.hw, zone: true, pt }); };
     return `<span style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${z('n')}`
         + `<span aria-hidden="true" style="display:block;width:${L(ctx, g.fracBar)};border-top:${B(ctx, 1.5)} solid ${INK.ink};margin:${L(ctx, 1)} 0;"></span>${z('d')}</span>`;
 }
@@ -698,15 +707,18 @@ function pwDiagram(p, ctx) {
     const g = pwGeom(p, ctx);
     const twin = isTwin(ctx);
     const compose = p.form === 'compose';
+    // task 'name' (A18): every box empty - the top box writes the mixed number (mw / mn / md), the parts as task 'two'
+    const name = p.form === 'name';
     const ones = p.form === 'ones';
     const a = p.answer || {};
     // the whole box: the printed mixed number, or (compose) the writing place for it
     let top;
-    if (compose) {
-        const wv = pwVal(p, ctx, 'w');
+    if (compose || name) {
+        const pre = name ? 'm' : '';
+        const wv = pwVal(p, ctx, `${pre}w`);
         top = `<span class="fm-pw-whole" data-ws-slot-group="answer" style="display:inline-flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};box-sizing:border-box;`
             + `width:${L(ctx, g.topW)};min-height:${L(ctx, g.topH)};padding:${L(ctx, 1)};border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, SLOT.slotRadiusMm[g.k])};background:#fff;">`
-            + `${pwSlot(ctx, 'w', wv, { marks: p._marks, w: g.wholeW - 6, h: 2 * g.hw + 2, zone: true, pt: digitPt(ctx) })}${pwFracSlot(p, ctx, g)}</span>`;
+            + `${pwSlot(ctx, `${pre}w`, wv, { marks: p._marks, w: g.wholeW - 6, h: 2 * g.hw + 2, zone: true, pt: digitPt(ctx) })}${pwFracSlot(p, ctx, g, pre)}</span>`;
     } else {
         top = `<span class="fm-pw-whole" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, g.topW)};`
             + `height:${L(ctx, g.topH)};border:${B(ctx, 1.5)} solid ${INK.ink};background:#fff;">${pwMixed(ctx, p.w, p.n, p.d)}</span>`;
@@ -795,12 +807,12 @@ function partitionSlots(p) {
     const a = p.answer || {};
     const ids = p.form === 'ones' || (p.form === 'eq' && p.ones)
         ? [...Array.from({ length: Math.max(1, Math.round(Number(p.w) || 1)) }, (_, i) => `w${i + 1}`), 'n', 'd']
-        : ['w', 'n', 'd'];
-    const vals = { w: String(a.w), n: String(a.n), d: String(a.d) };
+        : p.form === 'name' ? ['mw', 'mn', 'md', 'w', 'n', 'd'] : ['w', 'n', 'd'];
+    const vals = { w: String(a.w), n: String(a.n), d: String(a.d), mw: String(a.w), mn: String(a.n), md: String(a.d) };
     const slots = {};
     for (const id of ids) slots[id] = { value: /^w\d+$/.test(id) ? '1' : vals[id], graded: true };
     const frac = `${a.n}/${a.d}`;
-    const display = p.form === 'compose' ? `${a.w} ${frac}`
+    const display = p.form === 'compose' ? `${a.w} ${frac}` : p.form === 'name' ? `${a.w} ${frac} = ${a.w} + ${frac}`
         : ids[0] === 'w1' ? [...ids.filter((i) => /^w\d+$/.test(i)).map(() => '1'), frac].join(' + ') : `${a.w} + ${frac}`;
     return { ids, slots, display };
 }

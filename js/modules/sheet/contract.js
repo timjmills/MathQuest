@@ -303,6 +303,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'mixed-partition': 'Write the mixed number as wholes and a fraction.',
     'mixed-ones': 'Write the mixed number as ones and a fraction.',
     'mixed-compose': 'Write the mixed number.',
+    'mixed-name': 'Write the mixed number. Then split it into wholes and a fraction.',
     'mixed-eq': 'Write the wholes and the fraction.',
     'circle-line': 'Circle the number line that shows the fraction.',
     'multiply-array': 'Multiply the rows by the columns. Write the answer.',

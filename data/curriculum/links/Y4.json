@@ -5088,6 +5088,10 @@
     {
      "key": "fractions:write_mixed_from_parts",
      "missing": "names the mixed number from its wholes and its fraction (printed in a part-whole); no counting on in fractions past 1"
+    },
+    {
+     "key": "fractions:name_mixed_from_model",
+     "missing": "reads the mixed number from shaded bars (one bar a whole) and writes it; no counting on in fractions past 1"
     }
    ],
    "verdict": "partial",
@@ -5170,6 +5174,9 @@
      "opts": {
       "mnTask": "ones"
      }
+    },
+    {
+     "key": "fractions:name_mixed_from_model"
     }
    ],
    "partial": [],
@@ -5263,6 +5270,10 @@
     {
      "key": "fractions:mixed_numbers_intro",
      "why": "a mixed number as wholes and a fraction before it is placed on a line (Y4.B7.S3, the step before)"
+    },
+    {
+     "key": "fractions:name_mixed_from_model",
+     "why": "a mixed number read from its bars and split into wholes and a fraction (Y4.B7.S3)"
     }
    ],
    "preBuild": [
@@ -5324,6 +5335,10 @@
     {
      "key": "fractions:mixed_numbers_intro",
      "why": "the wholes and the fraction of each mixed number, compared wholes first (Y4.B7.S3)"
+    },
+    {
+     "key": "fractions:name_mixed_from_model",
+     "why": "a mixed number read from its bars and split into wholes and a fraction (Y4.B7.S3)"
     }
    ],
    "preBuild": [],
@@ -5389,6 +5404,10 @@
     {
      "key": "fractions:mixed_numbers_intro",
      "why": "a mixed number as wholes and a fraction: the wholes become fifths, quarters ... (Y4.B7.S3)"
+    },
+    {
+     "key": "fractions:name_mixed_from_model",
+     "why": "a mixed number read from its bars and split into wholes and a fraction (Y4.B7.S3)"
     }
    ],
    "preBuild": [
@@ -5439,6 +5458,10 @@
     {
      "key": "fractions:mixed_numbers_intro",
      "why": "the wholes and the fraction of the mixed number, before each whole is renamed (Y4.B7.S3)"
+    },
+    {
+     "key": "fractions:name_mixed_from_model",
+     "why": "a mixed number read from its bars and split into wholes and a fraction (Y4.B7.S3)"
     }
    ],
    "preBuild": [],
@@ -5732,6 +5755,10 @@
     {
      "key": "fractions:mixed_numbers_intro",
      "why": "partitioning a mixed number into wholes and a fraction, so wholes add to wholes (Y4.B7.S3)"
+    },
+    {
+     "key": "fractions:name_mixed_from_model",
+     "why": "a mixed number read from its bars and split into wholes and a fraction (Y4.B7.S3)"
     }
    ],
    "preBuild": [

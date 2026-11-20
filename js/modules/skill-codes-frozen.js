@@ -387,6 +387,8 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-11-20 lane lf-algebra, mixed-partition card: the new skill and its preset (mnTask compose). ZM, ZN (ZK and ZL
     // are left to the parallel lf-algebra multiply-three build). APPEND ONLY. ----
     "fractions:mixed_numbers_intro": "ZM", "fractions:write_mixed_from_parts": "ZN",
+    // (lead ruling A18, 2026-11-20: the preset name_mixed_from_model. ZP, the next free code after ZN - no O in a code.)
+    "fractions:name_mixed_from_model": "ZP",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

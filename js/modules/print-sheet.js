@@ -2870,7 +2870,8 @@ function optionTitle(sk, baseICan) {
     return optionTitleBase(sk, baseICan);
 }
 
-const TITLE_FROM_OPTS = new Set(['count_by_tables', 'mult_properties', 'arrays_groups']);
+// (+ mixed_numbers_intro, lf-algebra 2026-11-20: its title and instruction follow mnTask - compose / name write the mixed number)
+const TITLE_FROM_OPTS = new Set(['count_by_tables', 'mult_properties', 'arrays_groups', 'mixed_numbers_intro']);
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
 function skillMeta(sk, q) {
     // A ranged + / − id whose band (or regrouping, on a _mixed id) is set below its own name

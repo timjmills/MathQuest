@@ -1138,6 +1138,7 @@ export const SKILL_WRM = {
     // 2026-11-20 (lane lf-algebra, mixed-partition card): partition a mixed number; its preset writes the mixed number from
     // its parts (S2's "name the mixed number", in part).
     'fractions:mixed_numbers_intro': ['Y4.B7.S3'],
+    'fractions:name_mixed_from_model': ['Y4.B7.S3', { step: 'Y4.B7.S2', partial: 'naming the mixed number a bar model shows (the counting-beyond-1 line is not built)' }],
     'fractions:write_mixed_from_parts': [{ step: 'Y4.B7.S2', partial: 'naming the mixed number from its wholes and its fraction (the counting-beyond-1 line is not built)' }],
     'fraction_operations:unit_frac_div_whole': ['Y6.B4.S3'],
     'decimals:div_decimal_by_whole': ['Y6.B8.S8'],

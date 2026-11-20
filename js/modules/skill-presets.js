@@ -170,6 +170,9 @@ export const SKILL_PRESETS = Object.freeze({
     // 2026-11-20 (lane lf-algebra, mixed-partition card Q7): writing the mixed number from its parts is its own task (WRM Y4.B7.S2
     // "name the mixed number"); mnTask ones / mnForm eq / model none stay plain options.
     'fractions:write_mixed_from_parts': { skill: 'mixed_numbers_intro', opts: { mnTask: 'compose' } },
+    // (lead ruling A18 as corrected, 2026-11-20: read the bars and write the mixed number AND its parts - mnTask 'name', a
+    // distinct task, a preset by the 10-17 rule)
+    'fractions:name_mixed_from_model': { skill: 'mixed_numbers_intro', opts: { mnTask: 'name' } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

@@ -332,7 +332,7 @@ export const VALUE_TOKENS = Object.freeze({
     patTask: Object.freeze({ parity: 'P', feature: 'F', truefalse: 'T', next: 'N', rule: 'R', far: 'X' }),
     growShape: Object.freeze({ dots: 'D', squares: 'S', mixed: 'M' }),
     // lane lf-algebra (2026-11-20): fractions:mixed_numbers_intro
-    mnTask: Object.freeze({ partition: 'P', ones: 'O', compose: 'C' }),
+    mnTask: Object.freeze({ partition: 'P', ones: 'O', compose: 'C', name: 'N' }),
     mnDenoms: Object.freeze({ 'halves-quarters': 'H', 'to-8': 'E' }),
     mnForm: Object.freeze({ diagram: 'D', eq: 'E' }),
     // lane lf-vocab (2026-11-07)

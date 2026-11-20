@@ -1347,6 +1347,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `mixed-partition` | Write the mixed number as wholes and a fraction. | a mixed number in a part-whole diagram: write the wholes and the fraction in the part boxes (added 2026-11-20, lane lf-algebra, fractions:mixed_numbers_intro) |
 | `mixed-ones` | Write the mixed number as ones and a fraction. | the same, one part box per whole (2 3/4 = 1 + 1 + 3/4) (added 2026-11-20) |
 | `mixed-compose` | Write the mixed number. | the wholes and the fraction printed; write the mixed number in the whole box (added 2026-11-20) |
+| `mixed-name` | Write the mixed number. Then split it into wholes and a fraction. | every box empty: read the bars, write the mixed number, then its wholes and fraction (added 2026-11-20, lead ruling A18) |
 | `mixed-eq` | Write the wholes and the fraction. | the equation form: 2 3/4 = [ ] + [ ]/[ ] (added 2026-11-20) |
 
 | Id | Rule |

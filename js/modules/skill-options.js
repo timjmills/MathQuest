@@ -4060,13 +4060,16 @@ const LF_ALGEBRA_MIXED_OPTIONS = {
                 { v: 'partition', l: 'Split it: the wholes and the fraction (2 3/4 = 2 + 3/4)' },
                 { v: 'ones', l: 'Split it into ones: 1 + 1 + the fraction (2 3/4 = 1 + 1 + 3/4)' },
                 { v: 'compose', l: 'Write the mixed number from its wholes and fraction' },
+                // (APPENDED, lead ruling A18 2026-11-20: every box empty - the preset name_mixed_from_model)
+                { v: 'name', l: 'Read the bars: write the mixed number, then its wholes and fraction' },
             ],
-            // 'ones' adds a part box for every whole (a wider diagram)
-            addsDrawingValues: ['ones'],
+            // 'ones' adds a part box for every whole (a wider diagram); 'compose' and 'name' keep the bar model on every item
+            addsDrawingValues: ['ones', 'compose', 'name'],
             helpShort: 'One task a page: split the mixed number, split it into ones, or put the parts back together.',
             help: 'Split it: the mixed number is printed in the top box; the pupil writes the wholes and the fraction in the two boxes under it. '
                 + 'Into ones: one box for each whole (each takes 1) and one for the fraction. Write the mixed number: the parts are printed, '
-                + 'the pupil writes the mixed number in the top box.',
+                + 'the pupil writes the mixed number in the top box. Read the bars: every box is empty; the pupil writes the mixed number '
+                + 'from the bars, then its wholes and fraction. These two read the bars, so the bar model stays on every item.',
         },
         {
             id: 'mnDenoms', label: 'Denominators', type: 'enum', default: 'halves-quarters', group: 'difficulty',

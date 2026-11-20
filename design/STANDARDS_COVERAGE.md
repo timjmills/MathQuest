@@ -24,7 +24,7 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 736 live skills; 627 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 737 live skills; 628 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
@@ -1392,7 +1392,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.NF.A.1** — FULL. Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts; understand a fraction a/b as the quantity formed by a parts of size 1/b.  
   Taught by: Identify Fractions (Visual) (`fractions:identify`); Write the Fraction Shown (`fractions:write_fraction`); Shade the Fraction (`fractions:shade_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
-  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`, `fractions:identify_fraction_nl`, `fractions:write_fraction_nl`, `fractions:mixed_numbers_intro`, `fractions:write_mixed_from_parts`
+  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`, `fractions:identify_fraction_nl`, `fractions:write_fraction_nl`, `fractions:mixed_numbers_intro`, `fractions:write_mixed_from_parts`, `fractions:name_mixed_from_model`
 - **3.NF.A.2** — FULL (from its parts). Understand a fraction as a number on the number line; represent fractions on a number line diagram.  
 -   **3.NF.A.2a** — FULL. Represent a fraction 1/b on a number line diagram by defining the interval from 0 to 1 as the whole and partitioning it into b equal parts. Recognize that each part has size 1/b and that the endpoint of the part based at 0 locates the number 1/b on the number line.  
   Taught by: Fractions on Number Line (Visual) (`composing:fraction_number_line`); Place Fractions on Number Line (`fractions:graph_fractions`); Place Fractions on a Number Line (`fractions:fraction_nl_drag`)  
@@ -1547,7 +1547,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `fractions:compose_target_frac`, `fraction_operations:add_frac_like_nv`, `fraction_operations:sub_frac_like_nv`
 -   **4.NF.B.3b** — FULL. Decompose a fraction into a sum of fractions with the same denominator in more than one way, recording each decomposition by an equation. Justify decompositions, e.g., by using a visual fraction model. Examples: 3/8 = 1/8 + 1/8 + 1/8 ; 3/8 = 1/8 + 2/8 ; 2 1/8 = 1 + 1 + 1/8 = 8/8 + 8/8 + 1/8.  
   Taught by: Decompose to Unit Fractions (Visual) (`fraction_operations:decompose_fractions`); Decompose to Unit Fractions (No Visuals) (`fraction_operations:decompose_frac_nv`); Compose a Target Fraction (`fractions:compose_target_frac`); Partition a Mixed Number (`fractions:mixed_numbers_intro`)  
-  Also tagged: `fractions:improper_mixed`, `fractions:mixed_improper_visual`, `fractions:write_mixed_from_parts`
+  Also tagged: `fractions:improper_mixed`, `fractions:mixed_improper_visual`, `fractions:write_mixed_from_parts`, `fractions:name_mixed_from_model`
 -   **4.NF.B.3c** — FULL. Add and subtract mixed numbers with like denominators, e.g., by replacing each mixed number with an equivalent fraction, and/or by using properties of operations and the relationship between addition and subtraction.  
   Taught by: Add Mixed Numbers (Like Denom) (Visual) (`fraction_operations:add_mixed_like`); Subtract Mixed Numbers (Like Denom) (Visual) (`fraction_operations:sub_mixed_like`)  
   Also tagged: `fractions:improper_mixed`, `fractions:mixed_improper_visual`, `fraction_operations:add_mixed_like_nv`, `fraction_operations:sub_mixed_like_nv`

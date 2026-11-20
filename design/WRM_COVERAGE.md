@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 514 (59%), partial only 152 (17%), gap 206 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 406 skills carry WRM tags. 162 proposals (119 new skills, 43 options on existing skills) would close every gap.
+- 407 skills carry WRM tags. 162 proposals (119 new skills, 43 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -2659,11 +2659,12 @@ whatever happens to the WRM gaps.
   Skills: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
   Vocabulary: whole, equal parts, denominator  
 - **Y4.B7.S2** Count beyond 1 — PARTIAL. _3.NF.A.1, M.EE.3.NF.1_  
+  Partial: Name a Mixed Number from a Model (`fractions:name_mixed_from_model`), missing naming the mixed number a bar model shows (the counting-beyond-1 line is not built)  
   Partial: Write a Mixed Number from Wholes and a Fraction (`fractions:write_mixed_from_parts`), missing naming the mixed number from its wholes and its fraction (the counting-beyond-1 line is not built)  
   Proposal: Fractions Beyond 1 (option)  
   Vocabulary: interval, mixed number, integer  
 - **Y4.B7.S3** Partition a mixed number — covered. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
-  Skills: Partition a Mixed Number (`fractions:mixed_numbers_intro`)  
+  Skills: Partition a Mixed Number (`fractions:mixed_numbers_intro`); Name a Mixed Number from a Model (`fractions:name_mixed_from_model`)  
   Vocabulary: partition, mixed number, fractional part  
 - **Y4.B7.S4** Number lines with mixed numbers — covered. _3.NF.A.2, M.EE.3.NF.2_  
   Skills: Fractions on Number Line (Visual) (`composing:fraction_number_line`)  
