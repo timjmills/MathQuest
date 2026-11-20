@@ -620,6 +620,55 @@ function mtWrong(q) {
     ]);
 }
 
+/**
+ * Stretch (card section 7, role:stretch): FOUR factors. The item's three factors and one more small factor k (2 to 9, the
+ * one that gives the product N the most ways, four or more) make the worked row; the pupil writes N as four numbers multiplied
+ * (no 1s) in other ways, the check column is the product. No k works (a factor of 1, a product with too few ways): null, and
+ * the role deals another item.
+ */
+const mtWays = (N) => {
+    const ways = [];
+    for (let a = 2; a ** 4 <= N; a++) {
+        if (N % a) continue;
+        for (let b = a; a * b ** 3 <= N; b++) {
+            if ((N / a) % b) continue;
+            for (let c = b; a * b * c * c <= N; c++) {
+                const d = N / (a * b * c);
+                if (Number.isInteger(d) && d >= c) ways.push([a, b, c, d]);
+            }
+        }
+    }
+    return ways;
+};
+function mtOpen(q) {
+    const m = mtOf(q);
+    if (!m || m.form === 'missing' || m.f.some((v) => v < 2)) return null;
+    // (the k, 2 to 9, whose N has the most ways - up to the seven a page's table holds with its worked row - so the table fills
+    // its cell; N stays a 3-digit number)
+    let best = null;
+    for (let k = 2; k <= 9; k++) {
+        const N = m.P * k;
+        if (N > 999) break;
+        const n = Math.min(7, mtWays(N).length);
+        if (n >= 4 && (!best || n > best.n)) best = { k, n };
+    }
+    for (const k of best ? [best.k] : []) {
+        const N = m.P * k;
+        const ways = mtWays(N);
+        const ex = [...m.f, k];
+        const exKey = ex.slice().sort((x, y) => x - y).join(',');
+        const rest = ways.filter((w) => w.join(',') !== exKey);
+        return {
+            prompt: [`${m.f.join(' × ')} × ${k} = ${N}.`, `Find other ways to make ${N} with four numbers.`],
+            columns: ['Number', 'Number', 'Number', 'Number', 'Check: product'],
+            example: [...ex, N],
+            keyRows: rest.map((w) => [...w, N]),
+            rule: `× = ${N}`, total: ways.length, basic: false,
+        };
+    }
+    return null;
+}
+
 /** The task a page carries: the item's own, else the option (a page with no item yet). */
 const mtTask = (ref = {}) => {
     const m = mtOf(ref && ref.q);
@@ -634,6 +683,7 @@ registerSkill('multiplication:multiply_three_numbers', {
     misconceptions: ['mt-add-last', 'mt-stop-pair', 'mt-reuse', 'mt-grouping-changes'],
     workedSteps: (q) => mtSteps(q),
     wrongAnswer: (q) => mtWrong(q),
+    open: (q) => mtOpen(q),
     // (card section 3, Q8: solve / choose M 8 / L 6, two across; both one a row; missing M 10 / L 8)
     footprint: { kind: 'equation', factLike: false, maxCols: 2, measure: true },
     // (card section 7a: the Test is unaided - no printed bracket)

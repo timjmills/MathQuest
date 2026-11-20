@@ -651,3 +651,14 @@
 .ws-page .ws-grid > .ws-cell.ws-rowstretch[data-ws-cell]:not([data-ws-writeabove]):not(.blankrun) > [data-ws-stretchmid] { margin-top: 1.5mm !important; margin-bottom: -1.5mm !important; }
 .ws-page .ws-grid > .ws-cell.ws-rowstretch[data-ws-cell]:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(.blankrun) > [data-ws-stretchmid]:not(.pv-nospacer):has(> .ws-eq:first-child) {
     margin-top: calc(1.5mm - max(0mm, calc(var(--ws-tab, 5mm) - 2mm)) / 2) !important; margin-bottom: calc(max(0mm, calc(var(--ws-tab, 5mm) - 2mm)) / 2 - 1.5mm) !important; }
+
+/* multiply_three_numbers Stretch (lane lf-algebra, card design/cards/multiply-three role:stretch): a FIVE-column results table
+   (four numbers and the product check). Number columns 20 mm, and the closing frames go under the table when they do not fit
+   beside it - five 28 mm columns ran 25-39 mm past the cell's border (ws-empty-band EB-EDGE). Additive: only a mq-cols5 table. */
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols5 td{min-width:20mm;width:20mm}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols5 td:last-child{width:auto;min-width:30mm}
+:is(.ws-page,.ws-sheet) .mq-stretch-main:has(> .mq-table.mq-cols5){flex-wrap:wrap;align-items:flex-start;row-gap:6mm}
+:is(.ws-page,.ws-sheet) .mq-stretch-main:has(> .mq-table.mq-cols5) > .mq-closing{flex:1 1 100%}
+/* (the five-column rows 2 mm taller than the three-column table's: a 6-row table with the frames under it filled 66 % of the
+   one-cell page at M, a 31 % band under the frames - ws-empty-band EB-BAND) */
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols5 td{height:calc(var(--ws-hw) + 5mm)}

@@ -132,7 +132,10 @@ export function prepare(it, info = {}) {
     // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A, centred, as before - lf-vocab r5, ws-empty-band)
     // (a chart window past 100 - chart_120's band 120, three-digit squares, 85 mm at L - states its true width as footprint
     // inkWMm, so it takes the UNDER layout: A | B at half the cell each, the response under them; stacked it held one a page)
-    const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && workW > halfBeside);
+    // (a three-factor CHAIN - multiply_three_numbers, a four-line column of work 66-72 mm at L - takes the UNDER layout: A | B at
+    // half the cell each; stacked A over B it stood 147 mm and held ONE item at L, ws-cell-checks LONE-PAGE, lf-algebra rebuild)
+    const chainEq = it.template === 'equation' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.chain);
+    const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && !chainEq && workW > halfBeside);
     const under = !legacy && !twoCol && (story1 ? true : workW > halfBeside && workW <= halfCell);
     const wide = legacy || twoCol || (!under && workW > halfBeside);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');

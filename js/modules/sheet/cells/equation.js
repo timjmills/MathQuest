@@ -352,6 +352,12 @@ function chainSlotHtml(s, ctx, marks) {
         key = m ? m.value : '';
     }
     const c = Object.assign({}, ctx, { state: st });
+    // A shown answer with no slot of its own for this place (Reason It's RIGHT panel: shown = the product, no slots) writes the
+    // chain's own work here, never the product in every box ("6 × 60 = 60", lf-algebra rebuild 2026-11-20). A wrong answer's
+    // slots (the provider writes every place) are kept as they are.
+    if (st === 'wrong' && ctx.wrong && !(ctx.wrong.slots && ctx.wrong.slots[s.id] !== undefined) && !s.graded) {
+        c.wrong = Object.assign({}, ctx.wrong, { slots: Object.assign({}, ctx.wrong.slots || {}, { [s.id]: s.value }) });
+    }
     let html = blank(s, c, st === 'wrong' ? null : key);
     // AK-2: a value on the answer line is written at the digit size, as the one-line sentence draws it.
     if (s.shape === 'line') html = html.replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${st === 'answered' || st === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`);
@@ -367,7 +373,7 @@ function chainRender(p, ctx, marks = null) {
     const op = (v) => `<span class="o" style="width:0.4em">${v}</span>`;
     const expr = (bits) => `<span class="ws-mt-expr" style="display:inline-flex;align-items:flex-end;gap:0.14em;white-space:nowrap">${bits.join('')}</span>`;
     const row = (eq, bits) => `<span class="ws-mt-eq" style="text-align:center">${eq ? '<span class="o">=</span>' : ''}</span>${expr(bits)}`;
-    const grid = (rows, extra = '') => `<div class="ws-eq ws-mt-chain" data-ws-chain="${esc(p.form || 'solve')}"${extra} style="margin-top:auto;margin-bottom:auto;display:inline-grid;grid-template-columns:1em auto;column-gap:0.28em;row-gap:0.3em;align-items:end;justify-items:start">${rows.join('')}</div>`;
+    const grid = (rows, extra = '') => `<div class="ws-eq ws-mt-chain" data-ws-chain="${esc(p.form || 'solve')}"${extra} style="display:inline-grid;grid-template-columns:1em auto;column-gap:0.28em;row-gap:0.3em;align-items:end;justify-items:start">${rows.join('')}</div>`;
     const grouped = (L, bracket) => (L
         ? [...(bracket ? [op('(')] : []), n(a), X, n(b), ...(bracket ? [op(')')] : []), X, n(c)]
         : [n(a), X, ...(bracket ? [op('(')] : []), n(b), X, n(c), ...(bracket ? [op(')')] : [])]);
@@ -387,7 +393,7 @@ function chainRender(p, ctx, marks = null) {
             row(true, [ans]),
         ]);
         // (the two chains stacked: side by side they overran a lesson cell - ws-cell-checks OVERFLOW)
-        return `<div class="ws-mt-both" data-ws-chain="both" style="margin-top:auto;margin-bottom:auto;display:flex;flex-direction:column;align-items:flex-start;row-gap:0.6em">${one(true, S.inner, S.answer)}${one(false, S.inner2, S.answer2)}</div>`;
+        return `<div class="ws-mt-both" data-ws-chain="both" style="display:flex;flex-direction:column;align-items:flex-start;row-gap:0.6em">${one(true, S.inner, S.answer)}${one(false, S.inner2, S.answer2)}</div>`;
     }
     const pr = chainPair(p);
     const rows = [];
@@ -422,5 +428,7 @@ function chainFootprint(p, ctx) {
     const chainW = 1.28 * em + Math.max(em * (3 * 0.58 + 2 + 0.8 + 6 * 0.14), B + blankWidth(1, ctx.size) + em * (1 + 2 * 0.14) + 2);
     const wMm = chainW + 6;
     const hMm = lines * em * 1.15 + (lines - 1) * 0.3 * em + (p.form === 'both' ? 0.3 * em : 0) + 4;
+    // (the chain stands at the TOP of its cell: centred in a stretched cell, the white above it read as drawn height - ws-empty-band
+    // EB-FOOT 12-17 % on Independent / More practice; lf-algebra rebuild 2026-11-20)
     return { wMm: Math.ceil(wMm), hMm: Math.ceil(hMm), factLike: false, maxCols: 2, stretchCap: STRETCH_CAP.equation };
 }
