@@ -14697,6 +14697,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-sayless-break-apart",
+   "check": "ws-hint-no-blank SAYLESS: a skill whose provider has a Say frame shows a Say line on screen (mult_break_apart: the split frame held two answers, the parts, so the screen filled none of it)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK SAYLESS (lead routing 2026-11-20, sharded precritic on the lf-ops sizes branch)",
+   "browser": true,
+   "fail": {
+    "commit": "15ce118c7",
+    "state": "sizes branch: multiplication:mult_break_apart has no Say line on screen and is not pinned (SAYLESS)"
+   },
+   "pass": {
+    "commit": "f6135cefd",
+    "state": "mult_properties screenHelp: on a split item the pupil says '<rows> times <cols> is ___.' (the product the ONE gap; a number-free line when a factor equals a part)"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill multiplication:mult_break_apart --seeds 12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
