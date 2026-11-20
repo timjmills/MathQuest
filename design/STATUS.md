@@ -974,3 +974,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-20 — Deploy Pre-skill Check fill (lf-roles; narrow critic PASS 9/8/8/8): PSC ceilings 12 (M) / 8 (L); pre-skill-check joins EBLAST_BLOCKING_ROLES
 - One-prerequisite fact sheets 4 -> 12 (M) / 8 (L) on one page; multi-prerequisite sheets at most 2 pages (R13 2+2); EB-LASTPAGE / CAP-PARITY block on pre-skill-check. Next week: trim over-ceiling bases, stack-cell bands, D1-D4.
 - Gates: boot-smoke, code-snapshot, no-size-s, roles-unit, empty-band self-test / capacity / pin, backtest psc-fill-eblast, key-json (sample), simple-print, self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy lesson first-page fix (lf-engine; shared narrow critic: strict improvement, the three target defects fixed)
+- No WRM lesson prints a blank first page (empty anchor chart dropped; LESSON-EMPTY-FIRST 59 -> 0); times-table lessons model their own table (per-step seed); OPENER-SAME 22 -> 6; CELL-FITS on lesson pages with 28 known pages pinned shrink-only (cellfits-known.json); two_step_letter_equation chart re-pinned (4 full-width pages, lead ruling). Exposed first-page content defects listed per lane for next week.
+- Gates: boot-smoke, code-snapshot, no-size-s, roles-unit, lesson-pages, backtests lesson-empty-first / opener-same / cell-fits, simple-print, self-tests, precritic-plan, capacity-pin, lesson baseline.
+- Known red (lead-accepted): LESSON-OPENER-SAME 6 pairs = 5 confirmed check misfires (lf-checks fixes the signature next week) + Y4.B14.S4/S5 geo_rotate (identical skills, content item); 22 on master before.
