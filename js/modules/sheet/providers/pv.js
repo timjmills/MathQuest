@@ -136,7 +136,7 @@ registerSkill('placevalue:identify', {
         if (!p.place) return null;
         return {
             steps: [`Find the underlined digit: ${p.digit}.`, `Read the letter above it: ${LETTER[p.place]}.`,
-                `Find the place name that starts with ${LETTER[p.place]}${LETTER[p.place] === 'T' && p.n >= 1000 ? ', not Th' : ''}.`, ...(p.writeValue ? [`Then write what the ${p.digit} is worth.`] : [])],
+                `Find the place name that starts with ${LETTER[p.place]}${LETTER[p.place] === 'T' && p.n >= 1000 ? ', not Th' : ''}.`],
             say: `The ${p.digit} is in the ___ place.`,
         };
     },

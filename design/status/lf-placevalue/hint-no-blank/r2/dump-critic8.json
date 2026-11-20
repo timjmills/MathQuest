@@ -1,0 +1,357 @@
+[
+ {
+  "seed": 3,
+  "key": "addition:add_facts",
+  "text": "7 + 3 = ?",
+  "ans": 10,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start with 7.</li><li>Count on 3: 8, 9, …</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>7 plus 3 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start with 7. 2. Count on 3: 8, 9, … Say: 7 plus 3 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart with 7.Count on 3: 8, 9, …Say: 7 plus 3 equals ___. Listen",
+  "hint": "Start at 7 and count up 3. Or: add 7 + 3.",
+  "say": "7 plus 3 equals ___.",
+  "steps": [
+   "Start with 7.",
+   "Count on 3: 8, 9, …"
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "addition:add_facts",
+  "text": "8 + 7 = ?",
+  "ans": 15,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start with 8.</li><li>Make 10: 8 + 2 = 10.</li><li>7 is 2 and 5.</li><li>Now work out 10 + 5.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>8 plus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start with 8. 2. Make 10: 8 plus 2 equals 10. 3. 7 is 2 and 5. 4. Now work out 10 plus 5. Say: 8 plus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart with 8.Make 10: 8 + 2 = 10.7 is 2 and 5.Now work out 10 + 5.Say: 8 plus 7 equals ___. Listen",
+  "hint": "Start at 8 and count up 7. Or: add 8 + 7.",
+  "say": "8 plus 7 equals ___.",
+  "steps": [
+   "Start with 8.",
+   "Make 10: 8 + 2 = 10.",
+   "7 is 2 and 5.",
+   "Now work out 10 + 5."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "addition:add_facts",
+  "text": "6 + 7 = ?",
+  "ans": 13,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start with 7.</li><li>Make 10: 7 + 3 = 10.</li><li>6 is 3 and 3.</li><li>Now work out 10 + 3.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>6 plus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start with 7. 2. Make 10: 7 plus 3 equals 10. 3. 6 is 3 and 3. 4. Now work out 10 plus 3. Say: 6 plus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart with 7.Make 10: 7 + 3 = 10.6 is 3 and 3.Now work out 10 + 3.Say: 6 plus 7 equals ___. Listen",
+  "hint": "Start at 6 and count up 7. Or: add 6 + 7.",
+  "say": "6 plus 7 equals ___.",
+  "steps": [
+   "Start with 7.",
+   "Make 10: 7 + 3 = 10.",
+   "6 is 3 and 3.",
+   "Now work out 10 + 3."
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "subtraction:sub_facts",
+  "text": "10 − 7 = ?",
+  "ans": 3,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Think addition: 7 plus what number makes 10?</li><li>So 10 − 7.</li><li>Now: write how many are left.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>10 minus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Think addition: 7 plus what number makes 10? 2. So 10 minus 7. 3. Now: write how many are left. Say: 10 minus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThink addition: 7 plus what number makes 10?So 10 − 7.Now: write how many are left.Say: 10 minus 7 equals ___. Listen",
+  "hint": "Start at 10 and count back 7. Or think: which number plus 7 makes 10?",
+  "say": "10 minus 7 equals ___.",
+  "steps": [
+   "Think addition: 7 plus what number makes 10?",
+   "So 10 − 7.",
+   "Now: write how many are left."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "subtraction:sub_facts",
+  "text": "15 − 7 = ?",
+  "ans": 8,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Think addition: 7 plus what number makes 15?</li><li>So 15 − 7.</li><li>Now: write how many are left.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>15 minus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Think addition: 7 plus what number makes 15? 2. So 15 minus 7. 3. Now: write how many are left. Say: 15 minus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThink addition: 7 plus what number makes 15?So 15 − 7.Now: write how many are left.Say: 15 minus 7 equals ___. Listen",
+  "hint": "Start at 15 and count back 7. Or think: which number plus 7 makes 15?",
+  "say": "15 minus 7 equals ___.",
+  "steps": [
+   "Think addition: 7 plus what number makes 15?",
+   "So 15 − 7.",
+   "Now: write how many are left."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "subtraction:sub_facts",
+  "text": "13 − 7 = ?",
+  "ans": 6,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Think addition: 7 plus what number makes 13?</li><li>So 13 − 7.</li><li>Now: write how many are left.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>13 minus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Think addition: 7 plus what number makes 13? 2. So 13 minus 7. 3. Now: write how many are left. Say: 13 minus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThink addition: 7 plus what number makes 13?So 13 − 7.Now: write how many are left.Say: 13 minus 7 equals ___. Listen",
+  "hint": "Start at 13 and count back 7. Or think: which number plus 7 makes 13?",
+  "say": "13 minus 7 equals ___.",
+  "steps": [
+   "Think addition: 7 plus what number makes 13?",
+   "So 13 − 7.",
+   "Now: write how many are left."
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "division:div_facts",
+  "text": "99 ÷ 9 = ?",
+  "ans": 11,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read the division: 99 ÷ 9.</li><li>Think: 9 times what number makes 99?</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>99 divided by 9 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read the division: 99 divided by 9. 2. Think: 9 times what number makes 99? Say: 99 divided by 9 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead the division: 99 ÷ 9.Think: 9 times what number makes 99?Say: 99 divided by 9 equals ___. Listen",
+  "hint": "How many groups of 9 can you make from 99? Think: which number times 9 makes 99?",
+  "say": "99 divided by 9 equals ___.",
+  "steps": [
+   "Read the division: 99 ÷ 9.",
+   "Think: 9 times what number makes 99?"
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "division:div_facts",
+  "text": "18 ÷ 9 = ?",
+  "ans": 2,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read the division: 18 ÷ 9.</li><li>Think: 9 times what number makes 18?</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>18 divided by 9 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read the division: 18 divided by 9. 2. Think: 9 times what number makes 18? Say: 18 divided by 9 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead the division: 18 ÷ 9.Think: 9 times what number makes 18?Say: 18 divided by 9 equals ___. Listen",
+  "hint": "How many groups of 9 can you make from 18? Think: which number times 9 makes 18?",
+  "say": "18 divided by 9 equals ___.",
+  "steps": [
+   "Read the division: 18 ÷ 9.",
+   "Think: 9 times what number makes 18?"
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "division:div_facts",
+  "text": "63 ÷ 9 = ?",
+  "ans": 7,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read the division: 63 ÷ 9.</li><li>Think: 9 times what number makes 63?</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>63 divided by 9 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read the division: 63 divided by 9. 2. Think: 9 times what number makes 63? Say: 63 divided by 9 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead the division: 63 ÷ 9.Think: 9 times what number makes 63?Say: 63 divided by 9 equals ___. Listen",
+  "hint": "How many groups of 9 can you make from 63? Think: which number times 9 makes 63?",
+  "say": "63 divided by 9 equals ___.",
+  "steps": [
+   "Read the division: 63 ÷ 9.",
+   "Think: 9 times what number makes 63?"
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "addition:add_wp_20",
+  "text": "Lena has 16 books. Lena gets 2 more books. How many books does Lena have now?",
+  "ans": 18,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The numbers are 16 and 2.</li><li>I know both parts: 16 and 2. I add.</li><li>Write 16 + 2 in the boxes.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The answer is ___ books.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The numbers are 16 and 2. 2. I know both parts: 16 and 2. I add. 3. Write 16 plus 2 in the boxes. Say: The answer is blank books.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe numbers are 16 and 2.I know both parts: 16 and 2. I add.Write 16 + 2 in the boxes.Say: The answer is ___ books. Listen",
+  "hint": "Add: 16 + 2.",
+  "say": "The answer is ___ books.",
+  "steps": [
+   "The numbers are 16 and 2.",
+   "I know both parts: 16 and 2. I add.",
+   "Write 16 + 2 in the boxes."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "addition:add_wp_20",
+  "text": "Zara has 5 books. Zara gets 11 more books. How many books does Zara have now?",
+  "ans": 16,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The numbers are 5 and 11.</li><li>I know both parts: 5 and 11. I add.</li><li>Write 5 + 11 in the boxes.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The answer is ___ books.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The numbers are 5 and 11. 2. I know both parts: 5 and 11. I add. 3. Write 5 plus 11 in the boxes. Say: The answer is blank books.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe numbers are 5 and 11.I know both parts: 5 and 11. I add.Write 5 + 11 in the boxes.Say: The answer is ___ books. Listen",
+  "hint": "Add: 5 + 11.",
+  "say": "The answer is ___ books.",
+  "steps": [
+   "The numbers are 5 and 11.",
+   "I know both parts: 5 and 11. I add.",
+   "Write 5 + 11 in the boxes."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "addition:add_wp_20",
+  "text": "Noor has 10 pencils. Noor gets 7 more pencils. How many pencils does Noor have now?",
+  "ans": 17,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The numbers are 10 and 7.</li><li>I know both parts: 10 and 7. I add.</li><li>Write 10 + 7 in the boxes.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The answer is ___ pencils.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The numbers are 10 and 7. 2. I know both parts: 10 and 7. I add. 3. Write 10 plus 7 in the boxes. Say: The answer is blank pencils.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe numbers are 10 and 7.I know both parts: 10 and 7. I add.Write 10 + 7 in the boxes.Say: The answer is ___ pencils. Listen",
+  "hint": "Add: 10 + 7.",
+  "say": "The answer is ___ pencils.",
+  "steps": [
+   "The numbers are 10 and 7.",
+   "I know both parts: 10 and 7. I add.",
+   "Write 10 + 7 in the boxes."
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "hundreds",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 8.</li><li>Read the letter above it: H.</li><li>Find the place name that starts with H.</li><li>Then write what the 8 is worth.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 8 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 8. 2. Read the letter above it: H. 3. Find the place name that starts with H. 4. Then write what the 8 is worth. Say: The 8 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 8.Read the letter above it: H.Find the place name that starts with H.Then write what the 8 is worth.Say: The 8 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 8 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 8.",
+   "Read the letter above it: H.",
+   "Find the place name that starts with H.",
+   "Then write what the 8 is worth."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "tens",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 7.</li><li>Read the letter above it: T.</li><li>Find the place name that starts with T.</li><li>Then write what the 7 is worth.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 7 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 7. 2. Read the letter above it: T. 3. Find the place name that starts with T. 4. Then write what the 7 is worth. Say: The 7 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 7.Read the letter above it: T.Find the place name that starts with T.Then write what the 7 is worth.Say: The 7 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 7 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 7.",
+   "Read the letter above it: T.",
+   "Find the place name that starts with T.",
+   "Then write what the 7 is worth."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "hundreds",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 6.</li><li>Read the letter above it: H.</li><li>Find the place name that starts with H.</li><li>Then write what the 6 is worth.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 6 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 6. 2. Read the letter above it: H. 3. Find the place name that starts with H. 4. Then write what the 6 is worth. Say: The 6 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 6.Read the letter above it: H.Find the place name that starts with H.Then write what the 6 is worth.Say: The 6 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 6 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 6.",
+   "Read the letter above it: H.",
+   "Find the place name that starts with H.",
+   "Then write what the 6 is worth."
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "placevalue:digit_value_unit_form",
+  "text": "The underlined digit is worth ___ ___.",
+  "ans": "8 hundreds",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The underlined digit is 8.</li><li>It is in the hundreds place.</li><li>8 hundreds is 800.</li><li>Write 8, then choose hundreds.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 8 is worth 8 hundreds.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The underlined digit is 8. 2. It is in the hundreds place. 3. 8 hundreds is 800. 4. Write 8, then choose hundreds. Say: The 8 is worth 8 hundreds.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe underlined digit is 8.It is in the hundreds place.8 hundreds is 800.Write 8, then choose hundreds.Say: The 8 is worth 8 hundreds. Listen",
+  "hint": "Read the letter above the underlined digit. That place tells you what the digit is worth.",
+  "say": "The 8 is worth 8 hundreds.",
+  "steps": [
+   "The underlined digit is 8.",
+   "It is in the hundreds place.",
+   "8 hundreds is 800.",
+   "Write 8, then choose hundreds."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "placevalue:digit_value_unit_form",
+  "text": "The underlined digit is worth ___ ___.",
+  "ans": "7 tens",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The underlined digit is 7.</li><li>It is in the tens place.</li><li>7 tens is 70.</li><li>Write 7, then choose tens.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 7 is worth 7 tens.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The underlined digit is 7. 2. It is in the tens place. 3. 7 tens is 70. 4. Write 7, then choose tens. Say: The 7 is worth 7 tens.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe underlined digit is 7.It is in the tens place.7 tens is 70.Write 7, then choose tens.Say: The 7 is worth 7 tens. Listen",
+  "hint": "Read the letter above the underlined digit. That place tells you what the digit is worth.",
+  "say": "The 7 is worth 7 tens.",
+  "steps": [
+   "The underlined digit is 7.",
+   "It is in the tens place.",
+   "7 tens is 70.",
+   "Write 7, then choose tens."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "placevalue:digit_value_unit_form",
+  "text": "The underlined digit is worth ___ ___.",
+  "ans": "6 hundreds",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The underlined digit is 6.</li><li>It is in the hundreds place.</li><li>6 hundreds is 600.</li><li>Write 6, then choose hundreds.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 6 is worth 6 hundreds.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The underlined digit is 6. 2. It is in the hundreds place. 3. 6 hundreds is 600. 4. Write 6, then choose hundreds. Say: The 6 is worth 6 hundreds.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe underlined digit is 6.It is in the hundreds place.6 hundreds is 600.Write 6, then choose hundreds.Say: The 6 is worth 6 hundreds. Listen",
+  "hint": "Read the letter above the underlined digit. That place tells you what the digit is worth.",
+  "say": "The 6 is worth 6 hundreds.",
+  "steps": [
+   "The underlined digit is 6.",
+   "It is in the hundreds place.",
+   "6 hundreds is 600.",
+   "Write 6, then choose hundreds."
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "area_perimeter:area_triangle",
+  "text": "What is the area of this triangle?",
+  "ans": 18,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Area of a triangle = (base × height) ÷ 2 = (9 × 4) ÷ 2. Multiply 9 × 4, then halve it.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Area of a triangle equals (base times height) divided by 2 equals (9 times 4) divided by 2. Multiply 9 times 4, then halve it.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howArea of a triangle = (base × height) ÷ 2 = (9 × 4) ÷ 2. Multiply 9 × 4, then halve it.Listen",
+  "hint": "Area of a triangle = (base × height) ÷ 2 = (9 × 4) ÷ 2. Multiply 9 × 4, then halve it.",
+  "say": "",
+  "steps": [
+   "Area of a triangle = (base × height) ÷ 2 = (9 × 4) ÷ 2. Multiply 9 × 4, then halve it."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "area_perimeter:area_triangle",
+  "text": "What is the area of this triangle?",
+  "ans": 50,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Area of a triangle = (base × height) ÷ 2 = (10 × 10) ÷ 2. Multiply 10 × 10, then halve it.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Area of a triangle equals (base times height) divided by 2 equals (10 times 10) divided by 2. Multiply 10 times 10, then halve it.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howArea of a triangle = (base × height) ÷ 2 = (10 × 10) ÷ 2. Multiply 10 × 10, then halve it.Listen",
+  "hint": "Area of a triangle = (base × height) ÷ 2 = (10 × 10) ÷ 2. Multiply 10 × 10, then halve it.",
+  "say": "",
+  "steps": [
+   "Area of a triangle = (base × height) ÷ 2 = (10 × 10) ÷ 2. Multiply 10 × 10, then halve it."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "area_perimeter:area_triangle",
+  "text": "What is the area of this triangle?",
+  "ans": 21,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Area of a triangle = (base × height) ÷ 2 = (7 × 6) ÷ 2. Multiply 7 × 6, then halve it.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Area of a triangle equals (base times height) divided by 2 equals (7 times 6) divided by 2. Multiply 7 times 6, then halve it.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howArea of a triangle = (base × height) ÷ 2 = (7 × 6) ÷ 2. Multiply 7 × 6, then halve it.Listen",
+  "hint": "Area of a triangle = (base × height) ÷ 2 = (7 × 6) ÷ 2. Multiply 7 × 6, then halve it.",
+  "say": "",
+  "steps": [
+   "Area of a triangle = (base × height) ÷ 2 = (7 × 6) ÷ 2. Multiply 7 × 6, then halve it."
+  ]
+ },
+ {
+  "seed": 3,
+  "key": "composing:teen_compose",
+  "text": "10 and what number make 18?",
+  "ans": 8,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The full frame is 10.</li><li>Count the ones: say one number for each one.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>10 and ___ make 18.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The full frame is 10. 2. Count the ones: say one number for each one. Say: 10 and blank make 18.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe full frame is 10.Count the ones: say one number for each one.Say: 10 and ___ make 18. Listen",
+  "hint": "The full frame is 10. Count the loose counters — that is how many more than 10.",
+  "say": "10 and ___ make 18.",
+  "steps": [
+   "The full frame is 10.",
+   "Count the ones: say one number for each one."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "composing:teen_compose",
+  "text": "What number is 10 and 2 more?",
+  "ans": 12,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The full frame is 10.</li><li>Count the ones: 1, 2.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>10 and 2 make ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The full frame is 10. 2. Count the ones: 1, 2. Say: 10 and 2 make blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe full frame is 10.Count the ones: 1, 2.Say: 10 and 2 make ___. Listen",
+  "hint": "The full frame is 10. Count on from 10 for each loose counter.",
+  "say": "10 and 2 make ___.",
+  "steps": [
+   "The full frame is 10.",
+   "Count the ones: 1, 2."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "composing:teen_compose",
+  "text": "What number is 10 and 6 more?",
+  "ans": 16,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>The full frame is 10.</li><li>Count the ones: 1, 2, 3, 4, 5, 6.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>10 and 6 make ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. The full frame is 10. 2. Count the ones: 1, 2, 3, 4, 5, 6. Say: 10 and 6 make blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howThe full frame is 10.Count the ones: 1, 2, 3, 4, 5, 6.Say: 10 and 6 make ___. Listen",
+  "hint": "The full frame is 10. Count on from 10 for each loose counter.",
+  "say": "10 and 6 make ___.",
+  "steps": [
+   "The full frame is 10.",
+   "Count the ones: 1, 2, 3, 4, 5, 6."
+  ]
+ }
+]

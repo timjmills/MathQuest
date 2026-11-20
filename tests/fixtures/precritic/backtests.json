@@ -12093,10 +12093,170 @@
     "state": "master: 675 of 734 skills print ___ in their help (hideAnswer blanks the answer, Say frames of given-value gaps, '= ?' hints)"
    },
    "pass": {
-    "commit": "2b2a03c0b",
-    "state": "the answer sentence is left out (S8), the Say line keeps at most the answer's gap, hints rewritten: 0 skills"
+    "commit": "16b11a6ef",
+    "state": "the answer sentence is left out (S8), the Say line keeps at most the answer's gap, hints rewritten: 0 skills (r2 2026-11-20: was 2b2a03c0b, whose blanks passed only through the rawSteps worked-gap hole the critic found; F1, F2)"
    },
-   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,division:div_facts,addition:add_wp_20,placevalue:identify,subtraction:sub_facts",
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,division:div_facts,addition:add_wp_20,placevalue:identify,subtraction:sub_facts --only BLANK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-worked-gap",
+   "check": "ws-hint-no-blank WORKED-GAP: the worked-gap exemption accepts only a fill the pupil SEES in a later shown step, never the hidden fullWorked steps (F1 sub_facts \"7 + ? = 10.\", F2 div_facts \"9 × __ = 99.\")",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: a \"?\" / \"__\" gap filled only in the steps S8 hides"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: the gap fact is asked in words (\"7 plus what number makes 10?\")"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill subtraction:sub_facts,division:div_facts --only WORKED-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-hint-say-leak",
+   "check": "ws-hint-no-blank HINT-LEAK + SAY-LEAK: the hint and the Say line never state the answer (F3 sub_facts \"Or think: 3 + 7 = 10\", div_facts \"9 × 11 = 99\", area_triangle \"= 18 square units.\")",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: three hints state the answer"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: hints give the strategy without the result"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill subtraction:sub_facts,division:div_facts,area_perimeter:area_triangle --only HINT-LEAK,SAY-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-steps-leak",
+   "check": "ws-hint-no-blank STEPS-LEAK: no shown step states an element of a list answer, a long word answer or a sort, or prints \"Answer:\" / \"[object\" (F4 factors_identify, F13 vocab_grade_6_measurement, F14 round_sort_10)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: factor pairs list every missing factor; \"Answer: [object Object]\"; \"Rounds to 60: 64, 61.\""
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: list / sort / long-word tokens cut; fallback \"Answer:\" lines dropped"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_theory:factors_identify,vocabulary:vocab_grade_6_measurement,number_sense:round_sort_10 --only STEPS-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-unit-cut",
+   "check": "ws-hint-no-blank UNIT-CUT + HELP-EMPTY: withoutAnswer cuts \"= 18 square units.\" / \"cubic units\" / \"square cm\" / \"cm²\" at the answer, and area_triangle leaves EMPTY_PIN (F7)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: one unit word only: the whole sentence dropped, the box hidden"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: the cut keeps \"... = 36 ÷ 2.\"; EMPTY_PIN 28 -> 25"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill area_perimeter:area_triangle --only UNIT-CUT,HELP-EMPTY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-status-line",
+   "check": "ws-hint-no-blank HELP-EMPTY-HIDDEN: with no \"Here is how\" box the status line does not say \"Here is how. Finish it, then try again.\" (F8)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: status line points at a hidden box"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: \"Not yet. Try again.\" when no box is shown"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill area_perimeter:area_triangle --only HELP-EMPTY-HIDDEN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-say-fill",
+   "check": "ws-hint-no-blank SAY-FILL + SAY-GAP-GIVEN: every number filled into the Say line is a whole given value (never \"1\" of \"1/4\"), and the gap is never a value the question gives (F10 sub_frac_unlike, F11 place_on_number_line)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: \"1 minus 4 is ___.\"; \"___ is here.\" for \"Tap 16\""
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: fractions are one given value; \"16 is here.\""
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill fraction_operations:sub_frac_unlike,number_sense:place_on_number_line --only SAY-FILL,SAY-GAP-GIVEN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-bare-step",
+   "check": "ws-hint-no-blank BARE-STEP: a shown step is never a bare expression (\"10 + 5.\") or a repeat of an earlier step (F9 add_facts, add_wp_20)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: \"10 + 5.\"; \"16 + 2.\" after \"Write 16 + 2 in the boxes.\""
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: \"Now work out 10 + 5.\"; the repeat dropped"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,addition:add_wp_20 --only BARE-STEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r2-help-thin",
+   "check": "ws-hint-no-blank HELP-THIN + LISTEN + SAYLESS: a provider help that loses at least half its steps ends on a step saying what to do; a shown box always has Listen; identify has a Say line (F5, F6 placevalue:identify)",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r1 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank.md); owner S8 + lead ruling option 3",
+   "browser": true,
+   "fail": {
+    "commit": "fafc417d1",
+    "state": "critic r1 head: steps end \"The letter above it is H.\"; no Say, no Listen"
+   },
+   "pass": {
+    "commit": "16b11a6ef",
+    "state": "r2: \"Find the place name that starts with H.\"; Say \"The 8 is in the ___ place.\"; Listen"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill placevalue:identify --only HELP-THIN,LISTEN,SAYLESS",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

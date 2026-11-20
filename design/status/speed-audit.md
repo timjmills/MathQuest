@@ -1082,3 +1082,16 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 - r2 (FAIL): TOUCH-HIT (real clicks; elementFromPoint missed a covering wrapper), ws-screen-widths-plan (tablet checks never ran on precritic's path), CELL-READ needs a mark/slot and card kind = quiz kind. Speed-up: a real-tap probe found the regression in 2 min - fold probes the critic writes into the tool the same round.
 - r3 (PASS): TOUCH-HIT timing flake on untouched cells handed to lf-checks (re-tap after 2 rAF, 3-run backtest). Speed-up: owner scope changes (no 390, M/L) mid-lane cost one re-scope message per agent; brief agents to read the width/size table, not hard-coded widths.
 - 2026-11-13 lf-placevalue compare: a defect fixed in ONE string recurs in its siblings (the wrap: the "differ" step joined, the "Write" step not), and a check built on the default option misses the wide bands. Rule: fix the class at one helper, and run every layout check on the widest offered option value.
+
+### lf-placevalue HINT-NO-BLANK critic r1 FAIL -> r2 (2026-11-20)
+| Finding | What would have caught it before the critic | Rule / tool fix |
+|---|---|---|
+| F1, F2 worked gap left on screen | a backtest of the gate's OWN exemption on the state it exempts (the rawSteps clause passed a gap S8 then hides) | WORKED-GAP reads shown steps only. Rule: every exemption in a gate gets a backtest row that shows it does not pass the defect it exempts |
+| F3 hints state the answer | S8 run on EVERY help path (STEPS, Say, hint, Show Solution), not the one the change touched | HINT-LEAK / SAY-LEAK; 168 pre-existing skills pinned shrink-only by lane |
+| F4, F13, F14 list / word / sort answers leak | answer tokens read by the GATE, not borrowed from the code under test (answerTokens skipped tokens over 12 chars and never split a list) | STEPS-LEAK with gate-owned tokens. Rule: a leak check never reuses the fix's tokenizer |
+| F7 one-word unit cut | a unit test of the cutter on the real unit strings ("square units", "cubic cm") before the pin was written | UNIT-CUT; a pin entry must say why it cannot be fixed - a cutter bug is not "nothing to teach" (EMPTY_PIN 28 -> 25) |
+| F8 status line points at a hidden box | asserting the whole card (box AND message) when a box is hidden | HELP-EMPTY-HIDDEN checks the status line |
+| F5, F6, F9-F11 help that does not teach | content lints of the shown text: bare expression, repeat, last step has an instruction, Say numbers are whole given tokens, Say gap is not given, box has Listen | BARE-STEP, HELP-THIN, SAY-FILL, SAY-GAP-GIVEN, LISTEN |
+- Speed-up: --only <CHECK> on ws-hint-no-blank lets one backtest row prove one check on the same skill list in ~15 s.
+- Lost time this round: a "given value" rule widened to the picture's numbers made every clock hour "given" (ws-support-ladder
+  time_quarter caught it); a widening of what counts as given needs the time and money skills in its first run.

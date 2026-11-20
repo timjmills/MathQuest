@@ -305,3 +305,98 @@ its skills from the pin in the change that fixes them.
   HELP-EMPTY-HIDDEN does not FAIL on ada1a1e73: no item there has no step AND a Say line (the 28 cards drew no box; a forced
   probe over every provider skill found none) - ledger row exempt, the assertion is a guard. unit_form help: hash-identical to
   master 65c28ccdf on the card (box DOM, hint, Say, steps; ws-unit-form-bank seeds 3, 7, 11, 19, 42, 77), no exception needed.
+
+- 2026-11-20 HINT-NO-BLANK critic r1 FAIL -> r2 rebuild (fresh fixer, medium: rebuild after a failed critic; round 2 of cap 2).
+  ONE root cause: ws-hint-no-blank passed every finding. Checks built FIRST, each FAILS on fafc417d1 (backtest rows
+  hint-no-blank-r2-*, fix 16b11a6ef, all PASS): WORKED-GAP (fill must be in a SHOWN step: F1 F2), HINT-LEAK + SAY-LEAK
+  (F3), STEPS-LEAK (list / long-word / sort answers, "Answer:" / "[object": F4 F13 F14), UNIT-CUT (unit test of the
+  multi-word unit cut: F7), HELP-EMPTY-HIDDEN + status line (F8), BARE-STEP (F9), SAY-FILL + SAY-GAP-GIVEN (F10 F11),
+  HELP-THIN + LISTEN (F5 F6), S8-EXCEPTION (lead: digit_value_unit_form is the ONE named exception, "owner request
+  2026-11-15, fixed by lead"; a second entry or q.fullWorked on another skill FAILs; also in ws-support-ladder).
+  `--only <CHECK>[,..]` judges one check. Old row hint-no-blank-every-skill now passes on 16b11a6ef with --only BLANK
+  (its pass commit 2b2a03c0b only passed through the rawSteps hole).
+  Fixes: support-ladder.js (gap facts asked in words "7 plus what number makes 10?"; bare step -> "Now work out 10 + 5."
+  or dropped when it repeats; cut at "= 18 square units."; answer tokens for lists, sorts, long words, expressions;
+  fallback "Answer:" lines dropped and "Hint:" stripped; a thinned help closes with the skill's Steps line, a clean hint
+  or the sum; fractions are one given value; a 1-gap Say whose only question number is the answer is filled; Listen
+  without a Say line; "Not yet. Try again." when no box); contract.js screenHelp member (screen only, never printed);
+  pv.js identify screenHelp (steps end "Find the place name that starts with H.", Say "The 8 is in the ___ place."; no
+  "write what it is worth" step: the practice card has no value box);
+  hints: sub_facts / div_facts / area_triangle (gen-operations.js, gen-geometry.js).
+  Pins (shrink-only, full sweep FAILS a stale entry): EMPTY_PIN 28 -> 25 (8 left; 5 joined that showed "Answer: ..."
+  before and now hide the box), SAYLESS_PIN 131 -> 126 (identify + 5 fraction skills left; fractions:shade_fraction joined:
+  its Say filled the 3 of "2/3"), new pins in tests/fixtures/hint-no-blank-pins.json: HINT-LEAK 168, STEPS-LEAK 12,
+  BARE-STEP 1, HELP-THIN 5 (tables below). Print unchanged: ws-role-sweep 512/512 identical vs master e487f8f9a,
+  ws-lesson-baseline --check 2590 identical (pinned all-lessons baseline) and 334 identical vs a master render, ws-capacity-pin OK;
+  unit_form help md5-identical to master (ws-hint-shots --dump, 6 seeds). Renders: design/status/lf-placevalue/hint-no-blank/r2/.
+  Out of scope, for the lead: F12 (44 px Listen / Hint / Read, 46 px boxes at 820) -> lf-hosts; expanded_notation's steps
+  write every part of the answer ("The 7 is in the hundreds place: 7 × 100.") - pre-existing, ours, not flagged;
+  ws-hint-shots deals its first item differently run to run (both trees).
+  Gates: ws-hint-no-blank OK (734 skills), ws-support-ladder OK (default and --wide), ws-unit-form-bank OK, ws-boot-smoke OK,
+  ws-code-snapshot OK (741), ws-redesign-passed OK, ws-precritic-plan OK, ws-backtest 9/9 PASS. ws-precritic --skill placevalue:identify
+  --strict: stopped at 25 min by the run's timeout (34 PASS); its 7 FAILs are print / card gates (spec-card signature, coverage-matrix
+  PAGEFILL, empty-band, cell-checks lesson OVERFLOW, two-step align, sibling-compare) - print is identical to master, and empty-band
+  FAILs the same 69 on master e487f8f9a.
+### HINT-NO-BLANK r2 hand-off (2026-11-20): pins by owner lane
+
+Every list may only shrink: a skill joining FAILs, and on a full sweep a pinned skill that passes FAILs until it is taken off (tests/scripts/ws-hint-no-blank.cjs EMPTY_PIN / SAYLESS_PIN; tests/fixtures/hint-no-blank-pins.json). These replace the two tables above.
+
+**EMPTY_PIN (25) - write provider workedSteps that teach without the answer (the box is hidden today):**
+
+| Lane | Skills |
+|---|---|
+| fractions lane | `conversions:find_whole_from_pct`, `conversions:mixed_conversions`, `fraction_operations:div_unit_frac_nv`, `fraction_operations:estimate_frac_ops`, `fraction_operations:frac_mult_word`, `fraction_operations:frac_mult_word_plain`, `fraction_operations:frac_word_mixed_plain`, `fraction_operations:mixed_fraction_ops`, `fraction_operations:mult_frac_whole_nv`, `fraction_operations:unit_frac_div_whole`, `fraction_operations:whole_div_unit_frac`, `fractions:equiv_frac_nv`, `fractions:order_fractions` |
+| geometry lane | `angles_lines:identify_angles`, `angles_lines:mixed_angles_lines`, `coordinates:net_surface_area`, `shapes_classify:classify_triangles`, `shapes_classify:cross_section_3d`, `shapes_classify:mixed_shapes`, `shapes_classify:net_identify`, `shapes_early:compose_rect_from_squares` |
+| lf-algebra | `algebra:build_expr_multdiv` |
+| lf-ops | `multiplication:mixed_multiplication`, `multiplication:mult_missing_digit` |
+| time-money / measurement lane | `measurement:capacity` |
+
+**SAYLESS_PIN (126) - add a screen Say line (provider screenHelp.say, or sayValues of given values only):**
+
+| Lane | Skills |
+|---|---|
+| fractions lane | `decimals:decimal_nl_drag`, `fraction_operations:add_frac_unlike`, `fraction_operations:add_fractions_like`, `fraction_operations:add_mixed_like`, `fraction_operations:add_mixed_unlike`, `fraction_operations:sub_frac_unlike`, `fraction_operations:sub_fractions_like`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_unlike`, `fractions:compare_fractions_nl`, `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`, `fractions:identify`, `fractions:identify_fraction_nl`, `fractions:mixed_nl_drag`, `fractions:shade_fraction`, `fractions:write_fraction`, `fractions:write_fraction_nl` |
+| k2 (counting) lane | `comparing:compare_groups`, `composing:base10_build`, `composing:base10_build_hundreds`, `composing:chart_to_120`, `composing:compose_whole`, `composing:fraction_number_line`, `composing:hundreds_chart_fill`, `composing:odd_even`, `composing:ten_frame_build_teen`, `composing:whole_as_fraction` |
+| lf-algebra | `algebra:function_table_easy`, `algebra:function_table_find_inputs`, `algebra:function_table_find_rule`, `algebra:function_table_hard`, `algebra:two_step_estimate_check`, `algebra:two_step_letter_equation`, `patterns:follow_given_rule`, `patterns:notice_patterns`, `patterns:number_patterns_rule`, `patterns:skip_count_grid`, `patterns:skip_count_line` |
+| lf-ops | `addition:add_sub_fact_family`, `addition:cloze_addition`, `addition:fact_family_sort`, `addition:nl_add`, `division:div_remainders`, `integers:integer_nl_drag`, `multiplication:arrays_groups`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_tables`, `multiplication:dot_array_mult`, `multiplication:mult_arrays`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:mult_chart_headers`, `multiplication:mult_chart_pattern`, `multiplication:mult_chart_shade`, `multiplication:mult_comparison`, `multiplication:mult_comparison_plain`, `multiplication:mult_equal_groups`, `multiplication:mult_properties`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `subtraction:sub_5_pictures` |
+| lf-placevalue | `number_sense:between_tens`, `number_sense:estimate_diff`, `number_sense:estimate_products`, `number_sense:estimate_quotient`, `number_sense:estimate_sum`, `number_sense:estimate_sums_diffs`, `number_sense:nearest_10`, `number_sense:nearest_100`, `number_sense:nearest_1000`, `number_sense:nearest_10000`, `number_sense:nearest_100000`, `number_sense:nearest_million`, `number_sense:reasonable_quotients`, `number_sense:round_nl_hundred_thousands`, `number_sense:round_nl_ten_thousands`, `number_sense:round_nl_thousands`, `number_sense:round_sort_10`, `number_sense:round_sort_100`, `number_sense:round_sort_1000`, `number_sense:round_sort_10000`, `number_sense:round_sort_100000`, `number_sense:round_sort_hundredths`, `number_sense:round_sort_million`, `number_sense:round_sort_tenths`, `number_sense:rounding_table`, `number_sense:rounding_visual`, `placevalue:combine`, `placevalue:expanded_notation`, `placevalue:one_tenth_value`, `placevalue:place_value_10x`, `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:ten_times_story`, `placevalue:ten_times_value` |
+| lf-vocab | `vocabulary:vocab_grade_pictures` |
+| time-money / measurement lane | `measurement:clock_parts`, `measurement:coin_value`, `measurement:count_notes_and_coins`, `measurement:elapsed_15min`, `measurement:elapsed_30min`, `measurement:elapsed_find_duration`, `measurement:elapsed_find_start`, `measurement:elapsed_hour`, `measurement:elapsed_mixed`, `measurement:elapsed_visual_easy`, `measurement:elapsed_visual_hard`, `measurement:elapsed_visual_medium`, `measurement:enough_money`, `measurement:minutes_by_fives_all`, `measurement:money`, `measurement:money_change`, `measurement:money_compare`, `measurement:time_fives_ring`, `measurement:time_sense` |
+
+**HINT-LEAK (168) - rewrite q.hint to give the strategy without the result:**
+
+| Lane | Skills |
+|---|---|
+| data lane | `data_analysis:mad`, `data_analysis:mixed_data_analysis`, `graphs:pictograph_how_many_more` |
+| fractions lane | `conversions:d_to_p`, `conversions:f_to_d`, `conversions:find_whole_from_pct`, `conversions:mixed_conversions`, `conversions:p_to_d`, `conversions:percent_of_number`, `decimals:mixed_decimals`, `decimals:round_decimals`, `frac_dec_mixed:conversions_all`, `frac_dec_mixed:decimals_all`, `frac_dec_mixed:fdp_all`, `fraction_operations:add_frac_like_nv`, `fraction_operations:add_frac_unlike`, `fraction_operations:add_frac_unlike_nv`, `fraction_operations:add_fractions_like`, `fraction_operations:add_mixed_like_nv`, `fraction_operations:add_mixed_unlike_nv`, `fraction_operations:decompose_frac_nv`, `fraction_operations:decompose_fractions`, `fraction_operations:div_unit_frac_nv`, `fraction_operations:div_unit_fraction`, `fraction_operations:estimate_frac_ops`, `fraction_operations:frac_10_100`, `fraction_operations:frac_10_100_nv`, `fraction_operations:frac_as_div_nv`, `fraction_operations:frac_as_div_word`, `fraction_operations:frac_as_division`, `fraction_operations:frac_mult_word`, `fraction_operations:frac_mult_word_plain`, `fraction_operations:frac_word_mixed`, `fraction_operations:frac_word_mixed_plain`, `fraction_operations:frac_word_problems`, `fraction_operations:frac_word_problems_plain`, `fraction_operations:mixed_fraction_ops`, `fraction_operations:mult_frac_frac`, `fraction_operations:mult_frac_frac_nv`, `fraction_operations:mult_frac_whole_nv`, `fraction_operations:mult_scaling_nv`, `fraction_operations:sub_frac_like_nv`, `fraction_operations:sub_frac_unlike`, `fraction_operations:sub_frac_unlike_nv`, `fraction_operations:sub_mixed_like`, `fraction_operations:sub_mixed_like_nv`, `fraction_operations:unit_frac_div_whole`, `fraction_operations:whole_div_unit_frac`, `fractions:equiv_frac_nv`, `fractions:equiv_frac_visual`, `fractions:fraction_nl_drag`, `fractions:fraction_of_set`, `fractions:fraction_of_set_hard`, `fractions:fraction_of_set_hard_nv`, `fractions:fraction_of_set_nv`, `fractions:graph_fractions`, `fractions:identify_nv`, `fractions:mixed_fractions`, `fractions:order_fractions`, `fractions:shade_fraction` |
+| geometry lane | `angles_lines:additive_angles`, `angles_lines:angles_around_point`, `angles_lines:angles_in_right_angle`, `angles_lines:angles_on_straight_line`, `angles_lines:identify_angles`, `angles_lines:identify_lines`, `angles_lines:measure_angles`, `angles_lines:mixed_angles_lines`, `area_perimeter:area`, `area_perimeter:area_distributive_visual`, `area_perimeter:area_missing_side`, `area_perimeter:area_polygon_decompose`, `area_perimeter:area_unit_squares`, `area_perimeter:composite_shapes`, `area_perimeter:mixed_area_perimeter`, `area_perimeter:perimeter`, `area_perimeter:perimeter_grid`, `area_perimeter:perimeter_missing_side`, `area_perimeter:volume`, `area_perimeter:volume_composite`, `area_perimeter:volume_missing_edge`, `coordinates:coord_distance_q1`, `coordinates:coord_polygon`, `coordinates:mixed_coordinates`, `coordinates:net_surface_area`, `geo_mixed:geo_meas_all`, `geo_mixed:geometry_all`, `shapes_classify:classify_triangles`, `shapes_classify:cross_section_3d`, `shapes_classify:mixed_shapes`, `shapes_early:compose_rect_from_squares`, `shapes_early:compose_shapes`, `shapes_early:measure_nonstandard`, `shapes_early:mixed_shapes_early`, `shapes_early:name_3d_shapes` |
+| k2 (counting) lane | `composing:make_ten`, `composing:mixed_composing`, `composing:odd_even`, `composing:whole_as_fraction` |
+| lead (mixed reviews) | `all_mixed:custom_mixed`, `all_mixed:grade_3_mixed`, `all_mixed:grade_4_mixed`, `all_mixed:grade_5_mixed`, `all_mixed:grade_6_mixed` |
+| lf-algebra | `algebra:algebra_word_mixed_plain`, `algebra:build_expr_addsub`, `algebra:build_expr_multdiv`, `algebra:combine_like_terms`, `algebra:distributive_expr`, `algebra:factor_out_gcf`, `algebra:two_step_add_then_div`, `algebra:two_step_estimate_check`, `algebra:two_step_mult_div_first`, `algebra:write_equation`, `algebra:write_equation_story`, `algebra_mixed:algebraic_all`, `algebra_mixed:number_sense_all`, `algebra_mixed:placevalue_all`, `patterns:count_by_fill`, `patterns:notice_patterns` |
+| lf-ops | `addition:add_10_regroup`, `addition:add_5_pictures`, `addition:add_sub_100s`, `addition:add_sub_10s`, `addition:add_three`, `addition:comparison_word`, `addition:number_families_add`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_3by2_long`, `division:div_4by1_long`, `division:div_fix_estimate`, `division:mixed_division`, `division:mixed_mult_div`, `integers:mixed_integers`, `integers:ordering_rationals`, `multiplication:equal_or_unequal_groups`, `multiplication:mixed_multiplication`, `multiplication:mult_break_apart`, `multiplication:mult_by_hundred`, `multiplication:mult_by_ten`, `multiplication:mult_facts`, `multiplication:mult_facts_15`, `multiplication:mult_missing_digit`, `multiplication:mult_multiples_of_ten`, `multiplication:mult_properties`, `multiplication:mult_zeros`, `multiplication:number_families_mult`, `number_ops_mixed:missing_factor_or_addend`, `number_ops_mixed:number_families_mixed`, `number_theory:missing_multiples`, `number_theory:multiples`, `number_theory:prime_composite`, `subtraction:sub_10_regroup`, `subtraction:sub_5_pictures`, `subtraction:unknown_start_wp` |
+| lf-placevalue | `number_sense:compensation`, `number_sense:doubles_near_doubles`, `number_sense:make_a_ten`, `number_sense:near_doubles`, `number_sense:round_nl_hundred_thousands`, `number_sense:round_nl_ten_thousands`, `number_sense:round_nl_thousands`, `placevalue:ten_times_story` |
+| lf-vocab | `vocabulary:vocab_pick3_words` |
+| time-money / measurement lane | `measurement:capacity`, `measurement:pictograph_intro`, `measurement:unit_conversions` |
+
+**STEPS-LEAK (12) - a shown worked step states the answer (or part of it):**
+
+| Lane | Skills |
+|---|---|
+| fractions lane | `fraction_operations:add_fractions_like`, `fraction_operations:mult_frac_whole_nv`, `fraction_operations:mult_scaling_nv`, `fraction_operations:sub_frac_like_nv`, `fraction_operations:whole_div_unit_frac`, `fractions:fraction_of_set_hard`, `fractions:graph_fractions`, `fractions:identify`, `fractions:mixed_fractions`, `fractions:shade_fraction` |
+| k2 (counting) lane | `composing:odd_even` |
+| lf-algebra | `patterns:notice_patterns` |
+
+**BARE-STEP (1) - a step repeats an earlier one:**
+
+| Lane | Skills |
+|---|---|
+| lf-algebra | `patterns:notice_patterns` |
+
+**HELP-THIN (5) - the steps left end on no instruction:**
+
+| Lane | Skills |
+|---|---|
+| k2 (counting) lane | `composing:chart_to_120`, `composing:hundreds_chart_fill`, `composing:number_chart_fill`, `composing:whole_as_fraction` |
+| lf-ops | `addition:add_sub_fact_family` |
+
+
