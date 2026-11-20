@@ -34,6 +34,7 @@ import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, inked, box, esc, label, HAIR, HEAVY } from './ops-common.js';
 import { INK, stripPos } from '../tokens.js';
 import { bracketSvg } from './long-division.js';
+import { stepMarks } from '../steps.js';
 
 /* ------------------------------------------------------------------------------ the maths */
 
@@ -171,6 +172,14 @@ register('long-multiplication', {
             return o;
         });
         const showWork = ink !== null;                 // the key and a finished cell write the work
+        // `stepUpto` (stepState only, lane lf-ops sizes: the lesson's anchor chart): the work of rows 1..stepUpto is written,
+        // the newest row grey and the earlier ones black (P-LC-9); stepUpto > the row count writes the sum and the answer.
+        const upto = Number.isInteger(p.stepUpto) ? p.stepUpto : null;
+        const nRows = w.rows.length;
+        const inkAt = (idx) => (upto === null ? ink : idx >= upto ? null : idx === upto - 1 ? 'trace' : 'solid');
+        const sumInk = upto === null ? ink : upto > nRows ? 'trace' : null;
+        // (`stepZero`: the row whose placeholder 0 alone is written, grey - the step before that row is multiplied)
+        const zeroRow = Number.isInteger(p.stepZero) ? p.stepZero : -1;
         // a one-digit multiplier is SHORT multiplication (Y5.B5.S1): its one row is the answer, so
         // there is no partial row, no sum and no row names - the carries sit over the answer strip
         const single = w.B.length === 1;
@@ -190,19 +199,19 @@ register('long-multiplication', {
         row++;
         html += at('<span style="font-weight:700">×</span>', 1, row);
         digitsRow(w.B, row, `border-bottom:${HEAVY} solid ${INK.ink};`);
-        const carryRow = (carries, places, r, id) => {
+        const carryRow = (carries, places, r, id, cInk = ink) => {
             // a slim box over every place a carry can land in (never only where one does: that
             // would say where the carries are)
             for (const pl of places) {
-                const v = showWork && carries[pl] ? String(carries[pl]) : '';
+                const v = cInk !== null && carries[pl] ? String(carries[pl]) : '';
                 // fix r1 (H6): on screen the carry box carries a transparent touch input over it, >= 48 px (screen-cell.css)
                 const inner = g.twin ? scratch(`carry, ${id}, place ${pl}`, true, 48)
-                    : (v ? `<span style="font-size:0.6em;line-height:1">${inked(v, ink)}</span>` : '');
+                    : (v ? `<span style="font-size:0.6em;line-height:1">${inked(v, cInk)}</span>` : '');
                 html += at(inner, colOf(pl), r, `${g.twin ? 'position:relative;' : ''}box-sizing:border-box;height:${slimH};width:${g.em(tr * 0.62)};justify-self:center;`
                     + `border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm * 0.7)};background:#fff;`);
             }
         };
-        const workRow = (rw, r, rowIdx) => {
+        const workRow = (rw, r, rowIdx, wInk = ink) => {
             const val = S(rw.value).padStart(n, ' ');
             for (let i = 0; i < n; i++) {
                 const place = n - 1 - i;
@@ -214,7 +223,8 @@ register('long-multiplication', {
                 if (isPh && lvl >= 2) {
                     // the placeholder 0, given as a hint: trace grey (the pupil sees why the row starts one place left)
                     inner = `<span class="ws-trace" data-ws-ink="trace" style="color:${INK.grey}">0</span>`;
-                } else if (showWork && ch) inner = inked(ch, ink);
+                } else if (wInk !== null && ch) inner = inked(ch, wInk);
+                else if (isPh && rowIdx === zeroRow) inner = inked('0', 'trace');
                 else if (g.twin) inner = scratch(`row ${rowIdx + 1}, place ${place}`);
                 const ph = isPh && lvl === 1 ? `outline:${HAIR} solid ${INK.ink};outline-offset:-0.12em;border-radius:${g.em(g.rMm)};` : '';
                 html += at(inner, 2 + i, r, grid + ph);
@@ -228,31 +238,31 @@ register('long-multiplication', {
             row++;
             const places = [];
             for (let pl = 1; pl < w.A.length; pl++) places.push(pl);
-            carryRow(w.rows[0].carries, places, row, 'row 1');
+            carryRow(w.rows[0].carries, places, row, 'row 1', inkAt(0));
         }
         if (!single) w.rows.forEach((rw, idx) => {
             if (lvl >= 1) {
                 row++;
                 const places = [];
                 for (let pl = 1 + rw.k; pl < w.A.length + rw.k; pl++) places.push(pl);
-                carryRow(rw.carries, places, row, `row ${idx + 1}`);
+                carryRow(rw.carries, places, row, `row ${idx + 1}`, inkAt(idx));
             }
             row++;
             if (idx === w.rows.length - 1 && w.rows.length > 1) html += at('<span style="font-weight:700">+</span>', 1, row);
-            workRow(rw, row, idx);
+            workRow(rw, row, idx, inkAt(idx));
         });
         if (lvl >= 1 && !single) {
             row++;
             const places = [];
             for (let pl = 1; pl < n; pl++) places.push(pl);
-            carryRow(w.sumCarries, places, row, 'sum');
+            carryRow(w.sumCarries, places, row, 'sum', sumInk);
         }
         // the answer strip under the sum rule (SL-12): the only graded places
         row++;
         for (let i = 0; i < n; i++) {
             const id = `t-${i}`;
             html += at(box(g, id, {
-                wMm: tr, hMm: g.stripMm, value: vals[id] || '', ink, mark: 'cell', seg: stripPos(i, n),
+                wMm: tr, hMm: g.stripMm, value: upto !== null && !sumInk ? '' : (vals[id] || ''), ink: upto === null ? ink : sumInk, mark: 'cell', seg: stripPos(i, n),
                 graded: keySlots[id] !== '',
             }), 2 + i, row, `border-top:${HEAVY} solid ${INK.ink};padding-top:${g.em(1.2)};`);
         }
@@ -267,6 +277,23 @@ register('long-multiplication', {
             `<div role="group" aria-label="${esc(`${w.A} times ${w.B}`)}" style="display:inline-grid;${cols}grid-template-rows:${rowsTpl.join(' ')};`
             + `row-gap:${g.em(0.6)};align-items:stretch;margin:0 auto">${html}</div>`,
             'text-align:center;', lmFootprint(p, ctx).wMm);
+    },
+    /**
+     * P-LC-9 (lane lf-ops sizes): the grid as it looks after step k of a provider's workedSteps (providers/multiplication.js
+     * longMultSteps): a `row1` / `row2` mark writes that partial row and its carries, `row2zero` only row 2's placeholder 0,
+     * an `answer` mark the sum's carries and the answer strip; the newest work grey, the earlier black. Same geometry as every state of the cell (SCC-T10).
+     */
+    stepState(p, steps, k, ctx) {
+        let upto = 0;
+        let zero = -1;
+        const rows = longMultiplication(p.a, p.b).rows.length;
+        for (const m of stepMarks(steps, k)) {
+            const r = /^row(\d+)(zero)?$/.exec(m.slot);
+            if (r && r[2]) zero = Number(r[1]) - 1;
+            else if (r) upto = Math.max(upto, Number(r[1]));
+            else if (m.slot === 'answer' || m.slot === 'product') upto = Math.max(upto, rows + 1);
+        }
+        return this.render(Object.assign({}, p, { stepUpto: upto, stepZero: zero >= upto ? zero : -1 }), Object.assign({}, ctx, { state: 'answered' }));
     },
     answerKey(p) {
         const { w, slots: ks } = lmKey(p);

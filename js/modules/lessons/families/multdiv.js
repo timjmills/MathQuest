@@ -282,6 +282,126 @@ export const ROUTINES = Object.freeze({
             jumps: { 15: { chartMaxStates: 2, headFirst: true, guidedRows: 1 } },
         },
     },
+    // ------------------------------------------------ Multiplication by size (lane lf-ops sizes, card mult-sizes, 2026-11-20)
+    // Y5.B5.S1-S4 (4.NBT.B.5, 5.NBT.B.5): one routine per written method. Each routine's steps are the provider's worked steps
+    // for the example, one to one (lesson-pages/common.js namedSteps): the area model's areaSteps (sheet/providers/
+    // multiplication.js) - split, one step per part (1-digit multiplier) or per row (2-digit), add the parts - and, for the
+    // column methods, multiplication:multiply's own (shortMultSteps: one step per place, then the product; longMultSteps:
+    // the ones row, the tens row with its placeholder 0, the sum).
+    'mult-column-1digit': {
+        archetype: 'column',
+        casesPending: 'Lane lf-ops sizes (card mult-sizes): the 4-digit column lesson; its cases (a place with no regrouping, a regrouped place, a 0 digit) are declared when unit G4-Y5.B5 is carded.',
+        concepts: [
+            { id: 'ones-first', text: 'Multiply the ones first, then each place to the left.' },
+            { id: 'regroup', text: '10 or more? Write the ones digit. Regroup the tens into the next place.' },
+            { id: 'add-on', text: 'Multiply first, then add the regrouped number.' },
+        ],
+        vocab: [
+            { word: 'multiply', meaning: 'the × sign: equal groups', picture: { kind: 'glyph', text: '×' } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+            { word: 'regroup', meaning: '10 ones become 1 ten', picture: { kind: 'trade' } },
+        ],
+        // (one step per place of the 4-digit number, then the product: shortMultSteps' five worked steps)
+        steps: [
+            { icon: 'start', text: 'Multiply the ones.' },
+            { icon: 'regroup', text: 'Multiply the tens. Add on.' },
+            { icon: 'count', text: 'Multiply the hundreds. Add on.' },
+            { icon: 'write', text: 'Multiply the thousands. Add on.' },
+            { icon: 'check', text: 'Read the product.' },
+        ],
+        chant: 'Multiply, then add the regrouped number!',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error pupils make is adding the regrouped number before multiplying (or not at all); the chant says the order at step 2.',
+        },
+        example: { match: 'Regroup' },
+    },
+    'mult-column-2digit': {
+        archetype: 'column',
+        casesPending: 'Lane lf-ops sizes (card mult-sizes): the long-multiplication lesson; its cases (regrouping in a row / in the sum, a multiplier ending in 0) are declared when unit G4-Y5.B5 is carded.',
+        concepts: [
+            { id: 'two-rows', text: 'Multiply by the ones digit, then by the tens: two rows.' },
+            { id: 'zero', text: 'The tens row starts with a 0 in the ones place: you are multiplying by tens.' },
+            { id: 'add-rows', text: 'Add the two rows to find the product.' },
+        ],
+        vocab: [
+            { word: 'partial product', meaning: 'one row: the top number × one digit', picture: { kind: 'text', text: '76 × 9 = 684' } },
+            { word: 'placeholder 0', meaning: 'the 0 in the ones of the tens row', picture: { kind: 'text', text: '76 × 30 = 2,280' } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '684 + 2,280 = 2,964' } },
+        ],
+        // (longMultSteps' four worked steps: the ones row, the placeholder 0, the tens row, the sum)
+        steps: [
+            // (one line each in a half-width chart panel: the chant says them in the same order)
+            { icon: 'start', text: 'Ones row.' },
+            { icon: 'write', text: 'Write the 0.' },
+            { icon: 'regroup', text: 'Tens row.' },
+            { icon: 'count', text: 'Add the rows.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'icons + very short steps',
+            why: 'The step pupils drop is the placeholder 0 of the tens row (the second row then is ten times too small): it is a step of its own, and the four step names said in order ("Ones row. Write the 0. Tens row. Add the rows.") are the rule, so a chant would repeat them - and its band would push the 4-panel chart off its page.',
+        },
+        example: { match: 'Multiply by the ones' },
+        // (the long-multiplication grid - top number, two rows, the sum, their carry boxes - is ~20 mm too tall for two panel rows
+        // on one page at zoom 1 (118.5 mm a panel row, 195 mm free at M): it ran over the Say band. chart.js chartPage may draw
+        // it down to LR-15's floor, 0.8)
+        chartMinZoom: 0.8,
+    },
+    'mult-area-1digit': {
+        archetype: 'groups',
+        casesPending: 'Lane lf-ops sizes (card mult-sizes): the 4-digit area model; its cases (a 0 digit, a part of 10 or more) are declared when the lesson is carded.',
+        concepts: [
+            { id: 'split', text: 'Split the big number by place: thousands, hundreds, tens and ones.' },
+            { id: 'parts', text: 'Multiply each part by the 1-digit number.' },
+            { id: 'add', text: 'Add the parts: that is the product.' },
+        ],
+        vocab: [
+            { word: 'part', meaning: 'one place of the number', picture: { kind: 'text', text: '1,599 = 1,000 + 500 + 90 + 9' } },
+            { word: 'area model', meaning: 'a rectangle split into parts', picture: { kind: 'text', text: '5 × 500 = 2,500' } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Split the number by place.' },
+            { icon: 'start', text: 'Multiply the thousands.' },
+            { icon: 'regroup', text: 'Multiply the hundreds.' },
+            { icon: 'count', text: 'Multiply the tens.' },
+            { icon: 'write', text: 'Multiply the ones.' },
+            { icon: 'check', text: 'Add the parts.' },
+        ],
+        chant: 'Split it, multiply each part, add!',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'One step per part, so no part is dropped (the left-out-part error); the chant names the three moves.',
+        },
+        example: { match: '^Split' },
+    },
+    'mult-area-2digit': {
+        archetype: 'groups',
+        casesPending: 'Lane lf-ops sizes (card mult-sizes): the 2-row area model; its cases (a 0 digit, a 2 x 3 grid) are declared when the lesson is carded.',
+        concepts: [
+            { id: 'split', text: 'Split both numbers by place: tens and ones (and hundreds).' },
+            { id: 'rows', text: 'Multiply across each row: one part for each box.' },
+            { id: 'add', text: 'Add all the parts: that is the product.' },
+        ],
+        vocab: [
+            { word: 'part', meaning: 'one box: a place times a place', picture: { kind: 'text', text: '70 × 30 = 2,100' } },
+            { word: 'row', meaning: 'a line of boxes going across', picture: { kind: 'array', rows: 1, cols: 4, mark: 'row' } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Split both numbers by place.' },
+            { icon: 'start', text: 'Multiply across the first row.' },
+            { icon: 'write', text: 'Multiply across the second row.' },
+            { icon: 'check', text: 'Add all the parts.' },
+        ],
+        chant: 'Split, multiply each box, add!',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'One step per row, so every box is filled (the left-out-part error); the chant names the three moves.',
+        },
+        example: { match: '^Split' },
+    },
 });
 
 export const LESSONS = Object.freeze({
@@ -345,6 +465,96 @@ export const LESSONS = Object.freeze({
             { key: 'multiplication:mult_chart_easy', why: 'The times table the words describe.' },
         ],
         mixWith: [{ key: 'vocabulary:vocab_grade_pictures' }, { key: 'multiplication:mult_facts' }],
+    },
+    // ------------------------------------------------ Multiplication by size (lane lf-ops sizes, card mult-sizes, 2026-11-20)
+    // Each preset is its own lesson in unit G4-Y5.B5 (Y5.B5.S1 4 x 1, S2 2 x 2 area model, S3 2 x 2, S4 3 x 2); the second
+    // preset of a step (the area model of S1, of S4) is a skill: id. The Warm-up is the size below; the Prerequisite Check
+    // is written when the unit is carded (LR-17).
+    'Y5.B5.S1': {
+        routine: 'mult-column-1digit',
+        practice: { skill: 'multiplication:mult_4by1_column' },
+        defaultFor: true,
+        prereqsPending: 'Lane lf-ops sizes: the Warm-up (the size below and the facts) until the G4-Y5.B5 Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'multiplication:mult_3by1_column', why: 'The same column steps with three digits.' },
+            { key: 'multiplication:mult_facts', why: 'Each place is a times fact: 6 × 4.' },
+        ],
+        mixWith: [{ key: 'multiplication:mult_3by1_column' }, { key: 'addition:add_10k_regroup' }],
+        note: 'WRM Y5.B5.S1 "Multiply up to a 4-digit number by a 1-digit number": the column method; its area model is skill:multiplication:area_model_4by1.',
+    },
+    'skill:multiplication:area_model_4by1': {
+        routine: 'mult-area-1digit',
+        practice: { skill: 'multiplication:area_model_4by1' },
+        prereqsPending: 'Lane lf-ops sizes: the Warm-up (the size below and the facts) until the G4-Y5.B5 Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'multiplication:area_model_3by1', why: 'The same area model with three parts.' },
+            { key: 'multiplication:mult_by_hundred', why: 'A part is a fact times 10, 100 or 1,000: 5 × 500.' },
+        ],
+        mixWith: [{ key: 'multiplication:area_model_3by1' }, { key: 'addition:add_10k_regroup' }],
+        steps: ['Y5.B5.S1'],
+        note: 'WRM Y5.B5.S1 (the area model half; the column half is lesson Y5.B5.S1).',
+    },
+    'Y5.B5.S2': {
+        routine: 'mult-area-2digit',
+        practice: { skill: 'multiplication:area_model_2by2' },
+        defaultFor: true,
+        prereqsPending: 'Lane lf-ops sizes: the Warm-up (the 1-digit area model and tens times tens) until the G4-Y5.B5 Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'multiplication:area_model_2by1', why: 'The area model with one row: a 2-digit number times a 1-digit number.' },
+            { key: 'multiplication:mult_multiples_of_ten', why: 'A part is a fact times tens: 6 × 40.' },
+        ],
+        mixWith: [{ key: 'multiplication:area_model_2by1' }, { key: 'multiplication:mult_2by1_column' }],
+        note: 'WRM Y5.B5.S2 "Multiply a 2-digit number by a 2-digit number (area model)".',
+    },
+    'Y5.B5.S3': {
+        routine: 'mult-column-2digit',
+        practice: { skill: 'multiplication:mult_2by2_standard' },
+        defaultFor: true,
+        prereqsPending: 'Lane lf-ops sizes: the Warm-up (the 1-digit column and the area model) until the G4-Y5.B5 Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'multiplication:mult_2by1_column', why: 'Each row is a 2-digit number times a 1-digit number.' },
+            { key: 'multiplication:area_model_2by2', why: 'The area model shows the same two rows as parts.' },
+        ],
+        mixWith: [{ key: 'multiplication:area_model_2by2' }, { key: 'multiplication:mult_2by1_column' }],
+        note: 'WRM Y5.B5.S3 "Multiply a 2-digit number by a 2-digit number": the standard algorithm.',
+    },
+    'Y5.B5.S4': {
+        routine: 'mult-column-2digit',
+        practice: { skill: 'multiplication:mult_3by2_standard' },
+        defaultFor: true,
+        prereqsPending: 'Lane lf-ops sizes: the Warm-up (the size below) until the G4-Y5.B5 Prerequisite Check is written (LR-17).',
+        teach: {
+            vocab: [
+                { word: 'partial product', meaning: 'one row: the top number × one digit', picture: { kind: 'text', text: '135 × 4 = 540' } },
+                { word: 'placeholder 0', meaning: 'the 0 in the ones of the tens row', picture: { kind: 'text', text: '135 × 20 = 2,700' } },
+                { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '540 + 2,700 = 3,240' } },
+            ],
+        },
+        warmup: [
+            { key: 'multiplication:mult_2by2_standard', why: 'The same two rows with a 2-digit top number.' },
+            { key: 'multiplication:mult_3by1_column', why: 'Each row is a 3-digit number times a 1-digit number.' },
+        ],
+        mixWith: [{ key: 'multiplication:mult_2by2_standard' }, { key: 'multiplication:mult_3by1_column' }],
+        note: 'WRM Y5.B5.S4 "Multiply a 3-digit number by a 2-digit number": the standard algorithm; its area model is skill:multiplication:area_model_3by2.',
+    },
+    'skill:multiplication:area_model_3by2': {
+        routine: 'mult-area-2digit',
+        practice: { skill: 'multiplication:area_model_3by2' },
+        prereqsPending: 'Lane lf-ops sizes: the Warm-up (the 2 x 2 area model and tens times hundreds) until the G4-Y5.B5 Prerequisite Check is written (LR-17).',
+        teach: {
+            vocab: [
+                { word: 'part', meaning: 'one box: a place times a place', picture: { kind: 'text', text: '20 × 100 = 2,000' } },
+                { word: 'row', meaning: 'a line of boxes going across', picture: { kind: 'array', rows: 1, cols: 3, mark: 'row' } },
+                { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+            ],
+        },
+        warmup: [
+            { key: 'multiplication:area_model_2by2', why: 'The same two rows with a 2-digit top number.' },
+            { key: 'multiplication:mult_multiples_of_ten', why: 'A part is a fact times tens or hundreds: 20 × 100.' },
+        ],
+        mixWith: [{ key: 'multiplication:area_model_2by2' }, { key: 'multiplication:mult_3by1_column' }],
+        steps: ['Y5.B5.S4'],
+        note: 'WRM Y5.B5.S4 (the area model half; the standard algorithm is lesson Y5.B5.S4).',
     },
 });
 

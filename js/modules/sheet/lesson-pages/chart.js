@@ -503,7 +503,11 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // its render - add_wp_10, fact_family_sort ... are inside their page by CELL-FITS).
     let perPage = 0;
     if (mode === 'one') {
-        const z1 = solve((q) => lay.rows * H(q), availP, 1, zMax);
+        // (`chartMinZoom`, lesson data - lane lf-ops sizes: a long-multiplication grid - top number, two rows, the sum and their
+        // carry boxes - is ~20 mm too tall for two panel rows at zoom 1; it may draw down to this zoom, never under LR-15's 0.8,
+        // rather than run over the Say band. Absent, the floor stays 1 and no chart moves.)
+        const zMin = data && Number(data.chartMinZoom) >= 0.8 && Number(data.chartMinZoom) < 1 ? Number(data.chartMinZoom) : 1;
+        const z1 = solve((q) => lay.rows * H(q), availP, zMin, zMax);
         if (z1) z = z1;
         else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }

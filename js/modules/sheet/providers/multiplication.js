@@ -6,7 +6,7 @@
 // number." on arrays, charts and the area model. Each skill here teaches its own model: equal
 // groups and rows on arrays, partial products on the area model, row-meets-column on the chart.
 
-import { registerSkill } from '../contract.js';
+import { registerSkill, defaultAdapters } from '../contract.js';
 import { num, arr, obj, operands, countList, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
 import { storiesFor } from './stories.js';
 import { optionICan } from '../../skill-options.js';
@@ -291,6 +291,73 @@ registerSkill('multiplication:area_model_mult_hard', {
     workedSteps: areaSteps,
     wrongAnswer: areaWrong,
     stories: storiesFor('x'),
+});
+
+/* ============================================================================ multiply */
+// multiplication:multiply sized by `tiles` (lane lf-ops sizes, card mult-sizes; the presets mult_2by1_column ...
+// mult_4by1_column, mult_2by2_standard, mult_3by2_standard): the column methods' worked steps, one per place (a 1-digit
+// multiplier, the `stack` cell: the ones first, a regrouped number in the box over the next place) or one per row (a
+// 2-digit multiplier, the `long-multiplication` cell: the ones row, the tens row with its placeholder 0, the sum). Only
+// workedSteps is this skill's own; every other member keeps its default adapter, and an item that is not a sized column
+// (the default "Set by Max Number" deal) keeps the steps its hint gives (adapters.js defaultWorkedSteps).
+const MPLACE = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands'];
+const cap = (w) => w.charAt(0).toUpperCase() + w.slice(1);
+const fmtN = (n) => Number(n).toLocaleString('en-US');
+
+/** Column multiplication by a 1-digit number: one step per place, then the product. */
+export function shortMultSteps(a, m) {
+    const A = String(a).split('').reverse().map(Number);
+    const out = [];
+    let carry = 0;
+    A.forEach((d, i) => {
+        const pr = d * m + carry;
+        const sum = carry ? `${d} × ${m} = ${d * m}, + ${carry} regrouped = ${pr}` : `${d} × ${m} = ${pr}`;
+        const last = i === A.length - 1;
+        if (!last && pr >= 10) {
+            const up = Math.floor(pr / 10);
+            out.push(step(`${cap(MPLACE[i])}: ${sum}. Write ${pr % 10}. Regroup ${up} into the ${MPLACE[i + 1]}.`,
+                [{ slot: MPLACE[i], value: String(pr % 10) }, { slot: `regroup:${MPLACE[i + 1]}`, value: String(up) }]));
+        } else out.push(step(`${cap(MPLACE[i])}: ${sum}. Write ${pr}.`, [{ slot: MPLACE[i], value: String(last ? pr : pr % 10) }]));
+        carry = last ? 0 : Math.floor(pr / 10);
+    });
+    out.push(step(`The product is ${fmtN(a * m)}.`, [{ slot: 'answer', value: String(a * m) }]));
+    return out;
+}
+
+/** Long multiplication by a 2-digit number: the ones row, the placeholder 0 of the tens row, the tens row, the sum (P-1:
+ *  the placeholder 0 - the error pupils make most - is a step of its own). */
+export function longMultSteps(a, b) {
+    const ones = b % 10, tens = Math.floor(b / 10) % 10;
+    const r1 = a * ones, r2 = a * tens * 10;
+    return [
+        step(`Ones: ${fmtN(a)} × ${ones} = ${fmtN(r1)}.`, [{ slot: 'row1', value: String(r1) }]),
+        step('Tens row: write 0 in the ones.', [{ slot: 'row2zero', value: '0' }]),
+        step(`Tens: ${fmtN(a)} × ${tens * 10} = ${fmtN(r2)}.`, [{ slot: 'row2', value: String(r2) }]),
+        step(`Add: ${fmtN(r1)} + ${fmtN(r2)} = ${fmtN(a * b)}.`, [{ slot: 'answer', value: String(a * b) }]),
+    ];
+}
+
+/** The sized column item's operands {a, b, long}, or null (a default-deal item). */
+function sizedColumn(q) {
+    const c = q && q.cell;
+    if (!c || !c.payload) return null;
+    if (c.template === 'long-multiplication') {
+        const a = num(c.payload.a), b = num(c.payload.b);
+        return Number.isInteger(a) && Number.isInteger(b) && b >= 10 && b < 100 ? { a, b, long: true } : null;
+    }
+    if (c.template === 'stack' && c.payload.op === '*') {
+        const [a, b] = arr(c.payload.operands).map(num);
+        return Number.isInteger(a) && Number.isInteger(b) && a >= 10 && b >= 1 && b <= 9 ? { a, b, long: false } : null;
+    }
+    return null;
+}
+
+registerSkill('multiplication:multiply', {
+    workedSteps: (q) => {
+        const s = sizedColumn(q);
+        if (!s) return defaultAdapters().workedSteps(q);
+        return clampSteps(s.long ? longMultSteps(s.a, s.b) : shortMultSteps(s.a, s.b));
+    },
 });
 
 /* =========================================================================== mult_chart */
