@@ -12202,23 +12202,21 @@
    "id": "vocab-model-onepage",
    "check": "vocab_grade_pictures Scripted Model: no page before the last leaves 30 % or more of its body empty (EB-PAGE --page-fill). Builder vocab-blockers 2026-11-19: 3 Match 3 states dealt 2 + 1 (M p1 36 %, L p1 32 %) because roles/scripted-model.js reserves two step-text lines (textH2) on a one-line full-width state",
    "kind": "commit-pair",
-   "rule": "ws-empty-band EB-PAGE (--page-fill)",
+   "rule": "ws-empty-band EB-PAGE (--page-fill; precritic empty-band row)",
    "browser": true,
    "fail": {
     "commit": "b77b1dd9b",
     "state": "OPEN RED: Scripted Model M p1 36 %, L p1 32 % empty (2 pages)"
    },
    "pass": {
-    "commit": "",
-    "state": "the lf-engine fix (scripted-model.js: a one-line full-width state reserves one text line, textH1; lead D3) - arm with its commit"
+    "commit": "5054c8748",
+    "state": "MEASURED STATES: a full-width state is measured as drawn (step text, marks, wide state); the 3 Match 3 states print on one page at M and L"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles scripted-model --hosts none --page-fill --no-baseline --only EB-PAGE",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   },
-   "pending": true,
-   "pendingReason": "open red, owner lf-engine (lead D3: roles/scripted-model.js). The check is on precritic path (the default ws-empty-band row runs --page-fill on every offered role); this row is armed with the fix commit when it lands."
+   }
   },
   {
    "id": "mix-drop",
@@ -12254,6 +12252,26 @@
     "state": "fillClamped: Practice 1 page of 6 under its step strip"
    },
    "command": "node tests/scripts/ws-lesson-fill.cjs --lessons patterns:follow_given_rule,patterns:number_patterns_rule --sizes M,L --seeds 4242",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-measured-states",
+   "check": "ws-empty-band EB-STRETCH / EB-PAGE on the full-width Scripted Model states: a state row is sized from the state as DRAWN (its step text over it, its marks), never a two-line text estimate. lf-engine vocabfix item 3: vocab_pick3_words Model rows 88.7 / 93 mm held cells drawn 70.1 / 73.6 mm (15.5-16.4 mm over the cap), vocab_grade_pictures 2.6-3.7 mm over and p1 36 % / 39 % empty",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH / EB-PAGE (precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "414a0e108",
+    "state": "9 EB-PAGE / EB-STRETCH findings on the vocabulary Models (M / L)"
+   },
+   "pass": {
+    "commit": "5054c8748",
+    "state": "0 findings: rows from the measured state"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words --roles scripted-model --sizes M,L --hosts none --page-fill --no-baseline --only EB-PAGE,EB-STRETCH",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
