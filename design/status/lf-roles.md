@@ -445,3 +445,29 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
 - Hash proof (rolehash, guided + scripted-model 192 pages, lesson 96): HEAD vs HEAD with guided.js from 8533a8b48 (pre-W2; it is
   the only file W2 touched since) - 192 / 192 and 96 / 96 identical. origin/master is not a usable base: the branch's 42 unmerged
   commits change 172 of those pages (grid heights etc.) on their own.
+- 2026-11-20 PSC fill (lead request): check 27ec319a3 adds 'pre-skill-check' to ws-empty-band EBLAST_BLOCKING_ROLES (FAIL on 50
+  EB-LASTPAGE / CAP-PARITY findings, 32 PSC skills at M / L); fix ea36c4f61: counts() deals each prerequisite past its base 4 (up to
+  2 x its share of the role-capacity.js ceiling), fillBands grows the band with the fewest rows on each page while the next row fits
+  and the page stays <= the ceiling; items too wide for the band's columns are passed over; R13's band split (paginateBands) is
+  untouched. After: EB-LASTPAGE / CAP-PARITY PASS on all 32; page counts unchanged on every page (no 1 -> 2 or 2 -> 1); only
+  pre-skill-check pages changed (96 of 480 role pages); ws-lesson-baseline 334 identical; capacity pin 61 rises, 0 drops.
+  Backtest `psc-fill-eblast` PASS. OPEN for the lead: more cells raise the pre-existing EB-BAND / EB-SIDE counts on the stack
+  skills' PSC pages (sub_100k M EB-BAND 7 -> 14 etc.) and div_facts PSC M gains 2 EB-SIDE (30.8 %, equation cell in a 2-col band).
+- 2026-11-20 PSC fill r2 (lead rulings 1c / 2): pre-skill-check ceilings lowered to 12 M / 8 L in role-capacity.js (a SHORT check:
+  3 rows of 4 at M, 2 rows of 4 at L on a one-prerequisite fact page; WDS §12.1's 20 / 16 stays the outer bound). Check state
+  35465ad9c (new ceilings, master role code: FAIL), fix 903f2d778: deal <= ceiling + one row's spare, whole rows only (a lone item
+  drew a full-width cell, div_facts M), items narrower than the band's narrowest base item passed over (div_facts M "0 ÷ 8" EB-SIDE
+  30.8 %). EB-LASTPAGE / CAP-PARITY PASS on all 32 PSC skills; no PSC page has an EB-BAND / EB-SIDE finding master lacks; page counts
+  unchanged; 96 of 480 role pages changed, all pre-skill-check; ws-lesson-baseline 334 identical. Backtest psc-fill-eblast re-pointed,
+  PASS.
+- QUEUED for next week (lead ruling 2): the pre-existing stack-cell EB-BAND / EB-SIDE on the sub_*_no_regroup PSC pages (counts
+  rise with the filled rows on pages already red on master); not fixed in this lane round.
+
+### PSC fill: narrow critic PASS (2026-11-20, 2e01daf04)
+Independent critic (medium): correctness 9, teaching 8, layout 8, contract 8. 52 page screenshots (div_facts, add_facts,
+sub_wp_20, placevalue:identify, sub_1k; M/L; seeds 1, 7); other roles hash-identical to master. Minor defects, all pre-existing
+on master, queued for next week's PSC layout pass (with the trim to the ceiling and the stack-cell EB-BAND / EB-SIDE, lead 2026-11-20):
+- D1 sub_wp_20 L p1 48 % empty with a 2nd page of 6: check = EB-PAGE blocking for pre-skill-check, or "total fits under ceiling + 1 row -> one page".
+- D2 sub_1k PSC title "Pre-skill check: subtracting sub 1k" (skill id leaks): check = PSC title lint for id fragments.
+- D3 sub_wp_20 M p1: two adjacent bands with the same "Subtract." instruction, ragged 8 / 4: check = adjacent-band identical-instruction lint.
+- D4 add_facts M seed 7: three items answer 12, a turnaround pair in one band: check = deal-diversity (<= 2 share an answer, no turnaround pair per band).

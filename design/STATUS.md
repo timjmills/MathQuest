@@ -970,3 +970,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Guided hints never print a number a box of the same try expects unless the question prints it (HINT-LEAK / HINT-OVERMASK / HINT-UNIFORM); vocab pick-3 hint leaves 2 words; continuation hint rows fit (CELL-FITS).
 - Screen help never shows a blank (675 -> 0 skills); the Say fallback only for one-number answers; remaining leaks pinned shrink-only to their lanes.
 - Gates: boot-smoke, code-snapshot, no-size-s, no-phone-width, roles-unit, skip, end-run, guided-cellfit, hint-no-blank, support-ladder, unit-form-bank, screen-answer, simple-print, key-json (sample), self-tests, precritic-plan, capacity-pin, lesson baseline.
+
+## 2026-11-20 — Deploy Pre-skill Check fill (lf-roles; narrow critic PASS 9/8/8/8): PSC ceilings 12 (M) / 8 (L); pre-skill-check joins EBLAST_BLOCKING_ROLES
+- One-prerequisite fact sheets 4 -> 12 (M) / 8 (L) on one page; multi-prerequisite sheets at most 2 pages (R13 2+2); EB-LASTPAGE / CAP-PARITY block on pre-skill-check. Next week: trim over-ceiling bases, stack-cell bands, D1-D4.
+- Gates: boot-smoke, code-snapshot, no-size-s, roles-unit, empty-band self-test / capacity / pin, backtest psc-fill-eblast, key-json (sample), simple-print, self-tests, precritic-plan, capacity-pin, lesson baseline.
