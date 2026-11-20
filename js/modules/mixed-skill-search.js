@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, isMixedMetaSkill } from './data.js';
 import { searchSkillIndex } from './skill-search.js';
 
 export let mixedSkillSearchMouseDown = false;
@@ -65,7 +65,7 @@ export function updateMixedSkillsSkillSelect() {
     const skills = SKILLS[categoryId];
     if (skills) {
         for (const skill of skills) {
-            if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
+            if (skill.v !== 'mixed' && !(skill.v.startsWith('mixed_') && isMixedMetaSkill(skill.v))) {
                 skillSelect.innerHTML += `<option value="${skill.v}">${skill.l}</option>`;
             }
         }

@@ -1,4 +1,4 @@
-import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
+import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory, isMixedMetaSkill } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -652,7 +652,7 @@ export function handlePrintDialogSearch(query) {
     // ranked by the shared thesaurus search (skill-finder.js): label > concept > code > misspelling
     const index = searchSkillIndex(query);
 
-    const matches = index.filter(item => !(item.skillId === 'mixed' || item.skillId.startsWith('mixed_')));
+    const matches = index.filter(item => !(item.skillId === 'mixed' || (item.skillId.startsWith('mixed_') && isMixedMetaSkill(item.skillId))));
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.85rem;">No skills found.</div>';

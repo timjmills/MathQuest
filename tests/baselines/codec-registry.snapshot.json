@@ -126,7 +126,11 @@
     "familyChart": "4K",
     "patTask": "4U",
     "patShow": "4V",
-    "growShape": "4W"
+    "growShape": "4W",
+    "mnTask": "6F",
+    "mnDenoms": "6G",
+    "mnWholes": "6H",
+    "mnForm": "6J"
   },
   "blocks": {
     "0": {
@@ -801,6 +805,20 @@
       "dots": "D",
       "squares": "S",
       "mixed": "M"
+    },
+    "mnTask": {
+      "partition": "P",
+      "ones": "O",
+      "compose": "C"
+    },
+    "mnDenoms": {
+      "halves-quarters": "H",
+      "to-8": "E"
+    },
+    "mnWholes": {},
+    "mnForm": {
+      "diagram": "D",
+      "eq": "E"
     }
   },
   "scalarOnly": {
@@ -850,7 +868,8 @@
     "msLetter": "bool",
     "msCheck": "bool",
     "familyChart": "bool",
-    "patShow": "bool"
+    "patShow": "bool",
+    "mnWholes": "decimal"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

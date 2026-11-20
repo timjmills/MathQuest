@@ -243,7 +243,12 @@ export const MULTI_KEYS = Object.freeze({
     vocabTask: '6C',     // the picture task: match3 / pick3
     vocabGrade: '6D',    // the grade of the words (1-4)
     vocabSet: '6E',      // one BUILD lesson's word set (an index, append-only), or every word of the grade
-    // NEXT FREE IN BLOCK 6: 6F.
+    // lane lf-algebra (2026-11-20, mixed-partition card; the fractions sub-range 6C-6P): fractions:mixed_numbers_intro
+    mnTask: '6F',        // the task: partition (wholes + fraction) / ones (1 + 1 + fraction) / compose (write the mixed number)
+    mnDenoms: '6G',      // the denominators: halves and quarters / 2 to 8
+    mnWholes: '6H',      // the most wholes: 1 / 2 / 3 / 5
+    mnForm: '6J',        // the response form: the part-whole diagram / the equation frame
+    // NEXT FREE IN BLOCK 6: 6K.
     // Wave 1 lane A (sub-range 6X-6Z, pupil practice): the calculator button and the Skip rule.
     calculator: '6X',    // every skill: show the pupil a calculator button (default off)
     skipAfter: '6Y',     // every skill: wrong tries before Skip appears (default 5, 0 = off)
@@ -326,6 +331,10 @@ export const VALUE_TOKENS = Object.freeze({
     // lane lf-algebra (2026-11-07)
     patTask: Object.freeze({ parity: 'P', feature: 'F', truefalse: 'T', next: 'N', rule: 'R', far: 'X' }),
     growShape: Object.freeze({ dots: 'D', squares: 'S', mixed: 'M' }),
+    // lane lf-algebra (2026-11-20): fractions:mixed_numbers_intro
+    mnTask: Object.freeze({ partition: 'P', ones: 'O', compose: 'C' }),
+    mnDenoms: Object.freeze({ 'halves-quarters': 'H', 'to-8': 'E' }),
+    mnForm: Object.freeze({ diagram: 'D', eq: 'E' }),
     // lane lf-vocab (2026-11-07)
     vocabTask: Object.freeze({ match3: 'M', pick3: 'P' }),
     answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
@@ -497,6 +506,8 @@ export const SCALAR_ONLY = Object.freeze({
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
     // lane lf-algebra (2026-11-07)
     patShow: 'bool',
+    // lane lf-algebra (2026-11-20): the most wholes, 1 / 2 / 3 / 5
+    mnWholes: 'decimal',
 });
 
 /**

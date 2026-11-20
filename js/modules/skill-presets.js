@@ -167,6 +167,9 @@ export const SKILL_PRESETS = Object.freeze({
     // mult_facts and div_facts ("Tables to 15 x 15").
     'multiplication:mult_facts_15': { skill: 'mult_facts', opts: { band: 225 } },
     'division:div_facts_15': { skill: 'div_facts', opts: { band: 225 } },
+    // 2026-11-20 (lane lf-algebra, mixed-partition card Q7): writing the mixed number from its parts is its own task (WRM Y4.B7.S2
+    // "name the mixed number"); mnTask ones / mnForm eq / model none stay plain options.
+    'fractions:write_mixed_from_parts': { skill: 'mixed_numbers_intro', opts: { mnTask: 'compose' } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

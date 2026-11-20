@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { searchSkillIndex } from './skill-search.js';
 
 window.weightedItems = window.weightedItems || [];   // globals.js creates it (this module loads late)
@@ -63,7 +63,7 @@ export function buildPrintSkillsUI() {
         domainContent.style.cssText = "padding:8px;";
         
         domain.categories.forEach(cat => {
-            const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+            const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v))) || [];
             if (skills.length === 0) return;
 
             const catDiv = document.createElement("div");
@@ -300,7 +300,7 @@ export function generateWeightedSkillsFromDomains() {
             
             // Filter out "mixed" skills and map to weighted format
             const skills = categorySkills
-                .filter(s => !s.v.startsWith('mixed_') && s.v !== 'mixed')
+                .filter(s => !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v)) && s.v !== 'mixed')
                 .map(s => ({
                     id: s.v,
                     label: s.l.replace(/^[🟢🟡🟠🔴🎲🔢🥧📐📊🔤📏🔀🎯🔬🧮📍📈⬜🔷½]+\s*/, '') // Remove emoji prefixes
@@ -394,7 +394,7 @@ export function updateWeightedSkillSelect() {
     const skills = SKILLS[categoryId];
     if (skills) {
         for (const skill of skills) {
-            if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
+            if (skill.v !== 'mixed' && !(skill.v.startsWith('mixed_') && isMixedMetaSkill(skill.v))) {
                 skillSelect.innerHTML += `<option value="${skill.v}">${skill.l}</option>`;
             }
         }
@@ -612,7 +612,7 @@ export function getWeightedItemsForGeneration() {
             });
         } else if (item.type === 'category') {
             // Expand category to all its skills, split percentage
-            const skills = SKILLS[item.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+            const skills = SKILLS[item.id]?.filter(s => s.v !== 'mixed' && !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v))) || [];
             const perSkill = percent / Math.max(1, skills.length);
             skills.forEach(skill => {
                 result.push({
@@ -628,13 +628,13 @@ export function getWeightedItemsForGeneration() {
             if (domain) {
                 let totalSkills = 0;
                 domain.categories.forEach(cat => {
-                    const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+                    const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v))) || [];
                     totalSkills += skills.length;
                 });
                 
                 const perSkill = percent / Math.max(1, totalSkills);
                 domain.categories.forEach(cat => {
-                    const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+                    const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v))) || [];
                     skills.forEach(skill => {
                         result.push({
                             category: cat.id,

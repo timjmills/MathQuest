@@ -384,6 +384,9 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-11-14 lane lf-ops t15 presets (mult_facts / div_facts at "Tables to 15 x 15"). ZH and ZJ (no I or O in a code), the next free codes
     // after ZG. APPEND ONLY. ----
     "multiplication:mult_facts_15": "ZH", "division:div_facts_15": "ZJ",
+    // ---- 2026-11-20 lane lf-algebra, mixed-partition card: the new skill and its preset (mnTask compose). ZM, ZN (ZK and ZL
+    // are left to the parallel lf-algebra multiply-three build). APPEND ONLY. ----
+    "fractions:mixed_numbers_intro": "ZM", "fractions:write_mixed_from_parts": "ZN",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

@@ -310,7 +310,7 @@ export function updateSkillListInline() {
         const sorted = sortByGrade(categorySkills, catId);
         sorted.forEach(skill => {
             // Skip mixed skills
-            if (skill.v.startsWith('mixed_') || skill.v === 'mixed' || skill.v.endsWith('_all')) return;
+            if ((skill.v.startsWith('mixed_') && isMixedMetaSkill(skill.v)) || skill.v === 'mixed' || skill.v.endsWith('_all')) return;
 
             const isInQueue = UnifiedSkills.has(skill.v, catId);
             const bgColor = isInQueue ? 'var(--accent-green)' : 'var(--bg-card-light)';

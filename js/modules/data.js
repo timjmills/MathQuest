@@ -297,6 +297,7 @@ export const SKILL_GRADES = {
     'chart_to_120': 1,                                                    // 1.NBT.A.1 to 120 (2026-11-12 preset, chartwindow card)
     'div_facts_long': 3,                                                  // 3.OA.C.7 facts in the 4.NBT.B.6 bracket (2026-10-31 preset, facts card Q4)
     'mult_facts_15': 4, 'div_facts_15': 5,                                // past 3.OA.C.7: 2-digit x 2-digit (4.NBT.B.5), 2-digit divisors (5.NBT.B.6); 2026-11-14 presets, t15
+    'mixed_numbers_intro': 3, 'write_mixed_from_parts': 3,                // WRM Y4.B7.S3 (school grade 3; CCSS 4.NF.B.3b), 2026-11-20 lane lf-algebra, mixed-partition card
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
     'round_to_hundredth': 5, 'ratio_part_to_part': 6, 'ratio_simplest_form': 6, 'ratio_equivalent_or_not': 6,
@@ -946,6 +947,10 @@ export const SKILLS = {
         { v: "compare_fractions_nl", l: "Compare Fractions on a Number Line", presetOf: "compare" },
         { v: "equivalent_or_not", l: "Equivalent Fractions: Yes or No?", presetOf: "equivalent" },
         { v: "simplify_with_gcf", l: "Simplify Fractions Using the Greatest Common Factor", presetOf: "simplify" },
+        // APPENDED 2026-11-20 — NEW skill (lane lf-algebra, card design/cards/mixed-partition): WRM Y4.B7.S3, a mixed number
+        // split into wholes and a fraction in a part-whole diagram; and its PRESET (mnTask compose, card Q7).
+        { v: "mixed_numbers_intro", l: "Partition a Mixed Number" },
+        { v: "write_mixed_from_parts", l: "Write a Mixed Number from Wholes and a Fraction", presetOf: "mixed_numbers_intro" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -1513,6 +1518,7 @@ export const SKILLS = {
 // Real playable skills that happen to start with 'mixed_' or end with '_all'
 const REAL_PLAYABLE_SKILLS = new Set([
     'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
+    'mixed_numbers_intro',
     'coordinate_all',
 ]);
 export function isMixedMetaSkill(v) {
@@ -2008,6 +2014,7 @@ export const SKILL_TIME_CATEGORY = {
     // Drag-onto-number-line family (nl-drag widget — multi-marker drag is extended thinking)
     fraction_nl_drag: "extended", decimal_nl_drag: "extended",
     mixed_nl_drag: "extended", integer_nl_drag: "extended",
+    mixed_numbers_intro: "extended",
     // Math Vocabulary (matching takes thought, not pure recall)
     vocab_grade_K: "extended", vocab_grade_1: "extended", vocab_grade_2: "extended",
     vocab_grade_3: "extended", vocab_grade_4: "extended", vocab_grade_5: "extended",
@@ -2264,6 +2271,7 @@ export const SKILL_PRINT_SIZE = {
     // Drag-onto-number-line family (nl-drag widget — full-width number line)
     fraction_nl_drag: "wide", decimal_nl_drag: "wide",
     mixed_nl_drag: "wide", integer_nl_drag: "wide",
+    mixed_numbers_intro: "wide",
     // Compose-fraction-tiles & compose-shape-blocks widget skills (full-width drag stages)
     compose_whole: "wide", compose_target_frac: "wide",
     compose_hexagon: "wide", compose_rect_from_squares: "wide",

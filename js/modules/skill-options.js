@@ -4046,6 +4046,60 @@ const LF_ALGEBRA_OPTIONS = {
 Object.assign(SKILL_OPTIONS, LF_ALGEBRA_OPTIONS);
 // ---- end lf-algebra
 
+// ===========================================================================
+// lane lf-algebra (2026-11-20) · APPEND ONLY · fractions:mixed_numbers_intro (card design/cards/mixed-partition)
+// ===========================================================================
+// Read by gen-fractions.js (the mixed_numbers_intro branch). Keys (skill-option-keys.js, fractions sub-range 6C-6P): mnTask 6F,
+// mnDenoms 6G, mnWholes 6H, mnForm 6J; `model` is the shared 5D (values bar / none). The preset
+// fractions:write_mixed_from_parts opens it with mnTask 'compose' (skill-presets.js; card Q7).
+const LF_ALGEBRA_MIXED_OPTIONS = {
+    'fractions:mixed_numbers_intro': [
+        {
+            id: 'mnTask', label: 'Task', type: 'enum', default: 'partition', group: 'difficulty',
+            values: [
+                { v: 'partition', l: 'Split it: the wholes and the fraction (2 3/4 = 2 + 3/4)' },
+                { v: 'ones', l: 'Split it into ones: 1 + 1 + the fraction (2 3/4 = 1 + 1 + 3/4)' },
+                { v: 'compose', l: 'Write the mixed number from its wholes and fraction' },
+            ],
+            // 'ones' adds a part box for every whole (a wider diagram)
+            addsDrawingValues: ['ones'],
+            helpShort: 'One task a page: split the mixed number, split it into ones, or put the parts back together.',
+            help: 'Split it: the mixed number is printed in the top box; the pupil writes the wholes and the fraction in the two boxes under it. '
+                + 'Into ones: one box for each whole (each takes 1) and one for the fraction. Write the mixed number: the parts are printed, '
+                + 'the pupil writes the mixed number in the top box.',
+        },
+        {
+            id: 'mnDenoms', label: 'Denominators', type: 'enum', default: 'halves-quarters', group: 'difficulty',
+            values: [
+                { v: 'halves-quarters', l: 'Halves and quarters (2, 4)' },
+                { v: 'to-8', l: 'Halves to eighths (2, 3, 4, 5, 6, 8)' },
+            ],
+            help: 'The parts the fraction is made of. Start with halves and quarters, then thirds, fifths, sixths and eighths.',
+        },
+        {
+            id: 'mnWholes', label: 'Most wholes', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 1, l: '1 (1 1/2, 1 3/4)' }, { v: 2, l: '2' }, { v: 3, l: '3' }, { v: 5, l: '5 (no bar model past 3 wholes)' }],
+            help: 'The biggest whole number part. At 5 the items with 4 or 5 wholes have no bar model: six bars do not fit a cell.',
+        },
+        {
+            id: 'model', label: 'Bar model', type: 'enum', default: 'bar', group: 'support',
+            values: [{ v: 'bar', l: 'Bars beside the first items (a full bar for each whole)' }, { v: 'none', l: 'No bars: the part-whole diagram only' }],
+            addsDrawingValues: ['bar'],
+            helpShort: 'A hint that fades: one shaded bar for each whole and one part-shaded bar, beside the first two items of a page.',
+            help: 'The bar model is a hint. On paper the first two items of a page draw it beside the part-whole diagram; the rest stand two '
+                + 'across without it. The part-whole diagram and its labels "wholes" and "fraction" stay on every item.',
+        },
+        {
+            id: 'mnForm', label: 'Write the answer in', type: 'enum', default: 'diagram', group: 'difficulty',
+            values: [{ v: 'diagram', l: 'The part-whole diagram' }, { v: 'eq', l: 'A number sentence: 2 3/4 = [ ] + [ ]/[ ]' }],
+            appliesTo: (cur) => cur.mnTask !== 'compose', appliesBase: { mnTask: 'partition' },
+            help: 'The number sentence is the faded form (and the exit-slip form): the same parts, written after the equals sign.',
+        },
+    ],
+};
+Object.assign(SKILL_OPTIONS, LF_ALGEBRA_MIXED_OPTIONS);
+// ---- end lf-algebra mixed_numbers_intro
+
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
     const pre = _presetDefs(categoryId, skillId, optionsFor);

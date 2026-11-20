@@ -103,7 +103,7 @@ export function updateAddSkillsSkillSelect() {
     const skills = visibleSkills(categoryId);
     if (skills) {
         for (const skill of skills) {
-            if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
+            if (skill.v !== 'mixed' && !(skill.v.startsWith('mixed_') && isMixedMetaSkill(skill.v))) {
                 const grade = getSkillGrade(skill.v, categoryId);
                 const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
                 skillSelect.innerHTML += `<option value="${skill.v}">${prefix}${skill.l}</option>`;
@@ -524,7 +524,7 @@ export function playWithGlobalSkills(mode) {
                 selectedSkills[item.categoryId].push(item.id);
             }
         } else if (item.type === 'category') {
-            const skills = visibleSkills(item.id).filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'));
+            const skills = visibleSkills(item.id).filter(s => s.v !== 'mixed' && !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v)));
             if (!selectedSkills[item.id]) {
                 selectedSkills[item.id] = [];
             }
@@ -537,7 +537,7 @@ export function playWithGlobalSkills(mode) {
             const domain = DOMAINS[item.id];
             if (domain) {
                 domain.categories.forEach(cat => {
-                    const skills = visibleSkills(cat.id).filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'));
+                    const skills = visibleSkills(cat.id).filter(s => s.v !== 'mixed' && !(s.v.startsWith('mixed_') && isMixedMetaSkill(s.v)));
                     if (!selectedSkills[cat.id]) {
                         selectedSkills[cat.id] = [];
                     }
