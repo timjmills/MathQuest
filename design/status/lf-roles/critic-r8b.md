@@ -418,3 +418,61 @@ Renders are in `<scratchpad>/critic-r14/`.
 - **y2 (nit, carried over)** · "cookies." sits alone on a line in the sub_wp_20 Model's working (LINE-ORPHAN).
 
 **Critic r14 verdict: PASS.** All four graded pages are ≥ 8. Y1 is closed: EB-STRETCH is OK on add_wp_20 and sub_wp_10 L.
+
+## Critic r15 (narrow)
+
+Critic: independent (mq-opus-medium), 2026-11-20. Branch `claude/sweet-newton-c8wrv1-lf-roles-stretch` at 26034302b, checked
+out in a private worktree. I rendered every page myself, pupil page and key. Renders are in `<scratchpad>/critic-r15/`.
+
+### 1 · z1: vocab_pick3_words, seed 7, size L
+
+| Page | Cue printed | C1 / C2 / C3 / C4 | Verdict |
+|---|---|---|---|
+| Guided L | `Its word starts with "f" or "p".` (bank: factor / product / rule) | 9 / 8 / 8 / 9 | **PASS** |
+| Scripted Model L | step 1 `Its word starts with "e" or "o".` (bank: even / odd / multiple) | 8 / **7** / 8 / 8 | **FAIL** (W1) |
+| Lesson L | step 1 `Its word starts with "i" or "o".` (bank: input / rule / output) | 8 / **7** / 8 / 8 | **FAIL** (W1) |
+
+**What is right on all three pages:**
+- The cue now leaves two bank words, and the picture decides between them (the boxed factors, the dots in pairs, the boxed
+  Out column). Nothing gives the answer away, so z1 is closed.
+- Nothing is clipped. Checked in the DOM: no cell overflows and nothing passes the body bottom, on pupil page or key.
+- Each key has the same plan as its pupil page and is right.
+- On the Guided page the hint is natural: a grey hint under the try's line.
+
+**W1 · Scripted Model L and Lesson L: the letter cue stands in for the Model's reasoning (C2 7).**
+- On the Model pages the cue is **step 1**, where the worked example should say what the picture shows.
+  - The Lesson prints "① Look at the picture." with the cue under it. It never says *what* to look at (the boxed column is
+    the numbers that come out).
+  - The Scripted Model's step 1 is only the cue. Its "Read the three words" step comes after it, which is out of order with
+    the Steps strip (1 Look, 2 Read the three words, 3 Choose, 4 Write).
+- On an ELL vocabulary page the link between word and meaning is what teaches. A first-letter elimination is a test-taking
+  trick, and the Model never says why the answer is "even" or "output".
+- This is a pre-existing class, not caused by r15: r15 made the cue safe (it gave the answer before). The cue belongs in the
+  Guided hint. The Model's step 1 should name the feature in the picture ("Every dot has a partner." / "The box is around the
+  Out column.").
+- *Check:* proposed MODEL-STEP-NOT-CUE (ws-roles-unit): a Scripted Model or Lesson worked step may not be a hint cue (a
+  letter, or first-letter text that only narrows a bank). Step 1 of a vocab Model must name a feature of the picture.
+- Nit: the Lesson's step 2 prints "Read the three words in the box." twice, once as the heading and once as its text.
+
+### 2 · F3: two_step_add_then_div Guided L, page 2 (seeds 1 and 591220)
+
+- The hinted try's row now holds its hint line. The cell's **bottom rule prints** under "Step 1: circle +. 22 + 14 = 36." and
+  "Step 1: circle −. 14 − 6 = 8.".
+- Nothing is clipped on any of the 3 pages, pupil page or key.
+- `node tests/scripts/ws-guided-cellfit.cjs`: **OK**.
+- **F3 is closed.**
+
+**W2 · two_step: the continuation-page hint gives away the whole of Step 1 (C2 7 on that page; outside F3's fix).**
+- "Step 1: circle +. 22 + 14 = 36." gives the sign, both numbers and the result. The pupil is asked to write exactly those
+  in the Step 1 boxes, so all of Step 1 is given.
+- PT §2.3 asks for the first worked step "that holds none of its answer". The r10 hint ("Step 1: Circle +. Add.") stopped at
+  the sign, and that is the allowed form.
+- *Check:* proposed GUIDED-HINT-LEAK (r8b D3) extended to multi-step cells: a hint may not print a value that a scored slot
+  of the same try expects.
+- X2 (the lone Model on page 1, waiting on a lead ruling) was not graded.
+
+**Critic r15 verdict:**
+- **z1 closed** (Guided L PASS; the cue leaves two words).
+- **F3 closed** (the rule prints; cellfit OK).
+- **FAIL** on W1 (vocab Scripted Model and Lesson L: the cue replaces the Model's reasoning, pre-existing class) and W2
+  (two_step hint gives Step 1 away).
