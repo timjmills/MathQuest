@@ -999,3 +999,15 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   teaching skill's real item (lazy, teacher-chip mountCropped) or a plain "To build" card; teacher-chip.js unchanged.
   The "Only 8/10 ✓" switch on the Skills screen filters the Maths area view (the other Browse-by views ignore it).
   Screenshots: design/status/lf-checks/lessons-browser/build/.
+## 2026-11-20 — lessons browser fix round (critic lessons-browser r1 FAIL, D1-D10; medium, rebuild after a fail)
+
+- D1 first page of a detailed lesson as its card thumbnail (teacher-chip.js mountLessonPage: built once, one-page sheet in
+  an inert iframe scaled whole; cached `lessonId|renderHash` in memory + IndexedDB; renderHash = import-map stamps of the
+  sheet kit / lessons / print-sheet). D2 Skills "Only 8/10" row hidden outside the Maths area view and while searching.
+  D3 pending wording from the registry's own reason (lessons-passed.js pendingKind / pendingWords); empty state lists the
+  grade's pending lessons only. D4 48 px: the control token is 48 on the Skills and Lessons screens plus a 48 px floor for
+  every control (not inside item previews); "Skills to be made" toggle not shown at n = 0. D5 a link into By unit / date
+  scrolls Now into view. D6 item previews drawn whole ('preview' fit, then a refit of anything still outside the box).
+  D7 header card: grade, area and pass / pending only (the old tag row keeps CCSS · BUILD and the verdict); cards one top band.
+  D8-D10 gate: four default widths, round trip asserts view=list, exact Skills grade pills; one rule per defect.
+- Pre-existing, not this lane: ws-teacher-shell FAILs 3 on 6d0d8ff4a as well (popover summary / sample / board code).

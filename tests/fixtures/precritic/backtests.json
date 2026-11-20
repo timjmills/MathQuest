@@ -14281,6 +14281,190 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lessons-browse-thumb-first-page",
+   "check": "critic lessons-browser r1 D1: a card whose lesson has a detailed lesson shows that lesson's FIRST PAGE (card §7), cached by lessonId|renderHash (a second draw and a reload build nothing)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse THUMB-DETAILED-FIRST-PAGE",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only THUMB-DETAILED-FIRST-PAGE --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-skills-views",
+   "check": "critic lessons-browser r1 D2: the Skills screen's Only 8/10 is not offered (or filters) in every Browse-by view and while searching",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse SKILLS-VIEWS",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only SKILLS-VIEWS --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-pending-words",
+   "check": "critic lessons-browser r1 D3: every pending line words its lesson's own reason from the registry (no 'fix' for a render change), and the empty state names only the grade's pending lessons",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse PENDING-WORDS",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only PENDING-WORDS --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-screen-48",
+   "check": "critic lessons-browser r1 D4 + D8: every interactive control of the Lessons and Skills screens (not a hand list) is >= 48 px at 1366, 1280, 1024 and 820 (the default widths)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse SCREEN (all controls, all widths)",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only SCREEN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-unit-now-hash",
+   "check": "critic lessons-browser r1 D5: a link into By unit / date (Back, Forward, a pasted address) brings the Now unit into view",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse UNIT-NOW-ON-HASH",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only UNIT-NOW-ON-HASH --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-thumb-no-clip",
+   "check": "critic lessons-browser r1 D6: every drawn thumbnail preview is whole (no cut class, every visible part inside its box)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse THUMB-NO-CLIP",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only THUMB-NO-CLIP --widths 1280,1024",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-head-no-repeat",
+   "check": "critic lessons-browser r1 D7: the opened lesson's header card says no status fact twice; a thumbnail card has one colour band (the 4 px top band)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse HEAD-NO-REPEAT",
+   "browser": true,
+   "fail": {
+    "commit": "6d0d8ff4a",
+    "state": "critic lessons-browser r1 tree (FAIL C1 7 / C3 7 / C4 7)"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "lf-checks fix round for critic lessons-browser r1"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only HEAD-NO-REPEAT --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-roundtrip-view",
+   "check": "critic lessons-browser r1 D9: the List round trip really runs in view=list (same commit both sides: the fail state plants the r1 link with no view=, so the list case ran in thumbnails)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse ROUNDTRIP-VIEW",
+   "browser": true,
+   "fail": {
+    "commit": "610885593",
+    "state": "planted: the r1 'list' link with no view= after the thumbnails",
+    "args": "--plant roundtrip-thumbs"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "the fix: #wrm/3?a=OA&view=list, asserted",
+    "args": ""
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only ROUNDTRIP-VIEW --widths 1366 {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-browse-grade-pills",
+   "check": "critic lessons-browser r1 D10: the Skills grade pills equal All + the catalogue's grades (sorted) + Mixed, an assertion that can fail (same commit both sides: the fail state plants a dropped grade-3 pill)",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse SKILLS-GRADE-PILLS",
+   "browser": true,
+   "fail": {
+    "commit": "610885593",
+    "state": "planted: the grade 3 pill removed before the read",
+    "args": "--plant drop-grade-pill"
+   },
+   "pass": {
+    "commit": "610885593",
+    "state": "the generated pills",
+    "args": ""
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only SKILLS-GRADE-PILLS --widths 1366 {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
