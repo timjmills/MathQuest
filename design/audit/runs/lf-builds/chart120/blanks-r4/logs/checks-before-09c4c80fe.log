@@ -1,0 +1,22 @@
+  LESSON-TWIN composing:chart_to_120 lesson M seed 1: p3 window 1 is p2 window 3 again (the same squares and gaps)
+  LESSON-TWIN composing:chart_to_120 lesson M seed 1: p3 window 2 is p2 window 2 again (the same squares and gaps)
+  LESSON-TWIN composing:chart_to_120 lesson M seed 1: p3 window 4 is p2 window 1 again (the same squares and gaps)
+  ANSWER-VARIETY composing:chart_to_120 lesson M seed 1 p3: 5 of 5 windows answer 96, 106, 116
+  CROSSING-IN-PLAY composing:chart_to_120 lesson M seed 1: no pupil gap at 100, 101, 110 or 111 in the packet (gaps 96, 106, 116)
+  STEP-COVER composing:chart_to_120 lesson M seed 1 p2 window 3: no printed step solves 96, 106, 116 from a printed neighbour (steps: LUD)
+  STEP-COVER composing:chart_to_120 lesson M seed 1 p3 window 1: no printed step solves 96, 106, 116 from a printed neighbour (steps: LUD)
+  LESSON-TWIN composing:chart_to_120 lesson M seed 4242: p3 window 1 is p2 window 2 again (the same squares and gaps)
+  LESSON-TWIN composing:chart_to_120 lesson M seed 4242: p3 window 2 is p2 window 3 again (the same squares and gaps)
+  LESSON-TWIN composing:chart_to_120 lesson M seed 4242: p3 window 3 is p2 window 1 again (the same squares and gaps)
+  ANSWER-VARIETY composing:chart_to_120 lesson M seed 4242 p3: 4 of 5 windows answer 94, 104, 114
+  STEP-COVER composing:chart_to_120 lesson M seed 4242 p2 window 3: no printed step solves 94, 104, 114 from a printed neighbour (steps: LUD)
+  STEP-COVER composing:chart_to_120 lesson M seed 4242 p3 window 2: no printed step solves 94, 104, 114 from a printed neighbour (steps: LUD)
+  LESSON-TWIN composing:chart_to_120 lesson L seed 1: p3 window 4 is p2 window 1 again (the same squares and gaps)
+  ANSWER-VARIETY composing:chart_to_120 lesson L seed 1 p3: 5 of 5 windows answer 96, 106, 116
+  CROSSING-IN-PLAY composing:chart_to_120 lesson L seed 1: no pupil gap at 100, 101, 110 or 111 in the packet (gaps 96, 106, 116)
+  STEP-COVER composing:chart_to_120 lesson L seed 1 p3 window 1: no printed step solves 96, 106, 116 from a printed neighbour (steps: LUD)
+  LESSON-TWIN composing:chart_to_120 lesson L seed 4242: p3 window 3 is p2 window 1 again (the same squares and gaps)
+  ANSWER-VARIETY composing:chart_to_120 lesson L seed 4242 p3: 4 of 5 windows answer 94, 104, 114
+  STEP-COVER composing:chart_to_120 lesson L seed 4242 p3 window 2: no printed step solves 94, 104, 114 from a printed neighbour (steps: LUD)
+  OVERLAP-INFO 0 answer(s) shared by overlapping (not identical) windows; TF 0/0 False; EA multi-gap Correct 0 / Fix it 0
+ws-guided-echo: FAIL - 20 finding(s) (4 pages, composing:chart_to_120, sizes M/L, 8 seeds)

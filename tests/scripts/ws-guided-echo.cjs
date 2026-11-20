@@ -50,6 +50,11 @@
 //                      (`keyParts`) prints a plural frame, with k blanks when it is unfilled. Judged on chart windows.
 //   CHART-SQUARE       on Reason It / True or False? / Error analysis, laid out at its printed size, no chart square is narrower
 //                      than the 14 mm writing floor (F10: band 100 Reason It L squeezed A | B beside the response to 10.4 mm squares).
+//   (chart blanks critic r2, 2026-11-20:)
+//   LESSON-TWIN        no two pupil windows of one lesson packet hold the same squares and gaps (worked example left out; R2-1).
+//   ANSWER-VARIETY     on a page of 4+ pupil windows no one answer set covers more than half of them (R2-1).
+//   CROSSING-IN-PLAY   a chart_to_120 lesson packet leaves a pupil gap at 100, 101, 110 or 111 (R2-1).
+//   STEP-COVER         on a page with a Steps band every gap is solved by a printed step from a printed neighbour (R2-2).
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
 //                      cell on its page (F5: "The number before is 109 ... Write 110." beside windows with no 109 or 110).
 //
@@ -85,7 +90,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -315,6 +320,49 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             const ex = (exQs.length ? exQs : ((r.plan && r.plan.meta && r.plan.meta.exampleQs) || [])).map((q) => ({ q, anchor: true }));
                             judgeGiveaway(`${key} lesson packet ${size} seed ${s}`, ex.concat(packet.flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model)));
                         }
+                        // (chart blanks critic r2, 2026-11-20 - R2-1 / R2-2:)
+                        // LESSON-TWIN: no two pupil windows of one lesson packet are the same squares with the same gaps (the
+                        // worked example is shown, not answered: left out). ANSWER-VARIETY: on a page of 4+ pupil windows no one
+                        // answer set (a window's sorted gaps) covers more than half of them. CROSSING-IN-PLAY: a band-120 lesson
+                        // packet leaves at least one pupil gap at 100, 101, 110 or 111. STEP-COVER: on a page with a Steps band,
+                        // every gap is solved by a printed step from a printed neighbour (left +1, up +10, top row: down -10,
+                        // and right -1 only when "Look right" is printed).
+                        const pupilWins = (its) => its.filter((it) => it && it.q && !it.anchor && !it.model).map((it) => winOf(it.q)).filter(Boolean);
+                        const pagesJ = packet || pp;
+                        if (packet && on('LESSON-TWIN') && /chart/.test(skillId)) {
+                            const seenTw = new Map();
+                            packet.forEach((pg, pi) => pupilWins(pg.items).forEach((w, wi) => {
+                                const k = `${w.rows.join('.')}|${w.cols.join('.')}|${w.gaps.slice().sort((a, b) => a - b).join('.')}`;
+                                if (seenTw.has(k)) out.push(`LESSON-TWIN ${key} lesson ${size} seed ${s}: p${pi + 1} window ${wi + 1} is ${seenTw.get(k)} again (the same squares and gaps)`);
+                                else seenTw.set(k, `p${pi + 1} window ${wi + 1}`);
+                            }));
+                        }
+                        if (on('ANSWER-VARIETY') && /chart/.test(skillId)) pagesJ.forEach((pg, pi) => {
+                            const ws = pupilWins(pg.items); if (ws.length < 4) return;
+                            const cnt = new Map(); ws.forEach((w) => { const k = w.gaps.slice().sort((a, b) => a - b).join(', '); cnt.set(k, (cnt.get(k) || 0) + 1); });
+                            const [topSet, topN] = [...cnt].sort((a, b) => b[1] - a[1])[0];
+                            if (topN * 2 > ws.length) out.push(`ANSWER-VARIETY ${key} ${role} ${size} seed ${s} p${pi + 1}: ${topN} of ${ws.length} windows answer ${topSet}`);
+                        });
+                        if (packet && on('CROSSING-IN-PLAY') && skillId === 'chart_to_120') {
+                            const all = packet.flatMap((pg) => pupilWins(pg.items)).flatMap((w) => w.gaps);
+                            if (!all.some((n) => [100, 101, 110, 111].includes(n))) out.push(`CROSSING-IN-PLAY ${key} lesson ${size} seed ${s}: no pupil gap at 100, 101, 110 or 111 in the packet (gaps ${[...new Set(all)].sort((a, b) => a - b).join(', ')})`);
+                        }
+                        if (on('STEP-COVER') && /chart/.test(skillId)) pagesJ.forEach((pg, pi) => {
+                            const doc = new DOMParser().parseFromString(`<div>${pg.htmls.join(' ')}</div>`, 'text/html');
+                            const stp = [...doc.querySelectorAll('.mq-lstrip li, .mq-lstepszone li, ol.mq-lsteps li')].map((e) => e.textContent).join(' | ');
+                            if (!/Look (left|up)/i.test(stp)) return;
+                            const has = { L: /Look left/i.test(stp), U: /Look up/i.test(stp), D: /Look down/i.test(stp), R: /Look right/i.test(stp) };
+                            pupilWins(pg.items).forEach((w, wi) => {
+                                const inW = (n) => w.rows.includes(Math.floor((n - 1) / 10)) && w.cols.includes((n - 1) % 10);
+                                const pr = (n) => inW(n) && !w.gaps.includes(n);
+                                const top = Math.min(...w.rows);
+                                const bad = w.gaps.filter((n) => {
+                                    const c = (n - 1) % 10, r = Math.floor((n - 1) / 10);
+                                    return !((has.L && c > 0 && pr(n - 1)) || (has.U && pr(n - 10)) || (has.D && r === top && pr(n + 10)) || (has.R && c < 9 && pr(n + 1)));
+                                });
+                                if (bad.length) out.push(`STEP-COVER ${key} ${role} ${size} seed ${s} p${pi + 1} window ${wi + 1}: no printed step solves ${bad.join(', ')} from a printed neighbour (steps: ${Object.keys(has).filter((k) => has[k]).join('')})`);
+                            });
+                        });
                         // LESSON-EMPTY-PAGE (critic blanks B1): no page of a lesson packet past its first is printed empty, and the key
                         // prints as many pages as the pupil copy
                         if (packet && on('LESSON-EMPTY-PAGE')) {
@@ -409,7 +457,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
