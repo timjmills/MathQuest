@@ -1154,6 +1154,14 @@ export async function submitQuiz() {
 
 // ---- Results Screen ----
 
+/** The pupil's breakdown mark: a tick, a cross, or - for a question still skipped after the return pass - a neutral
+ *  "Skipped" (never a red cross: a skip is not a wrong answer; the teacher's view reads "Skipped" too). */
+function resultIcon(a) {
+    if (a && a.correct) return '<span class="correct-icon">&#10003;</span>';
+    if (a && a.skipped) return '<span class="skipped-icon" aria-label="Skipped">Skipped</span>';
+    return '<span class="incorrect-icon">&#10007;</span>';
+}
+
 function showQuizResults() {
     const test = state.currentQuiz;
     const result = state.currentQuizResult;
@@ -1183,14 +1191,12 @@ function showQuizResults() {
                 }
                 const q = allQs[fIdx].question;
                 const a = result.answers[fIdx];
-                const icon = a && a.correct
-                    ? '<span class="correct-icon">&#10003;</span>'
-                    : '<span class="incorrect-icon">&#10007;</span>';
+                const icon = resultIcon(a);
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
                     detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(quizAnswerText(q.questionData, q.questionData.ans))}</span>`;
                 }
-                breakdownHtml += `<div class="qt-result-q">
+                breakdownHtml += `<div class="qt-result-q${a && a.skipped ? ' qt-result-skipped' : ''}">
                     ${icon}
                     <span>Q${displayIdx + 1}</span>
                     <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml((q.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 50)}</span>
@@ -1202,14 +1208,12 @@ function showQuizResults() {
             state.quizOrder.forEach((fIdx, displayIdx) => {
                 const q = allQs[fIdx].question;
                 const a = result.answers[fIdx];
-                const icon = a && a.correct
-                    ? '<span class="correct-icon">&#10003;</span>'
-                    : '<span class="incorrect-icon">&#10007;</span>';
+                const icon = resultIcon(a);
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
                     detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(quizAnswerText(q.questionData, q.questionData.ans))}</span>`;
                 }
-                breakdownHtml += `<div class="qt-result-q">
+                breakdownHtml += `<div class="qt-result-q${a && a.skipped ? ' qt-result-skipped' : ''}">
                     ${icon}
                     <span>Q${displayIdx + 1}</span>
                     <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml((q.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 50)}</span>

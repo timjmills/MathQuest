@@ -323,6 +323,17 @@ async function runQuiz(page, w) {
     await sleep(500);
     const r = await page.evaluate(() => { const r = window.state.currentQuizResult; return { score: r.score, a: r.answers.map((a) => (a.skipped ? 'skipped' : a.correct ? 'right' : 'wrong')), id: r.id }; });
     judge('SKIP-RETURN', H, w, r.score === 3 && JSON.stringify(r.a) === '["right","right","skipped","right"]', `quiz result ${JSON.stringify(r)}`);
+    // the PUPIL's results breakdown (critic r2 F2): the still-skipped question reads "Skipped", neutral - never the red
+    // cross a wrong answer gets - and keeps the "Answer:" line the other unanswered-right rows show
+    await soft(waitFor(page, () => document.querySelectorAll('#quizTakeView .qt-result-q').length === 4, 8000, 'pupil breakdown'));
+    const pb = await page.evaluate(() => [...document.querySelectorAll('#quizTakeView .qt-result-q')].map((row) => {
+        const sk = row.querySelector('.skipped-icon');
+        const x = row.querySelector('.incorrect-icon');
+        return { skipped: !!sk && /Skipped/.test(sk.textContent) && getComputedStyle(sk).color !== 'rgb(239, 68, 68)', cross: !!x, answer: /Answer:/.test(row.textContent) };
+    }));
+    judge('SKIP-RESULTS', H, w, pb.length === 4 && pb[2].skipped && !pb[2].cross && pb[2].answer && pb.filter((x) => x.skipped).length === 1,
+        `pupil breakdown row Q3 ${JSON.stringify(pb[2])} (want "Skipped", no red cross, the answer shown; one skipped row of ${pb.length})`);
+    await shot(page, w, 'quiz-pupil-skipped', '#quizTakeView');
     const tags = await page.evaluate(async (rid) => {
         try {
             window.showView('quizResultsView');
@@ -416,8 +427,32 @@ async function typeCard(page, v) {
     await page.keyboard.press('Enter');
 }
 const cardAns = (page) => page.evaluate(() => String(window.state.currentQ.ans));
-const waitQ = (page, n) => waitArg(page, (n) => window.state.qCount === n && !window.state.hasAnswered && !document.getElementById('skipReturnIntro'), n, 9000, `card Q${n}`);
-const waitPassMove = async (page, at) => waitArg(page, (at) => (window.state._skipReturnIdx !== at && !window.state.hasAnswered) || (window.state.skipReturn && window.state.skipReturn.done), at, 9000, 'card pass advance');
+// lf-hosts skip critic r2 F1: the real-input runs wait on STATE (the item, the intro, the pass, the end modal), never on a
+// wall-clock pause, with generous timeouts; a soft wait that times out only lets the judge read what is there (a rule
+// passes on what it reads, never on a timeout).
+const LONG = 30000;
+const soft = (p) => p.then(() => true, () => false);
+const waitQ = (page, n) => waitArg(page, (n) => window.state.qCount === n && !window.state.hasAnswered && !document.getElementById('skipReturnIntro'), n, LONG, `card Q${n}`);
+const waitPassMove = async (page, at) => waitArg(page, (at) => (window.state._skipReturnIdx !== at && !window.state.hasAnswered) || (window.state.skipReturn && window.state.skipReturn.done), at, LONG, 'card pass advance');
+/** Type a wrong answer on the card and wait until the wrong try is recorded (the item's history entry reads incorrect). */
+async function typeWrong(page) {
+    // the item's own history slot: in the return pass recordQuestionStatus writes to state._skipReturnIdx
+    const i = await page.evaluate(() => (typeof window.state._skipReturnIdx === 'number' && window.state._skipReturnIdx >= 0 ? window.state._skipReturnIdx : window.state.qCount - 1));
+    await typeCard(page, '987654');
+    await soft(waitArg(page, (i) => { const e = (window.state.questionHistory || [])[i]; return !!(e && (e === 'incorrect' || e.status === 'incorrect')); }, i, 8000, 'wrong try recorded'));
+    await skipReady(page);
+}
+/** Wait until the card's Skip button is visible and is what a tap at its centre hits (the wrong-try feedback has
+ *  settled: nothing over it). A real click then lands on it, whatever the machine's load. */
+const skipReady = (page) => soft(waitFor(page, () => {
+    const b = document.getElementById('skipQuestionBtn');
+    if (!b || getComputedStyle(b).display === 'none') return false;
+    const r = b.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !!hit && (hit === b || b.contains(hit));
+}, 8000, 'card Skip ready'));
+const clickSkip = async (page) => { await skipReady(page); await page.click('#skipQuestionBtn'); };
 
 async function runCardReal(page, w) {
     const H = 'card';
@@ -427,16 +462,16 @@ async function runCardReal(page, w) {
     await waitQ(page, 1);
     await typeCard(page, await cardAns(page));                       // Q1 right
     await waitQ(page, 2);
-    await typeCard(page, '987654'); await sleep(500);                  // Q2 wrong, then Skip
-    await page.click('#skipQuestionBtn');
+    await typeWrong(page);                                             // Q2 wrong, then Skip
+    await clickSkip(page);
     await waitQ(page, 3);
-    await page.click('#skipQuestionBtn');                             // Q3 Skip
+    await clickSkip(page);                             // Q3 Skip
     await waitQ(page, 4);
     await typeCard(page, await cardAns(page)); await sleep(1500);      // Q4 right (typed, Enter)
     await waitQ(page, 5);
-    await typeCard(page, '987654'); await sleep(500);                  // Q5 (the LAST item) wrong, then Skip
-    await page.click('#skipQuestionBtn');
-    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), 9000, 'card intro');
+    await typeWrong(page);                                             // Q5 (the LAST item) wrong, then Skip
+    await clickSkip(page);
+    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), LONG, 'card intro');
     await sleep(3000);                                                 // any stray advance from an earlier item lands now
     const g = await page.evaluate(() => ({ sh: (window.state.sessionHistory || []).length, msg: document.getElementById('skipReturnMsg').textContent.trim(),
         pill: (document.getElementById('skipCountPill') || {}).textContent || '', dots: [...document.querySelectorAll('#questionDots [title], .q-dot[title]')].map((d) => d.getAttribute('title')) }));
@@ -446,20 +481,20 @@ async function runCardReal(page, w) {
     judge('SKIP-KEEP-WRONG', H, w, wrongDots === 2, `dots reading "Incorrect, then skipped": ${wrongDots} (want 2: Q2, Q5) ${JSON.stringify(g.dots)}`);
     await shot(page, w, 'card-return-intro');
     await page.click('#skipReturnGo');
-    await sleep(300);
+    await soft(waitFor(page, () => !document.getElementById('skipReturnIntro') && /Fixing/.test((document.getElementById('goalProgress') || {}).textContent || ''), 8000, 'pass header'));
     const hdr = await page.evaluate(() => (document.getElementById('goalProgress') || {}).textContent || '');
     judge('SKIP-COUNT-MATCH', H, w, /Fixing 1 of 3/.test(hdr), `pass header reads "${hdr}", want "Fixing 1 of 3" (R3)`);
     await shot(page, w, 'card-return-item', '#gameView');
     let at = await page.evaluate(() => window.state._skipReturnIdx);
-    await page.click('#skipQuestionBtn');                             // pass 1 (Q2): skip again
+    await clickSkip(page);                             // pass 1 (Q2): skip again
     await waitPassMove(page, at);
     judge('SKIP-END-GATE', H, w, (await page.evaluate(() => (window.state.sessionHistory || []).length)) === 0, 'a session row was written mid-pass');
     at = await page.evaluate(() => window.state._skipReturnIdx);
     await typeCard(page, await cardAns(page));                         // pass 2 (Q3): right
     await waitPassMove(page, at);
-    await typeCard(page, '987654'); await sleep(600);                  // pass 3 (Q5): wrong, then right
+    await typeWrong(page);                                             // pass 3 (Q5): wrong, then right
     await typeCard(page, await cardAns(page));
-    await waitFor(page, () => (window.state.sessionHistory || []).length > 0, 9000, 'card end');
+    await waitFor(page, () => (window.state.sessionHistory || []).length > 0, LONG, 'card end');
     await sleep(3000);
     const r = await page.evaluate(() => { const st = window.state; const h = st.sessionHistory; return { n: h.length, score: h[0].score, pct: h[0].percentage, sk: h[0].skipped, skw: h[0].skippedAfterWrong, hist: st.questionHistory.map((e) => e.status) }; });
     judge('SKIP-END-GATE', H, w, r.n === 1 && (await endModals(page)) === 1, `after the pass: ${r.n} session rows, ${await endModals(page)} end screens (want 1, 1)`);
@@ -471,17 +506,18 @@ async function runCardReal(page, w) {
 
     // SKIP-TIMER: the game clock runs out under the return-pass intro
     await clearEnd(page);
-    await startPractice(page, 'practice', 3, 60);
+    await startPractice(page, 'practice', 3, 600);   // long: the clock is run out by state below, never by the wall
     await waitQ(page, 1);
-    await page.click('#skipQuestionBtn');
+    await clickSkip(page);
     await waitQ(page, 2);
-    await page.click('#skipQuestionBtn');
+    await clickSkip(page);
     await waitQ(page, 3);
     await typeCard(page, await cardAns(page));
-    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), 9000, 'card timer intro');
+    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), LONG, 'card timer intro');
     await page.evaluate(() => { window.state.timerRemaining = 1; });
-    await waitFor(page, () => (window.state.sessionHistory || []).length > 0, 6000, 'card time up').catch(() => {});
-    await sleep(400);
+    await soft(waitFor(page, () => (window.state.sessionHistory || []).length > 0 && !document.getElementById('skipReturnIntro')
+        && [...document.querySelectorAll('body > div')].some((d) => /z-index: ?9999/.test(d.getAttribute('style') || '') && /Completed|Needed|Time's up|Nice work|Good try/i.test(d.textContent)), LONG, 'card time up'));
+    await sleep(400);                                                  // a second end screen, if any, lands now
     const t = await page.evaluate(() => { const st = window.state; const h = st.sessionHistory || []; return { intro: !!document.getElementById('skipReturnIntro'), n: h.length, sk: h[0] && h[0].skipped, hist: st.questionHistory.map((e) => e.status) }; });
     const tEnd = await endModals(page);
     judge('SKIP-TIMER', H, w, !t.intro && t.n === 1 && tEnd === 1 && t.sk === 2 && !t.hist.includes('incorrect'),
@@ -503,22 +539,24 @@ async function runWorksheetReal(page, w) {
     const pillTxt = () => page.evaluate(() => { const e = document.getElementById('worksheetSkipCount'); return e && getComputedStyle(e).display !== 'none' ? e.textContent.trim() : ''; });
     const before = await pillTxt();
     await page.evaluate(() => window.checkAllWorksheet());
-    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), 5000, 'worksheet intro');
+    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), LONG, 'worksheet intro');
     const msg = await page.evaluate(() => document.getElementById('skipReturnMsg').textContent.trim());
     judge('SKIP-COUNT-MATCH', H, w, msg === "You skipped 2. Let's fix them." && before === 'Skipped: 2', `intro "${msg}" vs count "${before}"`);
     await shot(page, w, 'worksheet-return-intro');
+    const cardUp = (id) => soft(waitArg(page, (id) => { const c = document.getElementById(id); return !document.getElementById('skipReturnIntro') && !!c && getComputedStyle(c).display !== 'none'
+        && [...document.querySelectorAll('#worksheetGrid > .problem-card')].filter((x) => getComputedStyle(x).display !== 'none').length === 1; }, id, 8000, `worksheet pass ${id}`));
     await page.click('#skipReturnGo');
-    await sleep(250);
+    await cardUp('ws_card_1');
     const shown = await pillTxt();
     judge('SKIP-COUNT-MATCH', H, w, shown === 'Skipped: 2', `count when the first skipped card is SHOWN reads "${shown}", want "Skipped: 2" (drops only on answer)`);
     await shot(page, w, 'worksheet-return-item', '#worksheetView');
     await typeWs(1);
     await page.click('#wsReturnNextBtn');
-    await sleep(250);
+    await cardUp('ws_card_2');
     const answered = await pillTxt();
     judge('SKIP-COUNT-MATCH', H, w, answered === 'Skipped: 1', `count after answering the first returned card reads "${answered}", want "Skipped: 1"`);
     await page.click('#wsReturnNextBtn');                             // card 2: blank Next
-    await waitFor(page, () => (window.state.sessionHistory || []).length > 0, 8000, 'worksheet graded');
+    await waitFor(page, () => (window.state.sessionHistory || []).length > 0, LONG, 'worksheet graded');
     const res = await page.evaluate(() => ({ h: window.state.sessionHistory[0], fin: !!window.state.worksheetQs[2]._skipped }));
     judge('SKIP-BLANK', H, w, res.h.score === '3/3' && res.h.skipped === 1 && res.fin, `blank Next in the pass: score ${res.h.score} (want 3/3), skipped ${res.h.skipped} (want 1), card skipped ${res.fin}`);
     await page.evaluate(() => { document.querySelectorAll('body > div[style*="z-index: 9999"], .mq-wsres-teacher').forEach((o) => o.remove()); window.showView && window.showView('homeView'); });
@@ -536,12 +574,12 @@ async function runQuizReal(page, w) {
     await typeQ(2); await nextBtn();
     const pill = await page.evaluate(() => { const e = document.getElementById('qtSkipCount'); return e ? e.textContent.trim() : ''; });
     await page.evaluate(() => window.showQuizReview());
-    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), 5000, 'quiz intro');
+    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), LONG, 'quiz intro');
     const msg = await page.evaluate(() => document.getElementById('skipReturnMsg').textContent.trim());
     judge('SKIP-COUNT-MATCH', H, w, msg === "You skipped 1. Let's fix them." && pill === 'Skipped: 1', `intro "${msg}" vs count "${pill}" (the pass is the skipped questions only)`);
     await shot(page, w, 'quiz-return-intro');
     await page.click('#skipReturnGo');
-    await sleep(200);
+    await soft(waitFor(page, () => !document.getElementById('skipReturnIntro') && !!document.getElementById('qtReturnNext'), 8000, 'quiz pass'));
     const came = [];
     for (let k = 0; k < 6; k++) {
         const nb = await page.$('#qtReturnNext');
@@ -549,27 +587,31 @@ async function runQuizReal(page, w) {
         const f = await page.evaluate(() => window.state.quizOrder[window.state.quizQuestionIndex]);
         const blank = await page.evaluate(() => { const i = document.getElementById('qtAnswerInput'); return !i || !i.value.trim(); });
         came.push({ f, blank });
+        const at = await page.evaluate(() => window.state.quizQuestionIndex);
         await page.click('#qtReturnNext');                            // Next with nothing typed
-        await sleep(200);
+        await soft(waitArg(page, (at) => window.state.quizQuestionIndex !== at || !document.getElementById('qtReturnNext'), at, 8000, 'quiz pass next'));
     }
     judge('SKIP-COUNT-MATCH', H, w, JSON.stringify(came.map((c) => c.f)) === '[1]', `the pass brought back ${JSON.stringify(came.map((c) => c.f))}, want [1] (not the flagged-and-answered Q2 nor the blank Q3)`);
     await page.evaluate(() => window.submitQuiz());
-    await sleep(500);
+    await waitFor(page, () => { const r = window.state.currentQuizResult; return !!(r && r.answers); }, LONG, 'quiz submitted');
     const a = await page.evaluate(() => window.state.currentQuizResult.answers.map((x) => (x.skipped ? 'skipped' : x.correct ? 'right' : 'wrong')));
     const bad = came.filter((c) => c.blank && a[c.f] !== 'skipped');
     judge('SKIP-BLANK', H, w, a[1] === 'skipped' && !bad.length, `blank Next in the pass ended ${JSON.stringify(bad.map((c) => `Q${c.f}=${a[c.f]}`))}; Q1 = ${a[1]} (want skipped)`);
     await page.evaluate(() => { window.state.quizMode = false; window.showView('homeView'); });
 
-    // SKIP-TIMER: the quiz clock runs out under the return-pass intro (6 s limit)
-    await buildQuiz(page, true, false, 0.1);
+    // SKIP-TIMER: the quiz clock runs out under the return-pass intro. The limit is long (5 min) and is run out by moving
+    // the page clock forward once the intro is up, so a slow machine can never expire it early (critic r2 F1).
+    await buildQuiz(page, true, false, 5);
     await page.click('#qtSkipBtn'); await sleep(120);
     await page.click('#qtSkipBtn'); await sleep(120);
     await typeQ(2); await nextBtn();
     await typeQ(3);
     await page.evaluate(() => window.showQuizReview());
-    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), 5000, 'quiz timer intro');
-    await waitFor(page, () => { const r = window.state.currentQuizResult; return !!(r && r.answers && r.answers.some((x) => x.skipped)); }, 9000, 'quiz time up').catch(() => {});
+    await waitFor(page, () => !!document.getElementById('skipReturnIntro'), LONG, 'quiz timer intro');
+    await page.evaluate(() => { const real = Date.now.bind(Date); window.__wsSkipRealNow = real; Date.now = () => real() + 10 * 60 * 1000; });
+    await soft(waitFor(page, () => { const r = window.state.currentQuizResult; return !!(r && r.answers && r.answers.some((x) => x.skipped)) && !document.getElementById('skipReturnIntro'); }, LONG, 'quiz time up'));
     await sleep(300);
+    await page.evaluate(() => { if (window.__wsSkipRealNow) Date.now = window.__wsSkipRealNow; });
     const t = await page.evaluate(() => ({ intro: !!document.getElementById('skipReturnIntro'), a: window.state.currentQuizResult.answers.map((x) => (x.skipped ? 'skipped' : x.correct ? 'right' : 'wrong')) }));
     if (t.intro) { await page.click('#skipReturnGo').catch(() => {}); await sleep(300); }   // the pupil taps the stale intro
     judge('SKIP-TIMER', H, w, !t.intro && t.a[0] === 'skipped' && t.a[1] === 'skipped', `time up under the intro: intro still up ${t.intro}, answers ${JSON.stringify(t.a)}`);
