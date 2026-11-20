@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-20 12:56Z: RESUMED (lead: the owner added budget; stop at cost_usd $715.37 = $665.37 + $50). Per the resume plan: checks SHEET-ANSWER-SET / ANSWER-REUSE / NEAR-TWIN / practice fill floor first, then the lesson deal redesign, then one narrow re-grade. Park at the stop.
 - 2026-11-20 06:10Z: PARKED at the budget/round stop (lead: "Park at your stop"). Narrow critic r4 FAILED (critic-blanks-r4.md, 982fd7fc4). This was the one round after the round-cap stop.
   - Passed:
     - c120 lesson at L;
