@@ -207,7 +207,10 @@ function dims(p, g) {
     const boxH = g.screen ? Math.max(g.writeMm + 1, 1.25 * g.E) : g.writeMm + 1;
     // (the 'make' head "In: 1–10" is bold text-size: its column is at least as wide as the head)
     const textMm0 = g.pt * g.textEm * PT_MM;
-    const colW = Math.max(boxW + 4, 16, p.inHead ? String(p.inHead).length * 0.56 * textMm0 + 3 : 0);
+    // (`insetMm`, a payload flag - critic r3 R3-10, the g3-oa9 exit slip's three tables across a half met their cell borders: each
+    // column gives up that much of its 4 mm air, digits unchanged, and the table stands that far in from both cell borders)
+    const inset = insetOf(p);
+    const colW = Math.max(boxW + 4 - inset, 16 - inset, p.inHead ? String(p.inHead).length * 0.56 * textMm0 + 3 : 0);
     // The rule column (task 'outputs' with the frame): "12 × 2 + 1" at the text size.
     const textMm = g.pt * g.textEm * PT_MM;              // one em of the text size, in mm
     const exprChars = Math.max(ruleText(p.rule).length, ...(p.rows || []).map((r) => ruleOn(p.rule, r.x).length));
@@ -245,6 +248,10 @@ function ruleInMachine(p, g, d, ctx) {
     // (a chart state (ftMerge) has a whole 2 x 2 panel, about 84 mm, not a third of the page)
     return mergedW(g, d) <= (ctx && ctx.ftMerge ? MERGE_CHART_MAX_MM : MERGE_MAX_MM);
 }
+
+/** The payload's inner margin (mm, 0-2.5): an exit slip's table kept off its cell borders (R3-10). */
+const insetOf = (p) => Math.max(0, Math.min(2.5, Number(p && p.insetMm) || 0));
+const insetCss = (p, g) => (insetOf(p) ? `;padding-left:${g.em(insetOf(p))};padding-right:${g.em(insetOf(p))};box-sizing:content-box` : '');
 
 function tableWidth(p, d) {
     return d.colW * 2 + (hasExprCol(p) ? d.exprW : 0);
@@ -681,7 +688,7 @@ register('function-table', {
             if (p.check && slotsById.chk && !p._noCheck) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(1.2)};text-align:center;line-height:1.2">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
-        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g, ctx)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g, ctx)}${insetCss(p, g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const slots = ftSlots(p);
@@ -711,7 +718,7 @@ register('function-table', {
         // (`guidedTight`, patterns precritic 2026-11-20 A3a: the Guided page stretched the Model's row and the tries' rows to
         // 109 mm at M / 156 mm at L for ~72 / ~85 mm of table, EB-BAND 31-46 % under every table; its rows keep their measured
         // height and the spare page height stays under the grid, PAGE_TYPES 12.1 - read by roles/guided.js only)
-        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3, guidedTight: true };
+        return { wMm: Math.ceil(w + 4 + 2 * insetOf(p)), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3, guidedTight: true };
     },
     inputs(p) {
         return ftSlots(p).map((s, n) => ({

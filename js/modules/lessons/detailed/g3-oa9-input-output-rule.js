@@ -156,11 +156,12 @@ export default {
     // ------------------------------------------------------------------ P6 Exit slip
     // One item per rule kind taught, then the Critical Atom's case (row 1 also fits +).
     exit: [
+        // (critic r3 R3-10: insetMm 2 - each table 2 mm in from its cell borders, its columns giving up that much air; no doubled rules)
         // Three tables one row across a half (four tall tables do not fit two rows of a 132.5 mm half; never shrunk):
         // a + rule, a − rule, and the Critical Atom's × table whose row 1 also fits + (it is the × item too).
-        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread', 'ftNeighbour'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
-        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
-        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
+        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true, insetMm: 2 }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread', 'ftNeighbour'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
+        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true, insetMm: 2 }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
+        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true, insetMm: 2 } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
     ],
     // (T2b: what each label means in THIS pack - critic r1 n3: nothing on the Guided page is traced)
     fadeMeans: [['★', 'Guided: the machine picture and the Steps; the teacher leads'], ['★★', 'Practice: Steps only, no machine picture'], ['★★★', 'Last row: a × table (row 1 also fits +) and a − table with an Out of 0']],
