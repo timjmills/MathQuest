@@ -1021,6 +1021,9 @@ function buildPlan(ctx) {
         // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
         // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
+        // (lf-algebra after patterns critic r3: the lesson's chart panels and We Do rows are not a card role, so --card never drew them;
+        // the A1 count-row overflow - backtest npr-lesson-train-oneline - is judged on the lesson pages too)
+        add(gate('cell-checks-lesson', 'ws-cell-checks --roles lesson (OVERFLOW on the lesson chart panels and We Do rows)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--roles', 'lesson', '--rules', 'OVERFLOW'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         // (lf-roles 2026-11-14, lf-engine -roles critic r2 F5: no key prints the generator's raw JSON as an answer, any role)
         add(gate('key-json', 'ws-key-json (L-KEY: no raw JSON answer on any key or page, every role)', scope, 'browser', 'ws-key-json', ['--skills', keys.join(',')], { missingMsg: 'ws-key-json is not in this tree' }));
         // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
@@ -1048,7 +1051,7 @@ function buildPlan(ctx) {
         add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS, TRAIN-PARITY)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
         // (lf-algebra after patterns critic r3 R3-1/2/3/6/7, lead ruling 2026-11-20: INSTR-SLOTS is general - a page's instruction
         // and Steps match its slots: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME; browser, --strict on the run's skills)
-        add(gate('instr-slots', 'ws-instr-slots (INSTR-SLOTS: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME on 7 roles x M / L)', scope, 'browser', 'ws-instr-slots', ['--skills', keys.join(','), '--strict'], { missingMsg: 'ws-instr-slots is not in this tree' }));
+        add(gate('instr-slots', 'ws-instr-slots (INSTR-SLOTS: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME on 7 roles x M / L)', scope, 'browser', 'ws-instr-slots', ['--skills', keys.join(','), '--roles', 'independent,more-practice,guided,test,opener,pre-skill-check,lesson', '--strict'], { missingMsg: 'ws-instr-slots is not in this tree' }));
         // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
         // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
         // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
