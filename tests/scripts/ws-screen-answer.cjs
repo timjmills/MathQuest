@@ -241,6 +241,13 @@ function PLAN(rootSel, which) {
         if (jn === ':' || jn === '.') vals = String(ans).split(jn);
         if (jn === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(ans)); if (m) vals = [m[1], m[2]]; }
         // a fraction [n]/[d], a mixed number [w] [n]/[d] (frac-model): the answer's own parts
+        // a part-whole of a mixed number (frac-model task 'partition', data-mq-join="parts"): "2 + 3/4", "1 + 1 + 3/4", "2 3/4",
+        // "2 3/4 = 2 + 3/4" - every box's value in reading order
+        if (jn === 'parts') {
+            vals = String(ans).split(/\s*[=+]\s*|\s+/).filter(Boolean).flatMap((t) => t.split('/'));
+            slots.forEach((c, i) => { if (vals[i]) tag(c, { type: 'text', value: vals[i] }); });
+            return { plan, q: String(ans) };
+        }
         if (jn === '/' || jn === 'mixed') {
             const a = String(ans).trim();
             const m = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(a) || (/^\d+$/.test(a) ? [a, a] : []);

@@ -173,20 +173,22 @@ function _mnItem(q) {
         q.text = 'Write the mixed number. Then split it into wholes and a fraction.';
         q.screenInstr = 'Type the mixed number. Then split it into wholes and a fraction.';
         q.ans = `${w} ${frac} = ${w} + ${frac}`;
-        q.hint = `Count the full bars: ${w} wholes. The last bar shows ${frac}. The mixed number is ${w} ${frac}.`;
+        q.hint = 'Count the full bars: they are the wholes. The last bar shows the fraction. Write the mixed number, then split it.';
     } else if (o.task === 'compose') {
         q.text = 'Write the mixed number.';
         q.screenInstr = 'Type the mixed number.';
         q.ans = `${w} ${frac}`;
-        q.hint = `${w} wholes and ${frac} make ${w} ${frac}. Write the wholes, then the fraction.`;
+        q.hint = 'Write the wholes first. Then write the fraction beside them.';
     } else {
         // the instruction library's strings (contract.js mixed-*): every instruction starts with a print verb (PEDAGOGY 10.2)
         q.text = o.form === 'eq' ? 'Write the wholes and the fraction.' : ones ? 'Write the mixed number as ones and a fraction.' : 'Write the mixed number as wholes and a fraction.';
         q.screenInstr = q.text.replace(/^Write/, 'Type');
         q.ans = ones ? [...Array.from({ length: w }, () => '1'), frac].join(' + ') : `${w} + ${frac}`;
-        q.hint = ones ? `${w} ${frac} is ${Array.from({ length: w }, () => '1').join(' + ')} + ${frac}. Each whole is 1.`
-            : `${w} ${frac} is ${w} wholes and ${frac}. The whole number is the wholes; the fraction is the part.`;
+        q.hint = ones ? 'Each whole is 1: write 1 for each whole. Then write the fraction.'
+            : 'The whole number is the wholes. The fraction is the part of the last bar.';
     }
+    // the screen's Say line: the lesson's chant (the Say frame with this item's numbers would say the answer)
+    q.sayText = 'Wholes first. Then the part.';
     q.mixedParts = { w, n, d };
     // the bar model fades down a page: the rows print in the dealt order (sheet/layout.js groupByHeight)
     q.keepDealOrder = true;
