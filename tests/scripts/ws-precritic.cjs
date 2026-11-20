@@ -1515,6 +1515,9 @@ function buildPlan(ctx) {
         // (critic title r1 T1 / T4 / T5: the title boxes driven by real keystrokes - the cursor survives the redraw; Title off
         // disables its controls; the simple print box is wide enough)
         add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
+        // (lane lf-hosts, lesson player slice 1, design/cards/lesson-player D10: seed parity with the anchor chart, the I do
+        // render at 820 / 1024 / 1280 / 1366 + 1920 board, the step reveal and keys, PLAYER-ANY-PART; browser, ~2 min)
+        add(gate('lesson-player', 'ws-lesson-player --unit --render --reveal --any-part (I do on the board, the part bar)', 'lesson player', 'browser', 'ws-lesson-player', ['--unit', '--render', '--reveal', '--any-part'], { missingMsg: 'no tests/scripts/ws-lesson-player.mjs' }));
         addPartOpts(add, ctx);
     }
     if (ctx.student) addStudent(add);

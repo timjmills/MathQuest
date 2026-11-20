@@ -1,0 +1,156 @@
+/* =========================================================================
+   lesson-player.css - the interactive lesson player (design/cards/lesson-player/lesson-player.md, lane lf-hosts).
+   Slice 1: I do on the board. NEW classes only (.mq-lp*), additive: nothing here restyles an existing selector.
+   Chrome (top bar, part bar, presenter bar) is coloured and sits OUTSIDE the cell (SP-30); the question region is
+   the black-and-white Andika screen cell (.mq-scell, SP-1/SP-2); the step numerals carry the lesson accent (INK-30).
+   Sizes (card drawing.sizes, D5): board at 1280 - cell digits 104 px, text 30 px, Steps 26 px, controls >= 64 px;
+   1920 board x1.5; tablet 820 / 1024 - the Steps strip becomes one chip row above the cell (L11). No 390.
+   ========================================================================= */
+
+body.mq-lp-open { overflow: hidden; }
+
+.mq-lp {
+    --lp-k: 1;
+    --lp-chrome: #1f2a44;
+    --lp-chrome-ink: #fff;
+    --lp-chrome-dim: #c9d3e6;
+    --lp-chrome-line: #5a6a8c;
+    --lp-stage-bg: #e9edf3;
+    --lp-accent: #5B2A86;              /* INK-30: the lesson accent (sheet/tokens.js LESSON_ACCENT) */
+    --lp-digit: calc(104px * var(--lp-k));
+    --lp-text: calc(30px * var(--lp-k));
+    --lp-steps: calc(26px * var(--lp-k));
+    --lp-ctl: max(64px, calc(64px * var(--lp-k)));
+    --lp-pill: max(48px, calc(48px * var(--lp-k)));
+    position: fixed; inset: 0; z-index: 10050;
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+    background: var(--lp-stage-bg);
+    font-family: "Andika", sans-serif;
+    color: #000;
+    overflow: hidden;
+}
+.mq-lp[data-mode="pupil"] { --lp-ctl: 48px; }
+.mq-lp *, .mq-lp *::before, .mq-lp *::after { box-sizing: border-box; }
+@media (min-width: 1600px) { .mq-lp { --lp-k: 1.5; } }
+@media (max-width: 1199px) { .mq-lp { --lp-k: 0.8; } }
+
+/* ---- top bar: title, mode pill, the part bar (D11: every pill jumps) ---- */
+.mq-lp-top {
+    background: var(--lp-chrome); color: var(--lp-chrome-ink);
+    display: flex; align-items: center; flex-wrap: wrap; gap: calc(10px * var(--lp-k)) calc(16px * var(--lp-k));
+    padding: calc(8px * var(--lp-k)) calc(24px * var(--lp-k));
+}
+.mq-lp-title { margin: 0; font-size: calc(26px * var(--lp-k)); font-weight: 700; line-height: 1.2; min-width: 0; }
+.mq-lp-mode {
+    font-size: calc(16px * var(--lp-k)); padding: 4px 12px; border: 2px solid var(--lp-chrome-dim); border-radius: 18px; color: var(--lp-chrome-dim);
+}
+.mq-lp-rail { display: flex; gap: calc(6px * var(--lp-k)); margin-left: auto; flex-wrap: wrap; }
+.mq-lp-pill {
+    font: 400 calc(18px * var(--lp-k)) "Andika", sans-serif;
+    min-height: var(--lp-pill); padding: 0 calc(14px * var(--lp-k)); border-radius: calc(var(--lp-pill) / 2);
+    border: 2px solid var(--lp-chrome-line); background: transparent; color: var(--lp-chrome-dim); cursor: pointer;
+}
+.mq-lp[data-mode="board"] .mq-lp-pill { min-height: var(--lp-ctl); min-width: var(--lp-ctl); border-radius: calc(var(--lp-ctl) / 2); }
+.mq-lp-pill[data-soon] { border-style: dashed; }
+.mq-lp-pill.is-done { border-color: #7fb08a; color: #cfe8d4; }
+.mq-lp-pill.is-on { background: #fff; color: var(--lp-chrome); border-color: #fff; border-style: solid; font-weight: 700; }
+.mq-lp-pill:focus-visible, .mq-lp-btn:focus-visible { outline: 4px solid #ffd166; outline-offset: 2px; }
+
+/* ---- the stage ---- */
+.mq-lp-stage {
+    min-height: 0; overflow: hidden;
+    padding: calc(20px * var(--lp-k)) calc(24px * var(--lp-k)) calc(12px * var(--lp-k));
+}
+.mq-lp-stage-ido {
+    display: grid; grid-template-columns: calc(340px * var(--lp-k)) minmax(0, 1fr); gap: calc(20px * var(--lp-k));
+}
+
+/* The Steps strip: content-sized (H13: never stretched below its last row); numerals in the lesson accent */
+.mq-lp-steps {
+    align-self: start; background: #fff; border: 2px solid #000;
+    padding: calc(14px * var(--lp-k)) calc(16px * var(--lp-k));
+}
+.mq-lp-steps h2 { margin: 0 0 calc(8px * var(--lp-k)); font-size: calc(22px * var(--lp-k)); font-weight: 700; }
+.mq-lp-steps ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(12px * var(--lp-k)); }
+.mq-lp-step {
+    display: grid; grid-template-columns: calc(56px * var(--lp-k)) minmax(0, 1fr); align-items: center; gap: calc(12px * var(--lp-k));
+    font-size: var(--lp-steps); line-height: 1.2; color: #000; padding: calc(4px * var(--lp-k));
+}
+.mq-lp-step .mq-lnum {
+    width: calc(52px * var(--lp-k)); height: calc(52px * var(--lp-k)); border-radius: 50%;
+    border: 3px solid var(--lp-accent); color: var(--lp-accent);
+    display: flex; align-items: center; justify-content: center;
+    font-style: normal; font-size: calc(30px * var(--lp-k)); font-weight: 700; line-height: 1;
+}
+.mq-lp-step.is-now { outline: 4px solid #000; outline-offset: 2px; }
+.mq-lp-step.is-now .mq-lnum { background: var(--lp-accent); color: #fff; }
+.mq-lp-step.is-later { color: #949494; }
+.mq-lp-step.is-later .mq-lnum { border-color: #949494; color: #949494; }
+.mq-lp-chant { margin: calc(12px * var(--lp-k)) 0 0; font-size: var(--lp-steps); line-height: 1.25; }
+
+/* The cell: the B&W Andika screen cell at board size */
+/* The cell is sized to its content at every step (H13: no empty band inside it); it grows downward as marks are added,
+   top-aligned, so earlier ink never moves. The stage background under it is chrome, not the cell. */
+.mq-lp-cellwrap { display: flex; flex-direction: column; justify-content: flex-start; min-height: 0; min-width: 0; }
+.mq-scell.mq-lp-cell {
+    --mq-digit: var(--lp-digit); --mq-text: var(--lp-text);
+    flex: none; display: flex; flex-direction: column;
+    border: 3px solid #000; background: #fff; padding: 0;
+}
+.mq-lp-instr { font-size: var(--lp-text); line-height: 1.25; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k)); border-bottom: 2px solid #000; }
+.mq-lp-work {
+    flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: calc(14px * var(--lp-k)); padding: calc(16px * var(--lp-k)) calc(12px * var(--lp-k));
+}
+.mq-lp-draw { display: flex; align-items: center; justify-content: center; max-width: 100%; }
+.mq-lp-work[data-variant="row"] { flex-direction: row; gap: calc(56px * var(--lp-k)); }
+.mq-lp-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(8px * var(--lp-k)); min-width: 0; }
+.mq-lp-work[data-variant="row"] .mq-lp-side { align-items: flex-start; max-width: 45%; }
+.mq-lp-work[data-variant="row"] .mq-lp-words { text-align: left; }
+.mq-lp-zoom { display: inline-block; }
+/* the chart's state drawing, as on paper (the kit's .ws-sheet rules), without the page box: zoomed as a whole to the
+   board's digit size by player.js fitDrawing, so its geometry is the printed chart's */
+.mq-lp .ws-sheet.mq-lp-kit { display: block; width: auto; max-width: none; overflow: visible; background: transparent; }
+.mq-lp-words { margin: 0; font-size: calc(34px * var(--lp-k)); line-height: 1.25; text-align: center; color: #000; }
+.mq-lp-say {
+    border-top: 2px solid #000; padding: calc(10px * var(--lp-k)) calc(22px * var(--lp-k));
+    font-size: calc(34px * var(--lp-k)); line-height: 1.25; color: #000; display: flex; gap: 0.35em; align-items: baseline;
+}
+
+/* A part this slice does not play: a clear, navigable "coming soon" (D11), chrome only - no cell */
+.mq-lp-stage-msg, .mq-lp-stage-soon { display: flex; align-items: center; justify-content: center; }
+.mq-lp-msg {
+    max-width: 44em; background: #fff; border: 3px dashed var(--lp-chrome-line); border-radius: 16px;
+    padding: calc(28px * var(--lp-k)) calc(36px * var(--lp-k)); text-align: center; color: var(--lp-chrome);
+}
+.mq-lp-msg h2 { margin: 0 0 0.4em; font-size: calc(34px * var(--lp-k)); }
+.mq-lp-msg p { margin: 0.3em 0 0; font-size: calc(24px * var(--lp-k)); line-height: 1.35; }
+
+/* ---- the presenter bar ---- */
+.mq-lp-bar {
+    background: var(--lp-chrome); color: #fff;
+    display: flex; align-items: center; gap: calc(16px * var(--lp-k));
+    padding: calc(14px * var(--lp-k)) calc(24px * var(--lp-k));
+}
+.mq-lp-bar[data-idle] .mq-lp-btn { visibility: hidden; }
+.mq-lp-btn {
+    min-width: var(--lp-ctl); min-height: var(--lp-ctl); border-radius: 12px; border: 2px solid #fff;
+    background: transparent; color: #fff; font: 700 calc(24px * var(--lp-k)) "Andika", sans-serif;
+    padding: 0 calc(20px * var(--lp-k)); display: inline-flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+}
+.mq-lp-btn:disabled { opacity: 0.45; cursor: default; }
+.mq-lp-btn.mq-lp-next { background: #fff; color: var(--lp-chrome); min-width: calc(240px * var(--lp-k)); font-size: calc(28px * var(--lp-k)); margin-left: auto; }
+.mq-lp-count { font-size: calc(24px * var(--lp-k)); margin: 0 0 0 8px; }
+.mq-lp-together { color: #ffd166; font-weight: 700; }
+.mq-lp-keys { font-size: calc(16px * var(--lp-k)); color: var(--lp-chrome-dim); text-align: right; line-height: 1.35; margin-left: auto; }
+
+/* ---- tablet (820 / 1024): the Steps strip becomes one chip row above the cell (L11); the key legend hides ---- */
+@media (max-width: 1199px) {
+    .mq-lp-stage-ido { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .mq-lp-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 8px 12px; }
+    .mq-lp-steps h2 { margin: 0; }
+    .mq-lp-steps ol { flex-direction: row; flex-wrap: wrap; gap: 8px 14px; }
+    .mq-lp-step { display: flex; gap: 8px; }
+    .mq-lp-chant { margin: 0; }
+    .mq-lp-keys { display: none; }
+}

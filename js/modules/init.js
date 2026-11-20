@@ -124,6 +124,14 @@ export function init() {
 export function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
 
+    // Check ?lesson= (the lesson player, design/cards/lesson-player D8 / D11: ?lesson=<id or slug>&part=&s=&mode=board)
+    if (urlParams.get('lesson')) {
+        if (typeof window.openLessonPlayer === 'function') {
+            Promise.resolve(window.openLessonPlayer(window.location.search)).catch((e) => console.warn('[lesson-player] did not open:', e));
+        }
+        return;
+    }
+
     // Check ?map= (Teacher MAP share-link — auto-launch a MAP session)
     const mapParam = urlParams.get('map');
     if (mapParam) {
