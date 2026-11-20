@@ -948,3 +948,24 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   `eblast-pin` + `eblast-capacity` and deploy session 1; P2 the pin failed open on an unreadable base → fails closed;
   P3 the list's comment names which listed roles each rule actually judges (8 of the 16 are not judged today). Rows
   `eblast-pin-dropped-entry`, `eblast-pin-fails-closed`.
+
+## 2026-11-19 — lesson pages: LESSON-EMPTY-FIRST + LESSON-OPENER-SAME (owner via the lead; fixes routed to lf-engine)
+
+- New `tests/scripts/ws-lesson-pages.mjs` (browser; `--self-test` / `--fixture` node only). Builds every built lesson of a
+  school grade the way the lessons browser does (role lesson, every live direct skill, mixed, key, size M, seed 4242;
+  `--req print` = teacher-wrm printLesson, first skill only) and measures the rendered pupil pages.
+  - LESSON-EMPTY-FIRST: a page whose content, once .ws-head / .ws-tab / .ws-ican / .ws-title / .ws-foot / style are removed,
+    holds no `[data-ws-cell]` and no text / svg / img / slot. Signal: the rendered page (0 cells AND 0 ink).
+  - LESSON-OPENER-SAME: consecutive steps of one block whose first content cell has the same template, the same text with
+    numbers masked, and numbers equal or differing by ONE swapped value (the varying factor, wherever it appears).
+- Grade 3, master d38308824: of the 46 distinct built lessons (lessons browser's 47 rows), LESSON-EMPTY-FIRST flags exactly
+  16: Y4.B4.S11; Y4.B5.S1, S3, S4, S9, S10, S13; Y4.B6.S3, S4; Y4.B7.S6, S10; Y3.B12.S4; Y4.B12.S2, S4, S5, S7 - the
+  owner's 16 (his "Y3.B12.S2 / S5 / S7" are Y4.B12 steps; B12.S4 is empty in BOTH years). Over every grade-3 lesson with a
+  direct skill (not only "built"): 59 header-only first pages - the same defect on 43 more (Y4.B2, B3, B8, B9, B14 ...).
+- LESSON-OPENER-SAME on Y4.B4: S2/S3, S3/S4, S4/S5, S7/S8, S9/S10 ("11 × n is 11 groups of n"), S11/S12 (the same 2 × 4
+  array); 22 pairs grade-wide (B1, B2, B5, B6, B7, B8, B10, B12, B14 - mostly two steps on one skill with one opener).
+- Wiring: precritic `--lesson` / `--unit` / `--role lesson` gate `lesson-pages-g<grade>[-<block>]` (a `--unit G3-Y4.B4` run:
+  grade 3, block Y4.B4), BLOCKING like the other lesson gates. Deploy session 4: `ws-lesson-pages --grade 3 --warn` as an
+  nfn gate, a WARNING (exit 4) until lf-engine's fix lands - then drop `--warn` and it blocks.
+- Backtests `lesson-empty-first`, `lesson-opener-same` (FAIL: master measured, fail.json; PASS: a PLANTED fixed lesson,
+  pass.json - no fix exists yet; re-point when lf-engine lands it). Ledger rows: CHECKS_FROM_CRITICS 2026-11-19 x 2.

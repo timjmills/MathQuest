@@ -26,7 +26,7 @@ import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, 
  * is state n of the Model), and ordinary numbers - the lower third of the candidates by size (the
  * research: easy numbers first, but never the trivial 1 + 1).
  */
-export function pickExample(items, data) {
+export function pickExample(items, data, opt = {}) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const want = data && Array.isArray(data.steps) ? data.steps.length : 0;
     const all0 = items.map((it, i) => ({ it, i, steps: workedStepsOf(it) })).filter((x) => x.steps.length >= 2);
@@ -66,12 +66,42 @@ export function pickExample(items, data) {
     // move to the nearer ten is seen, not a 1-tick hop from 79).
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     if (pref && pool.some((x) => pref.test(String((x.it.q && x.it.q.text) || '')))) pool = pool.filter((x) => pref.test(String((x.it.q && x.it.q.text) || '')));
+    // LESSON-OPENER-SAME (lf-engine, owner's grade-3 review 2026-11-19): a times-table lesson (every fact of the pool shares
+    // one factor - mult_facts {constant: [6]}) is modelled on an ordinary fact of ITS OWN table. The widest-operands rule below
+    // is a column skill's; on a fixed table it picked 10 / 11 / 12 x the table for every lesson ("11 x 6", "11 x 9": the edge
+    // fact, and 11 is another lesson's table). The other factor is one of 3-9 and moves with the lesson's `variant` (its WRM
+    // step number), so two consecutive steps do not open on the same fact.
+    const tableX = fixedTableOf(pool);
+    if (tableX) return tableX;
     const sorted = pool.slice().sort((a, b) => easeScore(a.it.q) - easeScore(b.it.q) || a.i - b.i);
     // Two digits beat one for a column skill: the example has the widest operands the skill deals.
     const widest = Math.max(...sorted.map((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0)));
     const wide = sorted.filter((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0) === widest);
     const list = wide.length ? wide : sorted;
     return list[Math.min(list.length - 1, Math.floor(list.length / 3))].it;
+
+    // (the fixed-table model above: null when the pool is not one table's multiplication facts)
+    function fixedTableOf(cands) {
+        const facts = cands.filter((x) => x.it.q && x.it.q.cell && x.it.q.cell.template === 'fact' && /^[×x*]$/.test(String((x.it.q.cell.payload || {}).op || '').trim()));
+        if (facts.length < 3 || facts.length !== cands.length) return null;
+        const ops = facts.map((x) => operandsOf(x.it.q).map(Number));
+        if (ops.some((o) => o.length !== 2 || !o.every(Number.isFinite))) return null;
+        const table = [...new Set(ops[0])].find((v) => ops.every((o) => o.includes(v)));
+        if (table === undefined || table < 2) return null;
+        const ORD = [3, 4, 5, 6, 7, 8, 9].filter((f) => f !== table);
+        const v = Number.isFinite(Number(opt.variant)) ? Math.abs(Math.floor(Number(opt.variant))) : 0;
+        const want = ORD[v % ORD.length];
+        // the table SECOND: "5 × 6 is 5 groups of 6", and the worked steps count by 6 (the provider counts by the second
+        // factor - "6 × 7" counted by 7, the 7 table, in a 6 times-table lesson)
+        const score = (o) => {
+            const other = o[1] === table ? o[0] : o[1];
+            const edge = other < 3 || other > 9 ? 100 : 0;
+            return edge + (o[1] === table ? 0 : 50) + Math.abs(other - want) * 2;
+        };
+        let best = 0;
+        for (let k = 1; k < facts.length; k++) if (score(ops[k]) < score(ops[best])) best = k;
+        return facts[best].it;
+    }
 }
 
 /**
@@ -157,7 +187,9 @@ export function stateDrawing(it, steps, groups, k, c) {
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
 export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
-    : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+    : n >= 4 ? { cols: data && data.chartFull ? 1 : 2, rows: data && data.chartFull ? n : Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+// `chartFull` (roles/lesson.js chartDataOf, CELL-FITS 2026-11-20): an authored lesson whose example needs the full width - four
+// panels one a row instead of 2 x 2; nothing else of the lesson changes.
 // `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
 // page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
 
@@ -361,7 +393,16 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const header = f.header;
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n, data);
+    // CELL-FITS (lead via lf-engine 2026-11-20): the 2 x 2 chart whose panels do not fit the page even at zoom 1, and whose
+    // drawings the host measured to fit one across but not two (two_step_letter_equation: story, bars and "= n" equation), was
+    // drawn at zoom 1 anyway - squeezed into half-width panels, past the page edge into the Say band and the footer, while its
+    // sizing said ok. It takes `chartFull`, one full-width panel a row (the panels run onto further chart pages below when
+    // needed). A 2 x 2 chart that fits is unchanged, whatever its drawings measure.
+    const lay0 = chartLayout(n, data);
+    const halfTooNarrow = (d) => !!(d && d.measured && d.measured[2] && d.measured[2].fits === false && d.measured[1] && d.measured[1].fits !== false);
+    const room0 = m.body - m.say - (data && data.chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0) - 2 - (tailItem ? Math.max(12, hOf(tailItem, 1)) + 4 * lay0.rows : 0);
+    const overfull2 = lay0.cols === 2 && lay0.rows * Math.max(...states.map((st) => hOf(st, 2) + 1)) > room0;
+    const lay = overfull2 && draws.some(halfTooNarrow) ? chartLayout(n, Object.assign({}, data || {}, { chartFull: true })) : lay0;
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
@@ -432,16 +473,38 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // 12-13 pt. It is now REPORTED: sizing.fallback, and sizing.ok false when the zoom is under 1, so the host fails the
     // build result and the compiler refuses the chart. The drawing itself is unchanged.)
     let fallback = false;
+    // CELL-FITS (lead via lf-engine 2026-11-20): panels that do not fit one page even at zoom 1 were drawn at zoom 1 anyway
+    // and ran over the Say band, the footer and the page edge (sizing said ok: the zoom was 1). Without a tail band they now
+    // run onto as many chart pages as they need, at full size (`perPage` panel rows a page); nothing shrinks. Only a chartFull
+    // chart (above): a chart whose measured panels merely read taller than the page prints as before (its measure over-reads
+    // its render - add_wp_10, fact_family_sort ... are inside their page by CELL-FITS).
+    let perPage = 0;
     if (mode === 'one') {
         const z1 = solve((q) => lay.rows * H(q), availP, 1, zMax);
         if (z1) z = z1;
+        else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
     }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
+    const more = [];   // (the chart pages after the first, when its panels run on: perPage)
     let rowH;
     let room;
-    if (mode === 'grid3') {
+    if (perPage) {
+        room = availP;
+        rowH = H(1);
+        // (a page before the last has the Say and Rule bands' room too: perPage rows; the last page holds what fits above them)
+        const per = perPage * cols;
+        const lastPer = Math.max(1, Math.floor(availP / H(1))) * cols;
+        const cuts = [];
+        for (let k = 0; k < states.length; k += per) cuts.push(states.slice(k, k + per));
+        const tail0 = cuts[cuts.length - 1];
+        if (tail0.length > lastPer) cuts.splice(cuts.length - 1, 1, tail0.slice(0, tail0.length - lastPer), tail0.slice(tail0.length - lastPer));
+        for (const [k, chunk] of cuts.entries()) {
+            const grid = gridPart(chunk.map((st) => withZoom(st, cols)), { cols, rows: Math.ceil(chunk.length / cols), cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
+            (k === 0 ? sections : (more[more.length] = [])).push(grid);
+        }
+    } else if (mode === 'grid3') {
         room = availAll;
         const hr = rowsAt(z);
         const tot = sum(hr);
@@ -483,13 +546,14 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const sayN = data && data.sayWords ? pvNumberOf(example) : null;
     // (`chartSay(q)`, lesson data - the detailed lesson maker, lesson 5 r3: the chart's Say in the lesson's own words, In / Out)
     const ownSay = data && typeof data.chartSay === 'function' && example ? (() => { try { return data.chartSay(example.q); } catch (e) { return ''; } })() : '';
-    sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
-    if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
+    const last = more.length ? more[more.length - 1] : sections;
+    last.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
+    if (chant) last.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
-        header, sections, zoom: z, second: shown, mode,
+        header, sections, more, zoom: z, second: shown, mode,
         // `ok`: drawn at its planned size - a fallback zoom under 1 is a FAILURE (lesson 7 D1; print-sheet chartSizing)
-        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
+        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), ...(perPage ? { pages: 1 + more.length } : {}), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
     };
 }
 
