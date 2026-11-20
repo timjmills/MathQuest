@@ -12582,6 +12582,63 @@
    "browser": true
   },
   {
+   "id": "two-step-guided-no-mid",
+   "check": "ws-two-step --guided GUIDED-NO-MID + GUIDED-MODEL-ALONE: no Guided cell prints the hidden middle question, and Guided page 1 holds the Model and a try at M (exempt by ruling: the family at L; multi_step_word (Visual) at M)",
+   "kind": "commit-pair",
+   "rule": "GUIDED-NO-MID (lead 2026-11-20, two-step card decision 6 amended)",
+   "fail": {
+    "commit": "cc17ba09a",
+    "state": "the Guided Model printed the two-line middle question, so multi_step_word_plain's Model stood alone on page 1 of every M sheet (0/10)"
+   },
+   "pass": {
+    "commit": "ddabf985a",
+    "state": "word-work drops the middle question on the Guided page (ctx.guided); Model + try share page 1 on 120/140 M sheets, _plain 20/20"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:multi_step_word_plain,algebra:two_step_add_then_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-story-work",
+   "check": "ws-two-step STORY-WORK: the story tells exactly the work's numbers (Step 1's two, Step 2's number that is not the Step 1 answer), seeds 1-200, every two-step skill",
+   "kind": "commit-pair",
+   "rule": "STORY-WORK (critic GUIDED-NO-MID F1, 2026-11-20)",
+   "fail": {
+    "commit": "6c15f17bb",
+    "state": "tellTwoStep read s2.bottom as the box count; a x Step 2 whose Step 1 answer is the smaller factor stores it as bottom ('Lena has 4 boxes' over 4 x 6 = 24)"
+   },
+   "pass": {
+    "commit": "36c8fe65f",
+    "state": "the story and the worked-wrong Step 2 read the factor that is not the Step 1 answer"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules STORY-WORK --skill algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-guided-hint-step",
+   "check": "ws-two-step --guided GUIDED-HINT-STEP: a two-step Guided try's grey hint prints no number (the sign and the operation only)",
+   "kind": "commit-pair",
+   "rule": "GUIDED-HINT-STEP (lead 2026-11-20, live on master; PAGE_TYPES 2.3)",
+   "fail": {
+    "commit": "ee6ecd047",
+    "state": "hintOf printed the two-step workedSteps' Step 1 line, 'Step 1: circle -. 26 - 6 = 20.' - the try's Step 1 boxes given away"
+   },
+   "pass": {
+    "commit": "ddabf985a",
+    "state": "the two-step steps carry a hint ('Step 1: circle +. Add.'); hintOf prefers it"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:two_step_add_then_div,algebra:multi_step_word_plain",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "lesson-empty-first",
    "check": "ws-lesson-pages LESSON-EMPTY-FIRST (owner via the lead 2026-11-19): no lesson page prints only its title / header - after the frame (.ws-head, .ws-tab, .ws-ican, .ws-title, .ws-foot) is taken off, each page holds a content cell ([data-ws-cell]) or other ink (text, svg, img, answer slot)",
    "kind": "fixture",
