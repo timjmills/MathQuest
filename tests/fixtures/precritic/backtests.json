@@ -12074,7 +12074,7 @@
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/lesson-pages/pass.json",
-    "state": "lf-engine fix a0986da35 measured (the same 46 lessons): the empty anchor-chart part dropped, every first page holds cells"
+    "state": "lf-engine fix 601667535 (merged ba67851f2) measured (the same 46 lessons): the empty anchor-chart part dropped, every first page holds cells"
    },
    "command": "node tests/scripts/ws-lesson-pages.mjs --rules LESSON-EMPTY-FIRST --fixture {fixture}",
    "expect": {
@@ -12094,7 +12094,7 @@
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/lesson-pages/pass.json",
-    "state": "lf-engine fix a0986da35 measured: Y4.B4 openers are an ordinary fact of each lesson's own table, the factor moving with the step (e.g. S2 5 x 6, S3 6 x 7 ...)"
+    "state": "lf-engine fix 601667535 (merged ba67851f2) measured: Y4.B4 openers are n x the lesson's own table, n moving with the step (S2 5 x 6, S3 8 x 6, S4 7 x 9, S5 8 x 9, S7 4 x 7, S8 6 x 7, S9 5 x 11, S10 7 x 12)"
    },
    "command": "node tests/scripts/ws-lesson-pages.mjs --rules LESSON-OPENER-SAME --blocks Y4.B4 --fixture {fixture}",
    "expect": {
