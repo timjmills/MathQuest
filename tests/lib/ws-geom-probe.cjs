@@ -10,7 +10,7 @@
 //          (`.ws-stack .head`, the ink box of their text) and the place letters over the zones of a place-value mat
 //          (`svg` text above its `[data-pv-zone]` rects). A pair that overlaps or sits closer than 1 mm reads as one
 //          run ("HThTTh"). (critic r1 D7: heads collide at 5-6 digits; critic r2 N8: 0.74 mm apart at S.)
-//   WRAP-OP no wrapped line of text ends in an operator glyph (− + × ÷ =) with the rest of its expression on the
+//   WRAP-OP no wrapped line of text ends in an operator glyph (− + × ÷ =) - nor starts with one after an operand (R3-5) - with the rest of its expression on the
 //          next line (critic r2 N6 "486,759 −" / "35,247" in a vocabulary picture; N7 "4 −" / "3 = 1." in a step).
 //          Read per block of text (the nearest non-inline ancestor of each text run): an operator whose next glyph
 //          in the same block starts a lower line. Grid and flex children are blocks of their own, so a stack's
@@ -150,6 +150,20 @@ function GEOM_PROBE(cfg) {
                     const before = glyphs.slice(Math.max(0, i - 10), i + 1).map((x) => x.ch).join('');
                     const after = glyphs.slice(i + 1, i + 8).map((x) => x.ch).join('');
                     out.wraps.push(Object.assign(loc(b), { op: g.ch, before, after }));
+                }
+                // (lf-algebra patterns critic r3 R3-5: nor BEFORE it - "7 / + 6 = 13", "n / + 6": a line that starts with an
+                // operator whose left operand ends the line above)
+                for (let i = 1; i + 1 < glyphs.length; i++) {
+                    const pv = glyphs[i - 1], g = glyphs[i];
+                    // (the left operand: a digit, ")" or a one-letter variable - "n / + 6"; a sign named after a word, "try / −.", is no expression)
+                    const pp = glyphs[i - 2];
+                    if (!OPS.includes(g.ch) || !(/[0-9)]/.test(pv.ch) || (/[A-Za-z]/.test(pv.ch) && !(pp && /[A-Za-z]/.test(pp.ch) && pp.r.top < pv.r.top + pv.r.height / 2 && pv.r.left - pp.r.right < 1)))) continue;
+                    if (g.r.top < pv.r.top + pv.r.height / 2) continue;
+                    if (seen.has(b)) continue;
+                    seen.add(b);
+                    const before = glyphs.slice(Math.max(0, i - 10), i).map((x) => x.ch).join('');
+                    const after = glyphs.slice(i, i + 8).map((x) => x.ch).join('');
+                    out.wraps.push(Object.assign(loc(b), { op: g.ch, before, after, side: 'before' }));
                 }
             }
         }

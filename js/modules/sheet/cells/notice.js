@@ -26,7 +26,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S, LETTERS } from './k2kit.js';
+import { L, P, D, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S, LETTERS } from './k2kit.js';
 
 export const NOTICE_TEMPLATE = 'notice';
 
@@ -132,10 +132,13 @@ function parityCell(p, ctx) {
         : ctx && ctx.scaffoldLevel === 0 && p.show !== false
             ? `<span class="mq-nt-hint" aria-hidden="true" style="display:block;margin-top:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx))};line-height:1.1;">\u00a0</span>`
             : '');
+    // (the fact's digits and its sign in the kit's DIGIT unit D: on paper the working digit pt as before; on a screen twin
+    // never under the host's --mq-digit - P drew them at the twin's paper scale, 52.8 px against the practice card's 56,
+    // ws-screen-ink-size TEXT-SIZE, patterns precritic 2026-11-20 A5)
     const num = (n) => `<span style="display:inline-flex;flex-direction:column;align-items:center;min-width:${L(ctx, 10)};">`
-        + `<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(n)}</span>${hint(n)}</span>`;
+        + `<span style="font-size:${D(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(n)}</span>${hint(n)}</span>`;
     const fact = `<div class="mq-nt-fact" role="img" aria-label="${esc(`${p.a} times ${p.b}`)}" style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 3)};">`
-        + `${num(p.a)}<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;">×</span>${num(p.b)}</div>`;
+        + `${num(p.a)}<span style="font-size:${D(ctx, dp)};font-weight:700;line-height:1;">×</span>${num(p.b)}</div>`;
     const ask = `<div style="font-size:${P(ctx, textPt(ctx) + 1)};line-height:1.2;">The product is</div>`;
     // Finished work (state 'wrong': Error analysis and the other thinking pages show a pupil's choice; lf-algebra r4,
     // H13): "The product is" and the circled word read as ONE sentence on one line where the column is wide enough
@@ -215,8 +218,11 @@ const FEATURE_STATE_W = 64;
 function featureCell(p, ctx) {
     const choices = (p.choices || []).map(String);
     const on = isTwin(ctx) ? -1 : checkedChoice(p, ctx, choices);
-    const rule = `<div class="mq-nt-rule" style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.2;">Start at ${esc(p.start)}. Add ${esc(p.step)} each time.</div>`;
     const tiles = trackTiles(p, ctx);
+    // (critic r3 R3-3: where the track leaves tiles for the pupil to write in - the Test, a faded hint - the item's own rule
+    // line says so; the page instruction is the same on every level and cannot. ws-instr-slots reads data-ws-prompt.)
+    const writes = tiles.some((t) => /data-ws-slot=/.test(t));
+    const rule = `<div class="mq-nt-rule"${writes ? ' data-ws-prompt' : ''} style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.2;">Start at ${esc(p.start)}. Add ${esc(p.step)} each time.${writes ? ' Write the numbers.' : ''}</div>`;
     // two threes side by side: one row of six where it fits, else three over three (never 5 + 1)
     const g = L(ctx, 1.5);
     const triple = (a) => `<span class="mq-nt-triple" style="display:inline-flex;flex-wrap:nowrap;gap:${g};">${a.join('')}</span>`;
@@ -277,7 +283,11 @@ register(NOTICE_TEMPLATE, {
     footprint(p, ctx) {
         // (one wide cell a row at every size: two across at S left a 37 % band beside a cell whose sentences wrap
         // to more lines, H13; S still fits more rows than L, its text being smaller)
-        if (p.task === 'feature' || p.task === 'truefalse') return { wMm: 130, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true };
+        // (`hardCap`: the one column is the author's cap, not a guess the measurement may widen - layout.itemCap let the
+        // measured 92 mm fit take two across at M, so a page laid one 2-across row (56 mm of ink) beside 1-across rows
+        // (43 mm) and both grids were spread to share the page: 23-25 mm empty bands, ws-print-lint L-DENSITY H13 30 %,
+        // ws-empty-band EB-BAND 29.8 %, patterns precritic 2026-11-20 A2)
+        if (p.task === 'feature' || p.task === 'truefalse') return { wMm: 130, hMm: null, measure: true, factLike: false, maxCols: 1, hardCap: true, denseRoom: 1, inPlace: true };
         return { wMm: 60, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true };
     },
     inputs(p) {

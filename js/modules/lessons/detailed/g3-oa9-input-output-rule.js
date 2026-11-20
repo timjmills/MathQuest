@@ -89,7 +89,9 @@ export default {
         steps: [
             { icon: 'look', text: 'Read rows 1 and 2 across.' },
             { icon: 'decide', text: 'Bigger or smaller? By how much?' },
-            { icon: 'check', text: 'Test every row.' },
+            // (critic r3 R3-9: the × rules of Guided, Practice and the exit - the step where a + read off row 1 fails names the
+            // next try; the chart's third example is drawn on the board, T4 §5)
+            { icon: 'check', text: 'Test every row. +\u00a0fails? Try\u00a0×.' },
             { icon: 'write', text: 'Write the rule.' },
         ],
         // No chant (research §4): the three steps are said in the Say band.
@@ -101,7 +103,7 @@ export default {
             return r && s0 ? `In ${r.x}, out ${r.y}. ${r.x} ${{ '+': '+', '-': '−', x: '×' }[s0.op]} ${s0.n} = ${r.y}. I test every row.` : ''; },
         growAll: true,
         // (Guided: one table of each rule the chart modelled, in its order: +, −, ×)
-        guided: ['ftAdd', 'ftSub', 'ftTimes'],
+        guided: ['ftAddNeighbour', 'ftSub', 'ftTimes'],   // (Guided 1's T6 row names its "down the Out column" wrong answer)
         practiceShape: [4, 2],
         format: {
             kind: 'numbered steps with icons',
@@ -141,7 +143,7 @@ export default {
         // (r3, critic D4: the lesson's own task - the story's table printed, find the rule, the rule frame; a + rule
         // that makes sense: Ann is always the same number of years older than Ben)
         ref: FT({ ftRules: ['+'], support: 'frame-bare' }),
-        want: 'ftAdd',
+        want: 'ftAddNeighbour',   // (T6 names its "down the Out column" wrong answer)
         tableItem: true,
         panelRows: [{ icon: 'read', text: 'Read it two times.' }, { icon: 'ringnum', text: 'Circle the numbers.' }, { icon: 'underline', text: 'Underline the question.' },
             { icon: 'read', text: 'Read the table.' }, { icon: 'check', text: 'Test every row.' }, { icon: 'write', text: 'Write the rule.' }],
@@ -156,11 +158,12 @@ export default {
     // ------------------------------------------------------------------ P6 Exit slip
     // One item per rule kind taught, then the Critical Atom's case (row 1 also fits +).
     exit: [
+        // (critic r3 R3-10: insetMm 2 - each table 2 mm in from its cell borders, its columns giving up that much air; no doubled rules)
         // Three tables one row across a half (four tall tables do not fit two rows of a 132.5 mm half; never shrunk):
         // a + rule, a − rule, and the Critical Atom's × table whose row 1 also fits + (it is the × item too).
-        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
-        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
-        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
+        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true, insetMm: 2 }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread', 'ftNeighbour'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
+        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true, insetMm: 2 }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
+        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true, insetMm: 2 } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
     ],
     // (T2b: what each label means in THIS pack - critic r1 n3: nothing on the Guided page is traced)
     fadeMeans: [['★', 'Guided: the machine picture and the Steps; the teacher leads'], ['★★', 'Practice: Steps only, no machine picture'], ['★★★', 'Last row: a × table (row 1 also fits +) and a − table with an Out of 0']],
@@ -248,14 +251,14 @@ export default {
                 { say: 'Yesterday each times row went up by the same number.' },
                 { say: 'Today the machine has a rule. We find it.' },
             ] },
-        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'The nodders', text: 'Pupils who nod at + {chart3.d} on panel {panel.third} are the one-pair group.' }],
+        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'The nodders', text: 'Pupils who nod at + {chart3.d} on the board are the one-pair group.' }],
             rows: [
                 { do: 'Feed card {chart.x1} into the rule machine. Show {chart.y1}.' },
                 { say: 'In {chart.x1}, out {chart.y1}. It got bigger.', note: 'Step 1 and step 2.' },
                 { ask: 'Bigger by how much?', note: 'Expected: [[{chart.d}]].' },
                 { say: 'Test every row: {chart.x2} {chart.sign} {chart.k} is {chart.y2}.', note: 'Step 3. Then row 3. The rule: [[{chart.rule}]].' },
-                { say: 'In {chart2.x1}, out {chart2.y1}. It got smaller.', note: 'Panel {panel.second}. The rule: [[{chart2.rule}]].' },
-                { say: 'In {chart3.x1}, out {chart3.y1}. Plus {chart3.d}? Test row 2.', note: 'Panel {panel.third}: the trap.' },
+                { say: 'In {chart2.x1}, out {chart2.y1}. It got smaller.', note: 'On the board. The rule: [[{chart2.rule}]].' },
+                { say: 'In {chart3.x1}, out {chart3.y1}. Plus {chart3.d}? Test row 2.', note: 'On the board: the trap. Chart step 3.' },
                 { say: '{chart3.x2} plus {chart3.d} is {chart3.plus}. Not {chart3.y2}. Try times.', note: 'Write “Wrong” beside + {chart3.d} on the board only.' },
                 { say: 'The rule is {chart3.word} {chart3.k}. It works for every row.', note: 'Pupils repeat. The rule: [[{chart3.rule}]].' },
             ] },

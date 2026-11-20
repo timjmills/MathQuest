@@ -2300,7 +2300,9 @@ function geomFindings(geo, F) {
     const at = (x) => { const o = { page: x.page, el: `<${x.tpl === '?' ? 'cell' : x.tpl}>${x.before ? ` "${x.before}"` : x.a ? ` "${x.a} ${x.b}"` : ''}` }; if (x.cell) o.cell = x.cell; if (x.skill) o.skill = x.skill; return o; };
     for (const x of geo.narrow) F('L-ANSAREA', 'TY-21', 'major', at(x), `answer ${x.kind} ${x.w} mm wide as printed${x.key ? ' (key page)' : ''}: under ${MIN_SEG_MM} mm a pupil cannot write a digit in it (TY-21, VA-12)`, `narrow answer ${x.kind}`);
     for (const x of geo.overlaps) F('L-OVERLAP', 'H2', 'major', at(x), `head labels "${x.a}" / "${x.b}" ${x.gap < 0 ? `overlap by ${-x.gap} mm` : `sit ${x.gap} mm apart`}: neighbouring heads need ${HEAD_GAP_MM} mm between them or they read as one run (H2)`, 'heads too close');
-    for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, `wrap after ${x.op}`);
+    for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), x.side === 'before'
+        ? `a wrapped line starts with "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks before its operator either (join the whole expression with no-break spaces) (C1, TY rules, critic r3 R3-5)`
+        : `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, x.side === 'before' ? `wrap before ${x.op}` : `wrap after ${x.op}`);
 }
 
 // =============================================================================================
@@ -3438,6 +3440,7 @@ const SELF_TESTS = [
     // L-WRAP (critic r2 N6 / N7): a line that wraps after its operator; the control is the same kind of text joined
     // with no-break spaces in a box wide enough for it.
     { name: 'a line wrapped after its operator (L-WRAP)', expect: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:24mm;font-size:16pt">12 + 345678</div>'); } },
+    { name: 'a line wrapped before its operator (L-WRAP, R3-5)', expect: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:30mm;font-size:16pt">1234 67 +&nbsp;6</div>'); } },
     { name: 'an expression joined with no-break spaces (L-WRAP control)', expect: [], absent: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:60mm;font-size:16pt">Then 12&nbsp;+&nbsp;3&nbsp;=&nbsp;15 and 4&nbsp;&#8722;&nbsp;1&nbsp;=&nbsp;3.</div>'); } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');

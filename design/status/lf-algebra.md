@@ -9,6 +9,14 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-20 ~14:00 PATTERNS r4 PASS (narrow, critic-r4/verdict.md) on 70b163833: all 22 versions that failed r3 with fixes in this lane now
+  >= 8 on every criterion. r3 (57 / 85) -> fix round (INSTR-SLOTS general check ws-instr-slots + 9 backtest rows) -> r4 PASS. Closed:
+  R3-1/2/3/5/8/9/10; part: R3-6 ("Drag" fixed; doubled answer areas -> lf-roles PSC build), R3-7 (Term 10 named; chart example in
+  practice -> lf-engine exclusion option); R3-4 pf opener M -> lf-roles (opener.js geometry budget). Earlier today: A1 count-row chart
+  train one line, A2/A5 notice, A3/A7/A8 function-table + small, A8b growing band 'auto', g3-oa9 seed 25, TWIN-FIT-RESET (PR #52 closed,
+  latent flaw logged for lf-hosts). Next week (queued): R4-2 ft rule-check title follows ftTask; R4-3 grow wording ("Write how many"
+  where counts are given; "up to Term 10"); R4-4 keep "try +" together; R4-1 ws-grade-render carries options between batch units
+  (lf-checks tool); two-step lesson charts story once per chart (lead); INSTR-SLOTS app-wide after slot tagging.
 - 2026-11-20 ~01:45 Two-step Guided fit + STORY-WORK + V-AMBIG (lead 2026-11-20), branch lfa-guided2 on master 65c28ccdf:
   GUIDED-NO-MID (lead ruling (i)): the Guided page drops the hidden middle question (check cc17ba09a, fix c09328807, row
   two-step-guided-no-mid PASS). Model + try share page 1 at M on 120/140 sheets (67 % before); _plain 0 -> 100 %; (Visual) keeps
