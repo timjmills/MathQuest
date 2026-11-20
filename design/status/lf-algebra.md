@@ -9,6 +9,19 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-20 PARKED (budget + precritic red, so no critic under rule 0b): fractions:mixed_numbers_intro + presets write_mixed_from_parts,
+  name_mixed_from_model, on branch claude/sweet-newton-c8wrv1-lf-algebra-mixed (6bc11d096). It is NOT for deploy.
+  Built on frac-model (task partition), on the re-signed card (A18: mnTask 'name', no `blank`). Fully linked (4.NF.B.3b / 3.NF.A.1, EE, Y4.B7.S3 direct, search terms).
+  The last precritic had 13 FAIL; ws-screen-answer and ws-hint-no-blank are fixed since, and it has not been re-run. Still red:
+  - Stretch empty band 42-50 %.
+  - L density POOL-MIN: the card's L 2 rows conflict with the gate.
+  - Lesson bands 29-33 %, over the 28 % limit.
+  - Reason It L LONE-PAGE.
+  - compose / name lesson overflow: bars beside the diagram do not fit the chart panels.
+  - sibling-compare: a new drawing has no siblings.
+  - role-cover shards 1 and 2.
+  CODE CLASH: this branch gives ZM to mixed_numbers_intro (ZN / ZP to the presets), but the mult3 branch gives ZM to mult_three_missing_factor.
+  Whichever ships second must re-take its codes.
 - 2026-11-20 ~18:10 PARKED (budget): multiplication:multiply_three_numbers (ZK) + presets mult_three_two_ways (ZL),
   mult_three_missing_factor (ZM), card RE-SIGNED, branch claude/sweet-newton-c8wrv1-lf-algebra-mult3 (NOT for deploy until clean).
   Built + linked (3.OA.B.5 full; Y4.B4.S13 direct; option keys mtForm 4X / mtPair 4Y / mtBracket 4Z / mtBand 5X); div_facts byte-identical.
