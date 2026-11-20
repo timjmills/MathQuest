@@ -379,3 +379,12 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
   pre-skill-check pages changed (96 of 480 role pages); ws-lesson-baseline 334 identical; capacity pin 61 rises, 0 drops.
   Backtest `psc-fill-eblast` PASS. OPEN for the lead: more cells raise the pre-existing EB-BAND / EB-SIDE counts on the stack
   skills' PSC pages (sub_100k M EB-BAND 7 -> 14 etc.) and div_facts PSC M gains 2 EB-SIDE (30.8 %, equation cell in a 2-col band).
+- 2026-11-20 PSC fill r2 (lead rulings 1c / 2): pre-skill-check ceilings lowered to 12 M / 8 L in role-capacity.js (a SHORT check:
+  3 rows of 4 at M, 2 rows of 4 at L on a one-prerequisite fact page; WDS §12.1's 20 / 16 stays the outer bound). Check state
+  35465ad9c (new ceilings, master role code: FAIL), fix 903f2d778: deal <= ceiling + one row's spare, whole rows only (a lone item
+  drew a full-width cell, div_facts M), items narrower than the band's narrowest base item passed over (div_facts M "0 ÷ 8" EB-SIDE
+  30.8 %). EB-LASTPAGE / CAP-PARITY PASS on all 32 PSC skills; no PSC page has an EB-BAND / EB-SIDE finding master lacks; page counts
+  unchanged; 96 of 480 role pages changed, all pre-skill-check; ws-lesson-baseline 334 identical. Backtest psc-fill-eblast re-pointed,
+  PASS.
+- QUEUED for next week (lead ruling 2): the pre-existing stack-cell EB-BAND / EB-SIDE on the sub_*_no_regroup PSC pages (counts
+  rise with the filled rows on pages already red on master); not fixed in this lane round.

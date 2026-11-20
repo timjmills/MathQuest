@@ -12584,7 +12584,7 @@
   {
    "id": "psc-fill-eblast",
    "kind": "commit-pair",
-   "check": "lf-roles PSC fill (lead request 2026-11-20): a Pre-skill Check page fills to its declared ceiling (role-capacity.js 20 M / 16 L) while the next row fits, R13's 2 + 2 split kept",
+   "check": "lf-roles PSC fill (lead rulings 1c / 2, 2026-11-20): a Pre-skill Check is a SHORT check - each page fills to its declared ceiling (role-capacity.js 12 M / 8 L) while the next whole row fits, R13's 2 + 2 split kept",
    "rule": "ws-empty-band EB-LASTPAGE / CAP-PARITY (blocking on pre-skill-check)",
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify,addition:add_facts,subtraction:sub_wp_20 --roles pre-skill-check --sizes M,L --hosts none --page-fill --only EB-LASTPAGE,CAP-PARITY",
    "expect": {
@@ -12592,12 +12592,12 @@
     "pass": "OK"
    },
    "fail": {
-    "commit": "27ec319a3",
-    "state": "identify L p2 36 % empty + CAP-PARITY 4 vs 8; add_facts 4 items, 78 % empty; sub_wp_20 M/L p2 44-50 % empty"
+    "commit": "35465ad9c",
+    "state": "ceilings 12 M / 8 L, role code at master: identify L 4 vs 8 a page (CAP-PARITY), add_facts 4 items 78 % empty, sub_wp_20 M/L p2 44-50 % empty"
    },
    "pass": {
-    "commit": "ea36c4f61",
-    "state": "fillBands: each page's bands take rows from their deal past the base while the row fits (pre-skill-check.js)"
+    "commit": "903f2d778",
+    "state": "fillBands: whole rows from each band's deal past the base while the row fits, to the ceiling (pre-skill-check.js)"
    },
    "browser": true
   }
