@@ -4163,6 +4163,25 @@
    }
   },
   {
+   "id": "vocab-model-step-not-cue",
+   "check": "ws-vocab-unit MODEL-STEP-NOT-CUE: no 1 picture, 3 words worked step (the Scripted Model and Lesson text) is a hint cue (letter cue / starts with / ends with / has N letters), the steps are distinct, step 1 reads the bank, the middle step names the picture's feature, not its word. lf-roles critic r15 W1: step 1 WAS the first-letter cue, so the Model and Lesson taught letter elimination, and 'Read the three words in the box.' printed after the cue and twice on the Lesson",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit MODEL-STEP-NOT-CUE (precritic node gate vocab-unit; the printed pages under --browser, gate vocab-unit-browser)",
+   "fail": {
+    "commit": "d7810d658",
+    "state": "8cae05dbd + 5f202c638 (z1): step 1 is 'Its word starts with ...'"
+   },
+   "pass": {
+    "commit": "40f36bdec",
+    "state": "W1: Read the three words / the picture's feature / Write; the cue on step 1's Guided-only hint"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --only MODEL-STEP-NOT-CUE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "vocab-v15-writeline",
    "check": "The 1 picture, 3 words answer line >= 1.2 x the widest bank word; grades 4-5 >= 55 mm (critic r3 #7: ~36 mm for \"times as many\")",
    "kind": "commit-pair",
