@@ -14737,6 +14737,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-pupiltag-colmult",
+   "check": "ws-cell-checks PUPILTAG (PT-ERR-4): the '<Name> wrote:' label sits 2-4 mm over the ink of a column multiplication's work, whose first ink is the carry-box row flush with the work's top",
+   "kind": "commit-pair",
+   "rule": "PT-ERR-4 (sharded precritic 2026-11-20, lf-ops sizes: mult_4by1_column Error analysis M, 1.8 mm)",
+   "browser": true,
+   "fail": {
+    "commit": "bdb3801c9",
+    "state": "sizes branch: the label 0.75 mm over the work box, 1.8 mm over the carry boxes' ink"
+   },
+   "pass": {
+    "commit": "4e5cf0103",
+    "state": "error-analysis tagLiftOf: a stack whose op is * lifts the label 0.5 mm more"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_4by1_column --roles error-analysis --size M --rules PUPILTAG 2>&1 | grep -E '^ws-cell-checks: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
