@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson player mock: I do, board, 1280</title>
+<!-- MOCK (lane lf-hosts, spec card design/cards/lesson-player/lesson-player.md). Static: not wired to the app.
+     Real content: library lesson Y1.B2.S9 (slug add-within-10, routine add-count-on, practice addition:add_facts
+     band 10 constant [1,2,3]); steps and Say frame from the routine and the addition:add_facts provider
+     (factSteps: "Start with 6." / "Count on 3: 7, 8, 9." / Write the sum; say "__ plus __ equals __."). -->
+<link rel="stylesheet" href="../../../css/fonts/andika.css">
+<link rel="stylesheet" href="../../../css/screen-cell.css">
+<style>
+  :root { --chrome-bg:#1f2a44; --chrome-ink:#fff; --accent:#2b6cb0; --lesson-accent:#2b6cb0; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:#e9edf3; font-family:"Andika", sans-serif; }
+  body { width:1280px; height:800px; display:grid; grid-template-rows:64px 1fr 96px; overflow:hidden; }
+
+  /* ---- chrome: top bar (colour allowed: chrome, outside the cell, SP-30) ---- */
+  .top { background:var(--chrome-bg); color:var(--chrome-ink); display:flex; align-items:center; gap:20px; padding:0 24px; }
+  .top .title { font-size:26px; font-weight:700; white-space:nowrap; }
+  .rail { display:flex; gap:6px; margin-left:auto; }
+  .rail span { font-size:18px; padding:8px 14px; border-radius:22px; border:2px solid #5a6a8c; color:#c9d3e6; min-height:48px; display:flex; align-items:center; }
+  .rail span.done { border-color:#7fb08a; color:#cfe8d4; }
+  .rail span.on { background:#fff; color:var(--chrome-bg); border-color:#fff; font-weight:700; }
+
+  /* ---- stage ---- */
+  .stage { display:grid; grid-template-columns:340px 1fr; gap:20px; padding:20px 24px 12px; min-height:0; }
+
+  /* Steps strip: the chart's steps (numerals + circles in the lesson accent, INK-30); text black */
+  .steps { background:#fff; border:2px solid #000; padding:16px 18px; display:flex; flex-direction:column; gap:14px; }
+  .steps h2 { margin:0 0 2px; font-size:22px; }
+  .step { display:grid; grid-template-columns:56px 1fr; align-items:center; gap:12px; font-size:26px; line-height:1.2; color:#000; }
+  .step .n { width:52px; height:52px; border-radius:50%; border:3px solid var(--lesson-accent); color:var(--lesson-accent);
+             display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:700; }
+  .step.now { outline:4px solid #000; outline-offset:6px; }
+  .step.now .n { background:var(--lesson-accent); color:#fff; }
+  .step.later { color:#949494; }
+  .step.later .n { border-color:#949494; color:#949494; }
+  .step.later .t { letter-spacing:0; }
+
+  /* The cell: the same B&W Andika screen cell (.mq-scell), at board size */
+  .cellwrap { display:flex; flex-direction:column; min-height:0; }
+  .mq-scell.board { --mq-digit:104px; --mq-text:30px; background:#fff; border:3px solid #000; flex:1;
+                    display:flex; flex-direction:column; padding:0; }
+  .instr { font-size:30px; padding:12px 22px; border-bottom:2px solid #000; }
+  .work { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; }
+  .fact { display:flex; align-items:center; gap:26px; font-size:104px; font-weight:700; line-height:1; }
+  .slot { width:150px; height:132px; border:3px solid #000; }
+  .count { display:flex; align-items:flex-end; gap:0; }
+  .count svg { display:block; }
+  .caption { font-size:34px; color:#000; }
+  .caption .g { color:#949494; }
+  .say { border-top:2px solid #000; padding:12px 22px; font-size:30px; color:#949494; display:flex; gap:12px; align-items:center; }
+  .say b { color:#949494; }
+
+  /* ---- presenter bar (chrome) ---- */
+  .bar { background:var(--chrome-bg); color:#fff; display:flex; align-items:center; gap:16px; padding:0 24px; }
+  .btn { min-width:64px; min-height:64px; border-radius:12px; border:2px solid #fff; background:transparent; color:#fff;
+         font:700 24px "Andika", sans-serif; padding:0 22px; display:flex; align-items:center; gap:10px; }
+  .btn.primary { background:#fff; color:var(--chrome-bg); min-width:240px; justify-content:center; font-size:28px; }
+  .count-label { font-size:24px; margin:0 auto 0 8px; }
+  .keys { font-size:16px; color:#c9d3e6; text-align:right; line-height:1.35; }
+  .mode { font-size:16px; padding:6px 12px; border:2px solid #c9d3e6; border-radius:18px; color:#c9d3e6; }
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="title">I Can add within 10</div>
+    <span class="mode">Board</span>
+    <nav class="rail" aria-label="Lesson parts">
+      <span class="done">Warm-up ✓</span>
+      <span class="on" aria-current="step">I do</span>
+      <span>We do</span>
+      <span>You do</span>
+      <span>Exit ticket</span>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <aside class="steps" aria-label="Steps">
+      <h2>Steps</h2>
+      <div class="step"><div class="n">1</div><div class="t">Start with the big number.</div></div>
+      <div class="step now"><div class="n">2</div><div class="t">Count on.</div></div>
+      <div class="step later"><div class="n">3</div><div class="t">Write how many.</div></div>
+    </aside>
+
+    <section class="cellwrap">
+      <div class="mq-scell board" role="group" aria-label="Worked example, step 2 of 3">
+        <div class="instr">Add.</div>
+        <div class="work">
+          <div class="fact"><span>6</span><span>+</span><span>3</span><span>=</span><span class="slot" aria-label="answer, not yet written"></span></div>
+          <!-- step 1 mark (black: earlier), step 2 marks (grey: newest, P-LC-9) -->
+          <div class="count" aria-hidden="true">
+            <svg width="560" height="150" viewBox="0 0 560 150">
+              <rect x="10" y="62" width="110" height="80" fill="#fff" stroke="#000" stroke-width="3"/>
+              <text x="65" y="122" text-anchor="middle" font-family="Andika" font-weight="700" font-size="64" fill="#000">6</text>
+              <g fill="none" stroke="#949494" stroke-width="4">
+                <path d="M100 58 Q 175 0 235 58"/><path d="M235 58 Q 320 0 380 58"/><path d="M380 58 Q 460 0 520 58"/>
+              </g>
+              <g font-family="Andika" font-weight="700" font-size="64" fill="#949494" text-anchor="middle">
+                <text x="235" y="122">7</text><text x="380" y="122">8</text><text x="520" y="122">9</text>
+              </g>
+            </svg>
+          </div>
+          <div class="caption">Count on 3: <span class="g">7, 8, 9.</span></div>
+        </div>
+        <div class="say"><b>Say:</b> <span>after step 3</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bar">
+    <button class="btn" aria-label="Back one step">◀ Back</button>
+    <button class="btn" aria-label="Read this step aloud">Read aloud</button>
+    <span class="count-label">Step 2 of 3</span>
+    <div class="keys">→ / Space / clicker: next &nbsp;·&nbsp; ← back<br>R read again &nbsp;·&nbsp; Esc leave</div>
+    <button class="btn primary" aria-label="Show next step">Next step ▶</button>
+  </footer>
+</body>
+</html>
