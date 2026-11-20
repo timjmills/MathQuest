@@ -1,6 +1,6 @@
 // ws-mix-pages — MIX-PAGES on any checkout (lf-placevalue vocab deploy, 2026-11-19; lf-engine review of fbca1a582).
 //
-//   node tests/scripts/ws-mix-pages.mjs [--root <checkout>]      (MQ_ROOT works too; default: this checkout)
+//   node tests/scripts/ws-mix-pages.mjs [--root <checkout>] [--only MIX-PAGES,MIX-DROP,MIX-SHELVES]   (MQ_ROOT works too)
 //
 // The node twin of ws-layout-unit MIX-PAGES, runnable on an OLD tree (a backtest row's {root}): ws-layout-unit imports its own
 // checkout's modules, so it cannot judge another commit. A library lesson's Mixed page (lessonFit, over several pages) ADDS lead
@@ -16,6 +16,10 @@ import { pathToFileURL } from 'url';
 
 const ai = process.argv.indexOf('--root');
 const ROOT = path.resolve(ai > -1 ? process.argv[ai + 1] : (process.env.MQ_ROOT || path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..')));
+// --only MIX-PAGES|MIX-DROP|MIX-SHELVES (comma list): judge only those (a backtest row on an old tree judges its own rule)
+const oi = process.argv.indexOf('--only');
+const ONLY = oi > -1 ? String(process.argv[oi + 1] || '').split(',') : null;
+const on = (rule) => !ONLY || ONLY.includes(rule);
 const imp = (rel) => import(pathToFileURL(path.join(ROOT, rel)).href);
 
 const { ROLE_MODULES } = await imp('js/modules/sheet/roles/index.js');
@@ -66,7 +70,7 @@ const got = pagesWith(want);
 const fewer = want[lead] > 1 ? pagesWith(Object.assign({}, want, { [lead]: want[lead] - 1 })) : got;
 console.log(`  root ${ROOT}: want ${JSON.stringify(want)}; lead ${want[lead]} shelves -> ${got} page(s); one shelf fewer -> ${fewer} page(s)`);
 let bad = 0;
-if (got > fewer) { console.log(`  FAIL MIX-PAGES: the shelf the packing added prints a page of its own (${fewer} -> ${got} pages)`); bad++; }
+if (on('MIX-PAGES') && got > fewer) { console.log(`  FAIL MIX-PAGES: the shelf the packing added prints a page of its own (${fewer} -> ${got} pages)`); bad++; }
 
 // MIX-DROP (lf-engine vocabfix, 2026-11-20; lf-placevalue vocab deploy blocker 1): a shelf that FITS is never dropped. packing()
 // counted every shelf of a pool at the pool's tallest UNCAPPED shelf (shelf.h, the probe's tallest item), while plan() lays each
@@ -97,10 +101,10 @@ if (got > fewer) { console.log(`  FAIL MIX-PAGES: the shelf the packing added pr
     const pm = wantB[lead] < 8 ? planB(Object.assign({}, wantB, { [lead]: wantB[lead] + 1 })) : null;
     const moreLead = pm ? ((pm.meta || {}).achieved || {})[lead] || 0 : 0;
     console.log(`  MIX-DROP: want ${JSON.stringify(wantB)} -> ${pagesB} page(s); dealt one lead item more, plan() lays out ${moreLead} lead on ${pm ? pm.pages.length : '-'} page(s)`);
-    if (pm && shelvesB < 7 * pagesB && moreLead > wantB[lead] && pm.pages.length <= pagesB) { console.log(`  FAIL MIX-DROP: a lead shelf that fits was dropped (counts ${wantB[lead]} lead; plan() fits ${moreLead} on the same ${pagesB} page(s))`); bad++; }
+    if (on('MIX-DROP') && pm && shelvesB < 7 * pagesB && moreLead > wantB[lead] && pm.pages.length <= pagesB) { console.log(`  FAIL MIX-DROP: a lead shelf that fits was dropped (counts ${wantB[lead]} lead; plan() fits ${moreLead} on the same ${pagesB} page(s))`); bad++; }
     const meta = pb.meta || {};
-    if (Number.isFinite(meta.packedPages) && meta.packedPages !== pagesB) { console.log(`  FAIL MIX-SHELVES: packing counted ${meta.packedPages} page(s), plan() lays out ${pagesB}`); bad++; }
-    if (Number.isFinite(meta.packedShelves) && meta.packedShelves !== shelvesB) { console.log(`  FAIL MIX-SHELVES: packing counted ${meta.packedShelves} shelves, plan() lays out ${shelvesB}`); bad++; }
+    if (on('MIX-SHELVES') && Number.isFinite(meta.packedPages) && meta.packedPages !== pagesB) { console.log(`  FAIL MIX-SHELVES: packing counted ${meta.packedPages} page(s), plan() lays out ${pagesB}`); bad++; }
+    if (on('MIX-SHELVES') && Number.isFinite(meta.packedShelves) && meta.packedShelves !== shelvesB) { console.log(`  FAIL MIX-SHELVES: packing counted ${meta.packedShelves} shelves, plan() lays out ${shelvesB}`); bad++; }
 }
 if (bad) { console.log('ws-mix-pages: FAIL'); process.exit(1); }
 console.log('ws-mix-pages: OK');

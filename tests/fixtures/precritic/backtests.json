@@ -12192,7 +12192,7 @@
     "commit": "fbca1a582",
     "state": "pagesOf counts the strip: lead 3 shelves -> 3 pages"
    },
-   "command": "node tests/scripts/ws-mix-pages.mjs --root {root}",
+   "command": "node tests/scripts/ws-mix-pages.mjs --root {root} --only MIX-PAGES",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
