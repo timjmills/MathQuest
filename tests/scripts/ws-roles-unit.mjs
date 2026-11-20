@@ -239,7 +239,8 @@ if (on('PSC-2PG-BALANCE')) {
         try { pl = PSC.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can add', grade: 2 }], items, seed: 1 }); }
         catch (e) { findings.push(`PSC-2PG-BALANCE: plan ERROR ${String(e && e.message || e).slice(0, 120)}`); continue; }
         const pages = pl.pages || [];
-        const bandsOf = (pg) => (pg.sections || []).filter((x) => x.kind === 'band' || x.kind === 'row').length;
+        // (a prerequisite is a grid: bands of one instruction share one strip, each its own grid - critic d2d5 r1 D-1)
+        const bandsOf = (pg) => (pg.sections || []).filter((x) => x.kind === 'band' || x.kind === 'row').reduce((t, x) => t + (Array.isArray(x.contents) ? x.contents.length : 1), 0);
         const counts = pages.map(bandsOf);
         if (counts.reduce((a, b) => a + b, 0) !== 4) findings.push(`PSC-2PG-BALANCE: h ${hMm} - ${counts.reduce((a, b) => a + b, 0)} of 4 prerequisites printed`);
         if (pages.length === 2 && Math.abs(counts[0] - counts[1]) > 0) findings.push(`PSC-2PG-BALANCE: h ${hMm} - two pages split ${counts.join(' + ')} (want 2 + 2)`);

@@ -332,25 +332,34 @@ export function dedupeDeal(items) {
     });
 }
 
-// (lead A10 sign floor, critic d2d5 r1 M1): a compare band's items in an order that never shows one sign three in a row and
-// opens with two different signs when it has them. Run on a band's FINAL items - after Form B's shuffle and the fill - so
-// no shuffle undoes it. Greedy and stable: an order that already keeps the floor comes back unchanged. Pure.
+// (lead A10 sign floor, critic d2d5 r1 M1): a compare band's items (every answer a sign) in an order that never shows one
+// sign three in a row and opens with two different signs. Run on a band's FINAL items - after Form B's shuffle and the
+// fill - so no shuffle undoes it. The earliest such order in the items' own order (a search, so "> < < <" becomes
+// "< > < <"): an order that already keeps the floor comes back unchanged; none possible, the items as they came. Pure.
 const signOf = (it) => { const a = JSON.stringify(it && it.q ? it.q.ans : null); return /^"[<>=]"$/.test(a) ? a : null; };
 export function signOrder(items) {
-    const rest = (items || []).slice();
-    if (rest.filter(signOf).length < 2) return rest;
-    const out = [];
-    const ok = (it) => {
-        const g = signOf(it);
-        if (!g) return true;
-        const placed = out.map(signOf).filter(Boolean);
-        const n = placed.length;
-        if (n >= 2 && placed[n - 1] === g && placed[n - 2] === g) return false;
-        if (n >= 1 && placed.every((x) => x === g) && rest.some((o) => signOf(o) && signOf(o) !== g)) return false;
-        return true;
+    const all = (items || []).slice();
+    if (all.length < 3 || !all.every(signOf)) return all;
+    const ok = (seq, g, rest) => {
+        const n = seq.length;
+        if (n >= 2 && seq[n - 1] === g && seq[n - 2] === g) return false;
+        return !(n >= 1 && seq.every((x) => x === g) && rest.some((o) => signOf(o) !== g));
     };
-    while (rest.length) { const i = Math.max(0, rest.findIndex(ok)); out.push(rest.splice(i, 1)[0]); }
-    return out;
+    const go = (rest, seq, out) => {
+        if (!rest.length) return out;
+        const tried = new Set();
+        for (let i = 0; i < rest.length; i++) {
+            const g = signOf(rest[i]);
+            if (tried.has(g)) continue;
+            tried.add(g);
+            const left = rest.slice(0, i).concat(rest.slice(i + 1));
+            if (!ok(seq, g, left)) continue;
+            const r = go(left, seq.concat([g]), out.concat([rest[i]]));
+            if (r) return r;
+        }
+        return null;
+    };
+    return go(all, [], []) || all;
 }
 
 // (critic d2d5 r1 M2) twin pools (one skill, two or more pools) merge into one band ALTERNATING their items, so the band
