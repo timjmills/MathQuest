@@ -307,8 +307,18 @@ const factOf = (it) => { const m = /(\d+)\s*([+\u00d7x*])\s*(\d+)/.exec(String((
 export function dedupeDeal(items) {
     const seen = new Map();
     const facts = new Set();
+    // (lead A10 sign floor: a compare item never makes one sign three in a row, nor a second of the only sign so far)
+    const signs = [];
+    const isSign = (a) => /^"[<>=]"$/.test(a);
     return (items || []).filter((it) => {
         const a = JSON.stringify(it && it.q ? it.q.ans : null);
+        if (isSign(a)) {
+            const n = signs.length;
+            if (n >= 2 && signs[n - 1] === a && signs[n - 2] === a) return false;
+            if (n >= 1 && signs.every((x) => x === a)) return false;
+            signs.push(a);
+            return true;
+        }
         const f = factOf(it);
         const turn = f ? f.split('|') : null;
         if (turn && turn[1] !== turn[2] && facts.has(`${turn[0]}|${turn[2]}|${turn[1]}`)) return false;
