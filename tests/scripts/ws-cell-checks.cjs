@@ -32,13 +32,24 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG,TITLE-RANGE,SENTENCE-FRAME,SM-STATE-PARITY'));
+// SM-STATE-PARITY (lf-ops critic cbt r3 m3, P-1): a Scripted Model draws as many states (.mq-smstate) at L as at M, for the same
+// skill, options and seed - count_by_tables at L merged steps 2 and 3 into one state (3 at L, 4 at M) to save a page.
+// SENTENCE-FRAME (lf-ops critic cbt r3 m2): an instruction that says "Finish the sentence" needs a sentence frame on the page - a
+// frame (.mq-frame) that is not a list of write lines (.mq-framelist, "Answer: __, __, __"). The count_by_tables True or False?
+// page said "Finish the sentence." over "Answer:" lines only.
+// TITLE-RANGE (lf-ops critic cbt r3 m1): an "I Can count ... by As to Bs" / "by As, Bs and Cs" title names exactly the steps the
+// page PRINTS (its count rows' step tabs, data-ws-steptab): a range's ends are the min / max step printed, a list is the set
+// printed. The Opener dealt 2s to 5s at M (2s to 4s at L) under "I Can count by 2s to 7s", and the key copied it. Pages with
+// no step tab, or a title naming no "by Ns", are not judged; nor is the lesson, whose I Can is the lesson's goal over its
+// several parts (the anchor chart names every table; the practice rows are a sample). The key's title is held to the pupil page's tabs too.
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
 if (H13ABS && !RULES.includes('H13-ABS')) RULES.push('H13-ABS');
 const RULE_SKILLS = list(arg('rule-skills', ''));
 const h13On = (j) => H13ABS && (has('h13-abs-all') || !!j.variant) && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
+// TITLE and LESSON-OPT (lf-ops critic r1 check 7) are OPT-IN: --rules ...,TITLE,LESSON-OPT (opt-in-rules.json lane lf-ops-props)
 // --words-rules (OPT-IN; critic lf-placevalue nwf r1 N2 / N4 / N5 / N7 / N8, lead ruling D1): the number-name cell's checks
 // (tests/lib/ws-words-cells.cjs: CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y), judged on --rule-skills
 const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', 'ROW-SLOT-Y'];
@@ -46,6 +57,8 @@ const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', '
 if (has('words-rules') && !arg('rules', null)) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
 const wordsOn = (j) => has('words-rules') && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
 const SIZES = list(arg('size', 'M,L')); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
+// the titles a signed card decided ({skill, opts, iCan, source}); the TITLE rule holds the page to them
+const DECIDED = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e) { try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e2) { return []; } } })();
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const optsKey = (o) => (o ? JSON.stringify(o) : '');
@@ -65,6 +78,41 @@ function lonePage(key, perPage, ceiling) {
     return [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${ceiling} (H5)` }];
 }
 
+/** TITLE-RANGE: the steps an I Can title names ({kind: 'range', lo, hi} | {kind: 'list', set}) or null. */
+const TITLE_RANGE_SKIP = new Set(['lesson', 'detailed-lesson']);
+/** SENTENCE-FRAME: `info` = {finish: the page says "Finish the sentence", frames: sentence frames, lists: list frames}. */
+function sentenceFrameFindings(info) {
+    if (!info || !info.finish || info.frames > 0) return [];
+    return [{ rule: 'SENTENCE-FRAME', msg: `the instruction says "Finish the sentence" but the page has no sentence frame (${info.lists} list frame(s) "Answer: __, __") (critic cbt r3 m2)` }];
+}
+/** SM-STATE-PARITY over the runs: a scripted-model page's state count at L equals the count at M (same skill and options). */
+function smStateParity(runs) {
+    const out = [];
+    for (const l of runs.filter((r) => r.role === 'scripted-model' && r.size === 'L' && Number.isFinite(r.smStates))) {
+        const mm = runs.find((r) => r.role === 'scripted-model' && r.size === 'M' && r.skill === l.skill && r.optsKey === l.optsKey && Number.isFinite(r.smStates));
+        if (mm && mm.smStates > 0 && l.smStates !== mm.smStates) out.push({ rule: 'SM-STATE-PARITY', msg: `${l.skill} scripted-model${l.optsKey ? ' ' + l.optsKey : ''}: ${l.smStates} state(s) at L against ${mm.smStates} at M - a step merged or dropped at one size (P-1; critic cbt r3 m3)` });
+    }
+    return out;
+}
+function titleSteps(title) {
+    const t = String(title || '').replace(/\u2013/g, '-');
+    if (!/^I Can\b/i.test(t)) return null;
+    const m = t.match(/\bby ((?:\d[\d,]*s(?:, | and | to )?)+)/i);
+    if (!m) return null;
+    const nums = (m[1].match(/\d[\d,]*(?=s)/g) || []).map((x) => Number(x.replace(/,/g, '')));
+    if (!nums.length) return null;
+    return / to \d/.test(m[1]) && nums.length === 2 ? { kind: 'range', lo: nums[0], hi: nums[1] } : { kind: 'list', set: nums };
+}
+/** TITLE-RANGE findings for a page titled `title` whose count rows print the step tabs `tabs` (strings: "7", "+7", "-7"). */
+function titleRangeFindings(title, tabs) {
+    const want = titleSteps(title);
+    const got = [...new Set((tabs || []).map((x) => Number(String(x).replace(/[^\d]/g, ''))).filter((v) => v > 0))].sort((a, b) => a - b);
+    if (!want || !got.length) return [];
+    const lo = got[0], hi = got[got.length - 1];
+    if (want.kind === 'range' ? (want.lo !== lo || want.hi !== hi) : (want.set.slice().sort((a, b) => a - b).join() !== got.join()))
+        return [{ rule: 'TITLE-RANGE', msg: `the title "${title}" names ${want.kind === 'range' ? `${want.lo}s to ${want.hi}s` : want.set.map((v) => v + 's').join(', ')}, but the page prints the steps ${got.join(', ')} (critic cbt r3 m1)` }];
+    return [];
+}
 async function checkDoc(sheet, html, ctx) {
     await sheet.setContent(html, { waitUntil: 'load', timeout: 60000 });
     await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
@@ -145,6 +193,21 @@ function selfTest() {
         }
         const sz = sizeSFindings([{ skill: 'k', role: 'independent', size: 'S', perPage: 6, cols: 2, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 30 }] }, { skill: 'k', role: 'independent', size: 'M', perPage: 6, cols: 2, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 40 }] }]);
         const sz0 = sizeSFindings([{ skill: 'k', role: 'independent', size: 'S', perPage: 9, cols: 3, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 30 }] }, { skill: 'k', role: 'independent', size: 'M', perPage: 6, cols: 2, optsKey: '', cells: [{ tmpl: 'arrays', inkH: 40 }] }]);
+        const trCases = [['I Can count by 2s to 7s', ['2', '3', '4', '5'], 1], ['I Can count by 2s to 5s', ['2', '3', '4', '5'], 0],
+            ['I Can count by 3s, 4s and 6s', ['3', '4', '6'], 0], ['I Can count by 3s, 4s and 6s', ['3', '4'], 1], ['I Can count back by 7s', ['−7'], 0],
+            ['I Can count by 5s', ['10'], 1], ['I Can count by 2s to 12s', [], 0], ['Pre-skill check: counting', ['2', '9'], 0]];
+        const sfCases = [[{ finish: true, frames: 0, lists: 4 }, 1], [{ finish: true, frames: 2, lists: 2 }, 0], [{ finish: false, frames: 0, lists: 4 }, 0]];
+        const sfBad = sfCases.filter(([c, n]) => sentenceFrameFindings(c).length !== n);
+        if (sfBad.length) bad++;
+        console.log(`  ${sfBad.length ? 'FAIL' : 'ok  '} SENTENCE-FRAME: ${sfCases.length} cases`);
+        const spBad = [[[{ role: 'scripted-model', size: 'M', skill: 'k', optsKey: '', smStates: 4 }, { role: 'scripted-model', size: 'L', skill: 'k', optsKey: '', smStates: 3 }], 1],
+            [[{ role: 'scripted-model', size: 'M', skill: 'k', optsKey: '', smStates: 4 }, { role: 'scripted-model', size: 'L', skill: 'k', optsKey: '', smStates: 4 }], 0],
+            [[{ role: 'scripted-model', size: 'L', skill: 'k', optsKey: '', smStates: 3 }], 0]].filter(([r, n]) => smStateParity(r).length !== n);
+        if (spBad.length) bad++;
+        console.log(`  ${spBad.length ? 'FAIL' : 'ok  '} SM-STATE-PARITY: 3 cases`);
+        const trBad = trCases.filter(([t, tabs, n]) => titleRangeFindings(t, tabs).length !== n);
+        if (trBad.length) bad++;
+        console.log(`  ${trBad.length ? 'FAIL' : 'ok  '} TITLE-RANGE: ${trCases.length} titles against printed step tabs${trBad.length ? ` (wrong: ${trBad.map((c) => c[0]).join('; ')})` : ''}`);
         const szOk = sz.length === 1 && sz0.length === 0;
         if (!szOk) bad++;
         console.log(`  ${szOk ? 'ok  ' : 'FAIL'} S = M with smaller drawings (SIZE-S) and its control`);
@@ -182,6 +245,7 @@ function selfTest() {
     await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });
     const findings = [];
     const runs = [];
+    const lessons = [];
     const t0 = Date.now();
     for (const j of jobs) {
         const [cat, id] = j.k.split(':');
@@ -190,12 +254,30 @@ function selfTest() {
             try {
                 const r = await window.buildSheet({ role, sections: [{ skills: [Object.assign({ categoryId: cat, skillId: id }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true, anchors: 'off' });
                 const f = Array.isArray(r.fits) ? r.fits[0] : (r.fits && r.fits.sections ? r.fits.sections[0] : r.fits);
-                return { pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
+                // TITLE (check 7): the provider's own I Can line for THESE options - the print path must print it
+                let want = '';
+                try { const pr = await import('./js/modules/sheet/roles/practice.js'); want = pr.skillWords({ categoryId: cat, skillId: id, opts: opts || undefined }).iCan; } catch (e) { want = ''; }
+                const rule = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; const el = d.querySelector('.mq-cchant span, .mq-lstripchant span, .mq-lchant'); return el ? el.textContent.trim() : ''; })();
+                const tabs = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return [...d.querySelectorAll('[data-ws-steptab]')].map((e) => e.getAttribute('data-ws-steptab')); })();
+                const keyTitle = (() => { const d = document.createElement('div'); d.innerHTML = r.keyHtml || ''; const el = d.querySelector('.mq-ican, [data-ws-title], h1'); return el ? el.textContent.trim() : ''; })();
+                const sent = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return { finish: /Finish the sentence/i.test(d.textContent || ''), frames: d.querySelectorAll('.mq-frame:not(.mq-framelist)').length, lists: d.querySelectorAll('.mq-framelist').length }; })();
+                const smStates = role === 'scripted-model' ? (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; return d.querySelectorAll('.mq-smstate').length; })() : null;
+                return { smStates, sent, tabs, keyTitle, want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
         if (built.unsupported) { console.log(`  n/a  ${tag}: ${built.unsupported.slice(0, 100)}`); continue; }
         if (built.error) { findings.push({ rule: 'ERROR', msg: `${tag}: ${built.error}` }); continue; }
+        // TITLE (check 7, D-MP-8, D-CB-2): the page prints the provider's title for its options, a title a signed card
+        // decided (tests/fixtures/precritic/card-titles.json) exactly, and never an option value ("(15 jumps)")
+        if (RULES.includes('TITLE')) {
+            const got = String(built.title || '').replace(/^(Test [AB]|More Practice [A-J]|Reason It|Review|Guided Practice)[:\s-]*/i, '');
+            const dec = DECIDED.find((d) => d.skill === j.k && optsKey(d.opts || null) === optsKey(j.opts));
+            if (/^I Can /.test(built.title || '') && built.want && built.title !== built.want && !(dec && built.title === dec.iCan)) findings.push({ rule: 'TITLE', msg: `${tag}: the page is titled "${built.title}" but the skill's strings for these options say "${built.want}": the title follows the options dealt (VQ-9, H17)` });
+            if (dec && /^I Can /.test(built.title || '') && built.title !== dec.iCan) findings.push({ rule: 'TITLE', msg: `${tag}: the page is titled "${built.title}"; ${dec.source} decided "${dec.iCan}"` });
+            if (/\(\d+ jumps\)|\(\w+=/.test(got)) findings.push({ rule: 'TITLE', msg: `${tag}: an option value in the title "${built.title}" (H17)` });
+        }
+        if (j.role === 'lesson') lessons.push({ k: j.k, size: j.size, opts: j.opts, want: built.want, rule: built.rule });
         const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false, h13abs: h13On(j), words: wordsOn(j) });
         const kk = await checkDoc(sheet, built.key, { role: j.role, key: true, words: wordsOn(j) });
         const here = [
@@ -205,12 +287,24 @@ function selfTest() {
             // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
             // only the passed skills)
             ...lonePage(j.opts ? '' : `${j.k} ${j.role} ${j.size}`, built.perPage, built.ceiling),
+            ...sentenceFrameFindings(built.sent),
+            ...(TITLE_RANGE_SKIP.has(j.role) ? [] : titleRangeFindings(built.title, built.tabs)),
+            ...(!TITLE_RANGE_SKIP.has(j.role) && built.keyTitle && built.keyTitle !== built.title && /^I Can /.test(built.keyTitle) ? titleRangeFindings(built.keyTitle, built.tabs).map((f) => Object.assign({}, f, { msg: `key ${f.msg}` })) : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
-        runs.push({ skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });
+        runs.push({ smStates: built.smStates, skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });
         console.log(`  ${here.length ? 'FAIL' : 'ok  '} ${tag}: ${built.pages}p ${built.cols}x? per ${built.perPage}${here.length ? ` - ${[...new Set(here.map((f) => f.rule))].join(', ')} (${here.length})` : ''}`);
     }
     if (RULES.includes('SIZE-S')) findings.push(...sizeSFindings(runs));
+    if (RULES.includes('SM-STATE-PARITY')) findings.push(...smStateParity(runs));
+    // LESSON-OPT (check 7 + speed-up 5): a lesson printed for an option value whose title differs from the default's
+    // (another property, another kind) carries its own Rule - never the default lesson's (D-MP-7 / D-MP-8)
+    if (RULES.includes('LESSON-OPT')) {
+        for (const l of lessons.filter((x) => x.opts)) {
+            const d = lessons.find((x) => x.k === l.k && x.size === l.size && !x.opts);
+            if (d && l.want && d.want && l.want !== d.want && l.rule && l.rule === d.rule) findings.push({ rule: 'LESSON-OPT', msg: `${l.k} lesson ${l.size} ${optsKey(l.opts)}: titled "${l.want}" but its Rule is the default lesson's ("${l.rule}"): no lesson data for this option value (lessons/prereqs.js byOption)` });
+        }
+    }
     await app.close();
     const by = {};
     for (const f of findings) by[f.rule] = (by[f.rule] || 0) + 1;

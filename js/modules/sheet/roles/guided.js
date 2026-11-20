@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, NO_STRETCH_ROOM, tightRows, rowStretches, koMm, oneRowCapOf } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -1401,6 +1401,13 @@ export function plan(input = {}) {
             // content needs about 90 mm; lf-vocab r6, critic r4 #2, ws-vocab-unit V18 measures the rendered rows)
             Hr = Hr.map(() => (even * rows <= pg.avail + 0.5 ? even : Math.max(Hr.reduce((a, b) => a + b, 0), pg.avail) / rows));
         }
+        // (lf-ops-props, lead ruling 2026-11-12 (b): a row of templates answered in place - footprint `noStretch`: an array and
+        // its turn, an array and its sentence, a count row - is at most NO_STRETCH_ROOM x the row's SHORTEST problem, as
+        // layout.js rowShape, never below its tallest; the spare height stays under the grid. D-MP-1 / D-AG-1 / D-CB-4, r4b)
+        // (critic cbt r1 D4: the Guided ROLE page's rows still stood 1.33-1.6 x their ink - the measured height already carries the
+        // row's slack, so 1.25 x it over-reached ruling (b). A row of noStretch cells keeps its MEASURED height; the spare stays
+        // under the grid. ws-print-lint ROW-STRETCH now reads the ink.)
+        if (host.length > 0 && host.every((it) => it && it.footprint && it.footprint.noStretch)) Hr = Hr.map((h, r) => Math.max(w[r], Math.min(h, w[r])));
         // ONE-ROW (layout.oneRowCapOf, lf-roles r9 item 4 on Guided): a page of ONE row - a two-step story's Model or hinted try
         // alone, 136 mm in a 197-200 mm row at M (31-32 %) - stops where the band under its work stays under 30 %; the white under
         // the grid is the Guided page's accepted white (PT-GDP / PAGE_TYPES 12.1). Only a one-column page of word-work stories

@@ -48,7 +48,7 @@ export const digitsOfOps = (it) => operandsOf((it && it.q) || {}).map((v) => Str
  * The step groups of the Model: one state per worked step; a closing check (a step that marks
  * nothing, after the last mark) rides with the state before it; at most 4 states.
  */
-export function stateGroups(steps) {
+export function stateGroups(steps, maxStates = 4) {
     const marked = (i) => ((steps[i] && steps[i].marks) || []).length > 0;
     const lastMark = steps.map((_, i) => i).filter(marked).pop();
     let groups = [];
@@ -56,7 +56,7 @@ export function stateGroups(steps) {
         if (groups.length && lastMark !== undefined && i > lastMark && !marked(i)) groups[groups.length - 1].push(i);
         else groups.push([i]);
     });
-    while (groups.length > 4) {
+    while (groups.length > Math.max(1, maxStates)) {
         // Merge the shortest adjacent pair whose first group marks nothing (a "look" step joins
         // the step it prepares).
         let best = 0;

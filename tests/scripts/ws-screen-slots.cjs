@@ -66,6 +66,11 @@
 // the instruction and screen-only chrome excluded) - must be at least the host's floor (tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR: card and quiz 56 / 56 / 48 / 48 px at those
 // widths; the online worksheet grid 29 px, the SP table's worksheet size; critic lf-tools r1 A3), in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
 // kind), e.g. "card@1280:digit". --rule-skills a:b,c:d judges it only on those skills (ws-precritic passes the lane's).
+// ARRAY-ORIENT (with --array-orient, or --screen-digit; lf-ops-props r5, owner 2026-11-13): every dot array of 2+ rows a kit cell draws
+//   is landscape on card 390/820/1280, worksheet, quiz and the paper Independent page S/M/L (tests/lib/ws-array-orient.cjs).
+// TRAIN-FIT (with --screen-digit, or --train-fit alone; lf-ops-props r4b, lead ruling (a) 2026-11-13): on the same renders, a
+// count-row train (.k2-countrow) draws its numerals at >= the SCREEN-DIGIT floor and nothing in it scrolls sideways or runs past
+// its cell's edge. A miss is "host@width:train".
 //   node tests/scripts/ws-screen-slots.cjs --digit-fixture file.html --viewport 1280   # the measure on a saved cell
 //                              ([data-mq-digit-root] or the body): OK / FAIL (a backtest fixture)
 //
@@ -186,6 +191,64 @@ function digitVerdict(m, width, bold = true, host = 'card', minPx = 0) {
     if (bold && !(Number(m.weight) >= 700)) why.push(`weight ${m.weight} (want >= 700)`);
     if (!/andika/i.test(String(m.family || '').split(',')[0])) why.push(`font ${String(m.family || '').split(',')[0].trim() || '?'} (want Andika)`);
     return why.length ? `the numeral "${m.text}" is ${why.join(', ')}` : null;
+}
+// ---- TRAIN-FIT (lf-ops-props r4b, lead ruling (a) 2026-11-13 on the count-row screen train): on every host a count-row train
+// (.k2-countrow) draws its numerals at the SCREEN-DIGIT floor (the host never shrinks the drawing under it) and has NO horizontal
+// overflow - no element in it scrolls sideways (scrollWidth > clientWidth: the old swipe row) and no ink runs past its cell's edge.
+// Runs with --screen-digit (beside it) or --train-fit alone; a page with no count-row train is not judged.
+const TRAIN_FIT = has('train-fit') || SCREEN_DIGIT;
+// ---- ARRAY-ORIENT (owner 2026-11-13 "arrays landscape so they can be bigger"; lead ruling for arrays_groups, lf-ops-props r5; the
+// same rule id and semantics as the -divarray branch's ws-screen-support-eq): every dot array of 2 or more rows a kit cell draws is
+// LANDSCAPE (its dots span at least as wide as high) on the card at 390 / 820 / 1280, the online worksheet, the quiz, and the paper
+// Independent page at S / M / L - except an item whose payload names its reading (data-mq-reading) and the arrays-turn pair (an
+// array and its turn: both orientations by design). tests/lib/ws-array-orient.cjs. Runs with --array-orient (or --screen-digit).
+const ARRAY_ORIENT = has('array-orient') || SCREEN_DIGIT;
+const { MEASURE_ARRAY_ORIENT, arrayOrientVerdict } = require('../lib/ws-array-orient.cjs');
+/** In the page: the count-row trains under `rootSel` - {n, px (smallest numeral), scroll, past} or null when there is none. */
+function MEASURE_TRAIN(rootSel) {
+    const root = document.querySelector(rootSel);
+    if (!root) return null;
+    const trains = [...root.querySelectorAll('.k2-countrow')].filter((t) => t.getBoundingClientRect().width > 0);
+    if (!trains.length) return null;
+    let px = Infinity, scroll = 0, past = 0, text = '', thin = Infinity, nLines = 0;
+    for (const t of trains) {
+        const cell = t.closest('[data-ws-cell]') || t.closest('.mq-scell') || root;
+        const cr = cell.getBoundingClientRect();
+        for (const e of t.querySelectorAll('*')) {
+            const r = e.getBoundingClientRect();
+            if (!r.width && !r.height) continue;
+            const cs = getComputedStyle(e);
+            if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+            if (/auto|scroll|hidden/.test(cs.overflowX) && e.scrollWidth > e.clientWidth + 1 && !e.closest('.k2-tile')) scroll++;
+            if (r.right > cr.right + 1 || r.left < cr.left - 1) past++;
+            const own = [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+            if (/^[\d,]+$/.test(own) && e.closest('.k2-shape, .k2-given')) { const f = parseFloat(cs.fontSize); if (f < px) { px = f; text = own; } }
+        }
+        if (t.scrollWidth > t.clientWidth + 1) scroll++;
+        // (critic cbt r1 D2: numbers a LINE - the worksheet's 250 px column stacked one number a line under arrows that point at
+        // nothing. Every line of the train holds >= 3 numbers / boxes, a short LAST line excepted)
+        const items = [...t.querySelectorAll('.k2-tile, .k2-given')].filter((e) => !e.parentElement.closest('.k2-tile, .k2-given') && e.getBoundingClientRect().width > 0);
+        const lines = [];
+        for (const e of items) { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; const ln = lines.find((l) => Math.abs(l.cy - cy) < Math.max(8, r.height / 2)); if (ln) ln.n++; else lines.push({ cy, n: 1 }); }
+        lines.sort((a, b) => a.cy - b.cy);
+        if (items.length >= 3) lines.forEach((l, i) => { if (l.n < 3 && !(i === lines.length - 1 && lines.length > 1)) thin = Math.min(thin, l.n); });
+        nLines = Math.max(nLines, lines.length);
+    }
+    return { n: trains.length, px: px === Infinity ? 0 : px, text, scroll, past, thin: thin === Infinity ? 0 : thin, nLines };
+}
+/** The verdict on a measured train at a viewport: null when it passes. */
+function trainVerdict(m, width, host = 'card') {
+    if (!m) return null;
+    // (the host's own floor - ONE table, tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR: the online worksheet 29 px, lead 2026-11-13)
+    const vp0 = DIGIT_VIEWPORTS.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
+    const vp = { w: vp0.w, px: SW.digitFloor(host, width) || vp0.px };
+    const why = [];
+    if (m.px && m.px < vp.px - 0.5) why.push(`its numeral "${m.text}" is ${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w}: the host shrank the train)`);
+    if (m.scroll) why.push(`${m.scroll} part(s) scroll sideways (no horizontal scroll or swipe)`);
+    if (m.past) why.push(`${m.past} part(s) run past the cell's edge`);
+    // (390 px is no longer a host - owner plan 2026-11-13, critic cbt r1 D10 out of scope: numbers a line judged at 820 / 1280)
+    if (m.thin && width >= 600) why.push(`a line holds ${m.thin} number(s) (want >= 3 a line, a short last line excepted; ${m.nLines} lines; critic cbt r1 D2)`);
+    return why.length ? `the count-row train: ${why.join('; ')}` : null;
 }
 /**
  * CELL-READ (lf-checks queue 20; lf-ops divarray critic, lead 2026-11-13: the mult_facts practice card drew no [data-ws-cell],
@@ -692,7 +755,7 @@ if (arg('digit-fixture', null)) {
         }
     }
     // ---- SCREEN-DIGIT (opt-in): the item's numeral on the card, the worksheet's first card and the quiz, at three widths
-    if (SCREEN_DIGIT && !SWEEP) {
+    if ((SCREEN_DIGIT || TRAIN_FIT || ARRAY_ORIENT) && !SWEEP) {
         const judged = skills.filter((s) => !RULE_SKILLS.length || RULE_SKILLS.includes(`${s.categoryId}:${s.skillId}`));
         for (const vp of DIGIT_VIEWPORTS) {
             await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: 1 });
@@ -705,7 +768,21 @@ if (arg('digit-fixture', null)) {
                     await prep(page, ROLES[0]);
                 }
                 if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
+                const judgeOrient = async (host, sel) => {
+                    if (!ARRAY_ORIENT) return;
+                    for (const a of await page.evaluate(MEASURE_ARRAY_ORIENT, sel)) {
+                        const v = arrayOrientVerdict(a);
+                        if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} ARRAY-ORIENT ${v}`; findings.push({ key, id: `${host}@${vp.w}:orient`, line: l }); console.log(l); }
+                    }
+                };
+                const judgeTrain = async (host, sel) => {
+                    await judgeOrient(host, sel);
+                    if (!TRAIN_FIT) return;
+                    const v = trainVerdict(await page.evaluate(MEASURE_TRAIN, sel), vp.w, host);
+                    if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} TRAIN-FIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:train`, line: l }); console.log(l); }
+                };
                 const judge = (host, m) => {
+                    if (!SCREEN_DIGIT) return;
                     checked++;
                     if (NO_NUMERAL(m)) { console.log(`${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT SKIP (no numeral in the cell)`); return; }
                     const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key), host, ratchetPx(key, host, vp.w));
@@ -716,11 +793,11 @@ if (arg('digit-fixture', null)) {
                         try { const st = window.state; st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView');
                             st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: 3 }); if (!st.currentQ) return false; window.renderQuestion(); return true; } catch (e) { return false; }
                     }, c, k);
-                    if (okc) { await sleep(350); judge('card', await page.evaluate(MEASURE_DIGIT, '#questionPaper') || await page.evaluate(MEASURE_DIGIT, '#visualAid')); }
+                    if (okc) { await sleep(350); judge('card', await page.evaluate(MEASURE_DIGIT, '#questionPaper') || await page.evaluate(MEASURE_DIGIT, '#visualAid')); await judgeTrain('card', '#gameView'); }
                     const okw = await page.evaluate((c, k) => {
                         try { const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 2; window.initWorksheet(); return true; } catch (e) { return false; }
                     }, c, k);
-                    if (okw) { await sleep(1100); judge('worksheet', await page.evaluate(MEASURE_DIGIT, '#ws_card_0 .mq-wspaper') || await page.evaluate(MEASURE_DIGIT, '#ws_card_0')); }
+                    if (okw) { await sleep(1100); judge('worksheet', await page.evaluate(MEASURE_DIGIT, '#ws_card_0 .mq-wspaper') || await page.evaluate(MEASURE_DIGIT, '#ws_card_0')); await judgeTrain('worksheet', '#worksheetView'); }
                     const okq = await page.evaluate((c, k) => {
                         try {
                             const q = window.generateQuestionFor({ category: c, skill: k, seed: 7, itemIndex: 0 });
@@ -732,11 +809,34 @@ if (arg('digit-fixture', null)) {
                             window.startQuizTest(); return true;
                         } catch (e) { return false; }
                     }, c, k);
-                    if (okq) { await sleep(400); judge('quiz', await page.evaluate(MEASURE_DIGIT, '#quizTakeView .mq-qtpaper')); }
+                    if (okq) { await sleep(400); judge('quiz', await page.evaluate(MEASURE_DIGIT, '#quizTakeView .mq-qtpaper')); await judgeTrain('quiz', '#quizTakeView .mq-qtpaper'); }
                     await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                 } catch (e) { const l = `${key} ERR SCREEN-DIGIT @${vp.w} ${String(e.message || e).split('\n')[0]}`; errors.push(l); console.log(l); }
             }
         }
+        // ARRAY-ORIENT on paper: the Independent page at M and L (size S dropped, owner 2026-11-13) (each skill judged; a page with no array is not judged)
+        if (ARRAY_ORIENT) {
+            const judged = skills.filter((s) => !RULE_SKILLS.length || RULE_SKILLS.includes(`${s.categoryId}:${s.skillId}`));
+            for (const { categoryId: c, skillId: k } of judged) {
+                for (const size of ['M', 'L']) {
+                    const html = await page.evaluate(async (c, k, size) => { try { const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: c, skillId: k }] }], size, paper: 'A4', seed: 7, key: false }); return window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }); } catch (e) { return ''; } }, c, k, size);
+                    if (!html) continue;
+                    const sh = await app.browser.newPage();
+                    try {
+                        await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+                        await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
+                        await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+                        await sh.emulateMediaType('print');
+                        for (const a of await sh.evaluate(MEASURE_ARRAY_ORIENT, '[data-ws-cell]')) {
+                            const v = arrayOrientVerdict(a);
+                            if (v) { const l = `${`${c}:${k}`.padEnd(44)} ${`paper ${size}`.padEnd(14)} ARRAY-ORIENT ${v}`; findings.push({ key: `${c}:${k}`, id: `paper-${size}:orient`, line: l }); console.log(l); }
+                        }
+                    } finally { await sh.close(); }
+                }
+            }
+            console.log(`ARRAY-ORIENT: ${findings.filter((f) => /:orient$/.test(f.id)).length} miss(es)`);
+        }
+        if (TRAIN_FIT) console.log(`TRAIN-FIT: ${findings.filter((f) => /:train$/.test(f.id)).length} miss(es)`);
         console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}, worksheet (>= ${WORKSHEET_DIGIT_PX} px): ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
     }
     await app.close();

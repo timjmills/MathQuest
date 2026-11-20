@@ -26,7 +26,7 @@ import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, 
  * is state n of the Model), and ordinary numbers - the lower third of the candidates by size (the
  * research: easy numbers first, but never the trivial 1 + 1).
  */
-export function pickExample(items, data) {
+export function pickExample(items, data, opt = {}) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const want = data && Array.isArray(data.steps) ? data.steps.length : 0;
     const all0 = items.map((it, i) => ({ it, i, steps: workedStepsOf(it) })).filter((x) => x.steps.length >= 2);
@@ -66,12 +66,42 @@ export function pickExample(items, data) {
     // move to the nearer ten is seen, not a 1-tick hop from 79).
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     if (pref && pool.some((x) => pref.test(String((x.it.q && x.it.q.text) || '')))) pool = pool.filter((x) => pref.test(String((x.it.q && x.it.q.text) || '')));
+    // LESSON-OPENER-SAME (lf-engine, owner's grade-3 review 2026-11-19): a times-table lesson (every fact of the pool shares
+    // one factor - mult_facts {constant: [6]}) is modelled on an ordinary fact of ITS OWN table. The widest-operands rule below
+    // is a column skill's; on a fixed table it picked 10 / 11 / 12 x the table for every lesson ("11 x 6", "11 x 9": the edge
+    // fact, and 11 is another lesson's table). The other factor is one of 3-9 and moves with the lesson's `variant` (its WRM
+    // step number), so two consecutive steps do not open on the same fact.
+    const tableX = fixedTableOf(pool);
+    if (tableX) return tableX;
     const sorted = pool.slice().sort((a, b) => easeScore(a.it.q) - easeScore(b.it.q) || a.i - b.i);
     // Two digits beat one for a column skill: the example has the widest operands the skill deals.
     const widest = Math.max(...sorted.map((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0)));
     const wide = sorted.filter((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0) === widest);
     const list = wide.length ? wide : sorted;
     return list[Math.min(list.length - 1, Math.floor(list.length / 3))].it;
+
+    // (the fixed-table model above: null when the pool is not one table's multiplication facts)
+    function fixedTableOf(cands) {
+        const facts = cands.filter((x) => x.it.q && x.it.q.cell && x.it.q.cell.template === 'fact' && /^[×x*]$/.test(String((x.it.q.cell.payload || {}).op || '').trim()));
+        if (facts.length < 3 || facts.length !== cands.length) return null;
+        const ops = facts.map((x) => operandsOf(x.it.q).map(Number));
+        if (ops.some((o) => o.length !== 2 || !o.every(Number.isFinite))) return null;
+        const table = [...new Set(ops[0])].find((v) => ops.every((o) => o.includes(v)));
+        if (table === undefined || table < 2) return null;
+        const ORD = [3, 4, 5, 6, 7, 8, 9].filter((f) => f !== table);
+        const v = Number.isFinite(Number(opt.variant)) ? Math.abs(Math.floor(Number(opt.variant))) : 0;
+        const want = ORD[v % ORD.length];
+        // the table SECOND: "5 × 6 is 5 groups of 6", and the worked steps count by 6 (the provider counts by the second
+        // factor - "6 × 7" counted by 7, the 7 table, in a 6 times-table lesson)
+        const score = (o) => {
+            const other = o[1] === table ? o[0] : o[1];
+            const edge = other < 3 || other > 9 ? 100 : 0;
+            return edge + (o[1] === table ? 0 : 50) + Math.abs(other - want) * 2;
+        };
+        let best = 0;
+        for (let k = 1; k < facts.length; k++) if (score(ops[k]) < score(ops[best])) best = k;
+        return facts[best].it;
+    }
 }
 
 /**
@@ -116,7 +146,8 @@ export function stateDrawing(it, steps, groups, k, c) {
     if (isWordSentence(it) && groups.length >= 2) return unslot(sentenceState(it, groups, k, c));
     if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
-    const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
+    // (`cellLiveMm`, lf-ops-props: the panel's own width travels past resolveCtx, which keeps only the kit's own keys)
+    const ctx = Object.assign(resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined })), Number(c.cellLiveMm) > 0 ? { cellLiveMm: Number(c.cellLiveMm) } : {});
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));
     if (isExpand(it)) return unslot(expandState(it, merged, k, c));
     // (an even-products window, detailed lesson 4: its own step states - the rows, then the columns, then odd x odd)
@@ -129,6 +160,8 @@ export function stateDrawing(it, steps, groups, k, c) {
     if (t) {
         const payload = Object.assign({}, it.q.cell.payload || {});
         if (it.q.cell.template === 'fact' && !payload.pt) payload.pt = ctx.metrics.digitPt;
+        // (critic cbt r1 D8: a count row in a full-width chart panel takes two lines - count-row arcsGeom `twoLines`)
+        if (it.q.cell.template === 'count-row' && c.chartTwoLines) payload.twoLines = true;
         let html = t.stepState(payload, merged, k, Object.assign({}, ctx, { step: k }));
         if (it.q.cell.template === 'fact') html = factMarks(html, it, steps, groups, k, !!c.hops);
         return unslot(html);
@@ -144,7 +177,7 @@ export function stateDrawing(it, steps, groups, k, c) {
         const fresh = [];
         ((merged[k] || {}).marks || []).forEach((m) => { if (m && m.slot !== undefined) { const id = idOf(m); if (acc[id] !== String(m.value)) fresh.push(id); acc[id] = String(m.value); } });
         let html = '';
-        try { html = it.render(ctx, { cols: 2, payload: Object.assign({}, it.q.cell.payload || {}, { traceSlots: acc, traceNew: fresh }) }); } catch (e) { html = ''; }
+        try { html = it.render(ctx, { cols: 2, payload: Object.assign({}, it.q.cell.payload || {}, { traceSlots: acc, traceNew: fresh }, c && c.chartTwoLines ? { twoLines: true } : {}) }); } catch (e) { html = ''; }
         return unslot(html);
     }
     // A template with no step states: the problem blank, then answered in grey on the last state.
@@ -157,7 +190,9 @@ export function stateDrawing(it, steps, groups, k, c) {
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
 export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
-    : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+    : n >= 4 ? { cols: data && data.chartFull ? 1 : 2, rows: data && data.chartFull ? n : Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+// `chartFull` (roles/lesson.js chartDataOf, CELL-FITS 2026-11-20): an authored lesson whose example needs the full width - four
+// panels one a row instead of 2 x 2; nothing else of the lesson changes.
 // `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
 // page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
 
@@ -174,7 +209,14 @@ export function stateItems(example, data) {
     // writes nothing new - it is the line under the panels, not a panel of its own.
     const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
-    const groups = stateGroups(steps);
+    // `headFirst` (lesson data - lead ruling 2026-11-14, cbt r3 E7): an opening step that writes nothing ("Read the jump") is a
+    // NUMBERED HEAD LINE above the panels, the way `tailLast` draws the closing step under them: every step keeps its own
+    // numbered line (P-1) and the panels stay as many as the row's working size allows (CHART-WIDTH).
+    const head = data && data.headFirst && steps.length > 1 && !((steps[0] && steps[0].marks) || []).length ? [0] : [];
+    // (`chartMaxStates`, lesson data - critic cbt r1 D8: a count row with its times labels or 15 jumps draws in TWO panels, the
+    // look step joining the step it prepares, so the row keeps the chart's working size)
+    const groups0 = stateGroups(head.length ? steps.slice(1) : steps, data && Number(data.chartMaxStates) > 0 ? Number(data.chartMaxStates) : 4);
+    const groups = head.length ? groups0.map((g) => Object.assign({}, g, { steps: g.steps.map((i) => i + 1) })) : groups0;
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
@@ -210,7 +252,13 @@ export function stateItems(example, data) {
             // Lessons r3: a panel whose step counts on draws the hops beside its words (the side
             // column has the room; under the fact they would push the panels past the page).
             const hops = v === 'row' ? panelHops(example, steps, groups, k) : '';
-            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
+            // (lf-ops-props, EB-EDGE: the drawing is measured at the PANEL's own width - a count row in a 2 x 2 panel took the
+            // page's 186 mm and ran 39 mm across the panel's border. `cellLiveMm`, read by count-row, is that width at zoom 1.)
+            // (critic cbt r1 D8: a `chartWide` panel is the page's full width - read as half (cols unset -> 2), the times=each and
+            // 15-jump rows wrapped into 77 mm at 13 pt, 60 % of the panel)
+            const cellLiveMm = ((v === 'row' ? 186 * 0.42 - 4 : 186 / Math.max(1, cols || (data && data.chartWide ? 1 : 2)) - 16)) / z;
+            const cz = Object.assign({}, c, { cellLiveMm }, v === 'row' ? {} : { hops: true }, data && data.chartWide ? { chartTwoLines: true } : {});
+            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, cz)}</div>`;
             return v === 'row'
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;
@@ -220,6 +268,12 @@ export function stateItems(example, data) {
         lessonDraw: k, cellCls: 'mq-cdrawcell',
         render: (c) => `<div class="mq-cdraw">${drawing(k, c)}</div>`,
     }));
+    const lineOf = (idx, c) => `<div class="mq-ctail">${idx.map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: { S: 7, M: 8.5, L: 10 }[c.size] || 10 })}<b>${esc(named[i].name)}</b>`
+        + `${named[i].words ? `<span class="mq-ctailw">${esc(named[i].words)}</span>` : ''}</div>`).join('')}</div>`;
+    const heads0 = head.length ? [Object.assign({}, base, {
+        lessonHead: true, cellCls: 'mq-ctailcell mq-cheadcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
+        render: (c) => lineOf(head, c),
+    })] : [];
     const tails = tail.length ? [Object.assign({}, base, {
         lessonTail: true, cellCls: 'mq-ctailcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
         // (`tailRead`, lesson data - the detailed lesson maker, lesson 7: the closing line is read, not worked: a reading cell)
@@ -245,7 +299,7 @@ export function stateItems(example, data) {
                 + `${words.length ? `<div class="mq-cwords">${words.map((w) => `<div>${esc(w)}</div>`).join('')}</div>` : ''}</div>`;
         },
     })] : [];
-    return panels.concat(draws, tails, tailPanels);
+    return panels.concat(draws, tails, tailPanels, heads0);
 }
 
 /**
@@ -348,7 +402,7 @@ export function sameFactForms(ex) {
  * panels fill the body left over, never above 2 x (rows) / 1.6 x (2 x 2) or the panel's width,
  * and a panel grows past its content by a quarter at most, the content centred in it (H13).
  */
-export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null) {
+export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null, headItem = null) {
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
     const f = frameOf({ skills: target, input, tabId: 'Anchor chart', score: 0, footerLeft: lesson.tagLine });
@@ -361,11 +415,21 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const header = f.header;
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n, data);
+    // CELL-FITS (lead via lf-engine 2026-11-20): the 2 x 2 chart whose panels do not fit the page even at zoom 1, and whose
+    // drawings the host measured to fit one across but not two (two_step_letter_equation: story, bars and "= n" equation), was
+    // drawn at zoom 1 anyway - squeezed into half-width panels, past the page edge into the Say band and the footer, while its
+    // sizing said ok. It takes `chartFull`, one full-width panel a row (the panels run onto further chart pages below when
+    // needed). A 2 x 2 chart that fits is unchanged, whatever its drawings measure.
+    const lay0 = chartLayout(n, data);
+    const halfTooNarrow = (d) => !!(d && d.measured && d.measured[2] && d.measured[2].fits === false && d.measured[1] && d.measured[1].fits !== false);
+    const room0 = m.body - m.say - (data && data.chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0) - 2 - (tailItem ? Math.max(12, hOf(tailItem, 1)) + 4 * lay0.rows : 0);
+    const overfull2 = lay0.cols === 2 && lay0.rows * Math.max(...states.map((st) => hOf(st, 2) + 1)) > room0;
+    const lay = overfull2 && draws.some(halfTooNarrow) ? chartLayout(n, Object.assign({}, data || {}, { chartFull: true })) : lay0;
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
-    const tailH = tailItem ? Math.max(12, hOf(tailItem, 1)) : 0;
+    // (`headFirst`: the head line above the panels takes its height as the tail line does)
+    const tailH = (tailItem ? Math.max(12, hOf(tailItem, 1)) : 0) + (headItem ? Math.max(12, hOf(headItem, 1)) : 0);
     const availAll = m.body - m.say - chantH - 2;
     const avail = availAll - tailH;
     // The second example's row: one cell per state, sized to its tallest drawing.
@@ -432,16 +496,38 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // 12-13 pt. It is now REPORTED: sizing.fallback, and sizing.ok false when the zoom is under 1, so the host fails the
     // build result and the compiler refuses the chart. The drawing itself is unchanged.)
     let fallback = false;
+    // CELL-FITS (lead via lf-engine 2026-11-20): panels that do not fit one page even at zoom 1 were drawn at zoom 1 anyway
+    // and ran over the Say band, the footer and the page edge (sizing said ok: the zoom was 1). Without a tail band they now
+    // run onto as many chart pages as they need, at full size (`perPage` panel rows a page); nothing shrinks. Only a chartFull
+    // chart (above): a chart whose measured panels merely read taller than the page prints as before (its measure over-reads
+    // its render - add_wp_10, fact_family_sort ... are inside their page by CELL-FITS).
+    let perPage = 0;
     if (mode === 'one') {
         const z1 = solve((q) => lay.rows * H(q), availP, 1, zMax);
         if (z1) z = z1;
+        else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
     }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
+    const more = [];   // (the chart pages after the first, when its panels run on: perPage)
     let rowH;
     let room;
-    if (mode === 'grid3') {
+    if (perPage) {
+        room = availP;
+        rowH = H(1);
+        // (a page before the last has the Say and Rule bands' room too: perPage rows; the last page holds what fits above them)
+        const per = perPage * cols;
+        const lastPer = Math.max(1, Math.floor(availP / H(1))) * cols;
+        const cuts = [];
+        for (let k = 0; k < states.length; k += per) cuts.push(states.slice(k, k + per));
+        const tail0 = cuts[cuts.length - 1];
+        if (tail0.length > lastPer) cuts.splice(cuts.length - 1, 1, tail0.slice(0, tail0.length - lastPer), tail0.slice(tail0.length - lastPer));
+        for (const [k, chunk] of cuts.entries()) {
+            const grid = gridPart(chunk.map((st) => withZoom(st, cols)), { cols, rows: Math.ceil(chunk.length / cols), cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
+            (k === 0 ? sections : (more[more.length] = [])).push(grid);
+        }
+    } else if (mode === 'grid3') {
         room = availAll;
         const hr = rowsAt(z);
         const tot = sum(hr);
@@ -461,9 +547,20 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         // the page) whenever they already use all of it, or when they are rows (the side column
         // spreads).
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
+        if (headItem) sections.push(gridPart([Object.assign(planItem(headItem, { cols: 1, nolabel: true }), { cls: headItem.cellCls })], { cols: 1, rows: 1, cellH: Math.max(12, hOf(headItem, 1)), labels: 'none', cls: 'mq-ctailgrid mq-cheadgrid' }));
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
+        // (`chartMaxStates` - critic cbt r1 D8: a merged panel holds two step heads, the next one; equal rows left a 38 % band
+        // under the shorter. Each one-column panel is as tall as ITS content, a quarter more at most, the rest under the grid)
+        if (cols === 1 && data && Number(data.chartMaxStates) > 0 && lay.rows === states.length) {
+            const own = states.map((_, k) => base[k] + (z - 1) * dH[k]);
+            const kk = Math.min(1.25, Math.max(1, room / own.reduce((a, b) => a + b, 0)));
+            const rowsMm = own.map((h) => h * kk);
+            grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
+            grid.height = `${Math.round(rowsMm.reduce((a, b) => a + b, 0) * 100) / 100}mm`;
+            sections.push(grid);
+        } else
         sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
-        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
+        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: Math.max(12, hOf(tailItem, 1)), labels: 'none', cls: 'mq-ctailgrid' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
         if (mode === 'row') {
@@ -483,13 +580,14 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const sayN = data && data.sayWords ? pvNumberOf(example) : null;
     // (`chartSay(q)`, lesson data - the detailed lesson maker, lesson 5 r3: the chart's Say in the lesson's own words, In / Out)
     const ownSay = data && typeof data.chartSay === 'function' && example ? (() => { try { return data.chartSay(example.q); } catch (e) { return ''; } })() : '';
-    sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
-    if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
+    const last = more.length ? more[more.length - 1] : sections;
+    last.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
+    if (chant) last.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
-        header, sections, zoom: z, second: shown, mode,
+        header, sections, more, zoom: z, second: shown, mode,
         // `ok`: drawn at its planned size - a fallback zoom under 1 is a FAILURE (lesson 7 D1; print-sheet chartSizing)
-        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
+        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), ...(perPage ? { pages: 1 + more.length } : {}), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
     };
 }
 

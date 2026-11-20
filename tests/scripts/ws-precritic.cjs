@@ -349,6 +349,11 @@ const scriptPath = (name) => ['.cjs', '.mjs', '.js', '.sh'].map((e) => path.join
 const srcHas = (file, flag) => { try { const s = fs.readFileSync(file, 'utf8'); return s.includes(`arg('${flag}'`) || s.includes(`'--${flag}'`) || s.includes(`"--${flag}"`) || new RegExp(`--${flag}\\b`).test(s.split('\n').slice(0, 80).join('\n')); } catch (e) { return false; } };
 
 /** A gate: {id, name, scope, kind 'node'|'browser', script, args, needFlags, parse, missing, expect, synthetic} */
+/** ws-lesson-pages' scopes: [[grade, block|'']] from the --unit ids (G3-Y4.B4 -> ['3', 'Y4.B4']), else --grade, else grade 3. */
+function lessonPagesScopes(ctx) {
+    const u = (ctx.unitInfo || []).map((x) => /^G(\d|K)-(Y\d\.B\d+)$/.exec(String(x.unit || ''))).filter(Boolean).map((m) => [m[1], m[2]]);
+    return u.length ? u : [[String(ctx.grade || '3'), '']];
+}
 function gate(id, name, scope, kind, script, args, extra = {}) {
     const file = scriptPath(script);
     let missing = null;
@@ -1346,7 +1351,7 @@ function buildPlan(ctx) {
                 ['--skills', vk.join(','), '--roles', 'guided,more-practice,error-analysis', '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, 'vocab-roles-render')]));
         }
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
-        add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
+        add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS,PRE-QUADRANTS,ROLE-SCOPE,CHART-PANELS (lesson data, option help names only offered values, wrongAnswer fits its slot, a hand-named Pre-skill check fills >= 3 quadrants, a page-typed option stays off on other roles, one chart panel a worked step)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS,PRE-QUADRANTS,ROLE-SCOPE,CHART-PANELS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
         // W0-B2 (lane S1): the spec card that covers these skills is signed, its rulings / notOffered / decisions are as
         // signed, and it decides every option value, role and screen host the repo offers today (ws-spec-card
         // --check-signed --skill). No card covers them (exit 4): N/A. An UNSIGNED card (exit 5, "needs owner signature";
@@ -1463,6 +1468,14 @@ function buildPlan(ctx) {
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
+            // (owner via the lead, 2026-11-19: 16 grade-3 WRM lessons printed a first page with only its title, and Y4.B4.S2-S10
+            // all modelled "11 × n") LESSON-EMPTY-FIRST + LESSON-OPENER-SAME on every built lesson the White Rose screen prints
+            // for the grade (a --unit G<g>-<block> run: that grade, that block); blocking like the other lesson gates. Fix: lf-engine.
+            for (const [g, b] of lessonPagesScopes(ctx)) add(gate(`lesson-pages-g${g}${b ? `-${b}` : ''}`, 'ws-lesson-pages (LESSON-EMPTY-FIRST: no lesson page prints only its title; LESSON-OPENER-SAME: consecutive lessons of a block never open on the same model item)', `grade ${g} WRM lessons${b ? ` of ${b}` : ''} × M`, 'browser', 'ws-lesson-pages', ['--grade', g, ...(b ? ['--blocks', b] : [])], { missingMsg: 'ws-lesson-pages is not in this tree' }));
+            // (lead via lf-engine, 2026-11-20: two_step_letter_equation's anchor chart drew its full-width story / bars / "= n" in
+            // half-width 2 x 2 panels, past the page edge into the Say band and the footer) CELL-FITS: no cell ink outside its
+            // panel or its page, on the render, on every library lesson at M and L; blocking.
+            add(gate('lesson-cellfits', 'ws-lesson-cellfits (CELL-FITS: no cell ink outside its panel or its page, judged on the render)', 'every lessons/library.js lesson × M/L', 'browser', 'ws-lesson-cellfits', ['--sizes', 'M,L'], { missingMsg: 'ws-lesson-cellfits is not in this tree' }));
             const SAMPLES = 'addition:add_facts,subtraction:sub_100_regroup,number_sense:nearest_10';
             for (const sz of ['L', 'M']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
         }
