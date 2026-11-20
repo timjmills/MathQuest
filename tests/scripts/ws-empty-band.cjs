@@ -942,6 +942,9 @@ function judge(cells, where, F, role) {
 async function htmlMain() {
     // --html honours --only, --json and --report-only as a --skill run does (critic eb-r3 m3)
     const findings = []; const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
+    // EBLAST-ADVISORY (lead 2026-11-20, critic eblast r2: false reds on passed skills): EB-LASTPAGE and CAP-PARITY REPORT only
+    // (printed, never blocking) until critic r3 passes the rebuilt rules; --eblast-block makes them findings (backtest rows)
+    const FA = (rule, where, msg) => { if (has('eblast-block')) return F(rule, where, msg); if (!ONLY || ONLY.includes(rule)) console.log(`  ADVISORY (not critic-passed) ${rule} ${where}: ${msg}`); };
     const app = await open({ seed: 1 });
     try {
         const sh = await app.browser.newPage();
@@ -969,11 +972,11 @@ async function htmlMain() {
             const groups = {}; for (const p of await sh.evaluate(measurePageFill, scope)) (groups[p.size || '-'] = groups[p.size || '-'] || []).push(p);
             for (const [z, pf] of Object.entries(groups)) {
                 const why = lastPageBad(role, pf[pf.length - 1], pf.length, pf[0].rows);
-                if (why) F('EB-LASTPAGE', `${path.basename(HTML)} ${role} ${z} p${pf.length}`, why);
+                if (why) FA('EB-LASTPAGE', `${path.basename(HTML)} ${role} ${z} p${pf.length}`, why);
             }
             if (groups.M && groups.L) { const by = countSetBy(roleSrc(role), null);
                 const why = by === 'role' ? capParityBad({ items: groups.M[0].items, full: !rowFits(groups.M[0]) }, { items: groups.L[0].items, full: !rowFits(groups.L[0]) }) : null;
-                if (why) F('CAP-PARITY', `${path.basename(HTML)} ${role} M/L`, why); }
+                if (why) FA('CAP-PARITY', `${path.basename(HTML)} ${role} M/L`, why); }
         }
         console.log(`note: ${slotInkNote(SLOT_INK)}`);
         for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
@@ -988,6 +991,9 @@ async function htmlMain() {
 async function main() {
     const findings = []; const notes = []; let renders = 0, cellsRead = 0;
     const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
+    // EBLAST-ADVISORY (lead 2026-11-20, critic eblast r2: false reds on passed skills): EB-LASTPAGE and CAP-PARITY REPORT only
+    // (printed, never blocking) until critic r3 passes the rebuilt rules; --eblast-block makes them findings (backtest rows)
+    const FA = (rule, where, msg) => { if (has('eblast-block')) return F(rule, where, msg); if (!ONLY || ONLY.includes(rule)) console.log(`  ADVISORY (not critic-passed) ${rule} ${where}: ${msg}`); };
     const app = await open({ seed: 1 });
     const { page } = app;
     const T0 = Date.now();
@@ -1079,7 +1085,7 @@ async function main() {
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
                             const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp, pf.length, pf[0].rows);
-                            if (why) F('EB-LASTPAGE', `${key} ${j.tag} p${pf.length}`, why);
+                            if (why) FA('EB-LASTPAGE', `${key} ${j.tag} p${pf.length}`, why);
                             else notes.push(`${key} ${j.tag} EB-LASTPAGE p${pf.length}/${pf.length}: ${lp.pct} % empty (${lp.whiteMm.toFixed(1)} mm, row ${Number.isFinite(lp.rowMm) ? lp.rowMm.toFixed(1) : '-'} mm, gap ${Number.isFinite(lp.gapMm) ? lp.gapMm.toFixed(1) : '-'} mm, ${lp.rows} row(s) of ${pf[0].rows} on p1)${lastPageNote(j.role, roleSrc(j.role), j)}`);
                         }
                         // CAP-PARITY: page 1's items and fill, per role and size (judged after the skill's jobs)
@@ -1128,7 +1134,7 @@ async function main() {
             for (const [rk, z] of Object.entries(capRec)) if (z.M && z.L) {
                 if (z.M.by === 'teacher' || z.L.by === 'teacher') { notes.push(`${key} ${rk} CAP-PARITY not judged: the teacher sets the count (M ${z.M.items}/page, L ${z.L.items}/page)`); continue; }
                 const why = capParityBad(z.M, z.L);
-                if (why) F('CAP-PARITY', `${key} ${rk} M/L`, why);
+                if (why) FA('CAP-PARITY', `${key} ${rk} M/L`, why);
                 else notes.push(`${key} ${rk} CAP-PARITY: M ${z.M.items}/page, L ${z.L.items}/page${z.L.full ? ' (L page full)' : ''} - OK`);
             }
             // screen hosts

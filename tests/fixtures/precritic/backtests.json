@@ -11999,7 +11999,7 @@
     "args": "--roles test,true-false,reason-it,error-analysis",
     "state": "INTERIM stand-in, not a fix (critic eblast r1 F4): the same commit, its other fixed-capacity roles, every last page full. The fixed state of the same role is the fixture row eb-lastpage-fixture-pre-skill-check; re-point this pass side to the fixing commit when cbt resumes"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only EB-LASTPAGE {args}",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only EB-LASTPAGE {args}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -12021,7 +12021,7 @@
     "args": "--roles test,true-false,reason-it,error-analysis",
     "state": "INTERIM stand-in, not a fix (critic eblast r1 F4): the same commit, its other fixed-capacity roles, L below 0.7 x M only where the L page is full. The flip on one page is the fixture row cap-parity-fixture-row-gap; re-point this pass side when cbt resumes"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --only CAP-PARITY {args}",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only CAP-PARITY {args}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -12041,7 +12041,7 @@
     "fixture": "tests/fixtures/precritic/page-fill/pre-skill-check.pass.html",
     "state": "the same page with its missing rows (5 rows fill the 236 mm body): a planted page that meets the rule, not a commit"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --only EB-LASTPAGE",
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only EB-LASTPAGE",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -12061,7 +12061,7 @@
     "fixture": "tests/fixtures/precritic/page-fill/cap-parity.pass.html",
     "state": "planted F1 boundary page: L 8 in 4 rows of 44 mm + 5 mm gaps, 45 mm white - a row alone fits, a row and its gap (49 mm) does not: full, OK (the r1 row-only rule failed it)"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --only CAP-PARITY",
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only CAP-PARITY",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -12081,7 +12081,7 @@
     "fixture": "tests/fixtures/precritic/page-fill/test-pg23.pass.html",
     "state": "the same Test rebalanced 3 + 3 rows: last page ~45 % empty, legal under PG-23 (the r1 flat 30 % failed it)"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --only EB-LASTPAGE",
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only EB-LASTPAGE",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
