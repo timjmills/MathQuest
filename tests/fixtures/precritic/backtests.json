@@ -12158,6 +12158,105 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-clip-guided",
+   "check": "ws-empty-band EB-CLIP (critic lf-engine-rowcap-s2 F1 / F2, the second side of EB-STRETCH): every print cell's ink - legacy and template-less cells too - ends at least 0.5 mm above its row's rule",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-CLIP",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_wp_10_plain Guided L p2: rows held under the tries' ink (the cap took a tab keep-out off rows that draw it), ink 0.2 mm off the rule"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "every Guided row at least its measured ink + 1 mm"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10_plain --sizes L --roles guided --hosts none --no-baseline --only EB-CLIP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tab-clear-ea",
+   "check": "ws-empty-band TAB-CLEAR (critic lf-engine-rowcap-s2 F3): a cell's number tab stands >= 2 mm from the text it numbers (CL-40's 1 mm from a one-line fact or a box), pupil page and key",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band TAB-CLEAR",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "fact_family_sort Error Analysis M: the tab 0.0 mm from \"Sam chose:\" (the held row no longer centred the work low enough)"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "the work keeps the tab's height + 0.75 mm over it, in its own markup"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:fact_family_sort --sizes M --roles error-analysis --hosts none --no-baseline --only TAB-CLEAR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-ink-floor",
+   "check": "ws-roles-unit GUIDED-INK-FLOOR (critic lf-engine-rowcap-s2 F2): every Guided row is at least its measured ink + 1 mm",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-INK-FLOOR",
+   "fail": {
+    "commit": "661965d43",
+    "state": "a continuation page of 93 mm tries held to 92-93 mm rows"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "rows of at least 94 mm"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-INK-FLOOR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pagefill-capped-roles",
+   "check": "ws-print-lint PAGEFILL on review / test / error-analysis / opener (critic lf-engine-rowcap-s2 F4 / F5): a strip over 20 % of the problem area is major under the role's ceiling, and over 30 % at the ceiling (a reshape fills it)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (capped roles)",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_facts Test L 4 x 3 at its ceiling of 12: a 91 mm strip, 39 %"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "3 x 4: 53 mm, 23 % (minor at the ceiling)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles test --fill-roles test --size L --lints L-DENSITY --skills addition:add_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "white-row-review",
+   "check": "ws-capacity-pin WHITE-ROW (critic lf-engine-rowcap-s2 F4): a one-page Review / Test / Error Analysis under its ceiling leaves at most one row of white under its last row",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin WHITE-ROW",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_facts Review M: 10 of 12 items under 100 mm of white (3 main columns, the earlier share's 20 % floor)"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "12 items (4 main columns): at the ceiling"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills addition:add_facts --roles review",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
