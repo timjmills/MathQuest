@@ -534,7 +534,7 @@ function sheetFit(items, cols, ctx, input, limit = Infinity) {
     // plain tries draw (level 1, MEASURE_LO); taken when it holds more on fewer or as many pages. Every other page is unchanged.
     if (cols === 1 && a.pages.length > 1 && a.pages.slice(1).some((p) => p.cap === 1) && items.some((it) => it.measured && it.measured[1] && it.measured[1].atLevel)) {
         const d = sheetFitWith(items, cols, ctx, input, !a.span, !a.hint, limit, !!a.noLines, 0, true);
-        if (d.total > a.total || (d.total === a.total && d.pages.length < a.pages.length)) return d;
+        if (d.total > a.total || (d.total === a.total && d.pages.length < a.pages.length)) return a.hintDrop ? Object.assign(d, { hintDrop: a.hintDrop }) : d;
     }
     // GUIDED-MODEL-SPAN (lead ruling (e), 2026-11-13; ws-capacity-pin SIZE-ORDER): the ceiling trims a grid whose Model takes one
     // cell to whole rows (S, 4 columns: Model + 10 tries is 11 cells, so the last part-row went and S printed 8 < M 9). Where
@@ -568,7 +568,8 @@ function sheetFitPlain(items, cols, ctx, input, limit = Infinity) {
     // the Model alone): tall problems drop the hint rather than the try.
     if (a.hint && a.pages[0].cap < 2) {
         const c = sheetFitWith(items, cols, ctx, input, !a.span, true, limit);
-        if (c.pages[0].cap > a.pages[0].cap) a = c;
+        // (GUIDED-HINT-DROP-P1, lead ruling F4 (a) 2026-11-20: the ruled case is recorded, ws-guided-cellfit HINT-UNIFORM reads it)
+        if (c.pages[0].cap > a.pages[0].cap) a = Object.assign(c, { hintDrop: { hintedCap: a.pages[0].cap, cap: c.pages[0].cap } });
     }
     // Round-4 re-grade: a spanning Model that pushed the tries onto a second page (Model + 2 on
     // page 1, a quarter-empty page 2) gives way to the Model in a cell of its own when that keeps
@@ -583,7 +584,7 @@ function sheetFitPlain(items, cols, ctx, input, limit = Infinity) {
     if (a.pages[0].cap < 2 && items.length > 1 && workLinesOf(items[0]).length) {
         for (const noHint of [false, true]) {
             const d = sheetFitWith(items, cols, ctx, input, true, noHint, limit, true);
-            if (d.pages[0].cap >= 2) return d;
+            if (d.pages[0].cap >= 2) return noHint && a.hint ? Object.assign(d, { hintDrop: { hintedCap: a.pages[0].cap, cap: d.pages[0].cap } }) : d;
         }
     }
     return a;
@@ -1461,7 +1462,8 @@ export function plan(input = {}) {
         meta: {
             items: use.length, scoreOutOf: scored, steps: fit.steps.length,
             fits: fitsOut.map((f, i) => Object.assign(f, { line: `Fits: ${cols} columns x ${f.rows} rows${n > 1 ? ` (page ${i + 1} of ${n})` : ''}, ${use.length} guided cells.` })),
-            notes: fit.steps.length ? [] : ['No Steps band: this skill supplies no steps of its own yet (strings.steps / workedSteps).'],
+            notes: [...(fit.steps.length ? [] : ['No Steps band: this skill supplies no steps of its own yet (strings.steps / workedSteps).']),
+                ...(fit.hintDrop ? [`GUIDED-HINT-DROP-P1 (ruled): page 1 holds the Model and ${fit.hintDrop.cap - 1} try; with its hint it would hold ${fit.hintDrop.hintedCap - 1}, so the first try prints without its grey hint.`] : [])],
         },
     });
 }
