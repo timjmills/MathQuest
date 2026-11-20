@@ -10,6 +10,40 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
 
+- **2026-11-20: week stop.** Spend is about $1,435 of the $1,481.60 stop.
+  - **Lesson first page: SHIP as a strict improvement** (lead ruling).
+    - Branch: claude/sweet-newton-c8wrv1-lf-engine-lessonfirst. The critic r1 report is at 4fd22cf49.
+    - Fixed: blank first pages 59 → 0; each times table models its own table; OPENER-SAME pairs 22 → 6; two_step_letter_equation no longer overflows (its 4-page chart is accepted for now, and the content fix goes to lf-algebra).
+    - New gate CELL-FITS, with a shrink-only KNOWN list of 28 pages that already overflowed (design/audit/baselines/cellfits-known.json, each page owned by its lane).
+  - **rowcap and vocabfix are PARKED** at vocabfix d2306451c. Resume steps are at the end of design/audit/runs/lf-engine-vocabfix/CRITIC-READY.md:
+    1. Measure the two-column Scripted Model state as it is drawn, and fix the print foot.
+    2. Add the named note for ROLE-CAPPED ERROR-ANALYSIS.
+    3. Run one round-cap critic.
+  - **Next week, in order:**
+    1. Finish rowcap and vocabfix (the three resume steps above).
+    2. The detailed-lesson defects (1c): g2-nbt3 seed 17, g3-oa9 seed 25 placeholder, g1-oa1 P6 overflow; a 25-seed sweep gate goes in first.
+    3. -roles: the F1 WRAP check plus a full-width Model at M; SPILL-P1 reserve read from the constant plus a boundary backtest; lf-placevalue's mixed_placevalue Opener (a) placed-items sizing and (b) the iMax cap; critic on ≥ 20 Openers.
+    4. -pc r6.
+- **Next week's lesson-content list, per lane** (from the lessonfirst critic r1; already on master, exposed once the blank page was dropped):
+  - **Lesson / curriculum lane (WRM records):**
+    - Lessons with no library record open with no model ("I do") and an empty Steps column: Y4.B4.S11, Y4.B5.S1, Y4.B6.S3, Y3.B12.S4, Y4.B12.S2 and the other recordless WRM steps. Planned check: LESSON-NO-MODEL (0 chart states, or a Steps zone with no ink).
+    - Ten consecutive WRM step pairs share identical skills and options in their links. Planned check: LESSON-STEP-SAME-REQ (warn).
+    - Y4.B14.S4/S5 deal the same geo_rotate figure, because both steps have identical skills and options.
+  - **Multiplication / lesson sheet (Y4.B4.S11):**
+    - "Look at the array. Write two facts." is printed with no array and only one fact.
+    - "What is 1 × 7?" prints 7 × 1 = ?.
+    - Planned checks: instruction noun vs cell template; question text vs equation operand order.
+  - **Area / perimeter (Y4.B6.S3):**
+    - Doubled answer slots ("Area = ?", "Area = ___" and "Answer:"). Planned check: H16 slot count.
+    - A blue hint box. Planned check: H4 colour scan on lesson sheets.
+    - A Warm-up that deals area in a perimeter lesson. Planned check: content audit on the Warm-up pool.
+  - **Factors (Y4.B5.S1):** extra "Answer:" lines under the factor-pair slots (H16).
+  - **Graphs (Y3.B12.S4 Guided):** decimal axis ticks (1.8, 3.7 …); "Draw a bar…" overlaps the category labels; tiny axis text. Planned checks: integer ticks; text overlap.
+  - **Chart engine (lf-engine):** the times-table anchor-chart panels are about 50 % empty. Planned check: H13 on chart panels.
+  - **lf-checks:**
+    - OPENER-SAME misfires: build the signature from numbers plus the drawing, and skip the one-swap mask when only one number varies.
+    - CELL-FITS gaps: the key, WRM packets, ink outside cells, nested cells, a single seed.
+
 - **2026-11-19 22:30 UTC: new week, resumed. Budget stop is cost_usd $1,481.60 ($1,181.60 + $300).**
   - (0) lf-placevalue's pagesOf fix (fbca1a582) is APPROVED.
     - It counts the strip of a further shelf that opens a page, as plan() does.
