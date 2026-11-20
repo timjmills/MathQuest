@@ -13255,6 +13255,66 @@
    "browser": true
   },
   {
+   "id": "lesson-empty-first",
+   "check": "ws-lesson-pages LESSON-EMPTY-FIRST (owner via the lead 2026-11-19): no lesson page prints only its title / header - after the frame (.ws-head, .ws-tab, .ws-ican, .ws-title, .ws-foot) is taken off, each page holds a content cell ([data-ws-cell]) or other ink (text, svg, img, answer slot)",
+   "kind": "fixture",
+   "rule": "ws-lesson-pages LESSON-EMPTY-FIRST",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-pages/fail.json",
+    "state": "master d38308824 measured (the 46 distinct built grade-3 WRM lessons): page 1 header-only on Y4.B4.S11, Y4.B5.S1/S3/S4/S9/S10/S13, Y4.B6.S3/S4, Y4.B7.S6/S10, Y3.B12.S4, Y4.B12.S2/S4/S5/S7"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-pages/pass.json",
+    "state": "lf-engine fix 601667535 (merged ba67851f2) measured (the same 46 lessons): the empty anchor-chart part dropped, every first page holds cells"
+   },
+   "command": "node tests/scripts/ws-lesson-pages.mjs --rules LESSON-EMPTY-FIRST --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-opener-same",
+   "check": "ws-lesson-pages LESSON-OPENER-SAME (owner via the lead 2026-11-19): consecutive lessons of one WRM block never open on the same model item - same template, same text with numbers masked, and numbers equal or differing by ONE swapped value (the varying factor)",
+   "kind": "fixture",
+   "rule": "ws-lesson-pages LESSON-OPENER-SAME",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-pages/fail.json",
+    "state": "master d38308824 measured: Y4.B4.S2-S10 all open on \"11 × n is 11 groups of n\" (pairs S2/S3, S3/S4, S4/S5, S7/S8, S9/S10) and S11/S12 on the same 2 × 4 array"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-pages/pass.json",
+    "state": "lf-engine fix 601667535 (merged ba67851f2) measured: Y4.B4 openers are n x the lesson's own table, n moving with the step (S2 5 x 6, S3 8 x 6, S4 7 x 9, S5 8 x 9, S7 4 x 7, S8 6 x 7, S9 5 x 11, S10 7 x 12)"
+   },
+   "command": "node tests/scripts/ws-lesson-pages.mjs --rules LESSON-OPENER-SAME --blocks Y4.B4 --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-cell-fits",
+   "check": "ws-lesson-cellfits CELL-FITS (lead via lf-engine 2026-11-20): no cell ink - text runs, svg shapes, img, drawn frames - falls outside its nearest .ws-cell box or its .ws-page on any lesson page, judged on the render with bounding boxes (tolerance 0.6 mm)",
+   "kind": "fixture",
+   "rule": "ws-lesson-cellfits CELL-FITS",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-cellfits/fail.json",
+    "state": "0983c6791 (master d38308824) measured: two_step_letter_equation's anchor chart, M and L - its full-width story / bars / '= n' drawn in half-width 2 x 2 panels, 104 ink pieces outside their panel and 14 outside the page"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-cellfits/pass.json",
+    "state": "lf-engine fix (chartFull + chart pages) measured: four full-width panels over the chart pages, no ink outside"
+   },
+   "command": "node tests/scripts/ws-lesson-cellfits.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "pl-cl40-arrays-turn-mp",
    "check": "An array dot never enters the cell label's 7 x 7 mm keep-out (CL-40; lf-ops-props precritic: mult_properties more-practice L, first dot 6.8 mm across, 4.8 mm down, cells 1 and 5)",
    "kind": "commit-pair",

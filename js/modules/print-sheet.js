@@ -407,6 +407,10 @@ function normaliseRequest(req = {}) {
         // A lesson packet by LESSON id (lessons/library.js, plan phase 0.4): the lesson's own practice skill
         // and options (buildSheet sets the section), its library record. '' = by skill (its default lesson).
         lessonId: req.role === 'lesson' && req.lessonId ? String(req.lessonId) : '',
+        // LESSON-OPENER-SAME (lf-engine 2026-11-19): which lesson of a run this packet is (the WRM screen sends the step number,
+        // wrm-links.js wrmLessonVariant). The worked example of a times-table lesson moves with it (chart.js pickExample), so two
+        // consecutive steps on one skill never open on the same model. Absent (null): the packet exactly as before.
+        lessonVariant: req.role === 'lesson' && req.lessonVariant !== undefined && req.lessonVariant !== null && req.lessonVariant !== '' && Number.isFinite(Number(req.lessonVariant)) ? Math.abs(Math.floor(Number(req.lessonVariant))) : null,
         // The lesson's PARTS to print (LR-18, plan §8e): a subset of LESSON_PARTS, null = the packet as
         // practicePages / mixed describe it. And each part's own seed (`lessonSeeds`, lessonPartSeed): a part
         // refreshed with new numbers changes alone.
@@ -5293,6 +5297,7 @@ async function buildLesson(n, metaOf) {
     const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
     const nz = Object.assign({}, n, { size });
     const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
+    if (n.lessonVariant !== null && n.lessonVariant !== undefined) lessonInput.variant = n.lessonVariant;
     // (lf-partopts: the counts the lesson role reads - chart examples, vocabulary words, Remember, We Do cells, rows)
     const partN = lessonPartN(po);
     if (partN) lessonInput.partN = partN;
@@ -5317,7 +5322,12 @@ async function buildLesson(n, metaOf) {
     let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
-    let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+    // LESSON-EMPTY-FIRST (lf-engine, owner's grade-3 review 2026-11-19): a lesson with no anchor-chart states (no lesson
+    // record, or an example with no worked steps) plans NO chart page - roles/lesson.js draws the chart only from states -
+    // and its chart part printed a header over an empty body as the packet's first page. That part is dropped: the lesson
+    // sheet, which carries the full header on its first page, opens the packet. A lesson with a chart is unchanged.
+    const chartEmpty = !(chart.plan && chart.plan.meta && Number(chart.plan.meta.states) > 0);
+    let parts = chartEmpty ? [{ part: 'teach', role: 'lesson', res: teach }] : [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
     // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
     const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
         // (LR-17: each question deals its `items`, ROUTE_ITEMS = 2 by default and its floor - the role gives a question's extra items up, never below 2,
