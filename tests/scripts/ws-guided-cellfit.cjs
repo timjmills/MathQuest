@@ -13,7 +13,13 @@
 // scored box of the SAME try expects. The box values are the numbers the try's key cell writes that its pupil cell does not (a
 // multiset difference of whole-number tokens, the hint's own text left out). The circled sign may stay (the designed Step-1 trace):
 // "Step 1: circle +. ___ + ___ = ___." passes, "22 + 14 = 36" and "22 + 14 = ___" fail. --skills widens it (passed-skill sweep);
-// --fixture judges recorded rows [{key, hint, boxes}].
+// --fixture judges recorded rows [{key, hint, boxes}]. A number printed in the try's own question text (the pupil cell's text
+// outside the hint) is GIVEN, not a secret, and is exempt (lead ruling 2026-11-20, lf-roles r18: "932 and 932" on compare).
+// HINT-OVERMASK (--only HINT-OVERMASK; lead ruling 2026-11-20, lf-roles r18): a Guided hint may not show a gap "___" where its
+// unmasked source (hintOf(it, {raw: true}), the same pick) had a number printed in the try's question text (q.text): the W2
+// mask blanked given story numbers ("The numbers are 4 and 9." -> "The numbers are ___ and ___."). Default sweep: the two-step
+// presets plus the passed word-work and place-value skills it changed; --skills overrides. --fixture rows [{key, hint, raw, q,
+// drawn}] (drawn: a place-value cell's printed numeral and its digits, also given).
 // Prints `ws-guided-cellfit: OK` / `FAIL (n)`.
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'lib', 'ws-harness.cjs'));
@@ -25,15 +31,31 @@ const SEEDS = arg('seeds', '1,2,591220').split(',').map(Number);
 const ONLY = arg('only', '');
 const on = (r) => !ONLY || ONLY.split(',').includes(r);
 const FIXTURE = arg('fixture', '');
+const OVERMASK_SKILLS = ['addition:add_wp_10', 'addition:add_wp_20', 'addition:add_wp_10_plain', 'addition:add_wp_20_plain', 'subtraction:sub_wp_10', 'subtraction:sub_wp_20', 'subtraction:sub_wp_10_plain', 'subtraction:sub_wp_20_plain', 'placevalue:identify', 'placevalue:value', 'placevalue:compare'];
 const PRESETS = ['algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult', 'algebra:two_step_add_then_div'];
 /** Judge GUIDED-HINT-LEAK rows [{key, hint, boxes}]: a hint number token that is a box value. */
 function judgeLeak(rows) {
     const bad = [];
     for (const r of rows) {
+        const given = new Set((r.given || []).map(String));
         const nums = (String(r.hint).match(/\d+(?:\.\d+)?/g) || []).filter((n) => !/^Step$/.test(n));
         const label = /^\s*Step\s+(\d+)\s*:/.exec(r.hint);
-        const hit = nums.filter((n, i) => !(label && i === 0 && n === label[1]) && (r.boxes || []).map(String).includes(n));
+        const hit = nums.filter((n, i) => !(label && i === 0 && n === label[1]) && !given.has(n) && (r.boxes || []).map(String).includes(n));
         if (hit.length) bad.push(`GUIDED-HINT-LEAK ${r.key}: the hint "${r.hint}" prints ${[...new Set(hit)].join(', ')}, which a box of the same try expects (${r.boxes.join(', ')})`);
+    }
+    return bad;
+}
+/** Judge HINT-OVERMASK rows [{key, hint, raw, q, drawn}]: a gap where the raw hint had a number the question prints. */
+function judgeOvermask(rows) {
+    const bad = [];
+    const TOK = /___|\d+(?:\.\d+)?/g;
+    for (const r of rows) {
+        if (!r.hint || !r.raw || r.hint === r.raw) continue;
+        const qn = new Set([...(String(r.q || '').replace(/,(?=\d{3}\b)/g, '').match(/\d+(?:\.\d+)?/g) || []), ...(r.drawn || [])].flatMap((n) => [n, String(Number(n))]));
+        const h = String(r.hint).match(TOK) || [], w = String(r.raw).replace(/,(?=\d{3}\b)/g, '').match(TOK) || [];
+        if (h.length !== w.length) continue;
+        const hit = w.filter((n, i) => h[i] === '___' && n !== '___' && qn.has(n));
+        if (hit.length) bad.push(`HINT-OVERMASK ${r.key}: the hint "${r.hint}" gaps ${[...new Set(hit)].join(', ')}, printed in the question ("${String(r.q).slice(0, 80)}"); unmasked "${r.raw}"`);
     }
     return bad;
 }
@@ -52,7 +74,7 @@ function judgeUniform(rows) {
 }
 if (FIXTURE) {
     const fx = JSON.parse(require('fs').readFileSync(path.resolve(FIXTURE), 'utf8'));
-    const [bad, notes] = fx.rule === 'GUIDED-HINT-LEAK' ? [judgeLeak(fx.rows), []] : judgeUniform(fx.rows);
+    const [bad, notes] = fx.rule === 'GUIDED-HINT-LEAK' ? [judgeLeak(fx.rows), []] : fx.rule === 'HINT-OVERMASK' ? [judgeOvermask(fx.rows), []] : judgeUniform(fx.rows);
     notes.forEach((x) => console.log('  NOTE ' + x)); bad.forEach((x) => console.log('  ' + x));
     console.log(bad.length ? `ws-guided-cellfit: FAIL (${bad.length})` : 'ws-guided-cellfit: OK');
     process.exit(bad.length ? 1 : 0);
@@ -113,12 +135,39 @@ if (FIXTURE) {
                     const kh = kc[ci].querySelector('.mq-hintline');
                     const boxes = nums(kh ? kc[ci].textContent.replace(kh.textContent, '') : kc[ci].textContent).slice();
                     for (const n of pupil) { const i = boxes.indexOf(n); if (i > -1) boxes.splice(i, 1); }
-                    out.push({ key: `${k} guided ${size} seed ${seed} p${pi + 1} cell ${ci + 1}`, hint, boxes: [...new Set(boxes)] });
+                    out.push({ key: `${k} guided ${size} seed ${seed} p${pi + 1} cell ${ci + 1}`, hint, boxes: [...new Set(boxes)], given: [...new Set(pupil)] });
                 }); });
             }
             return out;
         }, LK, SIZES, SEEDS);
         bad.push(...judgeLeak(rows));
+    }
+    if (on('HINT-OVERMASK')) {
+        const OM = argv.includes('--skills') ? SKILLS : [...PRESETS, ...OVERMASK_SKILLS];
+        const rows = await app.page.evaluate(async (P, SIZES, SEEDS) => {
+            const G = await import('/js/modules/sheet/roles/guided.js');
+            const out = [];
+            for (const k of P) for (const size of SIZES) for (const seed of SEEDS) {
+                const [categoryId, skillId] = k.split(':');
+                const b = await window.buildSheet({ role: 'guided', sections: [{ skills: [{ categoryId, skillId }] }], size, paper: 'A4', seed, key: false });
+                if (b.error) continue;
+                // (the plan's own items - every object with a q in its pages - are what hintOf read; a page's hint line draws its
+                // gaps as rules, so the printed text is matched with its gaps taken out)
+                const flat = (t) => String(t).replace(/___/g, '').replace(/\s+/g, ' ').trim();
+                const shown = new Set([...(new DOMParser().parseFromString(b.pupilHtml || '', 'text/html')).querySelectorAll('.mq-hintline')].map((h) => flat(h.textContent)));
+                const items = [], seen = new Set();
+                const walk = (o) => { if (!o || typeof o !== 'object' || seen.has(o)) return; seen.add(o); if (o.q && o.skill) items.push({ ...o, template: o.template || (o.q.cell && o.q.cell.template) }); for (const v of Object.values(o)) walk(v); };
+                walk(b.plan && b.plan.pages);
+                items.forEach((it, i) => {
+                    const hint = G.hintOf(it); if (!hint || !shown.has(flat(hint))) return;
+                    out.push({ key: `${k} guided ${size} seed ${seed} item ${i + 1}`, hint, raw: G.hintOf(it, { raw: true }), q: String((it.q && it.q.text) || '').replace(/<[^>]*>/g, ' '),
+                        // (a place-value cell prints its number - payload n - with one digit underlined: the numeral and its digits are given)
+                        drawn: (() => { const n = it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.n; return Number.isFinite(Number(n)) && n !== '' && n != null ? [String(n), ...String(n).replace(/\D/g, '').split('')] : []; })() });
+                });
+            }
+            return out;
+        }, OM, SIZES, SEEDS);
+        bad.push(...judgeOvermask(rows));
     }
     bad.forEach((x) => console.log('  ' + x));
     console.log(bad.length ? `ws-guided-cellfit: FAIL (${bad.length})` : 'ws-guided-cellfit: OK');

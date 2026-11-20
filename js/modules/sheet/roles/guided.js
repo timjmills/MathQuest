@@ -793,7 +793,7 @@ function givenNumbers(it) {
  * one in B."). Never a step holding the answer (critic guided-r1: "387 to the nearest 100 is 400",
  * "The hour is 1" on a 1:00 clock). A stack traces its first column instead; a fact its dot cue.
  */
-export function hintOf(it) {
+export function hintOf(it, { raw = false } = {}) {
     if (!it || it.template === 'stack' || countCueOf(it) || thinkCueOf(it)) return '';
     const q = it.q || {};
     const src = `${q.text || ''} ${JSON.stringify((q.cell && q.cell.payload) || {})}`;
@@ -823,7 +823,8 @@ export function hintOf(it) {
         const lab = (/^\s*Step\s+\d+\s*:/.exec(t) || [''])[0];
         return lab + t.slice(lab.length).replace(/,(?=\d{3}\b)/g, '').replace(/\d+(?:\.\d+)?/g, (n) => (boxToks.has(n) || boxToks.has(String(Number(n))) ? '___' : n));
     };
-    const keep = (t) => { const m = maskBoxes(t); return m.slice((/^\s*Step\s+\d+\s*:/.exec(m) || [''])[0].length).replace(/___|[\s.,:;=+\-−×÷()]/g, '') ? m : ''; };
+    // ({raw: true}: the same pick, unmasked - the source ws-guided-cellfit HINT-OVERMASK compares the printed hint against)
+    const keep = (t) => { const m = maskBoxes(t); return m.slice((/^\s*Step\s+\d+\s*:/.exec(m) || [''])[0].length).replace(/___|[\s.,:;=+\-−×÷()]/g, '') ? (raw ? t.replace(/,(?=\d{3}\b)/g, '') : m) : ''; };
     const pick = steps.find(own) || (all.find(own) && keep(all.find(own)) ? all.find(own) : '') || steps[0];
     if (pick) return keep(pick);
     // Every step names part of the answer (a clock's first step gives its hour): the first step
