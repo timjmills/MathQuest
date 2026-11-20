@@ -484,8 +484,9 @@ function planOnce(input = {}) {
         secondShown = chart.second;
         chartSizing = chart.sizing;
         out.push({ header: chart.header, sections: chart.sections });
-        // (CELL-FITS: the panels that run on, each further chart page under the continuation header)
-        for (const secs of chart.more || []) out.push({ sections: [{ kind: 'html', html: '<i class="mq-cont" hidden></i>' }].concat(secs) });
+        // (CELL-FITS: the panels that run on - each further chart page a wall-chart page of its own, under the chart's full
+        // header: lf-engine chart-name, every anchor chart page prints frame.js pageHeader's Name / Date line and title)
+        for (const secs of chart.more || []) out.push({ header: chart.header, sections: secs });
     }
     if (part !== 'chart') pages.forEach((pg, i) => out.push({
         header: i === 0 ? frame.header : undefined,
