@@ -266,6 +266,9 @@ const REDO = new Set(['seqstrip', 'count-row', 'cloze-bank']);
 // A template whose ink starts flush with its box (a count row's tiles) lifts the "<Name> wrote:" label a little more,
 // so the label's foot stays 2-4 mm over the ink (PT-ERR-4; ws-cell-checks PUPILTAG; lead order 5, 2026-11-13)
 const TAG_LIFT = { 'count-row': 0.5, 'function-table': 0.5 };
+// ... and a column multiplication's stack, whose carry boxes over the top number are its first ink, flush with the work's top
+// (lane lf-ops sizes fix 2026-11-20: mult_4by1_column Error analysis M, the label 1.8 mm over the boxes; ws-cell-checks PUPILTAG)
+const tagLiftOf = (it) => TAG_LIFT[it.template] || (it.template === 'stack' && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.op === '*' ? 0.5 : 0);
 
 /**
  * What names each part when the parts are a plain list inside a picture (critic round 3: "1st
@@ -709,7 +712,7 @@ export function prepare(it, info = {}) {
         // Lines at L its ink entered the label keep-out at 6.5 mm across, 2.3 mm down. The tag is set in past --ws-koin, as the
         // arrays-turn and Reason It fixes are; the work and the cell height do not move.)
         const tagLeft = kind === 'redo' && it.template === 'count-row' ? 'max(0mm, calc(var(--ws-koin, 0mm) + 0.5mm))' : '0';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:${tagLeft}"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + tagLiftOf(it)}mm);left:${tagLeft}"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
