@@ -12591,7 +12591,7 @@
     "state": "the Guided Model printed the two-line middle question, so multi_step_word_plain's Model stood alone on page 1 of every M sheet (0/10)"
    },
    "pass": {
-    "commit": "c09328807",
+    "commit": "ddabf985a",
     "state": "word-work drops the middle question on the Guided page (ctx.guided); Model + try share page 1 on 120/140 M sheets, _plain 20/20"
    },
    "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:multi_step_word_plain,algebra:two_step_add_then_div",
