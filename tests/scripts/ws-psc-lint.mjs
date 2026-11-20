@@ -83,13 +83,15 @@ async function main() {
             const bands = [];
             const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bands.push({ instr: sec.instr || '', n: Number((/__\/(\d+)/.exec(sec.extra || '') || [])[1]) || 0 }); for (const p of sec.parts || []) walk(p); };
             for (const pg of r.plan.pages) for (const sec of pg.sections) walk(sec);
-            return { title: (r.plan.header && r.plan.header.title) || '', bands, items: (r.items || []).map((it) => ({ pool: it.pool, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans })) };
+            return { title: (r.plan.header && r.plan.header.title) || '', bands, metaBands: (r.plan.meta && r.plan.meta.bands) || null, items: (r.items || []).map((it) => ({ pool: it.pool, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans })) };
         }, { c, s, size, seed });
         const F = (rule, msg) => { if (!only || only.includes(rule)) fails.push(`  FAIL ${rule} ${k} pre-skill-check ${size}: ${msg}`); };
         const tb = titleBad(b.title); if (tb) F('PSC-TITLE', `the title "${b.title}" carries the id fragment "${tb}"`);
         for (const i of instrRepeats(b.bands.map((x) => x.instr))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}"`);
+        // (the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
+        if (Array.isArray(b.metaBands) && b.metaBands.length === b.bands.length) { b.metaBands.forEach((bd, j) => { for (const why of dealBad(bd.items)) F('PSC-DEAL', `band ${j + 1}: ${why}`); }); }
         const pools = [...new Set(b.items.map((it) => it.pool))];
-        b.bands.forEach((bd, j) => { const its = b.items.filter((it) => it.pool === pools[j]).slice(0, bd.n); for (const why of dealBad(its)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
+        if (!(Array.isArray(b.metaBands) && b.metaBands.length === b.bands.length)) b.bands.forEach((bd, j) => { const its = b.items.filter((it) => it.pool === pools[j]).slice(0, bd.n); for (const why of dealBad(its)) F('PSC-DEAL', `band ${j + 1}: ${why}`); });
     }
     await app.close();
     for (const f of fails) console.log(f);

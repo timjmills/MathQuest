@@ -300,6 +300,48 @@ export function fillBands(pgs, bands, m, tag, ctx, cap) {
     return pgs;
 }
 
+// PSC-DEAL (critic D4, 2026-11-20): a prerequisite's items, in their seeded order, keeping no answer a third time and no
+// turnaround of an item already kept (a + b after b + a). A sign answer (<, >, =) shares by nature. Pure, so reproducible.
+const SIGN_ANS = /^"?(?:[<>=]|true|false|yes|no)"?$/i;
+const factOf = (it) => { const m = /(\d+)\s*([+\u00d7x*])\s*(\d+)/.exec(String((it && it.q && it.q.text) || '')); return m ? `${m[2] === '+' ? '+' : 'x'}|${m[1]}|${m[3]}` : null; };
+export function dedupeDeal(items) {
+    const seen = new Map();
+    const facts = new Set();
+    return (items || []).filter((it) => {
+        const a = JSON.stringify(it && it.q ? it.q.ans : null);
+        const f = factOf(it);
+        const turn = f ? f.split('|') : null;
+        if (turn && turn[1] !== turn[2] && facts.has(`${turn[0]}|${turn[2]}|${turn[1]}`)) return false;
+        if (!SIGN_ANS.test(a) && (seen.get(a) || 0) >= 2) return false;
+        seen.set(a, (seen.get(a) || 0) + 1);
+        if (f) facts.add(f);
+        return true;
+    });
+}
+
+// PSC-INSTR (critic D3, 2026-11-20): two neighbouring bands never print the same instruction - each of a run of equal
+// instructions names its own prerequisite ("Subtract within 20."), from the prerequisite's own label. In place.
+export function distinctInstrs(bands) {
+    for (let i = 0; i < bands.length; i++) {
+        const same = (j) => bands[j] && bands[j].instr && bands[j].instr === bands[i].instr;
+        if (!(same(i - 1) || same(i + 1))) continue;
+        bands[i].mark = true;
+    }
+    // (only where the label tells the neighbours apart: two bands of ONE prerequisite skill keep the instruction - a twin pool,
+    // left for a ruling - and a label must read as words, not an id ("div word"))
+    const wordy = (l) => /\s/.test(String(l || '')) && !/_/.test(String(l)) && String(l).length > 12;
+    for (let i = 0; i < bands.length; i++) if (bands[i].mark && bands.some((o, j) => j !== i && o.mark && o.instr === bands[i].instr && (o.label === bands[i].label || !wordy(o.label)))) bands[i].keep = true;
+    for (const b of bands) if (b.mark && !b.keep && wordy(b.label)) {
+        const base = String(b.instr).replace(/\.\s*$/, '');
+        // (sentence case: a label's Title Case words read as a sentence in an instruction line)
+        const lab0 = String(b.label).replace(/\.\s*$/, '');
+        const lab = lab0.charAt(0) + lab0.slice(1).toLowerCase();
+        b.instr = lab.toLowerCase().startsWith(base.toLowerCase()) ? `${lab}.` : `${base}: ${lab.charAt(0).toLowerCase()}${lab.slice(1)}.`;
+    }
+    for (const b of bands) { delete b.mark; delete b.keep; }
+    return bands;
+}
+
 function planCheck(input, cut) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
@@ -307,7 +349,7 @@ function planCheck(input, cut) {
     // takes row by row while the next row fits - lf-roles PSC fill; a lesson's check, perQuestion, takes none)
     const extra0 = [];
     const quads0 = [0, 1, 2, 3].map((i) => {
-        const pool = poolItems(input, `q${i}`);
+        const pool = dedupeDeal(poolItems(input, `q${i}`));
         let its = pool.slice(0, perQuad(input, i));
         let more = input.perQuestion ? [] : pool.slice(PER_QUAD);
         if (form === 'B') its = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'B', i)), its);
@@ -353,7 +395,7 @@ function planCheck(input, cut) {
         const r = routed ? routeOf(input, qi) : null;
         const b = {
             // (a routed question carries its own score, __/n - P-25, critic r2 N3: the routing table reads it)
-            kind: 'band', label: '', instr, extra: input.perQuestion && !routed ? '' : scoreTag(slotScore(its)),
+            kind: 'band', label: '', instr, pscLabel: ((input.skills || []).find((s0) => its[0] && (`${s0.categoryId}:${s0.skillId}` === its[0].skill || (its[0].q && s0.skillId === its[0].q.skillId))) || {}).label || (its[0] && its[0].q && its[0].q.skillLabel) || '', pscSkill: (its[0] && its[0].skill) || '', pscItems: its.map((it) => ({ text: String((it.q && it.q.text) || ''), ans: it.q ? it.q.ans : null })), extra: input.perQuestion && !routed ? '' : scoreTag(slotScore(its)),
             // (the detailed lesson's check centres each item in its grown cell, H13)
             content: routed ? { kind: 'col', cls: 'mq-lprecol', parts: [grid, { kind: 'html', html: (bandNo === 1 ? routeCssHtml() : '') + routeTagHtml(r, tagLines) }] } : grid,
         };
@@ -445,6 +487,16 @@ function planCheck(input, cut) {
         if (input.perQuestion && !routed && grow >= GROW_MAX) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
     }
     // (kept and n count answer slots - a chart window its empty squares, critic r1 F6; one a cell for every other template)
+    // (PSC-INSTR: the bands in page order, a quadrant row's two included; meta.bands lists them for ws-psc-lint)
+    let pscBands = [];
+    {
+        const bs = [];
+        const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bs.push(sec); for (const x of sec.parts || []) walk(x); };
+        for (const pg of pages) for (const sec of pg.sections) walk(sec);
+        distinctInstrs(bs.map((b) => Object.assign(b, { label: b.pscLabel, _l: b.label })));
+        pscBands = bs.map((b) => ({ instr: b.instr, items: b.pscItems || [] }));
+        for (const b of bs) { b.label = b._l; delete b._l; delete b.pscLabel; delete b.pscItems; }
+    }
     const n = kept || slotScore(all);
     const finalFrame = n === slotScore(all) ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
         tabId: `Check ${form}`, title: titleOf(), score: n, twoLine: false });
@@ -452,7 +504,7 @@ function planCheck(input, cut) {
     // (lead ruling R13: a check that runs to a second page prints the FULL header on every page - name, date, score, title)
     return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p, i) => (p.fullHeader && i > 0 ? { header: finalFrame.header, sections: p.sections } : { sections: p.sections })), {
         scaffoldLevel: 0,
-        meta: Object.assign({ foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
+        meta: Object.assign({ bands: pscBands, foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
             rp ? { routePlan: rp, routes: routeRows } : {}),
     });
 }
