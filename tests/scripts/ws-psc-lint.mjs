@@ -4,6 +4,7 @@
 //   PSC-TITLE    (D2) the page title carries no skill-id fragment: an underscore, or sub / add / mult / div followed by a digit
 //                ("Pre-skill check: subtracting sub 1k").
 //   PSC-INSTR    (D3) no two adjacent bands (in page order, across a page break too) print the same instruction ("Subtract." twice).
+//   PSC-TWIN     (lead A10) no two bands of one plan are dealt from the same skill (twin pools merge into one band).
 //   PSC-DEAL     (D4) in one band, at most 2 items share an answer, and no turnaround pair (a + b and b + a, a x b and b x a).
 //
 //   node tests/scripts/ws-psc-lint.mjs [--skills a:b,c:d] [--sizes M,L] [--seed 7] [--only PSC-TITLE,PSC-INSTR,PSC-DEAL]
@@ -22,6 +23,8 @@ const arg = (k, d) => { const i = argv.indexOf(`--${k}`); return i > -1 ? argv[i
 
 /** D2: an id fragment in a title, or null. Pure. */
 export const titleBad = (t) => { const m = /_|\b(?:sub|add|mult|div)\s*\d/i.exec(String(t || '')); return m ? m[0] : null; };
+/** PSC-TWIN: the skills dealt by more than one pool, from [{pool, skill}]. Pure. */
+export const twinSkills = (items) => { const by = new Map(); for (const it of items) { if (!it.skill) continue; const s = by.get(it.skill) || new Set(); s.add(it.pool); by.set(it.skill, s); } return [...by].filter(([, s]) => s.size > 1).map(([k]) => k); };
 /** D3: the indexes i where band i and band i + 1 print the same (non-empty) instruction. Pure. */
 export const instrRepeats = (instrs) => instrs.map((x, i) => (i && x && String(x).trim() === String(instrs[i - 1]).trim() ? i : -1)).filter((i) => i > -1);
 const factOf = (text) => { const m = /(\d+)\s*([+×x*])\s*(\d+)/.exec(String(text || '')); return m ? { a: +m[1], op: m[2] === '+' ? '+' : 'x', b: +m[3] } : null; };
@@ -49,6 +52,8 @@ function selfTest() {
         ['D2 "add 2-digit numbers" is a verb, not an id? (add + digit) flags', titleBad('Pre-skill check: add 2 numbers'), 'add 2'],
         ['D3 repeat', instrRepeats(['Subtract.', 'Subtract.', 'Add.']).join(), '1'],
         ['D3 none', instrRepeats(['Subtract.', 'Add.', 'Subtract.']).length, 0],
+        ['TWIN two pools one skill', twinSkills([{ pool: 'q2', skill: 'a:b' }, { pool: 'q3', skill: 'a:b' }, { pool: 'q0', skill: 'a:c' }]).join(), 'a:b'],
+        ['TWIN distinct', twinSkills([{ pool: 'q0', skill: 'a:b' }, { pool: 'q1', skill: 'a:c' }]).length, 0],
         ['D4 three 12s', dealBad([{ ans: 12 }, { ans: 12 }, { ans: 12 }]).length, 1],
         ['D4 two 12s ok', dealBad([{ ans: 12 }, { ans: 12 }]).length, 0],
         ['D4 turnaround', dealBad([{ text: '5 + 7 =', ans: 12 }, { text: '7 + 5 =', ans: 12 }]).length, 1],
@@ -83,9 +88,10 @@ async function main() {
             const bands = [];
             const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bands.push({ instr: sec.instr || '', n: Number((/__\/(\d+)/.exec(sec.extra || '') || [])[1]) || 0 }); for (const p of sec.parts || []) walk(p); };
             for (const pg of r.plan.pages) for (const sec of pg.sections) walk(sec);
-            return { title: (r.plan.header && r.plan.header.title) || '', bands, metaBands: (r.plan.meta && r.plan.meta.bands) || null, items: (r.items || []).map((it) => ({ pool: it.pool, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans })) };
+            return { title: (r.plan.header && r.plan.header.title) || '', bands, metaBands: (r.plan.meta && r.plan.meta.bands) || null, items: (r.items || []).map((it) => ({ pool: it.pool, skill: it.skill, text: String((it.q && it.q.text) || it.text || ''), ans: it.q ? it.q.ans : it.ans })) };
         }, { c, s, size, seed });
         const F = (rule, msg) => { if (!only || only.includes(rule)) fails.push(`  FAIL ${rule} ${k} pre-skill-check ${size}: ${msg}`); };
+        for (const t of twinSkills(b.items)) F('PSC-TWIN', `${t} is dealt by two pools (two bands of one skill)`);
         const tb = titleBad(b.title); if (tb) F('PSC-TITLE', `the title "${b.title}" carries the id fragment "${tb}"`);
         for (const i of instrRepeats(b.bands.map((x) => x.instr))) F('PSC-INSTR', `bands ${i} and ${i + 1} both read "${b.bands[i].instr}"`);
         // (the role lists each band's printed items in plan.meta.bands; a tree without it: each band reads the first n of its pool)
