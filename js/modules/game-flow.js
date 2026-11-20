@@ -199,6 +199,10 @@ export function checkProblemGoals() {
 }
 
 export function endGame(win, message) {
+    // A run ends exactly once (lf-hosts F3): the goal check's 600 ms end, the advance past the last item (_endRun), the
+    // timer and Finish all land here; only the first writes the session row and opens the end screen. startGame clears it.
+    if (state._runEnded) return;
+    state._runEnded = true;
     // The return pass ends with the run (timer expiry, goal reached): its intro and banner go, items still skipped
     // stay "skipped" (critic r1 F3).
     endCardSkipReturn();

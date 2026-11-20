@@ -12281,6 +12281,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "end-run-once",
+  "check": "ws-end-run END-ONCE: a typed + Enter practice run (mult_facts, sub_word_problems) ends with one end modal, one session row, score = correct/total",
+  "kind": "commit-pair",
+  "rule": "END-ONCE (lf-hosts skip critic r2 F3, lead-routed)",
+  "fail": {
+   "commit": "65c28ccdf",
+   "state": "the live check and Enter both finished the run: several end modals and session rows (\"6/9, 6/8 ...\" for 5 of 5)"
+  },
+  "pass": {
+   "commit": "f7448b02d",
+   "state": "endGame once per run, hasAnswered set on the goal end, one advance per item: 1 modal, 1 row, 5/5"
+  },
+  "command": "node tests/scripts/ws-end-run.cjs --root {root} --rules END-ONCE",
+  "browser": true,
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ },
+ {
+  "id": "end-run-inf",
+  "check": "ws-end-run END-INF: infinite practice, 3 answered, Finish with a 4th on screen counts 3",
+  "kind": "commit-pair",
+  "rule": "END-INF (lf-hosts skip critic r2 F4, lead-routed)",
+  "fail": {
+   "commit": "65c28ccdf",
+   "state": "Finish counted the unanswered item on screen (3/4)"
+  },
+  "pass": {
+   "commit": "f7448b02d",
+   "state": "finishPracticeRun counts answered items only (3/3)"
+  },
+  "command": "node tests/scripts/ws-end-run.cjs --root {root} --rules END-INF",
+  "browser": true,
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ }
  ]
 }

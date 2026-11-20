@@ -470,13 +470,18 @@ function _endRun(finish) {
     if (state._runEnded) return;
     if (_startSkipReturn(finish)) return;
     if (state.skipReturn && !state.skipReturn.done) return;
-    state._runEnded = true;
-    finish();
+    finish();                                      // endGame marks the run ended (once per run)
 }
 /** Infinite practice: the round modal's Finish runs the return pass first, then the end screen (ruling R2). */
 export function finishPracticeRun() {
     const ov = document.getElementById('roundOverlay');
     if (ov) ov.remove();
+    // Count only answered items (lf-hosts F4): the item dealt under the round modal, never answered (no status in its
+    // history slot), is not part of the run - 3 answered read 3/3, not 3/4.
+    if (!state._runEnded && !state.skipReturn && state.currentQ && state.qCount > 0) {
+        const cur = (state.questionHistory || [])[state.qCount - 1];
+        if (!cur || (typeof cur === 'object' && !cur.status)) state.qCount--;
+    }
     _endRun(() => endGame());
 }
 function _nextSkipReturn() {
@@ -487,7 +492,6 @@ function _nextSkipReturn() {
         endCardSkipReturn();
         _hideSkipReturnBanner();
         if (state._runEnded) return;
-        state._runEnded = true;
         sr.finish();
         return;
     }
@@ -628,6 +632,7 @@ export function startGame() {
     state._skipReturnIdx = -1;
     state.skipReturn = null;
     state._runEnded = false;
+    state._advancingQ = null;
     const _staleIntro = document.getElementById('skipReturnIntro');
     if (_staleIntro) _staleIntro.remove();
     _hideSkipReturnBanner();
@@ -778,6 +783,12 @@ export function updateTimerDisplay() {
 }
 
 export function transitionToNextQuestion() {
+    // ONE advance per answered item (lf-hosts F3): the transition belongs to the item on screen when it was asked for.
+    // A second request for the same item (the live check and Enter, two answer paths) is dropped, and a stale one (an
+    // earlier item's 2.5 s auto-advance timer, after the pupil's Enter already moved on) never advances a later item.
+    const forQ = state.currentQ;
+    if (forQ && state._advancingQ === forQ) return;
+    state._advancingQ = forQ;
     // Auto-dismiss any open hint popup so it doesn't linger over the next question.
     if (typeof window.closeHintPopup === 'function') {
         try { window.closeHintPopup(); } catch (_) { /* non-fatal */ }
@@ -787,6 +798,8 @@ export function transitionToNextQuestion() {
     card.classList.add("q-slide-out");
     setTimeout(() => {
         card.classList.remove("q-slide-out", "correct-bg", "incorrect-bg");
+        if (state._advancingQ === forQ) state._advancingQ = null;
+        if (state.currentQ !== forQ) return;      // the item already moved on (Enter, Skip, the end of the run)
         nextQuestion();
         // Slide in new question
         card.classList.add("q-slide-in");
