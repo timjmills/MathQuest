@@ -355,6 +355,15 @@ function exitAfterFlush(code) {
                     // R2-KEEP (lead ruling A12, 2026-11-20): a skill with no screenHelp keeps master's r2 box - the fact skills'
                     // own steps (critic r2 scored add_facts 9) are not swapped for a one-line hint
                     if (['addition:add_facts', 'subtraction:sub_facts'].includes(key) && paths.filter((x) => x[0] === 'STEPS').length < 2) F('R2-KEEP', key, i, `the box shows ${paths.filter((x) => x[0] === 'STEPS').length} step(s), want its own r2 steps (>= 2)`);
+                    // ENDS-WITH-ACTION (critic r3 R3-2, compensation): a skill that HAS screenHelp never shows a box whose last step
+                    // does not say what to do (a cut box loses to the screenHelp)
+                    try {
+                        const shOwn = kit.getProvider(cat, skill);
+                        let hasSH = false; try { const shv = shOwn && typeof shOwn.screenHelp === 'function' ? shOwn.screenHelp(q) : null; hasSH = !!(shv && Array.isArray(shv.steps) && shv.steps.length); } catch (e) { hasSH = false; }
+                        const st = paths.filter((x) => x[0] === 'STEPS').map((x) => x[2]);
+                        const ACT = /\b(add|subtract|take|count|find|write|type|read|look|put|start|make|use|say|tap|choose|round|keep|work|think|point|circle|compare|move|check|split|multiply|divide|halve|double|fill|mark|jump|go|now|then|drag|sort|tick|pick)\b/i;
+                        if (hasSH && st.length && !ACT.test(st[st.length - 1].split(/(?<=[.!?])\s+/).pop())) F('ENDS-WITH-ACTION', key, i, `last step "${st[st.length - 1]}" says nothing to do`);
+                    } catch (e) { /* no provider */ }
                     // SAYLESS: the skill's provider has a Say frame, but the screen shows no Say line for this item
                     try {
                         const pv = kit.getProvider(cat, skill);
@@ -539,7 +548,7 @@ function exitAfterFlush(code) {
         const FULL = !SKILL && !CATEGORY;
         const byCheck = {};
         for (const f of res.findings) (byCheck[f.check] = byCheck[f.check] || new Map()).set(f.key, f);
-        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'R2-KEEP', 'HELP-THIN', 'LISTEN',
+        const CHECKS = ['UNIT-CUT', 'S8-EXCEPTION', 'HINT-LEAK', 'SAY-LEAK', 'STEPS-LEAK', 'BARE-STEP', 'SAY-FILL', 'SAY-GAP-GIVEN', 'SAY-ORDER', 'R2-KEEP', 'ENDS-WITH-ACTION', 'HELP-THIN', 'LISTEN',
             'DANGLING-HEAD', 'ORPHAN', 'HELP-GENERIC'];
         const lists = {};
         for (const c of CHECKS) {

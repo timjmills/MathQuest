@@ -1104,7 +1104,10 @@ export function workedStepsFor(q, ctx = {}) {
             const ansT = new Set(answerTokens(q, raw).map((t) => t.replace(/,/g, '')));
             pure = nums(fin).every((v) => had.has(v) || ansT.has(v));
         }
-        if (pure && own.length && !own.some(leaks) && helpWhole(own, q)) return own;
+        // (critic r3 R3-2, compensation: a cut box that no longer says what to do loses to the skill's own screenHelp)
+        const cut = own.length !== texts.length || own[own.length - 1] !== texts[texts.length - 1];
+        const shFirst = cut && screenHelpOf(q, cat, skill);
+        if (!(shFirst && Array.isArray(shFirst.steps) && shFirst.steps.length) && pure && own.length && !own.some(leaks) && helpWhole(own, q)) return own;
     }
     // 2. the skill's screen-only steps (written once, S8-clean)
     const sh = screenHelpOf(q, cat, skill);
