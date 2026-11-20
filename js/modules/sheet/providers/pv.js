@@ -129,6 +129,17 @@ registerSkill('placevalue:identify', {
             ...(p.writeValue ? [step(`It is worth ${p.digit} ${placeWord(p.place, p.digit)}: ${f(p.digit * p.place)}.`, [{ slot: 'value', value: f(p.digit * p.place) }])] : []),
         ];
     },
+    // HINT-NO-BLANK r2 (F5, F6): on screen S8 leaves out "H means hundreds" (it IS the answer), so the help ends on the
+    // step that teaches the route - find the place name from its letter - and the Say line keeps the place as its one gap
+    screenHelp: (q) => {
+        const p = pvOf(q);
+        if (!p.place) return null;
+        return {
+            steps: [`Find the underlined digit: ${p.digit}.`, `Read the letter above it: ${LETTER[p.place]}.`,
+                `Find the place name that starts with ${LETTER[p.place]}${LETTER[p.place] === 'T' && p.n >= 1000 ? ', not Th' : ''}.`],
+            say: `The ${p.digit} is in the ___ place.`,
+        };
+    },
     wrongAnswer: (q) => {
         const p = pvOf(q);
         if (!p.place) return null;

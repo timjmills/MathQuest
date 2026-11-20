@@ -47,6 +47,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // first, when data.js order would give the wrong ones (lf-vocab r9: a picture vocabulary task checked four Grade 6
     // definition-matching skills). Absent: the role takes the skills listed before it (print-sheet.js earlierSkills).
     'preSkills',
+    // `screenHelp(q) -> {steps?: string[], say?: string}`: the on-screen help only (support-ladder.js "Here is how" and its
+    // Say line), for a skill whose printed worked steps state the answer (S8): steps that teach the route without it and a
+    // Say line with the answer as its one gap. Never read by a page role (HINT-NO-BLANK r2, lf-placevalue 2026-11-20).
+    'screenHelp',
     // `wrongText(q) -> WrongAnswer & {statement}`: a misconception's wrong answer that is shown only as TEXT (Reason It's
     // worked-wrong statement in words), because it does not fit the cell's own writing place (chart_120 'writes-ten-ten':
     // 1010 in a three-digit chart square; lead ruling 2026-11-13). Absent: none.

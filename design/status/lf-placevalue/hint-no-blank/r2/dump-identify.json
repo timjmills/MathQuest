@@ -1,0 +1,47 @@
+[
+ {
+  "seed": 3,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "hundreds",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 8.</li><li>Read the letter above it: H.</li><li>Find the place name that starts with H.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 8 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 8. 2. Read the letter above it: H. 3. Find the place name that starts with H. Say: The 8 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 8.Read the letter above it: H.Find the place name that starts with H.Say: The 8 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 8 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 8.",
+   "Read the letter above it: H.",
+   "Find the place name that starts with H."
+  ]
+ },
+ {
+  "seed": 7,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "tens",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 7.</li><li>Read the letter above it: T.</li><li>Find the place name that starts with T.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 7 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 7. 2. Read the letter above it: T. 3. Find the place name that starts with T. Say: The 7 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 7.Read the letter above it: T.Find the place name that starts with T.Say: The 7 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 7 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 7.",
+   "Read the letter above it: T.",
+   "Find the place name that starts with T."
+  ]
+ },
+ {
+  "seed": 11,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "hundreds",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 6.</li><li>Read the letter above it: H.</li><li>Find the place name that starts with H.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 6 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 6. 2. Read the letter above it: H. 3. Find the place name that starts with H. Say: The 6 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 6.Read the letter above it: H.Find the place name that starts with H.Say: The 6 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 6 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 6.",
+   "Read the letter above it: H.",
+   "Find the place name that starts with H."
+  ]
+ }
+]
