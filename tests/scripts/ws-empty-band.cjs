@@ -1097,7 +1097,17 @@ async function main() {
                             const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
                             return Math.round(Math.max(0, br.bottom - last) / br.height * 100);
                         }), 'body > section.ws-page, body > .ws-page');
-                        pf.slice(0, -1).forEach((v, i) => { if (v >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                        // (RULED 2-page pages, lead 2026-11-20: the items need two pages and R13 / PSC-2PG-BALANCE splits them 2 + 2, so
+                        // page 1's white is by design - the reason prints as a note, never a pass for any other page)
+                        const EB_PAGE_RULED = {
+                            'placevalue:identify pre-skill-check L': 'Pre-skill Check bands 54.3 + 54.3 + 74.5 + 77.4 = 260.5 mm against a 232 mm body: two pages, split 2 + 2 by R13 (lead 2026-11-20)',
+                        };
+                        pf.slice(0, -1).forEach((v, i) => {
+                            if (v < 30) return;
+                            const ruled = Object.entries(EB_PAGE_RULED).find(([k]) => `${key} ${j.tag}`.startsWith(k));
+                            if (ruled) { console.log(`  note EB-PAGE ${key} ${j.tag} p${i + 1}: ${v} % empty, ruled - ${ruled[1]}`); return; }
+                            F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`);
+                        });
                     }
                     if (has('grid-foot') && (j.cols ? /^(independent|more-practice|test|review)$/.test(j.role) : (j.role === 'test' || j.role === 'review')) && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
                         const gf = await sh.evaluate((scope) => {
