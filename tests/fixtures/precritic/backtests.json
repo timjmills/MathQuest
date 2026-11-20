@@ -12344,6 +12344,244 @@
    }
   },
   {
+   "id": "student-opts-carry",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "A pupil's chosen options and selection reach every play host: the sheet's Play this skill / Play all selected, each game style card, the bottom Play, and a game style tapped at once after a chip's ✕ and a changed option (student-opts card §6 CARRY)",
+   "rule": "ws-student-opts STUDENT-OPTS-CARRY (12 deals per host + the game's own first question; options captured at each generate)",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only CARRY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "no sheet (a Quick Start tap toggles, no Play this skill / Play all selected), and the REAL stale case: after a first play, a chip's ✕ then a game style tapped at once - startMode -> startGame skipped the rebuild (state.isMixedMode still true) and the game dealt subtraction:subtract, the removed skill"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "every pupil start goes through playSelectedSkills(mode[, {only}]): 0 findings at 1280 and 820"
+   }
+  },
+  {
+   "id": "student-opts-count",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "\"You will play N skills\" (sheet, game style row, bottom row), \"Play all selected (N)\" and the dealt skills equal the selection after adding, after ✕ and after Clear; N = 1 hides Play all selected (card §6 COUNT)",
+   "rule": "ws-student-opts STUDENT-OPTS-COUNT",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only COUNT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "no \"You will play N skills\" line anywhere (the rows read null after adding, after ✕ and with 1 selected)"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "the three lines and the button follow the selection: 0 findings"
+   }
+  },
+  {
+   "id": "student-opts-pupil",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The sheet opens folded, shows only pupilOptionsFor, every target >= 48 x 48 and tappable at its centre, the chip ✕ 48 x 48, inside the window (popover >= 1024, bottom sheet at 820), a teacher-link option locked \"Set by your teacher\", Esc returns focus to the card (card §6 PUPIL)",
+   "rule": "ws-student-opts STUDENT-OPTS-PUPIL (real pointer / touch taps, elementFromPoint)",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only PUPIL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "a Quick Start tap opens no sheet (the teacher-link card opens none either), no pupilOptionsFor; the chip × is 18 x 18"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "0 findings at 1280 (popover) and 820 (bottom sheet, touch)"
+   }
+  },
+  {
+   "id": "student-opts-unit",
+   "kind": "commit-pair",
+   "browser": false,
+   "check": "pupilOptionsFor on every live skill never returns a layout / appearance / more / nline / play / support / level / hidden / role-gated option, and its counts per group match the pin (card §6 Unit)",
+   "rule": "ws-student-opts --unit STUDENT-OPTS-UNIT (node; pin tests/fixtures/student-opts/pupil-counts.json)",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "skill-options.js has no pupilOptionsFor: no curated pupil subset (a pupil would see every teacher option)"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "742 live skills, 690 with pupil options (difficulty 1,241, facts 5); no teacher option; the pin holds"
+   }
+  },
+  {
+   "id": "student-explorer-nodup-plate-s",
+   "check": "lead 2026-11-20 (base red on ws-student-explorer): an explorer thumbnail never shows its question twice; at plate S (the explorer card layout, not the retired print size) placevalue:unit_form's crop head repeated the drawn item it sits over",
+   "kind": "commit-pair",
+   "rule": "ws-student-explorer THUMB legible sweep NODUP",
+   "browser": true,
+   "fail": {
+    "commit": "03a92fa2",
+    "state": "FAIL (1): THUMB legible sweep (S): placevalue:unit_form NODUP - the head \"556 = ___ hundreds ___ tens ___ ones\" above the drawn row that says it in boxes"
+   },
+   "pass": {
+    "commit": "ec45e671",
+    "state": "OK: the head says what to do (\"Fill in the boxes.\") when the drawn item already says the whole question"
+   },
+   "command": "node tests/scripts/ws-student-explorer.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "student-opts-words",
+   "kind": "commit-pair",
+   "check": "critic r1 F2: every label, choice and all-label a pupil reads (pupilOptionsFor, every live skill) is in pupil words: no teacher / print term, no explaining parenthesis, label <= 6 words, choice <= 8, no two choices alike; pinned at 0",
+   "rule": "ws-student-opts STUDENT-OPTS-WORDS",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit --only WORDS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "pupilOptionsFor returned the teacher wording: 1,712 hits, 529 distinct (\"What the items ask\", \"Use the Max Number setting\", \"As dealt (follows the Max Number setting)\", \"What the pupil reads\")"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "0 hits: the pupil-option-words.js layer (PUPIL_WORDS, PUPIL_WITHHOLD, plain())"
+   }
+  },
+  {
+   "id": "student-opts-verdict",
+   "kind": "commit-pair",
+   "check": "critic r1 F4 / card D3: one teacher label carries one pupil verdict across skills (an option offered to a pupil on one skill is never withheld as layout on another)",
+   "rule": "ws-student-opts STUDENT-OPTS-VERDICT",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit --only VERDICT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "3 split labels: \"How it is written\" (divForm offered, notation withheld), \"Task\", \"Bars\""
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "divForm and notation withheld on every sign (D3); the Task / Bars tile choices withheld"
+   }
+  },
+  {
+   "id": "student-opts-sweep",
+   "kind": "commit-pair",
+   "check": "critic r1 F1: with \"Change how it works\" open, both play buttons are wholly in view in the window and the sheet, with no scroll, and take a tap at their centre - for EVERY pupil skill, opened through the module in one page",
+   "rule": "ws-student-opts STUDENT-OPTS-SWEEP",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only SWEEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "89 play buttons out of view at 1280 (every mixed_*, mult_chart, function tables): the whole sheet scrolled"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "the play row is the sheet's fixed footer (.so-foot); only .so-body scrolls: 0 of 675 skills at 1280 and 820"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-anchor",
+   "kind": "commit-pair",
+   "check": "critic r1 F5: at >= 1024 px the open sheet never covers its own card (beside it, or a bottom sheet)",
+   "rule": "ws-student-opts STUDENT-OPTS-ANCHOR",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only ANCHOR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "the popover was pinned to the window edge over its card on 288 skills at 1280"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "place(): below, above, else beside the card (right, then left), else a bottom sheet: 0 covers"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-contrast",
+   "kind": "commit-pair",
+   "check": "critic r1 F3: the folded summary and the All / None buttons reach 4.5 : 1 (opacity counted); the \"Set by your teacher\" note is >= 13 px and 4.5 : 1",
+   "rule": "ws-student-opts STUDENT-OPTS-CONTRAST",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only CONTRAST",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "summary and All / None 3.46 : 1; the lock note 11.5 px at 2.07 : 1 (light grey under row opacity)"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "--so-ink-2 #4a4560 on the sheet, the locked row no longer faded (only its control), the note 14.4 px bold"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-toast",
+   "kind": "commit-pair",
+   "check": "critic r1 F6: three quick Quick Start taps leave at most one toast on screen",
+   "rule": "ws-student-opts STUDENT-OPTS-TOAST",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only TOAST",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "3 stacked \"Added ...!\" toasts"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "no Added toast on the pupil path: the sheet shows the selection"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-name",
+   "kind": "commit-pair",
+   "check": "critic r1 F7: every Quick Start card names the skill the same on the card, the sheet (.so-name) and the chip",
+   "rule": "ws-student-opts STUDENT-OPTS-NAME",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only NAME",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "card \"Mult Facts\", sheet and chip \"Multiplication Facts (1-12)\""
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "qsPupilNameFor(): the grid's own card name everywhere (quick-skills.js)"
+   },
+   "browser": true
+  },
+  {
    "id": "two-step-guided-no-mid",
    "check": "ws-two-step --guided GUIDED-NO-MID + GUIDED-MODEL-ALONE: no Guided cell prints the hidden middle question, and Guided page 1 holds the Model and a try at M (exempt by ruling: the family at L; multi_step_word (Visual) at M)",
    "kind": "commit-pair",
