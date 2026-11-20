@@ -472,7 +472,7 @@ card-critic-r4.md, FAIL min 5) found the items below; each is DEFERRED to the na
 | L8 | Step 1's property -> check map omits j2, l, m, n | step 1 (MR-E) | copy the §8 V1-core column into step 1 |
 | L9 | 12.1 long word problems ("2 a page at L if 4-5 lines"); `KIND_CAP` allows 3 | step 2 (MR-B) | a long word-problem kind capped at 2 at L |
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-20 (build-now ruling; §10 known limitations accepted)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
