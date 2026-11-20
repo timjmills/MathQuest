@@ -400,3 +400,11 @@ Every list may only shrink: a skill joining FAILs, and on a full sweep a pinned 
 | lf-ops | `addition:add_sub_fact_family` |
 
 
+
+## 2026-11-20 - Show Solution text fix (R3-3, R3-4; branch claude/lf-placevalue-sol-fix, no critic by lead ruling)
+- NEW gate tests/scripts/ws-solution-text.cjs (SOL-OBJECT, SOL-PROBLEM; every live skill × 4 seeds; on precritic --skill).
+- Master 2c42746aa: SOL-OBJECT 89 skills / 209 items, SOL-PROBLEM 54 skills / 172 items. After: 0 / 0, no pins.
+- Fix (solution-display.js, shared): ansText() renders object answers (sort map "70: 73, 74 · 80: 78, 75", points "A (8, 5)");
+  the fallback keeps the question as asked unless only a trailing "= ___" drops; generateSolutionSteps wraps the branches:
+  a broken Problem line becomes the question text, any other "[object" / undefined / NaN line is left out.
+- Backtests sol-object, sol-problem (FAIL 2c42746aa → OK a55a7aaaa): PASS. Ledger rows in CHECKS_FROM_CRITICS.md.
