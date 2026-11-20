@@ -9,6 +9,14 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-20 lead rulings (A25):
+  - "Write the mixed number as…" is ACCEPTED.
+  - The 14 mm L joins and the diagram up to 140 mm are ACCEPTED, as long as cell-fit and EB pass.
+  - sibling-compare: exempt with the reason "first of its drawing; no siblings".
+  - Share codes are taken at merge time from the live tail, never reserved on a branch. Whichever ships second re-takes its codes after
+    ws-merge-master, and ws-code-snapshot must show 0 moved. TODO: add a CODE-TAIL guard if ws-merge-master misses two branches claiming one code.
+  - The lead rules next week on POOL-MIN at L and the compose / name overflow. Bring the L page with 2 model rows and the chart panel the bars need.
+  - NEXT WEEK: #2 precritic to green -> full critic -> deploy; then #1 (medium) -> narrow critic; then the next grade-3 lessons.
 - 2026-11-20 PARKED (budget + precritic red, so no critic under rule 0b): fractions:mixed_numbers_intro + presets write_mixed_from_parts,
   name_mixed_from_model, on branch claude/sweet-newton-c8wrv1-lf-algebra-mixed (6bc11d096). It is NOT for deploy.
   Built on frac-model (task partition), on the re-signed card (A18: mnTask 'name', no `blank`). Fully linked (4.NF.B.3b / 3.NF.A.1, EE, Y4.B7.S3 direct, search terms).
