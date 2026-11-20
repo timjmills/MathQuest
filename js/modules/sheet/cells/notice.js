@@ -26,7 +26,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S, LETTERS } from './k2kit.js';
+import { L, P, D, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S, LETTERS } from './k2kit.js';
 
 export const NOTICE_TEMPLATE = 'notice';
 
@@ -132,10 +132,13 @@ function parityCell(p, ctx) {
         : ctx && ctx.scaffoldLevel === 0 && p.show !== false
             ? `<span class="mq-nt-hint" aria-hidden="true" style="display:block;margin-top:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx))};line-height:1.1;">\u00a0</span>`
             : '');
+    // (the fact's digits and its sign in the kit's DIGIT unit D: on paper the working digit pt as before; on a screen twin
+    // never under the host's --mq-digit - P drew them at the twin's paper scale, 52.8 px against the practice card's 56,
+    // ws-screen-ink-size TEXT-SIZE, patterns precritic 2026-11-20 A5)
     const num = (n) => `<span style="display:inline-flex;flex-direction:column;align-items:center;min-width:${L(ctx, 10)};">`
-        + `<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(n)}</span>${hint(n)}</span>`;
+        + `<span style="font-size:${D(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(n)}</span>${hint(n)}</span>`;
     const fact = `<div class="mq-nt-fact" role="img" aria-label="${esc(`${p.a} times ${p.b}`)}" style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 3)};">`
-        + `${num(p.a)}<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;">×</span>${num(p.b)}</div>`;
+        + `${num(p.a)}<span style="font-size:${D(ctx, dp)};font-weight:700;line-height:1;">×</span>${num(p.b)}</div>`;
     const ask = `<div style="font-size:${P(ctx, textPt(ctx) + 1)};line-height:1.2;">The product is</div>`;
     // Finished work (state 'wrong': Error analysis and the other thinking pages show a pupil's choice; lf-algebra r4,
     // H13): "The product is" and the circled word read as ONE sentence on one line where the column is wide enough
