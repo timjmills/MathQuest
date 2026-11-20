@@ -1214,13 +1214,13 @@ export function checkAnswer(userAns, btnElement) {
         // Update goal progress display
         updateGoalProgress();
 
-        // Check if problem goals are met (Mixed Mode)
-        if (checkProblemGoals()) {
-            return; // Game ended due to goal reached
-        }
+        // Check if problem goals are met (Mixed Mode). When they end the run (the end screen follows in 600 ms) the item
+        // is still finished below (hasAnswered, the practice log): an early return left hasAnswered false, so the
+        // pupil's Enter re-submitted the live-checked last item - scored twice and a second end screen (lf-hosts F3).
+        const runEnding = checkProblemGoals();
 
         // Auto-advance with green flash + slide transition
-        if (shouldShowNextButton()) {
+        if (!runEnding && shouldShowNextButton()) {
             setTimeout(() => {
                 transitionToNextQuestion();
             }, 2500);
