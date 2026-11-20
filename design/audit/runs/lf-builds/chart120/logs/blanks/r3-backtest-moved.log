@@ -1,0 +1,16 @@
+ws-backtest row c120-role-hidden: PASS  fail state FAIL 42.5s, pass state OK 104.3s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+ws-backtest: OK
+ws-backtest: c120-score-slots (pass state) has waited 120 s for a browser slot; holders:
+ws-backtest row c120-score-slots: PASS  fail state FAIL 69.6s, pass state OK 750.2s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+ws-backtest: OK
+ws-backtest: c120-screen-digit (fail state) has waited 120 s for a browser slot; holders:
+ws-backtest: c120-screen-digit (pass state) has waited 120 s for a browser slot; holders:
+ws-backtest row c120-screen-digit: PASS  fail state FAIL 169.5s, pass state OK 808.5s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+ws-backtest: OK
+ws-backtest: c120r2-cross-giveaway (pass state) has waited 120 s for a browser slot; holders:
+ws-backtest row c120r2-cross-giveaway: PASS  fail state FAIL 113.8s, pass state OK 226.6s
+ws-backtest: 1 row(s) from tests/fixtures/precritic/backtests.json
+ws-backtest: OK
