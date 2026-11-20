@@ -472,3 +472,4 @@ on master, queued for next week's PSC layout pass (with the trim to the ceiling 
 - D3 sub_wp_20 M p1: two adjacent bands with the same "Subtract." instruction, ragged 8 / 4: check = adjacent-band identical-instruction lint.
 - D4 add_facts M seed 7: three items answer 12, a turnaround pair in one band: check = deal-diversity (<= 2 share an answer, no turnaround pair per band).
 - (lead / lf-algebra 2026-11-20) notice_patterns Guided L row 1 is 74 mm tall for 50-53 mm of ink (H13 x2 at 34 %), from guided.js row sizing, on master: into next week's PSC / Guided layout pass; check first (EB-STRETCH / H13 on Guided L).
+- (lead 2026-11-20) Stretch role: offered on patterns:* but never composed (EB-ROLE). Compose Stretch for the pattern skills (their own items at harder option values); check first (EB-ROLE on patterns:* must FAIL before the fix).
