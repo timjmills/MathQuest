@@ -1320,6 +1320,11 @@ function buildPlan(ctx) {
         // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
         // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
         add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: a twin fitted narrow and then wide returns to its own --mq-k2)
+        add(gate('twin-fit-reset', 'ws-twin-fit-reset (TWIN-FIT-RESET: a worksheet twin narrowed and widened again is not left shrunk)', 'number_patterns_rule worksheet @1024', 'browser', 'ws-twin-fit-reset', [], { missingMsg: 'ws-twin-fit-reset is not in this tree' }));
+        // (FIT-FLOOR / FIT-RESET, lf-hosts 2026-11-20: the host twin fit never crosses the 29 px digit floor, no sideways scroll, a resize
+        // refits from the drawing's own size; a fixed twin-drawn sample on card / worksheet / quiz)
+        add(gate('fit-floor', 'ws-fit-floor (FIT-FLOOR / FIT-RESET: the host twin fit keeps digits >= 29 px and refits on a new width)', 'twin sample x card / worksheet / quiz x 820 / 1024 / 1280 / 1366', 'browser', 'ws-fit-floor', [], { missingMsg: 'ws-fit-floor is not in this tree' }));
         // lf-hosts skip (owner request 2026-11-19): Skip on the practice card, online worksheet, quiz and MAP test - the button,
         // the count, never wrong, the end-of-run return pass (same item, scored once), "skipped" in the teacher's results, the
         // teacher's off; a fixed mult_facts run, planned once per --skill run, at the widths of tests/lib/ws-screen-widths.cjs
@@ -1362,6 +1367,9 @@ function buildPlan(ctx) {
         // ---- HINT-NO-BLANK (lf-placevalue 2026-11-20; first found on placevalue:digit_value_unit_form, ws-unit-form-bank check 5):
         // the screen help - "Here is how" steps, the Say line, the hint, the Show Solution steps - never shows an unfilled blank
         add(gate('hint-no-blank', 'ws-hint-no-blank (HINT-NO-BLANK: no "___" / {n} / gap "?" in the screen help: worked steps, Say line, hint, solution; HELP-EMPTY pinned)', `${scope} × 4 seeds`, 'browser', 'ws-hint-no-blank', ['--skill', keys.join(',')], { missingMsg: 'ws-hint-no-blank is not in this tree' }));
+        // ---- SOL-TEXT (lf-placevalue 2026-11-20; HINT-NO-BLANK r3 R3-3 / R3-4): the Show Solution popup prints readable text:
+        // no "[object" / undefined / NaN (SOL-OBJECT), and its "Problem:" line restates the question (SOL-PROBLEM)
+        add(gate('solution-text', 'ws-solution-text (SOL-OBJECT: no [object / undefined / NaN in Show Solution; SOL-PROBLEM: the Problem line restates the question, no "? + ___")', `${scope} × 4 seeds`, 'browser', 'ws-solution-text', ['--skill', keys.join(',')], { missingMsg: 'ws-solution-text is not in this tree' }));
         // ---- lane lf-vocab (2026-11-07; design/cards/vocabulary): the picture vocabulary rules V1-V7 (every word drawn, one
         // right answer an item, no word twice on a page, every lesson set splits into two clash-free trios) whenever a picture
         // vocabulary skill is in scope. Default parse: its last "ws-vocab-unit: OK|FAIL" line and its exit code.

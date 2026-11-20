@@ -1001,3 +1001,11 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Routed minors: m1 GUIDED-TAB (lf-engine), m2 vocab_grade_pictures Model STATE-PROGRESS (vocab lane), m3 MIN-PT EA name tag (lf-engine). PT-PRE-3 stale expectation (master 903f2d778 PSC fill) → lf-roles.
 - Master's ws-layout-unit crashed at line 918 before this merge; the merged tree reports.
 - Lesson baseline re-pinned (2702): see the re-pin commit for the changed pages.
+
+## 2026-11-20 — Deploy batch: lf-hosts digit floor (bug fix) + lf-placevalue expand-2col (critic PASS), HINT-NO-BLANK r3 (strict improvement, A14), Show Solution fix (bug fix)
+- lf-hosts: twin fit stops at 29 px digits, then wraps / stacks; refit on resize (card + quiz); fit key covers width/count/host vars. New ws-fit-floor (FIT-FLOOR, FIT-RESET). Open → next week: sub_word_problems word-work base < 29 px (lf-builds), number_bonds fixed-width boxes in 300 px quiz cells (template owner).
+- lf-placevalue expand-2col: 2 columns at 1024, 78 px boxes, 29 px digits (critic 9/9/8/9). Next week: start the rule at ~1000 px.
+- HINT-NO-BLANK r3 under A12 guard (choice rule only for skills with screenHelp + lf-placevalue's); pins shrank. R3-1 (factors_identify, number_theory) open.
+- Show Solution: SOL-OBJECT 209 items / 89 skills → 0, SOL-PROBLEM 172 items / 54 skills → 0 (ws-solution-text, precritic gate). Fixes R3-3 / R3-4 app-wide.
+- Routed: mult_break_apart SAYLESS → lf-ops (Say line).
+- Gates: boot-smoke, code-snapshot 741, no-size-s, solution-text, hint-no-blank, support-ladder, redesign-passed, fit-floor, worksheet-reflow, roles-unit, precritic-plan, capacity-pin, simple-print, key-json, lesson-baseline 2700 identical — all OK.

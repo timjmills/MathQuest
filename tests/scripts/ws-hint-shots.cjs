@@ -4,6 +4,8 @@
 //   node tests/scripts/ws-hint-shots.cjs --skills cat:skill,.. [--seeds 3,7] [--widths 1280,820] [--shots <dir>] [--dump <file.json>]
 // MQ_ROOT=<tree> serves another checkout (ws-harness), so the same dump is taken on master and on the lane.
 // Prints `ws-hint-shots: OK` (it renders; it judges nothing).
+// (critic r2 R2-9, 2026-11-20: the item is dealt by generateQuestionFor with the seed, so EVERY width shows the same item, and
+// the dump holds one row per width - the text a critic grades is the text the PNG shows)
 const fs = require('fs');
 const path = require('path');
 const { open } = require('../lib/ws-harness.cjs');
@@ -15,24 +17,26 @@ const WIDTHS = String(arg('widths', '1280')).split(',').map(Number);
 const SHOTS = arg('shots', '');
 const DUMP = arg('dump', '');
 
-async function render(page, key) {
-    return page.evaluate(async (key) => {
+async function render(page, key, seed) {
+    return page.evaluate(async ({ key, seed }) => {
         const [cat, skill] = key.split(':');
         const st = window.state;
         if (window.clearSetOptions) window.clearSetOptions({ silent: true });
         st.category = cat; st.skill = skill; st.range = cat === 'placevalue' ? 1000 : 100; st.decimalPlaces = 0;
         st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
         if (window.showView) window.showView('gameView');
-        const q = window.generateQuestion(); st.currentQ = q; window.renderQuestion();
+        const gq = await import('/js/modules/generate-question.js');
+        const q = gq.generateQuestionFor({ category: cat, skill, range: st.range, decimals: 0, seed: (seed * 7919 + 17) >>> 0 });
+        st.currentQ = q; window.renderQuestion();
         const sl = await import('/js/modules/support-ladder.js');
         for (let k = 1; k <= 3; k++) sl.practiceLadderWrong(q, `zz${k}`);
         const box = document.querySelector('#questionCard .mq-ladder-worked');
         return {
             key, text: String(q.text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(), ans: q.ans,
             box: box ? box.outerHTML : null, boxText: box ? box.textContent.replace(/\s+/g, ' ').trim() : null,
-            hint: q.hint || null, say: sl.sayFor(q, { cat, skill }), steps: sl.workedStepsFor(q, { cat, skill }),
+            hint: (typeof sl.hintFor === 'function' ? sl.hintFor(q, { cat, skill }) : q.hint) || null, say: sl.sayFor(q, { cat, skill }), steps: sl.workedStepsFor(q, { cat, skill }),
         };
-    }, key);
+    }, { key, seed });
 }
 
 async function clipShot(page, sel, file) {
@@ -49,9 +53,9 @@ async function clipShot(page, sel, file) {
             for (const seed of SEEDS) {
                 const { page, close } = await open({ seed, viewport: { width: w, height: 1000, deviceScaleFactor: 1 } });
                 try {
-                    const r = await render(page, key);
+                    const r = await render(page, key, seed);
                     await new Promise((res) => setTimeout(res, 200));
-                    if (w === WIDTHS[0]) dump.push(Object.assign({ seed }, r));
+                    dump.push(Object.assign({ seed, width: w }, r));
                     if (SHOTS) {
                         fs.mkdirSync(SHOTS, { recursive: true });
                         const base = path.join(SHOTS, `${key.replace(':', '_')}-${w}-s${seed}`);
@@ -63,7 +67,7 @@ async function clipShot(page, sel, file) {
                         await new Promise((res) => setTimeout(res, 150));
                         await clipShot(page, '#solutionModal > div', `${base}-solution.png`);
                     }
-                    console.log(`  ${key} @${w} seed ${seed}: box ${r.box ? 'shown' : 'hidden'}; Say "${r.say}"`);
+                    console.log(`  ${key} @${w} seed ${seed}: "${r.text.slice(0, 60)}" box ${r.box ? 'shown' : 'hidden'}; Say "${r.say}"`);
                 } finally { await close(); }
             }
         }

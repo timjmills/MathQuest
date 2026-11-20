@@ -1,0 +1,306 @@
+[
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "placevalue:expanded_notation",
+  "text": "673 = ___ × 100 + ___ × 10 + ___ × 1",
+  "ans": "6 × 100 + 7 × 10 + 3 × 1",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read 673 from the left: hundreds, tens and ones.</li><li>The hundreds digit goes in the box before × 100.</li><li>Do the same for each place. Write each digit in its box.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>I read 673 from the left: hundreds, tens, ones.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read 673 from the left: hundreds, tens and ones. 2. The hundreds digit goes in the box before times 100. 3. Do the same for each place. Write each digit in its box. Say: I read 673 from the left: hundreds, tens, ones.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead 673 from the left: hundreds, tens and ones.The hundreds digit goes in the box before × 100.Do the same for each place. Write each digit in its box.Say: I read 673 from the left: hundreds, tens, ones. Listen",
+  "hint": "Write each digit. It is multiplied by its place.",
+  "say": "I read 673 from the left: hundreds, tens, ones.",
+  "steps": [
+   "Read 673 from the left: hundreds, tens and ones.",
+   "The hundreds digit goes in the box before × 100.",
+   "Do the same for each place. Write each digit in its box."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "tens",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 1.</li><li>Read the letter above it: T.</li><li>Find the place name that starts with T.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 1 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 1. 2. Read the letter above it: T. 3. Find the place name that starts with T. Say: The 1 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 1.Read the letter above it: T.Find the place name that starts with T.Say: The 1 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 1 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 1.",
+   "Read the letter above it: T.",
+   "Find the place name that starts with T."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "placevalue:expand",
+  "text": "673 = ___ + ___ + ___",
+  "ans": "600 + 70 + 3",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read 673 from the left: hundreds, tens and ones.</li><li>The hundreds digit is worth hundreds: write it with two zeros after it.</li><li>Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>I read 673 from the left: hundreds, tens, ones.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read 673 from the left: hundreds, tens and ones. 2. The hundreds digit is worth hundreds: write it with two zeros after it. 3. Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first. Say: I read 673 from the left: hundreds, tens, ones.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead 673 from the left: hundreds, tens and ones.The hundreds digit is worth hundreds: write it with two zeros after it.Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first.Say: I read 673 from the left: hundreds, tens, ones. Listen",
+  "hint": "Write what each digit is worth. A zero holds a place: its part is 0.",
+  "say": "I read 673 from the left: hundreds, tens, ones.",
+  "steps": [
+   "Read 673 from the left: hundreds, tens and ones.",
+   "The hundreds digit is worth hundreds: write it with two zeros after it.",
+   "Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "placevalue:compare",
+  "text": "Compare: 707 ___ 886",
+  "ans": "<",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Count the digits in 707 and in 886. More digits is bigger.</li><li>Same number of digits: look from the left for the first digit that is different.</li><li>The bigger digit makes the bigger number. Now write the sign in the box.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>707 is ___ 886.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Count the digits in 707 and in 886. More digits is bigger. 2. Same number of digits: look from the left for the first digit that is different. 3. The bigger digit makes the bigger number. Now write the sign in the box. Say: 707 is blank 886.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howCount the digits in 707 and in 886. More digits is bigger.Same number of digits: look from the left for the first digit that is different.The bigger digit makes the bigger number. Now write the sign in the box.Say: 707 is ___ 886. Listen",
+  "hint": "Compare the digits from the left. The first place that is different decides.",
+  "say": "707 is ___ 886.",
+  "steps": [
+   "Count the digits in 707 and in 886. More digits is bigger.",
+   "Same number of digits: look from the left for the first digit that is different.",
+   "The bigger digit makes the bigger number. Now write the sign in the box."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "number_sense:make_a_ten",
+  "text": "Use Make a Ten: 9 + 6 = ?",
+  "ans": 15,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start with 9. 9 + 1 = 10.</li><li>Take 1 from 6: 6 − 1 = 5.</li><li>Now add 10 + 5.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>9 plus 6 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start with 9. 9 plus 1 equals 10. 2. Take 1 from 6: 6 minus 1 equals 5. 3. Now add 10 plus 5. Say: 9 plus 6 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart with 9. 9 + 1 = 10.Take 1 from 6: 6 − 1 = 5.Now add 10 + 5.Say: 9 plus 6 equals ___. Listen",
+  "hint": "Make 10 first: 9 + 1 = 10. Then add what is left of 6.",
+  "say": "9 plus 6 equals ___.",
+  "steps": [
+   "Start with 9. 9 + 1 = 10.",
+   "Take 1 from 6: 6 − 1 = 5.",
+   "Now add 10 + 5."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "number_sense:round_nl_ten_thousands",
+  "text": "Tap the line to mark 81,559: ___ Round it to the nearest 10,000: ___",
+  "ans": 80000,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Put a dot for 81,559 on the line.</li><li>Find the halfway point between the two ends.</li><li>Is 81,559 before or after halfway? Before: round down. Halfway or after: round up.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>81,559 rounded to the nearest 10,000 is ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Put a dot for 81,559 on the line. 2. Find the halfway point between the two ends. 3. Is 81,559 before or after halfway? Before: round down. Halfway or after: round up. Say: 81,559 rounded to the nearest 10,000 is blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howPut a dot for 81,559 on the line.Find the halfway point between the two ends.Is 81,559 before or after halfway? Before: round down. Halfway or after: round up.Say: 81,559 rounded to the nearest 10,000 is ___. Listen",
+  "hint": "Put a dot for 81,559. Find the halfway point. Before halfway: round down. Halfway or after: round up.",
+  "say": "81,559 rounded to the nearest 10,000 is ___.",
+  "steps": [
+   "Put a dot for 81,559 on the line.",
+   "Find the halfway point between the two ends.",
+   "Is 81,559 before or after halfway? Before: round down. Halfway or after: round up."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "number_theory:factors_identify",
+  "text": "Fill in the missing factors of 72:",
+  "ans": "2, 3, 18, 12",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Each row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Each row is a factor pair: a times b equals 72. If you know one factor, divide 72 by it to find the other.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howEach row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other.Listen",
+  "hint": "Each row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other.",
+  "say": "",
+  "steps": [
+   "Each row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "fractions:compare",
+  "text": "Compare the fractions: 4/8 and 2/4.",
+  "ans": "=",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find a common denominator, or compare each to 1/2 or 1.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find a common denominator, or compare each to 1/2 or 1.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind a common denominator, or compare each to 1/2 or 1.Listen",
+  "hint": "Find a common denominator, or compare each to 1/2 or 1.",
+  "say": "",
+  "steps": [
+   "Find a common denominator, or compare each to 1/2 or 1."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "addition:add_facts",
+  "text": "9 + 7 = ?",
+  "ans": 16,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start at 9 and count up 7. Or: add 9 + 7.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>9 plus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start at 9 and count up 7. Or: add 9 plus 7. Say: 9 plus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart at 9 and count up 7. Or: add 9 + 7.Say: 9 plus 7 equals ___. Listen",
+  "hint": "Start at 9 and count up 7. Or: add 9 + 7.",
+  "say": "9 plus 7 equals ___.",
+  "steps": [
+   "Start at 9 and count up 7. Or: add 9 + 7."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 1280,
+  "key": "subtraction:sub_facts",
+  "text": "16 − 7 = ?",
+  "ans": 9,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start at 16 and count back 7. Or think: which number plus 7 makes 16?</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>16 minus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start at 16 and count back 7. Or think: which number plus 7 makes 16? Say: 16 minus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart at 16 and count back 7. Or think: which number plus 7 makes 16?Say: 16 minus 7 equals ___. Listen",
+  "hint": "Start at 16 and count back 7. Or think: which number plus 7 makes 16?",
+  "say": "16 minus 7 equals ___.",
+  "steps": [
+   "Start at 16 and count back 7. Or think: which number plus 7 makes 16?"
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "placevalue:expanded_notation",
+  "text": "673 = ___ × 100 + ___ × 10 + ___ × 1",
+  "ans": "6 × 100 + 7 × 10 + 3 × 1",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read 673 from the left: hundreds, tens and ones.</li><li>The hundreds digit goes in the box before × 100.</li><li>Do the same for each place. Write each digit in its box.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>I read 673 from the left: hundreds, tens, ones.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read 673 from the left: hundreds, tens and ones. 2. The hundreds digit goes in the box before times 100. 3. Do the same for each place. Write each digit in its box. Say: I read 673 from the left: hundreds, tens, ones.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead 673 from the left: hundreds, tens and ones.The hundreds digit goes in the box before × 100.Do the same for each place. Write each digit in its box.Say: I read 673 from the left: hundreds, tens, ones. Listen",
+  "hint": "Write each digit. It is multiplied by its place.",
+  "say": "I read 673 from the left: hundreds, tens, ones.",
+  "steps": [
+   "Read 673 from the left: hundreds, tens and ones.",
+   "The hundreds digit goes in the box before × 100.",
+   "Do the same for each place. Write each digit in its box."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "placevalue:identify",
+  "text": "Which place is the underlined digit in?",
+  "ans": "tens",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find the underlined digit: 1.</li><li>Read the letter above it: T.</li><li>Find the place name that starts with T.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>The 1 is in the ___ place.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find the underlined digit: 1. 2. Read the letter above it: T. 3. Find the place name that starts with T. Say: The 1 is in the blank place.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind the underlined digit: 1.Read the letter above it: T.Find the place name that starts with T.Say: The 1 is in the ___ place. Listen",
+  "hint": "Read the letter above the underlined digit.",
+  "say": "The 1 is in the ___ place.",
+  "steps": [
+   "Find the underlined digit: 1.",
+   "Read the letter above it: T.",
+   "Find the place name that starts with T."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "placevalue:expand",
+  "text": "673 = ___ + ___ + ___",
+  "ans": "600 + 70 + 3",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Read 673 from the left: hundreds, tens and ones.</li><li>The hundreds digit is worth hundreds: write it with two zeros after it.</li><li>Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>I read 673 from the left: hundreds, tens, ones.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Read 673 from the left: hundreds, tens and ones. 2. The hundreds digit is worth hundreds: write it with two zeros after it. 3. Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first. Say: I read 673 from the left: hundreds, tens, ones.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howRead 673 from the left: hundreds, tens and ones.The hundreds digit is worth hundreds: write it with two zeros after it.Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first.Say: I read 673 from the left: hundreds, tens, ones. Listen",
+  "hint": "Write what each digit is worth. A zero holds a place: its part is 0.",
+  "say": "I read 673 from the left: hundreds, tens, ones.",
+  "steps": [
+   "Read 673 from the left: hundreds, tens and ones.",
+   "The hundreds digit is worth hundreds: write it with two zeros after it.",
+   "Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "placevalue:compare",
+  "text": "Compare: 707 ___ 886",
+  "ans": "<",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Count the digits in 707 and in 886. More digits is bigger.</li><li>Same number of digits: look from the left for the first digit that is different.</li><li>The bigger digit makes the bigger number. Now write the sign in the box.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>707 is ___ 886.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Count the digits in 707 and in 886. More digits is bigger. 2. Same number of digits: look from the left for the first digit that is different. 3. The bigger digit makes the bigger number. Now write the sign in the box. Say: 707 is blank 886.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howCount the digits in 707 and in 886. More digits is bigger.Same number of digits: look from the left for the first digit that is different.The bigger digit makes the bigger number. Now write the sign in the box.Say: 707 is ___ 886. Listen",
+  "hint": "Compare the digits from the left. The first place that is different decides.",
+  "say": "707 is ___ 886.",
+  "steps": [
+   "Count the digits in 707 and in 886. More digits is bigger.",
+   "Same number of digits: look from the left for the first digit that is different.",
+   "The bigger digit makes the bigger number. Now write the sign in the box."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "number_sense:make_a_ten",
+  "text": "Use Make a Ten: 9 + 6 = ?",
+  "ans": 15,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start with 9. 9 + 1 = 10.</li><li>Take 1 from 6: 6 − 1 = 5.</li><li>Now add 10 + 5.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>9 plus 6 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start with 9. 9 plus 1 equals 10. 2. Take 1 from 6: 6 minus 1 equals 5. 3. Now add 10 plus 5. Say: 9 plus 6 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart with 9. 9 + 1 = 10.Take 1 from 6: 6 − 1 = 5.Now add 10 + 5.Say: 9 plus 6 equals ___. Listen",
+  "hint": "Make 10 first: 9 + 1 = 10. Then add what is left of 6.",
+  "say": "9 plus 6 equals ___.",
+  "steps": [
+   "Start with 9. 9 + 1 = 10.",
+   "Take 1 from 6: 6 − 1 = 5.",
+   "Now add 10 + 5."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "number_sense:round_nl_ten_thousands",
+  "text": "Tap the line to mark 81,559: ___ Round it to the nearest 10,000: ___",
+  "ans": 80000,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Put a dot for 81,559 on the line.</li><li>Find the halfway point between the two ends.</li><li>Is 81,559 before or after halfway? Before: round down. Halfway or after: round up.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>81,559 rounded to the nearest 10,000 is ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Put a dot for 81,559 on the line. 2. Find the halfway point between the two ends. 3. Is 81,559 before or after halfway? Before: round down. Halfway or after: round up. Say: 81,559 rounded to the nearest 10,000 is blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howPut a dot for 81,559 on the line.Find the halfway point between the two ends.Is 81,559 before or after halfway? Before: round down. Halfway or after: round up.Say: 81,559 rounded to the nearest 10,000 is ___. Listen",
+  "hint": "Put a dot for 81,559. Find the halfway point. Before halfway: round down. Halfway or after: round up.",
+  "say": "81,559 rounded to the nearest 10,000 is ___.",
+  "steps": [
+   "Put a dot for 81,559 on the line.",
+   "Find the halfway point between the two ends.",
+   "Is 81,559 before or after halfway? Before: round down. Halfway or after: round up."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "number_theory:factors_identify",
+  "text": "Fill in the missing factors of 72:",
+  "ans": "2, 3, 18, 12",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Each row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Each row is a factor pair: a times b equals 72. If you know one factor, divide 72 by it to find the other.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howEach row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other.Listen",
+  "hint": "Each row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other.",
+  "say": "",
+  "steps": [
+   "Each row is a factor pair: a × b = 72. If you know one factor, divide 72 by it to find the other."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "fractions:compare",
+  "text": "Compare the fractions: 4/8 and 2/4.",
+  "ans": "=",
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Find a common denominator, or compare each to 1/2 or 1.</li></ol><div class=\"mq-lw-say\"><button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Find a common denominator, or compare each to 1/2 or 1.\" aria-label=\"Read the steps aloud\">Listen</button></div></div>",
+  "boxText": "Here is howFind a common denominator, or compare each to 1/2 or 1.Listen",
+  "hint": "Find a common denominator, or compare each to 1/2 or 1.",
+  "say": "",
+  "steps": [
+   "Find a common denominator, or compare each to 1/2 or 1."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "addition:add_facts",
+  "text": "9 + 7 = ?",
+  "ans": 16,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start at 9 and count up 7. Or: add 9 + 7.</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>9 plus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start at 9 and count up 7. Or: add 9 plus 7. Say: 9 plus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart at 9 and count up 7. Or: add 9 + 7.Say: 9 plus 7 equals ___. Listen",
+  "hint": "Start at 9 and count up 7. Or: add 9 + 7.",
+  "say": "9 plus 7 equals ___.",
+  "steps": [
+   "Start at 9 and count up 7. Or: add 9 + 7."
+  ]
+ },
+ {
+  "seed": 3,
+  "width": 820,
+  "key": "subtraction:sub_facts",
+  "text": "16 − 7 = ?",
+  "ans": 9,
+  "box": "<div class=\"mq-ladder-worked\" data-mq-ladder-on=\"worked\" role=\"note\" aria-label=\"How to do it\"><div class=\"mq-lw-title\">Here is how</div><ol class=\"mq-lw-steps\"><li>Start at 16 and count back 7. Or think: which number plus 7 makes 16?</li></ol><div class=\"mq-lw-say\"><b>Say:</b> <span>16 minus 7 equals ___.</span> <button type=\"button\" class=\"mq-lw-speak\" data-say=\"Here is how. 1. Start at 16 and count back 7. Or think: which number plus 7 makes 16? Say: 16 minus 7 equals blank.\" aria-label=\"Read the steps and the Say line aloud\">Listen</button></div></div>",
+  "boxText": "Here is howStart at 16 and count back 7. Or think: which number plus 7 makes 16?Say: 16 minus 7 equals ___. Listen",
+  "hint": "Start at 16 and count back 7. Or think: which number plus 7 makes 16?",
+  "say": "16 minus 7 equals ___.",
+  "steps": [
+   "Start at 16 and count back 7. Or think: which number plus 7 makes 16?"
+  ]
+ }
+]
