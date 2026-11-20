@@ -43,6 +43,7 @@ import { groupByHeight, measuredH, NO_STRETCH_ROOM } from '../layout.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
 import { slotScore } from '../paginate.js';
+import { rowCapMm, drawnRowMm } from '../layout.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -61,6 +62,30 @@ const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d
  * under 30 %, H13) instead of a tenth - no blank band above the footer.
  */
 const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ? Number(input.stepStripMm) : 0);
+
+/**
+ * Shelf `s` of a pool as plan() draws it (MIX-DROP, lf-engine vocabfix 2026-11-20): its chunk of items, its height `h` (the
+ * tallest item IT holds, never past the pool's shelf height `sh.h`), the row cap `capH` (layout.rowCapMm) and the height it is
+ * laid out at, `shH`. packing() counts every shelf at this `shH` - at the pool's tallest uncapped shelf (`sh.h`) it judged a
+ * shelf that fits as spilling and dropped it (add_wp_10 L lesson Mixed 14 -> 12 items). A shelf past the items it is given
+ * (a probe shorter than the count) counts at `sh.h`.
+ */
+function shelfRow(its, sh, s, ctx) {
+    let chunk = (its || []).slice(s * sh.per, (s + 1) * sh.per);
+    if (!chunk.length) return { chunk, h: sh.h, capH: sh.h, shH: sh.h };
+    // SIDE: [twin | problem] pairs, the twin first (example, then problem).
+    if (sh.pairs) chunk = chunk.flatMap((it) => (it.twin ? [it.twin, it] : [it]));
+    const cols = Math.min(sh.k, 6);
+    const pupil = chunk.filter((it) => !it.anchor);
+    // H13 (owner 2026-09-25): a shelf is as tall as the tallest item IT holds, not the
+    // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
+    const own = hMinAt(pupil, cols, ctx);
+    const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
+    // (ROW-STRETCH CAP, layout.rowCapMm: a shelf of declared templates grows at most their writing room past what it draws)
+    // (the shelf's own height too, when a skill floor lifted it past what its items draw: shH)
+    const capH = rowCapMm(drawnRowMm(pupil, cols) || h, chunk);
+    return { chunk, h, capH, shH: Math.min(h, capH) };
+}
 
 /** Shelves: for each pool {id, k, h}, then how many shelves each gets. */
 function packing(poolsIn, input) {
@@ -90,11 +115,22 @@ function packing(poolsIn, input) {
     const weights = Object.fromEntries((input.pools || []).map((p) => [p.id, p.weight || 1]));
     // A skill's strip opens its first shelf only: its further shelves join the same band (an
     // empty strip between two shelves of one skill read as a blank row, H13).
-    const bandH = (id, first = true) => (first ? m.strip : 0) + shelf[id].h;
+    // (shelf s of a pool at the height plan() lays it out at: shelfRow's shH, MIX-DROP)
+    // (and the order plan() deals a noStretch pool in - layout.groupByHeight over the items it holds, ruling (b))
+    const itsOf = (id) => {
+        const sh = shelf[id];
+        const its0 = (poolsIn[id] || []).slice(0, sh.n * sh.per);
+        const noSt = its0.length > 0 && its0.every((it) => it && it.footprint && it.footprint.noStretch);
+        return noSt && sh.per > 1 && !sh.pairs ? groupByHeight(its0, Math.min(sh.k, 6)).concat((poolsIn[id] || []).slice(sh.n * sh.per)) : poolsIn[id];
+    };
+    const rowH = (id, s) => shelfRow(itsOf(id), shelf[id], s, ctx).shH;
+    const bandH = (id, s = 0) => (s === 0 ? m.strip + shelf[id].band : 0) + rowH(id, s);
+    // The height page 1 holds when every shelf is on it (as plan() sums it): `used` is recounted, never carried.
+    const usedNow = () => ids.reduce((a, id) => { let t = a; for (let s = 0; s < shelf[id].n; s++) t += bandH(id, s); return t; }, 0);
     // Page 1: one shelf per skill first (with its anchor band), then extra shelves by weight gap.
-    let used = 0;
     const order = [];
-    for (const id of ids) { order.push(id); used += bandH(id) + shelf[id].band; shelf[id].n = 1; }
+    for (const id of ids) { order.push(id); shelf[id].n = 1; }
+    let used = usedNow();
     const total = () => ids.reduce((a, id) => a + shelf[id].n * shelf[id].per, 0);
     // WORKSHEET_DESIGN_STANDARD 12.1: Mixed practice holds at most 9 / 7 / 5 rows (shelves).
     const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
@@ -105,9 +141,13 @@ function packing(poolsIn, input) {
         let cur = 0;
         for (const id of ids) {
             for (let k = 0; k < shelf[id].n; k++) {
-                const hh = bandH(id, k === 0) + (k === 0 ? shelf[id].band : 0);
+                let hh = bandH(id, k);
                 const budget = pages === 1 ? m.budget : mCont.budget;
-                if (cur && cur + hh > budget) { pages++; cur = 0; }
+                // (MIX-PAGES, lf-placevalue vocab deploy: a skill's further shelf that starts a page opens a band of its own,
+                // under its strip, as plan() lays it out - counted without the strip, a Match 3 shelf joined the anchor chart's
+                // page on paper only, and the chart spilled to a page of its own: vocab_grade_pictures L Mixed 3 -> 4 pages, a
+                // lone Match 3 cell on page 2; ws-layout-unit MIX-PAGES)
+                if (cur && cur + hh > budget) { pages++; cur = 0; if (k > 0) hh += m.strip; }
                 cur += hh;
             }
         }
@@ -124,7 +164,7 @@ function packing(poolsIn, input) {
         const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].per) / Math.max(1, total()) }))
             .sort((a, b) => b.gap - a.gap);
         const fits = (id) => {
-            if (!multi) return used + bandH(id, false) <= m.budget;
+            if (!multi) return used + bandH(id, shelf[id].n) <= m.budget;
             shelf[id].n++;
             const ok = pagesOf() <= basePages;
             shelf[id].n--;
@@ -133,7 +173,7 @@ function packing(poolsIn, input) {
         const next = gaps.find((g) => fits(g.id));
         if (!next) break;
         shelf[next.id].n++;
-        used += bandH(next.id, false);
+        used = usedNow();
     }
     // Lessons r3: a lesson's Mixed page (`leadHalf`) gives its first skill - the lesson's own - at
     // least half the placed items AFTER packing (weights alone lost to a taller lesson shelf):
@@ -143,12 +183,12 @@ function packing(poolsIn, input) {
         const cnt = (id) => shelf[id].n * shelf[id].per;
         const rest = () => ids.slice(1).reduce((a, id) => a + cnt(id), 0);
         // (lessonFit over several pages: a lead shelf fits when the pages stay the pages the start took)
-        const leadFits = () => { if (!multi) return used + bandH(lead, false) <= m.budget; shelf[lead].n++; const ok = pagesOf() <= basePages; shelf[lead].n--; return ok; };
+        const leadFits = () => { if (!multi) return used + bandH(lead, shelf[lead].n) <= m.budget; shelf[lead].n++; const ok = pagesOf() <= basePages; shelf[lead].n--; return ok; };
         for (let g = 0; g < 24 && cnt(lead) < rest(); g++) {
             const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
-            if (shelves < maxShelves * basePages && leadFits()) { shelf[lead].n++; used += bandH(lead, false); continue; }
+            if (shelves < maxShelves * basePages && leadFits()) { shelf[lead].n++; used = usedNow(); continue; }
             const drop = ids.slice(1).filter((id) => shelf[id].n > 1).sort((a, b) => cnt(b) - cnt(a))[0];
-            if (drop) { shelf[drop].n--; used -= bandH(drop, false); continue; }
+            if (drop) { shelf[drop].n--; used = usedNow(); continue; }
             // `leadDrop` (the detailed lesson maker, lesson 2 r4 - critic r2 D3: 2 stories of 14 items):
             // every partner is down to one shelf, so the LAST partner with the most items gives its
             // whole band up (one partner always stays); the last partner left narrows its shelf to
@@ -159,15 +199,15 @@ function packing(poolsIn, input) {
                 const most = Math.max(...live.map(cnt));
                 const gone = live.filter((id) => cnt(id) === most).pop();
                 shelf[gone].n = 0;
-                used -= bandH(gone, true);
+                used = usedNow();
                 continue;
             }
             const last = live[0];
             const k2 = last ? divisorsDesc(N).find((dv) => dv < shelf[last].k && fitsAt(poolsIn[last], dv, ctx)) : 0;
             if (!k2) break;
             const h2 = hMinAt(poolsIn[last], k2, ctx);
-            used += (Number.isFinite(h2) ? h2 : shelf[last].h) - shelf[last].h;
             Object.assign(shelf[last], { k: k2, per: k2, h: Number.isFinite(h2) ? h2 : shelf[last].h });
+            used = usedNow();
         }
     }
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
@@ -542,7 +582,8 @@ function planMixed(input, pools) {
         // H13: the shortest skill's cells on the shelf keep its drawing at least 70 % of the
         // shelf's height, so the spare height shared in below never opens a 30 % empty band.
         const short = Math.min(...[...new Set(chunk.map((it) => it.pool))].map((id) => hAtK(chunk.filter((it) => it.pool === id), k, ctx)).filter((x) => Number.isFinite(x) && x > 0), h);
-        shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
+        // (ROW-STRETCH CAP, layout.rowCapMm: a shelf of declared templates grows at most their writing room past what it draws)
+        shelves.push({ items: chunk, h, room: Math.max(0, Math.min(short / 0.7, rowCapMm(drawnRowMm(chunk, k) || h, chunk)) - h) });
     }
     const n = queue.length;
     const nScore = slotScore(queue);   // (answer slots: critic r1 F6)
@@ -631,18 +672,13 @@ export function plan(input = {}) {
         const noSt = its0.length > 0 && its0.every((it) => it && it.footprint && it.footprint.noStretch);
         const its = noSt && sh.per > 1 && !sh.pairs ? groupByHeight(its0, Math.min(sh.k, 6)) : its0;
         for (let s = 0; s < sh.n; s++) {
-            let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
-            // SIDE: [twin | problem] pairs, the twin first (example, then problem).
-            if (sh.pairs) chunk = chunk.flatMap((it) => (it.twin ? [it.twin, it] : [it]));
+            // (the shelf as packing() counted it: shelfRow, MIX-DROP)
+            const { chunk, h, capH, shH } = shelfRow(its, sh, s, ctx);
             const anchor = s === 0 && sh.band && A ? ((A.byPool[id] || {}).band || [])[0] : null;
-            // H13 (owner 2026-09-25): a shelf is as tall as the tallest item IT holds, not the
-            // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
-            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) : sh.h;
-            const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
             // (ruling (b): a noStretch shelf grows to at most NO_STRETCH_ROOM x its shortest item, never below its tallest)
             const hs = noSt ? chunk.filter((it) => !it.anchor).map((it) => measuredH(it, Math.min(sh.k, 6))) : [];
             const growCap = hs.length && hs.every((x) => x > 0) ? Math.max(0, NO_STRETCH_ROOM * Math.min(...hs) - h) : Infinity;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, growCap });
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, capH, shH, anchor, bandMm: sh.band, growCap });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -683,17 +719,19 @@ export function plan(input = {}) {
     const runShelves = (breaks, slack = 0) => {
     pages.length = 0; cur = null; start = 1;
     for (const [i, sh] of shelves.entries()) {
-        const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), sh.growCap === undefined ? Infinity : sh.growCap);
+        // (ROW-STRETCH CAP: shelfRow's capH / shH, the heights packing() counted; ruling (b)'s noStretch growCap too)
+        const { capH, shH } = sh;
+        const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), Math.max(0, capH - shH), sh.growCap === undefined ? Infinity : sh.growCap);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = (pages.length > 1 ? p.mCont.budget : m.budget) + slack;   // the page `cur` is on
-        let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+        let bandH = m.strip + shH + grow + (sh.anchor ? sh.bandMm : 0);
         let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
         if (joins) bandH -= m.strip;
         if (!cur || cur.used + bandH > budget || breaks.has(i)) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
-            bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+            bandH = m.strip + shH + grow + (sh.anchor ? sh.bandMm : 0);
         }
         const first = sh.items.find((it) => !it.anchor);
         // A preset skill's items carry the host's id in q.skillId and the preset's in q.presetId
@@ -704,7 +742,7 @@ export function plan(input = {}) {
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
-        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
+        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: shH + grow, labels, start });
         if (joins) {
             // A further shelf of the same skill on the same page: its grid under the last one.
             const prev = cur.sections[cur.sections.length - 1];
@@ -753,7 +791,7 @@ export function plan(input = {}) {
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
-        meta: { items: n, scoreOutOf: nScore, units: p.N, achieved, arrangement: 'sections',
+        meta: { items: n, scoreOutOf: nScore, units: p.N, achieved, arrangement: 'sections', packedPages: p.pages, packedShelves: p.ids.reduce((t, id) => t + p.shelf[id].n, 0),
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }

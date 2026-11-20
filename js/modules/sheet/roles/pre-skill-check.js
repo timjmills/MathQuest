@@ -33,13 +33,16 @@ import { getProvider } from '../contract.js';
 import { estimateTitleLines } from './practice.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed,
+    instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed, stripExtraMm,
 } from './compose.js';
 import { slotScore } from '../paginate.js';
+import { rowCapMm } from '../layout.js';
 import { roleCapacity } from '../role-capacity.js';
 
 export const ROLE_ID = 'pre-skill-check';
 const PER_QUAD = 4;
+/** The characters a strip keeps between its instruction and a shared strip's scores (the gap, the blanks' width, a margin). */
+export const STRIP_SCORE_PAD = 8;
 
 export function sources(skills, { earlier }) {
     let list;
@@ -263,7 +266,8 @@ export function paginateBands(bands, budget, gap = 0) {
  * the page stays within its ceiling `cap` (items). Pure.
  */
 export function fillBands(pgs, bands, m, tag, ctx, cap) {
-    const heightOf = (b) => m.strip + tag + Math.ceil(b.its.length / b.cols) * b.rowH;
+    // (a band under its neighbour's shared strip has no strip of its own: `strip` 0 - critic d2d5 r1 D-1)
+    const heightOf = (b) => (b.strip === undefined ? m.strip : b.strip) + tag + Math.ceil(b.its.length / b.cols) * b.rowH;
     for (const pg of pgs) {
         const on = pg.sections.map((j) => bands[j]);
         const done = new Set();
@@ -289,7 +293,7 @@ export function fillBands(pgs, bands, m, tag, ctx, cap) {
             if (k > cand.more.length || k > cap - items) { done.add(cand); continue; }
             const its = cand.its.concat(cand.more.slice(0, k));
             const rowH = Math.max(cand.rowH, hMinAt(its, cand.cols, ctx));
-            const h = m.strip + tag + Math.ceil(its.length / cand.cols) * rowH;
+            const h = (cand.strip === undefined ? m.strip : cand.strip) + tag + Math.ceil(its.length / cand.cols) * rowH;
             const rest = on.filter((b) => b !== cand).reduce((t, b) => t + b.h, 0);
             if (!fitsAt(its, cand.cols, ctx) || rest + h > m.budget) { done.add(cand); continue; }
             cand.its = its; cand.more = cand.more.slice(k); cand.rowH = rowH; cand.h = heightOf(cand);
@@ -300,6 +304,74 @@ export function fillBands(pgs, bands, m, tag, ctx, cap) {
     return pgs;
 }
 
+// PSC-DEAL (critic D4, 2026-11-20): a prerequisite's items, in their seeded order, keeping no answer a third time and no
+// turnaround of an item already kept (a + b after b + a). A sign answer (<, >, =) shares by nature. Pure, so reproducible.
+const SIGN_ANS = /^"?(?:[<>=]|true|false|yes|no)"?$/i;
+const factOf = (it) => { const m = /(\d+)\s*([+\u00d7x*])\s*(\d+)/.exec(String((it && it.q && it.q.text) || '')); return m ? `${m[2] === '+' ? '+' : 'x'}|${m[1]}|${m[3]}` : null; };
+export function dedupeDeal(items) {
+    const seen = new Map();
+    const facts = new Set();
+    // (lead A10 sign floor: a compare item never makes one sign three in a row, nor a second of the only sign so far)
+    const signs = [];
+    const isSign = (a) => /^"[<>=]"$/.test(a);
+    return (items || []).filter((it) => {
+        const a = JSON.stringify(it && it.q ? it.q.ans : null);
+        if (isSign(a)) {
+            const n = signs.length;
+            if (n >= 2 && signs[n - 1] === a && signs[n - 2] === a) return false;
+            if (n >= 1 && signs.every((x) => x === a)) return false;
+            signs.push(a);
+            return true;
+        }
+        const f = factOf(it);
+        const turn = f ? f.split('|') : null;
+        if (turn && turn[1] !== turn[2] && facts.has(`${turn[0]}|${turn[2]}|${turn[1]}`)) return false;
+        if (!SIGN_ANS.test(a) && (seen.get(a) || 0) >= 2) return false;
+        seen.set(a, (seen.get(a) || 0) + 1);
+        if (f) facts.add(f);
+        return true;
+    });
+}
+
+// (lead A10 sign floor, critic d2d5 r1 M1): a compare band's items (every answer a sign) in an order that never shows one
+// sign three in a row and opens with two different signs. Run on a band's FINAL items - after Form B's shuffle and the
+// fill - so no shuffle undoes it. The earliest such order in the items' own order (a search, so "> < < <" becomes
+// "< > < <"): an order that already keeps the floor comes back unchanged; none possible, the items as they came. Pure.
+const signOf = (it) => { const a = JSON.stringify(it && it.q ? it.q.ans : null); return /^"[<>=]"$/.test(a) ? a : null; };
+export function signOrder(items) {
+    const all = (items || []).slice();
+    if (all.length < 3 || !all.every(signOf)) return all;
+    const ok = (seq, g, rest) => {
+        const n = seq.length;
+        if (n >= 2 && seq[n - 1] === g && seq[n - 2] === g) return false;
+        return !(n >= 1 && seq.every((x) => x === g) && rest.some((o) => signOf(o) !== g));
+    };
+    const go = (rest, seq, out) => {
+        if (!rest.length) return out;
+        const tried = new Set();
+        for (let i = 0; i < rest.length; i++) {
+            const g = signOf(rest[i]);
+            if (tried.has(g)) continue;
+            tried.add(g);
+            const left = rest.slice(0, i).concat(rest.slice(i + 1));
+            if (!ok(seq, g, left)) continue;
+            const r = go(left, seq.concat([g]), out.concat([rest[i]]));
+            if (r) return r;
+        }
+        return null;
+    };
+    return go(all, [], []) || all;
+}
+
+// (critic d2d5 r1 M2) twin pools (one skill, two or more pools) merge into one band ALTERNATING their items, so the band
+// keeps both pools' kinds (div_facts_long: partitive and quotitive) whatever share of it a page prints. Pure.
+export function interleave(lists) {
+    const out = [];
+    const ls = lists.map((l) => (l || []).slice());
+    for (let k = 0; ls.some((l) => k < l.length); k++) for (const l of ls) if (k < l.length) out.push(l[k]);
+    return out;
+}
+
 function planCheck(input, cut) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
@@ -307,7 +379,7 @@ function planCheck(input, cut) {
     // takes row by row while the next row fits - lf-roles PSC fill; a lesson's check, perQuestion, takes none)
     const extra0 = [];
     const quads0 = [0, 1, 2, 3].map((i) => {
-        const pool = poolItems(input, `q${i}`);
+        const pool = input.perQuestion ? poolItems(input, `q${i}`) : dedupeDeal(poolItems(input, `q${i}`));
         let its = pool.slice(0, perQuad(input, i));
         let more = input.perQuestion ? [] : pool.slice(PER_QUAD);
         if (form === 'B') its = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'B', i)), its);
@@ -315,6 +387,21 @@ function planCheck(input, cut) {
         extra0.push(more);
         return its;
     });
+    // (lead A10, 2026-11-20, PSC-TWIN: two pools that deal ONE skill - a preset and its host, vocab_pick3_words and
+    // vocab_grade_pictures - are one band: the later pool's items join the first's, its counts summed; a lesson's routed
+    // check keeps one question per route)
+    if (!input.perQuestion) {
+        const keyOf = (q) => (q[0] && q[0].skill) || '';
+        for (let i = 0; i < quads0.length; i++) {
+            if (!quads0[i].length || !keyOf(quads0[i])) continue;
+            const twins = [];
+            for (let j = i + 1; j < quads0.length; j++) if (quads0[j].length && keyOf(quads0[j]) === keyOf(quads0[i])) twins.push(j);
+            if (!twins.length) continue;
+            quads0[i] = dedupeDeal(interleave([i, ...twins].map((j) => quads0[j])));
+            extra0[i] = dedupeDeal(interleave([i, ...twins].map((j) => extra0[j] || [])));
+            for (const j of twins) { quads0[j] = []; extra0[j] = []; }
+        }
+    }
     const quads = quads0.filter((q) => q.length);
     // (each band's question index, for its route; a route's tag takes TAG mm of its band)
     const qIndex = quads0.map((q, i) => (q.length ? i : -1)).filter((i) => i >= 0);
@@ -345,6 +432,8 @@ function planCheck(input, cut) {
     const answerOf = (it) => { const a = it && it.q ? it.q.ans : ''; return Array.isArray(a) ? a.join(', ') : a && typeof a === 'object' ? Object.values(a).join(', ') : String(a === undefined || a === null ? '' : a); };
     const band = (its, cols, rows, cellH, pageCols, tagLines = 1) => {
         const qi = qIndex[bandNo++];
+        // (the sign floor on the band's final items, after any shuffle - critic d2d5 r1 M1; a lesson's check deals as before)
+        if (!input.perQuestion) its = signOrder(its);
         const instr = instructionText(instructionKeyOf(its, input.skills), its);
         // (the detailed lesson's check centres each item in its grown cell, H13; a lesson's routed check keeps CL-4b's top
         // start - its rows grow only to the H13 cap, ROUTE_GROW)
@@ -353,7 +442,7 @@ function planCheck(input, cut) {
         const r = routed ? routeOf(input, qi) : null;
         const b = {
             // (a routed question carries its own score, __/n - P-25, critic r2 N3: the routing table reads it)
-            kind: 'band', label: '', instr, extra: input.perQuestion && !routed ? '' : scoreTag(slotScore(its)),
+            kind: 'band', label: '', instr, pscSkill: (its[0] && its[0].skill) || '', pscFirst: start, pscN: slotScore(its), pscItems: its.map((it) => ({ pool: it.pool, text: String((it.q && it.q.text) || ''), ans: it.q ? it.q.ans : null })), extra: input.perQuestion && !routed ? '' : scoreTag(slotScore(its)),
             // (the detailed lesson's check centres each item in its grown cell, H13)
             content: routed ? { kind: 'col', cls: 'mq-lprecol', parts: [grid, { kind: 'html', html: (bandNo === 1 ? routeCssHtml() : '') + routeTagHtml(r, tagLines) }] } : grid,
         };
@@ -366,13 +455,21 @@ function planCheck(input, cut) {
     let routedFoot = null;
     let routedUnits = null;
     let routedFits = true;
-    const quadFits = quads.length === 4 && quads.every((q) => fitsAt(q, 4, ctx));
+    // (critic d2d5 r1 D-1: a quadrant has a strip of its own, so neighbouring quadrants of one instruction would print it twice;
+    // such a check stacks its bands instead, where neighbours of one instruction share one strip - a lesson's check as before)
+    const instrOf = (q) => instructionText(instructionKeyOf(q, input.skills), q);
+    const sameNext = !input.perQuestion && quads.some((q, i) => i && instrOf(q) === instrOf(quads[i - 1]));
+    const quadFits = quads.length === 4 && !sameNext && quads.every((q) => fitsAt(q, 4, ctx));
     if (quadFits) {
         // Two rows of two quadrants; each quadrant a band over a 2 x 2 grid (PT-PRE-2 at L).
-        const quadH = (m.body - 2 - 3) / 2;
-        const cellH = (quadH - m.strip - TAG) / 2;
+        const quadH0 = (m.body - 2 - 3) / 2;
+        const cellH0 = (quadH0 - m.strip - TAG) / 2;
         const need = Math.max(...quads.map((q) => hMinAt(q, 4, ctx)));
-        if (need <= cellH) {
+        // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a quadrant's rows are held to
+        // what they draw + their writing room, and the quadrant to its rows; the spare stays at the foot of the page
+        const cellH = Math.min(cellH0, Math.max(need - 2, rowCapMm(need - 2, quads.flat())));
+        const quadH = Math.min(quadH0, m.strip + TAG + 2 * cellH);
+        if (need <= cellH0) {
             const rowPart = (a, b) => ({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow', height: `${quadH.toFixed(2)}mm`, parts: [band(a, 2, 2, cellH, 4), band(b, 2, 2, cellH, 4)] });
             pages.push({ sections: [rowPart(quads[0], quads[1]), rowPart(quads[2], quads[3])] });
         }
@@ -416,13 +513,16 @@ function planCheck(input, cut) {
             routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
         } else for (const [j, q0] of quads.entries()) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
-            const h = hMinAt(q0, cols, ctx) * grow;
+            // (ROW-STRETCH CAP stage 2: the grown row never passes what it draws + its writing room, layout.rowCapMm; hMinAt is the
+            // measure + 2 mm, the cell draws its measure)
+            const h0 = hMinAt(q0, cols, ctx);
+            const h = Math.min(h0 * grow, Math.max(h0 - 2, rowCapMm(h0 - 2, q0)));
             const share = (m.budget / quads.length - m.strip - TAG) * cut;
             const q = whole ? q0 : q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
             kept += slotScore(q);
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + TAG + rows * h;
-            if (!input.perQuestion) { kept -= slotScore(q); stacked.push({ h: bandH, n: q.length, sec: j, its: q, cols, rowH: h, more: q0.slice(q.length).concat(extra0[qIndex[j]] || []) }); continue; }
+            if (!input.perQuestion) { kept -= slotScore(q); stacked.push({ h: bandH, n: q.length, sec: j, its: q, cols, rowH: h, instr: instrOf(q0), more: q0.slice(q.length).concat(extra0[qIndex[j]] || []) }); continue; }
             if (cur.sections.length && cur.used + bandH > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
             // (the detailed lesson's check never lays a band out in more columns than it has items: one item in a two-up
             // band left an empty bordered half - lesson 4 critic r2 D9; the item keeps its measured size, centred)
@@ -431,10 +531,43 @@ function planCheck(input, cut) {
         }
         // (gap 0: the bands stand edge to edge, as the one-page sum always counted them)
         if (stacked.length) {
-            const pgs = paginateBands(stacked, m.budget, 0);
+            // (critic d2d5 r1 D-1: a band of its neighbour's instruction shares that strip, so it is counted without one; a page
+            // that would open with such a band gives it back its strip and is laid again)
+            for (const [j, b] of stacked.entries()) if (j && b.instr && b.instr === stacked[j - 1].instr) { b.strip = 0; b.h -= m.strip; }
+            let pgs = paginateBands(stacked, m.budget, 0);
+            for (let guard = 0; guard < stacked.length; guard++) {
+                const open = pgs.map((pg) => stacked[pg.sections[0]]).find((b) => b && b.strip === 0);
+                if (!open) break;
+                delete open.strip; open.h += m.strip;
+                pgs = paginateBands(stacked, m.budget, 0);
+            }
             fillBands(pgs, stacked, m, TAG, ctx, ceilingOf(ctx));
             // (the bands are drawn only now, in order, at their filled counts: numbering runs on across the pages)
-            for (const pg of pgs) pg.sections = pg.sections.map((j) => { const b = stacked[j]; kept += slotScore(b.its); return band(b.its, b.cols, Math.ceil(b.its.length / b.cols), b.rowH, b.cols); });
+            // (critic d2d5 r1 D-1: two neighbouring bands of one instruction SHARE one strip - one instruction for one task
+            // kind, never a label tail; the later band's grid joins the earlier band under it, each keeping its own score)
+            for (const pg of pgs) {
+                const secs = [];
+                for (const j of pg.sections) {
+                    const b = stacked[j];
+                    kept += slotScore(b.its);
+                    const sec = band(b.its, b.cols, Math.ceil(b.its.length / b.cols), b.rowH, b.cols);
+                    const prev = secs[secs.length - 1];
+                    if (prev && b.strip === 0) { prev.joined = (prev.joined || [prev]).concat([sec]); continue; }
+                    secs.push(sec);
+                }
+                for (const sec of secs) if (sec.joined) {
+                    sec.contents = sec.joined.map((x) => x.content);
+                    delete sec.content;
+                    // (each prerequisite keeps its own score, named by its items - "1-4 __/4  5-8 __/4" - while the strip holds them
+                    // on one line with its instruction (PSC-STRIP1: the page counts one line); else the strip's one score, the sum)
+                    const ranged = sec.joined.map((x) => `${x.pscItems.length > 1 ? `${x.pscFirst}\u2013${x.pscFirst + x.pscItems.length - 1}` : x.pscFirst} __/${x.pscN}`).join('\u2003');
+                    const oneLine = stripExtraMm(ctx, '', `${sec.instr}${' '.repeat(STRIP_SCORE_PAD)}${ranged}`) === 0;
+                    sec.extra = `<span class="mq-quadscore">${oneLine ? ranged : `__/${sec.joined.reduce((t, x) => t + x.pscN, 0)}`}</span>`;
+                    sec.pscParts = sec.joined;
+                    delete sec.joined;
+                }
+                pg.sections = secs;
+            }
             pages.push(...pgs);
         }
         if (cur.sections.length) pages.push(cur);
@@ -445,6 +578,17 @@ function planCheck(input, cut) {
         if (input.perQuestion && !routed && grow >= GROW_MAX) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
     }
     // (kept and n count answer slots - a chart window its empty squares, critic r1 F6; one a cell for every other template)
+    // (PSC-INSTR: the bands in page order, a quadrant row's two included; meta.bands lists them for ws-psc-lint)
+    let pscBands = [];
+    {
+        const bs = [];
+        const walk = (sec) => { if (!sec) return; if (sec.kind === 'band') bs.push(sec); for (const x of sec.parts || []) walk(x); };
+        for (const pg of pages) for (const sec of pg.sections) walk(sec);
+        // (one row a prerequisite band; a band under a shared strip prints no instruction of its own - `shared`)
+        for (const b of bs) for (const [k, x] of (b.pscParts || [b]).entries()) pscBands.push({ instr: k ? '' : b.instr, shared: k > 0, skill: x.pscSkill || '', items: x.pscItems || [] });
+        for (const b of bs) for (const x of (b.pscParts || [b])) { delete x.pscItems; delete x.pscSkill; delete x.pscFirst; delete x.pscN; }
+        for (const b of bs) delete b.pscParts;
+    }
     const n = kept || slotScore(all);
     const finalFrame = n === slotScore(all) ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
         tabId: `Check ${form}`, title: titleOf(), score: n, twoLine: false });
@@ -452,7 +596,7 @@ function planCheck(input, cut) {
     // (lead ruling R13: a check that runs to a second page prints the FULL header on every page - name, date, score, title)
     return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p, i) => (p.fullHeader && i > 0 ? { header: finalFrame.header, sections: p.sections } : { sections: p.sections })), {
         scaffoldLevel: 0,
-        meta: Object.assign({ foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
+        meta: Object.assign({ bands: pscBands, foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
             rp ? { routePlan: rp, routes: routeRows } : {}),
     });
 }
@@ -488,7 +632,8 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         u.h0 = Math.max(...hs);
         // (a legacy cell is measured taller than it draws - its own text and answer line: it keeps its measured height)
         const legacy = u.qs.some((q) => q.some((it) => it.legacy));
-        u.cap = legacy ? u.h0 : u.h0 * ROUTE_GROW;
+        // (ROW-STRETCH CAP stage 2, critic lf-engine-rowcap r1 F4: and never past what it draws + its writing room, layout.rowCapMm)
+        u.cap = legacy ? u.h0 : Math.min(u.h0 * ROUTE_GROW, Math.max(u.h0 - 2, rowCapMm(u.h0 - 2, u.qs.flat())));
         u.tagLines = Math.max(...u.qi.map((qi, x) => routeTagLines(routeOf(input, qi), two ? (x ? FULL_W_MM - w : w) : FULL_W_MM)));
         u.fixed = m.strip + Math.max(0, ...u.qs.map((q, x) => extraLines(q, two ? (x ? FULL_W_MM - w : w) : FULL_W_MM))) * em * 1.25 + routeTagMm(u.tagLines);
         u.h = u.h0;

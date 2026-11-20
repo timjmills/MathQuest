@@ -1,0 +1,31 @@
+vs 7d2 pin, changed by the cherry-pick (pin != pre): 48
+   addition:add_wp_10/L/4242 key-p4 key-p5 pupil-p4 pupil-p5
+   algebra:two_step_letter_equation/M/1 key-p6 key-p7 pupil-p6 pupil-p7
+   algebra:two_step_letter_equation/M/4242 key-p6 key-p7 pupil-p6 pupil-p7
+   vocabulary:vocab_grade_pictures/L/1 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+   vocabulary:vocab_grade_pictures/L/4242 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+   vocabulary:vocab_grade_pictures/M/1 key-p5 key-p6 key-p7 key-p8 pupil-p5 pupil-p6 pupil-p7 pupil-p8
+   vocabulary:vocab_grade_pictures/M/4242 key-p5 key-p6 key-p7 key-p8 pupil-p5 pupil-p6 pupil-p7 pupil-p8
+changed by vocabfix (pre != head): 78
+   add/L/1 key-p4 pupil-p4
+   add/L/4242 key-p4 pupil-p4
+   addition:add_facts/L/1 key-p4 pupil-p4
+   addition:add_facts/L/4242 key-p4 pupil-p4
+   addition:add_wp_10/L/4242 key-p4 key-p5 pupil-p4 pupil-p5
+   addition:fact_family_sort/L/1 key-p4 key-p5 pupil-p4 pupil-p5
+   addition:fact_family_sort/L/4242 key-p4 key-p5 pupil-p4 pupil-p5
+   algebra:function_table_easy/L/1 key-p5 key-p6 pupil-p5 pupil-p6
+   algebra:function_table_easy/L/4242 key-p5 key-p6 pupil-p5 pupil-p6
+   algebra:two_step_add_then_div/L/4242 key-p10 key-p11 pupil-p10 pupil-p11
+   algebra:two_step_letter_equation/M/1 key-p6 key-p7 pupil-p6 pupil-p7
+   algebra:two_step_letter_equation/M/4242 key-p6 key-p7 pupil-p6 pupil-p7
+   division:div_facts/L/1 key-p4 pupil-p4
+   division:div_facts/L/4242 key-p4 pupil-p4
+   patterns:follow_given_rule/L/4242 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+   patterns:follow_given_rule/M/4242 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+   patterns:number_patterns_rule/L/1 key-p4 pupil-p4
+   patterns:number_patterns_rule/L/4242 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+   patterns:number_patterns_rule/M/4242 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+   vocabulary:vocab_pick3_words/L/1 key-p6 key-p7 pupil-p6 pupil-p7
+   vocabulary:vocab_pick3_words/L/4242 key-p6 key-p7 pupil-p6 pupil-p7
+total vs pin: 106

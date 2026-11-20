@@ -23,6 +23,10 @@ export const CASES = Object.freeze({
     ftSubZero: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.yMin === 0; },
     // (no two Ins back to back - lesson 5 r4, critic r2 n14: testing row 3 after row 2 is then a real test)
     ftSpread: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || !Array.isArray(p.rows)) return false; const xs = p.rows.map((r) => Number(r.x)).sort((a, b) => a - b); return xs.every((v, i) => !i || v - xs[i - 1] >= 2); },
+    // (LP-SWEEP seed 25, 2026-11-20: a table whose neighbouring Outs differ by something other than a + rule's number - else the
+    // provider has no "down the Out column" wrong answer, and a lesson whose T6 table names it could not build)
+    ftNeighbour: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || !Array.isArray(p.rows)) return false; const r = ftRuleOf(it); for (let i = 1; i < p.rows.length; i++) { const d = Math.abs(Number(p.rows[i].y) - Number(p.rows[i - 1].y)); if (d > 0 && !(r && r.op === '+' && r.k === d)) return true; } return false; },
+    ftAddNeighbour: (it) => CASES.ftAdd(it) && CASES.ftNeighbour(it),
     ftEdge: (it) => CASES.ftTimes(it) || CASES.ftSubZero(it),
     ftLessonAny: (it) => CASES.ftAdd(it) || CASES.ftSub(it) || CASES.ftTimes(it),
     ftPracticeAny: (it) => CASES.ftAdd(it) || CASES.ftSub(it) || CASES.ftEdge(it),

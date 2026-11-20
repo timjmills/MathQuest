@@ -6,6 +6,7 @@
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --seed 4242 --out <dir>      # elsewhere
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check                      # GATE
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check --copy               # + copy for the owner
+//   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check --rows E42,E43       # only those rows decide (backtests)
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --repeats                    # GATE: repeats only (S2), no PDF
 //     (R-ANSWER / R-TURN / R-CELL, see repeatsCheck; prints `ws-detailed-lesson --repeats: OK` / `FAIL (n)`;
 //      with --check as well, the repeats join the self-check's verdict)
@@ -226,6 +227,9 @@ function measure(LIBRARY) {
         P.perRowXs = [...pg.querySelectorAll('svg[data-per-row]')].map((e) => { const cs = [...e.querySelectorAll('circle')]; if (!cs.length) return []; const y0 = cs[0].getAttribute('cy'); return cs.filter((c) => c.getAttribute('cy') === y0).map((c) => +c.getAttribute('cx')); });
         P.halfW = pg.classList.contains('dl-land') ? [...pg.querySelectorAll('.dl-halves > .mq-rowcol')].filter((x) => x.querySelector('.dl-half')).map((x) => Math.round(x.getBoundingClientRect().width / MM * 10) / 10) : [];
         P.sizeMm = [Math.round(pg.getBoundingClientRect().width / MM), Math.round(pg.getBoundingClientRect().height / MM)];
+        // E43 EDGE (critic r3 R3-10): a drawn table's side gap to the border of the cell that holds it (mm, the smallest on the page)
+        P.edge = [...pg.querySelectorAll('.ws-cell table')].map((t) => { const c = t.closest('.ws-cell').getBoundingClientRect(), r = t.getBoundingClientRect();
+            return { gap: Math.round(Math.min(r.left - c.left, c.right - r.right) / MM * 10) / 10, w: Math.round(c.width / MM) }; });
         // E26: chart step panels (the lesson role's state cells) each show a grey mark
         P.panels = /^P2[a-z]?(-key)?$/.test(id) ? [...pg.querySelectorAll('.mq-cstatecell')].map((c) => [...c.querySelectorAll('*')].some((e) => {
             const cs = getComputedStyle(e); if (cs.display === 'none') return false;
@@ -780,6 +784,21 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     row('E27', 'Counters in rows of at most 5 (6 to 10 with the 5-group gap drawn)', pupil.flatMap((p) => p.perRow.map((n) => `${p.id}:${n}`)).join(', ') || 'no counters', pupil.every((p) => p.perRow.every((n, i) => e27RowOk(n, (p.perRowXs || [])[i]))));
     const chs = pages.filter((p) => /^P2[a-z]?$/.test(p.id));
     row('E26', 'Every anchor-chart step panel adds a grey (newest) mark', chs.length ? chs.map((ch) => `${ch.id} ${ch.panels.filter(Boolean).length} / ${ch.panels.length} panels`).join('; ') : 'no chart', chs.length > 0 && chs.every((ch) => ch.panels.length > 0 && ch.panels.every(Boolean)));
+    // E42 SCRIPT-PANEL (lf-algebra patterns critic r3 R3-9): every "Panel N" / "panel N" a teacher page names is a panel the
+    // anchor chart prints (T4 named "Panel 5" and "Panel 6: the trap" on a 4-panel chart)
+    {
+        const nPanels = Math.max(0, ...chs.map((ch) => ch.panels.length));
+        const named = pages.filter((x) => x.teacher).flatMap((p) => [...String(p.text || '').matchAll(/\b[Pp]anels? (\d+)(?:\s*(?:–|-|and|to)\s*(\d+))?/g)].flatMap((m) => [Number(m[1]), m[2] ? Number(m[2]) : null].filter((v) => v !== null).map((v) => ({ id: p.id, v }))));
+        const bad = named.filter((x) => x.v > nPanels || x.v < 1);
+        row('E42', 'Every chart panel a teacher page names is printed (SCRIPT-PANEL)', `${named.length} panel reference(s), chart ${nPanels} panel(s)${bad.length ? `; missing: ${bad.map((x) => `${x.id} panel ${x.v}`).join(', ')}` : ''}`, !bad.length);
+    }
+    // E43 EDGE (lf-algebra patterns critic r3 R3-10): a table never runs edge to edge with its cell (doubled rules) - every drawn
+    // table on a pupil page stands at least 1.5 mm in from both side borders of its cell (a 2 mm inner margin less the border)
+    {
+        const tight = pupil.flatMap((p) => (p.edge || []).filter((e) => e.gap < 1.5).map((e) => `${p.id} ${e.gap} mm (cell ${e.w} mm)`));
+        const n = pupil.reduce((a, p) => a + (p.edge || []).length, 0);
+        row('E43', 'Every table stands at least 1.5 mm in from its cell side borders (EDGE)', tight.length ? [...new Set(tight)].slice(0, 6).join('; ') : `${n} table(s), all clear`, !tight.length);
+    }
     row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === `${p.id}-key`)));
     return rows;
 }
@@ -950,7 +969,10 @@ else (async () => {
             const rows = evaluate(R, rast, LIB, built.kitLib);
             fs.writeFileSync(path.join(OUT, 'SELF-CHECK.md'), selfCheckMd(rows, R.pages, { lesson: LESSON, seed: SEED, notes: built.notes || [] }));
             for (const r of rows) console.log(`${r.id.padEnd(5)} ${r.pass ? 'PASS' : 'FAIL'} ${String(r.measured).slice(0, 260)}`);
-            failed = failed || rows.some((r) => !r.pass);
+            // (--rows E42,E43: only those self-check rows decide the verdict - a backtest row proves one E-check on a commit where
+            // another, fixed later, still fails)
+            const only = String(arg('rows', '')).split(',').map((x) => x.trim()).filter(Boolean);
+            failed = failed || rows.some((r) => !r.pass && (!only.length || only.includes(r.id)));
             if (has('debug')) fs.writeFileSync(path.join(OUT, 'measure.json'), JSON.stringify(R, null, 1));
         }
         if (has('copy')) {

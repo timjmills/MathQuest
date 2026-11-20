@@ -997,6 +997,12 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-engine row cap, critic r1 F3: a capped template's rows are counted at the height they are drawn - ROWCAP-FILL)
+        add(gate('rowcap-fill', 'ws-rowcap-fill (ROWCAP-FILL: capped rows counted at drawn + room)', 'the page engine', 'node', 'ws-rowcap-fill', [], { missingMsg: 'ws-rowcap-fill is not in this tree' }));
+        // (lf-placevalue vocab deploy, lf-engine review of fbca1a582: a Mixed page's packing counts a page-opening shelf with its strip - MIX-PAGES)
+        add(gate('mix-pages', 'ws-mix-pages (MIX-PAGES: a lead shelf the Mixed packing adds never prints a page of its own; MIX-DROP: a shelf that fits is never dropped)', 'the Mixed page engine', 'node', 'ws-mix-pages', [], { missingMsg: 'ws-mix-pages is not in this tree' }));
+        // (lf-engine vocabfix item 2: a lesson part over two pages never leaves a page more white than the next page's first item needs)
+        add(gate('lesson-fill', "ws-lesson-fill (LESSON-FILL: the lesson's Practice page never leaves room for the next page's item)", `${scope} lesson × M/L`, 'browser', 'ws-lesson-fill', ['--lessons', keys.join(',')], { missingMsg: 'ws-lesson-fill is not in this tree' }));
         // (lf-roles r16 F3, lead: a Guided continuation page's cells hold their content - CELL-FITS, two-step stories M / L)
         add(gate('guided-cellfit', 'ws-guided-cellfit (CELL-FITS: Guided pages 2+ hold their cells; GUIDED-HINT-LEAK box numbers; HINT-OVERMASK given numbers stay - HINT-UNIFORM waits on lf-algebra)', 'the Guided role', 'browser', 'ws-guided-cellfit', ['--only', 'CELL-FITS,HINT-LEAK,HINT-OVERMASK'], { missingMsg: 'ws-guided-cellfit is not in this tree' }));
         // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
@@ -1011,6 +1017,8 @@ function buildPlan(ctx) {
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));
         // critic 2026-10-30 (WRM Y4 lessons F1, GATE-DRIFT): a skill, option or preset change can turn a site-lesson claim false;
         // every year's lessonfit runs on any skill scope (node, about a minute)
+        // PSC-TITLE / PSC-INSTR / PSC-DEAL (lf-roles critic D2-D4): the run's skills' Pre-skill Check pages
+        if (scriptPath('ws-psc-lint')) add(gate('psc-lint-skills', 'ws-psc-lint (PSC-TITLE, PSC-INSTR, PSC-STRIP1, PSC-TWIN(-MIX), PSC-DEAL on the run\'s skills, M / L, Forms A and B; PSC-LESSON on g3-oa8-two-step-wp)', scope, 'browser', 'ws-psc-lint', ['--skills', keys.join(',')], { missingMsg: 'ws-psc-lint is not in this tree' }));
         // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
         // at S / M / L, its option variants, and the screen hosts (card 1280 / 1366 / 820 / 1024, worksheet, quiz; owner 2026-11-13: no phone width), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
@@ -1021,6 +1029,9 @@ function buildPlan(ctx) {
         // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
         // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
+        // (lf-algebra after patterns critic r3: the lesson's chart panels and We Do rows are not a card role, so --card never drew them;
+        // the A1 count-row overflow - backtest npr-lesson-train-oneline - is judged on the lesson pages too)
+        add(gate('cell-checks-lesson', 'ws-cell-checks --roles lesson (OVERFLOW on the lesson chart panels and We Do rows)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--roles', 'lesson', '--rules', 'OVERFLOW'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         // (lf-roles 2026-11-14, lf-engine -roles critic r2 F5: no key prints the generator's raw JSON as an answer, any role)
         add(gate('key-json', 'ws-key-json (L-KEY: no raw JSON answer on any key or page, every role)', scope, 'browser', 'ws-key-json', ['--skills', keys.join(',')], { missingMsg: 'ws-key-json is not in this tree' }));
         // (lf-roles 2026-11-14, lf-ops critic-cbt-r2 E1: a True or False? equation stem must be true of the answer)
@@ -1045,7 +1056,10 @@ function buildPlan(ctx) {
         add(gate('precritic-clean', 'ws-precritic-clean (the lane status clean list: no open critic finding, every claimed role page-fill linted)', scope, 'node', 'ws-precritic-clean', ['--skill', keys.join(',')], { missingMsg: 'ws-precritic-clean is not in this tree' }));
         // (lf-algebra r10, critic r2 G5 / G6 / G8: the patterns cells against the page - Fix-it letters printed in the item, the card's
         // feature tile size, the growing row two across at S; OK (n/a) for a skill outside the patterns card)
-        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS, TRAIN-PARITY)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        // (lf-algebra after patterns critic r3 R3-1/2/3/6/7, lead ruling 2026-11-20: INSTR-SLOTS is general - a page's instruction
+        // and Steps match its slots: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME; browser, --strict on the run's skills)
+        add(gate('instr-slots', 'ws-instr-slots (INSTR-SLOTS: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME on 7 roles x M / L)', scope, 'browser', 'ws-instr-slots', ['--skills', keys.join(','), '--roles', 'independent,more-practice,guided,test,opener,pre-skill-check,lesson', '--strict'], { missingMsg: 'ws-instr-slots is not in this tree' }));
         // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
         // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
         // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
@@ -1204,8 +1218,14 @@ function buildPlan(ctx) {
         // - Scripted Model and Guided, the pages that run nearest full - printed to a real PDF at S, M and L and rasterised
         // (RR-PAGES the plan's page count, RR-EDGE no ink at the paper's edge, RR-CLIP no clipped or covered text). Only
         // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
-        add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × M/L`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // (critic lf-engine-rowcap-s2 F1-F3: RR-BOX - every frame edge inked in print - on EVERY role whose rows the row cap holds)
+        const RASTER_ROLES = 'scripted-model,guided,error-analysis,pre-skill-check,review,test,independent,mixed-practice,opener';
+        add(gate('raster-fit', `ws-grade-render --raster-fit (${RASTER_ROLES} printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP, RR-BOX)`, `${scope} × ${RASTER_ROLES} × M/L`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', RASTER_ROLES, '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // PAGEFILL on the roles whose rows the cap holds (critic lf-engine-rowcap-s2 F4 / F5): an empty strip over 20 % of the problem
+        // area under the grid on Review, Test, Error Analysis or Opener, at M and L
+        for (const sz of ['M', 'L']) add(gate(`print-lint-fill-${sz}`, `ws-print-lint --source kit --roles review,test,error-analysis,opener --fill-roles (same) --size ${sz} --lints L-DENSITY (PAGEFILL on the capped roles)`, `${scope} × review, test, error-analysis, opener × ${sz}`, 'browser', 'ws-print-lint',
+            ['--source', 'kit', '--roles', 'review,test,error-analysis,opener', '--fill-roles', 'review,test,error-analysis,opener', '--size', sz, '--lints', 'L-DENSITY', '--skills', keys.join(',')], { parse: PARSE.printLint }));
         // ROLE COVER (lf-ops critic cbt r2 root cause, lead 2026-11-14): print-lint, empty-band and raster-fit on EVERY role the
         // signed card offers (no card: every buildSheet role) at M and L, AND under every option value that changes the drawing
         // (tests/lib/ws-drawing-variants.mjs: another drawing vocabulary or size class, or a page option; one value a drawing).
@@ -1285,6 +1305,11 @@ function buildPlan(ctx) {
         // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
         // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
         add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: a twin fitted narrow and then wide returns to its own --mq-k2)
+        add(gate('twin-fit-reset', 'ws-twin-fit-reset (TWIN-FIT-RESET: a worksheet twin narrowed and widened again is not left shrunk)', 'number_patterns_rule worksheet @1024', 'browser', 'ws-twin-fit-reset', [], { missingMsg: 'ws-twin-fit-reset is not in this tree' }));
+        // (FIT-FLOOR / FIT-RESET, lf-hosts 2026-11-20: the host twin fit never crosses the 29 px digit floor, no sideways scroll, a resize
+        // refits from the drawing's own size; a fixed twin-drawn sample on card / worksheet / quiz)
+        add(gate('fit-floor', 'ws-fit-floor (FIT-FLOOR / FIT-RESET: the host twin fit keeps digits >= 29 px and refits on a new width)', 'twin sample x card / worksheet / quiz x 820 / 1024 / 1280 / 1366', 'browser', 'ws-fit-floor', [], { missingMsg: 'ws-fit-floor is not in this tree' }));
         // lf-hosts skip (owner request 2026-11-19): Skip on the practice card, online worksheet, quiz and MAP test - the button,
         // the count, never wrong, the end-of-run return pass (same item, scored once), "skipped" in the teacher's results, the
         // teacher's off; a fixed mult_facts run, planned once per --skill run, at the widths of tests/lib/ws-screen-widths.cjs
@@ -1327,6 +1352,9 @@ function buildPlan(ctx) {
         // ---- HINT-NO-BLANK (lf-placevalue 2026-11-20; first found on placevalue:digit_value_unit_form, ws-unit-form-bank check 5):
         // the screen help - "Here is how" steps, the Say line, the hint, the Show Solution steps - never shows an unfilled blank
         add(gate('hint-no-blank', 'ws-hint-no-blank (HINT-NO-BLANK: no "___" / {n} / gap "?" in the screen help: worked steps, Say line, hint, solution; HELP-EMPTY pinned)', `${scope} × 4 seeds`, 'browser', 'ws-hint-no-blank', ['--skill', keys.join(',')], { missingMsg: 'ws-hint-no-blank is not in this tree' }));
+        // ---- SOL-TEXT (lf-placevalue 2026-11-20; HINT-NO-BLANK r3 R3-3 / R3-4): the Show Solution popup prints readable text:
+        // no "[object" / undefined / NaN (SOL-OBJECT), and its "Problem:" line restates the question (SOL-PROBLEM)
+        add(gate('solution-text', 'ws-solution-text (SOL-OBJECT: no [object / undefined / NaN in Show Solution; SOL-PROBLEM: the Problem line restates the question, no "? + ___")', `${scope} × 4 seeds`, 'browser', 'ws-solution-text', ['--skill', keys.join(',')], { missingMsg: 'ws-solution-text is not in this tree' }));
         // ---- lane lf-vocab (2026-11-07; design/cards/vocabulary): the picture vocabulary rules V1-V7 (every word drawn, one
         // right answer an item, no word twice on a page, every lesson set splits into two clash-free trios) whenever a picture
         // vocabulary skill is in scope. Default parse: its last "ws-vocab-unit: OK|FAIL" line and its exit code.
@@ -1437,6 +1465,9 @@ function buildPlan(ctx) {
             // PSC-REVIEW-DOMAINS / PSC-SCORES (card design/cards/psc-review, lead 2026-11-20): the Quick review band and the two scores
             if (ctx.role === 'pre-skill-check' && scriptPath('ws-psc-review')) { add(gate('psc-review-self', 'ws-psc-review --self-test (PSC-REVIEW-DOMAINS / PSC-SCORES judges)', 'planted plans', 'node', 'ws-psc-review', ['--self-test'], { missingMsg: 'ws-psc-review is not in this tree' }));
                 add(gate('psc-review', 'ws-psc-review (PSC-REVIEW-DOMAINS, PSC-SCORES: add_facts M/L, div_facts M)', 'PSC fixtures', 'browser', 'ws-psc-review', [], { missingMsg: 'ws-psc-review is not in this tree' })); }
+            // PSC-TITLE / PSC-INSTR / PSC-DEAL (lf-roles critic D2-D4, 2026-11-20): the Pre-skill Check's title, instructions and deal
+            if (ctx.role === 'pre-skill-check' && scriptPath('ws-psc-lint')) { add(gate('psc-lint-self', 'ws-psc-lint --self-test (PSC-TITLE / PSC-INSTR / PSC-TWIN-MIX / PSC-DEAL judges)', 'planted cases', 'node', 'ws-psc-lint', ['--self-test'], { missingMsg: 'ws-psc-lint is not in this tree' }));
+                add(gate('psc-lint', 'ws-psc-lint (PSC-TITLE, PSC-INSTR, PSC-STRIP1, PSC-TWIN(-MIX), PSC-DEAL on every passed PSC skill, M / L, Forms A and B; PSC-LESSON on g3-oa8-two-step-wp)', 'passed PSC skills', 'browser', 'ws-psc-lint', [], { missingMsg: 'ws-psc-lint is not in this tree' })); }
             if (ctx.role === 'true-false') add(gate('tof-stem-role', 'ws-tof-stem (TOF-STEM) on the role sample', `role true-false × ${rk.length} skill(s)`, 'browser', 'ws-tof-stem', ['--skills', rk.join(',')], { missingMsg: 'ws-tof-stem is not in this tree' }));
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }

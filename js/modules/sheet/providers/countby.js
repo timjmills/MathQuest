@@ -258,7 +258,7 @@ registerSkill('patterns:number_patterns_rule', {
             ] : [
                 'Look at the jumps.',
                 'Name the rule.',
-                'Use the rule at the gap.',
+                'Write the number at the gap.',
                 'Every gap. Check each jump.',
             ],
             say: 'The rule is __. The next number is __.',

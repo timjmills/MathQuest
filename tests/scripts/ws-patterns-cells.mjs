@@ -17,6 +17,7 @@
 //              times-table row mq-nt-row, the growing given counts mq-gp-count, a feature track's given tiles past the
 //              first); on the screen twin every hint part is marked data-ws-hint="fade" and the quiz hides that mark
 //              (css/quiz-mode.css), so a quiz shows none.
+//   TRAIN-PARITY (critic r3 R3-8) a number_patterns_rule practice train takes as many lines as the chart's (full-width panel).
 //   STATE-PROGRESS (critic r1 F5) the lesson's anchor chart: each panel draws the example as it looks after its step
 //              (lesson-pages/chart.js stateDrawing over the provider's worked steps, stateGroups): two adjacent panels never
 //              draw the same picture, and a panel whose step says "Write N" shows N in its drawing. Judged on
@@ -191,6 +192,28 @@ if (mineState.length) {
         }
         if (!judged) out.push(`STATE-PROGRESS ${sk}: no item with two or more worked steps`);
     }
+}
+
+// TRAIN-PARITY (critic r3 R3-8, AX-4): a number_patterns_rule train on a practice page (a full-width paper cell, no cellLiveMm)
+// takes as many lines as the same train in the lesson chart's full-width panel (cellLiveMm 170): the chart stood 8 tiles on one
+// line while the practice rows wrapped 4 + 4 at the same digit size. Places [1, 10, 100, 1000] and [100], M and L, 6 items.
+if (mineState.includes('patterns:number_patterns_rule') || only.includes('number_patterns_rule')) {
+    const { loadApp, fnv } = await import(pathToFileURL(join(dirname(fileURLToPath(import.meta.url)), 'ws-card-rulings.mjs')).href);
+    const app = await loadApp(ROOT);
+    const cell = kit.getCell('count-row');
+    const lines = (html) => (String(html).match(/class="k2-countrow-line"/g) || []).length || 1;
+    let judged = 0;
+    for (const places of [[1, 10, 100, 1000], [100]]) for (const size of SIZES) for (let i = 0; i < 6; i++) {
+        let q = null;
+        try { q = app.gq.generateQuestionFor({ category: 'patterns', skill: 'number_patterns_rule', opts: { places }, seed: (fnv(`npr:train:${places}`) ^ Math.imul(i + 1, 2654435761)) >>> 0, itemIndex: i }); } catch (e) { q = null; }
+        if (!q || !q.cell || q.cell.template !== 'count-row' || !cell) continue;
+        const base = { size, look: 'ican', mode: 'print', state: 'blank', columns: 1, metrics: kit.metricsFor ? kit.metricsFor(size) : undefined };
+        const prac = lines(cell.render(q.cell.payload, base));
+        const chartL = lines(cell.render(q.cell.payload, Object.assign({}, base, { cellLiveMm: 170 })));
+        judged++;
+        if (prac !== chartL) fails.push(`TRAIN-PARITY ${size} places [${places}] item ${i} (${(q.cell.payload.values || []).length} tiles): the practice row takes ${prac} line(s), the chart's ${chartL}`);
+    }
+    if (!judged) fails.push('TRAIN-PARITY: no count-row item dealt');
 }
 
 // --rules A,B: only those rules' findings count (a backtest of one rule on a commit before the others were fixed)

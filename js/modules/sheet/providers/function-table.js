@@ -15,9 +15,18 @@
 // Pure module (SCC-01).
 
 import { registerSkill } from '../contract.js';
-import { chooseWrong, strings, step, clampSteps } from './util.js';
+import { chooseWrong, strings, step as rawStep, clampSteps } from './util.js';
 import { applyRule, ruleText, ruleOn, ftSlots, FT_GLYPH } from '../cells/function-table.js';
 
+/** A worked step whose expressions never break after an operator: "−\u00a02", "=\u00a011" joined by a no-break space (the lesson
+ *  chart's step words wrapped "Write the rule n −" / "2.", ws-print-lint L-WRAP WRAP-OP, patterns precritic 2026-11-20 A8c). */
+// (only AFTER the operator: a line may break before "− 2", never after "−" - joining both sides made the runs long enough
+// to push the chart's panels further out of their cells)
+// (critic r3 R3-5: nor BEFORE it - "7 / + 6 = 13", "n / + 6". A whole short expression is one unit: every space beside an
+// operator after an operand (a number, the letter n) is a no-break space; after a word ("is − 2") only the right side joins,
+// as A8c, and a sign named as a word ("try −.") may start a line. A line may break at a comma or between words.)
+const nbOps = (t) => String(t).replace(/(\d|\b[a-zA-Z]\b|\)) ([+−×÷=<>]) (?=\S)/g, '$1 $2 ').replace(/ ([+−×÷=<>]) (?=\S)/g, ' $1 ');
+const step = (text, ...rest) => rawStep(nbOps(text), ...rest);
 const payloadOf = (q) => (q && q.cell && q.cell.template === 'function-table' && q.cell.payload) || (q && q.ftCheck) || null;
 const taskOf = (q) => { const p = payloadOf(q); return p ? p.task : null; };
 
@@ -98,7 +107,8 @@ function workedSteps(q) {
             // Lesson 5 order for + / − (the sign picks the variant): bigger or smaller first, then the change.
             const bigger = rule[0].op === '+';
             out.push(step(`Out is ${bigger ? 'bigger' : 'smaller'}: try ${bigger ? '+' : '−'}. ${a.x} to ${a.y} is ${bigger ? '+' : '−'}\u00a0${rule[0].n}.`));
-            out.push(step(`Test ${ruleText(rule)} on every row: ${p.rows.slice(1).map((r) => `${ruleOn(rule, r.x)} = ${r.y}`).join(', ')}. It works.`));
+            // (R3-5: each expression is one unit now, so the words are a line shorter - "It works." left to the Say band and the ticks)
+            out.push(step(`Test ${ruleText(rule)} on every row: ${p.rows.slice(1).map((r) => `${ruleOn(rule, r.x)} = ${r.y}`).join(', ')}.`));
         } else {
             out.push(step(`One + or one × does not fit every row: try two steps.`));
         }

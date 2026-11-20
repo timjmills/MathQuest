@@ -50,7 +50,7 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `preSkillsWhy: '...'`: why a hand-named preSkills list checks fewer than three skills (ws-node-lint PRE-QUADRANTS, critic
     // cbt r2 E2: a list of one drew one quadrant on a 75 % empty page). Absent: the list names three or more.
     'preSkillsWhy',
-    // `screenHelp(q) -> {steps?: string[], say?: string}`: the on-screen help only (support-ladder.js "Here is how" and its
+    // `screenHelp(q) -> {steps?: string[], say?: string, hint?: string}`: the on-screen help only (support-ladder.js "Here is how", its hint popup and its
     // Say line), for a skill whose printed worked steps state the answer (S8): steps that teach the route without it and a
     // Say line with the answer as its one gap. Never read by a page role (HINT-NO-BLANK r2, lf-placevalue 2026-11-20).
     'screenHelp',
@@ -309,9 +309,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'product-even-odd': 'Is the product even or odd? Circle one.',
     'pattern-true-one': 'Read the pattern. Check the sentence that is true.',
     'row-true-false': 'Read the sentence. Circle True or False.',
-    'grow-next': 'Draw Term 4. Write how many it has.',
-    'grow-rule': 'Draw Term 4. Write how many it has. Write the rule.',
-    'grow-far': 'Find the rule. Write how many Term 10 has.',
+    // (lf-algebra critic r3 R3-3 / R3-7: the words name every slot - the Term 1-3 count boxes the Test leaves empty, Term 10)
+    'grow-next': 'Draw Term 4. Write how many each term has.',
+    'grow-rule': 'Draw Term 4. Write how many each term has. Write the rule.',
+    'grow-far': 'Draw Term 4. Write how many each term has, up to Term 10.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

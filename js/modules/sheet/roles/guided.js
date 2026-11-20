@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, NO_STRETCH_ROOM, tightRows, rowStretches, koMm, oneRowCapOf } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches, koMm, oneRowCapOf, rowCapMm, NO_STRETCH_ROOM } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -102,6 +102,8 @@ export const partialEndOf = (cols, span, n = Infinity, span2 = 0) => {
 };
 /** The row the first tries sit in. */
 // (a div_facts Mix page whose Models fill the first row - mixModels - has its first tries in row 2)
+/** The height a fact Model's think cue ("6 x __ = 24") reserves under its fact (mm). */
+const THINK_CUE_MM = 17;
 const partialRowOf = (cols, span, nModels = 1, span2 = 0) => (span || span2 >= cols || cols === 1 || nModels >= cols ? 1 : 0);
 /**
  * A Mix page's hinted tries: the tries in the row after the last Model (the rest of that row when
@@ -497,7 +499,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     const lines = model && items.length > 1 && !thinkCueOf(model) && !noLines ? (span2 ? sideLinesOf(model) : workLinesOf(model)) : [];
     const span = !span2 && !noSpan && cols > 1 && lines.length > 1;
     const extra = !model || items.length < 2 ? 0
-        : thinkCueOf(model) ? 17
+        : thinkCueOf(model) ? THINK_CUE_MM
         : span2 ? (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + Math.max(0, sideLinesMm(lines, cols, m, span2) - h0)
         : span ? TAB_CLEAR_MM + Math.max(0, workLinesMm(lines, 2, m) - h0)
         : (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + workLinesMm(lines, cols, m);
@@ -1422,6 +1424,23 @@ export function plan(input = {}) {
         // A one-column page holding ONE word-work story takes the row the story draws - its measured work and writing room, the
         // Model's tab clearance and worked lines, the hint line (w) - and the spare height stays under the grid (PAGE_TYPES 12.1).
         if (cols === 1 && rows === 1 && host.length === 1 && host[0].template === 'word-work') Hr = [Math.min(Hr[0], w[0])];
+        // ROW-STRETCH CAP (stage 2, critic lf-engine-rowcap r1 F4: one engine rule, layout.rowCapMm): a row is held to what it draws
+        // (w: its tallest item, the Model's worked lines, the hint line) + its templates' writing room; the spare stays under the grid
+        // (drawn: w is the measure + 1 mm and the measure holds a number tab's keep-out a Guided cell does not draw (CL-14) - unless
+        // the tight rows already took it off - so the row draws w - 1 - koMm; never below the planned need where that is larger)
+        const koCap = tightAll ? 0 : koMm(ctx.size);
+        // (a fact Model's think cue reserves THINK_CUE_MM in the plan (extra); it draws one boxed text line and its gap - the rest of
+        // the reserve is not drawn, so the cap is reckoned without it)
+        const cueSlack = (r) => (pi === 0 && r === 0 && nModels === 1 && use[0] && thinkCueOf(use[0]) ? Math.max(0, THINK_CUE_MM - (((ctx.s && ctx.s.textPt) || 14) * 1.2 * (25.4 / 72) + 4.7)) : 0);
+        // (critic rowcap-s2 F2, add_wp_10_plain Guided L p2 cut 1.3 mm short: the keep-out comes off the CAP only - every row stays at
+        // least its measured ink + 1 mm (hsOf: the measure + 1, at its drawn level), since a cell
+        // may draw the keep-out the measure holds. An exempt row (layout.rowCapMm Infinity) keeps the height planned for it.)
+        Hr = Hr.map((x, r) => {
+            // (the measured ink: the items' own measure - the Model's lines and the hint line are reserves the cap reckons in d)
+            const ink = Math.max(1, ...hsOf(r));
+            const d = w[r] - 1 - koCap - cueSlack(r);
+            return Math.min(x, Math.max(ink, d, rowCapMm(d, rowItems(r))));
+        });
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
