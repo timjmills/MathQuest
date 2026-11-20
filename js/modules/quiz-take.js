@@ -18,12 +18,21 @@ import {
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback, wirePlaceWordBank,
 } from './screen-cell.js';
 import { speakExplanation } from './hints-speech.js';
+import { showSkipReturnIntro, clearSkipReturnUI } from './skip-rule.js';
 
 let quizTimerInterval = null;
 let quizStartTime = 0;
 let quizTimeLimit = 0; // ms, 0 = no limit
 let quizAnswers = [];  // { studentAnswer, correct, timeSpent } indexed by globalIdx
 let quizFlags = [];    // boolean array indexed by globalIdx
+// Skip (lf-hosts, owner request 2026-11-19): Skip IS the Flag - it flags the question and moves on.
+// Before the review / submit, the return pass walks every flagged or unanswered question, one at a
+// time, after "You skipped n. Let's fix them." A question still unanswered after it is stored
+// `skipped: true` and the teacher's results read "Skipped". The teacher turns it off per quiz
+// (settings.allowSkip, default on; saved with the quiz and in its share link).
+let quizSkipped = [];  // boolean array indexed by globalIdx: the pupil pressed Skip on it
+let quizReturn = null; // { queue: [displayIdx], pos, active, done } - the end-of-run return pass
+const quizSkipOn = () => !!(state.currentQuiz && state.currentQuiz.settings && state.currentQuiz.settings.allowSkip !== false);
 let quizQuestionStartTime = 0;
 let quizPhase = 'landing'; // 'landing' | 'active' | 'review' | 'results'
 
@@ -124,6 +133,8 @@ export function startQuizTest() {
     const totalCount = allQs.length;
     quizAnswers = allQs.map(() => ({ studentAnswer: '', correct: false, timeSpent: 0 }));
     quizFlags = allQs.map(() => false);
+    quizSkipped = allQs.map(() => false);
+    quizReturn = null;
 
     // Build question order based on sectionMode
     const sectionMode = test.settings.sectionMode || 'sequential';
@@ -310,6 +321,7 @@ function renderQuizInterface() {
             </div>
             <div class="qt-topbar-right">
                 ${quizTimeLimit > 0 ? '<span class="qt-timer" id="qtTimer">--:--</span>' : ''}
+                ${quizSkipOn() && skippedOpen() > 0 ? `<span class="mq-skip-count qt-skip-count" id="qtSkipCount" role="status" style="display:inline-flex;">Skipped: ${skippedOpen()}</span>` : ''}
                 <span style="font-size:0.85rem;color:var(--text-dim);">${answered}/${total} answered</span>
             </div>
         </div>
@@ -317,6 +329,7 @@ function renderQuizInterface() {
             <div class="qt-progress-bar" style="width:${progressPct}%"></div>
         </div>
         ${sectionHeaderHtml}
+        ${quizReturn && quizReturn.active ? `<div class="mq-skipret-banner" id="qtReturnBanner" role="status">Skipped problem ${quizReturn.pos + 1} of ${quizReturn.queue.length}</div>` : ''}
         <div class="qt-question-card">
             ${renderQuizQuestion(qItem, flatIdx)}
         </div>
@@ -325,7 +338,9 @@ function renderQuizInterface() {
             <div class="qt-q-grid">
                 ${dotGridHtml}
             </div>
-            ${state.quizQuestionIndex < total - 1
+            ${quizReturn && quizReturn.active
+                ? `<button class="qt-nav-btn next" id="qtReturnNext" style="min-height:48px;" onclick="quizReturnNext()">${quizReturn.pos < quizReturn.queue.length - 1 ? 'Next' : 'Done'}</button>`
+                : state.quizQuestionIndex < total - 1
                 ? '<button class="qt-nav-btn next" onclick="navigateQuizQuestion(1)">Next</button>'
                 : '<button class="qt-nav-btn submit" onclick="showQuizReview()">Review & Submit</button>'}
         </div>
@@ -420,6 +435,7 @@ function renderQuizQuestion(qItem, flatIdx) {
             <button class="qt-flag-btn ${quizFlags[flatIdx] ? 'flagged' : ''}" onclick="flagQuizQuestion(${flatIdx})">
                 ${quizFlags[flatIdx] ? 'Flagged' : 'Flag'}
             </button>
+            ${quizSkipOn() ? `<button type="button" class="qt-skip-btn" id="qtSkipBtn" onclick="skipQuizQuestion(${flatIdx})" aria-label="Skip this question">Skip ⏭</button>` : ''}
         </div>
         <div class="mq-qtpaper mq-scell">
             ${instrHtml ? `<div class="mq-instr">${instrHtml}</div>` : ''}
@@ -911,6 +927,50 @@ export function flagQuizQuestion(flatIdx) {
     renderQuizInterface();
 }
 
+/** Skipped and not answered yet: the "Skipped: n" count. */
+function skippedOpen() {
+    let n = 0;
+    for (let i = 0; i < quizSkipped.length; i++) if (quizSkipped[i] && !isAnswered(quizAnswers[i])) n++;
+    return n;
+}
+
+/** Skip = the Flag: flag the question, leave it unanswered, move on (no answer is recorded). */
+export function skipQuizQuestion(flatIdx) {
+    if (!quizSkipOn() || quizPhase !== 'active') return;
+    quizFlags[flatIdx] = true;
+    quizSkipped[flatIdx] = true;
+    if (quizReturn && quizReturn.active) { quizReturnNext(true); return; }
+    const total = state.quizAllQuestions.length;
+    if (state.quizQuestionIndex < total - 1) {
+        state.quizQuestionIndex++;
+        quizQuestionStartTime = Date.now();
+        renderQuizInterface();
+    } else {
+        showQuizReview();
+    }
+}
+
+/** The return pass: the next flagged / unanswered question, or the review once they are all back. */
+export function quizReturnNext(skipping) {
+    if (!quizReturn || !quizReturn.active || quizPhase !== 'active') return;
+    if (!skipping) {
+        const flatIdx = state.quizOrder[state.quizQuestionIndex];
+        const input = document.getElementById('qtAnswerInput');
+        if (input && input.value.trim()) recordAnswer(flatIdx, input.value.trim());
+        if (isAnswered(quizAnswers[flatIdx])) quizFlags[flatIdx] = false;
+    }
+    quizReturn.pos++;
+    if (quizReturn.pos >= quizReturn.queue.length) {
+        quizReturn.active = false;
+        quizReturn.done = true;
+        showQuizReview();
+        return;
+    }
+    state.quizQuestionIndex = quizReturn.queue[quizReturn.pos];
+    quizQuestionStartTime = Date.now();
+    renderQuizInterface();
+}
+
 // ---- Review Screen ----
 
 export function showQuizReview() {
@@ -919,6 +979,23 @@ export function showQuizReview() {
     const input = document.getElementById('qtAnswerInput');
     if (input && input.value.trim()) {
         recordAnswer(flatIdx, input.value.trim());
+    }
+    // Before the review: the skipped (flagged) and unanswered questions come back, once per run.
+    // The pass is exactly the skipped questions still unanswered - the same n as the "Skipped: n" pill. A flagged
+    // question with an answer stays in the normal flag review; a blank never skipped is not in it (critic r1 F4).
+    if (quizSkipOn() && !quizReturn && quizPhase === 'active') {
+        const queue = state.quizOrder.map((fIdx, d) => (quizSkipped[fIdx] && !isAnswered(quizAnswers[fIdx]) ? d : -1)).filter((d) => d >= 0);
+        if (queue.length) {
+            const qr = { queue, pos: -1, active: false, done: false };
+            quizReturn = qr;
+            showSkipReturnIntro(queue.length, 'quiz', () => {
+                // the quiz may have been submitted under the intro (timer expiry): no pass on a finished quiz (F3)
+                if (quizReturn !== qr || quizPhase !== 'active') return;
+                qr.active = true;
+                quizReturnNext(true);
+            });
+            return;
+        }
     }
 
     quizPhase = 'review';
@@ -1031,6 +1108,8 @@ export async function submitQuiz() {
     }
 
     quizPhase = 'results';
+    // Timer expiry under the return-pass intro or mid-pass: the intro goes, still-skipped questions are "skipped" (F3)
+    clearSkipReturnUI();
     if (quizTimerInterval) {
         clearInterval(quizTimerInterval);
         quizTimerInterval = null;
@@ -1039,6 +1118,12 @@ export async function submitQuiz() {
     const test = state.currentQuiz;
     const result = state.currentQuizResult;
     if (!test || !result) return;
+
+    // A question the pupil skipped and never answered is "skipped" (scored as not answered)
+    for (let i = 0; i < quizAnswers.length; i++) {
+        if (quizSkipped[i] && !isAnswered(quizAnswers[i])) { quizAnswers[i].skipped = true; quizAnswers[i].correct = false; }
+    }
+    quizReturn = null;
 
     // Calculate score across all sections
     const allQs = state.quizAllQuestions;
@@ -1069,6 +1154,14 @@ export async function submitQuiz() {
 
 // ---- Results Screen ----
 
+/** The pupil's breakdown mark: a tick, a cross, or - for a question still skipped after the return pass - a neutral
+ *  "Skipped" (never a red cross: a skip is not a wrong answer; the teacher's view reads "Skipped" too). */
+function resultIcon(a) {
+    if (a && a.correct) return '<span class="correct-icon">&#10003;</span>';
+    if (a && a.skipped) return '<span class="skipped-icon" aria-label="Skipped">Skipped</span>';
+    return '<span class="incorrect-icon">&#10007;</span>';
+}
+
 function showQuizResults() {
     const test = state.currentQuiz;
     const result = state.currentQuizResult;
@@ -1098,14 +1191,12 @@ function showQuizResults() {
                 }
                 const q = allQs[fIdx].question;
                 const a = result.answers[fIdx];
-                const icon = a && a.correct
-                    ? '<span class="correct-icon">&#10003;</span>'
-                    : '<span class="incorrect-icon">&#10007;</span>';
+                const icon = resultIcon(a);
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
                     detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(quizAnswerText(q.questionData, q.questionData.ans))}</span>`;
                 }
-                breakdownHtml += `<div class="qt-result-q">
+                breakdownHtml += `<div class="qt-result-q${a && a.skipped ? ' qt-result-skipped' : ''}">
                     ${icon}
                     <span>Q${displayIdx + 1}</span>
                     <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml((q.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 50)}</span>
@@ -1117,14 +1208,12 @@ function showQuizResults() {
             state.quizOrder.forEach((fIdx, displayIdx) => {
                 const q = allQs[fIdx].question;
                 const a = result.answers[fIdx];
-                const icon = a && a.correct
-                    ? '<span class="correct-icon">&#10003;</span>'
-                    : '<span class="incorrect-icon">&#10007;</span>';
+                const icon = resultIcon(a);
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
                     detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(quizAnswerText(q.questionData, q.questionData.ans))}</span>`;
                 }
-                breakdownHtml += `<div class="qt-result-q">
+                breakdownHtml += `<div class="qt-result-q${a && a.skipped ? ' qt-result-skipped' : ''}">
                     ${icon}
                     <span>Q${displayIdx + 1}</span>
                     <span style="flex:1;font-size:0.82rem;color:var(--text-dim);">${escHtml((q.questionData.text || '').replace(/<[^>]*>/g, '')).substring(0, 50)}</span>

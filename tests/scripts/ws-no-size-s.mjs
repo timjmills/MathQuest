@@ -98,6 +98,7 @@ export const ALLOW = [
     { file: 'tests/scripts/wave1-c2-onepage.cjs', has: '*', rule: 'GATE-TOKEN', why: 'measures the compact one-page count-by layout, the ruled exception that still prints at the kit S token' },
     { file: 'tests/scripts/ws-cell-checks.cjs', has: 'sizeSFindings([{', rule: 'GATE-TOKEN', why: 'self-test fixture of the size rule (planted rows), no page is printed' },
     { file: 'tests/scripts/ws-empty-band.cjs', has: "const cases = [['guided', 'S', 10, false]", rule: 'GATE-TOKEN', why: 'self-test fixture rows of the band limits per token' },
+    { file: 'tests/scripts/ws-empty-band.cjs', has: "r4 Object.freeze constant read", rule: 'GATE-TOKEN', why: 'self-test fixture string of roleConstOf (a role constant read back from source text), no page is printed' },
     { file: 'tests/scripts/ws-envelope.mjs', has: 'const capped = capCritic(', rule: 'GATE-TOKEN', why: 'self-test fixture of the critic sampler cap, no page is printed' },
     { file: 'tests/scripts/ws-print-lint.cjs', has: 'narrow Lines write-on line at size S (SL-3a exception)', rule: 'GATE-TOKEN', why: 'self-test probe of the SL-3a rule on a page tagged S (the compact token)' },
     { file: 'tests/scripts/ws-node-lint.mjs', has: "pupilHtml(q, 'S')", rule: 'GATE-TOKEN', why: 'L1 legacy rule: compares the kit S token with L in node (S still renders for an explicit request)' },

@@ -1,0 +1,5 @@
+{
+ "about": "lead ruling 2026-11-13 (lf-ops-props cbt r1 D2): the count-row template is exempt from WS-REFLOW; a sheet of NON-count-row cards (k2kit) whose tallest card grows 37 px is still judged. FAIL.",
+ "baseline": { "cols": 2, "cardH": 359.3, "cardW": 560, "boxW": 67.4, "boxH": 48.5, "digit": 29, "cardHs": [359.3, 359.3], "digits": [29, 29] },
+ "measured": { "cols": 2, "cardH": 396.1, "cardW": 560, "boxW": 67.4, "boxH": 48.5, "digit": 29, "cardHs": [396.1, 396.1], "digits": [29, 29], "templates": [["k2kit"], ["k2kit"]] }
+}

@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { SKILLS } from './data.js';
+import { endCardSkipReturn } from './skip-rule.js';
 
 export function showModal(message, onOk) {
     const modal = document.createElement("div");
@@ -35,7 +36,9 @@ export function getGameDescriptionText() {
 
     // Get category name
     const categorySelect = document.getElementById("categorySelect");
-    const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+    // no selected option (a second sheet started from code, selectedIndex -1) must not throw and lose the result
+    const _catOpt = categorySelect && categorySelect.options[categorySelect.selectedIndex];
+    const categoryName = _catOpt ? _catOpt.text : String(state.category || '');
 
     // Build description
     if (skillLabel) {
@@ -141,7 +144,11 @@ export function updateGoalProgress() {
 
     // Show total problems progress
     if (settings.totalProblemsEnabled && settings.totalProblems) {
-        const qText = `Q${state.qCount}/${settings.totalProblems}`;
+        // the return pass reads "Fixing k of n", not "Q5/5" (ruling R3)
+        const sr = state.skipReturn;
+        const qText = sr && sr.active && sr.pos >= 0
+            ? `Fixing ${sr.pos + 1} of ${sr.queue.length}`
+            : `Q${state.qCount}/${settings.totalProblems}`;
         progressText = progressText ? `${progressText} | ${qText}` : qText;
     }
 
@@ -171,6 +178,10 @@ export function checkProblemGoals() {
     // Check if total problems limit is reached
     if (settings.totalProblemsEnabled && settings.totalProblems) {
         if (state.qCount >= settings.totalProblems) {
+            // Skip (lf-hosts): skipped problems still to come back, or the return pass under way - the normal advance
+            // (nextQuestion) runs the return pass and then the end screen.
+            if (state.gameMode === 'practice' && !state.quizMode && ((state.skipReturn && !state.skipReturn.done)
+                || (!state.skipReturn && (state.questionHistory || []).some((h) => h && h.status === 'skipped' && h.q)))) return false;
             // Check if they met the correct goal
             const metGoal = !settings.correctGoalEnabled || (state.score >= settings.correctGoal);
             setTimeout(() => {
@@ -188,6 +199,13 @@ export function checkProblemGoals() {
 }
 
 export function endGame(win, message) {
+    // A run ends exactly once (lf-hosts F3): the goal check's 600 ms end, the advance past the last item (_endRun), the
+    // timer and Finish all land here; only the first writes the session row and opens the end screen. startGame clears it.
+    if (state._runEnded) return;
+    state._runEnded = true;
+    // The return pass ends with the run (timer expiry, goal reached): its intro and banner go, items still skipped
+    // stay "skipped" (critic r1 F3).
+    endCardSkipReturn();
     if (state.timerInterval) clearInterval(state.timerInterval);
     if (state.cpuInterval) clearInterval(state.cpuInterval);
     if (state.bossInterval) clearInterval(state.bossInterval);
@@ -230,7 +248,7 @@ export function endGame(win, message) {
     showEndGameModal(win, message || (win ? "Nice work!" : "Good try!"));
 }
 
-export function saveWorksheetToHistory(correct, total, isPassing) {
+export function saveWorksheetToHistory(correct, total, isPassing, skipped = 0) {
     const gameDesc = getGameDescriptionText();
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -254,7 +272,8 @@ export function saveWorksheetToHistory(correct, total, isPassing) {
         score: `${correct}/${total}`,
         result: isPassing ? "✅ Pass" : "❌ Retry",
         percentage: percentage,
-        timestamp: now.getTime()
+        timestamp: now.getTime(),
+        skipped: skipped || 0
     });
 
     // Keep only last 100 entries
@@ -316,7 +335,11 @@ export function saveToSessionHistory(win) {
         percentage: state.qCount > 0 ? Math.round((state.score / state.qCount) * 100) : 0,
         timestamp: now.getTime(),
         incomplete: false,
-        skills: skillBreakdown
+        skills: skillBreakdown,
+        // problems still skipped after the return pass (scored as not answered; lf-hosts skip)
+        skipped: (state.questionHistory || []).filter((h) => h && (h === 'skipped' || h.status === 'skipped')).length,
+        // of those, skipped after a wrong try: the wrong try stays visible to the teacher (critic r1 F6)
+        skippedAfterWrong: (state.questionHistory || []).filter((h) => h && h.status === 'skipped' && h.wasWrong).length
     });
 
     // Reset session skill tracking

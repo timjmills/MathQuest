@@ -253,7 +253,7 @@ export async function exportResultsCSV(testId) {
         ];
         for (let i = 0; i < qCount; i++) {
             const a = r.answers && r.answers[i];
-            row.push(a ? (a.correct ? 'correct' : 'incorrect') : 'skipped');
+            row.push(a && !a.skipped ? (a.correct ? 'correct' : 'incorrect') : 'skipped');
         }
         csv += row.join(',') + '\n';
     }

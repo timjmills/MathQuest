@@ -1,0 +1,145 @@
+{
+ "about": "ws-lesson-cellfits shrink-only KNOWN list (lead 2026-11-20): pages that overflowed when CELL-FITS landed, each owned by its lane. A page passes only while it does not get worse; remove it once fixed.",
+ "pages": {
+  "skill:placevalue:identify L lesson-mixed p4": {
+   "pieces": 2,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "skill:placevalue:value L lesson-mixed p4": {
+   "pieces": 4,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "skill:placevalue:expand L lesson-mixed p4": {
+   "pieces": 14,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "skill:placevalue:combine L lesson-mixed p4": {
+   "pieces": 22,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "skill:placevalue:unit_form L lesson-mixed p4": {
+   "pieces": 8,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "skill:placevalue:compare L lesson-mixed p4": {
+   "pieces": 16,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "skill:composing:number_word_form L lesson-sheet p2": {
+   "pieces": 1,
+   "worst": 1.5,
+   "owner": "lf-vocab"
+  },
+  "skill:composing:number_word_form L lesson-mixed p4": {
+   "pieces": 8,
+   "worst": 1.8,
+   "owner": "lf-placevalue"
+  },
+  "Y1.B2.S9 L lesson-sheet p2": {
+   "pieces": 2,
+   "worst": 1.5,
+   "owner": "lf-vocab"
+  },
+  "skill:subtraction:sub_50_no_regroup L lesson-mixed p4": {
+   "pieces": 6,
+   "worst": 0.6,
+   "owner": "lf-placevalue"
+  },
+  "Y2.B2.S17 L lesson-mixed p4": {
+   "pieces": 6,
+   "worst": 0.6,
+   "owner": "lf-placevalue"
+  },
+  "skill:subtraction:sub_2d_1d L lesson-mixed p4": {
+   "pieces": 6,
+   "worst": 0.6,
+   "owner": "lf-placevalue"
+  },
+  "Y3.B2.S12 L lesson-sheet p2": {
+   "pieces": 3,
+   "worst": 0.7,
+   "owner": "lf-vocab"
+  },
+  "Y4.B2.S5 L lesson-sheet p2": {
+   "pieces": 5,
+   "worst": 0.7,
+   "owner": "lf-vocab"
+  },
+  "skill:division:div_facts L lesson-sheet p2": {
+   "pieces": 2,
+   "worst": 1.5,
+   "owner": "lf-vocab"
+  },
+  "skill:algebra:multi_step_word M lesson-chart p1": {
+   "pieces": 156,
+   "worst": 58.0,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:multi_step_word L lesson-chart p1": {
+   "pieces": 156,
+   "worst": 58.0,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:multi_step_word_plain M lesson-chart p1": {
+   "pieces": 156,
+   "worst": 58.0,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:multi_step_word_plain L lesson-chart p1": {
+   "pieces": 156,
+   "worst": 58.0,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_add_then_mult M lesson-chart p1": {
+   "pieces": 114,
+   "worst": 41.6,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_add_then_mult L lesson-chart p1": {
+   "pieces": 114,
+   "worst": 41.6,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_add_then_div M lesson-chart p1": {
+   "pieces": 110,
+   "worst": 41.6,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_add_then_div L lesson-chart p1": {
+   "pieces": 110,
+   "worst": 41.6,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_estimate_check M lesson-chart p1": {
+   "pieces": 49,
+   "worst": 11.7,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_estimate_check M lesson-sheet p3": {
+   "pieces": 1,
+   "worst": 1.2,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_estimate_check L lesson-chart p1": {
+   "pieces": 49,
+   "worst": 11.7,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_estimate_check L lesson-sheet p3": {
+   "pieces": 3,
+   "worst": 21.5,
+   "owner": "lf-algebra"
+  },
+  "skill:algebra:two_step_estimate_check L lesson-mixed p8": {
+   "pieces": 15,
+   "worst": 4.2,
+   "owner": "lf-algebra"
+  }
+ }
+}

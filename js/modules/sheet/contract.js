@@ -47,6 +47,13 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // first, when data.js order would give the wrong ones (lf-vocab r9: a picture vocabulary task checked four Grade 6
     // definition-matching skills). Absent: the role takes the skills listed before it (print-sheet.js earlierSkills).
     'preSkills',
+    // `preSkillsWhy: '...'`: why a hand-named preSkills list checks fewer than three skills (ws-node-lint PRE-QUADRANTS, critic
+    // cbt r2 E2: a list of one drew one quadrant on a 75 % empty page). Absent: the list names three or more.
+    'preSkillsWhy',
+    // `screenHelp(q) -> {steps?: string[], say?: string}`: the on-screen help only (support-ladder.js "Here is how" and its
+    // Say line), for a skill whose printed worked steps state the answer (S8): steps that teach the route without it and a
+    // Say line with the answer as its one gap. Never read by a page role (HINT-NO-BLANK r2, lf-placevalue 2026-11-20).
+    'screenHelp',
     // `wrongText(q) -> WrongAnswer & {statement}`: a misconception's wrong answer that is shown only as TEXT (Reason It's
     // worked-wrong statement in words), because it does not fit the cell's own writing place (chart_120 'writes-ten-ten':
     // 1010 in a three-digit chart square; lead ruling 2026-11-13). Absent: none.
@@ -145,6 +152,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'true-false': 'Check one box: True or False. Finish the sentence.',
     // (PT-TOF-4: a page whose statements all have sentence answers prints no frame, so nothing to finish; lf-roles critic r1 R1)
     'true-false-judge': 'Check one box: True or False.',
+    // (critic cbt r3 m2: a page whose frames are all write-line LISTS - a count row's "Answer: __, __, __" - has no sentence to
+    // finish; the pupil writes the right numbers on a False one. ws-cell-checks SENTENCE-FRAME)
+    'true-false-list': 'Check one box: True or False. If False, write the right numbers.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
     'odd-one': 'Circle the one that does not belong. Finish the sentence.',
     asn: 'Check one box: Always, Sometimes or Never. Write an example.',
@@ -228,12 +238,12 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'table-in': 'Use the rule backward. Write each In number.',
     'table-make': 'Write your own In numbers. Use the rule for Out.',
     // Added 2026-09-25 with count by 1-12, number patterns, the chart tasks and x / ÷ on a line.
-    'count-by-row': 'Count by the number in the box. Write the missing numbers.',
+    'count-by-row': 'Count by the number in the arrow. Write the missing numbers.',
     // Wave 1 lane C2: count back, and a page that mixes counting on and back (the sign in the box says which).
     // 2026-10-03: skip_count_grid / skip_count_line on the count-row drawing.
     'skip-count-row': 'Skip count by the number in the box. Write the missing numbers.',
     'skip-count-line': 'Skip count along the line. Write the missing numbers in the boxes.',
-    'count-back-row':'Count back by the number in the box. Write the missing numbers.',
+    'count-back-row':'Count back by the number in the arrow. Write the missing numbers.',
     'count-sign-row': 'Count on (+) or back (\u2212). Write the missing numbers.',
     'pattern-rule': 'Use the rule. Write the missing numbers.',
     'pattern-find-rule': 'Find the rule. Write the missing numbers and the rule.',

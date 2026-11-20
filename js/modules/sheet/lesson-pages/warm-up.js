@@ -220,7 +220,13 @@ export function warmUpBand(env) {
                 const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
                 const hs = its.map((it) => hOf(it, shape[id].cols));
                 if (!hs.length || hs.some((h) => !(h > 0))) return Infinity;
-                return rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
+                // (critic cbt r1 D3, lead ruling 2026-11-12 (b): a Warm-up of items answered in place - a shape train, a count row,
+                // an array: `noStretch` / `inPlace` footprints and the k2kit / seqstrip train - does not grow past its measured height,
+                // not 1 / (1 - WARM_BAND): count_by_tables' number_seq_fill trains stood 2.3 x their ink, 34-35 % bands)
+                const inPlace = its.every((it) => it && ((it.footprint && (it.footprint.noStretch || it.footprint.inPlace)) || ['k2kit', 'seqstrip', 'count-row', 'arrays', 'arrays-turn'].includes(it.template)));
+                // (the measured height already carries the cell's slack over its ink: such a cell keeps it, not 1.25 x it - 30.5 % at M)
+                const cap = inPlace ? rowsOf(id) * Math.min(...hs) : Infinity;
+                return Math.min(rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND), cap) - hW;
             });
             const maxAdd = Math.max(0, Math.min(...room));
             groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, Object.assign({ h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }, Number.isFinite(maxAdd) ? { maxAdd } : {})));

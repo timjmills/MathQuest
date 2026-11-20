@@ -48,7 +48,7 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       await page.evaluate(() => { const d = document.querySelector('#skillOptionsPopover details.sko-play'); if (d && !d.open) d.querySelector('summary').click(); });
       await new Promise((r) => setTimeout(r, 200));
       const text = await page.evaluate(() => document.getElementById('skillOptionsPopover').innerText.replace(/\n+/g, ' | '));
-      check(/Skip appears after/i.test(text) && /Calculator/i.test(text), `${ref} opened Pupil play shows both controls: ${text.slice(0, 200)}`);
+      check(/Skip button/i.test(text) && /Calculator/i.test(text), `${ref} opened Pupil play shows both controls: ${text.slice(0, 200)}`);
       const el = await page.$('#skillOptionsPopover');
       await el.screenshot({ path: path.join(OUT, `option-panel-${categoryId}-${skillId}.png`) });
       await page.evaluate(() => { const p = document.getElementById('skillOptionsPopover'); if (p) p.remove(); });
