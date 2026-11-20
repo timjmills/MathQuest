@@ -939,10 +939,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // no two side by side in a row, every gap a printed neighbour) holds the most it can, silently.
         const _hcRaw = Number(_kOpt('tiles'));
         const _hcWant = [1, 2, 3, 4, 5, 6, 7, 8].includes(_hcRaw) ? _hcRaw : big ? [1, 2, 2, 3][_kDeal(4)] : CHART_TILES_DEFAULT;   // (number_chart_fill keeps its own "1 to 3, dealt")
-        // (every window of the band on the same rows - band 120's rows 91-120, and bands 20 and 30, whose windows are the whole
+        // (every window of the band on the same three rows - band 120's rows 91-120, and band 30, whose windows are the whole
         // band's rows: six windows side by side, so the sheet's gaps repeat every five columns - chart blanks r3, ws-empty-band
         // on hundreds_chart_fill {band: 30}: without the shared pattern four windows were dealt and stretched to the page)
-        const _sameRows = !big && _grid === 'window' && C === 5 && (_to120 ? R === 3 : rowHi - rowLo + 1 === R);
+        const _sameRows = !big && _grid === 'window' && C === 5 && R === 3 && (_to120 || rowHi - rowLo + 1 === R);
         const want = Math.min(chartGapCap(R, C, _sameRows && _gaps === 'scatter'), _hcWant);
         const neighbours = (i) => {
             const r = Math.floor(i / C), c = i % C, out = [];
