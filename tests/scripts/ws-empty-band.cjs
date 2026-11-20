@@ -141,9 +141,17 @@ const gdpCap = (role, size, tries) => (role === 'guided' && GDP_CAP[size] != nul
 // as drawn, else the grid's computed row-gap; rows: distinct row tops).
 const FIXED_CAP_ROLES = new Set(['pre-skill-check', 'true-false', 'reason-it', 'error-analysis', 'test']);
 const ONE_PAGE_ROLES = new Set(['pre-skill-check']);
+// r3 (critic eblast r2 G1 / G2, round cap; EBLAST-ADVISORY root cause): the rules INFERRED capacity from white space, so a page
+// full BY DESIGN read as "another row fits" (Mixed practice L at its 5-row §12.1 ceiling: 10 vs 21; Scripted Model frames: 6 vs
+// 10). Each role's DESIGNED ceiling is declared once in the kit (js/modules/sheet/role-capacity.js, WDS §12.1); the rules read it.
+let CAPK = null; try { CAPK = require(path.join(__dirname, '..', '..', 'js', 'modules', 'sheet', 'role-capacity.js')); } catch (e) { CAPK = null; }
+const declOf = (role) => (CAPK && role ? CAPK.roleCapacity(String(role).split(' ')[0]) : null);
+const atCap = (role, size, pg) => !!(CAPK && role && size && CAPK.atCeiling(String(role).split(' ')[0], size, pg));
 const rowFits = (pg) => !!pg && Number.isFinite(pg.rowMm) && pg.rowMm > 0 && pg.whiteMm >= pg.rowMm + (Number.isFinite(pg.gapMm) && pg.gapMm > 0 ? pg.gapMm : 0);
-const lastPageBad = (role, pg, pages = 1, fullRows = NaN) => {
+const lastPageBad = (role, pg, pages = 1, fullRows = NaN, size = null) => {
     if (!FIXED_CAP_ROLES.has(role) || !pg) return null;
+    // r3: "another row fits" counts only while the page is BELOW its declared ceiling (rows or items at this size)
+    if (atCap(role, size, pg)) return null;
     if (pages > 1 && !ONE_PAGE_ROLES.has(role)) return Number.isFinite(fullRows) && fullRows > 0 && Number.isFinite(pg.rows) && pg.rows * 3 < fullRows
         ? `the last of ${pages} pages holds ${pg.rows} row(s) against ${fullRows} on a full page (fewer than one third: PG-23 rebalances the rows across the pages)` : null;
     const gap = Number.isFinite(pg.gapMm) && pg.gapMm > 0 ? ` + ${pg.gapMm.toFixed(1)} mm gap` : '';
@@ -159,11 +167,35 @@ const lastPageNote = (role, src, job) => (FIXED_CAP_ROLES.has(role) ? '' : count
     ? ' - teacher-count role (PG-23: may end short), measured not judged' : ' - not a fixed-capacity role (PT-ENG-3 banded / fixed layout: the remainder stays blank at the foot), measured not judged');
 // CAP-PARITY (same root cause): items a page at L >= ceil(0.7 x items a page at M), for the same skill, role and seed, unless the
 // L page is full (its fill measure: no room for another row and its gap). m / l: {items, full} of page 1 at M and at L.
-const capParityBad = (m, l) => {
+// r3 (critic eblast r2 G1 / G2): with a role, it reads the role's DECLARED capacity - only a role that sets its own count ('role')
+// is judged (teacher-count and fixed-layout roles such as scripted-model are not: their L count is not a capacity); an L page AT
+// its declared L ceiling passes; the need is capped at the L ceiling (in items). capNotJudged says why a role is not judged.
+const capNotJudged = (role) => { const d = declOf(role); if (!d) return 'declares no capacity ceiling (js/modules/sheet/role-capacity.js)';
+    return d.by === 'role' ? null : d.by === 'teacher' ? 'the teacher sets the count (PG-23)' : d.by === 'fixed' ? `a fixed layout, not a capacity (${d.cite})` : `capacity by table, not one ceiling (${d.cite})`; };
+const capParityBad = (m, l, role = null) => {
     if (!m || !l || !(m.items > 0) || !(l.items >= 0)) return null;
-    const need = Math.ceil(0.7 * m.items);
-    return l.items < need && !l.full ? `${l.items} items a page at L against ${m.items} at M (needs >= ${need} = ceil(0.7 x ${m.items})), and the L page is not full (another row and its gap fit)` : null;
+    let need = Math.ceil(0.7 * m.items); let cap = '';
+    if (role) {
+        if (capNotJudged(role)) return null;
+        if (atCap(role, 'L', l)) return null;
+        const d = declOf(role);
+        if (d.unit === 'items' && d.L < need) { need = d.L; cap = `, capped at the declared L ceiling ${d.L}`; }
+    }
+    return l.items < need && !l.full ? `${l.items} items a page at L against ${m.items} at M (needs >= ${need} = ceil(0.7 x ${m.items})${cap}), and the L page is not full (another row and its gap fit)${role ? ` and is below its declared L ceiling (${declOf(role).L} ${declOf(role).unit})` : ''}` : null;
 };
+// The capacity-declaration check (r3 machine check first): every page role a skill in js/modules/redesign-passed.js renders (its
+// signed card's offered roles, else DEFAULT_ROLES) declares its ceiling. Returns {roles, gaps}.
+function capacityCheck() {
+    const src = fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'modules', 'redesign-passed.js'), 'utf8');
+    const ids = [...new Set([...src.matchAll(/^\s*'([a-z0-9_]+:[a-z0-9_]+)',?\s*$/gm)].map((m) => m[1]))];
+    const roles = new Set();
+    for (const key of ids) {
+        let r = null;
+        try { const p = JSON.parse(execFileSync(process.execPath, [path.join(__dirname, '..', 'lib', 'ws-card-plan.mjs'), '--skill', key, '--root', ROOT], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }))[0]; if (p && p.cards && p.cards.length && p.roles.length) r = p.roles; } catch (e) { r = null; }
+        for (const x of (r || ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'])) roles.add(x);
+    }
+    return { ids, roles: [...roles], gaps: CAPK ? CAPK.capacityGaps([...roles]) : ['js/modules/sheet/role-capacity.js: no declared capacity table'] };
+}
 // the page-fill measure of every page in scope (browser side): {pct, whiteMm, rowMm, gapMm, rows, items, size}
 const measurePageFill = (scope) => [...document.querySelectorAll(scope)].map((pg) => {
     const MM = 96 / 25.4; const size = pg.getAttribute('data-eb-size') || null;
@@ -331,6 +363,12 @@ function itemParityFinding(tagged, plain, what) {
 // (the limits are defined before --self-test: its centred EB-BAND cases call judge())
 const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
 const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
+if (argv.includes('--capacity-check')) {
+    const r = capacityCheck();
+    for (const g of r.gaps) console.log(`  FAIL ${g}`);
+    console.log(`ws-empty-band --capacity-check: ${r.gaps.length ? `FAIL (${r.gaps.length})` : 'OK'} (${r.roles.length} roles used by ${r.ids.length} passed skills)`);
+    process.exit(r.gaps.length ? 1 : 0);
+}
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
         const t = [['all named', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs --html x', rule: `${RULES.join(' ')} ${RULE_CASES.join(' ')}` }]).length, 0],
@@ -481,7 +519,21 @@ if (argv.includes('--self-test')) {
             ['F3 pre-skill-check spills, p2 45 %, row fits: FAIL (PT-PRE-1)', !!lastPageBad('pre-skill-check', { pct: 45, whiteMm: 107.2, rowMm: 44.1, gapMm: 3, rows: 2 }, 2, 2), true],
             // r2 F7: the note names the role's kind
             ['F7 review note: banded, not teacher-count', /PT-ENG-3 banded/.test(lastPageNote('review', roleSrc('review'), {})), true],
-            ['F7 independent note: teacher count', /teacher-count role \(PG-23/.test(lastPageNote('independent', roleSrc('independent'), {})), true]];
+            ['F7 independent note: teacher count', /teacher-count role \(PG-23/.test(lastPageNote('independent', roleSrc('independent'), {})), true],
+            // r3 (critic eblast r2 G1 / G2): the DECLARED ceiling (js/modules/sheet/role-capacity.js, WDS §12.1)
+            ['r3 the capacity table loads', !!CAPK, true],
+            ['r3 every role used by a passed skill declares its ceiling', capacityCheck().gaps.length, 0],
+            ['r3 a role with no declaration is a gap', CAPK ? CAPK.capacityGaps(['no-such-role']).length : 1, 1],
+            ['r3 mixed-practice L at 5 rows (its ceiling), a row fits: CAP-PARITY OK', !!capParityBad({ items: 21 }, { items: 10, rows: 5, full: false }, 'mixed-practice'), false],
+            ['r3 mixed-practice L at 5 rows: EB-LASTPAGE OK', !!lastPageBad('mixed-practice', { pct: 17, whiteMm: 39.8, rowMm: 37.2, gapMm: 0.5, rows: 5, items: 10 }, 1, 5, 'L'), false],
+            ['r3 mixed-practice L at 4 rows (below 5), 10 vs 21: CAP-PARITY FAIL', !!capParityBad({ items: 21 }, { items: 8, rows: 4, full: false }, 'mixed-practice'), true],
+            ['r3 pre-skill-check M, 1 of its declared rows used (4 of 20 items), row fits: FAIL', !!lastPageBad('pre-skill-check', { pct: 78, whiteMm: 186, rowMm: 44, gapMm: 3, rows: 1, items: 4 }, 1, 1, 'M'), true],
+            ['r3 pre-skill-check L at its 16-item ceiling: EB-LASTPAGE OK', !!lastPageBad('pre-skill-check', { pct: 35, whiteMm: 84, rowMm: 42, gapMm: 3, rows: 4, items: 16 }, 1, 4, 'L'), false],
+            ['r3 scripted-model: CAP-PARITY not judged', capNotJudged('scripted-model') !== null && !capParityBad({ items: 10 }, { items: 6, rows: 3, full: false }, 'scripted-model'), true],
+            ['r3 independent: CAP-PARITY not judged (teacher count)', /teacher/.test(capNotJudged('independent') || ''), true],
+            ['r3 pre-skill-check is judged', capNotJudged('pre-skill-check'), null],
+            ['r3 true-false 4 vs 6 at its L ceiling 4: OK', !!capParityBad({ items: 6 }, { items: 4, rows: 2, full: false }, 'true-false'), false],
+            ['r3 value pre-skill-check 3 vs 6 (L ceiling 16): FAIL', !!capParityBad({ items: 6 }, { items: 3, rows: 1, full: false }, 'pre-skill-check'), true]];
         const lbad = lc.filter(([, v, w]) => v !== w);
         for (const [n, got, want] of lbad) console.log(`self-test FAIL: ${n}: ${got}, want ${want}`);
         if (lbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-LASTPAGE / CAP-PARITY)`); process.exit(1); }
@@ -510,7 +562,7 @@ if (argv.includes('--self-test')) {
         const cbad = cc.filter(([, got, want]) => got !== want);
         for (const [nm, , want] of cbad) console.log(`self-test FAIL: EB-BAND centred ${nm} should ${want ? 'fail' : 'pass'}`);
         const n = bad.length + kbad.length + cbad.length;
-        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length}; EB-LASTPAGE 6 + CAP-PARITY 5; r2 gap 6 + count 6 + PG-23 4 + notes 2)`);
+        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length}; EB-LASTPAGE 6 + CAP-PARITY 5; r2 gap 6 + count 6 + PG-23 4 + notes 2; r3 declared ceilings 13)`);
         process.exit(n ? 1 : 0);
     }).catch((e) => { console.log(`self-test FAIL: cannot import the sheet kit (${e.message})`); console.log('ws-empty-band self-test: FAIL'); process.exit(1); });
     return;
@@ -971,11 +1023,11 @@ async function htmlMain() {
             const role = (/<meta name="eb-role" content="([^"]+)"/.exec(src) || [])[1] || arg('role', null);
             const groups = {}; for (const p of await sh.evaluate(measurePageFill, scope)) (groups[p.size || '-'] = groups[p.size || '-'] || []).push(p);
             for (const [z, pf] of Object.entries(groups)) {
-                const why = lastPageBad(role, pf[pf.length - 1], pf.length, pf[0].rows);
+                const why = lastPageBad(role, pf[pf.length - 1], pf.length, pf[0].rows, z === '-' ? null : z);
                 if (why) FA('EB-LASTPAGE', `${path.basename(HTML)} ${role} ${z} p${pf.length}`, why);
             }
             if (groups.M && groups.L) { const by = countSetBy(roleSrc(role), null);
-                const why = by === 'role' ? capParityBad({ items: groups.M[0].items, full: !rowFits(groups.M[0]) }, { items: groups.L[0].items, full: !rowFits(groups.L[0]) }) : null;
+                const why = by === 'role' ? capParityBad({ items: groups.M[0].items, rows: groups.M[0].rows, full: !rowFits(groups.M[0]) }, { items: groups.L[0].items, rows: groups.L[0].rows, full: !rowFits(groups.L[0]) }, role) : null;
                 if (why) FA('CAP-PARITY', `${path.basename(HTML)} ${role} M/L`, why); }
         }
         console.log(`note: ${slotInkNote(SLOT_INK)}`);
@@ -1084,12 +1136,12 @@ async function main() {
                         pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
-                            const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp, pf.length, pf[0].rows);
+                            const lp = pf[pf.length - 1]; const why = lastPageBad(j.role, lp, pf.length, pf[0].rows, j.size);
                             if (why) FA('EB-LASTPAGE', `${key} ${j.tag} p${pf.length}`, why);
                             else notes.push(`${key} ${j.tag} EB-LASTPAGE p${pf.length}/${pf.length}: ${lp.pct} % empty (${lp.whiteMm.toFixed(1)} mm, row ${Number.isFinite(lp.rowMm) ? lp.rowMm.toFixed(1) : '-'} mm, gap ${Number.isFinite(lp.gapMm) ? lp.gapMm.toFixed(1) : '-'} mm, ${lp.rows} row(s) of ${pf[0].rows} on p1)${lastPageNote(j.role, roleSrc(j.role), j)}`);
                         }
                         // CAP-PARITY: page 1's items and fill, per role and size (judged after the skill's jobs)
-                        if (pf.length && !j.tag.includes('{')) capRec[`${j.role}${j.cols ? ` cols ${j.cols}` : ''}`] = Object.assign(capRec[`${j.role}${j.cols ? ` cols ${j.cols}` : ''}`] || {}, { [j.size]: { items: pf[0].items, full: !rowFits(pf[0]), pages: pf.length, by: countSetBy(roleSrc(j.role), j) } });
+                        if (pf.length && !j.tag.includes('{')) capRec[`${j.role}${j.cols ? ` cols ${j.cols}` : ''}`] = Object.assign(capRec[`${j.role}${j.cols ? ` cols ${j.cols}` : ''}`] || {}, { [j.size]: { items: pf[0].items, rows: pf[0].rows, full: !rowFits(pf[0]), pages: pf.length, by: countSetBy(roleSrc(j.role), j) } });
                     }
                     if (has('grid-foot') && (j.cols ? /^(independent|more-practice|test|review)$/.test(j.role) : (j.role === 'test' || j.role === 'review')) && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
                         const gf = await sh.evaluate((scope) => {
@@ -1133,7 +1185,9 @@ async function main() {
             // CAP-PARITY (lf-ops critic cbt r3 F1): items a page at L >= ceil(0.7 x M) unless the L page is full; the counts are reported
             for (const [rk, z] of Object.entries(capRec)) if (z.M && z.L) {
                 if (z.M.by === 'teacher' || z.L.by === 'teacher') { notes.push(`${key} ${rk} CAP-PARITY not judged: the teacher sets the count (M ${z.M.items}/page, L ${z.L.items}/page)`); continue; }
-                const why = capParityBad(z.M, z.L);
+                { const nj = capNotJudged(rk); if (nj) { notes.push(`${key} ${rk} CAP-PARITY not judged: ${nj} (M ${z.M.items}/page, L ${z.L.items}/page)`); continue; } }
+                if (atCap(rk, 'L', z.L)) { notes.push(`${key} ${rk} CAP-PARITY: L at its declared ceiling (${declOf(rk).L} ${declOf(rk).unit}; M ${z.M.items}/page, L ${z.L.items}/page) - OK`); continue; }
+                const why = capParityBad(z.M, z.L, rk);
                 if (why) FA('CAP-PARITY', `${key} ${rk} M/L`, why);
                 else notes.push(`${key} ${rk} CAP-PARITY: M ${z.M.items}/page, L ${z.L.items}/page${z.L.full ? ' (L page full)' : ''} - OK`);
             }
