@@ -195,7 +195,11 @@ async function buildSetAsTeacher(page) {
     await waitFor(page, () => !!document.getElementById('skillOptionsPopover'), 5000, 'options popover');
     const clickSet = async (label, text) => page.evaluate(({ label, text }) => {
         const panel = document.getElementById('skillOptionsPopover');
-        const block = [...panel.querySelectorAll(':scope > div')].find(el => el.textContent.includes(label) && el.querySelector('input'));
+        // The set's OWN block (its head names it), never the first panel section that mentions the label: since t15 the
+        // Times list stands last, under "Which facts", so the first None button of the panel body is the Support set's
+        // (hotfix t15fix: that click left all 16 ticks on and the toggles took 7 and 8 OFF).
+        const head = [...panel.querySelectorAll('.sko-set-head')].find(el => { const sp = el.querySelector('span'); return sp && sp.textContent.trim() === label; });
+        const block = head ? head.parentElement : [...panel.querySelectorAll(':scope > div')].find(el => el.textContent.includes(label) && el.querySelector('input'));
         if (text === 'None' || text === 'All') {
             [...block.querySelectorAll('button')].find(x => x.textContent.trim() === text).click();
             return true;
