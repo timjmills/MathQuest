@@ -835,3 +835,14 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - The row now measured is the page's TALLEST row (a row = its tallest cell), so "another row fits" is claimed only when any drawn
   row fits again. Verify: self-test OK; fixtures flip FAIL -> OK (3 pairs); `ws-backtest --row` on the 3 new + 2 cbt rows: 5 PASS; `ws-empty-band --page-fill` on add_facts, sub_facts,
   placevalue:value FAIL (7, all listed above); `ws-precritic-plan --checks-from-critics` OK (346 pass, 90 exempt, 0 fail). Lanes touching these skills see them under precritic's default `--page-fill`.
+
+## 2026-11-20 — EBLAST-ADVISORY (critic eblast r2 FAIL 6/8/4/7, round cap)
+
+- Root cause: the rules infer capacity from white space instead of the role's DESIGNED ceiling (WDS §12 caps, the role's
+  counts()), so a page full by design reads as "a row fits" (Mixed practice L at 5 rows; scripted-model).
+- Now: EB-LASTPAGE / CAP-PARITY print "ADVISORY (not critic-passed)" and never block; `--eblast-block` keeps the 5 rows
+  proving the rules; new row `eblast-advisory-fixture`. count_by_tables is clean either way.
+- Real reds (advisory, routed): lf-ops add_facts / sub_facts pre-skill-check M/L 78 %; lf-placevalue value pre-skill-check
+  L p2 45 % + CAP-PARITY 3 vs 6. The mixed-practice 10 vs 21 is FALSE (5-row ceiling).
+- Next: a fresh builder — machine check first that every role used by a passed skill declares its ceiling; the rules read
+  it; critic r3; blocking again only after r3 passes.

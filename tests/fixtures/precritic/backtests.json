@@ -12086,6 +12086,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "eblast-advisory-fixture",
+  "check": "lead EBLAST-ADVISORY (2026-11-20; critic eblast r2: false reds on passed skills): EB-LASTPAGE / CAP-PARITY must not block a run until critic r3 passes the rebuilt rules; the planted too-empty pre-skill-check page FAILed the gate at 7c7d487c1",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band: EB-LASTPAGE / CAP-PARITY print 'ADVISORY (not critic-passed)' and never fail without --eblast-block",
+  "browser": true,
+  "fail": {
+   "commit": "7c7d487c1",
+   "state": "the planted fail page -> ws-empty-band: FAIL (EB-LASTPAGE)"
+  },
+  "pass": {
+   "commit": "6a378c6c1",
+   "state": "the same page -> ADVISORY line printed, ws-empty-band: OK"
+  },
+  "command": "node {root}/tests/scripts/ws-empty-band.cjs --html {root}/tests/fixtures/precritic/page-fill/pre-skill-check.fail.html --page-fill --only EB-LASTPAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }
