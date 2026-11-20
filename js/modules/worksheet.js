@@ -1022,6 +1022,10 @@ export function layoutWorksheetGrid(grid) {
         for (const c of cards) { if (!_wsFitCard(c)) { ok = false; if (cols > 1) break; } }
         if (ok) break;
     }
+    // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: the column try above lays the cards out at 3 columns first at 1024, where a
+    // kit twin is fitted to a third of the sheet and shrinks; once the sheet settles on its columns, every twin fits again from its
+    // own drawing size at the width it now has - number_patterns_rule kept 22.9 px digits in a 2-up card that holds 26.5 px)
+    try { fitTwinRows(grid); } catch (e) { /* keep the drawing as fitted */ }
     _wsOneSupportPlace(cards);
     _wsOneAnswerPlace(cards);
     _wsEvenRows(cards);

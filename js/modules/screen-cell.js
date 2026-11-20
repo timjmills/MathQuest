@@ -3839,6 +3839,12 @@ export function fitTwinRows(root) {
         const fitW = `${Math.round(box.width)}:${twin.getElementsByTagName('*').length}`;
         if (twin.dataset.mqFitW === fitW) return;
         twin.dataset.mqFitW = fitW;
+        // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: a new cell width fits from the twin's OWN drawing size - the --mq-k2 it
+        // had before its first fit - never from a size an earlier, narrower width left behind. The fit only lowers --mq-k2, so a fit run
+        // while the two-up worksheet grid settled kept the smaller drawing for good: 22.9 px digits where 26.5 px fit.)
+        if (twin.dataset.mqK2Fit0 === undefined) twin.dataset.mqK2Fit0 = twin.style.getPropertyValue('--mq-k2') || '';
+        else if (twin.dataset.mqK2Fit0) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Fit0);
+        else twin.style.removeProperty('--mq-k2');
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
