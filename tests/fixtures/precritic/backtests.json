@@ -12099,6 +12099,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-guided-hint-step",
+   "check": "ws-two-step --guided GUIDED-HINT-STEP: a two-step Guided try's grey hint prints no number (the sign and the operation only)",
+   "kind": "commit-pair",
+   "rule": "GUIDED-HINT-STEP (lead 2026-11-20, live on master; PAGE_TYPES 2.3)",
+   "fail": {
+    "commit": "ee6ecd047",
+    "state": "hintOf printed the two-step workedSteps' Step 1 line, 'Step 1: circle -. 26 - 6 = 20.' - the try's Step 1 boxes given away"
+   },
+   "pass": {
+    "commit": "ddabf985a",
+    "state": "the two-step steps carry a hint ('Step 1: circle +. Add.'); hintOf prefers it"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:two_step_add_then_div,algebra:multi_step_word_plain",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
