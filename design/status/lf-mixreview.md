@@ -140,3 +140,14 @@ Card §10 deferrals done in these steps, with no re-sign (each is §10-deferred 
   `node tests/scripts/ws-grade-render.cjs --roles mixed-review --skills addition:add_20_regroup,subtraction:sub_20_regroup --gate --out <dir>`;
   after a generator change: `node tests/scripts/ws-mix-review-templates.cjs --check` (regenerate without --check, then
   `ws-mix-review --pin --reclass` while no V1 code has shipped).
+
+## Lead rulings for the resume (2026-11-20, after the park)
+1. Week vs pairs (finding 1): REFUSE the weekly set when pair-only skills (word-problem-long) make up more than half of the
+   pool; the teacher sees the plain message "Add more skills to make a week". Build it as a check (WEEK FAIL state
+   `week-pairs-majority`, with a backtest row) and the refusal in the dealer's week() - a V1 dealer change, so re-pin
+   frozen.json and the golden codes (allowed while no V1 code has shipped).
+2. Legacy kinds (finding 2): ACCEPTED for V1 - the 373 legacy skills print as typical. Record it in the card as known
+   limitation L10 ("legacy skills print as typical; the class improves as skills migrate to kit cells"); the card is signed,
+   so add the row and ask the lead to re-sign by hand.
+Resume order: these two rulings first, then step 3 part 2 (measured layout - the ws-grade-render --gate overflow is the
+main item), then steps 4-5, MR-SHARE-EXACT, the critic.
