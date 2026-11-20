@@ -1454,7 +1454,7 @@ function render() {
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
     h += `</div></details>`;
 
-    h += `</div><footer class="sp-foot">${isTeacher() ? `<button type="button" class="sp-btn sp-btn-2" data-sp="save" aria-label="Save to My Worksheets"><span class="sp-wide">Save</span><span class="sp-narrow">Save</span></button>` : ''}<button type="button" class="sp-btn sp-btn-2" data-sp="preview" aria-label="Preview every page"><span class="sp-wide">Preview every page</span><span class="sp-narrow">Preview</span></button><button type="button" class="sp-btn sp-btn-1" data-sp="print"${S.busy && !b ? ' aria-disabled="true"' : ''}>Print</button></footer>`;
+    h += `</div><footer class="sp-foot">${isTeacher() ? `<button type="button" class="sp-btn sp-btn-2" data-sp="save" aria-label="Save to My Worksheets">Save to My Worksheets</button>` : ''}<button type="button" class="sp-btn sp-btn-2" data-sp="preview" aria-label="Preview every page"><span class="sp-wide">Preview every page</span><span class="sp-narrow">Preview</span></button><button type="button" class="sp-btn sp-btn-1" data-sp="print"${S.busy && !b ? ' aria-disabled="true"' : ''}>Print</button></footer>`;
     dlg.innerHTML = h;
     showThumb();
     if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') { if (caret) el.setSelectionRange(Math.min(caret[0], el.value.length), Math.min(caret[1], el.value.length), caret[2]); else el.setSelectionRange(el.value.length, el.value.length); } } catch (e) { /* */ } } }
@@ -1654,6 +1654,9 @@ function onChange(e) {
 }
 function onKey(e) {
     if (!S) return;
+    // (My Worksheets critic r1 F1) a My Worksheets dialog open over this one owns the keyboard: its own handler keeps Tab
+    // inside it and Esc closes only it
+    if (document.querySelector('.mws-overlay')) return;
     if (S.root.contains(e.target) && quickRenameKey(e, render)) return;
     if (e.key === 'Escape' && qpMenu) { e.preventDefault(); e.stopPropagation(); qpMenu = null; render(); return; }
     if (e.key === 'Escape' && S.zoomOn) { e.preventDefault(); e.stopPropagation(); hideZoom(); return; }

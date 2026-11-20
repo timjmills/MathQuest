@@ -2013,6 +2013,7 @@ export function newWorksheet() {
     _wsScheduleLayout(grid);
     _wsHeaderPill();
     _wsSyncSaveButton();
+    if (!preset && document.body.classList.contains('teacher-mode')) _wsDealFromRequest();
     // Wave 5.2: the skill's number line above the sheet, covering every item on it.
     try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint: never block the sheet */ }
 
@@ -2030,15 +2031,57 @@ function _wsSyncSaveButton() {
         b.type = 'button';
         b.id = 'wsSaveSheet';
         b.className = 'btn btn-sm btn-secondary';
-        b.textContent = 'Save';
+        b.textContent = 'Save to My Worksheets';
         b.setAttribute('aria-label', 'Save to My Worksheets');
+        b.style.minHeight = '48px';   // (critic r1 F10) a 48 px target on a tablet
+        b.style.minWidth = '48px';
         b.addEventListener('click', () => {
             if (!document.body.classList.contains('teacher-mode')) return;
-            import('./my-worksheets.js').then((m) => m.openSaveDialog(playerSaveDraft())).catch((e) => console.warn('[worksheet] save failed', e));
+            Promise.resolve(_wsDealing).then(() => import('./my-worksheets.js')).then((m) => m.openSaveDialog(playerSaveDraft())).catch((e) => console.warn('[worksheet] save failed', e));
         });
         bar.insertBefore(b, bar.firstChild);
     }
     b.hidden = !document.body.classList.contains('teacher-mode');
+}
+
+/**
+ * (My Worksheets critic r1 F4) A teacher's fresh online worksheet is dealt FROM the request Save keeps: page 1 of an
+ * Independent sheet of these skills with this worksheet's seed (as Play deals a saved sheet), so the sheet Save keeps is
+ * the sheet on screen. Swapped in once built, unless the teacher has started answering or a new sheet was dealt.
+ */
+let _wsDealing = null;
+function _wsAnswered(grid) {
+    if (worksheetBannerRecorded.size || worksheetMscState.size || worksheetDndState.size || worksheetDragFillState.size || worksheetClockSetState.size || worksheetConfettiTriggered.size) return true;
+    return [...grid.querySelectorAll('input, textarea')].some((i) => !/^(hidden|button|submit|checkbox|radio)$/.test(i.type) && i.value);
+}
+function _wsDealFromRequest() {
+    const seedAt = state.worksheetSeed;
+    let draft = null;
+    try { draft = playerSaveDraft(); } catch (e) { draft = null; }
+    if (!draft || !draft.req.parts[0].sections[0].skills.length) return;
+    // the sheet is drawn once it is the saved request's page 1 (no visible swap); shown as dealt after 4 s at most
+    const grid0 = document.getElementById('worksheetGrid');
+    if (grid0) grid0.style.visibility = 'hidden';
+    const unhide = setTimeout(() => { if (grid0) grid0.style.visibility = ''; }, 4000);
+    const job = (async () => {
+        try {
+            const L = await import('./sheet-library.js');
+            const items = await L.pageOneItems({ host: 'player', req: draft.req, name: '' });
+            const grid = document.getElementById('worksheetGrid');
+            if (!items.length || state.worksheetSeed !== seedAt || !grid || _wsAnswered(grid)) return;
+            state.worksheetQs = [];
+            grid.innerHTML = '';
+            items.slice(0, 50).forEach((it, i) => { const q = Object.assign({}, it); state.worksheetQs.push(q); _wsRenderCard(grid, q, i); });
+            _wsScheduleLayout(grid);
+            const unl = document.getElementById('worksheetUnlimitedControls');
+            if (unl) unl.style.display = 'none';
+            state.worksheetSheet = draft;
+            try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint */ }
+        } catch (e) { console.warn('[worksheet] could not deal the sheet from its request', e); }
+        finally { clearTimeout(unhide); if (grid0) grid0.style.visibility = ''; }
+    })();
+    _wsDealing = job;
+    job.finally(() => { if (_wsDealing === job) _wsDealing = null; });
 }
 
 /**

@@ -158,7 +158,11 @@ function cardHTML(r) {
     const names = skills.slice(0, 3).map((k) => L.skillName(k.categoryId, k.skillId));
     const gone = L.missingSkills(r).length;
     const pages = r.pages ? `${r.pages} page${r.pages === 1 ? '' : 's'}` : '';
-    const meta = [L.pageTypeOf(r), L.sizeOf(r), pages, r.unit && r.unit.block ? r.unit.block.replace(/^([A-Z]+\d*)\.B(\d+)$/, '$1 · B$2') : '', L.dayText(r.updatedAt)].filter(Boolean).join(' · ');
+    // (critic r1 F9) the meta line never repeats a phrase the name already says (the default name holds the page type
+    // and the date)
+    const inName = (seg) => new RegExp(`(^|[^\\p{L}\\p{N}])${seg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}\\p{N}])`, 'iu').test(r.name || '');
+    const meta = [L.pageTypeOf(r), L.sizeOf(r), pages, r.unit && r.unit.block ? r.unit.block.replace(/^([A-Z]+\d*)\.B(\d+)$/, '$1 · B$2') : '', L.dayText(r.updatedAt)]
+        .filter(Boolean).flatMap((x) => String(x).split(' · ')).filter((seg) => !inName(seg)).join(' · ');
     const open = ui.menu === r.id;
     const mi = (act, label, extra = '') => `<button type="button" role="menuitem" data-mws="${act}"${extra}>${label}</button>`;
     return `<article class="tv-card tv-flush mws-card${open ? ' is-open' : ''}" data-id="${esc(r.id)}">
@@ -171,10 +175,28 @@ function cardHTML(r) {
     <button type="button" class="tv-btn mws-b" data-mws="play" aria-label="Open interactive: ${esc(r.name)}">${icon('play', 18)}<span>Play</span></button>
     <div class="mws-menu-wrap"><button type="button" class="tv-btn mws-b mws-more" data-mws="menu" aria-haspopup="true" aria-expanded="${open}" aria-label="More for ${esc(r.name)}">${icon('dots', 18)}</button>
     <div class="tv-menu mws-menu" role="menu"${open ? '' : ' hidden'}>
-      ${mi('send', 'Send code')}${mi('newmix', 'New mix')}${mi('edit', 'Edit')}${mi('rename', 'Rename')}${mi('move', 'Move to folder')}${mi('tags', 'Tags and class')}${mi('duplicate', 'Duplicate')}${mi('set', 'Send as a set')}<hr>${mi('delete', 'Delete', ' class="is-danger"')}
+      ${mi('newmix', 'New mix')}${mi('edit', 'Edit')}${mi('rename', 'Rename')}${mi('move', 'Move to folder')}${mi('tags', 'Tags and class')}${mi('duplicate', 'Duplicate')}${mi('set', 'Send as a set')}<hr>${mi('delete', 'Delete', ' class="is-danger"')}
     </div></div>
+    <button type="button" class="tv-btn mws-b mws-send" data-mws="send" aria-label="Send code: ${esc(r.name)}">${icon('send', 18)}<span>Send code</span></button>
   </div>
 </article>`;
+}
+
+/**
+ * (critic r1 F2) The ⋯ menu opens below its button when it fits, else above it when there is more room there; if it
+ * still does not fit, the page is scrolled just enough to show it whole, so no item needs a scroll (or a swipe, which
+ * would close it on a tablet).
+ */
+function placeMenu(card) {
+    const m = card.querySelector('.mws-menu'), btn = card.querySelector('[data-mws="menu"]');
+    if (!m || !btn || m.hidden) return;
+    m.classList.remove('mws-menu-up');
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const b = btn.getBoundingClientRect(), h = m.getBoundingClientRect().height;
+    const below = vh - b.bottom - 8, above = b.top - 8;
+    if (h > below && above > below) m.classList.add('mws-menu-up');
+    const r = m.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > vh) m.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
 
 function capText(n) {
@@ -210,7 +232,7 @@ async function onClick(e) {
                 const m = c.querySelector('.mws-menu'); if (m) m.hidden = !on;
                 c.querySelector('[data-mws="menu"]')?.setAttribute('aria-expanded', String(on));
             });
-            if (ui.menu) card.querySelector('.mws-menu button')?.focus({ preventScroll: true });
+            if (ui.menu) { placeMenu(card); card.querySelector('.mws-menu button')?.focus({ preventScroll: true }); }
             return;
         }
         default: break;
@@ -321,28 +343,43 @@ async function regenThumbs() {
     if (ui.thumbing) return;
     ui.thumbing = true;
     try {
-        for (const r of ui.list.filter((x) => !x.thumb).slice(0, 6)) {
+        for (const r of ui.list.filter((x) => !x.thumb || !x.pages).slice(0, 6)) {
             if (!root || !root.isConnected) break;
-            let thumb = '';
-            try { const b = await L.buildRecord(r); thumb = await L.makeThumb(b.firstHtml); } catch (e) { thumb = ''; }
-            if (!thumb) continue;
+            let thumb = r.thumb || '', pages = r.pages || 0;
+            // (critic r1 F9) the page count is made again with the thumbnail: New mix and Edit copies drop both
+            try { const b = await L.buildRecord(r); pages = pages || b.pages || 0; if (!thumb) thumb = await L.makeThumb(b.firstHtml); } catch (e) { /* the card shows the outline */ }
+            if (!thumb && !pages) continue;
             const cur = await L.getSheet(r.id);
-            if (!cur || cur.thumb) continue;
-            await L.putSheet(Object.assign(cur, { thumb }));
-            r.thumb = thumb;
-            const box = root.querySelector(`.mws-card[data-id="${CSS.escape(r.id)}"] .mws-thumb`);
-            if (box) box.innerHTML = `<img src="${esc(thumb)}" alt="Page 1 of ${esc(r.name)}" width="120">`;
+            if (!cur || (cur.thumb && cur.pages)) continue;
+            Object.assign(cur, thumb && !cur.thumb ? { thumb } : {}, pages && !cur.pages ? { pages } : {});
+            await L.putSheet(cur);
+            r.thumb = cur.thumb; r.pages = cur.pages;
+            const card = root.querySelector(`.mws-card[data-id="${CSS.escape(r.id)}"]`);
+            if (!card) continue;
+            const box = card.querySelector('.mws-thumb');
+            if (box && r.thumb) box.innerHTML = `<img src="${esc(r.thumb)}" alt="Page 1 of ${esc(r.name)}" width="120">`;
+            const tmp = document.createElement('div');
+            tmp.innerHTML = cardHTML(r);
+            const nm = tmp.querySelector('.mws-meta > span'), om = card.querySelector('.mws-meta > span');
+            if (nm && om) om.textContent = nm.textContent;
         }
     } finally { ui.thumbing = false; }
 }
 
 /* ================================================================= dialogs */
 
-let dlgBack = null;
+let dlgBack = null, dlgBackSel = '';
+function backSelector(el) {
+    if (!el || el === document.body) return '';
+    if (el.id) return `#${CSS.escape(el.id)}`;
+    for (const a of ['data-sp', 'data-act', 'data-mws', 'data-mws-code']) if (el.hasAttribute && el.hasAttribute(a)) return `[${a}="${CSS.escape(el.getAttribute(a))}"]`;
+    return '';
+}
 function openOverlay(id, html, label) {
     closeOverlay(id);
     ensureCss();
     dlgBack = document.activeElement;
+    dlgBackSel = backSelector(dlgBack);
     const o = document.createElement('div');
     o.id = id;
     o.className = 'mws-overlay';
@@ -362,7 +399,9 @@ function closeOverlay(id) {
     const o = document.getElementById(id);
     if (!o) return;
     o.remove();
-    if (dlgBack && dlgBack.isConnected) { try { dlgBack.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    // (critic r1 F1) back to the control that opened it; a host that redrew it is matched by the same selector
+    const back = dlgBack && dlgBack.isConnected ? dlgBack : (dlgBackSel ? [...document.querySelectorAll(dlgBackSel)].find((n) => n.offsetParent !== null) : null);
+    if (back) { try { back.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 
 function folderOptions(sel, unitLabel) {
@@ -471,6 +510,9 @@ export async function playRecord(rec) {
     if (!skills.length) { toast('No skill of this worksheet is in the app any more'); return; }
     const teacher = document.body.classList.contains('teacher-mode');
     const before = teacher ? currentSet().map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, weight: x.weight, opts: x.opts })) : null;
+    // (critic r1 F5; lead wording) a lesson whose pages hold no practice items to deal: Play opens practice of its skills,
+    // and says so, until the lesson player covers lessons (card §5, D12)
+    if (!items.length && /lesson/i.test(`${L.pageTypeOf(rec)} ${JSON.stringify((rec.req && rec.req.parts || []).map((p) => p.role))}`)) toast('Play opens the practice pages of this lesson.');
     loadSetIntoQueue({ skills });
     state.worksheetPreset = items.length ? items : null;
     try {

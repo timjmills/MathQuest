@@ -265,8 +265,10 @@ const CASES = [
             {
                 const ids0 = await L(async (L) => (await L.listSheets()).map((r) => r.id));
                 await SAVE_HOSTS[2].open();
-                await sleep(1500);
-                const shown = await page.evaluate(async () => { const { state } = await import('/js/modules/state.js'); return (state.worksheetQs || []).map((q) => `${q.text}=${q.ans}`); });
+                // what the teacher sees once the sheet has settled (unchanged for 3 s; at most 25 s)
+                const qsNow = () => page.evaluate(async () => { const { state } = await import('/js/modules/state.js'); return (state.worksheetQs || []).map((q) => `${q.text}=${q.ans}`); });
+                let shown = await qsNow(), still = 0;
+                for (let i = 0; i < 100 && still < 12; i++) { await sleep(250); const n = await qsNow(); if (JSON.stringify(n) === JSON.stringify(shown)) still++; else { shown = n; still = 0; } }
                 await click('#worksheetView #wsSaveSheet');
                 await page.waitForSelector('#mwsSave', { timeout: 15000 }).catch(() => {});
                 await sleep(300);
