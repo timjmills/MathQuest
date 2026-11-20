@@ -15,9 +15,15 @@
 // Pure module (SCC-01).
 
 import { registerSkill } from '../contract.js';
-import { chooseWrong, strings, step, clampSteps } from './util.js';
+import { chooseWrong, strings, step as rawStep, clampSteps } from './util.js';
 import { applyRule, ruleText, ruleOn, ftSlots, FT_GLYPH } from '../cells/function-table.js';
 
+/** A worked step whose expressions never break after an operator: "−\u00a02", "=\u00a011" joined by a no-break space (the lesson
+ *  chart's step words wrapped "Write the rule n −" / "2.", ws-print-lint L-WRAP WRAP-OP, patterns precritic 2026-11-20 A8c). */
+// (only AFTER the operator: a line may break before "− 2", never after "−" - joining both sides made the runs long enough
+// to push the chart's panels further out of their cells)
+const nbOps = (t) => String(t).replace(/ ([+−×÷=<>]) (?=\S)/g, ' $1\u00a0');
+const step = (text, ...rest) => rawStep(nbOps(text), ...rest);
 const payloadOf = (q) => (q && q.cell && q.cell.template === 'function-table' && q.cell.payload) || (q && q.ftCheck) || null;
 const taskOf = (q) => { const p = payloadOf(q); return p ? p.task : null; };
 
