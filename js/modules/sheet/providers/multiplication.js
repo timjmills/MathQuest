@@ -362,6 +362,9 @@ registerSkill('multiplication:multiply', {
         if (!s) return defaultAdapters().workedSteps(q);
         return clampSteps(s.long ? longMultSteps(s.a, s.b) : shortMultSteps(s.a, s.b));
     },
+    // (the card offers Word problems on the size presets: ws-empty-band EB-ROLE - "the app does not compose it" - while the
+    // multiply provider had no stories; the area models' own x stories carry the item's two numbers)
+    stories: storiesFor('x'),
 });
 
 /* =========================================================================== mult_chart */
