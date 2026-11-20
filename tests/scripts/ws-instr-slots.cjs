@@ -8,7 +8,8 @@
 //   node tests/scripts/ws-instr-slots.cjs --self-test
 // Default roles: independent, more-practice, guided, test, opener, pre-skill-check, lesson. Sizes M, L.
 // REPORT by default (exit 0, last line "ws-instr-slots: REPORT ..."); --strict fails (exit 1) on a finding of a strict skill
-// (--strict-skills, default every --skills skill). ws-precritic passes --strict for the run's own skills.
+// (--strict-skills, default every --skills skill). ws-precritic passes --strict for the run's own skills. ONE-PLACE on a
+// Pre-skill check (the prerequisites' legacy print) is always a note.
 // MQ_ROOT=<tree> serves another checkout (ws-backtest commit-pair rows).
 const H = require('../lib/ws-harness.cjs');
 const { instrSlotsInPage } = require('../lib/ws-instr-slots.cjs');
@@ -76,8 +77,11 @@ const PLANTED = [
         const here = (await run(built.html)).filter((f) => RULES.includes(f.rule));
         // one line per distinct finding (the same instruction repeats on every page)
         const uniq = [...new Map(here.map((f) => [`${f.rule} ${f.msg}`, f])).values()];
-        for (const f of uniq) findings.push(Object.assign({ tag, strict: strict.has(k) }, f));
-        console.log(`  ${uniq.length ? (strict.has(k) ? 'FAIL' : 'note') : 'ok  '} ${tag}: ${built.pages}p${uniq.length ? ` - ${[...new Set(uniq.map((f) => f.rule))].join(', ')} (${uniq.length})` : ''}`);
+        // (ONE-PLACE on a Pre-skill check reads the PREREQUISITE skills' legacy print - print-generate.js and the legacy adapter's
+        // stamped Answer line, owner the legacy path / lf-roles: reported, never failing the run's own skill)
+        for (const f of uniq) findings.push(Object.assign({ tag, strict: strict.has(k) && !(f.rule === 'ONE-PLACE' && role === 'pre-skill-check') }, f));
+        const hardHere = findings.slice(-uniq.length || findings.length).filter((f) => uniq.length && f.strict).length;
+        console.log(`  ${uniq.length ? (hardHere ? 'FAIL' : 'note') : 'ok  '} ${tag}: ${built.pages}p${uniq.length ? ` - ${[...new Set(uniq.map((f) => f.rule))].join(', ')} (${uniq.length})` : ''}`);
     }
     await app.close();
     const show = Number(arg('show', 60));
