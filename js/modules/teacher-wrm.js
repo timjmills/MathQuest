@@ -718,8 +718,10 @@ async function printLesson() {
             req = { role: 'detailed-lesson', lessonId: made.id, paper: 'A4', seed: 4242, key: { on: true }, sections: [{ skills: sk ? [{ categoryId: c, skillId: id, opts: sk.opts || {} }] : [] }] };
         } else {
             const [c, sk] = made.item.key.split(':');
+            // (LESSON-OPENER-SAME: the lesson's own variant and seed, so two steps on one skill never print one packet)
             req = { role: 'lesson', sections: [{ skills: [{ categoryId: c, skillId: sk, opts: made.item.opts || {} }] }], practicePages: 1, mixed: false,
-                size: 'M', look: 'auto', paper: 'A4', header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' }, seed: 4242 };
+                size: 'M', look: 'auto', paper: 'A4', header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' },
+                seed: L.wrmLessonSeed(l), lessonVariant: L.wrmLessonVariant(l) };
         }
         const res = await buildSheet(req);
         // a lesson is not a test form: no "Form A" in its footer
