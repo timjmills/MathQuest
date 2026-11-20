@@ -21,8 +21,8 @@
 //
 //   STUDENT-OPTS-WORDS  (node, critic r1 F2) every label, choice and all-label pupilOptionsFor returns on every live skill
 //            reads as pupil words: no teacher / print term (setting, Max Number, page, print, pupil, item(s), dealt, row(s),
-//            steps before, the class, worksheet, teacher, scaffold, level N, %, "1 in N", default, core), no parenthesis that
-//            explains in words (a word of 3+ letters inside it), a label of at most 6 words and a choice of at most 8. Pin: 0.
+//            steps before, the class, worksheet, teacher, scaffold, level N, "% of the items", "1 in N", default, core), no
+//            parenthesis that explains in words (it opens with a word of 3+ letters; "(7 × 8)" is a maths example), a label of at most 6 words and a choice of at most 8, and no two choices of one option read the same. Pin: 0.
 //   STUDENT-OPTS-VERDICT (node, critic r1 F4, card D3) one teacher label, one pupil verdict: an option label a pupil is
 //            offered on one skill is never withheld on another (a role-gated option, hiddenOnRoles, is its own rule).
 //   STUDENT-OPTS-SWEEP  (critic r1 F1) every skill with pupil options, opened through the module beside Quick Start card 1
@@ -105,16 +105,16 @@ async function unit() {
 /* ------------------------------------------------------------------ STUDENT-OPTS-WORDS (node) */
 const WORD_BAN = [
     [/setting/i, 'setting'], [/max(imum)? number/i, 'Max Number'], [/\bpages?\b/i, 'page'], [/\bprint/i, 'print'], [/\bpupils?\b/i, 'pupil'],
-    [/\bitems?\b/i, 'item'], [/\bdealt\b/i, 'dealt'], [/\brows?\b(?! and col)/i, 'row'], [/steps? before|step's/i, 'steps before'],
+    [/\bitems?\b/i, 'item'], [/\bdealt\b/i, 'dealt'], [/(?<!\b(?:one|a|each|in a) )\brows?\b(?! and col)/i, 'row'], [/steps? before|step's/i, 'steps before'],
     [/the class\b/i, 'the class'], [/worksheet/i, 'worksheet'], [/teacher/i, 'teacher'], [/scaffold/i, 'scaffold'], [/\blevel \d/i, 'level N'],
-    [/%/, '%'], [/\b1 in \d/i, '1 in N'], [/\bdefault\b/i, 'default'], [/\bcore\b/i, 'core'],
+    [/%\s*(of (the )?)?(items|page|questions|of them)/i, '%'], [/\b1 in \d/i, '1 in N'], [/\bdefault\b/i, 'default'], [/\bcore\b/i, 'core'],
 ];
 const countWords = (t) => String(t).split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length;
 /** The reasons a pupil-facing text breaks the wording rules (critic r1 F2; the lead: "Numbers up to", "Easier / Harder"). */
 function wordFaults(text, max) {
     const t = String(text == null ? '' : text);
     const out = WORD_BAN.filter(([re]) => re.test(t)).map(([, n]) => n);
-    for (const m of t.matchAll(/\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g)) if (/[A-Za-z]{3,}/.test(m[1])) { out.push('explains in a parenthesis'); break; }
+    for (const m of t.matchAll(/\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g)) if (/^\s*[A-Za-z]{3,}/.test(m[1])) { out.push('explains in a parenthesis'); break; }
     if (countWords(t) > max) out.push(`${countWords(t)} words (max ${max})`);
     return out;
 }
@@ -130,7 +130,13 @@ function words(data, so) {
                 n++;
                 let w = wordFaults(d.label, 6); if (w.length) hit(`label ${d.id}`, d.label, w);
                 if (d.allLabel) { w = wordFaults(d.allLabel, 8); if (w.length) hit(`all ${d.id}`, d.allLabel, w); }
-                for (const v of d.values || []) { w = wordFaults(v.l, 8); if (w.length) hit(`choice ${d.id}:${v.v}`, v.l, w); }
+                const seen = new Set();
+                for (const v of d.values || []) {
+                    w = wordFaults(v.l, 8);
+                    const t = String(v.l).trim().toLowerCase();
+                    if (seen.has(t)) w.push('two choices read the same'); seen.add(t);
+                    if (w.length) hit(`choice ${d.id}:${v.v}`, v.l, w);
+                }
             }
         }
     }
@@ -598,9 +604,9 @@ async function toastAndNames(page, w, touch) {
             const key = c && c.getAttribute('data-so-key');
             const sh = document.querySelector('#studentOptsSheet .so-name');
             const chip = key && document.querySelector(`#studentSkillsList [data-so-key="${CSS.escape(key)}"] .sel-chip-name`);
-            return { key, sheet: sh ? sh.textContent.trim() : null, chip: chip ? chip.textContent.trim() : null };
+            return { key, sheet: sh ? sh.textContent.trim() : null, chip: chip ? chip.textContent.trim() : null, q: (window.skillQueue || []).map((x) => x.skillId).join(',') };
         }, i);
-        if (got.sheet !== name || got.chip !== name) bad.push(`${got.key}: card "${name}", sheet "${got.sheet}", chip "${got.chip}"`);
+        if (got.sheet !== name || got.chip !== name) bad.push(`${got.key}: card "${name}", sheet "${got.sheet}", chip "${got.chip}" (selected: ${got.q || 'none'})`);
         await page.evaluate(() => { window.closeStudentOptions && window.closeStudentOptions({ focus: false }); window.UnifiedSkills.clear(); });
         await sleep(120);
     }

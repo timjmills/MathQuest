@@ -2,7 +2,8 @@ import { state } from './state.js';
 import { DOMAINS, SKILLS, getDomainByCategory, getSkillGrade, gradeCircleHTML, GRADE_COLORS } from './data.js';
 import { setCookie, getCookie } from './storage.js';
 import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js';
-import { describeOptions } from './skill-options.js';
+import { describeOptions, describePupilOptions } from './skill-options.js';
+import { getSetOptions } from './skill-option-store.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, escHTML } from './skill-options-ui.js';
 import { searchSkillIndex } from './skill-search.js';
 import { pupilNameOf, pupilCardParts } from './pupil-names.js';
@@ -31,6 +32,17 @@ export function qsPupilName(card) {
     const sn = card.shortName ? String(card.shortName).replace(/\s+$/, '') : '';
     if (sn && !(full.startsWith(sn) && sn.length <= full.length)) return sn;   // curated, not the label or an old cut of it
     return pupilNameOf(card.categoryId, card.skillId, card.skillLabel) || full;
+}
+/**
+ * The one name a pupil sees for a skill on its Quick Start card, the options sheet and the chip (critic r1 F7): the
+ * grid's own name for the card when the skill has one (qsCardNames, so a curated "Mult Facts" or a category-suffixed
+ * twin reads the same in all three), else the pupil name map.
+ */
+export function qsPupilNameFor(categoryId, skillId, skillLabel = '') {
+    const cards = window.customQuickSkills || [];
+    const i = cards.findIndex((x) => x.categoryId === categoryId && x.skillId === skillId);
+    if (i > -1) return qsCardNames(cards, true)[i];
+    return pupilNameOf(categoryId, skillId, skillLabel) || qsCleanName(skillLabel) || String(skillId);
 }
 /** Names for a whole grid: two cards never read the same (the same label in two categories adds the category). */
 export function qsCardNames(cards, pupil = false) {
@@ -104,7 +116,8 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
     });
 
     if (added) {
-        showNotification(`✓ Added ${_toastName(categoryId, skillId, skillLabel)}!`, 'success');
+        // a pupil's sheet shows the selection itself: no "Added" toast to stack (critic r1 F6)
+        if (!pupil) showNotification(`✓ Added ${_toastName(categoryId, skillId, skillLabel)}!`, 'success');
         // Update quick skill card visual
         updateQuickSkillCards();
         if (pupil && typeof window.openStudentOptions === 'function') window.openStudentOptions(categoryId, skillId, anchor);
@@ -229,11 +242,12 @@ export function updateStudentSkillsDisplay() {
 
     let html = '';
     UnifiedSkills.skills.forEach((skill, index) => {
-        const fullName = qsPupilName(skill);   // check r2 D1: the pupil name, as in the explorer
+        const fullName = qsPupilNameFor(skill.categoryId, skill.skillId, skill.skillLabel);   // critic r1 F7: the card's name
         const icon = skill.categoryIcon || '📚';
         const gradeHTML = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
 
-        const summary = describeOptions && skill && window.describeSetOptions && window.describeSetOptions(skill.categoryId, skill.skillId);
+        // in pupil words, over the pupil options (critic r1 F2)
+        const summary = skill ? describePupilOptions(skill.categoryId, skill.skillId, getSetOptions(skill.categoryId, skill.skillId)) : '';
         // student-opts card O-4: the chip body opens the skill's options sheet; the ✕ (48 x 48) deselects it
         html += `
             <div class="sel-chip" title="${escHTML(fullName)}" style="display:inline-flex;align-items:center;gap:4px;padding:0 0 0 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
@@ -282,7 +296,7 @@ function _renderQuickSkillsGridNow() {
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
         // The card's options, as a short line under its name ("Times: 7, 8").
-        const optText = skill.opts && Object.keys(skill.opts).length ? describeOptions(skill.categoryId, skill.skillId, skill.opts) : '';
+        const optText = skill.opts && Object.keys(skill.opts).length ? (isStudentMode ? describePupilOptions : describeOptions)(skill.categoryId, skill.skillId, skill.opts) : '';
         const baseName = cardNames[index];
         // check r3 R1: a pupil name that shares a long start with another shows that start as a clamped head and the
         // part that tells them apart as a sub-line of its own (pupilCardParts), so a clamp never makes two cards read alike

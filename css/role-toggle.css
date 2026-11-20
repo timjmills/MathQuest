@@ -440,3 +440,20 @@ body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-onl
 .so-sheet .so-play { display: flex; flex-direction: column; gap: 8px; }
 .so-sheet .so-btn { min-height: 48px; width: 100%; border-radius: 12px; border: 2px solid var(--mq-purple, #6d28d9); background: transparent; color: var(--mq-purple, #6d28d9); font: inherit; font-weight: 800; cursor: pointer; }
 .so-sheet .so-btn-main { background: var(--mq-purple, #6d28d9); color: #fff; }
+/* student-opts critic r1 (2026-11-20), additive.
+   F1: only the body scrolls; the play row ("You will play N skills" + both buttons) is the sheet's fixed footer. */
+.so-sheet { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+.so-sheet > .so-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px 4px; }
+.so-sheet > .so-foot { flex: none; padding: 0 16px 14px; border-top: 2px solid var(--border, #e5e7eb); background: var(--bg-card, #fff); }
+.so-sheet > .so-foot .so-count { margin: 10px 0 8px; }
+.so-sheet .so-reset { margin-bottom: 8px; }
+/* F3: the folded summary, All / None and the lock note at >= 4.5 : 1, the note >= 13 px; the locked row is greyed by its
+   control only, so its words stay readable */
+.so-sheet { --so-ink-2: #4a4560; }
+.dark .so-sheet, .dark-theme .so-sheet { --so-ink-2: #d4d0e4; }
+.so-sheet .so-more-vals { color: var(--so-ink-2) !important; }
+.so-sheet .sko-set-head button { color: var(--so-ink-2) !important; border-color: var(--so-ink-2) !important; }
+.so-sheet .so-row[data-so-locked] { opacity: 1; }
+.so-sheet .so-row .sko-locked { opacity: 1 !important; }
+.so-sheet .so-row .sko-locked > span:last-child { font-size: 0.9rem !important; font-weight: 700; color: var(--so-ink-2) !important; }
+.so-sheet .so-row .sko-locked select { opacity: 0.75; }

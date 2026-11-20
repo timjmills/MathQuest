@@ -11,11 +11,11 @@
 //
 // Loaded on the first tap (js/globals.js makeLazy), so the pupil home's startup is unchanged.
 
-import { pupilOptionsFor, normalizeOptions, describeOptions } from './skill-options.js';
+import { pupilOptionsFor, normalizeOptions, describePupilOptions } from './skill-options.js';
 import { optionControlHTML, nameFitOptions, registerSkillOptionsHost, escHTML, revealOverflowingChoices } from './skill-options-ui.js';
 import { getSetOptions, setSetOptions } from './skill-option-store.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
-import { qsPupilName } from './quick-skills.js';
+import { qsPupilNameFor } from './quick-skills.js';
 import { UnifiedSkills, playSelectedSkills } from './unified-skills.js';
 
 const COLOR = '#6d28d9';
@@ -36,12 +36,12 @@ function pupilDefs(categoryId, skillId) {
     try { return nameFitOptions(categoryId, skillId, pupilOptionsFor(categoryId, skillId)); } catch (e) { return []; }
 }
 
-/** What is chosen, in plain words, over the pupil options only ("Standard" at the defaults). */
+/** What is chosen, in pupil words, over the pupil options only ("Standard" at the defaults; critic r1 F2). */
 function summaryOf(categoryId, skillId, defs) {
     const set = getSetOptions(categoryId, skillId);
     const ids = new Set(defs.map((d) => d.id));
     const mine = Object.fromEntries(Object.entries(set).filter(([id]) => ids.has(id)));
-    return Object.keys(mine).length ? (describeOptions(categoryId, skillId, mine) || 'Standard') : 'Standard';
+    return Object.keys(mine).length ? (describePupilOptions(categoryId, skillId, mine) || 'Standard') : 'Standard';
 }
 
 registerSkillOptionsHost('pupil', {
@@ -71,18 +71,26 @@ function rowsHTML(categoryId, skillId, defs) {
     }).join('');
 }
 
+// The sheet goes below its card, else above it, else BESIDE it (right, then left: critic r1 F5, it never covers its own
+// card); when none fits, a bottom sheet. Only the body scrolls: the play row is the sheet's fixed footer (critic r1 F1).
 function place(el) {
     const vw = window.innerWidth, vh = window.innerHeight;
-    if (vw < WIDE || !_sheet.rect) { el.classList.add('so-bottom'); el.style.cssText = ''; return; }
+    const bottom = () => { el.classList.add('so-bottom'); el.style.cssText = ''; };
+    if (vw < WIDE || !_sheet.rect) { bottom(); return; }
     el.classList.remove('so-bottom');
     const r = _sheet.rect;
     const w = Math.min(440, vw - 24);
     el.style.cssText = `width:${w}px;left:0;top:0;max-height:${vh - 24}px;`;
     const h = Math.min(el.offsetHeight, vh - 24);
-    const left = Math.max(12, Math.min(vw - w - 12, r.left));
+    let left = Math.max(12, Math.min(vw - w - 12, r.left));
     let top = r.bottom + 8;
     if (top + h > vh - 12) top = r.top - 8 - h;           // above the card
-    if (top < 12) top = Math.max(12, vh - 12 - h);        // or pinned to the bottom edge
+    if (top < 12) {                                        // beside it, level with it as far as the window allows
+        top = Math.max(12, Math.min(vh - 12 - h, r.top));
+        if (r.right + 8 + w <= vw - 12) left = r.right + 8;
+        else if (r.left - 8 - w >= 12) left = r.left - 8 - w;
+        else { bottom(); return; }
+    }
     el.style.left = Math.round(left) + 'px';
     el.style.top = Math.round(top) + 'px';
 }
@@ -99,7 +107,8 @@ function render() {
     }
     const { categoryId, skillId } = _sheet;
     const queued = (window.skillQueue || []).find((s) => s.categoryId === categoryId && s.skillId === skillId);
-    const name = qsPupilName(queued || (window.customQuickSkills || []).find((x) => x.categoryId === categoryId && x.skillId === skillId) || { categoryId, skillId, skillLabel: skillId });
+    // one name on the card, the sheet and the chip (critic r1 F7)
+    const name = qsPupilNameFor(categoryId, skillId, queued && queued.skillLabel);
     const n = (window.skillQueue || []).length;
     const defs = pupilDefs(categoryId, skillId);
     el.setAttribute('aria-label', `${name}: options`);
@@ -110,14 +119,17 @@ function render() {
                 <button type="button" class="so-reset" onclick="studentOptsReset()">Back to standard</button>
             </details>`
         : '<p class="so-none">This skill has no settings to change.</p>';
-    el.innerHTML = `<div class="so-head">${gradeCircleHTML(getSkillGrade(skillId, categoryId))}<span class="so-name">${escHTML(name)}</span>
+    const keep = el.querySelector('.so-body') ? el.querySelector('.so-body').scrollTop : 0;
+    el.innerHTML = `<div class="so-body"><div class="so-head">${gradeCircleHTML(getSkillGrade(skillId, categoryId))}<span class="so-name">${escHTML(name)}</span>
             <button type="button" class="so-x" onclick="closeStudentOptions()" aria-label="Close">&times;</button></div>
-        ${fold}
+        ${fold}</div>
+        <div class="so-foot">
         <p class="so-count" data-so-count aria-live="polite">You will play ${n} skill${n === 1 ? '' : 's'}</p>
         <div class="so-play">
             <button type="button" class="so-btn so-btn-main" data-so-play="one" onclick="studentOptsPlay('one')">&#9654; Play this skill</button>
             ${n > 1 ? `<button type="button" class="so-btn" data-so-play="all" onclick="studentOptsPlay('all')">Play all selected (${n})</button>` : ''}
-        </div>`;
+        </div></div>`;
+    if (keep) el.querySelector('.so-body').scrollTop = keep;   // a change inside the options keeps the pupil's place
     el.hidden = false;
     place(el);
     revealOverflowingChoices(el);
