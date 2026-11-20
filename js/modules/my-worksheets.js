@@ -49,11 +49,11 @@ export function renderSheetsScreen(el) {
   <p class="mws-note">${NOTE}</p>
   <p class="mws-cap mws-cap-screen" hidden></p>
   <div class="mws-wrap">
-    <nav class="mws-side" aria-label="Folders"></nav>
+    <nav class="tv-card mws-side" aria-label="Folders"></nav>
     <div class="mws-main">
       <div class="mws-bar">
-        <label class="mws-pick-l"><span class="tv-sr">Folder</span><select id="mwsFolderPick" class="mws-pick" aria-label="Folder"></select></label>
-        <input id="mwsSearch" class="mws-search" type="search" placeholder="Search name, skill, tag or class" aria-label="Search name, skill, tag or class" autocomplete="off">
+        <label class="mws-pick-l"><span class="tv-sr">Folder</span><select id="mwsFolderPick" class="tv-select mws-pick" aria-label="Folder"></select></label>
+        <input id="mwsSearch" class="tv-input mws-search" type="search" placeholder="Search name, skill, tag or class" aria-label="Search name, skill, tag or class" autocomplete="off">
         <div class="mws-chips" role="group" aria-label="Sort and filter"></div>
       </div>
       <div class="mws-folderline" hidden></div>
@@ -133,7 +133,7 @@ function draw() {
     const chips = [['sort', 'date', 'Newest first', ui.sort === 'date'], ['sort', 'unit', 'By unit', ui.sort === 'unit']]
         .concat((ui.meta.classes || []).map((k) => ['chip', `cls:${k}`, `Class ${k}`, ui.chip === `cls:${k}`]))
         .concat((ui.meta.tags || []).map((t) => ['chip', `tag:${t}`, `#${t}`, ui.chip === `tag:${t}`]));
-    root.querySelector('.mws-chips').innerHTML = chips.map(([a, v, l, on]) => `<button type="button" class="mws-chip" data-mws="${a}" data-v="${esc(v)}" aria-pressed="${on}">${esc(l)}</button>`).join('');
+    root.querySelector('.mws-chips').innerHTML = chips.map(([a, v, l, on]) => `<button type="button" class="tv-chip mws-chip" data-mws="${a}" data-v="${esc(v)}" aria-pressed="${on}">${esc(l)}</button>`).join('');
     // the open folder's own controls (rename; delete when empty)
     const fl = root.querySelector('.mws-folderline');
     const f = ui.folder && ui.meta.folders.find((x) => x.id === ui.folder);
@@ -158,10 +158,10 @@ function cardHTML(r) {
     const names = skills.slice(0, 3).map((k) => L.skillName(k.categoryId, k.skillId));
     const gone = L.missingSkills(r).length;
     const pages = r.pages ? `${r.pages} page${r.pages === 1 ? '' : 's'}` : '';
-    const meta = [L.pageTypeOf(r), L.sizeOf(r), pages, r.unit && r.unit.block ? r.unit.block.replace(/^Y(\d)\.B(\d+)$/, 'Y$1 · B$2') : '', L.dayText(r.updatedAt)].filter(Boolean).join(' · ');
+    const meta = [L.pageTypeOf(r), L.sizeOf(r), pages, r.unit && r.unit.block ? r.unit.block.replace(/^([A-Z]+\d*)\.B(\d+)$/, '$1 · B$2') : '', L.dayText(r.updatedAt)].filter(Boolean).join(' · ');
     const open = ui.menu === r.id;
     const mi = (act, label, extra = '') => `<button type="button" role="menuitem" data-mws="${act}"${extra}>${label}</button>`;
-    return `<article class="mws-card${open ? ' is-open' : ''}" data-id="${esc(r.id)}">
+    return `<article class="tv-card tv-flush mws-card${open ? ' is-open' : ''}" data-id="${esc(r.id)}">
   <div class="mws-thumb">${r.thumb ? `<img src="${esc(r.thumb)}" alt="Page 1 of ${esc(r.name)}" width="120">` : '<div class="mws-page" aria-hidden="true"></div>'}</div>
   <div class="mws-meta"><b class="mws-name">${esc(r.name)}</b><span>${esc(meta)}</span><span class="mws-skills">${esc(names.join(', '))}${skills.length > 3 ? ` + ${skills.length - 3} more` : ''}</span>
   ${gone ? `<span class="mws-gone">${gone} skill${gone === 1 ? ' is' : 's are'} no longer in the app</span>` : ''}</div>
@@ -170,7 +170,7 @@ function cardHTML(r) {
     <button type="button" class="tv-btn tv-btn-primary mws-b" data-mws="print">${icon('print', 18)}<span>Print</span></button>
     <button type="button" class="tv-btn mws-b" data-mws="play" aria-label="Open interactive: ${esc(r.name)}">${icon('play', 18)}<span>Play</span></button>
     <div class="mws-menu-wrap"><button type="button" class="tv-btn mws-b mws-more" data-mws="menu" aria-haspopup="true" aria-expanded="${open}" aria-label="More for ${esc(r.name)}">${icon('dots', 18)}</button>
-    <div class="mws-menu" role="menu"${open ? '' : ' hidden'}>
+    <div class="tv-menu mws-menu" role="menu"${open ? '' : ' hidden'}>
       ${mi('send', 'Send code')}${mi('newmix', 'New mix')}${mi('edit', 'Edit')}${mi('rename', 'Rename')}${mi('move', 'Move to folder')}${mi('tags', 'Tags and class')}${mi('duplicate', 'Duplicate')}${mi('set', 'Send as a set')}<hr>${mi('delete', 'Delete', ' class="is-danger"')}
     </div></div>
   </div>
@@ -346,7 +346,7 @@ function openOverlay(id, html, label) {
     const o = document.createElement('div');
     o.id = id;
     o.className = 'mws-overlay';
-    o.innerHTML = `<div class="mws-scrim"></div><div class="mws-dialog" role="dialog" aria-modal="true" aria-label="${esc(label)}">${html}</div>`;
+    o.innerHTML = `<div class="mws-scrim"></div><div class="tv-card mws-dialog" role="dialog" aria-modal="true" aria-label="${esc(label)}">${html}</div>`;
     document.body.appendChild(o);
     o.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeOverlay(id); return; }

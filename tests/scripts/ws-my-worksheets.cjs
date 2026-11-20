@@ -20,6 +20,9 @@
 //   NO-LOSS            a seeded version-1 database (tests / results) and My sets are unchanged after the upgrade and a save.
 //   TOUCH-WIDTH        every control of the screen, the ⋯ menu and the Save dialog ≥ 48 px and hit by a real tap / click at
 //                      its centre; no sideways scroll; at 1280 × 1000, 1366 × 768 (mouse), 1024 × 768, 820 × 1180 (touch).
+//   THEME              the current app look (lead ruling A19, owner 2026-11-20: "the purple theme looks like the old website"):
+//                      css/my-worksheets.css and the screen's markup write no colour literal (only var(--…) tokens), and the
+//                      screen's primary button computes the same colours, font and corners as the Print worksheets primary.
 // Prints `ws-my-worksheets: OK` / `ws-my-worksheets: FAIL (n)`; exits 1 on FAIL.
 const fs = require('fs');
 const os = require('os');
@@ -28,7 +31,7 @@ const { open } = require('../lib/ws-harness.cjs');
 
 const argv = process.argv.slice(2);
 const arg = (f, d) => { const i = argv.indexOf(f); return i >= 0 && i + 1 < argv.length ? argv[i + 1] : d; };
-const ALL = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH'];
+const ALL = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME'];
 const ONLY = arg('--only', '') ? arg('--only', '').split(',').map((s) => s.trim().toUpperCase().replace(/^TOUCH\/WIDTH$|^TOUCH$/, 'TOUCH-WIDTH')) : ALL;
 const WIDTHS = String(arg('--widths', '1280,1366,1024,820')).split(',').map(Number).filter(Boolean);
 const SIZE = { 1280: [1280, 1000, false], 1366: [1366, 768, false], 1024: [1024, 768, true], 820: [820, 1180, true] };
@@ -143,7 +146,7 @@ const CASES = [
         }
 
         /* ---------------------------------------------------------------- SAVE-REPRODUCE */
-        const needSaved = ['SAVE-REPRODUCE', 'SHEET-CODE', 'LIBRARY-ROUNDTRIP', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH'].some((k) => ONLY.includes(k));
+        const needSaved = ['SAVE-REPRODUCE', 'SHEET-CODE', 'LIBRARY-ROUNDTRIP', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH', 'THEME'].some((k) => ONLY.includes(k));
         if (needSaved) {
             current = ONLY.includes('SAVE-REPRODUCE') ? 'SAVE-REPRODUCE' : ONLY.find((k) => k !== 'NO-LOSS');
             await L(async (L) => L.clearSheets());
@@ -565,6 +568,44 @@ const CASES = [
             }
         }
 
+        /* ---------------------------------------------------------------- THEME (lead ruling A19) */
+        if (want('THEME')) {
+            const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
+            const NAMED = /\b(white|black|red|blue|green|gr[ae]y|purple|violet|indigo|orange|yellow|pink|navy|silver|teal|maroon|olive|lime|aqua|fuchsia)\b/i;
+            const LIT = /#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(/i;
+            const stripVars = (v) => { let t = v, prev; do { prev = t; t = t.replace(/var\(--[\w-]+\s*(,[^()]*)?\)/g, ''); } while (t !== prev); return t; };
+            const cssFile = path.join(ROOT, 'css/my-worksheets.css');
+            if (!fs.existsSync(cssFile)) finding('THEME', 'no css/my-worksheets.css');
+            else {
+                const css = fs.readFileSync(cssFile, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+                for (const m of css.matchAll(/([\w-]+)\s*:\s*([^;{}]+)/g)) {
+                    if (!/color|background|border|shadow|outline|fill|stroke|caret|accent/i.test(m[1])) continue;
+                    const v = stripVars(m[2]);
+                    if (LIT.test(v) || NAMED.test(v)) finding('THEME', `css/my-worksheets.css: a colour literal in "${m[1]}: ${m[2].trim().slice(0, 60)}" (use a --tv-* / token variable)`);
+                }
+            }
+            const jsFile = path.join(ROOT, 'js/modules/my-worksheets.js');
+            if (fs.existsSync(jsFile)) {
+                const js = fs.readFileSync(jsFile, 'utf8');
+                for (const m of js.matchAll(/style="([^"]*)"/g)) { const v = stripVars(m[1]); if (LIT.test(v) || NAMED.test(v.replace(/[\w-]+\s*:/g, ''))) finding('THEME', `my-worksheets.js: a colour literal in style="${m[1].slice(0, 60)}"`); }
+                for (const m of js.matchAll(/(color|background|border|fill|stroke)[\w-]*\s*[:=]\s*['"`]?\s*(#[0-9a-f]{3,8}\b|rgba?\()/gi)) finding('THEME', `my-worksheets.js: a colour literal (${m[0].slice(0, 50)})`);
+            }
+            // the computed look: the screen's primary button = the Print worksheets primary (colours, font, corners)
+            const look = (sel) => page.evaluate((sel) => { const b = document.querySelector(sel); if (!b) return null; const c = getComputedStyle(b); return { bg: c.backgroundColor, fg: c.color, border: c.borderTopColor, font: c.fontFamily, weight: c.fontWeight, radius: c.borderTopLeftRadius }; }, sel);
+            await page.evaluate(async () => { const TP = await import('/js/modules/teacher-print.js'); TP.loadPrintUi({ seed: 11, size: 'M', sections: [{ role: 'independent', skills: [{ categoryId: 'addition', skillId: 'add_facts', opts: {} }] }] }); window.tvGo('print'); await TP.printBuiltNow(); });
+            await page.mouse.move(1, 1);
+            const pr = await look('#teacherMain .tv-screen.is-active[data-screen="print"] [data-act="print"]');
+            await go('sheets'); await onSheets();
+            await page.mouse.move(1, 1);
+            const mw = await look('#teacherMain .tv-screen.is-active[data-screen="sheets"] [data-mws="new"]');
+            const mc = await look('#teacherMain .tv-screen.is-active[data-screen="sheets"] .mws-card [data-mws="print"]');
+            if (!pr || !mw || !mc) finding('THEME', `a primary button is missing (Print ${!!pr}, New worksheet ${!!mw}, card Print ${!!mc})`);
+            else for (const [nm, x] of [['New worksheet', mw], ['the card Print', mc]]) {
+                const diff = Object.keys(pr).filter((k) => pr[k] !== x[k]);
+                if (diff.length) finding('THEME', `${nm} differs from the Print worksheets primary in ${diff.map((k) => `${k} ${x[k]} vs ${pr[k]}`).join('; ')}`);
+            }
+        }
+
         /* ---------------------------------------------------------------- TOUCH-WIDTH */
         if (want('TOUCH-WIDTH')) {
             for (const w of WIDTHS) {
@@ -646,7 +687,7 @@ const CASES = [
             }
         }
     } catch (e) {
-        if (String(e.message) !== 'no library') { finding(current, `stopped: ${String(e.stack || e).slice(0, 400)}`); const RUN_ORDER = ['NO-LOSS', 'SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH']; for (const id of RUN_ORDER.slice(RUN_ORDER.indexOf(current) + 1).filter((k) => ONLY.includes(k))) finding(id, `not run: ${current} stopped the gate`); }
+        if (String(e.message) !== 'no library') { finding(current, `stopped: ${String(e.stack || e).slice(0, 400)}`); const RUN_ORDER = ['NO-LOSS', 'SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'THEME', 'TOUCH-WIDTH']; for (const id of RUN_ORDER.slice(RUN_ORDER.indexOf(current) + 1).filter((k) => ONLY.includes(k))) finding(id, `not run: ${current} stopped the gate`); }
     } finally {
         // (the NO-LOSS step opens the origin on a stylesheet, whose page asks for /favicon.ico: that 404 is the harness's own)
         const favOnly = notFound.length > 0 && notFound.every((u) => /^\/favicon\.ico/.test(u));
