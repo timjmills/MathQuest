@@ -1012,3 +1012,13 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   D8-D10 gate: four default widths, round trip asserts view=list, exact Skills grade pills; one rule per defect.
 - Pre-existing, not this lane: ws-teacher-shell FAILs 3 on 6d0d8ff4a as well (popover summary / sample / board code).
 - 2026-11-20 lf-checks: critic r2 D11 reverted (lead ruling A20: item card thumbnails, no first-page build), THUMB-NO-FREEZE + THUMB-DETAILED-ITEM rules and backtests, D12 explicit pending kind; card waiver A20.
+
+## 2026-11-20 — lessons browser HELD (lead ruling (a), after A20)
+- Head 0e0811755 is held and not deployed. THUMB-NO-FREEZE fails on it: one 6,429 ms task and a 6,783 ms frame gap at 1024 with the CPU slowed ×4 and a cold cache.
+- Next week, item 1, in this order:
+  1. Profile the stall with a CPU profile at ×4 and name the function; no guessing.
+  2. Fix it.
+  3. Add the on-request "Show first page" button, cached.
+  4. Add a backtest row for D12.
+  5. Run the tiny critic on the D11 revert, D12 and THUMB-NO-FREEZE.
+- Spend on the lessons browser is about $170 of the $180 allowance (agent estimates).
