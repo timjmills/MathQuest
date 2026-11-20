@@ -725,6 +725,7 @@ registerSkill('fractions:mixed_numbers_intro', {
     preSkills: () => [
         { categoryId: 'fractions', skillId: 'write_fraction', opts: { model: ['bar'] } },
         { categoryId: 'fractions', skillId: 'shade_fraction', opts: { model: ['bar'] } },
-        { categoryId: 'composing', skillId: 'compose_whole', opts: {} },
+        // (not compose_whole: its key's "(any order)" note runs out of its cell - ws-cell-checks OVERFLOW)
+        { categoryId: 'composing', skillId: 'fraction_number_line', opts: {} },
     ],
 });

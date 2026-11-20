@@ -605,13 +605,15 @@ function rowSize(p, ctx) {
 const PW = Object.freeze({
     // whole box, part drop, part gap (mm); the bars of the model (WDS 11.2 minimums)
     M: { topW: 34, topH: 22, drop: 12, gap: 22, onesGap: 6, barW: 52, barH: 16 },
-    // (L: an 18 mm drop - the diagram is as tall as the 4-bar model, so a model row's cell holds no 30 % band; ws-empty-band)
-    L: { topW: 40, topH: 26, drop: 18, gap: 22, onesGap: 6, barW: 56, barH: 18 },
+    // (`modelDrop`, L: beside the bars an 18 mm drop - the diagram as tall as the 4-bar model, so a model row's cell holds no
+    // 30 % band, ws-empty-band; without the bars the 12 mm drop, so two Reason It pairs still fit a page)
+    L: { topW: 40, topH: 26, drop: 14, modelDrop: 18, gap: 22, onesGap: 6, barW: 56, barH: 18 },
 });
 const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
 /** The part boxes' geometry at the ctx size (mm). */
 function pwGeom(p, ctx) {
-    const k = pwSize(ctx), G = PW[k];
+    const k = pwSize(ctx), G0 = PW[k];
+    const G = p.model === 'bar' && G0.modelDrop ? Object.assign({}, G0, { drop: G0.modelDrop }) : G0;
     const hw = SZ(ctx).writeMm;
     const wholeW = blankWidth(1, k) + 6, fracBar = blankWidth(2, k), fracW = fracBar + 6;
     const partH = 2 * hw + 8;
