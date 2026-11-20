@@ -1,0 +1,3 @@
+{ "rule": "HINT-UNIFORM", "rows": [
+  { "key": "two_step_add_then_div M seed 1 (ruled drop)", "hint": "", "ruled": true, "p1": 2 },
+  { "key": "two_step_add_then_mult M seed 1", "hint": "Step 1: circle +. ___ + ___ = ___.", "ruled": false, "p1": 2 } ] }
