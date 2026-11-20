@@ -480,3 +480,8 @@ on master, queued for next week's PSC layout pass (with the trim to the ceiling 
 - NEXT WEEK'S QUEUE (lead ruling on item 2, option iii, 2026-11-20): a QUADRANT page (one 2 x 2 block per prerequisite, 4
   prerequisites) may hold 16 items on one page - a declared exception in role-capacity.js that EB-PSCCAP reads; every other PSC
   page is trimmed to its ceiling (12 M / 8 L). Folds into the Quick review build.
+- NEXT WEEK'S QUEUE (lead, via lf-algebra patterns r3, 2026-11-20; not built now):
+  - R3-4: pattern_features Opener M deals 0 independent items - roles/opener.js geometry() estimates "taller than the page" for
+    135 mm of a 239 mm body. Check first: PAGEFILL --roles opener must FAIL; fix the geometry estimate.
+  - R3-6: growing_shape_patterns' Pre-skill Check prints doubled answer areas (PSC cells from the prerequisites' legacy print via
+    print-generate.js + the adapters.js legacy stamp). Folds into the Quick review build, check first.
