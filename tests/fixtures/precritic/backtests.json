@@ -15172,6 +15172,186 @@
    }
   },
   {
+   "id": "psc-instr-adjacent",
+   "kind": "commit-pair",
+   "check": "lf-roles critic D3: no two adjacent Pre-skill Check bands print the same instruction",
+   "rule": "ws-psc-lint PSC-INSTR",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_wp_20,addition:add_wp_20 --form A --only PSC-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "9b475efe6",
+    "state": "sub_wp_20 M bands 1-2 'Subtract.' twice, bands 3-4 the story line twice"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "neighbouring bands of one instruction share one strip (critic d2d5 r1 D-1: 42310a2a3's label-built lines, its first pass state, now FAIL PSC-INSTR's tag rule)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-deal-dupes",
+   "kind": "commit-pair",
+   "check": "lf-roles critic D4: in a Pre-skill Check band at most 2 items share an answer and no turnaround pair",
+   "rule": "ws-psc-lint PSC-DEAL",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills addition:add_facts,subtraction:sub_50_no_regroup,addition:add_wp_10 --form A --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "9b475efe6",
+    "state": "add_facts M seed 7: three 12s and 8 + 4 / 4 + 8 in one band"
+   },
+   "pass": {
+    "commit": "42310a2a3",
+    "state": "dedupeDeal() per prerequisite, seeded order"
+   },
+   "browser": true
+  },
+  {
+   "id": "opener-countrow-growcap",
+   "kind": "commit-pair",
+   "check": "lf-roles item 5 (lead 2026-11-20): an Opener's count-row box rows keep their measured height (no 8 mm growth of air)",
+   "rule": "ws-empty-band EB-BAND",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:follow_given_rule --roles opener --sizes M --hosts none --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "8b1974587",
+    "state": "follow_given_rule Opener M count row 33.1 mm cell, 11.5 mm band (34.6 %)"
+   },
+   "pass": {
+    "commit": "816734000",
+    "state": "GROWCAP 0 for every count row (roles/opener.js)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-twin-pools",
+   "kind": "commit-pair",
+   "check": "lead A10: a Pre-skill Check never prints two bands dealt from one skill (twin pools merge)",
+   "rule": "ws-psc-lint PSC-TWIN",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills division:div_facts_long,subtraction:sub_2d_1d,vocabulary:vocab_pick3_words --form A --only PSC-TWIN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "e41e5ecc8",
+    "state": "div_word_problems / sub_word_problems / vocab_grade_pictures dealt by two pools, two bands with one instruction"
+   },
+   "pass": {
+    "commit": "a6fc9407a",
+    "state": "planCheck merges pools of one skill into one band (pre-skill-check.js)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-sign-floor",
+   "kind": "commit-pair",
+   "check": "lead A10: a Pre-skill Check compare band shows at least 2 signs and never one sign 3 times in a row",
+   "rule": "ws-psc-lint PSC-DEAL",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills placevalue:expand,placevalue:unit_form --form A --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "c2a50c33c",
+    "state": "expand band 4 and unit_form band 2: '>' three times in a row"
+   },
+   "pass": {
+    "commit": "0c1790e77",
+    "state": "dedupeDeal() sign floor, seeded order"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-instr-label-tail",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 D-1: no Pre-skill Check strip carries a skill label or a parenthesised option tag; neighbouring bands of one instruction share one strip",
+   "rule": "ws-psc-lint PSC-INSTR",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_2d_1d,subtraction:sub_wp_20 --sizes M,L --form A --only PSC-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "'Write the answer: subtraction number line.' / '...: number line subtraction (b&w).', 'Solve: subtraction word problems (within 10)'"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "label tails dropped; the later band joins its neighbour's strip"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-lesson-footer",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 L1: a detailed lesson's Prerequisite Check strips print on one line and its frame ends above the footer (DOM)",
+   "rule": "ws-psc-lint PSC-LESSON",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_2d_1d --sizes M --form A --lessons g3-oa8-two-step-wp --lesson-seeds 4242,1 --only PSC-LESSON",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "g3-oa8-two-step-wp check strips wrap to 2 lines; the frame ends 5.9 mm below the footer top"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "a lesson's perQuestion check prints master's one-line strips"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-formb-sign-floor",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 M1: Form B keeps the sign floor (no sign 3 times in a row)",
+   "rule": "ws-psc-lint PSC-DEAL (--form B)",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills placevalue:unit_form,placevalue:combine --seeds 5,6,1,3 --form B --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "unit_form seeds 5/6 '< < < =', combine seeds 1/3 '> > > <' (dedupe before Form B's shuffle)"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "signOrder() on each band's final items, after any shuffle: a search for the earliest order that keeps the floor"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-twin-mix",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 M2: a band merged from twin pools holds items of both pools",
+   "rule": "ws-psc-lint PSC-TWIN-MIX",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills division:div_facts_long,multiplication:count_by_tables --form A --only PSC-TWIN-MIX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "div_facts_long div_word_problems band prints q2 (partitive) only; count_by_tables number_seq_fill band q0 only"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "twin pools interleave round robin"
+   },
+   "browser": true
+  },
+  {
    "id": "lesson-player-any-part",
    "check": "ws-lesson-player --any-part PLAYER-ANY-PART: every player part id (warmup, ido, wedo, youdo, exit) opens directly by ?lesson=&part= and the part bar jumps to every other part, the URL following (design/cards/lesson-player D11)",
    "kind": "commit-pair",

@@ -41,7 +41,9 @@ export const TIGHT_ROWS = true;
 /** critic r3 N9 (H13): a Lines count row is short (digits on a rule), so its cell takes none of the PT-ENG-3 grow - the spare
  * height stays blank at the foot - where a row with boxes grows as before. */
 const isLinesRow = (it) => !!(it && it.template === 'count-row' && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.lines);
-const GROWCAP = (first) => (isLinesRow(first) ? 0 : Infinity);
+// (lf-roles item 5, lead 2026-11-20: a count row's box row is fixed-height too - its boxes do not grow, so 8 mm of growth was 8 mm
+// of air under them: follow_given_rule Opener M EB-BAND 34.6 %. Every count row keeps its measured height.)
+const GROWCAP = (first) => (isLinesRow(first) || (first && first.template === 'count-row') ? 0 : Infinity);
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
