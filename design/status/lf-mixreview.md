@@ -202,3 +202,14 @@ Resume:
   node tests/scripts/ws-mix-review.mjs --check count --fixture tests/fixtures/mix-review/count/engine
   node tests/scripts/ws-mix-review.mjs --built-only --sample tests/fixtures/precritic/mix-review-sample.json
   node tests/scripts/ws-precritic.cjs --role mixed-review --strict
+
+## Lead rulings after the second park (2026-11-20)
+- Card re-signed by the lead (L10 accepted).
+- Density (print-lint DN-2 / LONE / PG-23): ruling (b) - lower V1's typical page capacity to the measured reality and re-pin
+  frozen.json, the golden codes and the size table (allowed: no V1 code has shipped), so preview = print. Add the check that
+  a V1 page's planned cells fit its measured page (no one-item continuation pages from capacity), with a backtest.
+- fractions:mixed_fractions is not reproducible from its seed (a different accepted try on a second deal): it goes on next
+  week's list for a fractions owner; meanwhile EXCLUDE it from Mixed Review pools with a named note
+  (mixed-review-pool.js, "not seed-reproducible, lead 2026-11-20"), plus a POOL check that it never enters a pool.
+NEXT (next week, parked until then): the (b) re-pin, the mixed_fractions exclusion, print-lint at M and L (also SL-6 key
+score line and H13 stack side bands), precritic --role mixed-review --strict, then steps 4-5, MR-SHARE-EXACT, the critic.
