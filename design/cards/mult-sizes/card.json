@@ -147,6 +147,21 @@
    "date": "2026-11-20",
    "ruling": "4-digit × 1-digit deal keeps (thousands digit × multiplier) ≤ 9 so the partial products stay 4-digit for blank edge boxes.",
    "source": "lead 2026-11-20"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "Capacity (A9 1): Reason It at L - mult_2by2_standard and mult_3by2_standard take the UNDER layout, 1 a page (the 2-digit multiplier grid and the response column are wider than an A/B panel); M keeps 2 a page.",
+   "source": "lead ruling A9, 2026-11-20"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "Capacity (A9 2): area_model_4by1 word-problems at L, 1 a page; the 4-part model stands under its story, never past the cell; never a smaller font.",
+   "source": "lead ruling A9, 2026-11-20"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "Capacity (A9 3): area_model_4by1 true-false at L, 1 a page.",
+   "source": "lead ruling A9, 2026-11-20"
   }
  ],
  "misconceptions": [

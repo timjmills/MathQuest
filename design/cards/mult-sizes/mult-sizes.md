@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"mult-sizes","kind":"family","template":"area-model","families":["multiplication"],"match":{"templates":["area-model","stack","long-multiplication"]},"config":"design/cards/mult-sizes/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"e1770a68975574a9","format":2,"configSha":"60d8c140e932"}
+{"card":"mult-sizes","kind":"family","template":"area-model","families":["multiplication"],"match":{"templates":["area-model","stack","long-multiplication"]},"config":"design/cards/mult-sizes/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"bac15d947f37d325","format":2,"configSha":"1ce5e480bf52"}
 {"cited":"AK-2 AX-4 AX-9 C1 CL-9 H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 PG-12 PT-FRM-6 PT-GDP-1 PT-REV-3 RP-1 SL-1 SL-3a SP-20 TY-10a VA-10 WRM-rule-18","rules":"VA-1 12d322 SL-1 e3b064 12 3cbafa AK-1 a0cc12 P-1 5a3076 AK-2 d4709f TY-20 8964d2 21 53ed7d H13 36f579 L25 1b158f 26 bbd4cc SCC-01 8aa70b LS-8 59531d PG-12 8e75fd DN-1a 6ecf1e AX-4 2eb6c1 9 74e9a4 C1 a670d9 CL-9 accb97 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 e90105 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 L1 4f7d0c 6 6e19d8 PT-FRM-6 daac17 PT-GDP-1 a0e2cc PT-REV-3 d5e0d9 RP-1 d529bd SL-3a b8219f SP-20 cfb11a TY-10a 5e59f3 VA-10@WDS 9d9099 INK-1 0e2b59 P-LC-9 bc47bd PG-20 9c7999 SL-11 fc569a","entries":"D%3Atiles%3Dnull bcefeb D%3Atiles%3D11%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amult_3by2_standard%2Cmultiplication%3Amult_4by1_column%2Cmultiplication%3Amultiply bcefeb D%3Atiles%3D21 bcefeb D%3Atiles%3D31 bcefeb D%3Atiles%3D22 bcefeb D%3Atiles%3D23 bcefeb D%3Atiles%3D41 bcefeb D%3Atiles%3D32 bcefeb D%3AamEdges%3Dgiven bcefeb D%3AamEdges%3Dblank bcefeb D%3AamEdges%3Dmixed bcefeb D%3Anotation%3Dstacked bcefeb D%3Anotation%3Dacross%40multiplication%3Amultiply bcefeb D%3Anotation%3Dacross%40multiplication%3Amult_2by1_column%2Cmultiplication%3Amult_2by2_standard%2Cmultiplication%3Amult_3by1_column%2Cmultiplication%3Amult_3by2_standard%2Cmultiplication%3Amult_4by1_column bcefeb D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
@@ -15,6 +15,9 @@
  {"id":"T-5.3","source":"§5.3","text":"Two print sizes M and L; no phone width."},
  {"id":"T-5.4","source":"§5.4","text":"Add the missing multiplication size-pair presets, each with its own lesson."},
  {"id":"T-5.5","source":"§5.5","text":"4-digit × 1-digit deal keeps (thousands digit × multiplier) ≤ 9 so the partial products..."},
+ {"id":"T-5.6","source":"§5.6","text":"Capacity (A9 1): Reason It at L - mult_2by2_standard and mult_3by2_standard take the UN..."},
+ {"id":"T-5.7","source":"§5.7","text":"Capacity (A9 2): area_model_4by1 word-problems at L, 1 a page; the 4-part model stands ..."},
+ {"id":"T-5.8","source":"§5.8","text":"Capacity (A9 3): area_model_4by1 true-false at L, 1 a page."},
  {"id":"T-9.1","source":"§9.1","text":"No card covered area_model_mult / area_model_mult_hard, and the stack card has no decis..."},
  {"id":"T-9.2","source":"§9.2","text":"area_model_3by2 on tiles 23: the item today reads '24 x 135' (2-digit first). Write the..."},
  {"id":"T-9.3","source":"§9.3","text":"mult_3by2_standard: multiply tiles 22 prints through the legacy column-mult format toda..."},
@@ -139,6 +142,9 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-11-13** — Two print sizes M and L; no phone width. (`owner, FASTEST_PLAN_2026-11-13`)
 - **2026-11-19** — Add the missing multiplication size-pair presets, each with its own lesson. (`lead request, lf-ops brief`)
 - **2026-11-20** — 4-digit × 1-digit deal keeps (thousands digit × multiplier) ≤ 9 so the partial products stay 4-digit for blank edge boxes. (`lead 2026-11-20`)
+- **2026-11-20** — Capacity (A9 1): Reason It at L - mult_2by2_standard and mult_3by2_standard take the UNDER layout, 1 a page (the 2-digit multiplier grid and the response column are wider than an A/B panel); M keeps 2 a page. (`lead ruling A9, 2026-11-20`)
+- **2026-11-20** — Capacity (A9 2): area_model_4by1 word-problems at L, 1 a page; the 4-part model stands under its story, never past the cell; never a smaller font. (`lead ruling A9, 2026-11-20`)
+- **2026-11-20** — Capacity (A9 3): area_model_4by1 true-false at L, 1 a page. (`lead ruling A9, 2026-11-20`)
 
 ## 6. Misconceptions
 
