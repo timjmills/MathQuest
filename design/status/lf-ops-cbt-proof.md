@@ -88,3 +88,59 @@ Checks after the merge:
 - ws-boot-smoke: OK.
 - ws-code-snapshot: OK (741 codes, 35 categories).
 - ws-precritic-plan: OK (446 rows on path; checks-from-critics 388 pass / 100 exempt / 0 fail).
+
+## Lesson baseline re-pin: class-only proof (2026-11-20)
+
+**Why the gate failed.** `ws-lesson-baseline` (deploy form, `--all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned`)
+on the merged head: 2,102 of 2,590 hashes differ, and 3 lessons are UNPINNED. Master's pin is master's own render: the same
+command on a master worktree (273a0f379, pin unchanged by 0e80c26e4) prints `OK (2590 hashes identical)`.
+
+**Method.** A scratch copy of the gate (same builds, same keys) dumped every page's HTML on both trees: the branch (f34246ef5,
+-props merged with the eblast advisory) and master (worktree, MQ_ROOT). 2,216 pages per tree, the same keys on both (the
+other 374 of the 2,590 hashes are the whole pupilHtml / keyHtml / detailed html, which carry the same pages). Normalised in
+steps, then compared:
+
+| Step | Pages identical (of 2,216) |
+|---|---|
+| raw, after stripping `mq-tofblank` / `mq-smstate` from class lists | 488 |
+| + the embedded engine `<style data-mq-sheet-engine>` emptied | 2,038 |
+| + the class `mq-pagecap` stripped | 2,114 |
+| real changes left | **102 pages, 8 lessons** |
+
+- **The engine `<style>`** is on 1,702 of the pages and is why nearly every hash moved. The branch's copy adds 3 rules and removes
+  none: `[data-ws-tagged]:has(>.mq-tagout)`, `.mq-slottag.mq-tagout`, `.ws-grid.mq-ctailgrid.mq-cheadgrid`. No lesson page carries
+  `mq-tagout`; 120 carry `mq-ctailgrid` but none `mq-cheadgrid`, so no added rule matches any lesson page.
+- **`mq-tofblank`, `mq-smstate`, `mq-pagecap`** have no CSS: not in `css/`, not in the engine style. `mq-pagecap`
+  (practice.js, read by ws-print-lint ROW-STRETCH) is the third CSS-less lint marker, on 76 pages of 7 lessons
+  (placevalue:compare, g1-oa1-bar-model-wp-20, g2-nbt3-read-write-1000, g3-oa8-two-step-wp, g3-oa9-input-output-rule,
+  g3-oa9-mult-table-patterns, g4-nbt1-ten-times-value).
+- **Pixel sample.** 10 class-only lessons (add_facts, sub_100_regroup, placevalue:value, placevalue:identify, div_facts,
+  number_word_form, notice_patterns, sub_wp_10, nearest_10, function_table_easy), M, seed 4242, every pupil and key page,
+  printed through `sheetDocument` at DSF 1 (794 x 1123, print media) on both trees: **80 of 80 page pairs pixel-identical**.
+
+**Lessons that changed for real (102 pages; each is this lane's own work):**
+
+| Lesson | Pages | Cause |
+|---|---|---|
+| detailed g3-oa5-mult-properties | 48 | the mult_properties provider / dealer (lf-ops-props): different dealt facts (e.g. 7 x 5 → 6 x 7), arrays "Look at / Turn the array", count-by "in the arrow" rows, 2-digit-wide answer boxes (1.215 → 1.822 em) |
+| detailed g3-oa9-mult-table-patterns | 8 | count-row instruction "Count by the number in the box" → "... in the arrow" (cbt r1 M3 wording) |
+| patterns:follow_given_rule | 12 | lesson Practice row shape (lf-ops-props r4b ROW-STRETCH ruling (b)): grids get a fixed height (e.g. 114 → 61.25 mm, a spread grid → fixed 122.5 mm) |
+| patterns:number_patterns_rule | 16 | same Practice row shape (34.1 → 31 mm rows; 114 → 75 mm) |
+| patterns:growing_shape_patterns | 4 | same (41.85 → 38.75 mm row) |
+| patterns:pattern_features | 6 | same (41.85 → 38.75 mm row) |
+| subtraction:sub_2d_1d | 4 | Scripted Model step band (r4: a one-line step band tried before merging steps) — `mq-lstepsbox` height |
+| subtraction:sub_50_no_regroup | 4 | same Scripted Model step band |
+
+No lesson page changed by the r4 Pre-skill Check fill or the True or False? `true-false-list` instruction: those roles are
+not lesson parts. No other difference is left.
+
+**New pins (UNPINNED on master's pin, now in `prereqs.js` LESSONS on this branch):** `multiplication:arrays_groups`,
+`multiplication:count_by_tables`, `multiplication:mult_properties`.
+
+**Re-pin.** By the protocol (`--all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write
+design/audit/baselines/lesson-baseline.json`), written first on 4bdbd2bff (+ master 0e80c26e4), then again on 311af78fa
+(+ master eb2e26972) after master re-pinned 48 pages of its own (e591cf937). The two pins differ in exactly those 48 keys:
+algebra:two_step_add_then_mult 16, algebra:two_step_letter_equation 16, patterns:follow_given_rule 16 - master's own move,
+the same keys its pin moved since 0e80c26e4. 2,714 hashes, 55 lessons. Reason: lint marker classes `mq-tofblank` /
+`mq-smstate` (and `mq-pagecap`), CSS-less, plus the 3 additive engine rules that match no lesson page; class-only proof above;
+the 8 real lessons listed; the 3 new lessons pinned.
