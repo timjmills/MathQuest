@@ -23,7 +23,10 @@ Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
      - hcf item 3 repeats p3 grid 1's gaps, and 28 of 30 answers are re-asks.
      - New check LESSON-MIXED: the lesson checks (SHEET-ANSWER-SET, NEAR-TWIN, ANSWER-REUSE, STEP-COVER, blank counts) also run with mixed:true on every chart lesson that offers "+ mixed". Owner: lf-builds.
   2. A11 (2): NEAR-TWIN is measured against the SMALLER window. A rows-of-ten grid containing the Guided window with the same gaps is a twin and fails. Tighten the check, make the deal refuse such a grid, add backtest row c120b-near-twin-small.
-  3. G1 per the lead's ruling above, then the one-page re-grade (hcf lesson M p2 and its key, seeds 1 and 4242), then DEPLOY with the head.
+  3. G1, LEAD RULING A13 (2026-11-20): (a). On band 100 the practice rows-of-ten grids print the teaching sheet's gaps as GIVEN numbers, never as re-asks. ANSWER-REUSE stays at <= 1/3 and counts only real re-asks.
+     - A given square looks exactly like every other printed number: no mark, no grey. The key shows it as given.
+     - ANSWER-REUSE bookkeeping: printed-as-given is not a re-ask; blank-and-re-asked still counts. Backtest on seeds 1 and 777.
+     - Start from design/audit/runs/lf-builds/chart120/g1-slots-WIP.patch. Then the one-page re-grade (hcf lesson M p2 and its key, seeds 1 and 4242), then DEPLOY with the head.
   - Not scored, still open: FOOTER-SEED, numeral baseline, step range wording, Independent 1-25 label ("Review numbers to 30") and window order, crossing asked thinly.
 - 2026-11-20: band-100 lesson PAGEFILL + ANSWER-REUSE fixed (teaching windows fixed on rows 41-70; practice third rows grid always the least-reused band, 31-60). echo lesson + variants: hundreds_chart_fill clean; 3 ANSWER-VARIETY on chart_to_120 review/true-false seed 4242 are pre-existing at 6449ae672. print-lint lesson M/L OK, boot OK, backtest c120b-answer-reuse PASS.
 - 2026-11-20: chart blanks r4 fix BUILT (lead ruling option 1), commit c29d324f8; cap reached, partly proven.
