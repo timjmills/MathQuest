@@ -77,6 +77,19 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-20 **vocab deploy blockers** (builder, Opus medium, branch claude/lf-placevalue-vocab-deploy; brief
+  design/audit/runs/lf-placevalue/builder-vocab-blockers-brief.md). Merged origin/master d38308824 (master does NOT contain
+  lf-engine rowcap 3b0fdbcbb: it rides in on this branch). Lesson baseline rebuilt from master's pin (master clean, 2590
+  identical): 584 hashes re-pinned after rendering master / master+rowcap / head-without-pagesOf / head and attributing each
+  (312 rowcap, 52 vocab, 16 vocab + pagesOf, 8 removed); 62 HELD unpinned (patterns follow_given_rule / number_patterns_rule
+  p3-p4: rowcap leaves 40-55 % of a Practice page white with 2 items on the next page; pagesOf over-count: add_wp_10 L 4242
+  Mixed 14 -> 12 items, two_step_letter_equation M Mixed 6 -> 5 items). V23: 14 pupil pins re-pinned (rowcap rows; L 3 -> 4
+  rows; guided L also master's Guided refill). EB-PAGE (Scripted Model M 36 % / L 32 %) is the engine: D3 to lf-engine,
+  proven patch (scripted-model.js textH1 for a one-line full-width state) prints it on one page; pending row
+  vocab-model-onepage. MIX-PAGES got its own backtest (ws-mix-pages --root, `mix-pages`). Renders:
+  design/status/lf-placevalue/vocab-blockers/. Still red: the 62 held lesson hashes; EB-PAGE (D3); EB-BAND margin-2 on
+  pre-skill-check M p1 cell 2 (29.1 %, under the 30 % rule); V-AMBIG x2 on master's patterns / algebra lesson data (red on
+  master too).
 - 2026-11-13 **placevalue:compare PASSED** (critic compare r4 PASS; r1 FAIL F1-F6, r2 FAIL N1-N3, r3 FAIL N9 only -> round cap 2
   root cause: every relation a step writes is one no-break unit, WRAP-SIGN runs the wide bands). redesign-passed.js PVC. Rounds: 4 critic
   (r4 narrow), 5 builder passes (r1, r2, r3, checks pass, r4) + 2 merges. Every finding is in CHECKS_FROM_CRITICS with a backtest row
