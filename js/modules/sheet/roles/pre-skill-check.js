@@ -373,7 +373,7 @@ function planCheck(input, cut) {
     if (!input.perQuestion) {
         const keyOf = (q) => (q[0] && q[0].skill) || '';
         for (let i = 0; i < quads0.length; i++) for (let j = i + 1; j < quads0.length; j++) {
-            if (!quads0[i].length || !quads0[j].length || keyOf(quads0[i]) !== keyOf(quads0[j])) continue;
+            if (!quads0[i].length || !quads0[j].length || !keyOf(quads0[i]) || keyOf(quads0[i]) !== keyOf(quads0[j])) continue;
             quads0[i] = dedupeDeal(quads0[i].concat(quads0[j]));
             extra0[i] = dedupeDeal((extra0[i] || []).concat(extra0[j] || []));
             quads0[j] = []; extra0[j] = [];
