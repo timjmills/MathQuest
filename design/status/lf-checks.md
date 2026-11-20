@@ -955,3 +955,6 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   the whole pinned sample (~63 s). On master today it FAILs with 17 findings (24 renders), e.g. placevalue:expand@820 cards
   234.8 -> 227.4 px and 18 answer places moved sideways; patterns:number_patterns_rule@820 17 answer places moved. These
   need a fix or a ruled re-pin before the gate can be green.
+- Also on this branch (lead 2026-11-20, from lf-builds): precritic's screen-support-eq row now uses its own parser, so a tool
+  N/A (no screen supports) reads N/A, not FAIL. Row `precritic-sse-na`. The reflow gate merges only after lf-algebra's npr fix
+  (expand was re-pinned by lf-placevalue, 4e9df2e47).

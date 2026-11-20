@@ -12342,6 +12342,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "precritic-sse-na",
+  "check": "lf-builds 2026-11-20: precritic's screen-support-eq row used the generic OK|FAIL reader (and the skill-mention rule), so every skill whose tool run prints 'ws-screen-support-eq: N/A' (no screen supports) FAILed the row; PARSE.screenSupportEq existed but was not wired",
+  "kind": "commit-pair",
+  "rule": "ws-precritic screen-support-eq gate: parse: PARSE.screenSupportEq (N/A -> N/A)",
+  "browser": false,
+  "fail": {
+   "commit": "0e80c26e4",
+   "state": "the gate has no parse option: an N/A run reads as FAIL"
+  },
+  "pass": {
+   "commit": "1355cf547",
+   "state": "the gate uses PARSE.screenSupportEq: the N/A line reads N/A"
+  },
+  "command": "node {root}/tests/scripts/ws-precritic.cjs --self-test > /dev/null && node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const line=s.split('\\n').find(l=>l.includes(\\\"add(gate('screen-support-eq'\\\"))||'';const P=new Function(s.match(/const unparsed = .*\\n/)[0]+'const PARSE={'+s.match(/    screenSupportEq\\(g, out, code\\) \\{[\\s\\S]*?\\n    \\},/)[0]+'};return PARSE;')();const r=P.screenSupportEq({},'ws-screen-support-eq: N/A (checked: - ; no supports (n/a): algebra:function_table_easy )\\n',0);console.log(/parse: PARSE\\.screenSupportEq/.test(line)&&r.result==='N/A'?'sse-na: OK':'sse-na: FAIL (the row does not use its N/A parser)')\" {root}/tests/scripts/ws-precritic.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }
