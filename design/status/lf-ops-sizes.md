@@ -32,3 +32,23 @@
     -> 1 a page (ceiling 4). Measured capacity, not forced.
   - Area-model lesson charts print one panel a chart page (CELL-FITS chartFull; panel 130 mm, page 201 mm): 4 chart pages,
     each ~40 % blank. Shared with the area-model host overflow noted above.
+
+## 2026-11-20 fix round (lead A9)
+- A9 (1) Reason It L: long multiplication takes UNDER (reason-it.js workW); ruled 1 a page at L for mult_2by2/3by2 (capacity.json);
+  M still 2 a page. **Next-week engine item: the Reason It answer frame wraps at L** (then the beside layout may return).
+- A9 (2) area_model_4by1 word-problems L: the 4-part model stands under its story (word-problems.js mq-wpunder), 7.6 mm overflow
+  gone; 1 a page ruled. A9 (3) true-false L 1 a page ruled. Card: A9 (1)-(3) added, --resign, UNSIGNED.
+- Lesson print-lint: area_model_4by1 lesson clean at M; mult_4by1_column only L-TOPSTART x12 left (lesson Practice stack cells,
+  6.2 mm below the top pad: stack.js needsRegroup reads p.a/p.b, the multiply payload has `operands`, so the cell is not marked
+  write-above - not fixed: it moves the independent pages of every multiply preset; check: ws-print-lint L-TOPSTART).
+- Area-model lesson charts: chartMinZoom also adds a panel row a chart page (2x2 / 3x2 charts 4 -> 3 pages); area_model_4by1's
+  first panel (152 mm, the long "Split" words) still 4 pages.
+- multiply provider now carries the x stories (EB-ROLE). Backtests sizes-a9-ri-under, sizes-a9-wp-amodel4,
+  sizes-lesson-printlint, sizes-eb-role-stories: all PASS; ledger rows in CHECKS_FROM_CRITICS.md.
+- MASTER bugs (next week, evidence: same gate on master 9ae9ccd5d):
+  - options-verify: notation=across prints stacked on mult_2by2_standard; skipAfter=2/20 Skip off by one (also area_model_mult).
+  - cell-checks: area-model host OVERFLOW on lesson / opener / reason-it (area_model_3by1 M/L), stack error-analysis PUPILTAG
+    (mult_3by1_column M); area_model_mult word-problems L OVERFLOW.
+  - empty-band: stack independent EB-BAND (mult_3by1_column M/L, 35 % bands), area-model reason-it bands.
+- Not re-run this round (cap): slot-clip, role-cover (timed out last run, no finding seen), grade-render (its 12 were the chart
+  overflow fixed here + the area lesson-L host overflow above), the sharded precritic.
