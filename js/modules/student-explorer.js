@@ -587,9 +587,18 @@ function cropStage(frame, s, q) {
         const line = [...stage.querySelectorAll('.tvp-q, .tvp-instr')].find((n) => isVisible(n));
         const said = screenClean(line ? line.textContent : questionText(q)).replace(/\s+/g, ' ').trim();
         for (const n of stage.querySelectorAll('.tvp-q, .tvp-instr')) n.style.display = 'none';
+        // (NODUP, placevalue:unit_form at plate S) the drawn item IS the question, spread over its own boxes and spans
+        // ("556 = [] hundreds [] tens [] ones"): no one node can go, so the head names the skill instead of saying it twice
+        let sayHead = said;
+        if (said) {
+            const want = normText(said).split(' ').filter((w) => w.length > 1);
+            const drawn = new Set(normText([...stage.querySelectorAll('*')].filter((n) => !n.closest('svg') && isVisible(n))
+                .map((n) => [...n.childNodes].filter((c) => c.nodeType === 3).map((c) => c.textContent).join(' ')).join(' ')).split(' '));
+            if (want.length >= 3 && want.every((w) => drawn.has(w))) sayHead = '';
+        }
         // the head says the question: a line of the drawing that restates it ("Tap ALL the quadrilaterals." under
         // "Click ALL the quadrilaterals.") goes, so the window shows the figure (NODUP)
-        if (said) {
+        if (sayHead) {
             const have = new Set(normText(said).split(' '));
             for (const n of stage.querySelectorAll('*')) {
                 if (n.closest('svg') || !isVisible(n)) continue;
@@ -600,7 +609,8 @@ function cropStage(frame, s, q) {
         }
         head = document.createElement('p');
         head.className = 'mqx-thumb-crophead';
-        head.textContent = said || s.label;
+        // (a head that would only repeat the item says what to do; the card's own caption under the plate already names it)
+        head.textContent = sayHead || (stage.querySelector('[data-ws-slot], [data-mq-blank]') ? 'Fill in the boxes.' : s.label);
         win = document.createElement('div');
         win.className = 'mqx-thumb-window';
         frame.insertBefore(head, stage);
