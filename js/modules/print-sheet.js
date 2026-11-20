@@ -24,7 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
-import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet, setChartEdge, setChartPageGrid } from './chart-giveaway.js';
+import { chartOfQ, cwKey, cwExt, chartGivesAway, setChartSheet, setChartEdge, setChartPageGrid, setChartLesson } from './chart-giveaway.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
@@ -6452,7 +6452,7 @@ export function buildSheet(req = {}) {
     _cwShowFirst = !!(req && ['guided', 'scripted-model'].includes(req.role));
     _cwRoleTiles = req && req.role === 'guided' ? 3 : null;
     _cwForceFirst = null;
-    _cwEdge = false; setChartEdge(false); setChartPageGrid(null);
+    _cwEdge = false; setChartEdge(false); setChartPageGrid(null); setChartLesson(!!(req && req.role === 'lesson'));
     _cwSheet.clear();
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
     // queue: it builds its pages through buildSheet itself).

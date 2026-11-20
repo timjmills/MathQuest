@@ -94,6 +94,12 @@ export const chartEdge = () => EDGE;
 let PAGE_GRID = null;
 export const setChartPageGrid = (v) => { PAGE_GRID = v || null; };
 export const chartPageGrid = () => PAGE_GRID;
+/* A LESSON packet is being dealt (critic blanks r2, STEP-COVER and LESSON-TWIN on every band): its pages print the Steps band
+ * (left +1, up +10, top row: down -10), so every gap keeps a neighbour one of those steps reads, and no pupil window repeats
+ * another window's squares on any page. Set by buildSheet for role 'lesson', `false` elsewhere. */
+let LESSON = false;
+export const setChartLesson = (v) => { LESSON = !!v; };
+export const chartLesson = () => LESSON;
 
 /**
  * "Numbers to fill in" (lead ruling 2026-11-14): the most empty squares a window of R rows and C columns can legally hold -

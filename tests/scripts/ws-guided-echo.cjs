@@ -341,7 +341,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                 else seenTw.set(k, `p${pi + 1} window ${wi + 1}`);
                             }));
                         }
-                        if (on('ANSWER-VARIETY') && /chart/.test(skillId)) pagesJ.forEach((pg, pi) => {
+                        // (not a Scripted Model: its cells are the states of ONE worked window)
+                        if (on('ANSWER-VARIETY') && /chart/.test(skillId) && role !== 'scripted-model') pagesJ.forEach((pg, pi) => {
                             const ws = pupilWins(pg.items); if (ws.length < 4) return;
                             const cnt = new Map(); ws.forEach((w) => { const k = w.gaps.slice().sort((a, b) => a - b).join(', '); cnt.set(k, (cnt.get(k) || 0) + 1); });
                             const [topSet, topN] = [...cnt].sort((a, b) => b[1] - a[1])[0];

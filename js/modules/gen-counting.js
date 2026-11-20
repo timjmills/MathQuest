@@ -39,7 +39,7 @@ import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
 import { onNewPage } from './page-deal.js';
-import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge, chartPageGrid } from './chart-giveaway.js';
+import { chartSheet, chartGapCap, CHART_TILES_DEFAULT, chartEdge, chartPageGrid, chartLesson } from './chart-giveaway.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -934,6 +934,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
         const pickWin = () => {
+            // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
+            // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
+            const k10 = _lessonRows ? kept.filter((k) => !k.shows && !k.ext && k.cols.length === 10) : [];
+            if (k10.length) {
+                // (none left: the first grid's own squares - a twin, which the dealer refuses, so the page holds the grids it has)
+                const free = [6, 3].filter((a) => !k10.some((k) => k.rows.some((r) => r >= a && r <= a + 2)));
+                const r1 = free.length ? free[rng(0, free.length - 1)] : k10[0].rows[0];
+                return { rows: [r1, r1 + 1, r1 + 2], cols: Array.from({ length: C }, (_, k) => k) };
+            }
             const r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
             const c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
             return { rows: Array.from({ length: R }, (_, k) => r0 + k), cols: Array.from({ length: C }, (_, k) => c0 + k) };
@@ -996,7 +1005,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
             const idxOf = (n) => rows.indexOf(Math.floor((n - 1) / 10)) * C + cols.indexOf((n - 1) % 10);
             // (a window of the same squares: never on the same run or a shown one; on another page it repeats with the same gaps)
-            if (kept.some((k) => k.rows.join() === rows.join() && k.cols.join() === cols.join() && (!k.ext || k.shows))) continue;
+            if (kept.some((k) => k.rows.join() === rows.join() && k.cols.join() === cols.join() && (!k.ext || k.shows || (chartLesson() && !_lessonRows)))) continue;
             const forced = new Set(), barred = new Set();
             for (const k of kept) {
                 // (a SHOWN window - the worked Model - prints every square, its traced answers too: none is left empty here)
@@ -1060,7 +1069,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (_cross && t < (kept.length ? 40 : 200) && w < 12 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
                 // (critic blanks r2 R2-2, STEP-COVER: every gap of a band-120 lesson window is solved by a printed Step from a
                 // printed neighbour - left +1, up +10, top row: down -10; the Steps band names no "look right")
-                if (_to120 && chartEdge() && !cand.every((i) => (i % C > 0 && !set.has(i - 1)) || (i >= C && !set.has(i - C)) || (i < C && i + C < N && !set.has(i + C)))) continue;
+                if ((chartLesson() || (_to120 && chartEdge())) && !cand.every((i) => (i % C > 0 && !set.has(i - 1)) || (i >= C && !set.has(i - C)) || (i < C && i + C < N && !set.has(i + C)))) continue;
                 // (the rows grid: the crossing squares in play when the packet leaves one free - R2-1 CROSSING-IN-PLAY)
                 if (_lessonRows && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
                 pickIdx = cand;

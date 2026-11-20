@@ -1,0 +1,10 @@
+ws-print-lint: source kit, 1 skill(s)
+  composing:chart_to_120#lesson: 6+3 pages, 0 finding(s)
+
+document                         pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+composing:chart_to_120#lesson      6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                      .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+composing:chart_to_120#lesson (Count to 120 on the Chart (lesson))
+
+ws-print-lint: OK (1 document(s), source kit; 0 finding(s) in 0 document(s))
