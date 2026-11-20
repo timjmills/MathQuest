@@ -156,3 +156,5 @@ One fix round did not fit the $1,618.37 stop (≈ $58 left against 15 findings, 
 9. **F10:** the tiles=null Model step text is garbled.
 10. **F13–F15:** story sense, commas, host title.
 11. **A9c item 1:** area-model Reason It + word-problems at M, 2 a page (measurements above).
+
+**Carry-over (lead, 2026-11-20):** with the first next-week commit, add to design/audit/LESSONS_LEARNED.md "Process rules": "a precritic red on a page type master never drew (new*) is the branch's own red; it is never parked as master's". This is adopted after sizes r1 F1. The lead does the F1 master check, so this lane spends nothing on it.
