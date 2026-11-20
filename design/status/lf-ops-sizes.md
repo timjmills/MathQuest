@@ -93,3 +93,49 @@ Not run, with the reason:
 - ws-role-cover: its estimate is about 63 min of slot time per skill (2 shards of 30+ min). That does not fit 9-minute foreground shards inside the $12 cap.
 - grade-render on the other 12 roles, raster-fit, screen gates (screen-slots, screen-answer, chromebook-fit, phone-card, options-shots), guided-echo, two-step, the node unit gates and the rest of the plan: not run within the cap.
 - master cell-checks `--card --card-opts`: master has no signed card for these hosts.
+
+## 2026-11-20 fix round
+
+lf-ops fixer (Opus medium, rebuild of the sharded-precritic reds). Branch head before: 15ce118c7. Each fix is check-first, with a
+backtest row (tests/fixtures/precritic/backtests.json, FAIL on the old commit, OK on the fix) and a ledger row in
+design/lessons-first/CHECKS_FROM_CRITICS.md.
+
+| item | check | before → after | backtest row |
+|---|---|---|---|
+| 1 SAYLESS mult_break_apart | ws-hint-no-blank SAYLESS | FAIL → OK (mult_properties `screenHelp`: "<rows> times <cols> is ___."; a line with no number when a factor equals a part) | `sizes-sayless-break-apart` |
+| 2 OVERFLOW lesson (mult_2by2 / mult_3by2) | ws-cell-checks --card --card-opts | 12 + 4 → 0 (220 pages). tiles=41 takes the 1-digit column routine (`byOption`, tailLast); tiles=null caps the chart at zoom 1.3 (chart.js `chartMaxZoom`; prereqs optionLesson reads a 'null' entry) | `sizes-lesson-overflow-tiles` |
+| 2 why 12+6 pages | - | not a defect: the branch adds the authored lesson Y5.B5.S3 (routine mult-column-2digit: vocabulary, chart, Warm-up, Guided, Practice, Mixed); master printed the 2-page default lesson. print-lint lesson L/M counts are unchanged by this round | - |
+| 3 EB-GDPCAP Guided L | ws-empty-band EB-GDPCAP + EB-BAND, guided L | GDPCAP 8 → 5 tries (both skills); guided BAND 4 + 1 → 0. guided.js keeps the §12.1 ceiling on multi-page sheets (no row past it); the long-multiplication footprint is `noStretch` | `sizes-guided-gdpcap` |
+| 4 PUPILTAG mult_4by1_column EA M | ws-cell-checks PUPILTAG | 1.8 mm → in 2-4 mm (error-analysis tagLiftOf: a `*` stack lifts the label 0.5 mm) | `sizes-pupiltag-colmult` |
+| 5a OVERFLOW area_model_3by2 Word problems L | ws-cell-checks OVERFLOW | FAIL 2 → 0 (a 2-row model of 3+ parts takes the UNDER layout at L) | `sizes-wp-amodel32-under` |
+| 5b OVERFLOW area_model_4by1 Reason It M | ws-cell-checks OVERFLOW | NOT FIXED (below) | - |
+| 6 options-verify notation=across | ws-options-pin --check (notation pairs) | unpinned → pinned on mult_4by1_column and mult_3by2_standard, reason "master bug class, logged" (`reasons` in the pin) | `sizes-ov-notation-pin` |
+| A9b (a) LONE-PAGE L, ruled | ws-cell-checks LONE-PAGE | area_model_2by2 reason-it L / word-problems L, area_model_3by2 reason-it L / true-false L / word-problems L: FAIL → ruled (capacity.json, "4-part model under-layout; A9b") | (ruling) |
+| A9b (b) Word problems M, two a page | ws-cell-checks LONE-PAGE | DEFERRED to next week (below) | - |
+
+Not fixed, with the reason:
+- **area_model_4by1 Reason It M** (OVERFLOW 4; area_model_2by2 / 3by2 Reason It M show the same class, 4 each). reason-it.js
+  takes the BESIDE layout because an area-model footprint gives no true work width (`workW` 0). The 4-part model is 143 mm by
+  its footprint at M (about 121 mm drawn), against a 62 mm half panel beside the response column, so A and B run over each
+  other and out of the cell. Neither layout holds two a page: UNDER needs the model in half the cell (≤ 86 mm), and STACKED
+  (A over B, the response beside it in a ~124 mm column) is 2 × 79 mm of model per item, so one a page at M, which is a
+  LONE-PAGE that no ruling covers. Needs a lead ruling (one a page at M, or a smaller-panel A/B form) before a fix.
+- **A9b (b) Word problems M** (area_model_2by2 / 3by2, one a page where the role holds 3). Measured by footprint at M: the
+  2-row model is 86 × 91 mm (2by2) and 118 × 91 mm (3by2); the work space beside the answer column is about 117 mm wide. The
+  3by2 model does not fit beside; under, the story band (~25 mm) + the model (91 mm) + its work lines + the answer row is
+  more than half the ~230 mm body. Two a page needs a shorter model (drop the work lines at M) or the story beside the model.
+  Not started within the cap; deferred to next week.
+- area_model_2by2 true-false L LONE-PAGE: not in the A9b list (the ruling names 3by2 true-false L only).
+- TITLE: the long-multiplication lesson printed for tiles=41 keeps the preset's title ("2-digit by 2-digit"); LESSON-OPT /
+  TITLE are opt-in rules, so this is logged, not fixed.
+
+Gate reruns (touched skills, one at a time; scratchpad `rerun/`):
+- cell-checks `--card`: mult_4by1_column OK, mult_3by2_standard OK, mult_2by2_standard OK (and `--card --card-opts` 220 pages OK
+  for the two long-multiplication presets). area_model_4by1 26 (OVERFLOW lesson L, opener, reason-it M/L; PUPILTAG: master
+  class), area_model_2by2 22, area_model_3by2 31: master classes, reason-it M and Word problems M above. area_model_3by2
+  LONE-PAGE 4 → 1.
+- print-lint lesson L and M: the same per-skill counts as the shard (121 L / 110 M, the TOPSTART class left for next week).
+- empty-band (`--hosts none`, so not like-for-like with the shard's run): 141→96, 96→63, 31→15, 27→15, 27→17, 125→92;
+  EB-GDPCAP 0, EB-PAGE 0.
+- ws-hint-no-blank (the six skills + mult_break_apart + mult_properties): OK. ws-roles-unit: OK (113).
+- ws-backtest: the six new rows PASS one by one.
