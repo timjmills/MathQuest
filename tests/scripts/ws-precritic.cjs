@@ -997,6 +997,12 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-engine row cap, critic r1 F3: a capped template's rows are counted at the height they are drawn - ROWCAP-FILL)
+        add(gate('rowcap-fill', 'ws-rowcap-fill (ROWCAP-FILL: capped rows counted at drawn + room)', 'the page engine', 'node', 'ws-rowcap-fill', [], { missingMsg: 'ws-rowcap-fill is not in this tree' }));
+        // (lf-placevalue vocab deploy, lf-engine review of fbca1a582: a Mixed page's packing counts a page-opening shelf with its strip - MIX-PAGES)
+        add(gate('mix-pages', 'ws-mix-pages (MIX-PAGES: a lead shelf the Mixed packing adds never prints a page of its own; MIX-DROP: a shelf that fits is never dropped)', 'the Mixed page engine', 'node', 'ws-mix-pages', [], { missingMsg: 'ws-mix-pages is not in this tree' }));
+        // (lf-engine vocabfix item 2: a lesson part over two pages never leaves a page more white than the next page's first item needs)
+        add(gate('lesson-fill', "ws-lesson-fill (LESSON-FILL: the lesson's Practice page never leaves room for the next page's item)", `${scope} lesson × M/L`, 'browser', 'ws-lesson-fill', ['--lessons', keys.join(',')], { missingMsg: 'ws-lesson-fill is not in this tree' }));
         // (lf-roles r16 F3, lead: a Guided continuation page's cells hold their content - CELL-FITS, two-step stories M / L)
         add(gate('guided-cellfit', 'ws-guided-cellfit (CELL-FITS: Guided pages 2+ hold their cells; GUIDED-HINT-LEAK box numbers; HINT-OVERMASK given numbers stay - HINT-UNIFORM waits on lf-algebra)', 'the Guided role', 'browser', 'ws-guided-cellfit', ['--only', 'CELL-FITS,HINT-LEAK,HINT-OVERMASK'], { missingMsg: 'ws-guided-cellfit is not in this tree' }));
         // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
@@ -1210,8 +1216,14 @@ function buildPlan(ctx) {
         // - Scripted Model and Guided, the pages that run nearest full - printed to a real PDF at S, M and L and rasterised
         // (RR-PAGES the plan's page count, RR-EDGE no ink at the paper's edge, RR-CLIP no clipped or covered text). Only
         // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
-        add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × M/L`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // (critic lf-engine-rowcap-s2 F1-F3: RR-BOX - every frame edge inked in print - on EVERY role whose rows the row cap holds)
+        const RASTER_ROLES = 'scripted-model,guided,error-analysis,pre-skill-check,review,test,independent,mixed-practice,opener';
+        add(gate('raster-fit', `ws-grade-render --raster-fit (${RASTER_ROLES} printed to PDF at M, L: RR-PAGES, RR-EDGE, RR-CLIP, RR-BOX)`, `${scope} × ${RASTER_ROLES} × M/L`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', RASTER_ROLES, '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // PAGEFILL on the roles whose rows the cap holds (critic lf-engine-rowcap-s2 F4 / F5): an empty strip over 20 % of the problem
+        // area under the grid on Review, Test, Error Analysis or Opener, at M and L
+        for (const sz of ['M', 'L']) add(gate(`print-lint-fill-${sz}`, `ws-print-lint --source kit --roles review,test,error-analysis,opener --fill-roles (same) --size ${sz} --lints L-DENSITY (PAGEFILL on the capped roles)`, `${scope} × review, test, error-analysis, opener × ${sz}`, 'browser', 'ws-print-lint',
+            ['--source', 'kit', '--roles', 'review,test,error-analysis,opener', '--fill-roles', 'review,test,error-analysis,opener', '--size', sz, '--lints', 'L-DENSITY', '--skills', keys.join(',')], { parse: PARSE.printLint }));
         // ROLE COVER (lf-ops critic cbt r2 root cause, lead 2026-11-14): print-lint, empty-band and raster-fit on EVERY role the
         // signed card offers (no card: every buildSheet role) at M and L, AND under every option value that changes the drawing
         // (tests/lib/ws-drawing-variants.mjs: another drawing vocabulary or size class, or a page option; one value a drawing).

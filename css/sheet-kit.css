@@ -188,6 +188,9 @@
 /* ---------- bands (BD) ---------- */
 :is(.ws-page, .ws-sheet) .ws-band { flex: none; display: flex; flex-direction: column; border: var(--ws-heavy) solid var(--ws-ink); border-top: var(--ws-rule) solid var(--ws-ink); margin-top: -1.5pt; }
 :is(.ws-page, .ws-sheet) .ws-band:first-child { margin-top: 1.5mm; border-top-width: var(--ws-heavy); }  /* the header rule already closes the header */
+/* the Say band closes the Model frame: its top rule paints over the band above it, so a row that runs a hair past its share in
+   print never covers the frame's foot (RR-BOX; lf-engine vocabfix, rowcap critic F1) */
+:is(.ws-page, .ws-sheet) .ws-band.ws-band--say { position: relative; z-index: 1; background: #fff; }
 :is(.ws-page, .ws-sheet) .ws-band.grow { flex: 1 1 0; min-height: 0; }
 :is(.ws-page, .ws-sheet) .ws-strip { flex: none; min-height: var(--ws-strip); display: flex; align-items: center; gap: 3mm; padding: 0 3mm; font-size: var(--ws-text); }
 :is(.ws-page, .ws-sheet) .ws-strip b { font-weight: 700; }

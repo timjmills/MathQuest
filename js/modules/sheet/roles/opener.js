@@ -20,7 +20,7 @@ import {
     poolItems, answerOf, labelStyleOf, stripExtraMm, oneKindFirst, stepsKindOf,
 } from './compose.js';
 import { slotScore } from '../paginate.js';
-import { koMm } from '../layout.js';
+import { koMm, rowCapMm, drawnRowMm } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -152,8 +152,13 @@ function geometry(items, input, cap = {}) {
     if (first && first.template === 'count-row' && gc === 1 && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= m.budget) { gRows = 2; used += gH; }
     const spare = Math.max(0, m.budget - used - held);
     const rowsThatGrow = gRows + iRows;
+    // (ROW-STRETCH CAP, layout.rowCapMm: a row of declared templates grows at most their writing room past its drawn height;
+    // the spare height it refuses stays white at the foot)
+    // (the cap is reckoned on what the rows DRAW - their measurement - not on gH, which a footprint's floor may lift: rowMm)
+    const rowItems = practice.slice(0, gc * rowsThatGrow);
     const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first));
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used, stepPairs };
+    const rowMm = Math.min(gH + grow, rowCapMm(drawnRowMm(rowItems, gc) || gH, rowItems));
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, rowMm, overBudget: used > m.budget, used, stepPairs };
 }
 
 /**
@@ -301,10 +306,10 @@ export function plan(input = {}) {
         }
     }
     if (!g.spill) sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
-        content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH + g.grow, labels: 'none' }) });
+        content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.rowMm !== undefined ? g.rowMm : g.gH + g.grow, labels: 'none' }) });
     if (indep.length && !g.spill) {
         sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
-            content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
+            content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.rowMm !== undefined ? g.rowMm : g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
     }
     const notes = [];
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");

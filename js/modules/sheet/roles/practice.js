@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows, rowStretches, NO_STRETCH_ROOM, GDP_ROW_ROOM, capRowsToInk, isStoryWork,
+    tightRows, rowStretches, NO_STRETCH_ROOM, GDP_ROW_ROOM, capRowsToInk, isStoryWork, rowCapMm,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -696,7 +696,9 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0, cap = S
     // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
     // problem beside a tall one would otherwise sit in a band of a third of its cell)
     const k = Math.min(cap, (availMm - 1) / S);
-    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, capR[r] * mins[r]))));
+    // (ROW-STRETCH CAP, layout.rowCapMm: a row of declared templates is spread at most to its drawn height + their writing room)
+    const rcap = w.map((x, r) => rowCapMm(x, items.slice(r * cols, (r + 1) * cols)));
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, capR[r] * mins[r], rcap[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
@@ -761,7 +763,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         // takes the band off the page; s3 precritic-2 ex-group H13).
         const aMm0 = anchorBandOf(anchors, si);
         const L0 = resolveBandedLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: sec.noStretch } : {}) }, aMm0,
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: sec.noStretch } : {}), ...(sec.fillClamped ? { fillClamped: true } : {}) }, aMm0,
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -974,7 +976,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(Object.assign({}, sec, { srcIndex: si })); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: sec.noStretch } : {}) };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: sec.noStretch } : {}), ...(sec.fillClamped ? { fillClamped: true } : {}) };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -1095,7 +1097,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: sec.noStretch } : {}) },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: sec.noStretch } : {}), ...(sec.fillClamped ? { fillClamped: true } : {}) },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -1276,6 +1278,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             if (lone && !noCapSec && !capFill && !its.some((it) => it.anchor) && !L.blocks && !(L.cols === 2 && L.pairs) && (rowsN === 1 || (!gap.gap && its.every(isStoryWork)))) {
                 const drawn = spread ? spread.heightMm : gap.gap ? gap.heightMm : shape ? shape.heightMm : fillByFlex ? avail : rowsN * L.cellH;
                 oneRow = capRowsToInk(its, L.cols, rowsN, drawn, rowsN === 1 ? '' : spread ? spread.rowsTpl : shape ? shape.rowsTpl : '');
+                // (ROW-STRETCH CAP stage 2: a one-row grid the row cap already holds under its page is the same ruled one-row grid)
+                if (!oneRow && rowsN === 1 && drawn > 0 && drawn < avail - 1) oneRow = { heightMm: Math.round(drawn * 100) / 100, rowsTpl: '' };
             }
             if (oneRow) sections.push({
                 kind: 'grid', cols: L.cols, rows: rowsN, labels: labelStyle, start, cls: `fixed mq-spread ${rowsN === 1 ? 'mq-onerow' : 'mq-inkrows'}`, height: `${oneRow.heightMm}mm`, rowsTpl: oneRow.rowsTpl,
@@ -1415,7 +1419,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         return Object.assign({}, L0, { rows, perPage: per, pages: parts.length, note });
     }).map((L, si) => ({
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
-        requested: L.requested, clamped: L.clamped,
+        requested: L.requested, clamped: L.clamped, overflow: !!L.overflow,
         // The dialog's line tells the truth about a split-off group (splitWide).
         note: norm.sections[si].fineSplit ? [`${sheetItems[si].length} column problems in ${L.cols} columns.`, L.note].filter(Boolean).join(' ')
             : norm.sections[si].splitOf !== undefined
