@@ -444,6 +444,8 @@ export const VALUE_TOKENS = Object.freeze({
         '1/2': 'B', '1/3': 'C', '1/4': 'D', '1/5': 'E', '1/6': 'G', '1/8': 'I', '1/10': 'J', '1/12': 'L', '0.1': 'M', '0.01': 'N' }),
     nlLabels: Object.freeze({ auto: 'A', all: 'L', 2: '2', 5: '5', 10: 'T', ends: 'E', none: 'N' }),
     nlMinor: Object.freeze({ auto: 'A', 0: '0', 2: '2', 4: '4', 5: '5', 10: 'T' }),
+    // lane lf-algebra (2026-11-20): growing_shape_patterns band default 'auto' (20, or 50 on the Term 10 task); numbers stay decimal
+    band: Object.freeze({ auto: 'A' }),
 });
 
 // Every member a numeric SET option takes on any skill, written as itself in base 36 (7 -> "7",
@@ -507,6 +509,8 @@ export const SCALAR_ONLY = Object.freeze({
     patShow: 'bool',
     // lane lf-algebra (2026-11-20)
     mtBracket: 'bool', mtBand: 'decimal',
+    // lane lf-algebra lesson 7 r3: multi_step_word(_plain) choose the answer A-D
+    msChoose: 'bool',
 });
 
 /**

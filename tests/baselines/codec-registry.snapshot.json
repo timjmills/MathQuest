@@ -126,7 +126,12 @@
     "familyChart": "4K",
     "patTask": "4U",
     "patShow": "4V",
-    "growShape": "4W"
+    "growShape": "4W",
+    "msChoose": "4T",
+    "mtForm": "4X",
+    "mtPair": "4Y",
+    "mtBracket": "4Z",
+    "mtBand": "5X"
   },
   "blocks": {
     "0": {
@@ -259,7 +264,9 @@
     },
     "simplestForm": {},
     "pictures": {},
-    "band": {},
+    "band": {
+      "auto": "A"
+    },
     "step": {
       "0": "0",
       "1": "1",
@@ -801,7 +808,19 @@
       "dots": "D",
       "squares": "S",
       "mixed": "M"
-    }
+    },
+    "msChoose": {},
+    "mtForm": {
+      "solve": "S",
+      "both": "B",
+      "missing": "M"
+    },
+    "mtPair": {
+      "ten": "T",
+      "any": "A"
+    },
+    "mtBracket": {},
+    "mtBand": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -850,7 +869,10 @@
     "msLetter": "bool",
     "msCheck": "bool",
     "familyChart": "bool",
-    "patShow": "bool"
+    "patShow": "bool",
+    "msChoose": "bool",
+    "mtBracket": "bool",
+    "mtBand": "decimal"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
