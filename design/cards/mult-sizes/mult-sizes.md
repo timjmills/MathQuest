@@ -234,7 +234,7 @@ Each runs as `node tests/scripts/<script> …`.
 4. **G4-Y5.B5 is queue round 4, not the current round (FASTEST_PLAN rule 1). Build now?** Recommended: Lead decision; the lead requested it 2026-11-19. If built now, ship the five presets as one unit with their lessons.
 5. **MW4K / IXL research is from public pages only (no logins). Sign now?** Recommended: Yes: the size classes and responses agree across four sources; a logged-in pass can add item counts later without changing the card.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-20
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
