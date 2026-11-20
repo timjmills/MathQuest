@@ -218,8 +218,11 @@ const FEATURE_STATE_W = 64;
 function featureCell(p, ctx) {
     const choices = (p.choices || []).map(String);
     const on = isTwin(ctx) ? -1 : checkedChoice(p, ctx, choices);
-    const rule = `<div class="mq-nt-rule" style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.2;">Start at ${esc(p.start)}. Add ${esc(p.step)} each time.</div>`;
     const tiles = trackTiles(p, ctx);
+    // (critic r3 R3-3: where the track leaves tiles for the pupil to write in - the Test, a faded hint - the item's own rule
+    // line says so; the page instruction is the same on every level and cannot. ws-instr-slots reads data-ws-prompt.)
+    const writes = tiles.some((t) => /data-ws-slot=/.test(t));
+    const rule = `<div class="mq-nt-rule"${writes ? ' data-ws-prompt' : ''} style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.2;">Start at ${esc(p.start)}. Add ${esc(p.step)} each time.${writes ? ' Write the numbers.' : ''}</div>`;
     // two threes side by side: one row of six where it fits, else three over three (never 5 + 1)
     const g = L(ctx, 1.5);
     const triple = (a) => `<span class="mq-nt-triple" style="display:inline-flex;flex-wrap:nowrap;gap:${g};">${a.join('')}</span>`;

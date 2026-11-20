@@ -1246,6 +1246,8 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 const presentation = shuffle(terms.map((t, i) => ({ id: 't' + i, label: String(t), val: t })));
                 const ans = sortedTerms.map(v => presentation.find(t => t.val === v).id);
                 q.text = `Drag the numbers in ${direction === "asc" ? "counting" : "reverse counting"} order.`;
+                // (lf-algebra critic r3 R3-6: paper never says "Drag" - the pre-skill check prints this item; H7)
+                q.printText = `Write the numbers in ${direction === "asc" ? "counting" : "reverse counting"} order.`;
                 q.ans = ans;
                 q.answerType = 'dnd-generic';
                 q.dndMode = 'order';
