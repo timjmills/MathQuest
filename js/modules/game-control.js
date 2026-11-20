@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { SKILLS, DOMAINS } from './data.js';
-import { isSkipAvailable, calcAllowedFor } from './skip-rule.js';
+import { isSkipAvailable, calcAllowedFor, updateSkipButton, showSkipReturnIntro, endCardSkipReturn } from './skip-rule.js';
 import { isTeacherLaunch, syncPlayChrome, syncBoard } from './launch-chrome.js';
 
 let _fullscreenHandler = null;
@@ -112,8 +112,11 @@ export function shouldShowNextButton() {
 export function recordQuestionStatus(status, opts) {
     if (!Array.isArray(state.questionHistory)) state.questionHistory = [];
     const reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
+    // The end-of-run return pass (skipped items come back): the answer lands on the item's own index.
+    const returning = (typeof state._skipReturnIdx === 'number') ? state._skipReturnIdx : -1;
     const idx = reviewing >= 0
         ? reviewing
+        : returning >= 0 ? returning
         : Math.max(0, (state.qCount || 1) - 1);
     const prev = state.questionHistory[idx];
     const prevStatus = typeof prev === 'string' ? prev : (prev && prev.status);
@@ -140,6 +143,8 @@ export function recordQuestionStatus(status, opts) {
     if (status === 'incorrect' || prevStatus === 'incorrect' || prevWasWrong) {
         entry.wasWrong = true;
     }
+    // A skip after a wrong try keeps the wrong try visible to the teacher: "incorrect, then skipped" (critic r1 F6).
+    if (status === 'skipped' && entry.wasWrong) entry.wrongThenSkipped = true;
     state.questionHistory[idx] = entry;
     // Skipped count: increment ONLY on first-time skip (not re-skip via review).
     if (status === 'skipped' && !wasSkipped) {
@@ -148,7 +153,10 @@ export function recordQuestionStatus(status, opts) {
         // A previously-skipped question is now answered — decrement.
         state.skippedCount = Math.max(0, (state.skippedCount || 0) - 1);
     }
+    // a skip in the return pass is the second skip: the item ends "skipped" (scored as not answered)
+    if (status === 'skipped' && returning >= 0 && reviewing < 0) entry.finalSkip = true;
     renderQuestionDots();
+    updateSkipButton();
 }
 
 // Recompute state.score = number of 'correct' entries in history.
@@ -323,7 +331,8 @@ export function renderQuestionDots() {
     const fixed = state.problemCount > 0 && state.problemCount < 1000 ? state.problemCount : 0;
     const total = fixed > 0 ? fixed : Math.max(answered, current);
     if (total <= 0) { row.innerHTML = ''; return; }
-    const reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
+    let reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
+    if (reviewing < 0 && typeof state._skipReturnIdx === 'number' && state._skipReturnIdx >= 0) reviewing = state._skipReturnIdx;
     let html = '';
     for (let i = 0; i < total; i++) {
         const entry = state.questionHistory[i];
@@ -338,7 +347,7 @@ export function renderQuestionDots() {
         if (status === 'correct' && wasWrong) cls += ' wrong-then-right';
         else if (status === 'correct') cls += ' correct';
         else if (status === 'incorrect') cls += ' incorrect';
-        else if (status === 'skipped') cls += ' skipped';
+        else if (status === 'skipped') cls += wasWrong ? ' skipped wrong-then-skipped' : ' skipped';
         else cls += ' unanswered';
         if (isCurrent) cls += ' current';
         // Build a status label that explains what each color means on hover.
@@ -349,6 +358,7 @@ export function renderQuestionDots() {
         else if (status === 'correct' && wasWrong) statusLabel = 'Got it right after a wrong try';
         else if (status === 'correct') statusLabel = 'Correct';
         else if (status === 'incorrect') statusLabel = 'Wrong';
+        else if (status === 'skipped' && wasWrong) statusLabel = 'Incorrect, then skipped';
         else if (status === 'skipped') statusLabel = 'Skipped';
         else statusLabel = 'Not yet answered';
         // Clickable when this index has an answered entry with a stored
@@ -384,7 +394,8 @@ export function skipCurrentQuestion() {
 
     // Worksheet mode uses per-card Skip; the button shouldn't even be visible
     // there, but defensively no-op.
-    if (state.gameMode === 'worksheet') return;
+    // (a MAP session does not reset gameMode: a worksheet run before it left 'worksheet' there - lf-hosts skip)
+    if (state.gameMode === 'worksheet' && state.mapMode !== true) return;
 
     // MAP mode (practice OR simulation): hand off to the MAP skip path which
     // records as skipped without mutating RIT/streak.
@@ -400,6 +411,11 @@ export function skipCurrentQuestion() {
     // (state.currentQAttempts), so there is no rationing here any more.
     if (!isSkipAvailable()) return;
     state.totalSkipsEver = (state.totalSkipsEver || 0) + 1;
+    // A skip is never a miss: the wrong tries held back for the adaptive ladder are dropped, not
+    // flushed as misses (they are replayed when the item comes back and is answered).
+    if (typeof window.dropDeferredAdaptive === 'function') {
+        try { window.dropDeferredAdaptive(); } catch (_) { /* non-fatal */ }
+    }
 
     // Standard practice/boss/race: mark as skipped, advance.
     recordQuestionStatus('skipped');
@@ -417,6 +433,105 @@ export function skipCurrentQuestion() {
     } else {
         nextQuestion();
     }
+}
+
+// ===== The end-of-run return pass (owner request via lf-hosts, 2026-11-19) =====
+// Practice card: when the run's last problem is done, every problem the pupil skipped comes back,
+// the SAME item (the stored question object, so the same values), one at a time, after the message
+// "You skipped n. Let's fix them." Each is answered and scored then through the normal answer path
+// (recordQuestionStatus writes to the item's own index via state._skipReturnIdx); a second Skip leaves
+// it "skipped" (entry.finalSkip), scored as not answered. Boss / race have no return pass (skip-rule.js).
+function _skippedIndexes() {
+    return (state.questionHistory || [])
+        .map((h, i) => (h && typeof h === 'object' && h.status === 'skipped' && h.q ? i : -1))
+        .filter((i) => i >= 0);
+}
+function _startSkipReturn(finish) {
+    if (state.gameMode !== 'practice' || state.quizMode || state.mapMode === true) return false;
+    if (state.skipReturn) return false;            // one return pass per run
+    const queue = _skippedIndexes();
+    if (!queue.length) return false;
+    const sr = { queue, pos: -1, active: false, done: false, finish };
+    state.skipReturn = sr;
+    state.hasAnswered = true;
+    state.lastAnswerCorrect = true;
+    showSkipReturnIntro(queue.length, 'card', () => {
+        // the run may have ended under the intro (timer, goal, Home): never start a pass on a finished run (F3)
+        if (state.skipReturn !== sr || sr.done) return;
+        sr.active = true;
+        _nextSkipReturn();
+    });
+    return true;
+}
+// ONE gate for the end of a practice-card run (critic r1 F1): the end screen and the session-history row are written
+// only here, once, and only after the return pass (if there is one) is done. A stray advance from an earlier item's
+// timer cannot finish the run early: nextQuestion is a no-op while state.skipReturn exists (see there).
+function _endRun(finish) {
+    if (state._runEnded) return;
+    if (_startSkipReturn(finish)) return;
+    if (state.skipReturn && !state.skipReturn.done) return;
+    finish();                                      // endGame marks the run ended (once per run)
+}
+/** Infinite practice: the round modal's Finish runs the return pass first, then the end screen (ruling R2). */
+export function finishPracticeRun() {
+    const ov = document.getElementById('roundOverlay');
+    if (ov) ov.remove();
+    // Count only answered items (lf-hosts F4): the item dealt under the round modal, never answered (no status in its
+    // history slot), is not part of the run - 3 answered read 3/3, not 3/4.
+    if (!state._runEnded && !state.skipReturn && state.currentQ && state.qCount > 0) {
+        const cur = (state.questionHistory || [])[state.qCount - 1];
+        if (!cur || (typeof cur === 'object' && !cur.status)) state.qCount--;
+    }
+    _endRun(() => endGame());
+}
+function _nextSkipReturn() {
+    const sr = state.skipReturn;
+    if (!sr) return;
+    sr.pos++;
+    if (sr.pos >= sr.queue.length) {
+        endCardSkipReturn();
+        _hideSkipReturnBanner();
+        if (state._runEnded) return;
+        sr.finish();
+        return;
+    }
+    const idx = sr.queue[sr.pos];
+    const entry = state.questionHistory[idx];
+    state._skipReturnIdx = idx;
+    state.currentQ = entry.q;
+    state.hasAnswered = false;
+    state.lastAnswerCorrect = false;
+    if (typeof window.resetAttemptTracking === 'function') {
+        try { window.resetAttemptTracking(); } catch (_) { /* non-fatal */ }
+    }
+    state.questionStartTime = Date.now();
+    if (typeof window.startQuestionTimer === 'function') window.startQuestionTimer(state.skill);
+    renderQuestion();
+    const qNum = document.getElementById('qNum');
+    if (qNum) qNum.textContent = `Q${idx + 1}`;
+    _showSkipReturnBanner(sr.pos + 1, sr.queue.length);
+    if (typeof window.updateGoalProgress === 'function') window.updateGoalProgress();   // "Fixing k of n" (R3)
+    updateSkipButton();
+    renderQuestionDots();
+    syncPlayChrome();
+}
+function _showSkipReturnBanner(k, n) {
+    const card = document.getElementById('questionCard');
+    if (!card || !card.parentElement) return;
+    let b = document.getElementById('skipReturnBanner');
+    if (!b) {
+        b = document.createElement('div');
+        b.id = 'skipReturnBanner';
+        b.className = 'mq-skipret-banner';
+        b.setAttribute('role', 'status');
+        card.parentElement.insertBefore(b, card);
+    }
+    b.textContent = `Skipped problem ${k} of ${n}`;
+    b.style.display = 'block';
+}
+function _hideSkipReturnBanner() {
+    const b = typeof document !== 'undefined' && document.getElementById('skipReturnBanner');
+    if (b) b.style.display = 'none';
 }
 
 export function showNextButton() {
@@ -514,6 +629,13 @@ export function startGame() {
     state.sessionBadges = [];
     state._reviewingQIndex = -1;
     state._liveQSnapshot = null;
+    state._skipReturnIdx = -1;
+    state.skipReturn = null;
+    state._runEnded = false;
+    state._advancingQ = null;
+    const _staleIntro = document.getElementById('skipReturnIntro');
+    if (_staleIntro) _staleIntro.remove();
+    _hideSkipReturnBanner();
     // Hide any leftover review banner from a prior session.
     const _staleBanner = document.getElementById('practiceReviewBanner');
     if (_staleBanner) _staleBanner.style.display = 'none';
@@ -661,6 +783,12 @@ export function updateTimerDisplay() {
 }
 
 export function transitionToNextQuestion() {
+    // ONE advance per answered item (lf-hosts F3): the transition belongs to the item on screen when it was asked for.
+    // A second request for the same item (the live check and Enter, two answer paths) is dropped, and a stale one (an
+    // earlier item's 2.5 s auto-advance timer, after the pupil's Enter already moved on) never advances a later item.
+    const forQ = state.currentQ;
+    if (forQ && state._advancingQ === forQ) return;
+    state._advancingQ = forQ;
     // Auto-dismiss any open hint popup so it doesn't linger over the next question.
     if (typeof window.closeHintPopup === 'function') {
         try { window.closeHintPopup(); } catch (_) { /* non-fatal */ }
@@ -670,6 +798,8 @@ export function transitionToNextQuestion() {
     card.classList.add("q-slide-out");
     setTimeout(() => {
         card.classList.remove("q-slide-out", "correct-bg", "incorrect-bg");
+        if (state._advancingQ === forQ) state._advancingQ = null;
+        if (state.currentQ !== forQ) return;      // the item already moved on (Enter, Skip, the end of the run)
         nextQuestion();
         // Slide in new question
         card.classList.add("q-slide-in");
@@ -696,6 +826,14 @@ export function nextQuestion() {
         resumeLiveQuestion();
         return;
     }
+    // The return pass: the item just answered (or skipped again) gives way to the next skipped one.
+    // Once a pass exists nextQuestion only walks it: under the intro, or after it, a stray advance from an
+    // earlier item's timer is a no-op, so it can neither deal a new item nor finish the run (critic r1 F1).
+    if (state.skipReturn) {
+        if (state.skipReturn.active && !(state.currentQ && !state.lastAnswerCorrect)) _nextSkipReturn();
+        return;
+    }
+    if (state._runEnded) return;
 
     // Auto-mark unfinished INTERACTIVE COORDINATE problems wrong before
     // advancing. The student clicked Next without submitting → treat as
@@ -755,12 +893,18 @@ export function nextQuestion() {
     if (settings && settings.totalProblemsEnabled && settings.totalProblems) {
         if (state.qCount > settings.totalProblems) {
             // Already answered the last problem, check if goal was met
-            const metGoal = !settings.correctGoalEnabled || (state.score >= settings.correctGoal);
-            if (metGoal) {
-                endGame(true, `Completed ${settings.totalProblems} problems! Score: ${state.score}`);
-            } else {
-                endGame(false, `Needed ${settings.correctGoal} correct, got ${state.score}`);
-            }
+            const finish = () => {
+                const metGoal = !settings.correctGoalEnabled || (state.score >= settings.correctGoal);
+                if (metGoal) {
+                    endGame(true, `Completed ${settings.totalProblems} problems! Score: ${state.score}`);
+                } else {
+                    endGame(false, `Needed ${settings.correctGoal} correct, got ${state.score}`);
+                }
+            };
+            // Before the end screen, every skipped problem comes back (owner request, lf-hosts skip).
+            // The run's total is the problems dealt, never one more (critic r1 F2: 4 right of 4 read "4/5").
+            state.qCount = settings.totalProblems;
+            _endRun(finish);
             return;
         }
     }
@@ -826,11 +970,9 @@ export function nextQuestion() {
 
     // Universal Skip button — show in practice/boss/race AND MAP modes.
     // Hidden in worksheet mode (per-card Skip is used there instead).
-    const skipBtn = document.getElementById('skipQuestionBtn');
-    if (skipBtn) {
-        // Hidden until N wrong tries (teacher option); answer-check.js reveals it.
-        skipBtn.style.display = 'none';
-    }
+    // Practice card: Skip shows from the start (owner request, lf-hosts); boss / race: hidden until
+    // N wrong tries (teacher option), answer-check.js reveals it. skip-rule.js decides.
+    updateSkipButton();
 
     // Refresh per-question dot row (current question highlighted with ring).
     renderQuestionDots();

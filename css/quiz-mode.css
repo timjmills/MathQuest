@@ -1308,6 +1308,20 @@
 
 .qt-result-q .correct-icon { color: #06D6A0; }
 .qt-result-q .incorrect-icon { color: #ef4444; }
+/* lf-hosts skip critic r2: a question still skipped after the return pass reads "Skipped" in the pupil's breakdown -
+   a neutral outlined pill in the text colour, never the red cross (a skip is not a wrong answer). Additive. */
+.qt-result-q .skipped-icon {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 8px;
+    border: 1.5px solid currentColor;
+    border-radius: 999px;
+    color: var(--text-secondary, inherit);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+}
 
 .qt-result-actions {
     display: flex;

@@ -964,3 +964,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Guided page drops the hidden middle question with the bar (86 % of M sheets Model + try on page 1); two_step_add_then_mult never states the Step 1 answer; provider `hint` field: "Step 1: circle +. Add." (no number in a Guided hint).
 - Backtest two-step-guided-no-mid pass side re-pointed to ddabf985a (the later hint check tightened --guided). ws-no-size-s allow-lists the eblast roleConstOf self-test string.
 - Known red: ws-worksheet-reflow on patterns:number_patterns_rule (pre-existing on master; lf-algebra bisecting).
+
+## 2026-11-20 — Deploy SKIP button (owner request; lf-hosts critic r2 8+ on every host) + end-run / touch-target bug fixes + Guided hint W2 mask (lf-roles critic PASS) + HINT-NO-BLANK smaller head (lf-placevalue; strictly better than master)
+- Skip on card / worksheet / quiz / MAP: skipped items return at the end ("Fixing k of n"); never wrong, never break a streak; MAP twice-skipped scores incorrect for RIT (lead ruling), results say Skipped. A run ends once (END-ONCE); infinite Finish counts answered only. Card tools and add_wp_20 sign >= 48 px.
+- Guided hints never print a number a box of the same try expects unless the question prints it (HINT-LEAK / HINT-OVERMASK / HINT-UNIFORM); vocab pick-3 hint leaves 2 words; continuation hint rows fit (CELL-FITS).
+- Screen help never shows a blank (675 -> 0 skills); the Say fallback only for one-number answers; remaining leaks pinned shrink-only to their lanes.
+- Gates: boot-smoke, code-snapshot, no-size-s, no-phone-width, roles-unit, skip, end-run, guided-cellfit, hint-no-blank, support-ladder, unit-form-bank, screen-answer, simple-print, key-json (sample), self-tests, precritic-plan, capacity-pin, lesson baseline.

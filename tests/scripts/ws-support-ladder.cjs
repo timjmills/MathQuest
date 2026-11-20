@@ -30,6 +30,10 @@ const WIDE = ['multiplication:mult_facts', 'division:div_facts', 'division:box_d
     'addition:add_word_problems', 'number_sense:round_nl_thousands', 'number_sense:nearest_100', 'measurement:money_count',
     'measurement:time_quarter|{"response":"draw"}', 'area_perimeter:area_perimeter', 'fractions:write_fraction',
     'algebra:function_table_easy', 'placevalue:value', 'comparing:compare_groups', 'composing:number_bonds'];
+// S8 allow-list (lead, 2026-11-20): the ONE skill whose screen help states the answer (its help is filled, q.fullWorked).
+// No other skill may join it: a second entry FAILs, and q.fullWorked on any other skill FAILs (ws-hint-no-blank holds the same list).
+const S8_EXCEPTIONS = [{ skill: 'placevalue:digit_value_unit_form', source: 'owner request 2026-11-15, fixed by lead' }];
+const S8_SKILLS = S8_EXCEPTIONS.map((x) => x.skill);
 const LIST = (arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const SKILLS = LIST.length ? LIST : has('wide') ? WIDE : DEFAULT;
 const HOSTS = (arg('hosts', has('wide') ? 'card' : 'card,worksheet,quiz') || '').split(',');
@@ -101,7 +105,7 @@ async function LOOK(which) {
     const fb = which.host === 'quiz' ? (document.querySelector('#quizTakeView .qt-feedback') || {}).textContent || ''
         : which.host === 'card' ? (document.getElementById('feedbackArea') || {}).textContent || '' : '';
     return {
-        n: s.n, ids: s.ids, drawnIds: s.drawnIds, spent: s.spent, kitOn, dots, extraOn, ring, worked, leaks, red, fb: fb.trim(),
+        n: s.n, ids: s.ids, drawnIds: s.drawnIds, spent: s.spent, kitOn, dots, extraOn, ring, worked, leaks, red, fb: fb.trim(), fullWorked: !!q.fullWorked,
         entry: input && input.type !== 'hidden' && input.offsetParent ? input.value : null, ans: a,
         len: L.ladderOf(q) ? L.ladderOf(q).rungs.length : 0,
     };
@@ -202,7 +206,9 @@ function judge(k, r, host, fails, tag) {
     // a short ladder (worked steps only, or one support) is spent early: the host's own behaviour
     if (r.len && k > r.len) { if (!r.worked) F('spent without ever showing the worked steps'); if (r.n !== r.len) F(`ladder at ${r.n}, want ${r.len}`); return; }
     if (r.n !== k) F(`ladder at ${r.n}, want ${k}`);
-    if (r.leaks.length) F(`the answer shows: ${r.leaks.join(', ')}`);
+    const skillKey = String(tag).split(' ')[0];
+    if (r.fullWorked && !S8_SKILLS.includes(skillKey)) F('q.fullWorked (help that states the answer) on a skill not in S8_EXCEPTIONS');
+    if (r.leaks.length && !S8_SKILLS.includes(skillKey)) F(`the answer shows: ${r.leaks.join(', ')}`);
     if (r.red) F('red flood on a ladder step');
     if (host === 'card' && r.entry !== null && r.entry === '') F('the entry was cleared');
     if (host === 'quiz' && /answer is/i.test(r.fb)) F(`quiz feedback gives the answer: "${r.fb}"`);
@@ -232,6 +238,9 @@ async function shot(page, host, skill, k, w) {
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
     const { page } = app;
     const fails = [];
+    if (S8_EXCEPTIONS.length !== 1 || S8_SKILLS[0] !== 'placevalue:digit_value_unit_form' || !S8_EXCEPTIONS[0].source) {
+        fails.push(`S8 allow-list must hold only placevalue:digit_value_unit_form (has ${S8_SKILLS.join(', ')})`);
+    }
     for (const w of WIDTHS) {
         await page.setViewport({ width: w, height: w < 600 ? 844 : 900, deviceScaleFactor: 1 });
         for (const spec of SKILLS) {

@@ -786,6 +786,15 @@ export function generateSolutionSteps(q) {
             steps.push(`<strong>Step 2:</strong> Count: ${factors.length} factors`);
             steps.push(`<strong>Answer: ${nt.num} is ${nt.isPrime ? 'PRIME' : 'COMPOSITE'}</strong>`);
         }
+        else if (nt.type === 'factors_identify' && !Array.isArray(nt.displayList) && Array.isArray(nt.factorPairs)) {
+            // the factor-pair fill (gen-number-theory.js): no list to test, so the popup shows the pairs (it threw before)
+            steps.push(`<strong>Problem:</strong> Fill in the missing factors of ${nt.num}`);
+            steps.push(`<strong>Factor pairs:</strong>`);
+            nt.factorPairs.forEach(pair => {
+                steps.push(`&nbsp;&nbsp;${pair[0]} × ${pair[1]} = ${nt.num}`);
+            });
+            steps.push(`<strong>Answer: ${nt.factors.join(', ')}</strong>`);
+        }
         else if (nt.type === 'factors_identify') {
             steps.push(`<strong>Problem:</strong> Circle all factors of ${nt.num}`);
             steps.push(`<strong>Test each number:</strong>`);

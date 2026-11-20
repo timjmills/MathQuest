@@ -16,13 +16,13 @@ import { lessonById, lessonData, lessonsForSkill, defaultLessonForSkill } from '
 import { exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses } from './google-classroom.js';
 import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './quiz-storage.js';
 import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab, handleQbQuestionDragStart, handleQbQuestionDragEnd, handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop, openBuilderResults, openBuilderMonitor } from './quiz-builder.js';
-import { quizQuestionData, handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './quiz-take.js';
+import { quizQuestionData, handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, skipQuizQuestion, quizReturnNext, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './quiz-take.js';
 import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest, closeQuizResults, copyQuizLinkFromResults } from './quiz-results.js';
 import { tvqMenu } from './teacher-quiz-ui.js';
 import { openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring, closeQuizMonitor } from './quiz-monitor.js';
 import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz } from './skills-organizer.js';
 import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem, mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward } from './map-engine.js';
-import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector, generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
+import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapSkipAllowed, setMapMode, printMapFromSelector, generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession, updateMapGradeContext } from './map-results.js';
 import { tvGo } from './teacher-shell.js';
 import { openSimplePrint, closeSimplePrint } from './simple-print.js';   // owner 2026-11-03: ONE simple print everywhere
@@ -80,7 +80,7 @@ export const API = {
     shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab,
     handleQbQuestionDragStart, handleQbQuestionDragEnd, handleQbSectionDragOver, handleQbSectionDragLeave,
     handleQbSectionDrop, openBuilderResults, openBuilderMonitor, quizQuestionData, handleQuizURL, startQuizTest,
-    submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview,
+    submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, skipQuizQuestion, quizReturnNext, showQuizReview,
     jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults, showQuizResults, showStudentQuizDetail,
     exportQuizCSV, importStudentResultsFile, printQuizTest, closeQuizResults, copyQuizLinkFromResults, tvqMenu,
     openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring,
@@ -90,7 +90,7 @@ export const API = {
     soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz, startMapSession, nextMapItem,
     recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem, mapJumpToItem, mapResumeCurrent,
     mapNavBack, mapNavForward, openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand,
-    toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector,
+    toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapSkipAllowed, setMapMode, printMapFromSelector,
     generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink, renderMapResults, printMapSession,
     restartMapSession, updateMapGradeContext, tvGo, openSimplePrint, closeSimplePrint,
 };
