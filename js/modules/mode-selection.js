@@ -15,8 +15,11 @@ export function selectMode(mode) {
 }
 
 // Student home (Wave 1 item 1.6): each "Start ..." button picks its mode and starts it directly.
+// student-opts card O-5: with skills selected, a game style plays them all, each with its own options, rebuilt from the
+// selection as it is now (startGame skipped that rebuild while state.isMixedMode stayed true after a first play).
 export function startMode(mode) {
     selectMode(mode);
+    if ((window.skillQueue || []).length && typeof window.playSelectedSkills === 'function') { window.playSelectedSkills(mode); return; }
     if (typeof window.startGame === 'function') window.startGame();
 }
 
