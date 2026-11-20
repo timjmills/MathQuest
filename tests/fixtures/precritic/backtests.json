@@ -14337,6 +14337,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "npr-lesson-train-oneline",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-cell-checks OVERFLOW on the number_patterns_rule lesson at places [1,10,100,1000], M and L: the chart panels' and We Do rows' box trains stay inside their cells",
+   "rule": "OVERFLOW (lf-algebra A1, patterns count-row overflows after lf-ops' count_by_tables rework; 208 findings, all lesson)",
+   "fail": {
+    "commit": "77c9c9134",
+    "state": "8 tiles sized from the band's widest number (23 mm) took two lines of four in the 170 mm panel; the second line ran ~14 mm out of each 57 mm panel (18 findings a size)"
+   },
+   "pass": {
+    "commit": "3d0e11c4e",
+    "state": "in a cellLiveMm panel the train gives up its tiles' spare air (glyph + 4 mm, digits unchanged) and stands on one line"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles lesson --size M,L --opts '{\"places\":[1,10,100,1000]}' --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
