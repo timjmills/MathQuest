@@ -547,7 +547,8 @@ export function plan(input = {}) {
         // states evenly so no page holds a lone one (critic r2 D8: 4 states, 3 fit -> 2 + 2), says so on its grid; ws-empty-band
         // exempts exactly that page shape from EB-PAGE, by name
         const fitsHere = Math.max(1, Math.floor((pages.length ? roomC : room1) / H));
-        const noLone = !across && i + take.length < steps.length && take.length < fitsHere && steps.length - i - take.length >= 2 ? 'mq-model-nolone' : '';
+        const evenTwo = caps.length === 2 && caps[0] === 2 && caps[1] === 2;   // (the honest 2 + 2 split: four states, two a page)
+        const noLone = !across && i + take.length < steps.length && (take.length < fitsHere || evenTwo) && steps.length - i - take.length >= 2 ? 'mq-model-nolone' : '';
         const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none', cls: noLone });
         // (3 + 2: the full rows in `across` columns, the rest in a grid of their own count, same row height)
         const grids = split ? [gridPart(cells.slice(0, across * Math.floor(take.length / across)), { cols: across, rows: Math.floor(take.length / across), cellH: H, labels: 'none' }),
