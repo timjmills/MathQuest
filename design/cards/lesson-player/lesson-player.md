@@ -206,7 +206,7 @@ Each runs as `node tests/scripts/<script> …`.
 11. **Critic brief: what is graded?** Recommended: An independent critic (medium) grades the rendered PNGs of every part, both modes, at 820 / 1024 / 1280 / 1366 / 1920, for 3 lessons (add-within-10, one place-value, one detailed lesson): 1 Teaching (one new thing per step, steps follow the item, Say filled and spoken, real hint fade, exit at level 0); 2 Look (B&W Andika cell, big digits, chrome outside, nothing squeezed, no empty band); 3 Use (48 / 64 px targets, keyboard + clicker, TTS, resume, Skip / retry identical to the card host); 4 Truth to the lesson (every part traceable to record and seed, replay identical, matches the printed packet). Each >= 8; one 7 fails.
 12. **Risks and out of scope?** Recommended: Risks: uneven workedSteps (show the anchor's single state, report the skill, never invent steps); templates without stepState (sentence only, listed); board scale overflow on card-measured templates (Steps collapse, content never shrinks). Out of scope: phone width, authoring lessons, per-pupil live response, printing from the player, the paused long atomised lessons, new skills.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-20
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
