@@ -1,0 +1,8 @@
+{
+ "check": "count",
+ "state": "count-pass-engine",
+ "module": "engine",
+ "expect": "pass",
+ "browser": true,
+ "note": "buildSheet role mixed-review prints exactly the dealt list on V1's pages, the key has the same cells and ends with the key summary; N = 5 2-up; a week"
+}

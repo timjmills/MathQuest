@@ -1,0 +1,9 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-sum",
+ "module": "breakdown",
+ "expect": "fail",
+ "catchState": "breakdown-sum",
+ "tamper": "sum",
+ "note": "subtotals that do not sum to N (Node core: answer-key.js reviewSummary over the product dealer's deals; build step 3)"
+}

@@ -258,7 +258,101 @@ async function statePlacement(fx) {
     if (n < 10) v.push(`pool-placement-pk: only ${n} skills are linked by Reception lessons: the check proves too little`);
     return v;
 }
-const MODULE_STATES = { placement: statePlacement, labels: stateLabels, pool: statePool, share: stateShare, 'week-days': stateWeekDays, trace: stateTrace };
+// card §7a "Breakdown layout" / §8 MIX-REVIEW-BREAKDOWN (Node core, build step 3): the key summary answer-key.js
+// reviewSummary builds from the dealt list lists every item exactly once, under its skill's area, the per-skill and per-area
+// counts sum to N, the areas run in AREA_ORDER; and (MIX-REVIEW-WEEK) the weekly table holds every dealt item exactly once.
+// `fx.tamper` breaks the summary or table AFTER it is built (dup-item, wrong-area, sum, table-missing).
+async function reviewCtx() {
+    const D = await mod(PRODUCT_DEALER); const K = await mod('js/modules/sheet/roles/answer-key.js'); const A = await mod('js/modules/teacher-areas.js');
+    if (!D || !K) return { pending: 'the product dealer or answer-key.js is missing' };
+    if (!K.reviewSummary || !K.reviewWeekTable) return { pending: 'answer-key.js has no reviewSummary / reviewWeekTable yet (build step 3)' };
+    return { D, K, A };
+}
+async function stateBreakdown(fx) {
+    const c = await reviewCtx(); if (c.pending) return c;
+    const { D, K, A } = c; const v = [];
+    for (const ref of ['pool-large', 'pool-kinds', 'pool-3mix', 'pool-6']) {
+        const pool = JSON.parse(readFileSync(join(FIX, 'pools', `${ref}.json`), 'utf8'));
+        const area = new Map(pool.map((r) => [r.id, r.area]));
+        for (const N of D.COUNTS) for (const size of ['m', 'l']) for (let seed = 1; seed <= 6 && v.length < 4; seed++) {
+            const out = D.deal({ pool, N, seed, size, order: 'mixed' }); if (out.error) continue;
+            const sum = K.reviewSummary(out.items.map((it) => ({ n: it.n, skill: it.skill, area: area.get(it.skill) })), { areaOrder: D.AREA_ORDER, areaLabels: A.AREA_LABELS });
+            if (fx.tamper === 'dup-item') sum.areas[0].skills[0].items.push(sum.areas[0].skills[0].items[0]);
+            if (fx.tamper === 'wrong-area' && sum.areas.length > 1) { const x = sum.areas[0].skills.pop(); sum.areas[1].skills.push(x); }
+            if (fx.tamper === 'sum') sum.areas[0].n += 1;
+            const tag = `${ref} N=${N} ${size} S=${seed}`;
+            const listed = sum.areas.flatMap((a) => a.skills.flatMap((x) => x.items));
+            const want = out.items.map((it) => it.n);
+            if (J(listed.slice().sort((a, b) => a - b)) !== J(want)) v.push(`breakdown-dup-item: ${tag}: the summary lists items ${listed.length} (${J(listed.slice().sort((a, b) => a - b)).slice(0, 60)}) for the ${N} dealt`);
+            for (const a of sum.areas) for (const x of a.skills) for (const n of x.items) {
+                const it = out.items[n - 1];
+                if (!it || it.skill !== x.skill || area.get(it.skill) !== a.area) { v.push(`breakdown-wrong-area: ${tag}: item ${n} (${it && it.skill}, area ${it && area.get(it.skill)}) is listed under ${a.area} / ${x.skill}`); break; }
+            }
+            const ranks = sum.areas.map((a) => D.AREA_ORDER.indexOf(a.area));
+            if (J(ranks) !== J(ranks.slice().sort((a, b) => a - b))) v.push(`breakdown-wrong-area: ${tag}: areas ${sum.areas.map((a) => a.area).join(' ')} are not in AREA_ORDER`);
+            for (const a of sum.areas) if (a.n !== a.skills.reduce((t, x) => t + x.items.length, 0)) { v.push(`breakdown-sum: ${tag}: area ${a.area} subtotal ${a.n} != its skills' ${a.skills.reduce((t, x) => t + x.items.length, 0)}`); break; }
+            if (sum.areas.reduce((t, a) => t + a.n, 0) !== N || sum.N !== N) v.push(`breakdown-sum: ${tag}: area subtotals sum to ${sum.areas.reduce((t, a) => t + a.n, 0)} (total ${sum.N}), not N = ${N}`);
+            for (const a of sum.areas) if (a.label !== A.AREA_LABELS[a.area]) { v.push(`breakdown-wrong-area: ${tag}: area ${a.area} labelled ${J(a.label)}, AREA_LABELS says ${J(A.AREA_LABELS[a.area])}`); break; }
+        }
+    }
+    return v;
+}
+async function stateWeekTable(fx) {
+    const c = await reviewCtx(); if (c.pending) return c;
+    const { D, K } = c; const v = [];
+    for (const ref of ['pool-large', 'pool-6', 'pool-kinds']) {
+        const pool = JSON.parse(readFileSync(join(FIX, 'pools', `${ref}.json`), 'utf8'));
+        for (const N of [5, 10, 20]) for (const size of ['m', 'l']) for (let seed = 1; seed <= 4 && v.length < 4; seed++) {
+            const w = D.week({ pool, N, seed, size, order: 'mixed', week: 7 }); if (w.error) continue;
+            const t = K.reviewWeekTable(w.days.map((d) => ({ day: d.day, items: d.items.map((it) => ({ n: it.n, skill: it.skill })) })));
+            if (fx.tamper === 'table-missing') t.rows[0].days[0].pop();
+            for (const d of w.days) {
+                const got = t.rows.flatMap((r) => r.days[d.day - 1].map((n) => `${r.skill}#${n}`)).sort();
+                const want = d.items.map((it) => `${it.skill}#${it.n}`).sort();
+                if (J(got) !== J(want)) { v.push(`week-table-missing: ${ref} N=${N} ${size} S=${seed} day ${d.day}: the weekly table holds ${got.length} of the ${want.length} dealt items (each exactly once)`); break; }
+            }
+        }
+    }
+    return v;
+}
+// MIX-REVIEW-COUNT engine state count-key-cells (browser, build step 3): buildSheet({role: 'mixed-review'}) prints exactly the
+// dealt list (N items, N cells; 2-up: 2 x 5), the key holds the same cells as the pupil pages (PT-KEY-1), every page's
+// cells are V1's page counts, and the key ends with the key summary (total N). `fx.tamper` 'key-cells' drops a key cell.
+async function stateEngine(fx) {
+    const { createRequire } = await import('node:module');
+    const { open } = createRequire(import.meta.url)('../lib/ws-harness.cjs');
+    const app = await open({ seed: 1 });
+    try {
+        const v = await app.page.evaluate(async (tamper) => {
+            const PS = await import('/js/modules/print-sheet.js');
+            const v = [];
+            const reqs = [[5, 'm', 7, {}], [5, 'l', 8, {}], [10, 'm', 5, {}], [15, 'l', 9, {}], [20, 'm', 3, { order: 'area' }], [30, 'l', 11, { order: 'easyhard' }], [10, 'l', 4, { week: 3 }]];
+            for (const [N, size, seed, extra] of reqs) {
+                const res = await PS.buildSheet({ role: 'mixed-review', review: Object.assign({ N, seed, size, order: 'mixed', filters: { grades: ['2', '3', '4'] } }, extra), key: true });
+                const tag = `N=${N} ${size} S=${seed}${extra.week ? ' week' : ''}`;
+                if (res.error) { v.push(`count-key-cells: ${tag}: refused: ${res.error}`); continue; }
+                const sheets = extra.week ? 5 : 1;
+                const pupil = document.createElement('div'); pupil.innerHTML = res.pupilHtml;
+                const key = document.createElement('div'); key.innerHTML = res.keyHtml;
+                if (tamper === 'key-cells') { const c = key.querySelector('[data-ws-cell]'); if (c) c.remove(); }
+                const pc = pupil.querySelectorAll('[data-ws-cell]').length; const kc = key.querySelectorAll('[data-ws-cell]').length;
+                const want = res.twoUp ? 10 : N * sheets;
+                if (res.items.length !== N * sheets) v.push(`count-key-cells: ${tag}: ${res.items.length} items dealt, not ${N * sheets}`);
+                if (pc !== want) v.push(`count-key-cells: ${tag}: ${pc} pupil cells, not ${want}`);
+                if (kc !== pc) v.push(`count-key-cells: ${tag}: the key holds ${kc} cells, the pupil pages ${pc} (PT-KEY-1)`);
+                const sums = [...key.querySelectorAll('[data-mq-review-summary]')].map((x) => Number(x.getAttribute('data-mq-review-summary')));
+                if (sums.length !== sheets || sums.some((x) => x !== N)) v.push(`count-key-cells: ${tag}: key summaries ${JSON.stringify(sums)}, not ${sheets} of ${N}`);
+                const v1pages = res.review.plan.days ? res.review.plan.days.reduce((t, d) => t + (d.twoUp ? 1 : d.pages.length), 0) : (res.twoUp ? 1 : res.review.plan.pages.length);
+                if (res.pageCount !== v1pages) v.push(`count-key-cells: ${tag}: ${res.pageCount} pupil pages, V1 planned ${v1pages}`);
+                if (new Set(res.items.map((i) => i.sig)).size !== res.items.length && !extra.week) v.push(`count-key-cells: ${tag}: a duplicate item on the sheet`);
+            }
+            return v;
+        }, fx.tamper || '');
+        if (app.problems.length) v.push(`count-key-cells: console errors: ${app.problems.slice(0, 3).map((p) => p.text).join(' | ')}`);
+        return v;
+    } finally { await app.close(); }
+}
+const MODULE_STATES = { engine: stateEngine, breakdown: stateBreakdown, 'week-table': stateWeekTable, placement: statePlacement, labels: stateLabels, pool: statePool, share: stateShare, 'week-days': stateWeekDays, trace: stateTrace };
 
 /* ---------------------------------------------------------------------------------------------------- runner */
 let C1 = null;

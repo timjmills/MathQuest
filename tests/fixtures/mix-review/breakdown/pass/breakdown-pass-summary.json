@@ -1,0 +1,7 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-pass-summary",
+ "module": "breakdown",
+ "expect": "pass",
+ "note": "the key summary from reviewSummary: every item once, under its area, subtotals sum to N, areas in AREA_ORDER, labels from AREA_LABELS"
+}

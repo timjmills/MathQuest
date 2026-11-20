@@ -1,0 +1,7 @@
+{
+ "check": "week",
+ "state": "week-pass-table",
+ "module": "week-table",
+ "expect": "pass",
+ "note": "the weekly table holds every dealt item of every day exactly once"
+}

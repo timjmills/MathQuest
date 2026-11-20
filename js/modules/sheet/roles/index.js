@@ -72,6 +72,7 @@ export const ROLE_MODULES = Object.freeze({
 export const ROLE_ALIASES = Object.freeze({
     'lesson-opener': 'opener', model: 'scripted-model', 'pre-skill': 'pre-skill-check', mixed: 'mixed-practice',
     reason: 'reason-it', 'check-it': 'error-analysis', 'test-a': 'test', 'test-b': 'test',
+    'mixed-review': 'mixed-practice',   // card design/cards/mixed-review §7a: an alias of mixed-practice + input.review (print-sheet.js buildReviewSheet)
 });
 
 /** Role ids this build carries. A role is added here the day its composer lands. */

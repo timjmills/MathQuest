@@ -1,0 +1,9 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-dup-item",
+ "module": "breakdown",
+ "expect": "fail",
+ "catchState": "breakdown-dup-item",
+ "tamper": "dup-item",
+ "note": "an item missing from the key summary or listed twice (Node core: answer-key.js reviewSummary over the product dealer's deals; build step 3)"
+}

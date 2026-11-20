@@ -12185,8 +12185,8 @@
   {
    "id": "mix-review-count-engine",
    "pending": true,
-   "pendingReason": "build step 3 (MR-A): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/count/pending/ (moved to fail/ when built). Re-arm when it lands.",
-   "check": "MIX-REVIEW-COUNT browser states (engine): count-spill-redeal, count-key-cells, count-shelf-k-differs",
+   "pendingReason": "build step 3 remainder (MR-A, parked): count-spill-redeal (a drawn page that cannot hold its cells must spill whole shelves, numbers kept) and count-shelf-k-differs (mixed-practice's drawn k vs V1 SHELF) need the measured layout; count-key-cells is live in mix-review-count-key-cells.",
+   "check": "MIX-REVIEW-COUNT browser states (engine): count-spill-redeal, count-shelf-k-differs",
    "kind": "fixture",
    "rule": "ws-mix-review --check count",
    "browser": true,
@@ -12250,19 +12250,17 @@
   },
   {
    "id": "mix-review-week-table",
-   "pending": true,
-   "pendingReason": "build step 3 (MR-A): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/week/pending/ (moved to fail/ when built). Re-arm when it lands.",
-   "check": "MIX-REVIEW-WEEK print state: week-table-missing (the weekly key table)",
+   "check": "MIX-REVIEW-WEEK weekly key table (build step 3, Node core): answer-key.js reviewWeekTable holds every dealt item of every day exactly once",
    "kind": "fixture",
    "rule": "ws-mix-review --check week",
    "browser": false,
    "fail": {
-    "fixture": "tests/fixtures/mix-review/week/pending",
-    "state": "the named pending FAIL fixtures"
+    "fixture": "tests/fixtures/mix-review/week/fail/week-table-missing.json",
+    "state": "a weekly table that drops a dealt item"
    },
    "pass": {
-    "fixture": "tests/fixtures/mix-review/week/pass",
-    "state": "the built product"
+    "fixture": "tests/fixtures/mix-review/week/pass/week-pass-table.json",
+    "state": "reviewWeekTable over product weeks"
    },
    "command": "node tests/scripts/ws-mix-review.mjs --check week --fixture {fixture}",
    "expect": {
@@ -12295,8 +12293,8 @@
   {
    "id": "mix-review-breakdown",
    "pending": true,
-   "pendingReason": "build steps 3 and 5 (MR-A / MR-D): the product code these states measure is not built; each state has its named fixture under tests/fixtures/mix-review/breakdown/pending/ (moved to fail/ when built). Re-arm when it lands.",
-   "check": "MIX-REVIEW-BREAKDOWN (key summary and results): breakdown-dup-item, breakdown-wrong-area, breakdown-sum, breakdown-screen-differs",
+   "pendingReason": "build step 5 (MR-D): breakdown-screen-differs (a results screen whose numbers differ from the key) needs the screen hosts; the key-summary states are live in mix-review-breakdown-key (step 3).",
+   "check": "MIX-REVIEW-BREAKDOWN screen state: breakdown-screen-differs",
    "kind": "fixture",
    "rule": "ws-mix-review --check breakdown",
    "browser": true,
@@ -12369,6 +12367,46 @@
     "state": "Reception lessons under Pre-K"
    },
    "command": "node tests/scripts/ws-mix-review.mjs --check pool --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-breakdown-key",
+   "check": "MIX-REVIEW-BREAKDOWN key summary (build step 3, Node core): answer-key.js reviewSummary over the product dealer's deals lists every item exactly once, under its skill's area (AREA_LABELS), subtotals per skill and area sum to N, areas in AREA_ORDER",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check breakdown",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/breakdown/fail",
+    "state": "breakdown-dup-item, breakdown-wrong-area, breakdown-sum (each caught for its reason)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/breakdown/pass",
+    "state": "reviewSummary on 4 pools x every N x M, L"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check breakdown --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-count-key-cells",
+   "check": "MIX-REVIEW-COUNT engine (build step 3, browser): buildSheet role mixed-review prints exactly the dealt list on V1's pages (N items and cells; N = 5 2-up 2 x 5; a week 5 x N), the key holds the same cells as the pupil pages (PT-KEY-1) and ends with the key summary of N",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check count",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/count/engine/fail/count-key-cells.json",
+    "state": "a key with one cell fewer than the pupil pages"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/count/engine/pass/count-pass-engine.json",
+    "state": "7 requests: N 5 (M, L), 10, 15, 20 area, 30 easyhard, a week"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check count --fixture {fixture}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

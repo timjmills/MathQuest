@@ -627,9 +627,82 @@ export function keyCoverage(plan, opts = {}) {
     };
 }
 
+/* ------------------------------------------------------- the mixed review key summary (PT-MXR-8) */
+
+/**
+ * The KEY SUMMARY of a mixed review (card design/cards/mixed-review §7a "Breakdown layout", PT-MXR-8): Area | Skill | Items |
+ * Score, one subtotal row per area in `areaOrder`, a total row. Pure data from the dealt list: every item is listed exactly
+ * once, under its own skill and that skill's area, so the per-skill and per-area counts each sum to N.
+ *   items: [{n, skill, area, label?}] (dealReviewItems' accepted list or skillItemMap(plan) joined with the areas)
+ *   opts:  {areaOrder: [area ids], areaLabels: {area: label}}
+ * Returns {areas: [{area, label, n, skills: [{skill, label, items: [n ..], n}]}], N}.
+ */
+export function reviewSummary(items = [], { areaOrder = [], areaLabels = {} } = {}) {
+    const byArea = new Map();
+    for (const it of items) {
+        if (!byArea.has(it.area)) byArea.set(it.area, new Map());
+        const sk = byArea.get(it.area);
+        if (!sk.has(it.skill)) sk.set(it.skill, { skill: it.skill, label: it.label || it.skill, items: [] });
+        sk.get(it.skill).items.push(it.n);
+    }
+    const rank = (a) => { const i = areaOrder.indexOf(a); return i < 0 ? areaOrder.length : i; };
+    const areas = [...byArea.keys()].sort((a, b) => rank(a) - rank(b)).map((area) => {
+        const skills = [...byArea.get(area).values()].map((x) => ({ ...x, items: x.items.slice().sort((a, b) => a - b), n: x.items.length }))
+            .sort((a, b) => a.items[0] - b.items[0]);
+        return { area, label: areaLabels[area] || area, n: skills.reduce((t, x) => t + x.n, 0), skills };
+    });
+    return { areas, N: areas.reduce((t, a) => t + a.n, 0) };
+}
+
+/** Item numbers as runs: 1, 3-5, 9. */
+const runsText = (ns) => {
+    const out = []; let i = 0;
+    while (i < ns.length) { let j = i; while (j + 1 < ns.length && ns[j + 1] === ns[j] + 1) j++; out.push(j > i + 1 ? `${ns[i]}–${ns[j]}` : j === i + 1 ? `${ns[i]}, ${ns[j]}` : `${ns[i]}`); i = j + 1; }
+    return out.join(', ');
+};
+
+/** The key summary table (Andika, black and white; 11 / 12 pt at M / L). `data-mq-review-summary` carries the rows for checks. */
+export function reviewSummaryHtml(summary, { size = 'L', title = 'Key summary' } = {}) {
+    const pt = String(size).toUpperCase() === 'M' ? 11 : 12;
+    const td = 'border:0.35mm solid #000;padding:1.2mm 2mm;text-align:left;vertical-align:top';
+    const rows = [];
+    for (const a of summary.areas) {
+        a.skills.forEach((x, i) => rows.push(`<tr data-mq-sum-skill="${esc(x.skill)}" data-mq-sum-items="${x.items.join(' ')}"><td style="${td}">${i === 0 ? esc(a.label) : ''}</td><td style="${td}">${esc(x.label)}</td><td style="${td}">${runsText(x.items)}</td><td style="${td}">___ / ${x.n}</td></tr>`));
+        rows.push(`<tr data-mq-sum-area="${esc(a.area)}" data-mq-sum-n="${a.n}"><td style="${td}" colspan="3"><b>${esc(a.label)}</b></td><td style="${td}"><b>___ / ${a.n}</b></td></tr>`);
+    }
+    rows.push(`<tr data-mq-sum-total="${summary.N}"><td style="${td}" colspan="3"><b>Total</b></td><td style="${td}"><b>___ / ${summary.N}</b></td></tr>`);
+    return `<div class="mq-review-summary" data-mq-review-summary="${summary.N}" style="font-family:Andika,sans-serif;font-size:${pt}pt;color:#000;margin-top:6mm">`
+        + `<div style="font-weight:700;margin-bottom:2mm">${esc(title)}</div>`
+        + `<table style="border-collapse:collapse;width:100%"><thead><tr><th style="${td}">Area</th><th style="${td}">Skill</th><th style="${td}">Items</th><th style="${td}">Score</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+}
+
+/**
+ * The WEEKLY TABLE of a Mon-Fri mixed review (card §3 "A week adds one weekly-table page"): one row per dealt skill, one
+ * column per day, each cell the item numbers of that skill on that day. Every dealt item of every day is in it exactly once.
+ *   days: [{day: 1..5, items: [{n, skill, label?}]}]   Returns {rows: [{skill, label, days: [[n ..] x 5]}], n: [count a day]}.
+ */
+export function reviewWeekTable(days = []) {
+    const rows = new Map();
+    for (const d of days) for (const it of d.items || []) {
+        if (!rows.has(it.skill)) rows.set(it.skill, { skill: it.skill, label: it.label || it.skill, days: [[], [], [], [], []] });
+        rows.get(it.skill).days[d.day - 1].push(it.n);
+    }
+    return { rows: [...rows.values()], n: [1, 2, 3, 4, 5].map((k) => (days.find((d) => d.day === k) || { items: [] }).items.length) };
+}
+
+export function reviewWeekTableHtml(table, { size = 'L' } = {}) {
+    const pt = String(size).toUpperCase() === 'M' ? 11 : 12;
+    const td = 'border:0.35mm solid #000;padding:1.2mm 2mm;text-align:left;vertical-align:top';
+    const head = ['Skill', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((h) => `<th style="${td}">${h}</th>`).join('');
+    const body = table.rows.map((r) => `<tr data-mq-week-skill="${esc(r.skill)}"><td style="${td}">${esc(r.label)}</td>${r.days.map((ns, i) => `<td style="${td}" data-mq-week-day="${i + 1}" data-mq-week-items="${ns.join(' ')}">${runsText(ns)}</td>`).join('')}</tr>`).join('');
+    return `<div class="mq-review-week" style="font-family:Andika,sans-serif;font-size:${pt}pt;color:#000"><div style="font-weight:700;margin-bottom:2mm">This week</div>`
+        + `<table style="border-collapse:collapse;width:100%"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
 export default {
     KEY_ID_LINE, keyTab, keyHeader, keyFooterRight, markKeyName,
     fillSlots, workBox, workingHtml, keyStamp, answerWords,
     renderPages, answerKeyPlan, renderAnswerKey, renderSource, renderPageAndKey,
     answerListRows, skillItemMap, keyCoverage,
+    reviewSummary, reviewSummaryHtml, reviewWeekTable, reviewWeekTableHtml,
 };

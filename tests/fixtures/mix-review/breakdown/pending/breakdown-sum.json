@@ -1,7 +1,0 @@
-{
- "check": "breakdown",
- "state": "breakdown-sum",
- "expect": "fail",
- "pending": "MR-A step 3",
- "note": "subtotals that do not sum to N"
-}

@@ -1,0 +1,9 @@
+{
+ "check": "week",
+ "state": "week-table-missing",
+ "module": "week-table",
+ "expect": "fail",
+ "catchState": "week-table-missing",
+ "tamper": "table-missing",
+ "note": "a dealt item missing from the weekly key table (Node core: answer-key.js reviewWeekTable over product weeks; build step 3)"
+}

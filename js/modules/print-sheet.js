@@ -34,6 +34,8 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
+import * as MIX_REVIEW_V1 from './mixed-review.js';
+import { deriveSeed as mrDeriveSeed } from './sheet/rng.js';
 import { applySheetTags, ebItemOf } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, roleOptions, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
@@ -58,6 +60,9 @@ import { detailedLessonFor, validateDescription, fillPlaceholders } from './less
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups, stackCarryTop } from './sheet/index.js';
 const { tBand } = teacherParts;
+import { frameOf as composeFrameOf, gridPart as composeGridPart } from './sheet/roles/compose.js';
+import { reviewSummary, reviewSummaryHtml, reviewWeekTable, reviewWeekTableHtml } from './sheet/roles/answer-key.js';
+import { areaOf as mrAreaOf, AREA_LABELS as MR_AREA_LABELS } from './teacher-areas.js';
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, SIDE_BAND_ONLY, easeScore, ineligibleNote,
@@ -6370,10 +6375,175 @@ try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catc
  * The result carries `stats`: the build's time, deals, page checks and cell measurements.
  */
 let buildQueue = Promise.resolve();
+/* ======================================================================= the mixed review dealer (card §7a "Identical") */
+
+/**
+ * THE ONE MIXED-REVIEW DEALER (design/cards/mixed-review/mixed-review.md §7a "Identical", §9b step 3, §10 L7). V1 (`deal` /
+ * `week` of js/modules/mixed-review.js) decides the PLAN: skills, counts, pages, shelves, numbers and item seeds; this runs each
+ * item through `generateQuestionFor` on the duplicate ladder and returns the ACCEPTED list in printed order. Print and every
+ * screen host play exactly this list, so they match by construction, retries included.
+ *   Seeds: try 0 of item i is `item.seed` = deriveSeed('mixed-review', S', day, i) (four parts); try r >= 1 is
+ *   deriveSeed('mixed-review', S', day, i, r) (five parts). S' = S on a single sheet (day 0); on day d of a week the day seed
+ *   deriveSeed('mixed-review-week', S, d), exactly as V1 seeds the plan.
+ *   Ladder (RETRIES = 40 tries an item): rung 'unique' (no signature twice on the sheet and no answer twice for one skill on a
+ *   page), then from try 20 'answers' dropped (signature only), and past the last try 'repeat' (the first try is taken).
+ * req: the V1 input {pool, filters?, N, seed, order?, size?, week?, day?, adapt?, listed?, replay?}, plus `optsFor(item)` (the
+ * decoded ~options of a dealt item, else none). Returns {plan, sheets: [{day, daySeed, items}], items} or {error}; a week (week
+ * with no day) gives five sheets, and `items` is the first (a single sheet) or every day's in day order.
+ */
+export function dealReviewItems(req = {}) {
+    const V = MIX_REVIEW_V1;
+    const input = Object.assign({}, req);
+    delete input.optsFor;
+    const isWeek = !!input.week && !input.day;
+    const plan = isWeek ? V.week(input) : V.deal(input);
+    if (!plan || plan.error) return { error: (plan && plan.error) || 'the mix could not be dealt' };
+    const days = isWeek ? plan.days : [plan];
+    const sheets = days.map((sh) => {
+        const sp = sh.daySeed !== undefined ? sh.daySeed : input.seed;     // S'
+        const day = sh.day || 0;
+        const sigs = new Set(); const answers = new Map();                 // answers: `${page}|${skill}` -> Set
+        const items = sh.pages.flatMap((pg) => pg.shelves.flatMap((shelf) => shelf.items)).sort((a, b) => a - b).map((nNum) => {
+            const it = sh.items[nNum - 1];
+            const [categoryId, skillId] = String(it.skill).split(':');
+            const opts = typeof req.optsFor === 'function' ? req.optsFor(it) : undefined;
+            const ak = `${it.page}|${it.skill}`;
+            if (!answers.has(ak)) answers.set(ak, new Set());
+            let first = null; let acc = null; let rung = 'repeat'; let tries = 0;
+            for (let r = 0; r <= RETRIES && !acc; r++) {
+                const seed = r === 0 ? it.seed : mrDeriveSeed('mixed-review', sp, day, nNum - 1, r);
+                let q = null;
+                try { q = _generateQuestionFor(Object.assign({ category: categoryId, skill: skillId, seed }, opts ? { opts } : {})); } catch (e) { q = null; }
+                tries = r + 1;
+                if (!q) continue;
+                const cand = { seed, q, sig: signature(q), ans: typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans) };
+                if (!first) first = cand;
+                if (sigs.has(cand.sig)) continue;
+                if (r < RETRIES / 2 && answers.get(ak).has(cand.ans)) continue;
+                acc = cand; rung = r < RETRIES / 2 ? 'unique' : 'answers';
+            }
+            if (!acc) acc = first;
+            if (!acc) return { n: it.n, categoryId, skillId, skill: it.skill, page: it.page, opts, seed: it.seed, q: null, rung: 'none', tries };
+            sigs.add(acc.sig); answers.get(ak).add(acc.ans);
+            return { n: it.n, categoryId, skillId, skill: it.skill, code: it.code, page: it.page, opts, seed: acc.seed, itemSeed: it.seed, q: acc.q, rung, tries };
+        });
+        return { day, daySeed: sp, plan: sh, items };
+    });
+    return { plan, sheets, items: sheets.flatMap((x) => x.items), twoUp: !isWeek && !!plan.twoUp };
+}
+
+const MR_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+/** A dealt item as a plan item: the template the sheet draws (kitCellSpec / a number family), else a legacy cell. */
+function reviewPlanItem(it) {
+    const q0 = it.q || {};
+    const spec = kitCellSpec(q0) || numberFamilySpec(q0);
+    const q = Object.assign({}, q0, { cell: spec ? { template: spec.template, payload: spec.payload, v: 1 } : { template: 'legacy', v: 1 } });
+    return composePlanItem({ q, skill: it.skill, visual: !!(q0.visual) }, { level: 1 });
+}
+/** One sheet's pages from V1's plan, drawn as given (card §3: no measuring decides a page). */
+function reviewPages(sheet, size) {
+    const V = MIX_REVIEW_V1;
+    const byN = new Map(sheet.items.map((it) => [it.n, it]));
+    return sheet.plan.pages.map((pg) => {
+        const sections = [];
+        if (pg.arrangement === 'm1') {
+            // the M1 arrangement: one "Solve." strip, the items interleaved in rows of k cells (each cell keeps its instruction)
+            const ns = pg.shelves.flatMap((sh) => sh.items);
+            const k = V.SHELF[size][pg.cls[0]] || 3;
+            sections.push({ kind: 'band', label: '', instr: 'Solve.', content: composeGridPart(ns.map((n) => reviewPlanItem(byN.get(n))), { cols: k, labels: 'tab', start: ns[0] }) });
+        } else {
+            for (const sh of pg.shelves) {
+                const its = sh.items.map((n) => byN.get(n));
+                const pis = its.map(reviewPlanItem);
+                const key = composeInstrKeyOf(its.map((x) => ({ q: x.q })), [{ categoryId: its[0].categoryId, skillId: its[0].skillId }]);
+                const kk = Math.max(sh.items.length, V.SHELF[size][V.rowOf(sheet.rowOf(sh.skill)).fc] || 1);
+                // a skill's last shelf may be short: its cells keep their width, the row ends early (left-aligned, card §3)
+                sections.push({ kind: 'band', label: '', instr: composeInstrText(key, its.map((x) => ({ q: x.q }))), content: composeGridPart(pis, { cols: kk, rows: 1, labels: 'tab', start: sh.items[0] }) });
+            }
+        }
+        return { sections, v1page: pg.n };
+    });
+}
+/**
+ * THE MIXED REVIEW SHEET (card §3, §9b step 3; PT-MXR): exactly the list `dealReviewItems` accepted, laid out on V1's pages,
+ * shelves and numbers. Header Name / Date / Score ___ / N, tab `Level <grades> | Review` (a week: `Week n | Mon`), title
+ * `Mixed review`; level 1 supports (a Review: no anchors). N = 5 prints 2-up when V1 says the 5 fit a half page: the same
+ * five twice, each half with its own header, a dashed cut line between. The key is the facsimile of every page, then the key
+ * summary (Area | Skill | Items | Score) and, for a week, the weekly table.
+ * req: {role: 'mixed-review', review: <the V1 input>, size, key, header, optsFor?}
+ */
+async function buildReviewSheet(req = {}) {
+    const V = MIX_REVIEW_V1;
+    const rv = Object.assign({}, req.review || {});
+    if (!req.review) {
+        // a generic request (the print tools: sections of skills): the listed skills are the pool when there are 2 or more,
+        // else the listed skill's grade; N the section count when it is a V1 count, else 10
+        const refs = ((req.sections || [])[0] || {}).skills || [];
+        const rows = (await import('./mixed-review-pool.js')).poolRows();
+        const ids = new Set(refs.map((r) => `${r.categoryId}:${r.skillId}`));
+        const mine = rows.filter((r) => ids.has(r.id));
+        const cnt = Number(((req.sections || [])[0] || {}).count);
+        Object.assign(rv, { N: MIX_REVIEW_V1.COUNTS.includes(cnt) ? cnt : 10, seed: Number.isFinite(Number(req.seed)) ? Number(req.seed) >>> 0 : 1, order: 'mixed' },
+            mine.length >= 2 ? { pool: mine } : { pool: rows, filters: { grades: mine.length ? [...new Set([mine[0].grade, ...(mine[0].placement || [])])] : [] } });
+    }
+    const size = String(rv.size || req.size || 'L').toLowerCase() === 'm' ? 'm' : 'l';
+    rv.size = size;
+    if (!rv.pool) rv.pool = (await import('./mixed-review-pool.js')).poolRows();
+    const pool = rv.pool;
+    const rowById = new Map(pool.map((r) => [r.id, r]));
+    const dealt = dealReviewItems(Object.assign({}, rv, req.optsFor ? { optsFor: req.optsFor } : {}));
+    if (dealt.error) return { error: dealt.error, pupilHtml: '', keyHtml: '', pageCount: 0, keyPageCount: 0, items: [] };
+    const SZ = size.toUpperCase();
+    const labelOf = (id) => { const [c, k] = id.split(':'); const l = SKILL_FULL_LABELS && SKILL_FULL_LABELS[k]; return (l && (l.label || l)) || ((SKILLS[c] || []).find((x) => x && x.v === k) || {}).label || k; };
+    const plans = []; const summaries = [];
+    for (const sheet of dealt.sheets) {
+        sheet.rowOf = (id) => rowById.get(id) || { fc: 'typical' };
+        const N = sheet.items.length;
+        const skills = [...new Set(sheet.items.map((it) => it.skill))].map((id) => { const [categoryId, skillId] = id.split(':'); const r = rowById.get(id) || {}; return { categoryId, skillId, grade: r.grade, grades: r.placement && r.placement.length ? r.placement : undefined }; });
+        let ccss = [];
+        try { const st = await import('./standards.js'); ccss = [...new Set(skills.flatMap((k) => ((st.standardsFor(k.categoryId, k.skillId) || {}).ccss || []).slice(0, 1)))]; } catch (e) { ccss = []; }
+        const twoUp = !!(dealt.twoUp && N === 5);
+        const tab1 = sheet.day ? `Week ${rv.week} | ${MR_DAYS[sheet.day - 1]}` : null;
+        const frame = composeFrameOf({ skills, input: { header: Object.assign({}, req.header || {}, tab1 ? { tab: [tab1.split(' | ')[0], tab1.split(' | ')[1]] } : {}, { footerLeft: ccss.join(', ') }), ctx: { size: SZ }, seed: rv.seed, form: '' },
+            tabId: 'Review', title: 'Mixed review', twoLine: true, score: N });
+        let pages = reviewPages(sheet, size);
+        if (twoUp) {
+            // 2-up (§9.7): the same five twice; each half numbered 1-5 with its own Name / Date / Score line
+            const half = pages[0].sections;
+            const cut = '<div class="mq-review-cut" style="border-top:0.5mm dashed #000;margin:6mm 0 4mm"></div>';
+            const head2 = `<div class="mq-review-half2" style="font-family:Andika,sans-serif;display:flex;gap:8mm;margin-bottom:3mm"><span>Name ____________</span><span>Date ________</span><span>Score ___ / 5</span></div>`;
+            pages = [{ sections: [...half, { kind: 'html', html: cut + head2 }, ...half.map((p) => Object.assign({}, p, { content: Object.assign({}, p.content, { start: p.content.start }) }))] }];
+        }
+        plans.push({ role: 'mixed-review', ctx: { size: SZ, look: 'daily', paper: (req.paper || 'A4') }, header: frame.header, contHeader: frame.contHeader, footer: frame.footer, seed: rv.seed, pages });
+        const sum = reviewSummary(sheet.items.map((it) => ({ n: it.n, skill: it.skill, area: (rowById.get(it.skill) || {}).area || mrAreaOf(it.categoryId, it.skillId), label: labelOf(it.skill) })),
+            { areaOrder: V.AREA_ORDER, areaLabels: MR_AREA_LABELS });
+        summaries.push({ day: sheet.day, sum, items: sheet.items.map((it) => ({ n: it.n, skill: it.skill, label: labelOf(it.skill) })) });
+    }
+    const outs = plans.map((pl) => renderPlan(pl, { key: req.key !== false }));
+    const pupilPages = outs.flatMap((o) => o.pupilPages);
+    let keyPages = outs.flatMap((o) => o.keyPages || []);
+    if (req.key !== false) {
+        const sumHtml = summaries.map((x) => (x.day ? `<div style="font-family:Andika,sans-serif;font-weight:700;margin-top:4mm">${MR_DAYS[x.day - 1]}</div>` : '') + reviewSummaryHtml(x.sum, { size: SZ })).join('');
+        const extra = [{ kind: 'html', html: sumHtml }];
+        if (dealt.sheets.length > 1) extra.push({ kind: 'html', html: reviewWeekTableHtml(reviewWeekTable(summaries.map((x) => ({ day: x.day, items: x.items }))), { size: SZ }) });
+        const kp = renderPlan({ role: 'mixed-review', ctx: { size: SZ, look: 'daily' }, header: Object.assign({}, plans[0].header, { score: false, title: 'Mixed review: key summary' }), footer: plans[0].footer, seed: rv.seed, pages: [{ sections: extra }] }, { key: true });
+        keyPages = keyPages.concat((kp.keyPages || []).map((h) => h.replace('class="ws-page ', 'class="ws-page ws-keyextra mq-review-summary-page ')));
+    }
+    return {
+        pupilHtml: pupilPages.join('\n'), keyHtml: keyPages.join('\n'), pupilPages, keyPages,
+        pageCount: pupilPages.length, keyPageCount: keyPages.length, role: 'mixed-review', seed: rv.seed,
+        twoUp: !!dealt.twoUp, review: { plan: dealt.plan, sheets: dealt.sheets.map((x) => ({ day: x.day, daySeed: x.daySeed })) },
+        summaries: summaries.map((x) => ({ day: x.day, summary: x.sum })),
+        items: dealt.items.map((it) => ({ n: it.n, skill: it.skill, page: it.page, seed: it.seed, rung: it.rung, text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, sig: it.q ? signature(it.q) : undefined })),
+    };
+}
+
 export function buildSheet(req = {}) {
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
     // queue: it builds its pages through buildSheet itself).
     if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
+    // The MIXED REVIEW (card design/cards/mixed-review, §9b step 3): exactly the list dealReviewItems accepted, on V1's pages.
+    if (req && req.role === 'mixed-review') { const run = buildQueue.then(() => buildReviewSheet(req)); buildQueue = run.catch(() => {}); return run; }
     // A lesson asked for by id: its section is the lesson's practice skill with the lesson's option values
     // (a skill the request names is replaced - the lesson record decides, LINK-1).
     if (req && req.role === 'lesson' && req.lessonId) {

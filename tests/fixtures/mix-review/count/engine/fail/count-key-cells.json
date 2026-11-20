@@ -1,0 +1,10 @@
+{
+ "check": "count",
+ "state": "count-key-cells",
+ "module": "engine",
+ "expect": "fail",
+ "catchState": "count-key-cells",
+ "tamper": "key-cells",
+ "browser": true,
+ "note": "a key whose cells differ from the pupil page (PT-KEY-1; browser, buildSheet role mixed-review, build step 3)"
+}

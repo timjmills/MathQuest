@@ -1,0 +1,9 @@
+{
+ "check": "breakdown",
+ "state": "breakdown-wrong-area",
+ "module": "breakdown",
+ "expect": "fail",
+ "catchState": "breakdown-wrong-area",
+ "tamper": "wrong-area",
+ "note": "an item under the wrong area (Node core: answer-key.js reviewSummary over the product dealer's deals; build step 3)"
+}
