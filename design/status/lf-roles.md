@@ -404,3 +404,14 @@ Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medi
   so it gave the answer. It now narrows the bank to two: the answer's first letter when another word shares it, else that
   letter and one other bank word's letter, in alphabetical order. Check: ws-vocab-unit V14 GUIDED-HINT-LEAK (bank).
 - Hash (ROLES=guided): only vocab_pick3_words guided S/M/L changed. Backtest `vocab-hint-bank-leak` PASS. y2 deferred (lead).
+
+## Round r16 (2026-11-20): F3 continuation-cell overflow; F4 returned to the lead
+
+- F3: the two-step stories' Guided L page 2 hinted try overflowed its cell by 13 px. `hintRow` was set on page 1 only, so a
+  continuation row never took the hint height. Fix GUIDED-CONT-HINT (guided.js, the `hintRow` / `hintedHere` lines): the row holding the
+  hinted tries on any page takes the hint. New check ws-guided-cellfit CELL-FITS, now a precritic browser gate. Backtest
+  `guided-cont-hint-cellfit` (FAIL ead49fcce -> OK dd4942463). Hash ROLES=guided: no passed page changed. No refill: pages 2 + 3 are
+  116 + 104 mm, more than one L body. Unrelated, already on the base: EB-STRETCH 2-3 mm on the page-1 Model of the three two-step skills.
+- F4: hintOf gives "Step 1: …" on every two-step preset. The hint is dropped by sheetFitPlain's round-4 rule ("the hint line never
+  costs page 1 its only try") when Model + hinted try does not fit page 1 (add_then_div and mult_div_first at M seed 1). Not changed:
+  it needs a lead ruling (keep the hint and move the try to page 2, against GUIDED-MODEL-ALONE, or keep the rule).
