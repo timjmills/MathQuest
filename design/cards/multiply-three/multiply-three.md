@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"multiply-three","kind":"template","template":"equation","families":["multiplication"],"match":{"templates":["equation"]},"config":"design/cards/multiply-three/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"def982ffc1b28dcb","format":2,"configSha":"b0932c770fac"}
+{"card":"multiply-three","kind":"template","template":"equation","families":["multiplication"],"match":{"templates":["equation"]},"config":"design/cards/multiply-three/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"7970c0028fa33e9e","format":2,"configSha":"b0932c770fac"}
 {"cited":"AK-2 AX-4 CL-8 CL-40 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L2 L3 L5 L6 P-1 PG-12 PG-14 PT-FRM-6 PT-FRW-5 PT-FRW-6 PT-REV-3 RP-1 SL-1 SL-3a TY-10a","rules":"AK-1 a0cc12 2 d4709f H13 36f579 TY-25 b0a223 6 abca40 SL-3 f5cbcc DN-22 9d3337 VQ-1 dea36a 2 f15b47 3 db17cc 4 b89965 9 0b5532 10 2ed85c SL-2 f404d5 4 911174 7 1c59c4 11 fc569a CL-4 1a96ce 5 75480a 6 102a92 INK-1 0e2b59 3 b9f1f1 10 7755c0 DN-11 6fa438 P-35 4b32c0 1 5a3076 7 aa3040 10 256ad3 21 ce35dc SCC-01 8aa70b SCC-T15 fc9373 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H5@RUBRIC b3892d H6 e90105 8 44c23b 14 395d48 15 cfa87a 16 ad15de 17 eabdac L1 4f7d0c 2 885b43 3 901e56 6 6e19d8 10 d2ca35 AX-4 2eb6c1 C1 a670d9 2 a51365 3 075ae0 4 e59efd H4 464c24 7 3d3d38 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 L5 4d48a8 PG-12 8e75fd 14 64a88e PT-FRM-6 daac17 PT-FRW-5 e5cd7b 6 754eb7 PT-REV-3 d5e0d9 RP-1 d529bd SL-1 e3b064 DN-1a 6ecf1e SL-3a b8219f TY-10a 5e59f3 CL-8 c4e70b 40 2a6dbb P-LC-9 bc47bd PG-20 9c7999 PT-FRW-9 2cfd17 TY-7 e3e1e1","entries":"D%3AmtBand%3D30 972948 D%3AmtBand%3D60 972948 D%3AmtBand%3D100 972948 D%3AmtPair%3Dten 972948 D%3AmtPair%3Dany 972948 D%3AmtBracket%3Dtrue 972948 D%3AmtBracket%3Dfalse 972948 D%3AmtForm%3Dsolve 972948 D%3AmtForm%3Dboth 972948 D%3AmtForm%3Dmissing 972948 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
@@ -42,11 +42,11 @@ ONE new skill, multiplication:multiply_three_numbers 'Multiply Three Numbers' (W
 
 - **multiplication** (1): `multiply_three_numbers`
 
-**CCSS** (SKILL_STANDARDS of those skills): (none)
+**CCSS** (SKILL_STANDARDS of those skills): 3.OA.B.5
 
 **Essential Elements:** (none)
 
-**WRM small steps** (SKILL_WRM): (none)
+**WRM small steps** (SKILL_WRM): Y4.B4 S13; Y4.B5 S2 (part)
 
 ## 2. Problem types and progression
 
@@ -78,7 +78,6 @@ ONE new skill, multiplication:multiply_three_numbers 'Multiply Three Numbers' (W
 - `explain_strategy` (new) Why Does It Work? — host `number_sense:why_it_works`
 - `formulae` (new) Formulae — host `algebra:use_formulae`
 - `gcf_distributive` (option) Factor a Sum With the GCF — host `number_theory:gcf_easy`
-- `mult_three` (new) Multiply Three Numbers — host `multiplication:multiply_three_numbers`
 - `odd_even_pairs` (option) Odd or Even by Pairing — host `composing:odd_even`
 - `parts_of_expression` (new) Parts of an Expression — host `algebra:parts_of_expression`
 - `pictures_to_sentence` (option) Write the Number Sentence for the Picture — host `addition:add_5_pictures`
@@ -171,7 +170,7 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 - **M-MT2** multiplies the pair and stops (mt-stop-pair) — e.g. (2 × 5) × 7: writes 10
 - **M-MT3** reuses a factor of the pair with the inner product (mt-reuse) — e.g. (2 × 5) × 7: writes 10 × 5 = 50
 - **M-MT4** thinks a different grouping gives a different product (the property not seen) — e.g. (2 × 3) × 4 = 24 but 2 × (3 × 4) 'must be bigger'; marks the equality false
-- From the build list (entries hosted on multiplication): reads 5 × 7 as "5 more than 7"; only one of the two statements is true; adds the third number; multiplies two and stops
+- From the build list (entries hosted on multiplication): reads 5 × 7 as "5 more than 7"; only one of the two statements is true
 
 ## 7. Options and presets
 
@@ -262,8 +261,18 @@ Signed: owner, 2026-11-20
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (3 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (13 lines; 0 undecided)
 
+- `mtForm=solve` Task [difficulty], default (all 1) [offered, PROPOSED]
+- `mtForm=both` Task [difficulty] (all 1) [offered, PROPOSED]
+- `mtForm=missing` Task [difficulty] (all 1) [offered, PROPOSED]
+- `mtPair=ten` Easy pair [difficulty], default (all 1) [offered, PROPOSED]
+- `mtPair=any` Easy pair [difficulty] (all 1) [offered, PROPOSED]
+- `mtBand=30` Products within [difficulty] (all 1) [offered, PROPOSED]
+- `mtBand=60` Products within [difficulty] (all 1) [offered, PROPOSED]
+- `mtBand=100` Products within [difficulty], default (all 1) [offered, PROPOSED]
+- `mtBracket=true` Print the bracket [support], default (all 1) [offered, PROPOSED]
+- `mtBracket=false` Print the bracket [support] (all 1) [offered, PROPOSED]
 - `calculator=true` Calculator [play] (all 1) [out of scope, PROPOSED]
 - `calculator=false` Calculator [play], default (all 1) [out of scope, PROPOSED]
 - `skipAfter=*` Skip button (0 = off) [play] (all 1) [out of scope, PROPOSED]
@@ -273,9 +282,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:independent` — the skill's own items (all 1) [offered, PROPOSED]
 - `role:more-practice` — the skill's own items (all 1) [offered, PROPOSED]
 - `role:opener` (also lesson-opener) — provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 0/1 (default on multiply_three_numbers); provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 0/1 (default on multiply_three_numbers); provider misconceptions: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 1/1 (all 1) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 1/1; provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 1/1; provider misconceptions: real 1/1 (all 1) [offered, PROPOSED]
 - `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
 - `role:test` (also test-a, test-b) — provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 1) [offered, PROPOSED]
@@ -283,10 +292,10 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:fact-rows` — provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [out of scope, PROPOSED]
 - `role:fact-probe` — the skill's own items (all 1) [out of scope, PROPOSED]
 - `role:mixed-practice` (also mixed) — provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 0/1 (default on multiply_three_numbers); provider wrongAnswer: real 0/1 (default on multiply_three_numbers); provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 1/1 (all 1) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 1/1; provider wrongAnswer: real 1/1; provider stories: real 0/1 (default on multiply_three_numbers) (all 1) [offered, PROPOSED]
 - `role:stretch` — the skill's own items (all 1) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 0/1 (FALLBACK, warm-up from the earlier skills in data.js order, on multiply_three_numbers) (all 1) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 1/1 (all 1) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
@@ -299,5 +308,12 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 1) [offered, PROPOSED]
 - `host:race` — driven by ws-chromebook-fit (all 1) [out of scope, PROPOSED]
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
+**Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
+
+- `mtBand` Products within: 30 / 60 / 100 (1)
+- `mtBracket` Print the bracket: free (1)
+- `mtForm` Task: solve / both / missing (1)
+- `mtPair` Easy pair: ten / any (1)
+
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `multiplication:mult_three_missing_factor` → `multiplication:multiply_three_numbers` {"mtForm":"missing"}; `multiplication:mult_three_two_ways` → `multiplication:multiply_three_numbers` {"mtForm":"both"}
 <!-- /informational -->
