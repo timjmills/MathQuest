@@ -955,3 +955,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-20 — Deploy EB-LASTPAGE / CAP-PARITY rebuild (lf-checks critic r5 9/8/9/8): declared role ceilings, blocking per role
 - The rules read each role's declared ceiling (js/modules/sheet/role-capacity.js, WDS 12.1); --capacity-check fails on an undeclared or drifted role; EBLAST_BLOCKING_ROLES (16 roles, all but pre-skill-check) block, the rest advisory; --pin-check: the list only grows.
 - Gates: boot-smoke, code-snapshot, empty-band self-test / capacity-check / pin-check, backtest + precritic self-tests, precritic-plan, capacity-pin.
+
+## 2026-11-20 — Deploy STUDENT OPTIONS (owner request; lf-partopts critic r2: 8 on every criterion at 1280 / 1366 / 1024 / 820)
+- Pupil taps a skill: its options open folded with "Play this skill" / "Play all selected (N)"; "You will play N skills"; chip x deselects (48 px); teacher-fixed options greyed "Set by your teacher"; pupil wording layer (pupil-option-words.js, WORDS lint 0); every pupil start goes through playSelectedSkills. Explorer NODUP fix at plate S.
+- Gates: boot-smoke, code-snapshot, no-size-s, no-phone-width, student-opts (4 widths), student-explorer, share-options, simple-print, screen-answer, self-tests, precritic-plan, capacity-pin, lesson baseline.

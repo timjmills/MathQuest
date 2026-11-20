@@ -118,6 +118,12 @@ const ALLOW = new Set(list(arg('allow', '')));
     // cap and takes the ones that fit (add_facts Review M: 10 of 12 under 100 mm of white). Read on the printed page (print media);
     // the ceilings are read from each role's own `const CEILING = {...}`. --no-white-row turns it off.
     const whiteRow = [];
+    // pages that held this white before the check existed, each with its reason and owner (WHITE-ROW reports them, never fails them)
+    const WHITE_ROW_KNOWN = {
+        'algebra:two_step_mult_div_first test L': 'pre-existing on master: one two-step story a Test page at L; routed to lf-roles with critic rowcap-s2 N3',
+        'division:div_facts_long review M': 'the Mixed Review share (20-45 %) and whole rows cap it: its long-division earlier row is 84-94 mm, so a third main row with the mixed row passes the ceiling or the share (rose 8 -> 10 this round); a lead call',
+        'division:div_facts_long review L': 'as M: 8 a page (4 main columns do not fit at L); a lead call',
+    };
     if (has('check') && !has('no-white-row')) {
         const ceilOf = {};
         for (const [role, file] of [['review', 'review.js'], ['test', 'test.js'], ['error-analysis', 'error-analysis.js']]) {
@@ -148,9 +154,18 @@ const ALLOW = new Set(list(arg('allow', '')));
                     if (!cells.length) return null;
                     const low = Math.max(...[...p.querySelectorAll('[data-ws-cell], .ws-grid')].map((e) => e.getBoundingClientRect().bottom).filter((b) => b <= fTop + 2));
                     const rowMm = Math.min(...cells.map((c) => c.getBoundingClientRect().height)) / MM;
-                    return { whiteMm: +((fTop - low) / MM).toFixed(1), rowMm: +rowMm.toFixed(1) };
+                    // (the cells of the LAST row: one more such row is what the page could take)
+                    const lastTop = Math.max(...cells.map((c) => c.getBoundingClientRect().top));
+                    const perRow = cells.filter((c) => Math.abs(c.getBoundingClientRect().top - lastTop) < 2).length;
+                    return { whiteMm: +((fTop - low) / MM).toFixed(1), rowMm: +rowMm.toFixed(1), perRow };
                 });
-                if (w && w.whiteMm > w.rowMm + 3) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
+                // (the role caps the count when one more row would pass its ceiling - "unless the deal or the role caps the count")
+                const known = WHITE_ROW_KNOWN[k];
+                // (one more row FITS when the white holds it with the roles' own room - 1.15 x its height, the Error Analysis / Guided need -
+                // plus the grid's rules; a story row of 112 mm under 120 mm of white does not)
+                const more = w && w.whiteMm > 1.15 * w.rowMm + 3;
+                if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size] && known) console.log(`  known ${k}: WHITE-ROW ${w.whiteMm} mm (${known})`);
+                else if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size]) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
             }
             await app2.close();
         }
