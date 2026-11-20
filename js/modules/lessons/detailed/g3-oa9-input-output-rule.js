@@ -89,7 +89,9 @@ export default {
         steps: [
             { icon: 'look', text: 'Read rows 1 and 2 across.' },
             { icon: 'decide', text: 'Bigger or smaller? By how much?' },
-            { icon: 'check', text: 'Test every row.' },
+            // (critic r3 R3-9: the × rules of Guided, Practice and the exit - the step where a + read off row 1 fails names the
+            // next try; the chart's third example is drawn on the board, T4 §5)
+            { icon: 'check', text: 'Test every row. +\u00a0fails? Try\u00a0×.' },
             { icon: 'write', text: 'Write the rule.' },
         ],
         // No chant (research §4): the three steps are said in the Say band.
@@ -249,14 +251,14 @@ export default {
                 { say: 'Yesterday each times row went up by the same number.' },
                 { say: 'Today the machine has a rule. We find it.' },
             ] },
-        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'The nodders', text: 'Pupils who nod at + {chart3.d} on panel {panel.third} are the one-pair group.' }],
+        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'The nodders', text: 'Pupils who nod at + {chart3.d} on the board are the one-pair group.' }],
             rows: [
                 { do: 'Feed card {chart.x1} into the rule machine. Show {chart.y1}.' },
                 { say: 'In {chart.x1}, out {chart.y1}. It got bigger.', note: 'Step 1 and step 2.' },
                 { ask: 'Bigger by how much?', note: 'Expected: [[{chart.d}]].' },
                 { say: 'Test every row: {chart.x2} {chart.sign} {chart.k} is {chart.y2}.', note: 'Step 3. Then row 3. The rule: [[{chart.rule}]].' },
-                { say: 'In {chart2.x1}, out {chart2.y1}. It got smaller.', note: 'Panel {panel.second}. The rule: [[{chart2.rule}]].' },
-                { say: 'In {chart3.x1}, out {chart3.y1}. Plus {chart3.d}? Test row 2.', note: 'Panel {panel.third}: the trap.' },
+                { say: 'In {chart2.x1}, out {chart2.y1}. It got smaller.', note: 'On the board. The rule: [[{chart2.rule}]].' },
+                { say: 'In {chart3.x1}, out {chart3.y1}. Plus {chart3.d}? Test row 2.', note: 'On the board: the trap. Chart step 3.' },
                 { say: '{chart3.x2} plus {chart3.d} is {chart3.plus}. Not {chart3.y2}. Try times.', note: 'Write “Wrong” beside + {chart3.d} on the board only.' },
                 { say: 'The rule is {chart3.word} {chart3.k}. It works for every row.', note: 'Pupils repeat. The rule: [[{chart3.rule}]].' },
             ] },
