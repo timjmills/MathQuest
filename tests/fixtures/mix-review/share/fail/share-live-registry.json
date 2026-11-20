@@ -2,7 +2,7 @@
  "check": "share",
  "state": "share-live-registry",
  "proto": "case-fail-i-live-registry",
- "note": "r3 D1: replay reads a LIVE registry whose footprint class changed (AE stack -> visual-full); the golden codes re-page",
+ "note": "r3 D1: replay reads a LIVE registry whose footprint kind changed (UL, EX legacy -> visual-full: typical -> wide); the product golden codes re-page",
  "expect": "fail",
  "catch": "i",
  "catchText": "golden",
@@ -16,10 +16,10 @@
   "size": "m",
   "golden": true,
   "liveRegistry": {
-   "AE": {
+   "UL": {
     "kind": "visual-full"
    },
-   "AK": {
+   "EX": {
     "kind": "visual-full"
    }
   }

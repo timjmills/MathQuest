@@ -12104,8 +12104,6 @@
   },
   {
    "id": "mix-review-count",
-   "pending": true,
-   "pendingReason": "build step 2 (MR-B): js/modules/mixed-review.js (the V1 dealer moved) is not built yet; re-arm when it lands",
    "check": "MIX-REVIEW-COUNT Node core (card §8; check-v1 props b c d e h j j2 k l on the PRODUCT dealer js/modules/mixed-review.js): exact N, ceil(N/2), 3 skills a page, no avoidable adjacency, the frozen size / kind tables, shelves, flat >= 2, fill, no lone item; one named fixture per FAIL state",
    "kind": "fixture",
    "rule": "ws-mix-review --check count",
@@ -12126,8 +12124,6 @@
   },
   {
    "id": "mix-review-pool",
-   "pending": true,
-   "pendingReason": "build step 2 (MR-B): js/modules/mixed-review.js and mixed-review-pool.js are not built yet; re-arm when they land",
    "check": "MIX-REVIEW-POOL (card §8; check-v1 props g n + b c d on the product dealer, plus mixed-review-pool.js): rows carry kind never fc (L4), codes are FROZEN_SKILL_CODES (L5), passed = REDESIGN_PASSED, defaults off, 200 seeded filter sets, adapt only the listed skills, the weighting formula",
    "kind": "fixture",
    "rule": "ws-mix-review --check pool",
@@ -12148,8 +12144,6 @@
   },
   {
    "id": "mix-review-share",
-   "pending": true,
-   "pendingReason": "build step 2 (MR-B): the product dealer, its frozen table and pins and the skill-codes.js V1 tokens are not built yet; re-arm when they land",
    "check": "MIX-REVIEW-SHARE (card §8; check-v1 props a i m on the product dealer): determinism and the code round trip, the V1 freeze (sha256 of the four files, golden codes), the seed formula, the V1 table codes = FROZEN_SKILL_CODES (L5), one codec (generateEnhancedSkillCode == D.encode byte for byte, parseEnhancedSkillCode reads it back)",
    "kind": "fixture",
    "rule": "ws-mix-review --check share",
@@ -12170,8 +12164,6 @@
   },
   {
    "id": "mix-review-week",
-   "pending": true,
-   "pendingReason": "build step 2 (MR-B): js/modules/mixed-review.js is not built yet; re-arm when it lands",
    "check": "MIX-REVIEW-WEEK Node core (card §8; check-v1 prop f on the product dealer + every K<d> day code rebuilt alone equals that day, L24)",
    "kind": "fixture",
    "rule": "ws-mix-review --check week",

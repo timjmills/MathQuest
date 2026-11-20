@@ -1,0 +1,4961 @@
+{
+ "note": "FROZEN V1 TABLE (card §9b step 2, §10 L4 / L5): code -> {id, kind, grade, area} of every live skill outside MIXED / NOSTD, generated ONCE by `node tests/scripts/ws-mix-review.mjs --pin` from mixed-review-pool.js poolRows (code = FROZEN_SKILL_CODES[id]; kind = the provider footprint kind as is; grade = data.js getSkillGrade, M when none). A V1 code replays through this table only, never the live registry. Append-only: a new skill appends a row; no row changes. Pinned by sha256 in frozen.json.",
+ "rows": [
+  {
+   "id": "counting:count_objects",
+   "code": "AA",
+   "grade": "K",
+   "area": "CC",
+   "kind": "legacy"
+  },
+  {
+   "id": "counting:count_sequence",
+   "code": "AB",
+   "grade": "K",
+   "area": "CC",
+   "kind": "legacy"
+  },
+  {
+   "id": "counting:number_seq_fill",
+   "code": "AC",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "counting:mixed_counting",
+   "code": "SB",
+   "grade": "M",
+   "area": "CC",
+   "kind": "legacy"
+  },
+  {
+   "id": "comparing:compare_groups",
+   "code": "AD",
+   "grade": "K",
+   "area": "CC",
+   "kind": "legacy"
+  },
+  {
+   "id": "comparing:compare_objects",
+   "code": "AE",
+   "grade": "K",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "comparing:classify_count",
+   "code": "AF",
+   "grade": "K",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:number_bonds",
+   "code": "AG",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:make_ten",
+   "code": "AH",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:teen_compose",
+   "code": "AJ",
+   "grade": "K",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:tens_foundation_visual",
+   "code": "AK",
+   "grade": "K",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:hundreds_chart_fill",
+   "code": "AL",
+   "grade": "1",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:ten_frame_build",
+   "code": "AM",
+   "grade": "K",
+   "area": "CC",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:ten_frame_build_teen",
+   "code": "AN",
+   "grade": "K",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:base10_build",
+   "code": "AP",
+   "grade": "1",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:base10_regroup",
+   "code": "AQ",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:base10_build_hundreds",
+   "code": "AR",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:odd_even",
+   "code": "AS",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:select_even_odd",
+   "code": "AT",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:number_word_form",
+   "code": "AU",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:fraction_number_line",
+   "code": "AV",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:whole_as_fraction",
+   "code": "AW",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:compose_whole",
+   "code": "AX",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:mixed_composing",
+   "code": "SD",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:number_chart_fill",
+   "code": "U9",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:write_numbers_in_words",
+   "code": "Y5",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "composing:chart_to_120",
+   "code": "ZG",
+   "grade": "1",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_facts",
+   "code": "AY",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_sub_10s",
+   "code": "AZ",
+   "grade": "1",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_sub_100s",
+   "code": "A2",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add",
+   "code": "A3",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_word_problems",
+   "code": "A4",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_word_problems_plain",
+   "code": "A5",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_sub_fact_family",
+   "code": "A6",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:number_families_add",
+   "code": "A7",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_three",
+   "code": "BA",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:comparison_word",
+   "code": "BB",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:equal_sign",
+   "code": "BC",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_5_pictures",
+   "code": "BD",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_10_no_regroup",
+   "code": "BE",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_10_regroup",
+   "code": "BF",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_10_mixed",
+   "code": "BG",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_20_no_regroup",
+   "code": "BH",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_20_regroup",
+   "code": "BJ",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_20_mixed",
+   "code": "BK",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_50_no_regroup",
+   "code": "BL",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_50_regroup",
+   "code": "BM",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_50_mixed",
+   "code": "BN",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_100_no_regroup",
+   "code": "BP",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_100_regroup",
+   "code": "BQ",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_100_mixed",
+   "code": "BR",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_1k_no_regroup",
+   "code": "BS",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_1k_regroup",
+   "code": "BT",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_1k_mixed",
+   "code": "BU",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_10k_no_regroup",
+   "code": "BV",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_10k_regroup",
+   "code": "BW",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_10k_mixed",
+   "code": "BX",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_100k_no_regroup",
+   "code": "BY",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_100k_regroup",
+   "code": "BZ",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_100k_mixed",
+   "code": "B2",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_1m_no_regroup",
+   "code": "B3",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_1m_regroup",
+   "code": "B4",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_1m_mixed",
+   "code": "B5",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_10",
+   "code": "B6",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_10_plain",
+   "code": "B7",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_20",
+   "code": "B8",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_20_plain",
+   "code": "B9",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_50",
+   "code": "CA",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_50_plain",
+   "code": "CB",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_100",
+   "code": "CC",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_100_plain",
+   "code": "CD",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_1k",
+   "code": "CE",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_1k_plain",
+   "code": "CF",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_10k",
+   "code": "CG",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_10k_plain",
+   "code": "CH",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_100k",
+   "code": "CJ",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_100k_plain",
+   "code": "CK",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_1m",
+   "code": "CL",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_wp_1m_plain",
+   "code": "CM",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:nl_add",
+   "code": "CN",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:number_line_add",
+   "code": "CP",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:cloze_addition",
+   "code": "CQ",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:mixed_addition",
+   "code": "SF",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_column_multi",
+   "code": "T6",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:add_missing_digit",
+   "code": "T7",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "addition:fact_family_sort",
+   "code": "T8",
+   "grade": "1",
+   "area": "OA",
+   "kind": "family-check"
+  },
+  {
+   "id": "subtraction:sub_facts",
+   "code": "CR",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:subtract",
+   "code": "CS",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_word_problems",
+   "code": "CT",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain",
+   "code": "CU",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:missing_add_sub",
+   "code": "CV",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_5_pictures",
+   "code": "CW",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:unknown_start_wp",
+   "code": "CX",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_10_no_regroup",
+   "code": "CY",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_10_regroup",
+   "code": "CZ",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_10_mixed",
+   "code": "C2",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_20_no_regroup",
+   "code": "C3",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_20_regroup",
+   "code": "C4",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_20_mixed",
+   "code": "C5",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup",
+   "code": "C6",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_50_regroup",
+   "code": "C7",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_50_mixed",
+   "code": "C8",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup",
+   "code": "C9",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_100_regroup",
+   "code": "DA",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_100_mixed",
+   "code": "DB",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup",
+   "code": "DC",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_1k_regroup",
+   "code": "DD",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_1k_mixed",
+   "code": "DE",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup",
+   "code": "DF",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_10k_regroup",
+   "code": "DG",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_10k_mixed",
+   "code": "DH",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup",
+   "code": "DJ",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_100k_regroup",
+   "code": "DK",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_100k_mixed",
+   "code": "DL",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup",
+   "code": "DM",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_1m_regroup",
+   "code": "DN",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_1m_mixed",
+   "code": "DP",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_10",
+   "code": "DQ",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_10_plain",
+   "code": "DR",
+   "grade": "K",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_20",
+   "code": "DS",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_20_plain",
+   "code": "DT",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_50",
+   "code": "DU",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_50_plain",
+   "code": "DV",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_100",
+   "code": "DW",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_100_plain",
+   "code": "DX",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_1k",
+   "code": "DY",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_1k_plain",
+   "code": "DZ",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_10k",
+   "code": "D2",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_10k_plain",
+   "code": "D3",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_100k",
+   "code": "D4",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_100k_plain",
+   "code": "D5",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_1m",
+   "code": "D6",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_1m_plain",
+   "code": "D7",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:nl_sub",
+   "code": "D8",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:number_line_sub",
+   "code": "D9",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:mixed_add_sub",
+   "code": "SG",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:mixed_subtraction",
+   "code": "SH",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_across_zeros",
+   "code": "T9",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_missing_digit",
+   "code": "UA",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_check_by_adding",
+   "code": "UB",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_compare",
+   "code": "VT",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_wp_start_unknown",
+   "code": "VU",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "subtraction:sub_2d_1d",
+   "code": "Y6",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_facts",
+   "code": "EA",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:multiply",
+   "code": "EB",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:arrays_groups",
+   "code": "EC",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:dot_array_mult",
+   "code": "ED",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_properties",
+   "code": "EE",
+   "grade": "3",
+   "area": "OA",
+   "kind": "arrays-turn"
+  },
+  {
+   "id": "multiplication:mult_word_problems",
+   "code": "EF",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_word_problems_plain",
+   "code": "EG",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_comparison",
+   "code": "EH",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_comparison_plain",
+   "code": "EJ",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:area_model_mult",
+   "code": "EK",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:area_model_mult_hard",
+   "code": "EL",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_div_fact_family",
+   "code": "EM",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:number_families_mult",
+   "code": "EN",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_chart",
+   "code": "ER",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_chart_easy",
+   "code": "ES",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:nl_mult",
+   "code": "EV",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mixed_multiplication",
+   "code": "SJ",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:repeated_add_to_mult",
+   "code": "UC",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:equal_or_unequal_groups",
+   "code": "UD",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_zeros",
+   "code": "UE",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_placeholder_zero",
+   "code": "UF",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_missing_digit",
+   "code": "UG",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_tables",
+   "code": "UU",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_2by1_column",
+   "code": "VA",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_3by1_column",
+   "code": "VB",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_2by2_standard",
+   "code": "VC",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_chart_shade",
+   "code": "VD",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_chart_pattern",
+   "code": "VE",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_chart_headers",
+   "code": "VF",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_multiples_of_ten",
+   "code": "VG",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_break_apart",
+   "code": "VV",
+   "grade": "3",
+   "area": "OA",
+   "kind": "arrays-turn"
+  },
+  {
+   "id": "multiplication:area_model_2by1",
+   "code": "VW",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:area_model_3by1",
+   "code": "VX",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_arrays",
+   "code": "V2",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_equal_groups",
+   "code": "V3",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_by_ten",
+   "code": "V4",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_by_hundred",
+   "code": "V5",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_2s",
+   "code": "V6",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_3s",
+   "code": "V7",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_4s",
+   "code": "V8",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_5s",
+   "code": "V9",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_6s",
+   "code": "WA",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_7s",
+   "code": "WB",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_8s",
+   "code": "WC",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_9s",
+   "code": "WD",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_10s",
+   "code": "WE",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_11s",
+   "code": "WF",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:count_by_12s",
+   "code": "WG",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "multiplication:mult_facts_15",
+   "code": "ZH",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_facts",
+   "code": "EW",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:divide",
+   "code": "EX",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_remainders",
+   "code": "EY",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_word_problems",
+   "code": "EZ",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_word_problems_plain",
+   "code": "E2",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:remainder_interpret",
+   "code": "E3",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:remainder_contexts",
+   "code": "E4",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:box_division_easy",
+   "code": "E5",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:box_division_hard",
+   "code": "E6",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:area_model_div_2by1",
+   "code": "E7",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:area_model_div_3by1",
+   "code": "E8",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:long_div_2digit",
+   "code": "E9",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:missing_mult_div",
+   "code": "FA",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:nl_div",
+   "code": "FB",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:mixed_mult_div",
+   "code": "SK",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:mixed_division",
+   "code": "SL",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:share_into_groups",
+   "code": "UH",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_equation_parts",
+   "code": "UJ",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_zero_in_quotient",
+   "code": "UK",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:remainder_too_big",
+   "code": "UL",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_check_by_multiplying",
+   "code": "UM",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_fix_estimate",
+   "code": "UN",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_2by1_long",
+   "code": "VJ",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_3by1_long",
+   "code": "VK",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_4by1_long",
+   "code": "VL",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_3by2_long",
+   "code": "VM",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_sharing_word_problems",
+   "code": "WJ",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_grouping_word_problems",
+   "code": "WK",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_facts_long",
+   "code": "ZF",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "division:div_facts_15",
+   "code": "ZJ",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:number_line_int",
+   "code": "FC",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:compare_int",
+   "code": "FD",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:add_int",
+   "code": "FE",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:sub_int",
+   "code": "FF",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:order_negatives",
+   "code": "FG",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:integer_nl_drag",
+   "code": "FH",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:mixed_integers",
+   "code": "SM",
+   "grade": "M",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:abs_value",
+   "code": "FJ",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:opposite_numbers",
+   "code": "FK",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:ordering_rationals",
+   "code": "FL",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:add_negative",
+   "code": "WM",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "integers:sub_negative",
+   "code": "WN",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:mixed",
+   "code": "SN",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:word_problems_mixed",
+   "code": "FM",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:word_problems_mixed_plain",
+   "code": "FN",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:number_families_mixed",
+   "code": "FP",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:operations_all",
+   "code": "SP",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:which_sign",
+   "code": "UP",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_ops_mixed:missing_factor_or_addend",
+   "code": "UQ",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:identify",
+   "code": "FS",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:write_fraction",
+   "code": "FT",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:shade_fraction",
+   "code": "FU",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:equiv_frac_visual",
+   "code": "FV",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:equiv_frac_nv",
+   "code": "FW",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:select_equiv_frac",
+   "code": "FX",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:equivalent",
+   "code": "FY",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:fraction_of_set",
+   "code": "FZ",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:fraction_of_set_hard",
+   "code": "F2",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:compare",
+   "code": "F3",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:simplify",
+   "code": "F4",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:improper_mixed",
+   "code": "F5",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:mixed_improper_visual",
+   "code": "SQ",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:mixed_fractions",
+   "code": "SR",
+   "grade": "M",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:compose_target_frac",
+   "code": "F6",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:identify_nv",
+   "code": "F7",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:fraction_of_set_nv",
+   "code": "F8",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:fraction_of_set_hard_nv",
+   "code": "F9",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:order_fractions",
+   "code": "GA",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:order_frac_numline",
+   "code": "GB",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:benchmark_fractions",
+   "code": "GC",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:compare_frac_lcd",
+   "code": "GD",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:graph_fractions",
+   "code": "GE",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:round_fractions",
+   "code": "GF",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:fraction_bar_ops",
+   "code": "GG",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:fraction_nl_drag",
+   "code": "GH",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:mixed_nl_drag",
+   "code": "SS",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:compare_to_half",
+   "code": "VN",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:identify_fraction_nl",
+   "code": "WP",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:write_fraction_nl",
+   "code": "WQ",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:compare_fractions_nl",
+   "code": "WR",
+   "grade": "3",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:equivalent_or_not",
+   "code": "WS",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fractions:simplify_with_gcf",
+   "code": "WT",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_fractions_like",
+   "code": "GJ",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_fractions_like",
+   "code": "GK",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_mixed_like",
+   "code": "GL",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_mixed_like",
+   "code": "GM",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mult_frac_whole",
+   "code": "GN",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:decompose_fractions",
+   "code": "GP",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_word_problems",
+   "code": "GQ",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_word_problems_plain",
+   "code": "GR",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_10_100",
+   "code": "GS",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_frac_unlike",
+   "code": "GT",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_frac_unlike",
+   "code": "GU",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_mixed_unlike",
+   "code": "GV",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_mixed_unlike",
+   "code": "GW",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_frac_like_nv",
+   "code": "GX",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_frac_like_nv",
+   "code": "GY",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_frac_unlike_nv",
+   "code": "GZ",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_frac_unlike_nv",
+   "code": "G2",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_mixed_like_nv",
+   "code": "G3",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_mixed_like_nv",
+   "code": "G4",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:add_mixed_unlike_nv",
+   "code": "G5",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:sub_mixed_unlike_nv",
+   "code": "G6",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mult_frac_whole_nv",
+   "code": "G7",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:decompose_frac_nv",
+   "code": "G8",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_10_100_nv",
+   "code": "G9",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mult_frac_frac_nv",
+   "code": "HA",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:div_unit_frac_nv",
+   "code": "HB",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_as_div_nv",
+   "code": "HC",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_as_div_word",
+   "code": "HD",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mult_scaling_nv",
+   "code": "HE",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mult_frac_frac",
+   "code": "HF",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:div_unit_fraction",
+   "code": "HG",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_as_division",
+   "code": "HH",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mult_scaling",
+   "code": "HJ",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_mult_word",
+   "code": "HK",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_mult_word_plain",
+   "code": "HL",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_word_mixed",
+   "code": "HM",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:frac_word_mixed_plain",
+   "code": "HN",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:mixed_fraction_ops",
+   "code": "ST",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:estimate_frac_ops",
+   "code": "HP",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:unit_frac_div_whole",
+   "code": "WU",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "fraction_operations:whole_div_unit_frac",
+   "code": "WV",
+   "grade": "5",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:add_decimal",
+   "code": "HQ",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:sub_decimal",
+   "code": "HR",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:mult_decimal",
+   "code": "HS",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:div_decimal",
+   "code": "HT",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:compare_decimal",
+   "code": "HU",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:compare_thousandths",
+   "code": "HV",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:round_decimals",
+   "code": "HW",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:round_thousandths",
+   "code": "HX",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:order_decimals",
+   "code": "HY",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:decimal_nl_drag",
+   "code": "HZ",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:mixed_decimals",
+   "code": "SU",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:div_decimal_by_whole",
+   "code": "WW",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:div_by_decimal",
+   "code": "WX",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:round_to_tenth",
+   "code": "WY",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "decimals:round_to_hundredth",
+   "code": "WZ",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:f_to_d",
+   "code": "H2",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:d_to_f",
+   "code": "H3",
+   "grade": "4",
+   "area": "NF",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:f_to_p",
+   "code": "H4",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:p_to_f",
+   "code": "H5",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:d_to_p",
+   "code": "H6",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:p_to_d",
+   "code": "H7",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:percent_visual",
+   "code": "H8",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:percent_of_number",
+   "code": "H9",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:find_whole_from_pct",
+   "code": "JA",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:order_fdp",
+   "code": "JB",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:ratio_intro",
+   "code": "JC",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:unit_rate_intro",
+   "code": "JD",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:double_num_line",
+   "code": "JE",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:mixed_conversions",
+   "code": "SV",
+   "grade": "M",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:equiv_ratios",
+   "code": "JF",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:ratio_tables",
+   "code": "JG",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:ratio_part_to_part",
+   "code": "W2",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:ratio_simplest_form",
+   "code": "W4",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "conversions:ratio_equivalent_or_not",
+   "code": "W5",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:name_2d_shapes",
+   "code": "JH",
+   "grade": "K",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:name_3d_shapes",
+   "code": "JJ",
+   "grade": "K",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:shape_name_match_2d",
+   "code": "JK",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:shape_name_match_3d",
+   "code": "JL",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:shape_positions",
+   "code": "JM",
+   "grade": "K",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:shape_corners_count",
+   "code": "JN",
+   "grade": "K",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:count_edges_faces_vertices",
+   "code": "JP",
+   "grade": "2",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:count_sides_vertices_2d",
+   "code": "JQ",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:order_objects_length",
+   "code": "JR",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:measure_nonstandard",
+   "code": "JS",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:compose_shapes",
+   "code": "JT",
+   "grade": "K",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:compose_hexagon",
+   "code": "JU",
+   "grade": "1",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:compose_rect_from_squares",
+   "code": "JV",
+   "grade": "2",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:partition_shapes",
+   "code": "JW",
+   "grade": "1",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:shape_attributes",
+   "code": "JX",
+   "grade": "1",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:compose_from_attributes",
+   "code": "JY",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_early:mixed_shapes_early",
+   "code": "S2",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:perimeter_intro",
+   "code": "JZ",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area_unit_squares",
+   "code": "J2",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:perimeter_grid",
+   "code": "J3",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:perimeter",
+   "code": "J4",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area",
+   "code": "J5",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area_perimeter",
+   "code": "J6",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area_distributive_visual",
+   "code": "J7",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area_triangle",
+   "code": "J8",
+   "grade": "6",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area_polygon_decompose",
+   "code": "J9",
+   "grade": "6",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:composite_shapes",
+   "code": "KA",
+   "grade": "6",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:volume",
+   "code": "KB",
+   "grade": "5",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:volume_composite",
+   "code": "KC",
+   "grade": "5",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:mixed_area_perimeter",
+   "code": "S3",
+   "grade": "M",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:area_missing_side",
+   "code": "W6",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:perimeter_missing_side",
+   "code": "W7",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:volume_missing_edge",
+   "code": "W8",
+   "grade": "5",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "area_perimeter:composite_area_perimeter",
+   "code": "W9",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:identify_angles",
+   "code": "KD",
+   "grade": "4",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:measure_angles",
+   "code": "KE",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:identify_lines",
+   "code": "KF",
+   "grade": "4",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:symmetry",
+   "code": "KG",
+   "grade": "4",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:place_symmetry_lines",
+   "code": "KH",
+   "grade": "4",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:additive_angles",
+   "code": "KJ",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:mixed_angles_lines",
+   "code": "S4",
+   "grade": "M",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:angles_in_right_angle",
+   "code": "XA",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:angles_on_straight_line",
+   "code": "XB",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "angles_lines:angles_around_point",
+   "code": "XC",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_classify:classify_triangles",
+   "code": "KK",
+   "grade": "4",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_classify:classify_quads",
+   "code": "KL",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_classify:hotspot_quads",
+   "code": "KM",
+   "grade": "3",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_classify:net_identify",
+   "code": "KN",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_classify:cross_section_3d",
+   "code": "KP",
+   "grade": "6",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "shapes_classify:mixed_shapes",
+   "code": "S5",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinate_q1",
+   "code": "KQ",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinate_all",
+   "code": "S6",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinate_graph",
+   "code": "KR",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coord_distance_q1",
+   "code": "KS",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coord_polygon",
+   "code": "KT",
+   "grade": "6",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:net_surface_area",
+   "code": "KU",
+   "grade": "6",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:geo_reflect",
+   "code": "KV",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:geo_rotate",
+   "code": "KW",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:geo_translate",
+   "code": "KX",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:mixed_coordinates",
+   "code": "S7",
+   "grade": "M",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinates_read_q1",
+   "code": "XD",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinates_plot_q1",
+   "code": "XE",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinates_read_all",
+   "code": "Y2",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:coordinates_plot_all",
+   "code": "Y3",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:reflect_x_axis",
+   "code": "XF",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:reflect_y_axis",
+   "code": "XG",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:rotate_half_turn",
+   "code": "XH",
+   "grade": "5",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:rotate_quarter_turn",
+   "code": "XJ",
+   "grade": "5",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:rotate_three_quarter_turn",
+   "code": "XK",
+   "grade": "5",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:translate_right_up",
+   "code": "XL",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:translate_left_up",
+   "code": "XM",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:translate_right_down",
+   "code": "XN",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "coordinates:translate_left_down",
+   "code": "XP",
+   "grade": "5",
+   "area": "G",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_hour",
+   "code": "KY",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_half_hour",
+   "code": "KZ",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_quarter",
+   "code": "K2",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_5min",
+   "code": "K3",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_1min",
+   "code": "K4",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_analog_digital",
+   "code": "K5",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_match_clock",
+   "code": "K6",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:order_clocks_analog_asc",
+   "code": "K7",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:order_clocks_analog_desc",
+   "code": "K8",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:order_clocks_digital_asc",
+   "code": "K9",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:order_clocks_digital_desc",
+   "code": "LA",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_30min",
+   "code": "LB",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_hour",
+   "code": "LC",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_15min",
+   "code": "LD",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_mixed",
+   "code": "LE",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_find_duration",
+   "code": "LF",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_visual_easy",
+   "code": "LG",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_visual_medium",
+   "code": "LH",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_visual_hard",
+   "code": "LJ",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:heavier_lighter_visual",
+   "code": "LK",
+   "grade": "K",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:pictograph_intro",
+   "code": "LL",
+   "grade": "1",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:bar_graph_intro",
+   "code": "LM",
+   "grade": "K",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:reading_ruler",
+   "code": "LN",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:reading_ruler_hard",
+   "code": "LP",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:money_count",
+   "code": "LQ",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:money",
+   "code": "LR",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:equiv_coin_sets",
+   "code": "LS",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:enough_money",
+   "code": "LT",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:make_change_least_coins",
+   "code": "LU",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:temperature",
+   "code": "LV",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:capacity",
+   "code": "LW",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:unit_conversions",
+   "code": "LX",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:length_customary",
+   "code": "LY",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:length_metric",
+   "code": "LZ",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:unit_conversion_word",
+   "code": "L2",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:mass_volume_liquid",
+   "code": "L3",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:estimate_length",
+   "code": "L4",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:mixed_measurement",
+   "code": "S8",
+   "grade": "M",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:mixed_time",
+   "code": "S9",
+   "grade": "M",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:clock_parts",
+   "code": "UW",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_fives_ring",
+   "code": "UX",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:time_sense",
+   "code": "UY",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:elapsed_find_start",
+   "code": "UZ",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:coin_value",
+   "code": "U2",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:money_notation",
+   "code": "U3",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:money_change",
+   "code": "U4",
+   "grade": "3",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:money_compare",
+   "code": "U5",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:count_notes",
+   "code": "XQ",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:count_notes_and_coins",
+   "code": "XR",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_feet_to_inches",
+   "code": "XS",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_yards_to_feet",
+   "code": "XT",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_yards_to_inches",
+   "code": "XU",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_miles_to_feet",
+   "code": "XV",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_cm_to_mm",
+   "code": "XW",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_m_to_cm",
+   "code": "XX",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_m_to_mm",
+   "code": "XY",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:convert_km_to_m",
+   "code": "XZ",
+   "grade": "4",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:clock_hands",
+   "code": "X2",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:minutes_by_fives_all",
+   "code": "Y4",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:order_notes",
+   "code": "X3",
+   "grade": "1",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "measurement:money_amount_in_words",
+   "code": "X4",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:bar_graph",
+   "code": "L5",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:build_bar_graph",
+   "code": "L6",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:pictograph",
+   "code": "L7",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:build_pictograph",
+   "code": "L8",
+   "grade": "2",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:tally_chart",
+   "code": "L9",
+   "grade": "2",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:line_plot",
+   "code": "MA",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:line_plot_g2",
+   "code": "MB",
+   "grade": "2",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:line_plot_fractions",
+   "code": "MC",
+   "grade": "4",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:pie_chart",
+   "code": "MD",
+   "grade": "5",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:mixed_graphs",
+   "code": "TD",
+   "grade": "M",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:pictograph_how_many_more",
+   "code": "X5",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:bar_graph_how_many_more",
+   "code": "X6",
+   "grade": "3",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "graphs:tally_how_many_more",
+   "code": "X7",
+   "grade": "2",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:mean",
+   "code": "ME",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:median",
+   "code": "MF",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:mode",
+   "code": "MG",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:range",
+   "code": "MH",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:box_plot_intro",
+   "code": "MJ",
+   "grade": "5",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:histogram_read",
+   "code": "MK",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:mad",
+   "code": "ML",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:statistical_question",
+   "code": "MM",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:mixed_data_analysis",
+   "code": "TE",
+   "grade": "M",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "data_analysis:box_plot_quartiles",
+   "code": "X8",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "probability:probability_basic",
+   "code": "MN",
+   "grade": "6",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "probability:mixed_probability",
+   "code": "TF",
+   "grade": "M",
+   "area": "DATA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:seq_2",
+   "code": "MP",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:seq_5",
+   "code": "MQ",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:seq_10",
+   "code": "MR",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:count_by_fill",
+   "code": "MS",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:skip_count_line",
+   "code": "MT",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "count-row"
+  },
+  {
+   "id": "patterns:skip_count_grid",
+   "code": "MU",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "count-row"
+  },
+  {
+   "id": "patterns:count_by_step_up",
+   "code": "MV",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:count_by_step_down",
+   "code": "MW",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:count_by_powers_of_10",
+   "code": "MX",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:double",
+   "code": "MY",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:halve",
+   "code": "MZ",
+   "grade": "2",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:shape_pattern",
+   "code": "M2",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:number_pattern",
+   "code": "M3",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:pattern_relationship",
+   "code": "M4",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:mixed_patterns",
+   "code": "TH",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:number_patterns_rule",
+   "code": "UV",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "patterns:notice_patterns",
+   "code": "ZW",
+   "grade": "3",
+   "area": "OA",
+   "kind": "choice"
+  },
+  {
+   "id": "patterns:growing_shape_patterns",
+   "code": "ZX",
+   "grade": "4",
+   "area": "OA",
+   "kind": "picture"
+  },
+  {
+   "id": "patterns:pattern_features",
+   "code": "ZY",
+   "grade": "4",
+   "area": "OA",
+   "kind": "choice"
+  },
+  {
+   "id": "patterns:follow_given_rule",
+   "code": "ZZ",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:tape_diagram",
+   "code": "M5",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:tape_diagram_plain",
+   "code": "M6",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:multi_step_word",
+   "code": "M7",
+   "grade": "4",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "algebra:multi_step_word_plain",
+   "code": "M8",
+   "grade": "4",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "algebra:solve_unknown",
+   "code": "M9",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:balance_addsub",
+   "code": "NA",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:write_expression",
+   "code": "NB",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:evaluate_expression",
+   "code": "NC",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:evaluate_expression_hard",
+   "code": "ND",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:inequalities",
+   "code": "NE",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:combine_like_terms",
+   "code": "NF",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:distributive_expr",
+   "code": "NG",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:function_table_easy",
+   "code": "NH",
+   "grade": "4",
+   "area": "OA",
+   "kind": "table"
+  },
+  {
+   "id": "algebra:function_table_hard",
+   "code": "NJ",
+   "grade": "5",
+   "area": "OA",
+   "kind": "table"
+  },
+  {
+   "id": "algebra:algebra_word_mixed",
+   "code": "NK",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:algebra_word_mixed_plain",
+   "code": "NL",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_eq_addsub",
+   "code": "NM",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_eq_multdiv",
+   "code": "NN",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_eq_twostep",
+   "code": "NP",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:write_equation",
+   "code": "NQ",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:build_expr_addsub",
+   "code": "NR",
+   "grade": "3",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:build_expr_multdiv",
+   "code": "NS",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:mixed_algebra",
+   "code": "TJ",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_x_plus_a",
+   "code": "X9",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_x_minus_a",
+   "code": "YA",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_ax_eq_b",
+   "code": "YB",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_x_div_a",
+   "code": "YC",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_ax_plus_b",
+   "code": "YD",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_ax_minus_b",
+   "code": "YE",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_x_div_a_plus_b",
+   "code": "YF",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:solve_bracket_div",
+   "code": "YG",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:write_equation_story",
+   "code": "YH",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:factor_out_gcf",
+   "code": "YJ",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "algebra:function_table_find_rule",
+   "code": "YK",
+   "grade": "4",
+   "area": "OA",
+   "kind": "table"
+  },
+  {
+   "id": "algebra:function_table_find_inputs",
+   "code": "YL",
+   "grade": "4",
+   "area": "OA",
+   "kind": "table"
+  },
+  {
+   "id": "algebra:two_step_mult_div_first",
+   "code": "ZA",
+   "grade": "3",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "algebra:two_step_add_then_mult",
+   "code": "ZB",
+   "grade": "3",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "algebra:two_step_add_then_div",
+   "code": "ZC",
+   "grade": "3",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "algebra:two_step_letter_equation",
+   "code": "ZD",
+   "grade": "3",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "algebra:two_step_estimate_check",
+   "code": "ZE",
+   "grade": "3",
+   "area": "OA",
+   "kind": "word-work"
+  },
+  {
+   "id": "order_of_operations:oop_easy",
+   "code": "NT",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:oop_medium",
+   "code": "NU",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:oop_hard",
+   "code": "NV",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:two_ops_no_paren",
+   "code": "NW",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:three_ops_no_paren",
+   "code": "NX",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:multi_ops_no_paren",
+   "code": "NY",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:paren_simple",
+   "code": "NZ",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:paren_multi",
+   "code": "N2",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:nested_complex",
+   "code": "N3",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:exponents_simple",
+   "code": "N4",
+   "grade": "6",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:compare_expressions",
+   "code": "N5",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:mixed_order_ops",
+   "code": "TK",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:square_numbers",
+   "code": "YM",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "order_of_operations:cube_numbers",
+   "code": "YN",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:more_less_10",
+   "code": "N6",
+   "grade": "1",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:more_less_100",
+   "code": "N7",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:place_value_disks",
+   "code": "N8",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:pv_disks_build",
+   "code": "N9",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:pv_digit_drag",
+   "code": "PA",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:number_word_names",
+   "code": "PB",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:place_value_10x",
+   "code": "PC",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:identify",
+   "code": "PD",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:value",
+   "code": "PE",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:compare",
+   "code": "PF",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:expand",
+   "code": "PG",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:combine",
+   "code": "PH",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:order_least_to_greatest",
+   "code": "PJ",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:order_greatest_to_least",
+   "code": "PK",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:mixed_placevalue",
+   "code": "TL",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:unit_form",
+   "code": "UR",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:expanded_notation",
+   "code": "VP",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:digit_value_unit_form",
+   "code": "YP",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:digit_value_notation",
+   "code": "YQ",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:count_pv_disks",
+   "code": "YR",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:ten_times_value",
+   "code": "Y7",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:one_tenth_value",
+   "code": "Y8",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "placevalue:ten_times_story",
+   "code": "Y9",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:rounding_visual",
+   "code": "PL",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:nearest_10",
+   "code": "PM",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:nearest_100",
+   "code": "PN",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:nearest_1000",
+   "code": "PP",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:nearest_10000",
+   "code": "PQ",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:nearest_100000",
+   "code": "PR",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:nearest_million",
+   "code": "PS",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_10",
+   "code": "PT",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_100",
+   "code": "PU",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_1000",
+   "code": "PV",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_10000",
+   "code": "PW",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_100000",
+   "code": "PX",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_million",
+   "code": "PY",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_tenths",
+   "code": "PZ",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_sort_hundredths",
+   "code": "P2",
+   "grade": "5",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:estimate_sum",
+   "code": "P3",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:estimate_diff",
+   "code": "P4",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:estimate_sums_diffs",
+   "code": "P5",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:estimate_products",
+   "code": "P6",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:estimate_quotient",
+   "code": "P7",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:rounding_table",
+   "code": "P8",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:make_a_ten",
+   "code": "P9",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:doubles_near_doubles",
+   "code": "QA",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:compensation",
+   "code": "QB",
+   "grade": "2",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:mixed_number_sense",
+   "code": "TM",
+   "grade": "M",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:between_tens",
+   "code": "US",
+   "grade": "3",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:place_on_number_line",
+   "code": "UT",
+   "grade": "2",
+   "area": "MEAS",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_nl_thousands",
+   "code": "U6",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_nl_ten_thousands",
+   "code": "U7",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:round_nl_hundred_thousands",
+   "code": "U8",
+   "grade": "4",
+   "area": "NBT",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:near_doubles",
+   "code": "VQ",
+   "grade": "1",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_sense:reasonable_quotients",
+   "code": "YU",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:prime_composite",
+   "code": "QC",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factors_identify",
+   "code": "QD",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factor_tchart_easy",
+   "code": "QE",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factor_tchart_medium",
+   "code": "QF",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factor_tchart_hard",
+   "code": "QG",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factor_links_easy",
+   "code": "QH",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factor_links_medium",
+   "code": "QJ",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:factor_links_hard",
+   "code": "QK",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:multiples",
+   "code": "QL",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:gcf_easy",
+   "code": "QM",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:gcf_hard",
+   "code": "QN",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:lcm",
+   "code": "QP",
+   "grade": "6",
+   "area": "RPNS",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:divisibility_sort",
+   "code": "QQ",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:mixed_number_theory",
+   "code": "TN",
+   "grade": "M",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:sort_prime_composite",
+   "code": "YV",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:list_multiples",
+   "code": "YW",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:missing_multiples",
+   "code": "YX",
+   "grade": "4",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:common_factors",
+   "code": "YY",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "number_theory:common_multiples",
+   "code": "YZ",
+   "grade": "5",
+   "area": "OA",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K",
+   "code": "QR",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1",
+   "code": "QS",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2",
+   "code": "QT",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3",
+   "code": "QU",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4",
+   "code": "QV",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5",
+   "code": "QW",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6",
+   "code": "QX",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K_operations",
+   "code": "QY",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K_counting",
+   "code": "QZ",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K_geometry",
+   "code": "Q2",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K_data",
+   "code": "Q3",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K_algebra",
+   "code": "Q4",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_K_measurement",
+   "code": "Q5",
+   "grade": "K",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1_operations",
+   "code": "Q6",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1_counting",
+   "code": "Q7",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1_geometry",
+   "code": "Q8",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1_data",
+   "code": "Q9",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1_algebra",
+   "code": "RA",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_1_measurement",
+   "code": "RB",
+   "grade": "1",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_operations",
+   "code": "RC",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_counting",
+   "code": "RD",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_fractions",
+   "code": "RE",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_geometry",
+   "code": "RF",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_data",
+   "code": "RG",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_algebra",
+   "code": "RH",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_2_measurement",
+   "code": "RJ",
+   "grade": "2",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3_operations",
+   "code": "RK",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3_fractions",
+   "code": "RL",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3_geometry",
+   "code": "RM",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3_data",
+   "code": "RN",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3_algebra",
+   "code": "RP",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_3_measurement",
+   "code": "RQ",
+   "grade": "3",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4_operations",
+   "code": "RR",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4_fractions",
+   "code": "RS",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4_geometry",
+   "code": "RT",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4_data",
+   "code": "RU",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4_algebra",
+   "code": "RV",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_4_measurement",
+   "code": "RW",
+   "grade": "4",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5_operations",
+   "code": "RX",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5_fractions",
+   "code": "RY",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5_geometry",
+   "code": "RZ",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5_data",
+   "code": "R2",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5_algebra",
+   "code": "R3",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_5_measurement",
+   "code": "R4",
+   "grade": "5",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6_operations",
+   "code": "R5",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6_fractions",
+   "code": "R6",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6_geometry",
+   "code": "R7",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6_data",
+   "code": "R8",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6_algebra",
+   "code": "R9",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_6_measurement",
+   "code": "SA",
+   "grade": "6",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_grade_pictures",
+   "code": "VS",
+   "grade": "M",
+   "area": "WORDS",
+   "kind": "legacy"
+  },
+  {
+   "id": "vocabulary:vocab_pick3_words",
+   "code": "VZ",
+   "grade": "M",
+   "area": "WORDS",
+   "kind": "legacy"
+  }
+ ]
+}

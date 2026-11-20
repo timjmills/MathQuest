@@ -1,1 +1,1 @@
-{"check":"pool","state":"pool-passed-leak","module":"pool","expect":"fail","catchState":"pool-passed-leak","rowsPatch":[{"id":"place_value:compare_numbers","set":{"passed":true}}],"note":"a non-passed skill marked passed, so it leaks into an only-8/10 pool"}
+{"check":"pool","state":"pool-passed-leak","module":"pool","expect":"fail","catchState":"pool-passed-leak","rowsPatch":[{"id":"counting:count_objects","set":{"passed":true}}],"note":"a non-passed skill marked passed, so it leaks into an only-8/10 pool"}

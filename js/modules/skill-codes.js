@@ -1,3 +1,4 @@
+import { encode as encodeMixReview, decode as decodeMixReview } from './mixed-review.js';
 import { state } from './state.js';
 import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML, getPositionalSkills } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
@@ -867,7 +868,13 @@ export function resetMixedMode() {
 
 // ===== ENHANCED SHARING SYSTEM =====
 
-export function generateEnhancedSkillCode(list) {
+export function generateEnhancedSkillCode(list, opts) {
+    // MIXED REVIEW (card design/cards/mixed-review §7a, appended 2026-11-20): ONE codec. A dealt mix {input, out} of DEALER V1
+    // is written by V1's own encode (the dealt list with counts and ~options, then V1 N S O Y K P Z), byte for byte; the
+    // `?c=` prefix is the caller's, as for every other code. No other caller passes opts, so every existing code is unchanged.
+    if (opts && opts.mixReview && opts.mixReview.input && opts.mixReview.out) {
+        return encodeMixReview(opts.mixReview.input, opts.mixReview.out).replace(/^\?c=/, '');
+    }
     // Reuse existing skill code generation for the skills part
     const skillsPart = generateSkillCode(Array.isArray(list) ? list : undefined);
     if (!skillsPart || skillsPart === '---') return '';
@@ -998,8 +1005,13 @@ export function parseEnhancedSkillCode(code) {
                     // Mixed practice: X1 allows related facts on one page
                     result.settings.families = val === '1' ? 'allow' : 'off';
                     break;
+                // V S O Y K P Z (mixed review, appended 2026-11-20) are read below by V1's own decode; an old app
+                // reaches none of these letters and ignores them (no default case), so it plays the same skills.
             }
         }
+        // MIXED REVIEW: a V token makes the code a DEALER V1 mix; V1's decode reads the whole code (skills, counts,
+        // ~options, N S O Y K P Z), refusing a V1 code without S or Z (its `error`).
+        if (tokens.some((t) => /^V\d+$/.test(t))) result.settings.mixReview = decodeMixReview('?c=' + code);
     }
 
     return result;

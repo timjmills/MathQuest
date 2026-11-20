@@ -255,3 +255,21 @@ All ten digit blocks are allocated, but most waves used only a few letters. `KEY
 own range or in a sub-range of that digit. Sub-ranges are append-only and pinned by `ws-codec-registry`.
 Current: k2 3B–3M, operations 3N–3Z, placevalue 4E–4O, algebra 4P–4Z, fractions 6C–6P, geometry 2G–2T,
 measurement 7F–7S, timemoney 7T–7Z, data 8D–8O, numtheory 8P–8Z, lessons / support ladder / later 5N–5Z.
+
+## Mixed review tokens (DEALER V1, appended 2026-11-20)
+
+A mixed review code is an enhanced skill code (`?c=<skills>|<tokens>`) written and read by DEALER V1 itself
+(`js/modules/mixed-review.js` `encode` / `decode`; card `design/cards/mixed-review/mixed-review.md` §7a). `skill-codes.js`
+delegates to it: `generateEnhancedSkillCode(null, {mixReview: {input, out}})` returns V1's string byte for byte, and
+`parseEnhancedSkillCode` puts V1's decode in `settings.mixReview` whenever a `V` token is present. There is one codec.
+
+- **Skills part:** the DEALT list in the dealer's pick order, each part `<frozen 2-char code><item count>[~<options>]`
+  (a week: the week totals). The codes are `FROZEN_SKILL_CODES`; the frozen V1 table
+  `tests/fixtures/mix-review/v1-registry.json` maps them back (code → id, kind, grade, area; append-only).
+- **New letters:** `V1` mixed review, dealer V1 · `S<base36>` seed · `O<e|a>` order easy → hard / by area (absent = mixed) ·
+  `Y<week>` a Mon–Fri week · `K<1–5>` one day of the week · `P1` adapt to each pupil on screen · `Z<m|l>` print size (an `s`
+  reads as m). `N<n>` keeps its meaning (the count). A V1 code without `S` or without `Z` is refused.
+- **Compatibility:** append-only. No existing letter changes meaning, and a code with none of these letters decodes as
+  before. An older app ignores the new letters and plays the same skills with the same weights, but not the identical items.
+- **Gate:** `node tests/scripts/ws-mix-review.mjs --check share` (`share-two-codecs`, `share-table-code`, the V1 freeze and
+  the golden codes).

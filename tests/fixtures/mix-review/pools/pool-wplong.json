@@ -1,0 +1,6 @@
+[
+ { "id": "word_problems:two_step_long", "code": "WA", "grade": "3", "area": "OA", "kind": "word-problem-long" },
+ { "id": "word_problems:compare_long", "code": "WB", "grade": "4", "area": "OA", "kind": "word-problem-long" },
+ { "id": "word_problems:one_step", "code": "WC", "grade": "2", "area": "OA", "kind": "word-problem" },
+ { "id": "facts:add_20", "code": "WD", "grade": "1", "area": "OA", "kind": "fact" }
+]

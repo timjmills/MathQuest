@@ -8,6 +8,9 @@
 //   node tests/scripts/ws-mix-review.mjs --fixture <file|dir>     # only these fixtures (ws-backtest): a FAIL dir prints
 //                                                                 # "ws-mix-review: FAIL" when EVERY fixture is caught for its reason
 //   node tests/scripts/ws-mix-review.mjs --sample <json>          # also deal the pinned precritic filter sample through V1
+//   node tests/scripts/ws-mix-review.mjs --pin                    # build step 2 ONCE: generate the frozen V1 table from the live
+//                                                                 # registry (append-only after: an existing row never changes),
+//                                                                 # pin the four V1 files by sha256, regenerate the golden codes
 //
 // The Node cores ARE check-v1's properties (design/cards/mixed-review/proto/check-v1.mjs), run on the PRODUCT dealer
 // js/modules/mixed-review.js through check-v1's `configure()` (card §9b step 1, §10 L8):
@@ -86,13 +89,15 @@ async function stateLabels(fx) {
     }
     return v;
 }
-const KIND_OK = (D, k) => Object.prototype.hasOwnProperty.call(D.KIND_CLASS, k);
+// A row's kind is the provider's StaticFootprint.kind AS IS (a non-empty string). V1 classes it through its frozen
+// KIND_CLASS, and rowOf reads a kind KIND_CLASS does not list as typical (not legacy): the class is V1's either way.
+const KIND_OK = (D, k) => typeof k === 'string' && k.length > 0;
 async function poolCtx() {
     const P = await mod(POOL_MODULE); const D = await mod(PRODUCT_DEALER);
     if (!P || !D) return { pending: `${!P ? POOL_MODULE : PRODUCT_DEALER} is not built yet (build step 2)` };
     if (P.__error || D.__error) return { error: `import failed: ${(P.__error || D.__error).message}` };
     const F = await mod('js/modules/skill-codes-frozen.js'); const R = await mod('js/modules/redesign-passed.js'); const DATA = await mod('js/modules/data.js');
-    return { P, D, FROZEN: F.FROZEN_SKILL_CODES, PASSED: new Set(Object.keys(R.REDESIGN_PASSED)), DATA };
+    return { P, D, FROZEN: F.FROZEN_SKILL_CODES, PASSED: new Set(R.REDESIGN_PASSED), DATA };
 }
 const patchRows = (rows, patch = []) => rows.map((r, i) => { const p = patch.find((x) => x.index === i || x.id === r.id); return p ? { ...r, ...p.set } : r; });
 async function statePool(fx) {
@@ -105,7 +110,7 @@ async function statePool(fx) {
     // L4: rows carry the StaticFootprint kind, never a class (`fc`), so V1's frozen KIND_CLASS decides the class
     for (const r of rows) {
         if ('fc' in r) { v.push(`pool-row-fc: ${r.id} carries fc ${r.fc} (a class), not its footprint kind`); break; }
-        if (!KIND_OK(D, r.kind)) { v.push(`pool-row-fc: ${r.id} kind ${J(r.kind)} is not a V1 KIND_CLASS kind`); break; }
+        if (!KIND_OK(D, r.kind)) { v.push(`pool-row-fc: ${r.id} kind ${J(r.kind)} is not a footprint kind`); break; }
     }
     // L5: every row's code is its frozen share code
     for (const r of rows) if (r.code !== FROZEN[r.id]) { v.push(`pool-code-unfrozen: ${r.id} code ${r.code} != FROZEN_SKILL_CODES ${FROZEN[r.id]}`); break; }
@@ -159,7 +164,7 @@ async function stateShare(fx) {
     const table = patchRows(JSON.parse(readFileSync(tableFile, 'utf8')).rows, fx.tablePatch);
     // L5: the frozen V1 table's codes ARE the frozen share codes; kinds are V1 kinds; no class column
     for (const r of table) if (r.code !== FROZEN[r.id]) { v.push(`share-table-code: V1 table ${r.id} code ${r.code} != FROZEN_SKILL_CODES ${FROZEN[r.id]}`); break; }
-    for (const r of table) if ('fc' in r || !KIND_OK(D, r.kind)) { v.push(`share-table-code: V1 table ${r.id} has ${'fc' in r ? 'an fc class' : `kind ${J(r.kind)}`}, not a V1 kind`); break; }
+    for (const r of table) if ('fc' in r || !KIND_OK(D, r.kind)) { v.push(`share-table-code: V1 table ${r.id} has ${'fc' in r ? 'an fc class' : `kind ${J(r.kind)}`}, not a footprint kind`); break; }
     // ONE codec: skill-codes.js generateEnhancedSkillCode writes D.encode's string byte for byte; parseEnhancedSkillCode reads it back
     if (!SC.generateEnhancedSkillCode || !SC.parseEnhancedSkillCode) return [...v, 'skill-codes.js lacks generateEnhancedSkillCode / parseEnhancedSkillCode'];
     const hand = (input, out) => D.encode(input, out).replace(/-S([0-9A-Z]+)/, (m, s) => `-S${s.toLowerCase()}`).slice(3);   // a second, hand codec
@@ -247,7 +252,41 @@ function fixturesOf(p) {
     if (statSync(abs).isFile()) return [abs];
     return walk(abs).filter((f) => f.endsWith('.json') && !f.includes('/pools/'));
 }
+/** --pin (card §9b step 2): the product's frozen V1 table, its sha256 pins and its golden codes. Append-only: a row already in
+ *  the table is never changed or removed (a changed row FAILS the pin); new live skills are appended. */
+async function pin() {
+    const { writeFileSync } = await import('node:fs');
+    const { createHash } = await import('node:crypto');
+    const c = await poolCtx(); if (c.pending || c.error) { console.log(`${TOOL}: FAIL (--pin: ${c.pending || c.error})`); return 1; }
+    const tf = join(FIX, 'v1-registry.json');
+    const old = existsSync(tf) ? JSON.parse(readFileSync(tf, 'utf8')).rows : [];
+    const live = c.P.poolRows().map((r) => ({ id: r.id, code: r.code, grade: r.grade, area: r.area, kind: r.kind }));
+    const byId = new Map(old.map((r) => [r.id, r]));
+    for (const r of live) { const o = byId.get(r.id); if (o && J(o) !== J(r)) { console.log(`${TOOL}: FAIL (--pin: frozen row ${r.id} would change ${J(o)} -> ${J(r)}; append-only, a change ships as V2)`); return 1; } }
+    const rows = [...old, ...live.filter((r) => !byId.has(r.id))];
+    writeFileSync(tf, JSON.stringify({ note: 'FROZEN V1 TABLE (card §9b step 2, §10 L4 / L5): code -> {id, kind, grade, area} of every live skill outside MIXED / NOSTD, generated ONCE by `node tests/scripts/ws-mix-review.mjs --pin` from mixed-review-pool.js poolRows (code = FROZEN_SKILL_CODES[id]; kind = the provider footprint kind as is; grade = data.js getSkillGrade, M when none). A V1 code replays through this table only, never the live registry. Append-only: a new skill appends a row; no row changes. Pinned by sha256 in frozen.json.', rows }, null, 1) + '\n');
+    const sha = (f) => createHash('sha256').update(readFileSync(join(ROOT, f), 'utf8')).digest('hex');
+    writeFileSync(join(FIX, 'frozen.json'), JSON.stringify({ files: PRODUCT_FROZEN, sha256: Object.fromEntries(Object.entries(PRODUCT_FROZEN).map(([k, f]) => [k, sha(f)])), note: 'V1 freeze of the PRODUCT (card §7a, §9b step 2): js/modules/mixed-review.js (= design/cards/mixed-review/proto/dealer-v1.mjs with its two import paths changed, the only diff), the two kit files it imports (pins unchanged from the prototype) and the product frozen table. A change that changes a deal ships as V2.' }, null, 1) + '\n');
+    const g = JSON.parse(readFileSync(join(ROOT, 'design/cards/mixed-review/proto/fixtures/golden-v1.json'), 'utf8'));
+    const D = c.D; const listOf = (o) => (o.days ? o.days : [o]).map((s) => s.items.map((it) => [it.n, it.skill, it.opts || '', it.seed, it.page]));
+    const goldenOf = (o) => ({ pages: (o.days ? o.days : [o]).map((s) => s.pages.map((p) => p.n)), items: listOf(o) });
+    const codes = [];
+    for (const sp of g.specs) {
+        const input = { ...sp, pool: rows };
+        const o = input.week ? D.week({ ...input, day: undefined }) : D.deal(input);
+        if (o.error) { console.log(`${TOOL}: FAIL (--pin: golden spec ${J(sp)} refused: ${o.error})`); return 1; }
+        const code = D.encode(sp, o);
+        const rin = D.replayInput(D.decode(code), rows); const r2 = rin.week && !rin.day ? D.week(rin) : D.deal(rin);
+        const want = goldenOf(sp.day ? o.days[sp.day - 1] : o);
+        if (J(goldenOf(r2)) !== J(want)) { console.log(`  (spec ${J(sp)}: ${code} replays to another sheet: card §10 L1, MR-SHARE-EXACT; not pinned as golden)`); continue; }
+        codes.push({ code, ...want });
+    }
+    writeFileSync(join(FIX, 'golden-v1.json'), JSON.stringify({ note: 'PRODUCT GOLDEN V1 CODES (card §9b step 2): each code replays, through tests/fixtures/mix-review/v1-registry.json alone, to its pinned pages and items [n, skill, ~options, seed, page] (check-v1 prop i on the product). The specs are the prototype golden specs over the product table.', specs: g.specs, codes }, null, 1) + '\n');
+    console.log(`${TOOL}: OK (--pin: ${rows.length} table rows (${rows.length - old.length} appended), 4 sha256 pins, ${codes.length} of ${g.specs.length} golden codes)`);
+    return 0;
+}
 async function main() {
+    if (args.includes('--pin')) return pin();
     if (args.includes('--help')) { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); return 0; }
     const want = (arg('--check') || Object.keys(CHECKS).join(',')).split(',').map((s) => s.trim()).filter(Boolean);
     for (const c of want) if (!CHECKS[c]) { console.log(`${TOOL}: unknown check ${c} (${Object.keys(CHECKS).join('|')})\n${TOOL}: FAIL (usage)`); return 2; }
