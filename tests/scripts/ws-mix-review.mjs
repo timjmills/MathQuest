@@ -343,7 +343,7 @@ async function stateEngine(fx) {
                 const sums = [...key.querySelectorAll('[data-mq-review-summary]')].map((x) => Number(x.getAttribute('data-mq-review-summary')));
                 if (sums.length !== sheets || sums.some((x) => x !== N)) v.push(`count-key-cells: ${tag}: key summaries ${JSON.stringify(sums)}, not ${sheets} of ${N}`);
                 const v1pages = res.review.plan.days ? res.review.plan.days.reduce((t, d) => t + (d.twoUp ? 1 : d.pages.length), 0) : (res.twoUp ? 1 : res.review.plan.pages.length);
-                if (res.pageCount !== v1pages) v.push(`count-key-cells: ${tag}: ${res.pageCount} pupil pages, V1 planned ${v1pages}`);
+                if (res.pageCount !== v1pages + (res.review.spills || 0)) v.push(`count-key-cells: ${tag}: ${res.pageCount} pupil pages, V1 planned ${v1pages} + ${res.review.spills || 0} spill page(s)`);
                 if (new Set(res.items.map((i) => i.sig)).size !== res.items.length && !extra.week) v.push(`count-key-cells: ${tag}: a duplicate item on the sheet`);
             }
             return v;
@@ -352,7 +352,84 @@ async function stateEngine(fx) {
         return v;
     } finally { await app.close(); }
 }
-const MODULE_STATES = { engine: stateEngine, breakdown: stateBreakdown, 'week-table': stateWeekTable, placement: statePlacement, labels: stateLabels, pool: statePool, share: stateShare, 'week-days': stateWeekDays, trace: stateTrace };
+// MIX-REVIEW-COUNT layout states (browser, build step 3 part 2): the MEASURED layout of buildSheet role mixed-review.
+//   count-spill-redeal: a V1 page whose measured shelves do not fit spills WHOLE shelves to a continuation page; the printed
+//     items are exactly dealReviewItems' list (the same skills and seeds, numbers 1..N in order on the pupil pages), never a
+//     re-deal. Tamper 'redeal' re-seeds the items of the continuation pages.
+//   count-shelf-k-differs: every shelf / M1 row draws V1's SHELF k (drawnK = v1K), or fewer only when a cell does not fit at
+//     V1's k (`narrow`), and the drawn grid has drawnK columns. Tamper 'k-differs' narrows one shelf without the reason.
+//   Both sample the grade-request the grade-render gate prints and three seeded kind pools (a wide, a compact and a legacy
+//   kind together), at M and L, and fail on a page body or cell that overflows in the printed document.
+export async function stateLayout(fx) {
+    const { createRequire } = await import('node:module');
+    const { open } = createRequire(import.meta.url)('../lib/ws-harness.cjs');
+    const app = await open({ seed: 1 });
+    try {
+        const v = await app.page.evaluate(async (tamper) => {
+            const PS = await import('/js/modules/print-sheet.js');
+            const V = await import('/js/modules/mixed-review.js');
+            const P = await import('/js/modules/mixed-review-pool.js');
+            const R = await import('/js/modules/sheet/rng.js');
+            const rows = P.poolRows();
+            const clsOf = (r) => V.rowOf(r).fc;
+            const pick = (pred, i) => rows.filter(pred)[i];
+            const v = []; let spilled = 0; let narrowed = 0;
+            const pools = [0, 1, 2].map((i) => [pick((r) => clsOf(r) === 'wide' && r.kind !== 'legacy', i), pick((r) => clsOf(r) === 'compact', i), pick((r) => r.kind === 'legacy', 3 * i), pick((r) => r.kind === 'legacy', 3 * i + 1)].filter(Boolean));
+            const reqs = [];
+            for (const size of ['M', 'L']) {
+                reqs.push({ tag: `grade sub_20_regroup ${size}`, req: { role: 'mixed-review', sections: [{ skills: [{ categoryId: 'subtraction', skillId: 'sub_20_regroup' }], count: 20 }], size, seed: 722887, key: true } });
+                pools.forEach((pool, i) => reqs.push({ tag: `kinds pool ${i + 1} ${size}`, req: { role: 'mixed-review', review: { pool, N: 15, seed: 31 + i, size: size.toLowerCase(), order: 'mixed' }, size, key: true } }));
+            }
+            const overflow = async (html) => {
+                const f = document.createElement('iframe'); f.style.cssText = 'position:absolute;left:-30000px;top:0;width:1280px;height:900px;';
+                document.body.appendChild(f);
+                const d = f.contentDocument; d.open(); d.write(window.sheetDocument(html, 'x', { paper: 'A4' })); d.close();
+                await new Promise((r) => setTimeout(r, 600)); try { await d.fonts.ready; } catch (e) { /* */ }
+                const out = [];
+                d.querySelectorAll('.ws-page').forEach((pg, i) => {
+                    const b = pg.querySelector('.ws-body');
+                    if (b && b.scrollHeight > b.clientHeight + 1) out.push(`page ${i + 1}: the body overflows by ${((b.scrollHeight - b.clientHeight) * 25.4 / 96).toFixed(1)} mm`);
+                    pg.querySelectorAll('[data-ws-cell]').forEach((c, k) => { if (c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1) out.push(`page ${i + 1} cell ${k + 1}: overflows its cell`); });
+                });
+                f.remove(); return out;
+            };
+            for (const { tag, req } of reqs) {
+                const res = await PS.buildSheet(req);
+                if (res.error) { v.push(`count-layout: ${tag}: refused: ${res.error}`); continue; }
+                const sh = res.review.sheets[0];
+                spilled += res.review.spills;
+                // no re-deal on spill: every printed item is V1's planned item (number, skill) with a seed of ITS OWN ladder
+                // (try 0 = the plan seed, try r = deriveSeed('mixed-review', S', day, n - 1, r))
+                const plan = res.review.plan.days ? res.review.plan.days[0] : res.review.plan;
+                let items = res.items.map((it) => ({ n: it.n, skill: it.skill, seed: it.seed }));
+                if (tamper === 'redeal' && res.review.spills) {
+                    const contN = new Set(sh.layout.filter((p) => p.cont).flatMap((p) => p.items || []));
+                    items = items.map((it) => (contN.has(it.n) ? Object.assign({}, it, { seed: (it.seed + 1) >>> 0 }) : it));
+                }
+                const sp = sh.daySeed !== undefined ? sh.daySeed : plan.seed; const day = sh.day || 0;
+                const bad = items.filter((it) => { const p0 = plan.items[it.n - 1]; if (!p0 || p0.skill !== it.skill) return true; if (it.seed === p0.seed) return false; for (let r = 1; r <= 40; r++) if (R.deriveSeed('mixed-review', sp, day, it.n - 1, r) === it.seed) return false; return true; });
+                if (bad.length || items.length !== plan.items.length) v.push(`count-spill-redeal: ${tag}: ${bad.length} printed item(s) are not V1's planned items on their own ladder (items ${bad.slice(0, 6).map((x) => x.n).join(',')}; ${res.review.spills} spill page(s))`);
+                const box = document.createElement('div'); box.innerHTML = res.pupilHtml;
+                const nums = [...box.querySelectorAll('[data-ws-cell] .ws-tab')].map((t) => Number(t.textContent.trim())).filter(Number.isFinite);
+                if (!res.twoUp && nums.length && nums.join(',') !== nums.map((_, i) => i + 1).join(',')) v.push(`count-spill-redeal: ${tag}: the pupil numbers run ${nums.slice(0, 12).join(',')} (not 1..N in order)`);
+                const v1pages = res.twoUp ? 1 : res.review.plan.pages.length;
+                if (res.pageCount !== v1pages + res.review.spills) v.push(`count-spill-redeal: ${tag}: ${res.pageCount} pupil pages, V1 planned ${v1pages} + ${res.review.spills} spill page(s)`);
+                const ks = sh.shelfKs.map((x) => Object.assign({}, x));
+                if (tamper === 'k-differs' && ks.length) { const x = ks.find((y) => y.v1K > 1) || ks[0]; x.drawnK = Math.max(1, x.v1K - 1); if (x.drawnK === x.v1K) x.drawnK = x.v1K + 1; x.narrow = false; }
+                for (const x of ks) { if (x.narrow) narrowed++; if (x.drawnK !== x.v1K && !(x.narrow && x.drawnK < x.v1K)) v.push(`count-shelf-k-differs: ${tag}: items ${x.items.join(',')} drawn at k ${x.drawnK}, V1 SHELF k ${x.v1K}`); }
+                const grids = [...box.querySelectorAll('.ws-grid')].filter((g) => !g.closest('[data-ws-cell]') && !/repeat\(\d+,\s*(?:max-content|auto)/.test(g.getAttribute('style') || '') && !g.querySelector('[data-ws-cell="fact"]')).map((g) => (g.getAttribute('style') || '').match(/repeat\((\d+)/)).filter(Boolean).map((m) => Number(m[1]));
+                if (!res.twoUp && grids.length === ks.length && grids.some((c, i) => c !== ks[i].drawnK)) v.push(`count-shelf-k-differs: ${tag}: drawn grid columns ${grids.join(',')} vs shelf k ${ks.map((x) => x.drawnK).join(',')}`);
+                for (const o of await overflow(res.pupilHtml)) v.push(`count-layout-overflow: ${tag} pupil ${o}`);
+                for (const o of await overflow(res.keyHtml)) v.push(`count-layout-overflow: ${tag} key ${o}`);
+            }
+            if (!spilled) v.push('count-spill-redeal: the sample spilled no page (it must exercise the spill)');
+            return v;
+        }, fx.tamper || '');
+        if (app.problems.length) v.push(`count-layout: console errors: ${app.problems.slice(0, 3).map((p) => p.text).join(' | ')}`);
+        return v;
+    } finally { await app.close(); }
+}
+const MODULE_STATES = { engine: stateEngine, layout: stateLayout, breakdown: stateBreakdown, 'week-table': stateWeekTable, placement: statePlacement, labels: stateLabels, pool: statePool, share: stateShare, 'week-days': stateWeekDays, trace: stateTrace };
 
 /* ---------------------------------------------------------------------------------------------------- runner */
 let C1 = null;

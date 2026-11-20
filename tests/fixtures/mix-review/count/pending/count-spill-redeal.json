@@ -1,7 +1,0 @@
-{
- "check": "count",
- "state": "count-spill-redeal",
- "expect": "fail",
- "pending": "MR-A step 3",
- "note": "a drawn page that cannot hold its cells is re-dealt, not spilled by whole shelves with its numbers kept (browser, the engine)"
-}

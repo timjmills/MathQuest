@@ -1,0 +1,10 @@
+{
+ "check": "count",
+ "state": "count-spill-redeal",
+ "module": "layout",
+ "expect": "fail",
+ "catchState": "count-spill-redeal",
+ "tamper": "redeal",
+ "browser": true,
+ "note": "a drawn page that cannot hold its measured shelves is re-dealt (its continuation items re-seeded), not spilled by whole shelves with the dealt list and numbers kept (browser, buildSheet role mixed-review, build step 3)"
+}

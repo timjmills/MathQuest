@@ -612,7 +612,42 @@ export function counts(pools, input) {
     return out;
 }
 
+/**
+ * `input.plan` (mixed review, card design/cards/mixed-review §3 / §9b step 3): a page plan dealt elsewhere (DEALER V1), drawn
+ * AS GIVEN. `input.plan.pages` = [{v1page, sections: [{hMm, ...section}]}], one entry a V1 page, each section one shelf (or
+ * the M1 strip) with its MEASURED height; `input.plan.bodyMm` = {first, cont} (the body under the first page's header and
+ * under a continuation header). Nothing re-deals: a page whose shelves do not fit its body spills WHOLE shelves, in order,
+ * onto a continuation page that keeps their numbers (`cont: true`, the same `v1page`); a shelf taller than a whole body
+ * stands alone on its page. Returns {pages, spills}: `spills` = the continuation pages added.
+ */
+export function layoutGivenPages(pages, bodyMm = {}) {
+    // (1 mm kept back, as the practice packer does: shares that sum to the whole body must not run over on rounding)
+    const first = (Number(bodyMm.first) || 0) - 1; const cont = (Number(bodyMm.cont) || Number(bodyMm.first) || 0) - 1;
+    const out = []; let spills = 0;
+    for (const pg of pages || []) {
+        let cur = null;
+        for (const sec of pg.sections || []) {
+            const h = Number(sec.hMm) || 0;
+            const room = () => (cur === out[0] ? first : cont);
+            if (!cur) { cur = { v1page: pg.v1page, sections: [], usedMm: 0 }; out.push(cur); }
+            else if (cur.sections.length && cur.usedMm + h > room() + 0.01) {
+                cur = { v1page: pg.v1page, sections: [], usedMm: 0, cont: true }; out.push(cur); spills++;
+            }
+            cur.sections.push(sec); cur.usedMm += h;
+        }
+    }
+    return { pages: out, spills };
+}
+/** A plan from `input.plan` (layoutGivenPages) with the frame the host built (`input.frame`: header, contHeader, footer). */
+export function planGiven(input = {}) {
+    const f = input.frame || {};
+    const lay = layoutGivenPages(input.plan.pages, input.plan.bodyMm);
+    return { role: input.role || ROLE_ID, ctx: input.ctx || {}, header: f.header, contHeader: f.contHeader, footer: f.footer, seed: input.seed,
+        pages: lay.pages.map((pg) => ({ sections: pg.sections, v1page: pg.v1page, cont: !!pg.cont, usedMm: Math.round(pg.usedMm * 10) / 10 })), spills: lay.spills };
+}
+
 export function plan(input = {}) {
+    if (input.plan && Array.isArray(input.plan.pages)) return planGiven(input);
     const poolIds = [...new Set((input.items || []).map((it) => it.pool))];
     const pools = Object.fromEntries(poolIds.map((id) => [id, poolItems(input, id)]));
     if (input.arrangement === 'mixed') return planMixed(input, pools);
@@ -758,4 +793,4 @@ export function plan(input = {}) {
     });
 }
 
-export default { ROLE_ID, DEFAULT_LOOK, sources, measureCols, counts, plan, mixedClass, MIX_H_RATIO, factPick, factFillAt, FACT_FILL };
+export default { ROLE_ID, DEFAULT_LOOK, sources, measureCols, counts, plan, planGiven, layoutGivenPages, mixedClass, MIX_H_RATIO, factPick, factFillAt, FACT_FILL };

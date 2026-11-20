@@ -14260,19 +14260,37 @@
   },
   {
    "id": "mix-review-count-engine",
-   "pending": true,
-   "pendingReason": "build step 3 remainder (MR-A, parked): count-spill-redeal (a drawn page that cannot hold its cells must spill whole shelves, numbers kept) and count-shelf-k-differs (mixed-practice's drawn k vs V1 SHELF) need the measured layout; count-key-cells is live in mix-review-count-key-cells.",
-   "check": "MIX-REVIEW-COUNT browser states (engine): count-spill-redeal, count-shelf-k-differs",
+   "check": "MIX-REVIEW-COUNT count-spill-redeal (build step 3 part 2, browser): the MEASURED layout of buildSheet role mixed-review spills WHOLE shelves (rows of a narrowed shelf / M1 strip) to a continuation page; every printed item is V1's planned item (number, skill) with a seed of its own ladder, numbers 1..N in order, pages = V1 pages + spills, and no page body or cell overflows (grade request + 3 kind pools: wide + compact + legacy, M and L)",
    "kind": "fixture",
    "rule": "ws-mix-review --check count",
    "browser": true,
    "fail": {
-    "fixture": "tests/fixtures/mix-review/count/pending",
-    "state": "the named pending FAIL fixtures"
+    "fixture": "tests/fixtures/mix-review/count/engine/fail/count-spill-redeal.json",
+    "state": "tamper redeal: the continuation pages' items re-seeded (a re-deal), as the 3199b8ba engine would have needed with no spill"
    },
    "pass": {
-    "fixture": "tests/fixtures/mix-review/count/pass",
-    "state": "the built product"
+    "fixture": "tests/fixtures/mix-review/count/engine/pass/count-pass-layout.json",
+    "state": "the measured layout on the grade request and 3 kind pools at M and L"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check count --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-review-count-shelf-k",
+   "check": "MIX-REVIEW-COUNT count-shelf-k-differs (build step 3 part 2, browser): every drawn shelf / M1 row has V1's SHELF k for its class, or fewer only when a cell measures too wide for V1's k (`narrow`, rows of k' kept whole)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check count",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/count/engine/fail/count-shelf-k-differs.json",
+    "state": "tamper k-differs: one shelf drawn at k - 1 with no too-wide cell"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/count/engine/pass/count-pass-layout.json",
+    "state": "the measured layout on the grade request and 3 kind pools at M and L"
    },
    "command": "node tests/scripts/ws-mix-review.mjs --check count --fixture {fixture}",
    "expect": {

@@ -1,0 +1,10 @@
+{
+ "check": "count",
+ "state": "count-shelf-k-differs",
+ "module": "layout",
+ "expect": "fail",
+ "catchState": "count-shelf-k-differs",
+ "tamper": "k-differs",
+ "browser": true,
+ "note": "a shelf drawn at a k other than V1's SHELF k for its class, with no cell too wide for V1's k (browser, build step 3)"
+}

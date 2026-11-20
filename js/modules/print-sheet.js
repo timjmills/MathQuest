@@ -60,8 +60,10 @@ import { detailedLessonFor, validateDescription, fillPlaceholders } from './less
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups, stackCarryTop } from './sheet/index.js';
 const { tBand } = teacherParts;
-import { frameOf as composeFrameOf, gridPart as composeGridPart } from './sheet/roles/compose.js';
+import { frameOf as composeFrameOf, gridPart as composeGridPart, hMinAt as composeHMinAt, fitsAt as composeFitsAt } from './sheet/roles/compose.js';
 import { reviewSummary, reviewSummaryHtml, reviewWeekTable, reviewWeekTableHtml } from './sheet/roles/answer-key.js';
+import { planGiven as mixedPlanGiven } from './sheet/roles/mixed-practice.js';
+import { decodeOptionPayload as mrDecodeOptions } from './skill-option-codec.js';
 import { areaOf as mrAreaOf, AREA_LABELS as MR_AREA_LABELS } from './teacher-areas.js';
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -6626,7 +6628,9 @@ export function dealReviewItems(req = {}) {
         const items = sh.pages.flatMap((pg) => pg.shelves.flatMap((shelf) => shelf.items)).sort((a, b) => a - b).map((nNum) => {
             const it = sh.items[nNum - 1];
             const [categoryId, skillId] = String(it.skill).split(':');
-            const opts = typeof req.optsFor === 'function' ? req.optsFor(it) : undefined;
+            // the dealt item's ~options payload (the code's, card §7a), decoded to the skill's packed options; `req.optsFor` overrides
+            let opts = typeof req.optsFor === 'function' ? req.optsFor(it) : undefined;
+            if (opts === undefined && it.opts) { try { const o = mrDecodeOptions(categoryId, skillId, it.opts); if (o && Object.keys(o).length) opts = o; } catch (e) { opts = undefined; } }
             const ak = `${it.page}|${it.skill}`;
             if (!answers.has(ak)) answers.set(ak, new Set());
             let first = null; let acc = null; let rung = 'repeat'; let tries = 0;
@@ -6653,35 +6657,81 @@ export function dealReviewItems(req = {}) {
 }
 
 const MR_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-/** A dealt item as a plan item: the template the sheet draws (kitCellSpec / a number family), else a legacy cell. */
-function reviewPlanItem(it) {
-    const q0 = it.q || {};
-    const spec = kitCellSpec(q0) || numberFamilySpec(q0);
-    const q = Object.assign({}, q0, { cell: spec ? { template: spec.template, payload: spec.payload, v: 1 } : { template: 'legacy', v: 1 } });
-    return composePlanItem({ q, skill: it.skill, visual: !!(q0.visual) }, { level: 1 });
+/** A dealt item as a HOSTED item (hostItem: the template the sheet draws, else a legacy cell), measured before layout. */
+function reviewHostItem(it, SZ) {
+    const q = Object.assign({}, it.q || {});
+    if (!q.skillId) q.skillId = it.skillId;
+    if (!q.categoryId) q.categoryId = it.categoryId;
+    return hostItem({ q, skill: Object.assign({ categoryId: it.categoryId, skillId: it.skillId }, it.opts ? { opts: it.opts } : {}) }, 0, SZ, { supports: false });
 }
-/** One sheet's pages from V1's plan, drawn as given (card §3: no measuring decides a page). */
-function reviewPages(sheet, size) {
+/** Each drawn section's own frame and rules (1.5 pt frame + the instruction rule), on top of its rows: measured 2026-11-20 as
+ *  about 0.9 mm a section (a page of 3-4 sections ran 2.6 mm over without it). */
+const REVIEW_SEC_MM = 1;
+/** The drawn shelf k of a V1 shelf / M1 strip: V1's SHELF k for the class (card §3; MIX-REVIEW-COUNT count-shelf-k-differs). */
+function reviewShelfK(sheet, size, pg, sh) {
     const V = MIX_REVIEW_V1;
-    const byN = new Map(sheet.items.map((it) => [it.n, it]));
+    if (pg.arrangement === 'm1') return V.SHELF[size][pg.cls[0]] || 3;
+    return V.SHELF[size][V.rowOf(sheet.rowOf(sh.skill)).fc] || 1;
+}
+/**
+ * One sheet's V1 pages as MEASURED sections (card §3, §9b step 3): each shelf (or the M1 strip) is a band whose row height is
+ * the tallest MEASURED cell it holds at its drawn k (= V1 SHELF k); a skill's short last shelf keeps k columns, so its cells
+ * keep their width and the row ends early, left-aligned. `hMm` (instruction line + rows x cell height) is what the page
+ * layout (mixed-practice.js planGiven) spills on. No measurement changes a page's items, numbers or order.
+ */
+function reviewPages(sheet, size, hostOf) {
+    const SZ = size.toUpperCase();
+    const instr = instructionMm(SZ);
+    // a cell that cannot be drawn at V1's k (its measured content is wider than 1/k of the line: `fits` false) is never shrunk:
+    // its shelf draws at the widest k' < k at which every cell fits, in rows of k' (still whole, its numbers kept); the shelf
+    // records `narrow` (MIX-REVIEW-COUNT count-shelf-k-differs allows drawnK < v1K only with it)
+    const lctx = { paper: 'A4', size: SZ, look: 'daily' };
+    const fitK = (hs, k) => { for (let c = k; c > 1; c--) { let ok = false; try { ok = composeFitsAt(hs, c, lctx); } catch (e) { ok = true; } if (ok && hs.every((h) => !(h && h.measured && h.measured[c] && h.measured[c].fits === false))) return c; } return 1; };
+    // the row height: the layout's own minimum for these cells at k (compose.js hMinAt: the measured height + the 1 mm the
+    // grid's rules take, legacy cells included), never under the tallest measured cell + 1 mm
+    const cellHOf = (hs, k) => {
+        const own = Math.max(12, ...hs.map((h) => { const m = h && h.measured && (h.measured[k] || h.measured[1]); return m && Number.isFinite(m.hMm) ? m.hMm + 1 : 0; }));
+        let lay = 0; try { lay = composeHMinAt(hs, k, lctx); } catch (e) { lay = 0; }
+        // + 4 mm: a key cell's written answer can draw taller than its measured 'answered' state (k2 fraction wall: 2 mm at M,
+        // 3 mm at L; reported to the lead, the template's own measurement should carry it)
+        return Math.ceil((Math.max(own, Number.isFinite(lay) ? lay : 0) + 4) * 10) / 10;
+    };
     return sheet.plan.pages.map((pg) => {
         const sections = [];
         if (pg.arrangement === 'm1') {
             // the M1 arrangement: one "Solve." strip, the items interleaved in rows of k cells (each cell keeps its instruction)
             const ns = pg.shelves.flatMap((sh) => sh.items);
-            const k = V.SHELF[size][pg.cls[0]] || 3;
-            sections.push({ kind: 'band', label: '', instr: 'Solve.', content: composeGridPart(ns.map((n) => reviewPlanItem(byN.get(n))), { cols: k, labels: 'tab', start: ns[0] }) });
+            const v1K = reviewShelfK(sheet, size, pg, null);
+            const hs = ns.map(hostOf);
+            const k = fitK(hs, v1K);
+            const cellH = cellHOf(hs, k); const rows = Math.ceil(ns.length / k);
+            // one section a ROW (a row is the M1 strip's shelf): the first under the strip's one "Solve." line, so a page that
+            // cannot hold the strip spills whole rows with their numbers
+            for (let r = 0; r < rows; r++) {
+                const rn = ns.slice(r * k, (r + 1) * k); const rh = hs.slice(r * k, (r + 1) * k);
+                const grid = composeGridPart(rh.map((h) => composePlanItem(h, { cols: k, level: 1 })), { cols: k, rows: 1, cellH, labels: 'tab', start: rn[0] });
+                sections.push(Object.assign(r === 0 ? { kind: 'band', label: '', instr: 'Solve.', content: grid } : grid, { hMm: (r === 0 ? instr : 0) + cellH + REVIEW_SEC_MM, drawnK: k, v1K, narrow: k < v1K, mrItems: rn }));
+            }
         } else {
             for (const sh of pg.shelves) {
-                const its = sh.items.map((n) => byN.get(n));
-                const pis = its.map(reviewPlanItem);
-                const key = composeInstrKeyOf(its.map((x) => ({ q: x.q })), [{ categoryId: its[0].categoryId, skillId: its[0].skillId }]);
-                const kk = Math.max(sh.items.length, V.SHELF[size][V.rowOf(sheet.rowOf(sh.skill)).fc] || 1);
-                // a skill's last shelf may be short: its cells keep their width, the row ends early (left-aligned, card §3)
-                sections.push({ kind: 'band', label: '', instr: composeInstrText(key, its.map((x) => ({ q: x.q }))), content: composeGridPart(pis, { cols: kk, rows: 1, labels: 'tab', start: sh.items[0] }) });
+                const hs = sh.items.map(hostOf);
+                const v1K = reviewShelfK(sheet, size, pg, sh);
+                const k = fitK(hs, v1K);
+                const rows = Math.ceil(hs.length / k);
+                const cellH = cellHOf(hs, k);
+                const key = composeInstrKeyOf(hs.map((x) => ({ q: x.q })), [{ categoryId: hs[0].q.categoryId, skillId: hs[0].q.skillId }]);
+                // a skill's last shelf may be short: k columns still, so its cells keep their width and the row ends early.
+                // A narrowed shelf is drawn as rows of k (one section a row, the first under the shelf's instruction), so a
+                // page spills it row by row with its numbers kept.
+                for (let r = 0; r < rows; r++) {
+                    const rn = sh.items.slice(r * k, (r + 1) * k); const rh = hs.slice(r * k, (r + 1) * k);
+                    const grid = composeGridPart(rh.map((h) => composePlanItem(h, { cols: k, level: 1 })), { cols: k, rows: 1, cellH, labels: 'tab', start: rn[0] });
+                    sections.push(Object.assign(r === 0 ? { kind: 'band', label: '', instr: composeInstrText(key, hs.map((x) => ({ q: x.q }))), content: grid } : grid,
+                        { hMm: (r === 0 ? instr : 0) + cellH + REVIEW_SEC_MM, drawnK: k, v1K, narrow: k < v1K, mrItems: rn, mrSkill: sh.skill }));
+                }
             }
         }
-        return { sections, v1page: pg.n };
+        return { sections, v1page: pg.index !== undefined ? pg.index + 1 : sheet.plan.pages.indexOf(pg) + 1 };
     });
 }
 /**
@@ -6714,35 +6764,70 @@ async function buildReviewSheet(req = {}) {
     const dealt = dealReviewItems(Object.assign({}, rv, req.optsFor ? { optsFor: req.optsFor } : {}));
     if (dealt.error) return { error: dealt.error, pupilHtml: '', keyHtml: '', pageCount: 0, keyPageCount: 0, items: [] };
     const SZ = size.toUpperCase();
+    // the MEASURED layout (card §9b step 3): every dealt cell is hosted (hostItem) and measured at its shelf's drawn k
+    await fontsReady();
+    MDOC = await measureDocument();
+    const paper = req.paper || 'A4';
+    const chips = rv.filters && Array.isArray(rv.filters.grades) && rv.filters.grades.length ? rv.filters.grades.map(String) : null;
     const labelOf = (id) => { const [c, k] = id.split(':'); const l = SKILL_FULL_LABELS && SKILL_FULL_LABELS[k]; return (l && (l.label || l)) || ((SKILLS[c] || []).find((x) => x && x.v === k) || {}).label || k; };
     const plans = []; const summaries = [];
     for (const sheet of dealt.sheets) {
         sheet.rowOf = (id) => rowById.get(id) || { fc: 'typical' };
         const N = sheet.items.length;
-        const skills = [...new Set(sheet.items.map((it) => it.skill))].map((id) => { const [categoryId, skillId] = id.split(':'); const r = rowById.get(id) || {}; return { categoryId, skillId, grade: r.grade, grades: r.placement && r.placement.length ? r.placement : undefined }; });
+        // tab `Level <grades>`: the teacher's grade chips when set (PT-MXR-2), else the dealt skills' placement grades
+        const skills = [...new Set(sheet.items.map((it) => it.skill))].map((id) => { const [categoryId, skillId] = id.split(':'); const r = rowById.get(id) || {}; return { categoryId, skillId, grade: r.grade, grades: chips || (r.placement && r.placement.length ? r.placement : undefined) }; });
         let ccss = [];
-        try { const st = await import('./standards.js'); ccss = [...new Set(skills.flatMap((k) => ((st.standardsFor(k.categoryId, k.skillId) || {}).ccss || []).slice(0, 1)))]; } catch (e) { ccss = []; }
+        const codeOf = (c) => (c && typeof c === 'object' ? (c.code || c.id || '') : String(c || ''));
+        try { const st = await import('./standards.js'); ccss = [...new Set(skills.flatMap((k) => ((st.standardsFor(k.categoryId, k.skillId) || {}).ccss || []).slice(0, 1).map(codeOf)))].filter(Boolean); } catch (e) { ccss = []; }
+        // host and measure every cell at its drawn k (one measuring pass a sheet)
+        const hosts = new Map(sheet.items.map((it) => [it.n, reviewHostItem(it, SZ)]));
+        const ks = new Set();
+        for (const pg of sheet.plan.pages) for (const sh of pg.shelves) ks.add(reviewShelfK(sheet, size, pg, sh));
+        try { measureItems([...hosts.values()], { size: SZ, look: 'daily', colsList: Array.from({ length: Math.max(1, ...ks) }, (_, i) => i + 1) }); } catch (e) { /* unmeasured: the 12 mm floor */ }
         const twoUp = !!(dealt.twoUp && N === 5);
         const tab1 = sheet.day ? `Week ${rv.week} | ${MR_DAYS[sheet.day - 1]}` : null;
         const frame = composeFrameOf({ skills, input: { header: Object.assign({}, req.header || {}, tab1 ? { tab: [tab1.split(' | ')[0], tab1.split(' | ')[1]] } : {}, { footerLeft: ccss.join(', ') }), ctx: { size: SZ }, seed: rv.seed, form: '' },
             tabId: 'Review', title: 'Mixed review', twoLine: true, score: N });
-        let pages = reviewPages(sheet, size);
+        const given = reviewPages(sheet, size, (n) => hosts.get(n));
+        const laid = mixedPlanGiven({ role: 'mixed-review', ctx: { size: SZ, look: 'daily', paper }, frame, seed: rv.seed,
+            plan: { pages: given, bodyMm: { first: bodyHeightMm(paper, frame.header), cont: bodyHeightMm(paper, frame.contHeader, { cont: true }) } } });
+        let pages = laid.pages;
+        sheet.spills = laid.spills;
+        sheet.shelfKs = given.flatMap((pg) => pg.sections.map((x) => ({ v1page: pg.v1page, drawnK: x.drawnK, v1K: x.v1K, narrow: !!x.narrow, items: x.mrItems })));
+        sheet.bodyMm = { first: bodyHeightMm(paper, frame.header), cont: bodyHeightMm(paper, frame.contHeader, { cont: true }) };
+        sheet.layout = pages.map((pg) => ({ v1page: pg.v1page, cont: !!pg.cont, usedMm: pg.usedMm, secs: pg.sections.map((x) => Math.round((x.hMm || 0) * 10) / 10), items: pg.sections.flatMap((x) => x.mrItems || []) }));
         if (twoUp) {
             // 2-up (§9.7): the same five twice; each half numbered 1-5 with its own Name / Date / Score line
-            const half = pages[0].sections;
+            const half = pages.flatMap((pg) => pg.sections);
             const cut = '<div class="mq-review-cut" style="border-top:0.5mm dashed #000;margin:6mm 0 4mm"></div>';
             const head2 = `<div class="mq-review-half2" style="font-family:Andika,sans-serif;display:flex;gap:8mm;margin-bottom:3mm"><span>Name ____________</span><span>Date ________</span><span>Score ___ / 5</span></div>`;
-            pages = [{ sections: [...half, { kind: 'html', html: cut + head2 }, ...half.map((p) => Object.assign({}, p, { content: Object.assign({}, p.content, { start: p.content.start }) }))] }];
+            pages = [{ sections: [...half, { kind: 'html', html: cut + head2 }, ...half.map((p) => (p.content ? Object.assign({}, p, { content: Object.assign({}, p.content) }) : Object.assign({}, p)))] }];
+            sheet.layout = [{ v1page: 1, cont: false, twoUp: true, items: half.flatMap((x) => x.mrItems || []) }]; sheet.spills = 0;
         }
         plans.push({ role: 'mixed-review', ctx: { size: SZ, look: 'daily', paper: (req.paper || 'A4') }, header: frame.header, contHeader: frame.contHeader, footer: frame.footer, seed: rv.seed, pages });
         const sum = reviewSummary(sheet.items.map((it) => ({ n: it.n, skill: it.skill, area: (rowById.get(it.skill) || {}).area || mrAreaOf(it.categoryId, it.skillId), label: labelOf(it.skill) })),
             { areaOrder: V.AREA_ORDER, areaLabels: MR_AREA_LABELS });
         summaries.push({ day: sheet.day, sum, items: sheet.items.map((it) => ({ n: it.n, skill: it.skill, label: labelOf(it.skill) })) });
     }
-    const outs = plans.map((pl) => renderPlan(pl, { key: req.key !== false }));
+    // card §3 Key pages: a single sheet's key summary goes UNDER the last key page's grid when its rows fit
+    // (rows x 7 mm + 14 mm, rows = areas + skills + the total); else (and for a week) it takes a key page of its own
+    let sumUnder = false;
+    if (req.key !== false && plans.length === 1 && !dealt.twoUp) {
+        const pl = plans[0]; const last = pl.pages[pl.pages.length - 1];
+        const sm = summaries[0].sum;
+        const rowsN = sm.areas.length + sm.areas.reduce((t, a) => t + a.skills.length, 0) + 1;
+        const room = (pl.pages.length === 1 ? dealt.sheets[0].bodyMm.first : dealt.sheets[0].bodyMm.cont) - (Number(last.usedMm) || 0);
+        // card §3: rows x 7 mm + 14 mm; drawn at the size's own type it takes about 9 mm (M) / 10.5 mm (L) a row + 20 mm
+        sumUnder = rowsN * (SZ === 'L' ? 10.5 : 9) + 20 <= room;
+    }
+    const outs = plans.map((pl) => renderPlan(pl, { key: req.key !== false && !sumUnder }));
     const pupilPages = outs.flatMap((o) => o.pupilPages);
     let keyPages = outs.flatMap((o) => o.keyPages || []);
-    if (req.key !== false) {
+    if (sumUnder) {
+        const pl = plans[0];
+        const kplan = Object.assign({}, pl, { pages: pl.pages.map((pg, i) => (i < pl.pages.length - 1 ? pg : Object.assign({}, pg, { sections: [...pg.sections, { kind: 'html', html: `<div class="mq-review-summary-under">${reviewSummaryHtml(summaries[0].sum, { size: SZ })}</div>` }] }))) });
+        keyPages = renderPlan(kplan, { key: true }).keyPages || [];
+    } else if (req.key !== false) {
         const sumHtml = summaries.map((x) => (x.day ? `<div style="font-family:Andika,sans-serif;font-weight:700;margin-top:4mm">${MR_DAYS[x.day - 1]}</div>` : '') + reviewSummaryHtml(x.sum, { size: SZ })).join('');
         const extra = [{ kind: 'html', html: sumHtml }];
         if (dealt.sheets.length > 1) extra.push({ kind: 'html', html: reviewWeekTableHtml(reviewWeekTable(summaries.map((x) => ({ day: x.day, items: x.items }))), { size: SZ }) });
@@ -6752,7 +6837,8 @@ async function buildReviewSheet(req = {}) {
     return {
         pupilHtml: pupilPages.join('\n'), keyHtml: keyPages.join('\n'), pupilPages, keyPages,
         pageCount: pupilPages.length, keyPageCount: keyPages.length, role: 'mixed-review', seed: rv.seed,
-        twoUp: !!dealt.twoUp, review: { plan: dealt.plan, sheets: dealt.sheets.map((x) => ({ day: x.day, daySeed: x.daySeed })) },
+        twoUp: !!dealt.twoUp, summaryUnder: sumUnder,
+        review: { input: Object.assign({}, rv), plan: dealt.plan, sheets: dealt.sheets.map((x) => ({ day: x.day, daySeed: x.daySeed, spills: x.spills || 0, shelfKs: x.shelfKs || [], bodyMm: x.bodyMm, layout: x.layout })), spills: dealt.sheets.reduce((t, x) => t + (x.spills || 0), 0) },
         summaries: summaries.map((x) => ({ day: x.day, summary: x.sum })),
         items: dealt.items.map((it) => ({ n: it.n, skill: it.skill, page: it.page, seed: it.seed, rung: it.rung, text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, sig: it.q ? signature(it.q) : undefined })),
     };

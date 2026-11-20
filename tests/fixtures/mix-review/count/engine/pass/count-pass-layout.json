@@ -1,0 +1,8 @@
+{
+ "check": "count",
+ "state": "count-pass-layout",
+ "module": "layout",
+ "expect": "pass",
+ "browser": true,
+ "note": "the measured layout: the grade request and three kind pools (wide + compact + legacy) at M and L spill whole shelves with the dealt list and numbers kept, draw V1's shelf k (or fewer only for a cell too wide), and nothing overflows its page or cell"
+}
