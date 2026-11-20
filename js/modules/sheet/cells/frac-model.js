@@ -613,7 +613,8 @@ const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
 /** The part boxes' geometry at the ctx size (mm). */
 function pwGeom(p, ctx) {
     const k = pwSize(ctx), G0 = PW[k];
-    const G = p.model === 'bar' && G0.modelDrop ? Object.assign({}, G0, { drop: G0.modelDrop }) : G0;
+    // (on screen the joins drop 8 mm: the card fits the drawing to its height, and a taller diagram drew every digit smaller - ws-screen-ink-size)
+    const G = isTwin(ctx) ? Object.assign({}, G0, { drop: 8 }) : p.model === 'bar' && G0.modelDrop ? Object.assign({}, G0, { drop: G0.modelDrop }) : G0;
     const hw = SZ(ctx).writeMm;
     const wholeW = blankWidth(1, k) + 6, fracBar = blankWidth(2, k), fracW = fracBar + 6;
     const partH = 2 * hw + 8;
@@ -695,7 +696,8 @@ function pwMixed(ctx, w, n, d) {
     const twin = isTwin(ctx);
     const dig = twin ? D(ctx, digitPt(ctx)) : P(ctx, digitPt(ctx));
     const fpt = SZ(ctx).fracPt;
-    const fs = twin ? `max(calc(var(--mq-digit, 40px) * 0.72), ${L(ctx, fpt * PT_MM)})` : P(ctx, fpt);
+    // (on screen a printed fraction's digits are working digits too: the host's digit size - ws-screen-ink-size TEXT-SIZE)
+    const fs = twin ? D(ctx, fpt) : P(ctx, fpt);
     const whole = Number(w) ? `<span style="font-size:${dig};font-weight:700;line-height:1;">${esc(w)}</span>` : '';
     const frac = Number(n) ? `<span style="display:inline-flex;flex-direction:column;align-items:center;font-size:${fs};font-weight:700;line-height:1.1;">`
         + `<span>${esc(n)}</span><span aria-hidden="true" style="display:block;align-self:stretch;min-width:0.8em;border-top:${B(ctx, 1.5)} solid ${INK.ink};margin:${L(ctx, 0.6)} 0;"></span><span>${esc(d)}</span></span>` : '';
@@ -727,7 +729,7 @@ function pwDiagram(p, ctx) {
             + `${pwSlot(ctx, `${pre}w`, wv, { marks: p._marks, w: g.wholeW - 6, h: 2 * g.hw + 2, zone: true, pt: digitPt(ctx) })}${pwFracSlot(p, ctx, g, pre)}</span>`;
     } else {
         top = `<span class="fm-pw-whole" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, g.topW)};`
-            + `height:${L(ctx, g.topH)};border:${B(ctx, 1.5)} solid ${INK.ink};background:#fff;">${pwMixed(ctx, p.w, p.n, p.d)}</span>`;
+            + `${twin ? 'min-height' : 'height'}:${L(ctx, g.topH)};${twin ? `padding:${L(ctx, 1)} ${L(ctx, 2)};` : ''}border:${B(ctx, 1.5)} solid ${INK.ink};background:#fff;">${pwMixed(ctx, p.w, p.n, p.d)}</span>`;
     }
     // the joins: from the whole box's foot to each part box's top, drawn across the part row in percent of its width
     // (the row stretches with its cell); 1 CSS px = 0.75 pt, held at that width whatever the stretch
@@ -757,7 +759,7 @@ function pwDiagram(p, ctx) {
         + cols.map((c) => `<span style="display:flex;flex-direction:column;align-items:center;">${c}</span>`).join('') + `</span>`;
     const join = twin ? ` data-mq-join="parts" data-mq-sep="${compose ? ' ' : ' + '}"` : '';
     return `<span class="fm-pw" data-ws-slot-group="answer"${join} style="display:flex;flex-direction:column;align-items:center;box-sizing:border-box;`
-        + `width:100%;min-width:${L(ctx, g.minW)};max-width:${L(ctx, g.maxW)};margin:0 auto;padding-top:${L(ctx, 0.6)};flex:0 1 auto;">${top}${joins}${row}</span>`;
+        + `width:100%;min-width:${L(ctx, g.minW)};max-width:${L(ctx, twin ? Math.max(g.rowW, g.topW) : g.maxW)};margin:0 auto;padding-top:${L(ctx, 0.6)};flex:0 1 auto;">${top}${joins}${row}</span>`;
 }
 /** The equation form: "2 3/4 = [ ] + [ ]/[ ]" (the faded form, no diagram). */
 function pwEquation(p, ctx) {

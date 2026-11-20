@@ -66,7 +66,8 @@ export const LESSONS = Object.freeze({
         prereqsPending: MN_CHECK,
         warmup: [
             { key: 'fractions:write_fraction', opts: { model: ['bar'] }, why: 'The part bar is a fraction: the shaded parts of the parts in one whole.' },
-            { key: 'fractions:shade_fraction', opts: { model: ['bar'] }, why: 'A full bar is one whole: every part shaded.' },
+            // (two cells of one height: a shade-it bar beside a write-it bar left a 35 % band under the shorter one at L)
+            { key: 'fractions:identify', opts: { model: ['bar'] }, why: 'A bar cut into equal parts: count the parts in one whole.' },
         ],
         mixWith: [{ key: 'fractions:write_fraction', opts: { model: ['bar'] } }, { key: 'fractions:shade_fraction', opts: { model: ['bar'] } }],
     },

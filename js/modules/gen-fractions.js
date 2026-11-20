@@ -154,7 +154,10 @@ function _mnItem(q) {
         return [ww, randInt(1, dd - 1), dd];
     }, { sig: (v) => v.join(':'), window: 12 });
     const onPage = Number.isFinite(state.itemIndex);
-    const model = reads || (o.model === 'bar' && o.form !== 'eq' && w <= 3 && (!onPage || state.itemIndex < 2)) ? 'bar' : 'none';
+    // (the online worksheet is a screen: every card keeps the bars, as the practice card does - a page of cards with and
+    // without them left short cards in tall rows, ws-empty-band)
+    const paper = onPage && state.gameMode !== 'worksheet';
+    const model = reads || (o.model === 'bar' && o.form !== 'eq' && w <= 3 && (!paper || state.itemIndex < 2)) ? 'bar' : 'none';
     const form = o.form === 'eq' ? 'eq' : o.task === 'ones' ? 'ones' : o.task === 'compose' ? 'compose' : o.task === 'name' ? 'name' : 'two';
     const payload = { task: 'partition', w, n, d, form, model, answer: { w, n, d } };
     if (o.form === 'eq' && o.task === 'ones') payload.ones = true;
