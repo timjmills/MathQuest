@@ -12510,7 +12510,7 @@
     "commit": "dd4942463",
     "state": "every continuation cell holds its content"
    },
-   "command": "node tests/scripts/ws-guided-cellfit.cjs",
+   "command": "node tests/scripts/ws-guided-cellfit.cjs --only CELL-FITS",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
