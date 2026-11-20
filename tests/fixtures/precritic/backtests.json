@@ -12101,6 +12101,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-cell-fits",
+   "check": "ws-lesson-cellfits CELL-FITS (lead via lf-engine 2026-11-20): no cell ink - text runs, svg shapes, img, drawn frames - falls outside its nearest .ws-cell box or its .ws-page on any lesson page, judged on the render with bounding boxes (tolerance 0.6 mm)",
+   "kind": "fixture",
+   "rule": "ws-lesson-cellfits CELL-FITS",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-cellfits/fail.json",
+    "state": "0983c6791 (master d38308824) measured: two_step_letter_equation's anchor chart, M and L - its full-width story / bars / '= n' drawn in half-width 2 x 2 panels, 104 ink pieces outside their panel and 14 outside the page"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-cellfits/pass.json",
+    "state": "lf-engine fix (chartFull + chart pages) measured: four full-width panels over the chart pages, no ink outside"
+   },
+   "command": "node tests/scripts/ws-lesson-cellfits.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
