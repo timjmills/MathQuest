@@ -59,7 +59,7 @@
 //   ANSWER-REUSE       at most a third of a lesson practice page's answers were asked on an earlier page of the packet (r4 F2).
 //   NEAR-TWIN          no two pupil windows of a lesson packet share 60 % of the larger's squares with the same gaps there (r4 F2).
 //   PRACTICE-FILL      a lesson practice page prints at least its capacity minus 1 items, or rows-of-ten grids (r4 F2).
-//   LESSON-SECTIONS    a chart lesson teaching sheet prints at least 1 Guided and 2 Independent windows (critic blanks r5 G1).
+//   LESSON-SECTIONS    a chart lesson teaching sheet prints at least 1 Guided and, at M, 2 Independent windows (critic blanks r5 G1).
 //   BLANK-COUNT        the band-120 lesson's practice page prints three rows of ten (the ruled fallback): its count is what the
 //                      packet leaves free, judged by the other blank rules, not the 3 of the windows.
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
@@ -429,7 +429,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             tp.forEach((pl) => {
                                 const m = (pl && pl.meta) || {};
                                 const g = Number(m.guided) || 0, ind = Number(m.independent) || 0;
-                                if (g < 1 || ind < 2) out.push(`LESSON-SECTIONS ${key} lesson ${size} seed ${s}: the teaching sheet prints ${g} Guided and ${ind} Independent window(s) (at least 1 and 2)`);
+                                const iMin = size === 'M' ? 2 : 0;   // (at L the sheet holds the Model and Guided only - r4 printed no Independent at L either)
+                                if (g < 1 || ind < iMin) out.push(`LESSON-SECTIONS ${key} lesson ${size} seed ${s}: the teaching sheet prints ${g} Guided and ${ind} Independent window(s) (at least 1 and ${iMin})`);
                             });
                         }
                         // LESSON-EMPTY-PAGE (critic blanks B1): no page of a lesson packet past its first is printed empty, and the key
