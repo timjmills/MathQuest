@@ -1,0 +1,44 @@
+{
+ "note": "lead ruling 2026-11-20 (week vs pairs): a dealer that deals a week whose pool is more than half long word problems (2 + 1) instead of refusing it with \"Add more skills to make a week\"",
+ "expect": "fail",
+ "catch": "f",
+ "catchText": "Add more skills to make a week",
+ "props": [
+  "f"
+ ],
+ "mutate": {
+  "allowPairsMajorityWeek": true
+ },
+ "input": {
+  "pool": "pool-wplong-week",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "week": 2
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ]
+ }
+}

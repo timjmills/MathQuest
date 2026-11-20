@@ -155,7 +155,18 @@ function propE(input, out) {
     }
     return v;
 }
-function propF(input, out) {
+/** Lead ruling 2026-11-20 (week vs pairs): a week whose pool is more than half pair-only skills (long word problems) is
+ *  refused with the plain message. Built from the fixture's pool: its pair rows plus one fewer other row. Asserted by f
+ *  (the week) and, on a week, by p (the pairs). */
+const WEEK_PAIRS_MSG = 'Add more skills to make a week';
+function weekPairsMajority(input, mut) {
+    const rows = poolOf(input.pool); const pr = rows.filter((r) => OWN_KIND_PAIR.includes(r.kind)); const np = rows.filter((r) => !OWN_KIND_PAIR.includes(r.kind));
+    if (pr.length < 2 || !np.length) return [];
+    const maj = [...pr, ...np.slice(0, pr.length - 1)];
+    const w = D.week({ pool: maj, N: 10, seed: input.seed, size: input.size, order: input.order, week: input.week || 1 }, mut);
+    return w.error === WEEK_PAIRS_MSG ? [] : [`a week on ${pr.length} long word problems + ${maj.length - pr.length} other skill(s) is not refused with "${WEEK_PAIRS_MSG}"${w.error ? ` (got "${w.error}")` : ''}`];
+}
+function propF(input, out, mut = {}) {
     const v = [];
     if (!out.days) return ['not a week'];
     const pool = D.filterPool(poolOf(input.pool), input.filters).map((s) => s.id);
@@ -176,6 +187,7 @@ function propF(input, out) {
         if (d.day >= 3 && d.comeback && !sets[d.day - 3].has(d.comeback)) v.push(`day ${d.day}: comeback ${d.comeback} was not on day ${d.day - 2}`);
     });
     const kMax = Math.max(...sets.map((s) => s.size));
+    v.push(...weekPairsMajority(input, mut));
     if (pool.length >= 2 * kMax) for (let d = 1; d < 5; d++) for (const id of sets[d]) if (sets[d - 1].has(id)) v.push(`${id} on days ${d} and ${d + 1}`);
     return v;
 }
@@ -287,6 +299,7 @@ function propP(input, out, mut = {}) {
     const v = [];
     const pairs = poolOf(input.pool).filter((r) => OWN_KIND_PAIR.includes(r.kind));      // a pool of long word problems alone
     if (pairs.length >= 2 && !D.deal({ pool: pairs, N: 5, seed: input.seed, size: input.size }, mut).error) v.push('a pool of long word problems alone is dealt at the odd N = 5 (it must be refused)');
+    if (out && out.days) v.push(...weekPairsMajority(input, mut));
     for (const sh of sheetsOf(out)) {
         const tot = {};
         sh.pages.forEach((p, i) => {

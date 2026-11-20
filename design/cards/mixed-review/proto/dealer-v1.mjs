@@ -87,6 +87,8 @@ export const KIND_CAP = Object.freeze({ 'word-problem': Object.freeze({ m: 3, l:
 /** Kinds dealt in PAIRS only (lead ruling 2026-11-20, card §10 L9): a long word problem (12.1 "2 if 4-5 lines" at L) holds an
  *  EVEN count on every page it is on (2 at L), so its counts are always even and no long word problem is ever alone. */
 export const KIND_PAIR = Object.freeze(['word-problem-long']);
+/** The plain refusal a teacher sees when long word problems (dealt in pairs) are more than half of a week's pool. */
+export const WEEK_PAIRS_MAJORITY = 'Add more skills to make a week';
 const isPair = (s, mut = {}) => !mut.noPairs && !!s.kind && KIND_PAIR.includes(s.kind);
 /** A pool row as V1 reads it: its class from KIND_CLASS when the row names a kind (a row with `fc` only is a test row). */
 export function rowOf(s, mut = {}) {
@@ -361,6 +363,8 @@ function eligibleOf(input, mut) {
 export function week(input, _mutate = {}) {
     const eligible = eligibleOf(input, _mutate);
     if (eligible.error) return { v: VERSION, error: eligible.error };
+    // lead ruling 2026-11-20 (week vs pairs): a week is refused when pair-only skills are more than half of the pool.
+    if (!_mutate.allowPairsMajorityWeek && 2 * eligible.filter((s) => isPair(s, _mutate)).length > eligible.length) return { v: VERSION, error: WEEK_PAIRS_MAJORITY };
     const cycle = cycleOf(input, eligible, _mutate);
     const ws = { seen: new Set(), prevDay: new Set(), uses: new Map(), appear: new Map(), comeback: null };
     const days = []; const sets = [];

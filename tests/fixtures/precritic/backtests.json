@@ -14487,6 +14487,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mix-review-week-pairs-majority",
+   "check": "lead ruling 2026-11-20 (week vs pairs): a Mon-Fri week whose pool is more than half pair-only skills (word-problem-long) is refused with the plain message \"Add more skills to make a week\" (check-v1 props f and p: the fixture's pairs plus one fewer other skill must be refused)",
+   "kind": "fixture",
+   "rule": "ws-mix-review --check week",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/mix-review/week/fail/week-pairs-majority.json",
+    "state": "the 3199b8ba dealer (no majority refusal: mutate allowPairsMajorityWeek) deals a week on 2 long word problems + 1 other skill"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/mix-review/week/pass/week-pass-pairs-minority.json",
+    "state": "the refusing dealer on pools/pool-wplong-week.json (2 long word problems of 8): the week is dealt (p, l, k) and the 2 + 1 pool is refused"
+   },
+   "command": "node tests/scripts/ws-mix-review.mjs --check week --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

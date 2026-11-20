@@ -1,0 +1,43 @@
+{
+ "note": "lead ruling 2026-11-20 (week vs pairs): 2 long word problems in an 8-skill pool make a week (p, l, k); the same 2 with one other skill are refused with \"Add more skills to make a week\" (p on a week). Prop f is not asserted: a day whose unseen skills are only pair skills that do not fit its room still repeats a skill (step 3 finding 1, open beyond the majority case).",
+ "expect": "pass",
+ "props": [
+  "p",
+  "l",
+  "k"
+ ],
+ "input": {
+  "pool": "pool-wplong-week",
+  "N": 10,
+  "seed": 1,
+  "size": "m",
+  "order": "mixed",
+  "week": 2
+ },
+ "sweep": {
+  "N": [
+   5,
+   10,
+   15,
+   20,
+   25,
+   30
+  ],
+  "size": [
+   "m",
+   "l"
+  ],
+  "seed": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ]
+ }
+}

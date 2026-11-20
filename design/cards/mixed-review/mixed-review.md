@@ -201,6 +201,7 @@ The options belong to the **page type** (job / section scope, PAGE_TYPES 9), not
 **Weekly set**
 
 - Five sheets Mon–Fri of N problems each [P:f,e]. Day d seed = `deriveSeed('mixed-review-week', S, d)` [P:f].
+- **Pairs majority (lead ruling 2026-11-20).** A week is refused when pair-only skills (long word problems, §2) are more than half of the pool; the teacher sees the plain message "Add more skills to make a week" [P:f,p].
 - Rotation (DEALER V1 `week`, frozen with the file): one cycle for the week (`deriveSeed('mixed-review-cycle', S)`); each day deals its sheet with the choice order fresh (unseen this week) → not on yesterday's sheet → least used this sheet → least used this week → pick order [P:f]. So **every pool skill appears before any repeat other than the planned comeback** (r2 resolution 4), and **no skill falls on two consecutive days** while |pool| ≥ 2·k_d [P:f]. **The comeback:** from Wednesday, the first page of day d opens with the first skill of day d − 2 that is not on day d − 1 (spacing) [P:f]. Prop f exempts exactly that skill on that day [P:f].
 - Print: 5 pupil sheets (tab `Week n [X:MIX-REVIEW-WEEK] | Mon` … `Fri`, footer code with K1–K5), then 5 keys, then one weekly key table (PT-KEY-5: areas and skills as rows, Mon–Fri as columns, item numbers in the cells). A pool of exactly 2·k_d skills alternates A / B / A / B / A: each set comes back 2–3 times, no skill falls on consecutive days, and the comeback is then a no-op (r3 open item) [P:f]. Each day reprints exactly from its day code (P-RV-13) [P:a]. The week reuses its one plan for each day; a day code rebuilds that same day, never re-plans it differently (L24) [P:a].
 
@@ -471,8 +472,9 @@ card-critic-r4.md, FAIL min 5) found the items below; each is DEFERRED to the na
 | L7 | §9b step 3 seed wording | step 3 (MR-A) | text as §7a: try 0 = `item.seed` (four parts), try r >= 1 = five parts, S' |
 | L8 | Step 1's property -> check map omits j2, l, m, n | step 1 (MR-E) | copy the §8 V1-core column into step 1 |
 | L9 | 12.1 long word problems ("2 a page at L if 4-5 lines"); `KIND_CAP` allows 3 | step 2 (MR-B); BUILT step 3 (lead ruling 2026-11-20: pairs only) | a long word-problem kind capped at 2 at L, dealt in pairs (prop p, `count-long-wp`) |
+| L10 | Legacy skills print as typical (373 of 708 draw no kit cell); the class improves as skills migrate to kit cells | V1 (lead ruling 2026-11-20, ACCEPTED) | none in this lane: each family's kit migration re-classes its rows (a new V1 table only while no V1 code has shipped, else V2) |
 
-Signed: owner, 2026-11-20 (build-now ruling; §10 known limitations accepted)
+Signed: unsigned (re-sign needed: L10 added, 2026-11-20; was: owner, 2026-11-20, build-now ruling; §10 known limitations accepted)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)

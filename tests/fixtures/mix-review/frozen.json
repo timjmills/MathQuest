@@ -6,7 +6,7 @@
   "registry": "tests/fixtures/mix-review/v1-registry.json"
  },
  "sha256": {
-  "dealer": "f7c7b03a572daebec954c9f7e896075d7cbc6eb99513584c821f60a1de59bc2e",
+  "dealer": "052432e157f9c56ddf9e89c7897e8420d7af139c60bff63352a143e1c46772e1",
   "interleave": "8066c12c9e3d21e56e7549986fff31f5a286319b0a1841a945896480551fe966",
   "rng": "6b60dcb07a01b1de991455f1ea0598ab985fe2d874a80070ab00e1545692c130",
   "registry": "0550ece4769c23f38d1bc8eb6ba284a4dfe0541982db439cc0024a24c679f247"
