@@ -515,6 +515,30 @@ const CASES = [
             const wantUnit = await L(async (L) => (await L.listSheets()).slice().sort((a, b) => ((a.unit && a.unit.order) || 1e9) - ((b.unit && b.unit.order) || 1e9) || (b.updatedAt - a.updatedAt)).map((r) => r.id));
             if (JSON.stringify(orderUnit) !== JSON.stringify(wantUnit)) finding('ORGANISE', 'By unit is not the unit order');
             await click('#teacherMain [data-mws="sort"][data-v="date"]');
+            // Edit (A15 #1): the Print screen opens with the sheet loaded; Save offers "Save changes" (the same record) and
+            // "Save as a copy"
+            await click(`${card} [data-mws="menu"]`);
+            await click(`${card} [data-mws="edit"]`);
+            await sleep(800);
+            const ed = await page.evaluate(async () => {
+                const TP = await import('/js/modules/teacher-print.js');
+                const L = await import('/js/modules/sheet-library.js');
+                await TP.printBuiltNow();
+                const d = TP.printSaveDraft();
+                return { screen: (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen, req: d && JSON.stringify(L.packReq('teacher-print', d.req)) };
+            });
+            const tgNow = await recOf(tp.id);
+            if (ed.screen !== 'print' || ed.req !== JSON.stringify(tgNow.req)) finding('ORGANISE', `Edit did not open the sheet on the Print screen (${ed.screen})`);
+            await click('#teacherMain [data-screen="print"] [data-act="save-sheet"]');
+            await page.waitForSelector('#mwsSave', { timeout: 15000 }).catch(() => {});
+            const eb = await page.evaluate(() => ({ copy: !!document.querySelector('#mwsSave [data-mws-save="copy"]'), save: ((document.querySelector('#mwsSave [data-mws-save="save"]') || {}).textContent || '').trim() }));
+            if (!eb.copy || eb.save !== 'Save changes') finding('ORGANISE', `Save after Edit does not offer Save changes + Save as a copy (${JSON.stringify(eb)})`);
+            const nE = await L(async (L) => (await L.listSheets()).length);
+            await click('#mwsSave [data-mws-save="save"]');
+            await sleep(1500);
+            const afterE = await recOf(tp.id);
+            if ((await L(async (L) => (await L.listSheets()).length)) !== nE || !afterE || afterE.updatedAt <= tgNow.updatedAt || afterE.name !== 'Renamed sheet Q') finding('ORGANISE', 'Save changes after Edit did not update the same sheet');
+            await go('sheets'); await onSheets();
             // delete + Undo (10 s)
             await click(`.mws-card[data-id="${dup.id}"] [data-mws="menu"]`);
             await click(`.mws-card[data-id="${dup.id}"] [data-mws="delete"]`);
@@ -624,7 +648,9 @@ const CASES = [
     } catch (e) {
         if (String(e.message) !== 'no library') { finding(current, `stopped: ${String(e.stack || e).slice(0, 400)}`); const RUN_ORDER = ['NO-LOSS', 'SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'TOUCH-WIDTH']; for (const id of RUN_ORDER.slice(RUN_ORDER.indexOf(current) + 1).filter((k) => ONLY.includes(k))) finding(id, `not run: ${current} stopped the gate`); }
     } finally {
-        const errs = (problems || []).filter((p) => !/favicon|ERR_ABORTED|net::ERR_FAILED.*(fonts|gsi|jsdelivr)|accounts\.google|cdn\.jsdelivr/.test(p.text));
+        // (the NO-LOSS step opens the origin on a stylesheet, whose page asks for /favicon.ico: that 404 is the harness's own)
+        const favOnly = notFound.length > 0 && notFound.every((u) => /^\/favicon\.ico/.test(u));
+        const errs = (problems || []).filter((p) => !/favicon|ERR_ABORTED|net::ERR_FAILED.*(fonts|gsi|jsdelivr)|accounts\.google|cdn\.jsdelivr/.test(p.text) && !(favOnly && /status of 404/.test(p.text)));
         if (errs.length) finding('CONSOLE', `${errs.length} console / page errors: ${errs.slice(0, 3).map((p) => p.text.slice(0, 160)).join(' | ')}${notFound.length ? ` (404: ${notFound.slice(0, 4).join(', ')})` : ''}`);
         await app.close();
     }
