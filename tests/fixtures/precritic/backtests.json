@@ -12123,6 +12123,522 @@
    }
   },
   {
+   "id": "eb-lastpage-cbt-pre-skill-check",
+   "check": "the last (or only) page of a fixed-capacity role (pre-skill-check, true-false, reason-it, error-analysis, test) is measured: FAIL at >= 30 % of its body empty when its next row fits (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check L, one page, 84 mm empty foot; EB-PAGE skipped a role's last page, so a one-page role was never measured)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check L p1 34 % empty (81.0 mm, its next 25.5 mm row fits)"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "INTERIM stand-in, not a fix (critic eblast r1 F4): the same commit, its other fixed-capacity roles, every last page full. The fixed state of the same role is the fixture row eb-lastpage-fixture-pre-skill-check; re-point this pass side to the fixing commit when cbt resumes"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only EB-LASTPAGE {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cap-parity-cbt-pre-skill-check",
+   "check": "for the same skill, role and seed, items a page at L >= ceil(0.7 x items a page at M) unless the L page is full (no room for another row) (lf-ops critic cbt r3 F1: count_by_tables Pre-skill check 10 items at L against 16 at M, the L page not full)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band CAP-PARITY",
+   "browser": true,
+   "fail": {
+    "commit": "3038af154",
+    "args": "--roles pre-skill-check",
+    "state": "critic cbt r3 tree: Pre-skill check M 16 / L 10 items a page (needs >= 12), L page not full"
+   },
+   "pass": {
+    "commit": "3038af154",
+    "args": "--roles test,true-false,reason-it,error-analysis",
+    "state": "INTERIM stand-in, not a fix (critic eblast r1 F4): the same commit, its other fixed-capacity roles, L below 0.7 x M only where the L page is full. The flip on one page is the fixture row cap-parity-fixture-row-gap; re-point this pass side when cbt resumes"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --hosts none --page-fill --no-baseline --eblast-block --only CAP-PARITY {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-lastpage-fixture-pre-skill-check",
+   "check": "the last (or only) page of a role that fixes its count is judged: FAIL at >= 30 % empty when its next row AND its row gap fit (critic eblast r1 F4: the cbt rows pass on other roles of the same commit; this pair flips the SAME role from the page as rendered to the page filled)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/pre-skill-check.fail.html",
+    "state": "planted page modelled on add_facts Pre-skill check M as rendered (one row, ~80 % empty, 42.6 mm rows + 4 mm gap); no fix has landed (routed to lf-ops), so the pass side is a fixture"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/pre-skill-check.pass.html",
+    "state": "the same page with its missing rows (5 rows fill the 236 mm body): a planted page that meets the rule, not a commit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only EB-LASTPAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cap-parity-fixture-row-gap",
+   "check": "CAP-PARITY judges \"the L page is full\" by a row PLUS its rendered row gap (critic eblast r1 F1: placevalue:value mixed-practice L, 39.8 mm white against a 37.2 mm row, failed with no room for the gap)",
+   "kind": "fixture",
+   "rule": "ws-empty-band CAP-PARITY",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/cap-parity.fail.html",
+    "state": "M 15 a page (full); L 8 in 4 rows of 44 mm + 3 mm gaps, 51 mm white: a row and its gap fit, 8 < 11"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/cap-parity.pass.html",
+    "state": "planted F1 boundary page: L 8 in 4 rows of 44 mm + 5 mm gaps, 45 mm white - a row alone fits, a row and its gap (49 mm) does not: full, OK (the r1 row-only rule failed it)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only CAP-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-lastpage-fixture-test-pg23",
+   "check": "a MULTI-page fixed-count role is judged on its last page by PG-23 (fewer than one third of a full page's rows is a missed rebalance; a rebalanced last page is legal however white), not by a flat 30 % (critic eblast r1 F3)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-LASTPAGE",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/test-pg23.fail.html",
+    "state": "planted 2-page Test: 5 rows then 1 row on the last page (1 < 5/3)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/test-pg23.pass.html",
+    "state": "the same Test rebalanced 3 + 3 rows: last page ~45 % empty, legal under PG-23 (the r1 flat 30 % failed it)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --page-fill --eblast-block --only EB-LASTPAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-advisory-fixture",
+   "check": "lead EBLAST-ADVISORY (2026-11-20; critic eblast r2: false reds on passed skills): EB-LASTPAGE / CAP-PARITY must not block a run until critic r3 passes the rebuilt rules; the planted too-empty pre-skill-check page FAILed the gate at 7c7d487c1",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band: EB-LASTPAGE / CAP-PARITY print 'ADVISORY (not critic-passed)' and never fail without --eblast-block",
+   "browser": true,
+   "fail": {
+    "commit": "7c7d487c1",
+    "state": "the planted fail page -> ws-empty-band: FAIL (EB-LASTPAGE)"
+   },
+   "pass": {
+    "commit": "6a378c6c1",
+    "state": "the same page -> ADVISORY line printed, ws-empty-band: OK"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --html {root}/tests/fixtures/precritic/page-fill/pre-skill-check.fail.html --page-fill --only EB-LASTPAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-role-capacity-declared",
+   "check": "lead EBLAST-ADVISORY root cause (critic eblast r2 G1/G2, round cap): EB-LASTPAGE / CAP-PARITY inferred capacity from white space, so pages full by design (Mixed practice L at its 5-row WDS §12.1 ceiling; Scripted Model frames) read red; every page role a passed skill renders must DECLARE its ceiling per size (js/modules/sheet/role-capacity.js) and the rules read it",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --capacity-check: every role used by a skill in redesign-passed.js declares its capacity ceiling (EB-LASTPAGE / CAP-PARITY read it)",
+   "fail": {
+    "commit": "a55ce281f",
+    "state": "no declared capacity table; the check does not exist -> role-capacity: FAIL"
+   },
+   "pass": {
+    "commit": "7fb4a0659",
+    "state": "17 roles used by 32 passed skills all declare a ceiling -> role-capacity: OK"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --capacity-check 2>/dev/null | tail -1 | grep -q '^ws-empty-band --capacity-check: OK' && echo 'role-capacity: OK' || echo 'role-capacity: FAIL (a role used by a passed skill declares no ceiling)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-role-capacity-drift",
+   "check": "critic eblast r3 G1 (drift): role-capacity.js copies 8 ceilings the role modules hold as their own constants (CEILING, ROWS, PER_PAGE, MAX_SHELVES); --capacity-check reads each role's own constant and fails when the two differ, naming role, size, both values and file",
+   "kind": "fixture",
+   "rule": "ws-empty-band --capacity-check: role-capacity.js agrees with each role module's own ceiling constant",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/role-capacity/guided.drift.js",
+    "state": "guided CEILING M 9 against the table's 8 -> FAIL guided M: role-capacity.js says 8, ... CEILING says 9"
+   },
+   "pass": {
+    "fixture": "js/modules/sheet/roles/guided.js",
+    "state": "the real guided.js CEILING {S 10, M 8, L 6} -> OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --capacity-check --role-src guided={fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-blocking-pin",
+   "check": "lead EBLAST-BLOCKING (2026-11-20): EB-LASTPAGE / CAP-PARITY are findings on an allow-list of roles that may only GROW; --pin-check fails when an entry of the base copy is gone",
+   "kind": "fixture",
+   "rule": "ws-empty-band --pin-check: EBLAST_BLOCKING_ROLES never loses an entry against the merge-base copy",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/eblast-pin/dropped-test.cjs",
+    "state": "the list with 'test' removed, against a2fddf4c7 (16 roles) -> FAIL lost 'test'"
+   },
+   "pass": {
+    "fixture": "tests/scripts/ws-empty-band.cjs",
+    "state": "the live list (16 roles) -> OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --pin-check --base a2fddf4c7 --file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-pin-dropped-entry",
+   "check": "critic eblast r4 P1: EBLAST_BLOCKING_ROLES may only grow: a copy that drops a later-added entry ('stretch') must FAIL against a base that has it",
+   "kind": "fixture",
+   "rule": "ws-empty-band --pin-check (merge-base pin)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/page-fill/blocking-dropped.cjs.txt",
+    "state": "the list without 'stretch' against base 4292106c4 (which has it): FAIL"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/page-fill/blocking-full.cjs.txt",
+    "state": "the full list: OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --pin-check --base 4292106c4 --file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eblast-pin-fails-closed",
+   "check": "critic eblast r4 P2: an unresolvable pin base (a bad --base, a shallow clone, no origin/master) reported OK ('has no list'): the pin failed open",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --pin-check fails closed on a base it cannot read",
+   "browser": false,
+   "fail": {
+    "commit": "3714ea89d",
+    "state": "--pin-check --base deadbeef0 -> OK (exit 0)"
+   },
+   "pass": {
+    "commit": "4292106c4",
+    "state": "--pin-check --base deadbeef0 -> FAIL (exit 1)"
+   },
+   "command": "node {root}/tests/scripts/ws-empty-band.cjs --pin-check --base deadbeef0 > /dev/null; [ $? -ne 0 ] && echo 'pin-closed: OK' || echo 'pin-closed: FAIL (an unreadable base passed)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "student-opts-carry",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "A pupil's chosen options and selection reach every play host: the sheet's Play this skill / Play all selected, each game style card, the bottom Play, and a game style tapped at once after a chip's ✕ and a changed option (student-opts card §6 CARRY)",
+   "rule": "ws-student-opts STUDENT-OPTS-CARRY (12 deals per host + the game's own first question; options captured at each generate)",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only CARRY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "no sheet (a Quick Start tap toggles, no Play this skill / Play all selected), and the REAL stale case: after a first play, a chip's ✕ then a game style tapped at once - startMode -> startGame skipped the rebuild (state.isMixedMode still true) and the game dealt subtraction:subtract, the removed skill"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "every pupil start goes through playSelectedSkills(mode[, {only}]): 0 findings at 1280 and 820"
+   }
+  },
+  {
+   "id": "student-opts-count",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "\"You will play N skills\" (sheet, game style row, bottom row), \"Play all selected (N)\" and the dealt skills equal the selection after adding, after ✕ and after Clear; N = 1 hides Play all selected (card §6 COUNT)",
+   "rule": "ws-student-opts STUDENT-OPTS-COUNT",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only COUNT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "no \"You will play N skills\" line anywhere (the rows read null after adding, after ✕ and with 1 selected)"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "the three lines and the button follow the selection: 0 findings"
+   }
+  },
+  {
+   "id": "student-opts-pupil",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The sheet opens folded, shows only pupilOptionsFor, every target >= 48 x 48 and tappable at its centre, the chip ✕ 48 x 48, inside the window (popover >= 1024, bottom sheet at 820), a teacher-link option locked \"Set by your teacher\", Esc returns focus to the card (card §6 PUPIL)",
+   "rule": "ws-student-opts STUDENT-OPTS-PUPIL (real pointer / touch taps, elementFromPoint)",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only PUPIL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "a Quick Start tap opens no sheet (the teacher-link card opens none either), no pupilOptionsFor; the chip × is 18 x 18"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "0 findings at 1280 (popover) and 820 (bottom sheet, touch)"
+   }
+  },
+  {
+   "id": "student-opts-unit",
+   "kind": "commit-pair",
+   "browser": false,
+   "check": "pupilOptionsFor on every live skill never returns a layout / appearance / more / nline / play / support / level / hidden / role-gated option, and its counts per group match the pin (card §6 Unit)",
+   "rule": "ws-student-opts --unit STUDENT-OPTS-UNIT (node; pin tests/fixtures/student-opts/pupil-counts.json)",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "89b9dad95",
+    "state": "skill-options.js has no pupilOptionsFor: no curated pupil subset (a pupil would see every teacher option)"
+   },
+   "pass": {
+    "commit": "52a9b2499",
+    "state": "742 live skills, 690 with pupil options (difficulty 1,241, facts 5); no teacher option; the pin holds"
+   }
+  },
+  {
+   "id": "student-explorer-nodup-plate-s",
+   "check": "lead 2026-11-20 (base red on ws-student-explorer): an explorer thumbnail never shows its question twice; at plate S (the explorer card layout, not the retired print size) placevalue:unit_form's crop head repeated the drawn item it sits over",
+   "kind": "commit-pair",
+   "rule": "ws-student-explorer THUMB legible sweep NODUP",
+   "browser": true,
+   "fail": {
+    "commit": "03a92fa2",
+    "state": "FAIL (1): THUMB legible sweep (S): placevalue:unit_form NODUP - the head \"556 = ___ hundreds ___ tens ___ ones\" above the drawn row that says it in boxes"
+   },
+   "pass": {
+    "commit": "ec45e671",
+    "state": "OK: the head says what to do (\"Fill in the boxes.\") when the drawn item already says the whole question"
+   },
+   "command": "node tests/scripts/ws-student-explorer.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "student-opts-words",
+   "kind": "commit-pair",
+   "check": "critic r1 F2: every label, choice and all-label a pupil reads (pupilOptionsFor, every live skill) is in pupil words: no teacher / print term, no explaining parenthesis, label <= 6 words, choice <= 8, no two choices alike; pinned at 0",
+   "rule": "ws-student-opts STUDENT-OPTS-WORDS",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit --only WORDS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "pupilOptionsFor returned the teacher wording: 1,712 hits, 529 distinct (\"What the items ask\", \"Use the Max Number setting\", \"As dealt (follows the Max Number setting)\", \"What the pupil reads\")"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "0 hits: the pupil-option-words.js layer (PUPIL_WORDS, PUPIL_WITHHOLD, plain())"
+   }
+  },
+  {
+   "id": "student-opts-verdict",
+   "kind": "commit-pair",
+   "check": "critic r1 F4 / card D3: one teacher label carries one pupil verdict across skills (an option offered to a pupil on one skill is never withheld as layout on another)",
+   "rule": "ws-student-opts STUDENT-OPTS-VERDICT",
+   "command": "node tests/scripts/ws-student-opts.cjs --unit --only VERDICT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "3 split labels: \"How it is written\" (divForm offered, notation withheld), \"Task\", \"Bars\""
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "divForm and notation withheld on every sign (D3); the Task / Bars tile choices withheld"
+   }
+  },
+  {
+   "id": "student-opts-sweep",
+   "kind": "commit-pair",
+   "check": "critic r1 F1: with \"Change how it works\" open, both play buttons are wholly in view in the window and the sheet, with no scroll, and take a tap at their centre - for EVERY pupil skill, opened through the module in one page",
+   "rule": "ws-student-opts STUDENT-OPTS-SWEEP",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280,820 --only SWEEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "89 play buttons out of view at 1280 (every mixed_*, mult_chart, function tables): the whole sheet scrolled"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "the play row is the sheet's fixed footer (.so-foot); only .so-body scrolls: 0 of 675 skills at 1280 and 820"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-anchor",
+   "kind": "commit-pair",
+   "check": "critic r1 F5: at >= 1024 px the open sheet never covers its own card (beside it, or a bottom sheet)",
+   "rule": "ws-student-opts STUDENT-OPTS-ANCHOR",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only ANCHOR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "the popover was pinned to the window edge over its card on 288 skills at 1280"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "place(): below, above, else beside the card (right, then left), else a bottom sheet: 0 covers"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-contrast",
+   "kind": "commit-pair",
+   "check": "critic r1 F3: the folded summary and the All / None buttons reach 4.5 : 1 (opacity counted); the \"Set by your teacher\" note is >= 13 px and 4.5 : 1",
+   "rule": "ws-student-opts STUDENT-OPTS-CONTRAST",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only CONTRAST",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "summary and All / None 3.46 : 1; the lock note 11.5 px at 2.07 : 1 (light grey under row opacity)"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "--so-ink-2 #4a4560 on the sheet, the locked row no longer faded (only its control), the note 14.4 px bold"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-toast",
+   "kind": "commit-pair",
+   "check": "critic r1 F6: three quick Quick Start taps leave at most one toast on screen",
+   "rule": "ws-student-opts STUDENT-OPTS-TOAST",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only TOAST",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "3 stacked \"Added ...!\" toasts"
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "no Added toast on the pupil path: the sheet shows the selection"
+   },
+   "browser": true
+  },
+  {
+   "id": "student-opts-name",
+   "kind": "commit-pair",
+   "check": "critic r1 F7: every Quick Start card names the skill the same on the card, the sheet (.so-name) and the chip",
+   "rule": "ws-student-opts STUDENT-OPTS-NAME",
+   "command": "node tests/scripts/ws-student-opts.cjs --widths 1280 --only NAME",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "1a5180bd7",
+    "state": "card \"Mult Facts\", sheet and chip \"Multiplication Facts (1-12)\""
+   },
+   "pass": {
+    "commit": "9107164a3",
+    "state": "qsPupilNameFor(): the grid's own card name everywhere (quick-skills.js)"
+   },
+   "browser": true
+  },
+  {
+   "id": "two-step-guided-no-mid",
+   "check": "ws-two-step --guided GUIDED-NO-MID + GUIDED-MODEL-ALONE: no Guided cell prints the hidden middle question, and Guided page 1 holds the Model and a try at M (exempt by ruling: the family at L; multi_step_word (Visual) at M)",
+   "kind": "commit-pair",
+   "rule": "GUIDED-NO-MID (lead 2026-11-20, two-step card decision 6 amended)",
+   "fail": {
+    "commit": "cc17ba09a",
+    "state": "the Guided Model printed the two-line middle question, so multi_step_word_plain's Model stood alone on page 1 of every M sheet (0/10)"
+   },
+   "pass": {
+    "commit": "ddabf985a",
+    "state": "word-work drops the middle question on the Guided page (ctx.guided); Model + try share page 1 on 120/140 M sheets, _plain 20/20"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:multi_step_word_plain,algebra:two_step_add_then_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-story-work",
+   "check": "ws-two-step STORY-WORK: the story tells exactly the work's numbers (Step 1's two, Step 2's number that is not the Step 1 answer), seeds 1-200, every two-step skill",
+   "kind": "commit-pair",
+   "rule": "STORY-WORK (critic GUIDED-NO-MID F1, 2026-11-20)",
+   "fail": {
+    "commit": "6c15f17bb",
+    "state": "tellTwoStep read s2.bottom as the box count; a x Step 2 whose Step 1 answer is the smaller factor stores it as bottom ('Lena has 4 boxes' over 4 x 6 = 24)"
+   },
+   "pass": {
+    "commit": "36c8fe65f",
+    "state": "the story and the worked-wrong Step 2 read the factor that is not the Step 1 answer"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules STORY-WORK --skill algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-guided-hint-step",
+   "check": "ws-two-step --guided GUIDED-HINT-STEP: a two-step Guided try's grey hint prints no number (the sign and the operation only)",
+   "kind": "commit-pair",
+   "rule": "GUIDED-HINT-STEP (lead 2026-11-20, live on master; PAGE_TYPES 2.3)",
+   "fail": {
+    "commit": "ee6ecd047",
+    "state": "hintOf printed the two-step workedSteps' Step 1 line, 'Step 1: circle -. 26 - 6 = 20.' - the try's Step 1 boxes given away"
+   },
+   "pass": {
+    "commit": "ddabf985a",
+    "state": "the two-step steps carry a hint ('Step 1: circle +. Add.'); hintOf prefers it"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --guided --sizes M --seeds 3 --skill algebra:two_step_add_then_div,algebra:multi_step_word_plain",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "mult-size-presets",
    "check": "every multiplication size pair is a preset of its host (tiles 21/31/41/22/32 on multiply, 21/31/41 on area_model_mult, 22/23 on area_model_mult_hard), each item deals its size, multiply 2-digit multipliers draw the kit long-multiplication cell, and area_model_3by2 writes the 3-digit factor first (lead 2026-11-19; card mult-sizes Q2 / Q3)",
    "kind": "commit-pair",
