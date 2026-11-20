@@ -59,6 +59,9 @@
 //   ANSWER-REUSE       at most a third of a lesson practice page's answers were asked on an earlier page of the packet (r4 F2).
 //   NEAR-TWIN          no two pupil windows of a lesson packet share 60 % of the larger's squares with the same gaps there (r4 F2).
 //   PRACTICE-FILL      a lesson practice page prints at least its capacity minus 1 items, or rows-of-ten grids (r4 F2).
+//   SHEET-REASK        an Independent window re-asks at most 1 answer a Guided window on the same lesson teaching sheet asked (r6 H1).
+//   GRID-BLANK-FLOOR   every rows-of-ten grid on a lesson practice page holds at least 5 blanks (r6 H2).
+//   COL-RUN            at most one column of a lesson rows-of-ten grid is blank in every row (r6 H3).
 //   LESSON-SECTIONS    a chart lesson teaching sheet prints at least 1 Guided and, at M, 2 Independent windows (critic blanks r5 G1).
 //   BLANK-COUNT        the band-120 lesson's practice page prints three rows of ten (the ruled fallback): its count is what the
 //                      packet leaves free, judged by the other blank rules, not the 3 of the windows.
@@ -97,7 +100,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -424,6 +427,28 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             const rowsGrids = ws.length && ws.every((w) => w.rows.length === 3 && w.cols.length === 10);
                             if (cap && its.length < cap - 1 && !rowsGrids) out.push(`PRACTICE-FILL ${key} lesson ${size} seed ${s} p${pi + 1}: ${its.length} item(s) on a practice page that holds ${cap} (at least ${cap - 1}, or rows-of-ten grids)`);
                         });
+                        // (chart blanks critic r6, 2026-11-20 - H1 / H2 / H3:)
+                        // SHEET-REASK: on a lesson teaching sheet, an Independent window re-asks at most 1 answer a Guided window on the same
+                        // sheet asked (the plan's first meta.guided pupil windows are Guided). GRID-BLANK-FLOOR: every rows-of-ten grid (3 x 10)
+                        // on a lesson practice page holds at least 5 blanks. COL-RUN: at most one column of a rows-of-ten grid is blank in every row.
+                        if (packet && on('SHEET-REASK') && /chart/.test(skillId)) (r.partPlans || []).filter((x) => x.part === 'teach').flatMap((x) => x.plans || []).forEach((pl) => {
+                            const g = Number(pl && pl.meta && pl.meta.guided) || 0;
+                            const ws = planPages(pl).flatMap((pg) => pupilWins(pg.items));
+                            const gAsk = new Set(ws.slice(0, g).flatMap((w) => w.gaps));
+                            const reW = ws.slice(g).map((w) => w.gaps.filter((n) => gAsk.has(n)));
+                            const tot = reW.reduce((t, x) => t + x.length, 0), all = ws.slice(g).reduce((t, w) => t + w.gaps.length, 0);
+                            reW.forEach((re, wi) => { if (re.length > 1) out.push(`SHEET-REASK ${key} lesson ${size} seed ${s}: Independent window ${wi + 1} re-asks ${re.length} Guided answer(s) on the same sheet (${re.join(', ')}; at most 1; ${tot} of ${all} on the sheet)`); });
+                        });
+                        if (pkParts && (on('GRID-BLANK-FLOOR') || on('COL-RUN'))) pkParts.forEach((pg, pi) => {
+                            if (pg.part !== 'practice') return;
+                            pupilWins(pg.items).forEach((w, wi) => {
+                                if (!(w.rows.length === 3 && w.cols.length === 10)) return;
+                                const lo = Math.min(...w.rows) * 10 + 1, hi = Math.max(...w.rows) * 10 + 10;
+                                if (on('GRID-BLANK-FLOOR') && w.gaps.length < 5) out.push(`GRID-BLANK-FLOOR ${key} lesson ${size} seed ${s} p${pi + 1}: rows-of-ten grid ${wi + 1} (${lo}-${hi}) has ${w.gaps.length} blank(s) (at least 5)`);
+                                const full = w.cols.filter((c) => w.rows.every((rr) => w.gaps.includes(rr * 10 + c + 1)));
+                                if (on('COL-RUN') && full.length > 1) out.push(`COL-RUN ${key} lesson ${size} seed ${s} p${pi + 1}: rows-of-ten grid ${wi + 1} (${lo}-${hi}) has ${full.length} columns blank all the way down (at most 1)`);
+                            });
+                        });
                         // LESSON-SECTIONS (critic blanks r5 G1): the chart lesson teaching sheet prints Guided (>= 1 window) and
                         // Independent (>= 2 windows) - a placement that drops a section fails here, never silently.
                         if (packet && on('LESSON-SECTIONS') && /chart/.test(skillId)) {
@@ -531,7 +556,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
