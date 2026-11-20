@@ -14757,6 +14757,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-guided-gdpcap",
+   "check": "ws-empty-band EB-GDPCAP + EB-BAND on the long-multiplication Guided L: at most 6 scored tries (§12.1), and the trimmed page's row never stretched into a band over 30 %",
+   "kind": "commit-pair",
+   "rule": "PAGE_TYPES §12.1 ceiling (sharded precritic 2026-11-20, lf-ops sizes: mult_2by2_standard / mult_3by2_standard Guided L, 8 tries)",
+   "browser": true,
+   "fail": {
+    "commit": "38a82f147",
+    "state": "sizes branch: page 2 kept two whole rows past the ceiling (Model + 8 tries); page 1 cells 1.3 x their ink"
+   },
+   "pass": {
+    "commit": "825046897",
+    "state": "guided.js: no slack past the ceiling (Model + 5 tries in whole rows); long-multiplication footprint noStretch - the rows keep their measured height"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_2by2_standard,multiplication:mult_3by2_standard --roles guided --sizes L --hosts none --only EB-GDPCAP,EB-BAND 2>&1 | grep -E '^ws-empty-band: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
