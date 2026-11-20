@@ -11995,7 +11995,7 @@
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/lesson-pages/pass.json",
-    "state": "PLANTED fixed lesson (no lf-engine fix exists yet): the same summaries with every header-only page holding cells; re-point to the lf-engine fix commit when it lands"
+    "state": "lf-engine fix a0986da35 measured (the same 46 lessons): the empty anchor-chart part dropped, every first page holds cells"
    },
    "command": "node tests/scripts/ws-lesson-pages.mjs --rules LESSON-EMPTY-FIRST --fixture {fixture}",
    "expect": {
@@ -12015,7 +12015,7 @@
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/lesson-pages/pass.json",
-    "state": "PLANTED fixed lesson (no lf-engine fix exists yet): Y4.B4's openers made distinct items; re-point to the lf-engine fix commit when it lands"
+    "state": "lf-engine fix a0986da35 measured: Y4.B4 openers are an ordinary fact of each lesson's own table, the factor moving with the step (e.g. S2 5 x 6, S3 6 x 7 ...)"
    },
    "command": "node tests/scripts/ws-lesson-pages.mjs --rules LESSON-OPENER-SAME --blocks Y4.B4 --fixture {fixture}",
    "expect": {
