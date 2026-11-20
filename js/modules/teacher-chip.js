@@ -373,7 +373,8 @@ export function lessonPageDoc(id, build) {
         if (hit) return hit;
         const run = pageChain.then(() => { window.__mqLessonPageBuilds = (window.__mqLessonPageBuilds || 0) + 1; return build(id); });
         pageChain = run.catch(() => null);
-        return run.then((doc) => { if (doc) pagePut(k, doc); return doc; });
+        // stored before it is drawn, so a reload right after finds it
+        return run.then(async (doc) => { if (doc) await pagePut(k, doc); return doc; });
     }).catch(() => null);
     PAGE_MEM.set(k, p);
     p.then((doc) => { if (!doc) PAGE_MEM.delete(k); });

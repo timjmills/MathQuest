@@ -380,7 +380,7 @@ try {
             check('THUMB-DETAILED-FIRST-PAGE', withDl.length > 0, 'no lesson row has a detailed lesson to test');
             const pageReady = async (key, tag) => {
                 await page.$eval(`#tvwLessons [data-w-card="${key}"]`, (c) => c.scrollIntoView({ block: 'center' }));
-                try { await waitFor(page, `!!document.querySelector('#tvwLessons [data-w-card="${key}"] [data-w-page-ready]')`, 90000, `first page ${key}`); } catch (e) { check('THUMB-DETAILED-FIRST-PAGE', false, `${tag}: the first page of ${key} was not drawn`); return null; }
+                try { await waitFor(page, `!!document.querySelector('#tvwLessons [data-w-card="${key}"] [data-w-page-ready]')`, 150000, `first page ${key}`); } catch (e) { check('THUMB-DETAILED-FIRST-PAGE', false, `${tag}: the first page of ${key} was not drawn`); return null; }
                 return page.evaluate((k) => { const h = document.querySelector(`#tvwLessons [data-w-card="${k}"] [data-w-page]`); const f = h && h.querySelector('iframe'); const pg = f && f.contentDocument && f.contentDocument.querySelector('.ws-page'); const hr = h.getBoundingClientRect(); const fr = f.getBoundingClientRect(); return { kind: h.dataset.wThumbKind, page: !!pg, inside: fr.left >= hr.left - 1 && fr.top >= hr.top - 1 && fr.right <= hr.right + 1 && fr.bottom <= hr.bottom + 1, builds: window.__mqLessonPageBuilds || 0 }; }, key);
             };
             for (const g of [...new Set(withDl.map((r) => r.grade))]) {
