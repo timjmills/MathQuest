@@ -49,7 +49,7 @@ function instrSlotsInPage(html) {
     root.querySelectorAll('style, script, [data-ws-teacher]').forEach((e) => e.remove());
     // text nodes joined with a space: a Steps number ("1") and its words ("Count.") are two elements, never "1Count."
     const txt = (e) => { if (!e || !e.nodeType) return String((e && e.textContent) || '').trim(); const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); const out = []; for (let n = w.nextNode(); n; n = w.nextNode()) out.push(n.textContent); return out.join(' ').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim(); };
-    const INSTR = '.ws-instrline, [data-ws-instruction], .ws-strip > span, .ws-steps li, .mq-lstrip li, .mq-chead, .p-prompt';
+    const INSTR = '.ws-instrline, [data-ws-instruction], .ws-strip > span, .ws-steps li, .mq-lstrip li, .mq-chead, .p-prompt, [data-ws-prompt]';
     const isInstr = (e) => !e.closest('.ws-strip--say, .mq-cchant, .ws-sayframe') && !e.classList.contains('mq-quadscore')
         && !(e.parentElement && e.parentElement.classList.contains('ws-strip') && /^Rule:?$/i.test(txt(e.parentElement.querySelector('b') || { textContent: '' })));
     const findings = [];
@@ -113,6 +113,7 @@ function instrSlotsInPage(html) {
                 for (const nm of [...new Set(names)]) {
                     const word = nm.split(' ')[0];
                     if (!named.some((x) => x.startsWith(`${word} `))) continue;   // the instruction names no "Term N": not judged
+                    if (new RegExp(`\\b(each|every|all) ${word}s?\\b`, 'i').test(all)) continue;   // "Write how many each term has"
                     if (!named.includes(nm)) findings.push({ rule: 'SLOT-NAME', page: pno, msg: `${where}: a slot for "${nm}" that the instruction never names (it names ${[...new Set(named)].join(', ')}): "${all.slice(0, 100)}"` });
                 }
             }
