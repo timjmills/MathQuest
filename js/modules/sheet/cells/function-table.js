@@ -591,7 +591,9 @@ const SIDE_MACHINE_MM = 54;
  * the drawing starts below the keep-out. Down, not right: a wider drawing pushed a lesson model's steps past its cell
  * (ws-detailed-lesson E40). A cell without a tab (a twin, a chart) keeps its top.
  */
-const koPad = (g) => (g.screen ? '' : ';padding-top:max(0mm, calc(var(--ws-ko, 0mm) - 4.5mm))');
+// (Error analysis - `options.fix` - places its own "<Name> wrote:" tag above the work, clear of the tab: the pad there pushed
+// the table 5 mm under that tag at L, ws-cell-checks PUPILTAG x8, PT-ERR-4 2-4 mm; patterns precritic 2026-11-20 A7)
+const koPad = (g, ctx) => (g.screen || fixMode(ctx) ? '' : ';padding-top:max(0mm, calc(var(--ws-ko, 0mm) - 4.5mm))');
 const WIDE_GAP_MM = 8;
 const WIDE_MAX_MM = 132;
 function sideWidth(p, g, d, ctx) {
@@ -657,7 +659,7 @@ register('function-table', {
             inner = `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(WIDE_GAP_MM)}">`
                 + `<div>${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
                 + `<div style="display:flex;flex-direction:column;align-items:center">${sideHtml}</div></div>`;
-            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g, ctx)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
         }
         const merged = ruleInMachine(p, g, d, ctx);
         if (merged) inner += machine(p, g, d, wMm, ruleAnswer(p, g, d, vals, ink, slots, ctx, fx, 'merged'));
@@ -679,7 +681,7 @@ register('function-table', {
             if (p.check && slotsById.chk && !p._noCheck) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(1.2)};text-align:center;line-height:1.2">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
-        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g, ctx)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const slots = ftSlots(p);
