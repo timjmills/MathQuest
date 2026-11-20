@@ -756,6 +756,8 @@ export const SKILL_STANDARDS = {
     'fractions:compare_fractions_nl': { ccss: ['3.NF.A.3d', '3.NF.A.2'], ee: ['M.EE.3.NF.3'] }, // Compare Fractions on a Number Line
     'fractions:equivalent_or_not': { ccss: ['4.NF.A.1'], ee: ['M.EE.4.NF.1'] }, // Equivalent Fractions: Yes or No?
     'fractions:simplify_with_gcf': { ccss: ['6.NS.B.4', '4.NF.A.1'], ee: ['M.EE.4.NF.1'] }, // Simplify Fractions Using the Greatest Common Factor
+    'fractions:mixed_numbers_intro': { ccss: ['4.NF.B.3b', '3.NF.A.1'], ee: ['M.EE.4.NF.3', 'M.EE.3.NF.1'] }, // Partition a Mixed Number (2026-11-20, lane lf-algebra; WRM Y4.B7.S3, school grade 3)
+    'fractions:write_mixed_from_parts': { ccss: ['4.NF.B.3b', '3.NF.A.1'], ee: ['M.EE.4.NF.3', 'M.EE.3.NF.1'] }, // Write a Mixed Number from Wholes and a Fraction (preset 2026-11-20: mixed_numbers_intro, mnTask compose)
     'fraction_operations:unit_frac_div_whole': { ccss: ['5.NF.B.7a'], ee: [] }, // Divide a Unit Fraction by a Whole Number
     'fraction_operations:whole_div_unit_frac': { ccss: ['5.NF.B.7b'], ee: [] }, // Divide a Whole Number by a Unit Fraction
     'decimals:div_decimal_by_whole': { ccss: ['5.NBT.B.7'], ee: ['M.EE.5.NBT.7'] }, // Divide a Decimal by a Whole Number

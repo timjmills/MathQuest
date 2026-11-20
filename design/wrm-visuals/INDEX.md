@@ -215,7 +215,7 @@ the first entry.
 | V161 | Short multiplication column; expanded partial-product column | Y4 R38 (MATCH / GAP) | 2 | PARTIAL | `template:stack`, `multiplication:multiply`, `multiplication:mult_missing_digit` | `vis_stack_layouts`*, `vis_carry_below`* | `operations` |
 | V162 | Area by unit squares (half squares; same area) | Y4 R43, Y6 N31 | 5 | PARTIAL | `area_perimeter:area_unit_squares`, `area_perimeter:area` | `area_compare`, `same_area`, `vis_migrate_area_volume`* | `geometry` |
 | V163 | Regular polygons with equal-side hatch marks | Y4 R46 | 3 | GAP | `area_perimeter:perimeter` | `regular_polygon`, `polygons` | `geometry` |
-| V164 | Mixed numbers / improper fractions across several wholes | Y4 R50 | 9 | PARTIAL | `fractions:mixed_improper_visual`, `fractions:improper_mixed` | `vis_frac_bar_modes`*, `frac_beyond_1` | `fractions` |
+| V164 | Mixed numbers / improper fractions across several wholes | Y4 R50 (PARTIAL (S3 MATCH 2026-11-20: the stacked bars of `fractions:mixed_numbers_intro`)) | 9 | PARTIAL | `fractions:mixed_improper_visual`, `fractions:improper_mixed` | `vis_frac_bar_modes`*, `frac_beyond_1` | `fractions` |
 | V165 | Fraction counters ringed into wholes | Y4 R56 | 1 | GAP | `template:counters`, `fractions:improper_mixed` | `vis_migrate_fraction_ops`* | `fractions` |
 | V166 | Tenths pictured (bar, frame, 0–1 line) | Y4 R59 | 4 | PARTIAL | `decimals:decimal_nl_drag` | `vis_frac_bar_modes`*, `decimal_pv` | `fractions` |
 | V167 | Decimal place-value chart and counters (Tth, Hth, Thth) | Y4 R60, Y4 R61, Y5 N5-03, Y6 N01 | 39 | GAP | `template:pv`, `placevalue:expand`, `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:value` | `vis_pv_decimal_places`*, `decimal_pv`, `thousandths_pv` | `placevalue` |
@@ -301,7 +301,7 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `frac_nl_equiv` Equivalent Fractions on a Number Line (option) | `fractions` | White Rose audit | V056 | 12 |
 | `vis_operator_arcs` Operator Arcs (pane) | `fractions` | added from visual catalogue | V187 | 12 |
 | `percent_multi` Percentages: Multi-Step and Missing Values (option) | `fractions` | White Rose audit | V196 | 11 |
-| `frac_beyond_1` Fractions Beyond 1 | `fractions` | White Rose audit | V164 | 9 |
+| `frac_beyond_1` Fractions Beyond 1 (option) | `fractions` | White Rose audit | V164 | 9 |
 | `ratio_problems` Ratio and Proportion Problems | `fractions` | White Rose audit | V028 | 8 |
 | `scale` Scale Drawing and Scale Factors | `fractions` | White Rose audit | V173, V197 | 5 |
 | `frac_count` Count in Fractions | `fractions` | White Rose audit | V093 | 1 |

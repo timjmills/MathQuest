@@ -161,7 +161,8 @@ export const WRM_SPECS = {
     frac_amount_wp: S(['find a part of an amount (bar model)', 'find the whole from a part', 'compare two fractions of amounts', 'story with a fraction of an amount'],
         ['word-work', 'frac-model'], 'write the missing value', 'O2 unit fractions → non-unit → find the whole · O3 bar split and labelled → none · O6 bar / plain',
         ['divides by the numerator', 'multiplies the amount by the denominator'], ['bar-model']),
-    frac_beyond_1: S(['count beyond 1 in fractions', 'wholes and a fraction (partition a mixed number)', 'mixed number on a number line', 'improper and mixed together'],
+    // (2026-11-20: 'wholes and a fraction (partition a mixed number)' is built - fractions:mixed_numbers_intro)
+    frac_beyond_1: S(['count beyond 1 in fractions', 'mixed number on a number line', 'improper and mixed together'],
         ['frac-model', 'number-line'], 'write the mixed number or improper fraction', 'O2 halves → quarters → eighths; to 2 → to 5 · O3 wholes shaded solid → none · O6 bars / circles / line',
         ['writes 1 1/4 as 11/4', 'counts all parts as the denominator']),
     frac_add_multi: S(['add three fractions, same denominator', 'add a fraction to a mixed number', 'subtract from a whole (3 − 3/4)', 'total past 1'],

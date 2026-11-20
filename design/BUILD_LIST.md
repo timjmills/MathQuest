@@ -19,7 +19,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 278 entries: **132 new skills, 90 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
+- 278 entries: **131 new skills, 91 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
 - 162 from the White Rose audit (42 extended for standards), 62 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
@@ -32,7 +32,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 44 | 19 | 12 | 1 | 12 | 23 | 50 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 8 | 36 | 23 | 327 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 13 | 11 | 0 | 4 | 17 | 20 | 17 | 104 |
-| Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
+| Fractions, decimals, conversions, ratio (`fractions`) | 45 | 16 | 22 | 0 | 7 | 19 | 48 | 23 | 233 |
 | Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
 | Measurement (length, mass, capacity, conversions) (`measurement`) | 23 | 12 | 9 | 0 | 2 | 14 | 34 | 11 | 74 |
 | Time and money (`timemoney`) | 17 | 10 | 5 | 0 | 2 | 8 | 30 | 18 | 81 |
@@ -1734,21 +1734,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **After:** `vis_frac_line_modes`.
 - **Visual catalogue:** also draws V056 Two stacked fraction lines; multi-labelled line (F, D, %) (reach 12 steps).
 
-### 10. Fractions Beyond 1 — `frac_beyond_1`
-
-- **What:** new skill `fractions:mixed_numbers_intro`. Grade 3 · family fractions · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 4.NF.B.3, 3.NF.A.3, 4.NF.A.2, EE M.EE.3.NF.1, M.EE.4.NF.3, M.EE.3.NF.3, M.EE.4.NF.2
-- **Closes (White Rose steps):** Y4.B7.S2, Y4.B7.S3, Y4.B7.S5
-- **Teaches:** counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line.
-- **Problem types:** (1) count beyond 1 in fractions; (2) wholes and a fraction (partition a mixed number); (3) mixed number on a number line; (4) improper and mixed together.
-- **Representation:** bar and number-line models with wholes shaded; write the mixed number. Templates: `frac-model`, `number-line`.
-- **Answer:** write the mixed number or improper fraction.
-- **Ladder:** O2 halves → quarters → eighths; to 2 → to 5 · O3 wholes shaded solid → none · O6 bars / circles / line.
-- **Misconceptions:** writes 1 1/4 as 11/4; counts all parts as the denominator.
-- **After:** `vis_frac_bar_modes`.
-- **Visual catalogue:** also draws V164 Mixed numbers / improper fractions across several wholes (reach 9 steps).
-
-### 11. Percentages: Multi-Step and Missing Values (option) — `percent_multi`
+### 10. Percentages: Multi-Step and Missing Values (option) — `percent_multi`
 
 - **What:** option on `conversions:percent_of_number`: multi-step. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
@@ -1761,7 +1747,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** adds the percent as a number (40 + 30% = 70); finds 30% and stops for an increase.
 - **Visual catalogue:** also draws V196 Percentage bar (reach 11 steps).
 
-### 12. Operator Arcs (pane) — `vis_operator_arcs`
+### 11. Operator Arcs (pane) — `vis_operator_arcs`
 
 - **Added from visual catalogue.** pane · grade 4-5 · lane `fractions`.
 - **Build:** a new pane:operator-arcs: an arc with an operator box above and below a pair (× n / ÷ n on numerator and denominator, + / − between numbers, the 2 × 2 proportion arrow box), a support value on the equivalence, percent and double-line skills.
@@ -1771,7 +1757,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Reach:** 12 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 13. Double and Triple Number Lines — `vis_double_scale`
+### 12. Double and Triple Number Lines — `vis_double_scale`
 
 - **Added from visual catalogue.** template · grade 1-5 · lane `fractions`.
 - **Build:** a new double-scale template: two or three aligned scales (kg | g, m | cm, h | min; fraction | decimal | percent; a ratio) with blanks on either row and operator arcs above / below; conversions:double_num_line leaves the legacy path.
@@ -1781,6 +1767,20 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Reach:** 20 White Rose small steps use these pictures.
 - **After:** `vis_operator_arcs`.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 13. Fractions Beyond 1 (option) — `frac_beyond_1`
+
+- **What:** option on `fractions:mixed_numbers_intro`: count beyond 1 and mixed numbers on a line. Grade 3 · family fractions · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 3.NF.A.3, 4.NF.A.2, EE M.EE.3.NF.1, M.EE.3.NF.3, M.EE.4.NF.2
+- **Closes (White Rose steps):** Y4.B7.S2, Y4.B7.S5
+- **Teaches:** counting beyond 1 in fractions and mixed numbers on a number line.
+- **Problem types:** (1) count beyond 1 in fractions; (2) mixed number on a number line; (3) improper and mixed together.
+- **Representation:** bar and number-line models with wholes shaded; write the mixed number. Templates: `frac-model`, `number-line`.
+- **Answer:** write the mixed number or improper fraction.
+- **Ladder:** O2 halves → quarters → eighths; to 2 → to 5 · O3 wholes shaded solid → none · O6 bars / circles / line.
+- **Misconceptions:** writes 1 1/4 as 11/4; counts all parts as the denominator.
+- **After:** `vis_frac_bar_modes`.
+- **Visual catalogue:** also draws V164 Mixed numbers / improper fractions across several wholes (reach 9 steps).
 
 ### 14. Count in Fractions — `frac_count`
 

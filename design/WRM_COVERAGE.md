@@ -22,9 +22,9 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
+- Covered 514 (59%), partial only 152 (17%), gap 206 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 404 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 406 skills carry WRM tags. 162 proposals (119 new skills, 43 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -32,10 +32,10 @@ Sources:
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 19 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
-| Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
+| Year 4 | 3 | 14 | 129 | 82 (64%) | 19 | 28 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 23 | 32 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **151** | **208** |
+| **All** | | **97** | **872** | **514 (59%)** | **152** | **206** |
 
 ## Source disagreements
 
@@ -186,7 +186,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Strengthens: Y6.B9.S9  
   _proposal id: percent_multi_
 
-### fractions (18 proposals, 28 steps)
+### fractions (18 proposals, 27 steps)
 
 - **Count in Fractions** — new skill `fractions:count_in_fractions`. Teaches counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4). Representation: a number line with fraction ticks; fill the missing counts.  
   Closes (4): Y2.B8.S15 Count in fractions up to a whole; Y3.B6.S8 Count in fractions on a number line; Y3.B6.S9 Equivalent fractions on a number line; Y4.B7.S9 Equivalent fractions on a number line  
@@ -194,12 +194,12 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Equal and Unequal Parts** — new skill `fractions:equal_parts`. Teaches parts and wholes; deciding whether parts are equal; finding the whole from a part. Representation: shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter.  
   Closes (3): Y2.B8.S1 Introduction to parts and whole; Y2.B8.S2 Equal and unequal parts; Y2.B8.S9 Find the whole  
   _proposal id: fraction_parts_
-- **Fractions Beyond 1** — new skill `fractions:mixed_numbers_intro`. Teaches counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line. Representation: bar and number-line models with wholes shaded; write the mixed number.  
-  Closes (3): Y4.B7.S2 Count beyond 1; Y4.B7.S3 Partition a mixed number; Y4.B7.S5 Compare and order mixed numbers  
-  _proposal id: frac_beyond_1_
 - **Halves and Quarters** — new skill `fractions:halves_and_quarters`. Teaches finding and recognising a half and a quarter of a shape, an object and a small quantity (equal parts, 2 or 4). Representation: shapes and small sets of objects; shade or circle a half/quarter; tick if the parts are equal.  
   Closes (2): Y1.B10.S3 Recognise a half of a quantity; Y1.B10.S7 Recognise a quarter of a quantity  
   _proposal id: half_quarter_
+- **Fractions Beyond 1 (option)** — option on `fractions:mixed_numbers_intro`: count beyond 1 and mixed numbers on a line. Teaches counting beyond 1 in fractions and mixed numbers on a number line. Representation: bar and number-line models with wholes shaded; write the mixed number.  
+  Closes (2): Y4.B7.S2 Count beyond 1; Y4.B7.S5 Compare and order mixed numbers  
+  _proposal id: frac_beyond_1_
 - **Add and Subtract More Fractions (option)** — option on `fraction_operations:add_fractions_like`: three addends and wholes. Teaches adding two or more fractions with the same denominator, adding fractions to mixed numbers, and subtracting from whole amounts (3 − 3/4). Representation: addend-count and "from a whole" options with a bar-model support.  
   Closes (2): Y4.B7.S11 Add two or more fractions; Y4.B7.S14 Subtract from whole amounts  
   _proposal id: frac_add_multi_
@@ -2658,18 +2658,19 @@ whatever happens to the WRM gaps.
 - **Y4.B7.S1** Understand the whole — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
   Vocabulary: whole, equal parts, denominator  
-- **Y4.B7.S2** Count beyond 1 — GAP. _3.NF.A.1, M.EE.3.NF.1_  
-  Proposal: Fractions Beyond 1  
+- **Y4.B7.S2** Count beyond 1 — PARTIAL. _3.NF.A.1, M.EE.3.NF.1_  
+  Partial: Write a Mixed Number from Wholes and a Fraction (`fractions:write_mixed_from_parts`), missing naming the mixed number from its wholes and its fraction (the counting-beyond-1 line is not built)  
+  Proposal: Fractions Beyond 1 (option)  
   Vocabulary: interval, mixed number, integer  
-- **Y4.B7.S3** Partition a mixed number — GAP. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
-  Proposal: Fractions Beyond 1  
+- **Y4.B7.S3** Partition a mixed number — covered. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
+  Skills: Partition a Mixed Number (`fractions:mixed_numbers_intro`)  
   Vocabulary: partition, mixed number, fractional part  
 - **Y4.B7.S4** Number lines with mixed numbers — covered. _3.NF.A.2, M.EE.3.NF.2_  
   Skills: Fractions on Number Line (Visual) (`composing:fraction_number_line`)  
   Vocabulary: interval, mixed number, midpoint  
 - **Y4.B7.S5** Compare and order mixed numbers — PARTIAL. _3.NF.A.3, 4.NF.A.2, M.EE.3.NF.3, M.EE.4.NF.2_  
   Partial: Compare Fractions (>, <, =) (`fractions:compare`), missing comparing and ordering mixed numbers  
-  Proposal: Fractions Beyond 1  
+  Proposal: Fractions Beyond 1 (option)  
   Vocabulary: whole number, numerator, compare  
 - **Y4.B7.S6** Understand improper fractions — covered. _3.NF.A.1, 3.NF.A.3c, M.EE.3.NF.1, M.EE.3.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`); Mixed ↔ Improper (Visual Pizza) (`fractions:mixed_improper_visual`)  

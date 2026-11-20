@@ -1135,6 +1135,10 @@ export const SKILL_WRM = {
     'division:div_sharing_word_problems': ['Y3.B3.S5'],
     'division:div_grouping_word_problems': ['Y3.B3.S5'],
     'fractions:simplify_with_gcf': ['Y6.B3.S1'],
+    // 2026-11-20 (lane lf-algebra, mixed-partition card): partition a mixed number; its preset writes the mixed number from
+    // its parts (S2's "name the mixed number", in part).
+    'fractions:mixed_numbers_intro': ['Y4.B7.S3'],
+    'fractions:write_mixed_from_parts': [{ step: 'Y4.B7.S2', partial: 'naming the mixed number from its wholes and its fraction (the counting-beyond-1 line is not built)' }],
     'fraction_operations:unit_frac_div_whole': ['Y6.B4.S3'],
     'decimals:div_decimal_by_whole': ['Y6.B8.S8'],
     'decimals:round_to_tenth': ['Y5.B7.S11'],
@@ -1531,13 +1535,16 @@ export const WRM_PROPOSALS = {
         family: 'fractions',
         steps: ['Y3.B8.S6'],
     },
+    // (2026-11-20, lane lf-algebra, mixed-partition card Q3: Y4.B7.S3 "partition a mixed number" is BUILT as the host
+    // fractions:mixed_numbers_intro; this entry keeps the rest - counting beyond 1 and mixed numbers on a number line - as
+    // an option of that host)
     frac_beyond_1: {
-        kind: 'new', skill: 'fractions:mixed_numbers_intro',
-        name: 'Fractions Beyond 1',
-        teaches: 'counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line',
+        kind: 'option', skill: 'fractions:mixed_numbers_intro', option: 'count beyond 1 and mixed numbers on a line',
+        name: 'Fractions Beyond 1 (option)',
+        teaches: 'counting beyond 1 in fractions and mixed numbers on a number line',
         representation: 'bar and number-line models with wholes shaded; write the mixed number',
         family: 'fractions',
-        steps: ['Y4.B7.S2', 'Y4.B7.S3', 'Y4.B7.S5'],
+        steps: ['Y4.B7.S2', 'Y4.B7.S5'],
     },
     frac_add_multi: {
         kind: 'option', skill: 'fraction_operations:add_fractions_like', option: 'three addends and wholes',

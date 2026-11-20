@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 732 live skills; 623 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 736 live skills; 627 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 278 entries — 132 new skills, 90 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 278 entries — 131 new skills, 91 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 62 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -286,12 +286,12 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 3 | **Compare Fractions With the Same Numerator or Denominator (option)** (`compare_numerator`) | option on `fractions:compare` | 3.NF.A.3d, M.EE.6.NS.1 | 1 |
 | 4 | **Compare Fractions of the Same Whole (option)** (`frac_same_whole`) | option on `fractions:compare` | 3.NF.A.3d, 4.NF.A.2 | - |
 | 5 | **Halves and Quarters** (`half_quarter`) | new `fractions:halves_and_quarters` | 1.G.A.3 | 2 |
-| 6 | **Fractions Beyond 1** (`frac_beyond_1`) | new `fractions:mixed_numbers_intro` | - | 3 |
-| 7 | **Multi-Step Fraction Problems** (`frac_multistep`) | new `fraction_operations:fraction_multi_step_problems` | 5.NF.A.2 | 1 |
-| 8 | **Equivalent Fractions on a Number Line (option)** (`frac_nl_equiv`) | option on `fractions:equiv_frac_visual` | 3.NF.A.3a | 1 |
-| 9 | **Multiply a Mixed Number by an Integer (option)** (`mult_mixed_int`) | option on `fraction_operations:mult_frac_whole` | 5.NF.B.6 | 1 |
-| 10 | **Divide Fractions by Fractions** (`div_frac_frac`) | new `fraction_operations:div_frac_frac` | 6.NS.A.1 | - |
-| 11 | **Add and Subtract More Fractions (option)** (`frac_add_multi`) | option on `fraction_operations:add_fractions_like` | - | 2 |
+| 6 | **Multi-Step Fraction Problems** (`frac_multistep`) | new `fraction_operations:fraction_multi_step_problems` | 5.NF.A.2 | 1 |
+| 7 | **Equivalent Fractions on a Number Line (option)** (`frac_nl_equiv`) | option on `fractions:equiv_frac_visual` | 3.NF.A.3a | 1 |
+| 8 | **Multiply a Mixed Number by an Integer (option)** (`mult_mixed_int`) | option on `fraction_operations:mult_frac_whole` | 5.NF.B.6 | 1 |
+| 9 | **Divide Fractions by Fractions** (`div_frac_frac`) | new `fraction_operations:div_frac_frac` | 6.NS.A.1 | - |
+| 10 | **Add and Subtract More Fractions (option)** (`frac_add_multi`) | option on `fraction_operations:add_fractions_like` | - | 2 |
+| 11 | **Fractions Beyond 1 (option)** (`frac_beyond_1`) | option on `fractions:mixed_numbers_intro` | - | 2 |
 | 12 | **Fraction Word Problems With Unlike Denominators (option)** (`frac_wp_unlike`) | option on `fraction_operations:frac_word_problems` | 5.NF.A.2 | - |
 | 13 | **Mixed Fraction Questions** (`mixed_frac_qs`) | new `fraction_operations:mixed_fraction_questions` | - | 2 |
 | 14 | **Fractions That Equal Whole Numbers (option)** (`whole_frac_reverse`) | option on `composing:whole_as_fraction` | 3.NF.A.3c | - |
@@ -1363,7 +1363,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.OA.C.7** — FULL. Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division (e.g., knowing that 8 × 5 = 40, one knows 40 ÷ 5 = 8) or properties of operations. By the end of Grade 3, know from memory all products of two one-digit numbers.  
   Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`); Division Facts (÷1 to ÷12) (`division:div_facts`)  
-  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `division:div_facts_long`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
+  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `division:div_facts_long`, `multiplication:mult_facts_15`, `division:div_facts_15`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
 *D. Solve problems involving the four operations, and identify and explain patterns in arithmetic.*
 
 - **3.OA.D.8** — FULL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
@@ -1392,7 +1392,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.NF.A.1** — FULL. Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts; understand a fraction a/b as the quantity formed by a parts of size 1/b.  
   Taught by: Identify Fractions (Visual) (`fractions:identify`); Write the Fraction Shown (`fractions:write_fraction`); Shade the Fraction (`fractions:shade_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
-  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`, `fractions:identify_fraction_nl`, `fractions:write_fraction_nl`
+  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`, `fractions:identify_fraction_nl`, `fractions:write_fraction_nl`, `fractions:mixed_numbers_intro`, `fractions:write_mixed_from_parts`
 - **3.NF.A.2** — FULL (from its parts). Understand a fraction as a number on the number line; represent fractions on a number line diagram.  
 -   **3.NF.A.2a** — FULL. Represent a fraction 1/b on a number line diagram by defining the interval from 0 to 1 as the whole and partitioning it into b equal parts. Recognize that each part has size 1/b and that the endpoint of the part based at 0 locates the number 1/b on the number line.  
   Taught by: Fractions on Number Line (Visual) (`composing:fraction_number_line`); Place Fractions on Number Line (`fractions:graph_fractions`); Place Fractions on a Number Line (`fractions:fraction_nl_drag`)  
@@ -1524,7 +1524,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.B.5** — PARTIAL. Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers, using strategies based on place value and the properties of operations. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   In part: Basic Multiplication (`multiplication:multiply`); Area Model Multiplication (`multiplication:area_model_mult`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
   Missing: a 4-digit number × a 1-digit number (the sizes stop at 3 × 1); a dedicated standard-algorithm skill with the sizes 2 × 1 to 3 × 2 (owner 2026-10-17) → `mult_4x1`, `mult_standard`  
-  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`, `multiplication:area_model_2by1`, `multiplication:area_model_3by1`
+  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`, `multiplication:mult_facts_15`, `multiplication:area_model_2by1`, `multiplication:area_model_3by1`
 - **4.NBT.B.6** — FULL. Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Basic Division (`division:divide`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`); Division with Remainders (Visual) (`division:div_remainders`) — divide at tiles 41 is 4-digit ÷ 1-digit  
   Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_4by1_long`, `division:div_facts_long`, `number_sense:reasonable_quotients`
@@ -1546,8 +1546,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: Add Fractions (Like Denom) (Visual) (`fraction_operations:add_fractions_like`); Subtract Fractions (Like Denom) (Visual) (`fraction_operations:sub_fractions_like`); Fraction Bar Operations (Visual) (`fractions:fraction_bar_ops`)  
   Also tagged: `fractions:compose_target_frac`, `fraction_operations:add_frac_like_nv`, `fraction_operations:sub_frac_like_nv`
 -   **4.NF.B.3b** — FULL. Decompose a fraction into a sum of fractions with the same denominator in more than one way, recording each decomposition by an equation. Justify decompositions, e.g., by using a visual fraction model. Examples: 3/8 = 1/8 + 1/8 + 1/8 ; 3/8 = 1/8 + 2/8 ; 2 1/8 = 1 + 1 + 1/8 = 8/8 + 8/8 + 1/8.  
-  Taught by: Decompose to Unit Fractions (Visual) (`fraction_operations:decompose_fractions`); Decompose to Unit Fractions (No Visuals) (`fraction_operations:decompose_frac_nv`); Compose a Target Fraction (`fractions:compose_target_frac`)  
-  Also tagged: `fractions:improper_mixed`, `fractions:mixed_improper_visual`
+  Taught by: Decompose to Unit Fractions (Visual) (`fraction_operations:decompose_fractions`); Decompose to Unit Fractions (No Visuals) (`fraction_operations:decompose_frac_nv`); Compose a Target Fraction (`fractions:compose_target_frac`); Partition a Mixed Number (`fractions:mixed_numbers_intro`)  
+  Also tagged: `fractions:improper_mixed`, `fractions:mixed_improper_visual`, `fractions:write_mixed_from_parts`
 -   **4.NF.B.3c** — FULL. Add and subtract mixed numbers with like denominators, e.g., by replacing each mixed number with an equivalent fraction, and/or by using properties of operations and the relationship between addition and subtraction.  
   Taught by: Add Mixed Numbers (Like Denom) (Visual) (`fraction_operations:add_mixed_like`); Subtract Mixed Numbers (Like Denom) (Visual) (`fraction_operations:sub_mixed_like`)  
   Also tagged: `fractions:improper_mixed`, `fractions:mixed_improper_visual`, `fraction_operations:add_mixed_like_nv`, `fraction_operations:sub_mixed_like_nv`
@@ -1663,7 +1663,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `multiplication:mult_2by2_standard`
 - **5.NBT.B.6** — FULL. Find whole-number quotients of whole numbers with up to four-digit dividends and two-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`); Zero in the Quotient (`division:div_zero_in_quotient`)  
-  Also tagged: `division:div_3by2_long`
+  Also tagged: `division:div_3by2_long`, `division:div_facts_15`
 - **5.NBT.B.7** — PARTIAL. Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.  
   In part: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`); Multiplying Decimals (`decimals:mult_decimal`); Dividing Decimals (`decimals:div_decimal`)  
   Missing: concrete models or drawings for decimal operations, related to the written method → `decimal_models`, `dec_known_facts`  
@@ -2100,7 +2100,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **M.EE.4.NF.2** — FULL. Identify models of one half (½) and one fourth (¼). (CCSS 4.NF.A.2)  
   Taught by: Identify Fractions (Visual) (`fractions:identify`); Benchmark Fractions (0, ¼, ½, ¾, 1) (`fractions:benchmark_fractions`)  
 - **M.EE.4.NF.3** — FULL. Differentiate between whole and half. (CCSS 4.NF.B.3)  
-  Taught by: Identify Fractions (Visual) (`fractions:identify`)  
+  Taught by: Identify Fractions (Visual) (`fractions:identify`); Partition a Mixed Number (`fractions:mixed_numbers_intro`)  
 - **M.EE.4.MD.1** — FULL. Identify the smaller measurement unit that comprises a larger unit within a measurement system including inches/foot, centimeter/meter, minutes/hour. (CCSS 4.MD.A.1)  
   Taught by: Customary Length (in/ft/yd/mi) (`measurement:length_customary`); Metric Length (mm/cm/m/km) (`measurement:length_metric`); Measurement Conversions (Visual) (`measurement:unit_conversions`)  
 - **M.EE.4.MD.2** — PARTIAL. Apply concepts of measurement. (CCSS 4.MD.A.2)  
