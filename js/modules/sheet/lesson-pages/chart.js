@@ -462,16 +462,36 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // 12-13 pt. It is now REPORTED: sizing.fallback, and sizing.ok false when the zoom is under 1, so the host fails the
     // build result and the compiler refuses the chart. The drawing itself is unchanged.)
     let fallback = false;
+    // CELL-FITS (lead via lf-engine 2026-11-20): panels that do not fit one page even at zoom 1 were drawn at zoom 1 anyway
+    // and ran over the Say band, the footer and the page edge (sizing said ok: the zoom was 1). Without a tail band they now
+    // run onto as many chart pages as they need, at full size (`perPage` panel rows a page); nothing shrinks.
+    let perPage = 0;
     if (mode === 'one') {
         const z1 = solve((q) => lay.rows * H(q), availP, 1, zMax);
         if (z1) z = z1;
+        else if (!tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
     }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
+    const more = [];   // (the chart pages after the first, when its panels run on: perPage)
     let rowH;
     let room;
-    if (mode === 'grid3') {
+    if (perPage) {
+        room = availP;
+        rowH = H(1);
+        // (a page before the last has the Say and Rule bands' room too: perPage rows; the last page holds what fits above them)
+        const per = perPage * cols;
+        const lastPer = Math.max(1, Math.floor(availP / H(1))) * cols;
+        const cuts = [];
+        for (let k = 0; k < states.length; k += per) cuts.push(states.slice(k, k + per));
+        const tail0 = cuts[cuts.length - 1];
+        if (tail0.length > lastPer) cuts.splice(cuts.length - 1, 1, tail0.slice(0, tail0.length - lastPer), tail0.slice(tail0.length - lastPer));
+        for (const [k, chunk] of cuts.entries()) {
+            const grid = gridPart(chunk.map((st) => withZoom(st, cols)), { cols, rows: Math.ceil(chunk.length / cols), cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
+            (k === 0 ? sections : (more[more.length] = [])).push(grid);
+        }
+    } else if (mode === 'grid3') {
         room = availAll;
         const hr = rowsAt(z);
         const tot = sum(hr);
@@ -513,13 +533,14 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const sayN = data && data.sayWords ? pvNumberOf(example) : null;
     // (`chartSay(q)`, lesson data - the detailed lesson maker, lesson 5 r3: the chart's Say in the lesson's own words, In / Out)
     const ownSay = data && typeof data.chartSay === 'function' && example ? (() => { try { return data.chartSay(example.q); } catch (e) { return ''; } })() : '';
-    sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
-    if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
+    const last = more.length ? more[more.length - 1] : sections;
+    last.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
+    if (chant) last.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
-        header, sections, zoom: z, second: shown, mode,
+        header, sections, more, zoom: z, second: shown, mode,
         // `ok`: drawn at its planned size - a fallback zoom under 1 is a FAILURE (lesson 7 D1; print-sheet chartSizing)
-        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
+        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), ...(perPage ? { pages: 1 + more.length } : {}), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
     };
 }
 

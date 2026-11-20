@@ -142,9 +142,20 @@ export function fitLessonData(data, example) {
  * the Steps). Authored lesson data decides chartWide itself and is returned unchanged.
  */
 function chartDataOf(data, example) {
-    if (data || !example) return data;
+    if (!example) return data;
     const fp = example.footprint || {};
-    return fp.maxCols === 1 || Number(fp.wMm) > 93 ? { chartWide: true, chartRow: false } : data;
+    const full = fp.maxCols === 1 || Number(fp.wMm) > 93;
+    if (!data) return full ? { chartWide: true, chartRow: false } : data;
+    // (an authored record: the example as MEASURED - it fits one across only, half a page is not enough - or its footprint)
+    const m2 = example.measured && example.measured[2];
+    const fullM = full || !!(m2 && m2.fits === false && example.measured[1] && example.measured[1].fits !== false);
+    // CELL-FITS (lead via lf-engine 2026-11-20): authored lesson data that does not decide `chartWide` itself was laid out by
+    // state count alone - four states, a 2 x 2 grid - so a full-width drawing (two_step_letter_equation's story, bars and
+    // "= n" equation) was squeezed into a half-width panel and ran past the page edge. A cell that needs full width gets a
+    // full-width panel: such a record takes the full-width rows. A record that sets chartWide (true or false) is unchanged.
+    // (the step head above the drawing, as the fallback lesson's: beside it - chartRow - the drawing wraps at 58 % of the width
+    // and two_step_letter_equation's panel grew from 120 to 147 mm)
+    return fullM && data.chartWide === undefined ? Object.assign({}, data, { chartWide: true, chartRow: false }) : data;
 }
 
 /**
@@ -480,6 +491,8 @@ function planOnce(input = {}) {
         secondShown = chart.second;
         chartSizing = chart.sizing;
         out.push({ header: chart.header, sections: chart.sections });
+        // (CELL-FITS: the panels that run on, each further chart page under the continuation header)
+        for (const secs of chart.more || []) out.push({ sections: [{ kind: 'html', html: '<i class="mq-cont" hidden></i>' }].concat(secs) });
     }
     if (part !== 'chart') pages.forEach((pg, i) => out.push({
         header: i === 0 ? frame.header : undefined,
