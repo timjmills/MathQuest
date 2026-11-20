@@ -14663,7 +14663,7 @@
    "kind": "commit-pair",
    "check": "critic d2d5 r1 L1: a detailed lesson's Prerequisite Check strips print on one line and its frame ends above the footer (DOM)",
    "rule": "ws-psc-lint PSC-LESSON",
-   "command": "node tests/scripts/ws-psc-lint.mjs --skills none --lessons g3-oa8-two-step-wp --lesson-seeds 4242,1 --only PSC-LESSON",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_2d_1d --sizes M --form A --lessons g3-oa8-two-step-wp --lesson-seeds 4242,1 --only PSC-LESSON",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

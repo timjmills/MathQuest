@@ -1012,7 +1012,7 @@ function buildPlan(ctx) {
         // critic 2026-10-30 (WRM Y4 lessons F1, GATE-DRIFT): a skill, option or preset change can turn a site-lesson claim false;
         // every year's lessonfit runs on any skill scope (node, about a minute)
         // PSC-TITLE / PSC-INSTR / PSC-DEAL (lf-roles critic D2-D4): the run's skills' Pre-skill Check pages
-        if (scriptPath('ws-psc-lint')) add(gate('psc-lint-skills', 'ws-psc-lint (PSC-TITLE, PSC-INSTR, PSC-STRIP1, PSC-TWIN(-MIX), PSC-DEAL on the run\'s skills, M / L, Forms A and B)', scope, 'browser', 'ws-psc-lint', ['--skills', keys.join(',')], { missingMsg: 'ws-psc-lint is not in this tree' }));
+        if (scriptPath('ws-psc-lint')) add(gate('psc-lint-skills', 'ws-psc-lint (PSC-TITLE, PSC-INSTR, PSC-STRIP1, PSC-TWIN(-MIX), PSC-DEAL on the run\'s skills, M / L, Forms A and B; PSC-LESSON on g3-oa8-two-step-wp)', scope, 'browser', 'ws-psc-lint', ['--skills', keys.join(',')], { missingMsg: 'ws-psc-lint is not in this tree' }));
         // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
         // at S / M / L, its option variants, and the screen hosts (card 1280 / 1366 / 820 / 1024, worksheet, quiz; owner 2026-11-13: no phone width), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json

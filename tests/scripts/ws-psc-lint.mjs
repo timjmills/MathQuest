@@ -9,7 +9,7 @@
 //                number line.", "(within 10, no pictures)"): two adjacent bands of one task kind SHARE one strip instead.
 //   PSC-STRIP1   (critic d2d5 r1 L1) every strip's instruction prints on ONE line at its width (the page's heights count one line).
 //   PSC-LESSON   (critic d2d5 r1 L1) a detailed lesson's Prerequisite Check pages (pupil and key, --lessons, seeds 4242 and 1;
-//                the critic's g3-oa8-two-step-wp by default on a full run): every strip on one line, and every band's bottom
+//                the critic's g3-oa8-two-step-wp by default, on every run): every strip on one line, and every band's bottom
 //                above the page's footer top (the frame never overprints the footer), measured in the DOM.
 //   PSC-TWIN-MIX (critic d2d5 r1 M2) a band merged from twin pools holds items of both pools, when both have items.
 //   PSC-TWIN     (lead A10) no two bands of one plan are dealt from the same skill (twin pools merge into one band).
@@ -175,7 +175,7 @@ async function main() {
         for (const l of lines) if (l.n > 1) F('PSC-STRIP1', `the strip "${l.t}" wraps to ${l.n} lines (the page counts one)`);
     }
     // (PSC-LESSON: a lesson's check deals perQuestion, its own path - its pages are measured as printed)
-    const lessons = arg('lessons', arg('skills', null) ? 'none' : 'g3-oa8-two-step-wp');
+    const lessons = arg('lessons', 'g3-oa8-two-step-wp');
     if (lessons !== 'none') {
         const conn = await require('puppeteer').connect({ browserWSEndpoint: app.browser.wsEndpoint(), protocolTimeout: 0, defaultViewport: null });
         const lp = (await conn.pages()).find((p) => p.url() === app.page.url());
