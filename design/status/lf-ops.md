@@ -41,3 +41,4 @@ Spend at the stop: session cost_usd $1,216.42 (2026-11-15) (baseline $756.09).
   - area_model_4by1 LONE-PAGE;
   - record the confirmed 4x1 deal decision in the card;
   - the full critic.
+- **Next week, after sizes (lead 2026-11-20): the STACK template footprint.** The shared stack cell (sheet/cells/stack.js) asks for more height than it draws. On the Pre-skill Check stack pages (sub_50 / 100 / 1k / 10k …), cells of 52–63 mm hold the stack's ink with empty bands above and below it (EB-BAND), even at the cell's own measured minimum. Fix the stack.js footprint / measure to the drawn height, check first. lf-roles' measurements are in design/status/lf-roles.md on -lf-roles-psc2.
