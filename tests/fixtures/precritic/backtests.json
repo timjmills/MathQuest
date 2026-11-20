@@ -15050,6 +15050,186 @@
     "commit": "5d028d66b",
     "state": "teacher classes (.tv-card, .tv-chip, .tv-menu, .tv-input, .tv-select) and --tv-* / token variables only"
    }
+  },
+  {
+   "id": "mws-keys",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "On each Save host (Print worksheets, simple print, online worksheet) focus stays in the Save dialog after every Tab and Shift+Tab; Esc closes only the dialog and focus returns to the host's Save button",
+   "rule": "ws-my-worksheets KEYS (lane lf-partopts, My Worksheets critic r1 F1)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only KEYS --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): over the simple print Shift+Tab leaves the dialog and Esc closes the simple print underneath (its document capture-phase onKey runs first)"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "the simple print ignores keys while a My Worksheets dialog is open; focus returns by the Save button's selector"
+   }
+  },
+  {
+   "id": "mws-menu-reach",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The ⋯ menu of the LAST card, opened by a real tap with the page at the bottom, at 1024x768, 1366x768 and 820x1180: every item inside the viewport and hit by elementFromPoint",
+   "rule": "ws-my-worksheets MENU-REACH (lane lf-partopts, My Worksheets critic r1 F2)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only MENU-REACH --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): the 9-item menu always opens downward: Edit to Delete are below the fold"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "the menu opens upward when there is more room above, and is scrolled whole into view"
+   }
+  },
+  {
+   "id": "mws-card-box",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Every element of every My Worksheets card lies inside the card's box (1 px), at every width",
+   "rule": "ws-my-worksheets CARD-BOX (lane lf-partopts, My Worksheets critic r1 F3)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only CARD-BOX --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): at 1366 the ⋯ button sticks out of each card by 5 px (1fr 1fr 48px)"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "minmax(0,1fr) columns; Send code on its own row"
+   }
+  },
+  {
+   "id": "mws-player-fresh",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Save on a freshly played online worksheet keeps the sheet on screen: the on-screen items equal page 1 of the saved sheet, in order (SAVE-REPRODUCE player-fresh)",
+   "rule": "ws-my-worksheets SAVE-REPRODUCE (lane lf-partopts, My Worksheets critic r1 F4)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SAVE-REPRODUCE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): playerSaveDraft saves the skills with its own seed: other items than the ones on screen"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "a teacher's fresh online worksheet is dealt from the request Save keeps (page 1, its seed)"
+   }
+  },
+  {
+   "id": "mws-play-lesson-msg",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Play on a saved detailed lesson either deals page 1's items or says \"Play opens the practice pages of this lesson.\" (INTERACTIVE-SAME tp-detailed)",
+   "rule": "ws-my-worksheets INTERACTIVE-SAME (lane lf-partopts, My Worksheets critic r1 F5)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only INTERACTIVE-SAME --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): a detailed lesson has no page-1 items; Play deals fresh practice silently"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "the lead's plain message as a toast"
+   }
+  },
+  {
+   "id": "mws-send-set",
+   "kind": "fixture",
+   "browser": true,
+   "check": "Send as a set puts one new set first in My sets with the sheet's de-duplicated skills and options, and leaves every other set byte-identical (ORGANISE)",
+   "rule": "ws-my-worksheets ORGANISE (lane lf-partopts, My Worksheets critic r1 F6)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only ORGANISE --widths 1280 --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mws-send-set.fail.js",
+    "state": "a mutation: writing My sets keeps only the newest set (Send as a set worked on 35bc9ebb5, so the check is proved on an injected defect)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mws-send-set.pass.js",
+    "state": "no mutation: My Worksheets as built"
+   }
+  },
+  {
+   "id": "mws-save-label",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The Save control reads \"Save to My Worksheets\" on Print worksheets, the simple print and the online worksheet, at 1280 and 820",
+   "rule": "ws-my-worksheets SAVE-LABEL (lane lf-partopts, My Worksheets critic r1 F7)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SAVE-LABEL --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): the simple print and the online worksheet read a bare \"Save\""
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "\"Save to My Worksheets\" on every host"
+   }
+  },
+  {
+   "id": "mws-card-conform",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Card S-3: Print, Play, Send code and ⋯ are visible buttons on each card face (F8); every record with a thumbnail has a page count, New mix included, and the meta line never repeats a phrase of the name (F9)",
+   "rule": "ws-my-worksheets CARD-CONFORM (lane lf-partopts, My Worksheets critic r1 F8, F9)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only CARD-CONFORM --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): Send code only in the ⋯ menu; the meta line repeats the page type and date of the default name; New mix copies lose their page count"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "Send code on the card; meta drops phrases in the name; the page count is made again with the thumbnail"
+   }
+  },
+  {
+   "id": "mws-touch-save",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The simple print's and the online worksheet's Save buttons are at least 48 x 48 at 820 and 1024 (TOUCH-WIDTH)",
+   "rule": "ws-my-worksheets TOUCH-WIDTH (lane lf-partopts, My Worksheets critic r1 F10)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only TOUCH-WIDTH --widths 820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): the online worksheet's Save is 70 x 44"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "min-height and min-width 48 px"
+   }
   }
  ]
 }
