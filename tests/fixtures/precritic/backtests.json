@@ -15490,6 +15490,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "lesson-player-hops-below",
+  "check": "ws-lesson-player --render --hops-below (A26, + A26b): at every width and I do step the count-on hops box never sits above the drawing, and where it shares the drawing's columns it starts >= 0.5 digit under the drawing's foot (beside is fine); at 820 portrait only, the answer row + the hops' room under it is reserved room (H13 <= 35 % without it, <= 47 % with it) that the last step inks in full",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player critic r3 F1 (lead rulings A26 / A26b 2026-11-20)",
+  "browser": true,
+  "fail": {
+   "commit": "68b6ba366",
+   "state": "player r3: at 820 the stacked hops '5 6 7' sat 11 px above the sum's ringed 5, over its columns (306-470 px vs the drawing from 481 px): read as a top row of the addition"
+  },
+  "pass": {
+   "commit": "862f96afe",
+   "state": "A26: stacked, the hops under the answer row, 0.6 digit below the drawing's foot; A26b reserved room at 820 portrait, inked by the last step"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --render --hops-below --widths 820,1024,1280",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }
