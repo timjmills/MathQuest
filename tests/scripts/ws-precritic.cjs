@@ -1046,6 +1046,9 @@ function buildPlan(ctx) {
         // (lf-algebra r10, critic r2 G5 / G6 / G8: the patterns cells against the page - Fix-it letters printed in the item, the card's
         // feature tile size, the growing row two across at S; OK (n/a) for a skill outside the patterns card)
         add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        // (lf-algebra after patterns critic r3 R3-1/2/3/6/7, lead ruling 2026-11-20: INSTR-SLOTS is general - a page's instruction
+        // and Steps match its slots: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME; browser, --strict on the run's skills)
+        add(gate('instr-slots', 'ws-instr-slots (INSTR-SLOTS: KIND-UNNAMED, VERB-ABSENT, SCREEN-VERB, ONE-PLACE, SLOT-NAME on 7 roles x M / L)', scope, 'browser', 'ws-instr-slots', ['--skills', keys.join(','), '--strict'], { missingMsg: 'ws-instr-slots is not in this tree' }));
         // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
         // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
         // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
