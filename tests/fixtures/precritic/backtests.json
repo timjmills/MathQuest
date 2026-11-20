@@ -12080,6 +12080,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-story-work",
+   "check": "ws-two-step STORY-WORK: the story tells exactly the work's numbers (Step 1's two, Step 2's number that is not the Step 1 answer), seeds 1-200, every two-step skill",
+   "kind": "commit-pair",
+   "rule": "STORY-WORK (critic GUIDED-NO-MID F1, 2026-11-20)",
+   "fail": {
+    "commit": "6c15f17bb",
+    "state": "tellTwoStep read s2.bottom as the box count; a x Step 2 whose Step 1 answer is the smaller factor stores it as bottom ('Lena has 4 boxes' over 4 x 6 = 24)"
+   },
+   "pass": {
+    "commit": "36c8fe65f",
+    "state": "the story and the worked-wrong Step 2 read the factor that is not the Step 1 answer"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules STORY-WORK --skill algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
