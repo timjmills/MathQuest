@@ -309,13 +309,17 @@ export function shortMultSteps(a, m) {
     const A = String(a).split('').reverse().map(Number);
     const out = [];
     let carry = 0;
+    // (one short line a step, its expression held together with no-break spaces: in a 2 x 2 chart panel the long form -
+    // "Tens: 9 × 3 = 27, + 2 regrouped = 29. Write 9. Regroup 2 into the hundreds." - wrapped after "=" and ran 22 mm
+    // out of its panel, print-lint WRAP-OP / OVERFLOW)
+    const nb = (t) => t.replace(/ ([×+=]) /g, '\u00a0$1\u00a0');
     A.forEach((d, i) => {
         const pr = d * m + carry;
-        const sum = carry ? `${d} × ${m} = ${d * m}, + ${carry} regrouped = ${pr}` : `${d} × ${m} = ${pr}`;
+        const sum = nb(carry ? `${d} × ${m} + ${carry} = ${pr}` : `${d} × ${m} = ${pr}`);
         const last = i === A.length - 1;
         if (!last && pr >= 10) {
             const up = Math.floor(pr / 10);
-            out.push(step(`${cap(MPLACE[i])}: ${sum}. Write ${pr % 10}. Regroup ${up} into the ${MPLACE[i + 1]}.`,
+            out.push(step(`${cap(MPLACE[i])}: ${sum}. Write ${pr % 10}, regroup ${up}.`,
                 [{ slot: MPLACE[i], value: String(pr % 10) }, { slot: `regroup:${MPLACE[i + 1]}`, value: String(up) }]));
         } else out.push(step(`${cap(MPLACE[i])}: ${sum}. Write ${pr}.`, [{ slot: MPLACE[i], value: String(last ? pr : pr % 10) }]));
         carry = last ? 0 : Math.floor(pr / 10);

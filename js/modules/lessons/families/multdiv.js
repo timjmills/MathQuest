@@ -298,7 +298,7 @@ export const ROUTINES = Object.freeze({
         ],
         vocab: [
             { word: 'multiply', meaning: 'the × sign: equal groups', picture: { kind: 'glyph', text: '×' } },
-            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
             { word: 'regroup', meaning: '10 ones become 1 ten', picture: { kind: 'trade' } },
         ],
         // (one step per place of the 4-digit number, then the product: shortMultSteps' five worked steps)
@@ -314,7 +314,12 @@ export const ROUTINES = Object.freeze({
             kind: 'numbered steps with icons + a chant',
             why: 'The error pupils make is adding the regrouped number before multiplying (or not at all); the chant says the order at step 2.',
         },
-        example: { match: 'Regroup' },
+        example: { match: 'regroup' },
+        // (five worked steps in a 2 x 2 chart: the drawing may go down to LR-15's 0.8 floor rather than past the Say band)
+        chartMinZoom: 0.8,
+        // (the product step writes nothing new - the thousands step already wrote every digit: the line under the four panels,
+        // so no panel holds two steps; print-lint OVERFLOW 22 mm / L-OVERLAP "Say:" when steps 1 and 2 shared panel 1)
+        tailLast: true,
     },
     'mult-column-2digit': {
         archetype: 'column',
@@ -357,9 +362,9 @@ export const ROUTINES = Object.freeze({
             { id: 'add', text: 'Add the parts: that is the product.' },
         ],
         vocab: [
-            { word: 'part', meaning: 'one place of the number', picture: { kind: 'text', text: '1,599 = 1,000 + 500 + 90 + 9' } },
+            { word: 'part', meaning: 'one place of the number', picture: { kind: 'text', text: '1,000 + 500' } },
             { word: 'area model', meaning: 'a rectangle split into parts', picture: { kind: 'text', text: '5 × 500 = 2,500' } },
-            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
         ],
         steps: [
             { icon: 'look', text: 'Split the number by place.' },
@@ -374,6 +379,9 @@ export const ROUTINES = Object.freeze({
             kind: 'numbered steps with icons + a chant',
             why: 'One step per part, so no part is dropped (the left-out-part error); the chant names the three moves.',
         },
+        // (lead A9: the area model is too wide for a half-page panel, so the chart prints one full-width panel a row; down to LR-15's
+        // 0.8 floor, two panel rows share a chart page instead of one, chart.js chartPage)
+        chartMinZoom: 0.8,
         example: { match: '^Split' },
     },
     'mult-area-2digit': {
@@ -387,7 +395,7 @@ export const ROUTINES = Object.freeze({
         vocab: [
             { word: 'part', meaning: 'one box: a place times a place', picture: { kind: 'text', text: '70 × 30 = 2,100' } },
             { word: 'row', meaning: 'a line of boxes going across', picture: { kind: 'array', rows: 1, cols: 4, mark: 'row' } },
-            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
         ],
         steps: [
             { icon: 'look', text: 'Split both numbers by place.' },
@@ -400,6 +408,9 @@ export const ROUTINES = Object.freeze({
             kind: 'numbered steps with icons + a chant',
             why: 'One step per row, so every box is filled (the left-out-part error); the chant names the three moves.',
         },
+        // (lead A9: the area model is too wide for a half-page panel, so the chart prints one full-width panel a row; down to LR-15's
+        // 0.8 floor, two panel rows share a chart page instead of one, chart.js chartPage)
+        chartMinZoom: 0.8,
         example: { match: '^Split' },
     },
 });
@@ -545,7 +556,7 @@ export const LESSONS = Object.freeze({
             vocab: [
                 { word: 'part', meaning: 'one box: a place times a place', picture: { kind: 'text', text: '20 × 100 = 2,000' } },
                 { word: 'row', meaning: 'a line of boxes going across', picture: { kind: 'array', rows: 1, cols: 3, mark: 'row' } },
-                { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
+                { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
             ],
         },
         warmup: [

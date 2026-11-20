@@ -509,7 +509,16 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         const zMin = data && Number(data.chartMinZoom) >= 0.8 && Number(data.chartMinZoom) < 1 ? Number(data.chartMinZoom) : 1;
         const z1 = solve((q) => lay.rows * H(q), availP, zMin, zMax);
         if (z1) z = z1;
-        else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) { z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1))); }
+        else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) {
+            z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1)));
+            // (`chartMinZoom`, lane lf-ops sizes A9: an area-model chart printed ONE full-width panel a chart page - 4 pages, each
+            // ~40 % blank; when a zoom down to the lesson's floor puts one more panel row on each page, it takes the largest such zoom)
+            if (zMin < 1) {
+                const rowsAt = (q) => Math.floor((availP + m.say + chantH) / H(q));
+                const zz = rowsAt(zMin) > perPage ? solve((q) => (rowsAt(q) > perPage ? 0 : 1), 0, zMin, 1) : 0;
+                if (zz) { z = zz; perPage = rowsAt(zz); }
+            }
+        }
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
     }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
