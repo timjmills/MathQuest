@@ -206,6 +206,19 @@ function geomRaw(p, ctx) {
     }
     let boxW = 14 + wide;
     let perRow = n;
+    // (lf-algebra r? A1, ws-cell-checks OVERFLOW on the number_patterns_rule lesson: a box train drawn in a panel of fixed height -
+    // the lesson chart's state panels and the We Do rows, which pass `cellLiveMm` - took two lines of four 23 mm tiles where its
+    // band reaches "1,057", and the second line ran 14 mm out of the panel. Before such a row wraps, its tiles give up their
+    // spare air (never their digits: the digit size is the one the standard tile set, `ptFix`) down to the widest number's
+    // glyph plus TRAIN_AIR_MM; only a row that still cannot stand on one line wraps, as before.)
+    const ptOf = (w) => Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18, (w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
+    const ptFix = ptOf(boxW);
+    // (critic r3 R3-8, AX-4: every paper sheet, not only a cellLiveMm panel - the practice rows wrapped 4 + 4 under a chart that
+    // stood the same 8 tiles on one line; ws-patterns-cells TRAIN-PARITY)
+    if (shape === 'box' && !isTwin(ctx) && n * boxW + (n - 1) * gap > live - tab + 1e-6) {
+        const tight = Math.max(14, trainGlyphMm(p, ptFix) + TRAIN_AIR_MM);
+        if (tight < boxW && n * tight + (n - 1) * gap <= live - tab + 1e-6) boxW = tight;
+    }
     // (lf-algebra options-verify --render, 2026-11-07: a circle / hexagon train tile grew past the box - S held 5 rows a page where
     // the box page holds 8; as on the arcs row, a shaped tile keeps the box's height and pitch: a circle as wide as the box is tall)
     const sz = shape === 'box' ? { w: boxW, h: baseH } : shape === 'circle' ? { w: Math.min(boxW, baseH), h: Math.min(boxW, baseH) } : { w: boxW, h: baseH };
@@ -221,8 +234,23 @@ function geomRaw(p, ctx) {
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
     const rows = Math.ceil(n / perRow);
-    const pt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18, (sz.w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
+    const pt = boxW === 14 + wide ? ptOf(sz.w) : ptFix;
     return { size, n, look, shape, w: sz.w, h: sz.h, pitch, gap, tab, tabBody, perRow, rows, arcH: 0, pt, hasLbl, lblH, lblPt };
+}
+
+/** A train tile's least air round its widest number (mm, both sides together): 2 mm a side in the key's bold. */
+const TRAIN_AIR_MM = 4;
+/**
+ * The printed width (mm) of the row's widest number at `pt` in Andika bold: a digit 0.555 em, a comma 0.28 em (measured
+ * 2026-11-20 in the lesson chart: "339" at 17.9 pt is 10.54 mm, "1,057" 15.81 mm). The band's widest number (`bandDigits` characters, "1,000"-style) counts too.
+ */
+function trainGlyphMm(p, pt) {
+    const em = pt * PT_MM;
+    const strs = (p.values || []).map((v) => fmt(v));
+    const bd = Number(p.bandDigits) || 0;
+    if (bd > 0) { const commas = Math.floor(bd / 4); strs.push('9'.repeat(bd - commas - commas) + ','.repeat(commas) + '9'.repeat(commas)); }
+    const w = (t) => [...String(t)].reduce((s, ch) => s + (/\d/.test(ch) ? 0.555 : ch === ',' ? 0.28 : 0.6), 0) * em;
+    return Math.max(0, ...strs.map(w));
 }
 
 /**

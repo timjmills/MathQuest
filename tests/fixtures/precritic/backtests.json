@@ -14139,6 +14139,406 @@
    }
   },
   {
+   "id": "notice-feature-onecol-h13",
+   "check": "ws-print-lint L-DENSITY H13: no pattern_features (notice patTask=feature) cell at M keeps a row taller than its ink by 30 % (Independent page)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (patterns precritic on master 2026-11-20, A2; ws-empty-band EB-BAND 29.8 % on the same rows)",
+   "browser": true,
+   "fail": {
+    "commit": "ddee858cc",
+    "state": "the measured 92 mm fit widened maxCols 1 to two across: one 2-across row (56 mm ink) over 1-across rows (43 mm), both grids spread - 25 mm band in 82.1 mm cells, x8"
+   },
+   "pass": {
+    "commit": "ee2191d25",
+    "state": "footprint hardCap: four 1-across rows of 53 mm for 43 mm of ink, 0 findings"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --skills patterns:pattern_features",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "notice-twin-digit-size",
+   "check": "ws-screen-ink-size TEXT-SIZE: the notice parity fact's digits on the practice card and quiz are at least the host digit size (56 px at 1280 / 1366, 48 px at 820 / 1024)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE (patterns precritic on master 2026-11-20, A5)",
+   "browser": true,
+   "fail": {
+    "commit": "ee2191d25",
+    "state": "parityCell sized the twin's digits with P (paper scale): '5' 52.8 px against 56 at 1280, 44.1 against 48 at 820; 16 findings"
+   },
+   "pass": {
+    "commit": "1e74b45fe",
+    "state": "the digits and sign in D (max(--mq-digit, paper scale)): 0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:notice_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-guided-tight-band",
+   "check": "ws-empty-band EB-BAND: no function_table_easy Guided cell at M / L keeps a band of 28 % or more under its table",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (patterns precritic 2026-11-20, A3a)",
+   "browser": true,
+   "fail": {
+    "commit": "7f5377d94",
+    "state": "the Guided rows stretched to 108.8 mm (M) / 156.4 mm (L) for ~72 / ~85 mm of table: EB-BAND 31-46 %, 4 findings"
+   },
+   "pass": {
+    "commit": "4053829a3",
+    "state": "footprint guidedTight: the rows keep their measure, 0 findings"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill algebra:function_table_easy --roles guided --sizes M,L --hosts none --vocab-ink --page-fill --margin 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-twin-label-size",
+   "check": "ws-screen-ink-size TEXT-SIZE: the function table's In / Out labels on the online worksheet are at least their print size",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE label (patterns precritic 2026-11-20, A3b)",
+   "browser": true,
+   "fail": {
+    "commit": "4053829a3",
+    "state": "\"In\" 15.5 px against 16.5 at every worksheet width, 16 findings"
+   },
+   "pass": {
+    "commit": "c8be8e4eb",
+    "state": "twin text runs max(em, print pt): 0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill algebra:function_table_easy",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-twin-slot-target",
+   "check": "ws-grade-render TARGET: every function_table_easy answer box on the online worksheet at 820 / 1024 is at least 48 x 48 px",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TARGET H6 (patterns precritic 2026-11-20, A3b)",
+   "browser": true,
+   "fail": {
+    "commit": "4053829a3",
+    "state": "inputs 48 x 42 px at worksheet 820 / 1024, 22 findings"
+   },
+   "pass": {
+    "commit": "c8be8e4eb",
+    "state": "twin slots max(em, 48 px + border): 0 findings"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills algebra:function_table_easy --gate",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-ea-pupiltag",
+   "check": "ws-cell-checks PUPILTAG: on function_table_easy Error analysis at L the \"<Name> wrote:\" tag sits 2-4 mm over the table",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG (PT-ERR-4; patterns precritic 2026-11-20, A7)",
+   "browser": true,
+   "fail": {
+    "commit": "c8be8e4eb",
+    "state": "the CL-40 tab pad pushed the table 5 mm under the tag, x8"
+   },
+   "pass": {
+    "commit": "86b529460",
+    "state": "no tab pad in fix mode: 0 findings"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy --roles error-analysis --size L --rules PUPILTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grow-psc-type-verb",
+   "check": "ws-print-lint L-VERBS BD-12: growing_shape_patterns' pre-skill-check (the shape_pattern prerequisite) prints no screen verb on paper",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-VERBS BD-12 (patterns precritic 2026-11-20, A8a)",
+   "browser": true,
+   "fail": {
+    "commit": "86b529460",
+    "state": "\"Type missing shapes separated by commas\" printed at L, x2"
+   },
+   "pass": {
+    "commit": "1260f10b3",
+    "state": "\"Write the missing shapes, ...\": no L-VERBS finding (the page's DN-2 is lf-roles')"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --roles pre-skill-check --skills patterns:growing_shape_patterns 2>&1 | grep -q 'L-VERBS BD-12' && echo 'verbs: FAIL' || echo 'verbs: OK'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ft-lesson-wrap-op",
+   "check": "ws-print-lint L-WRAP WRAP-OP: the function_table_easy lesson (ftTask rule-check) never wraps a step's line after an operator",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-WRAP WRAP-OP (patterns precritic 2026-11-20, A8c)",
+   "browser": true,
+   "fail": {
+    "commit": "1260f10b3",
+    "state": "chart panel 4 wrapped \"Write the rule n −\" / \"2.\", x4 at M"
+   },
+   "pass": {
+    "commit": "9e8545f21",
+    "state": "the provider's steps join an operator to the number after it: no L-WRAP finding (the lesson's OVERFLOW / TOPSTART are lf-engine's)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --roles lesson --opts '{\"ftTask\":\"rule-check\"}' --skills algebra:function_table_easy 2>&1 | grep -q 'L-WRAP WRAP-OP' && echo 'wrap: FAIL' || echo 'wrap: OK'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grow-far-band-repeat",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-print-lint L-DENSITY REPEAT on the growing_shape_patterns lesson at patTask=far: no problem printed twice on a page",
+   "rule": "L-DENSITY REPEAT (patterns precritic 2026-11-20, A8b; lead ruling: far-task default band 50)",
+   "fail": {
+    "commit": "a9fc719cb",
+    "state": "band default 20: the Term 10 task has 6 distinct patterns; lesson p4 printed items 2 = 3"
+   },
+   "pass": {
+    "commit": "3adeb4f85",
+    "state": "band default 'auto' (20, or 50 on the Term 10 task: 33 distinct)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M --skills patterns:growing_shape_patterns --opts '{\"patTask\":\"far\"}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "g3oa9-sweep-neighbour",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-detailed-lesson --sweep (LP-SWEEP) on g3-oa9-input-output-rule seed 25: the lesson builds, every T6 placeholder has a value",
+   "rule": "LP-SWEEP (g3-oa9 lesson precritic 2026-11-20)",
+   "fail": {
+    "commit": "e3c0d443b",
+    "state": "seed 25: unknown placeholder {exit.0.wrong.neighbouroutputs} - the exit + table's Out gaps all equal the rule"
+   },
+   "pass": {
+    "commit": "c03a3010c",
+    "state": "the + items T6 names want ftNeighbour (a gap that is not the rule)"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --sweep --seed-list 25",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "npr-lesson-train-oneline",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-cell-checks OVERFLOW on the number_patterns_rule lesson at places [1,10,100,1000], M and L: the chart panels' and We Do rows' box trains stay inside their cells",
+   "rule": "OVERFLOW (lf-algebra A1, patterns count-row overflows after lf-ops' count_by_tables rework; 208 findings, all lesson)",
+   "fail": {
+    "commit": "77c9c9134",
+    "state": "8 tiles sized from the band's widest number (23 mm) took two lines of four in the 170 mm panel; the second line ran ~14 mm out of each 57 mm panel (18 findings a size)"
+   },
+   "pass": {
+    "commit": "3d0e11c4e",
+    "state": "in a cellLiveMm panel the train gives up its tiles' spare air (glyph + 4 mm, digits unchanged) and stands on one line"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles lesson --size M,L --opts '{\"places\":[1,10,100,1000]}' --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "instr-slots-notice-feature",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-instr-slots on notice_patterns patTask=feature independent / test, M and L: the instruction names the tick boxes and says no 'Circle'",
+   "rule": "INSTR-SLOTS KIND-UNNAMED, VERB-ABSENT (lf-algebra critic r3 R3-1)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "the page took the parity strings: 'Is the product even or odd? Circle one.' over tick boxes"
+   },
+   "pass": {
+    "commit": "2bff0a95e",
+    "state": "printFormat notice-pattern-feature: 'Read the pattern. Check the sentence that is true.'"
+   },
+   "command": "node tests/scripts/ws-instr-slots.cjs --skills patterns:notice_patterns --opts '{\"patTask\":\"feature\"}' --roles independent,test --strict --rules KIND-UNNAMED,VERB-ABSENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "instr-slots-pf-guided-steps",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-instr-slots on pattern_features guided M and L: no Steps verb names a slot the page lacks",
+   "rule": "INSTR-SLOTS VERB-ABSENT (critic r3 R3-2)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "Step 1 'Read the rule. Write the numbers.' over printed tiles (check slots only)"
+   },
+   "pass": {
+    "commit": "2bff0a95e",
+    "state": "Step 1 'Read the rule. Find each number.'"
+   },
+   "command": "node tests/scripts/ws-instr-slots.cjs --skills patterns:pattern_features --roles guided --strict --rules VERB-ABSENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "instr-slots-test-slots-named",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-instr-slots on the pattern_features and growing_shape_patterns Tests, M and L: every blank tile / count box is named",
+   "rule": "INSTR-SLOTS KIND-UNNAMED, SLOT-NAME (critic r3 R3-3)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "5 blank tiles a feature item, Term 1-3 count boxes, never named by the instruction"
+   },
+   "pass": {
+    "commit": "2bff0a95e",
+    "state": "the track's rule line says 'Write the numbers.'; grow-next 'Write how many each term has.'"
+   },
+   "command": "node tests/scripts/ws-instr-slots.cjs --skills patterns:pattern_features,patterns:growing_shape_patterns --roles test --strict --rules KIND-UNNAMED,SLOT-NAME",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "instr-slots-pre-skill-drag",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-instr-slots on the growing_shape_patterns Pre-skill check, M and L: no screen verb on paper",
+   "rule": "INSTR-SLOTS SCREEN-VERB (critic r3 R3-6, H7)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "number_pattern's order item printed 'Drag the numbers in counting order.'"
+   },
+   "pass": {
+    "commit": "2bff0a95e",
+    "state": "its printText 'Write the numbers in counting order.'"
+   },
+   "command": "node tests/scripts/ws-instr-slots.cjs --skills patterns:growing_shape_patterns --roles pre-skill-check --strict --rules SCREEN-VERB",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "instr-slots-growing-far",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-instr-slots on growing_shape_patterns patTask=far lesson / independent, M and L: the Term 10 slot is named",
+   "rule": "INSTR-SLOTS SLOT-NAME (critic r3 R3-7)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "'Draw Term 4. Write how many it has.' (the next task's words) over a Term 10 slot"
+   },
+   "pass": {
+    "commit": "2bff0a95e",
+    "state": "grow-far 'Draw Term 4. Write how many each term has, up to Term 10.'; lesson byOption far 'Count on to Term 10.'"
+   },
+   "command": "node tests/scripts/ws-instr-slots.cjs --skills patterns:growing_shape_patterns --opts '{\"patTask\":\"far\"}' --roles lesson,independent --strict --rules SLOT-NAME,KIND-UNNAMED",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "wrapop-before-ft-rule-check",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-print-lint WRAP-OP (both ways) on the function_table_easy lesson at ftTask=rule-check, M and L",
+   "rule": "L-WRAP WRAP-OP before an operator (critic r3 R3-5)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "'7 / + 6 = 13', 'n / + 6': A8c joined only after the operator"
+   },
+   "pass": {
+    "commit": "091b44621",
+    "state": "a whole short expression is one unit (no-break spaces both sides after an operand)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M,L --skills algebra:function_table_easy --opts '{\"ftTask\":\"rule-check\"}' --lints WRAP-OP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "g3oa9-script-panel",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-detailed-lesson --check E42 on g3-oa9-input-output-rule: every chart panel the teacher script names is printed",
+   "rule": "E42 SCRIPT-PANEL (critic r3 R3-9)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "T4 named 'Panel 5' and 'Panel 6: the trap' on a 4-panel chart"
+   },
+   "pass": {
+    "commit": "f993ba953",
+    "state": "the - and x examples go on the board; Step 3 names the x try"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --check --rows E42 --out /tmp/mq-bt-g3oa9",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "g3oa9-exit-edge",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-detailed-lesson --check E43 on g3-oa9-input-output-rule: every table 1.5 mm or more in from its cell side borders",
+   "rule": "E43 EDGE (critic r3 R3-10)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "the P6 exit tables ran 0.6 mm from their cell borders (doubled rules)"
+   },
+   "pass": {
+    "commit": "318d8134d",
+    "state": "function-table insetMm 2 on the exit items"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --check --rows E43 --out /tmp/mq-bt-g3oa9",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "npr-train-parity",
+   "kind": "commit-pair",
+   "browser": false,
+   "check": "ws-patterns-cells TRAIN-PARITY: an npr practice train (places [1,10,100,1000] / [100], M and L) takes as many lines as the chart's",
+   "rule": "TRAIN-PARITY (critic r3 R3-8, AX-4)",
+   "fail": {
+    "commit": "4572adb08",
+    "state": "practice rows wrapped 4 + 4 (no cellLiveMm: the A1 tight tiles only in chart panels)"
+   },
+   "pass": {
+    "commit": "4feb22956",
+    "state": "every paper box train gives up spare air before it wraps"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --skill patterns:number_patterns_rule --rules TRAIN-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "twin-fit-reset",
    "kind": "commit-pair",
    "browser": true,

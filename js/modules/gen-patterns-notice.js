@@ -207,7 +207,8 @@ function generateNotice(q) {
     q.selfAnswering = true;
     q.cell = { template: NOTICE_TEMPLATE, v: 1, payload };
     try { q.visual = k2Twin(NOTICE_TEMPLATE, payload); } catch (e) { q.visual = ''; }
-    q.printFormat = 'notice-pattern';
+    // (critic r3 R3-1: the page's title and instruction follow the task, read from here - providers/patterns.js noticeStrings)
+    q.printFormat = task === 'parity' ? 'notice-pattern' : `notice-pattern-${task}`;
 }
 
 /* ================================================================== growing_shape_patterns */
@@ -260,19 +261,19 @@ function generateGrowing(q) {
     if (ask === 'rule') {
         q.ans = `${counts[3]}, ${pick.step}`;
         q.text = `Look at Terms 1, 2 and 3. How many ${unit} does Term 4 have? What is the rule?`;
-        q.printText = 'Draw Term 4. Write how many it has. Write the rule.';
+        q.printText = 'Draw Term 4. Write how many each term has. Write the rule.';
         q.screenInstr = 'Make Term 4 on the grid. Type how many it has. Type the rule.';
         q.answerType = 'text';
     } else if (ask === 'far') {
         q.ans = String(c10);
         q.text = `Look at Terms 1, 2 and 3. How many ${unit} does Term 10 have?`;
-        q.printText = 'Find the rule. Write how many Term 10 has.';
+        q.printText = 'Draw Term 4. Write how many each term has, up to Term 10.';
         q.screenInstr = 'Find the rule. Type how many Term 10 has.';
         q.answerType = 'number';
     } else {
         q.ans = String(counts[3]);
         q.text = `Look at Terms 1, 2 and 3. How many ${unit} does Term 4 have?`;
-        q.printText = 'Draw Term 4. Write how many it has.';
+        q.printText = 'Draw Term 4. Write how many each term has.';
         q.screenInstr = 'Make Term 4 on the grid. Type how many it has.';
         q.answerType = 'number';
     }
@@ -285,7 +286,7 @@ function generateGrowing(q) {
     for (const c of cands) { const s = `${c.start}+${c.step}`; if (!seen.has(s)) { seen.add(s); set.push([c.start, c.step, c.ans]); } }
     Object.defineProperty(q, 'dealSet', { value: { of: 'start, step', items: set }, enumerable: false, configurable: true, writable: true });
     try { q.visual = k2Twin(GROW_TEMPLATE, payload); } catch (e) { q.visual = ''; }
-    q.printFormat = 'growing-pattern';
+    q.printFormat = ask === 'next' ? 'growing-pattern' : `growing-pattern-${ask}`;   // (R3-1 class: the title follows the task)
 }
 
 /** Fill `q` for one of NOTICE_SKILLS. Returns true when it handled the skill. */

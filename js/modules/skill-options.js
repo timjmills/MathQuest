@@ -4024,9 +4024,12 @@ const LF_ALGEBRA_OPTIONS = {
                 + 'The answer is a number: how many Term 4 has, plus the rule on the second task, or how many Term 10 has on the third.',
         },
         {
-            id: 'band', label: 'Answers to', type: 'enum', default: 20, group: 'difficulty',
-            values: [{ v: 10, l: '10 (grows by 1, 2 or 3)' }, { v: 20, l: '20' }, { v: 50, l: '50 (for Term 10)' }],
-            help: 'The biggest answer: the number in Term 4, or in Term 10 on the Term 10 task.',
+            // (A8b, lead ruling 2026-11-20: 'auto' is the default - 20, or 50 on the Term 10 task, which has only 6 distinct patterns
+            // with answers to 20, too few for a lesson's chart, Guided and practice items without a repeat. Appended, so the positions
+            // of 10 / 20 / 50 - and every code that names one - are unchanged; "Answers to 20" stays a choice.)
+            id: 'band', label: 'Answers to', type: 'enum', default: 'auto', group: 'difficulty',
+            values: [{ v: 10, l: '10 (grows by 1, 2 or 3)' }, { v: 20, l: '20' }, { v: 50, l: '50 (for Term 10)' }, { v: 'auto', l: 'Auto: 20, or 50 on the Term 10 task' }],
+            help: 'The biggest answer: the number in Term 4, or in Term 10 on the Term 10 task. Auto is 20, and 50 on the Term 10 task.',
         },
         {
             id: 'patShow', label: 'Counts of Terms 1 to 3', type: 'bool', default: true, group: 'support',
