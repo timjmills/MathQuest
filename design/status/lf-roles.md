@@ -556,3 +556,16 @@ key labels `[data-review-label]` "<domain> · <skill>" in grey. EB-PSCCAP counts
 - Passed over by rule (template defects, not this band): word-work at L (two-digit tab 1.6 mm, TAB-CLEAR; red on sub_wp_20's own
   L check on master) and composing:fraction_number_line (its line touches a two-digit tab at M).
 - EB-PSCCAP (1f11f3c1e) stays red as briefed; ws-empty-band --self-test fails on its missing backtest row (as on psc2).
+
+### Quick review: lead rulings A24 (2026-11-20) - next week's build, in this order
+1. EB-PAGE reds (mult_facts L 31 %, div_facts L 33 %, sub_wp_20 L p1 51 %): first (a) the 3-column PSC choice (measureCols 3) for
+   the L pages; then (b) for anything still > 30 % white, the review may fill page 1 of a 2-page check (the last page stays first choice).
+   (c) blanket acceptance REFUSED.
+2. Capped A DROPPED: EB-STRETCH (drawn + 3 mm) is a ruled engine cap and stays; white is filled with review items, not taller check rows.
+3. Selection beyond the card ACCEPTED (like-height preference within a domain; one domain cycle). Skipped review skills are template
+   defects routed by the lead: word-work tab labels at L -> lf-builds; composing:fraction_number_line TAB-CLEAR -> its family.
+4. "Check __/n" only under a single strip; a multi-strip check keeps per-prerequisite scores: ACCEPTED.
+5. Before the critic: check KEYLABEL-CLEAR (on every review answer, the key label's box does not intersect the cell's ink box);
+   grade window: review items only from the pupil's grade down to 2 grades below; a domain with nothing in the window is skipped
+   (a grade-3 page takes no K counting). Both check first.
+Then: critic; then PSC-QUADRANT-16, the EB-PSCCAP trim, R3-6 (growing_shape_patterns doubled answer areas), the non-live-id guard.
