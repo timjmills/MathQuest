@@ -319,7 +319,8 @@ details p, details li { color: var(--muted); font-size: 14px; }
       if (left == null) { td.textContent = 'Not measured yet'; td.classList.add('flat'); }
       else if (left <= 0) { td.textContent = 'Done'; td.classList.add('up'); }
       else if (p == null) { td.textContent = 'Pace shows after one more measured week'; td.classList.add('flat'); }
-      else if (p <= 0) { td.textContent = 'No progress at the current pace'; td.classList.add('down'); }
+      else if (p <= 0 && tw > 0) { td.textContent = 'Moving this week; the pace counts finished weeks only'; td.classList.add('flat'); }
+      else if (p <= 0) { td.textContent = 'No progress at the pace reached'; td.classList.add('down'); }
       else { const wks = Math.ceil(left / p); const end = new Date(Date.parse(D.generated) + wks * 7 * 864e5); td.textContent = `about ${wks} week${wks === 1 ? '' : 's'} · ${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`; if (wks <= 12) td.classList.add('up'); }
       tr.appendChild(td);
       const tg = (cur.targets || {})[r.target]; const td2 = document.createElement('td'); td2.className = 'eta'; td2.dataset.l = 'At the planned pace';
