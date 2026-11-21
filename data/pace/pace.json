@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T05:35:06.635Z",
- "head": "a860630af",
+ "generated": "2026-11-21T05:35:07.946Z",
+ "head": "1f4343b08",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -165,7 +165,7 @@
    "done": false,
    "usagePct": 77,
    "usageEstimated": true,
-   "rev": "a860630af",
+   "rev": "1f4343b08",
    "skills": 742,
    "passed": 33,
    "gates": 174,
