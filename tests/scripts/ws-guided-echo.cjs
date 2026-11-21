@@ -71,6 +71,13 @@
 //                      packet leaves free, judged by the other blank rules, not the 3 of the windows.
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
 //                      cell on its page (F5: "The number before is 109 ... Write 110." beside windows with no 109 or 110).
+//   LESSON-MIXED       (lead ruling A11) the chart lesson is ALSO built with mixed:true (the optional "+ mixed" Mixed practice
+//                      page) and that page is judged by the lesson rules: SHEET-ANSWER-SET, NEAR-TWIN and LESSON-TWIN (against
+//                      every earlier pupil window), ANSWER-REUSE (<= 1/3 of its answers asked earlier; A13 givens are printed,
+//                      not gaps, so never counted), STEP-COVER, CROSS-GIVEAWAY (A13 exception kept) and BLANK-COUNT. Findings read
+//                      `LESSON-MIXED <rule> ...`. On by default whenever lesson is a scored role (so precritic's guided-echo gate
+//                      runs it); --no-mixed skips it. hundreds_chart_fill is judged at its default band and at band 100;
+//                      --mixed-band N builds band N only. LEAD: the lesson skill holds at least half the Mixed page (leadHalf).
 //
 //   node tests/scripts/ws-guided-echo.cjs --skill composing:chart_to_120 [--seeds 8] [--sizes M,L] [--only GUIDED-MODEL-ECHO] [--variants]
 //   MQ_ROOT=<tree> judges another checkout (ws-backtest commit-pair rows; the harness serves that tree)
@@ -90,6 +97,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const scoreTpl = list(arg('score-templates', 'chartwindow'));
     const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false,reason-it,scripted-model'));
     const variants = argv.includes('--variants');
+    const noMixed = argv.includes('--no-mixed');
+    const mixedBand = arg('mixed-band', null) ? Number(arg('mixed-band')) : 0;   // (LESSON-MIXED: the one band to build; else default, + 100 on hcf)
     const tilesOpt = arg('tiles', null) ? Number(arg('tiles')) : null;   // (BLANK-COUNT: "Numbers to fill in" to deal and judge)
     const H = require('../lib/ws-harness.cjs');
     // (a seeded Math.random: the screen deals - the worksheet and the quiz builder - draw from it; `__wsReseed` per seed)
@@ -98,13 +107,13 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     try {
         // (one evaluate per key x size x seed, and per key x band for --variants: a whole run in one call passed the browser's
         // protocol timeout once --variants was added; the TF / EA / overlap tallies live on window.__geState between calls)
-        const call = (part) => app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, part }) => {
+        const call = (part) => app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, part, noMixed, mixedBand }) => {
             const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0, tilesOpt = null } = part || {};
             // (BLANK-COUNT's chosen number: --tiles, else the skill's default 5; number_chart_fill keeps "1 to 3, dealt" - not judged)
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN', 'EDGE-SHARE', 'PAGE-COL-RUN', 'SKELETON-TWIN', 'MODEL-ROWS'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN', 'EDGE-SHARE', 'PAGE-COL-RUN', 'SKELETON-TWIN', 'MODEL-ROWS', 'LESSON-MIXED'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -494,6 +503,68 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             if (Number(r.pageCount) > packet.length) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: ${r.pageCount} pupil page(s) printed, ${packet.length} with a plan (an empty page)`);
                             if (Number(r.keyPageCount) > 0 && Number(r.pageCount) !== Number(r.keyPageCount)) out.push(`LESSON-EMPTY-PAGE ${key} lesson ${size} seed ${s}: ${r.pageCount} pupil page(s), ${r.keyPageCount} key page(s)`);
                         }
+                        // LESSON-MIXED (lead ruling A11): the same lesson built with mixed:true; its Mixed practice page judged by the lesson rules
+                        // (hundreds_chart_fill is also built at band 100 - the critic's hcf100 packet - unless --mixed-band names one band)
+                        if (role === 'lesson' && !noMixed && on('LESSON-MIXED') && /chart/.test(skillId)) for (const mBand of (mixedBand ? [mixedBand] : skillId === 'hundreds_chart_fill' ? [0, 100] : [0])) {
+                            let rm = null;
+                            try { rm = await window.buildSheet({ role, mixed: true, sections: [{ skills: [{ categoryId, skillId, ...(tilesOpt || mBand ? { opts: { ...(tilesOpt ? { tiles: tilesOpt } : {}), ...(mBand ? { band: mBand } : {}) } } : {}) }] }], size, paper: 'A4', seed: s, key: false }); } catch (e) { out.push(`LESSON-MIXED ${key}${mBand ? ` band ${mBand}` : ''} lesson ${size} seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); }
+                            // (the Mixed page nests its grids in band `contents`, which planPages does not walk: a walker of its own here, so no
+                            // other rule's reading changes)
+                            const mixPages = (pl) => (pl && Array.isArray(pl.pages) ? pl.pages : []).map((pg) => { const items = [], htmls = []; const walk = (x) => { if (!x || typeof x !== 'object') return; if (Array.isArray(x)) { x.forEach(walk); return; } if (x.kind === 'grid' && Array.isArray(x.items)) items.push(...x.items.filter(Boolean)); if (typeof x.html === 'string') htmls.push(x.html); for (const k of ['sections', 'parts', 'content', 'contents']) if (x[k]) walk(x[k]); }; walk(pg); return { items, htmls }; });
+                            const mParts = rm ? (rm.partPlans || []).flatMap((x) => (x.plans || []).flatMap((pl) => (x.part === 'mixed' ? mixPages(pl) : planPages(pl)).map((pg) => ({ part: x.part, items: pg.items, htmls: pg.htmls, plan: pl })))) : [];
+                            const L = `LESSON-MIXED ${key}${mBand ? ` band ${mBand}` : ''} lesson ${size} seed ${s}`;
+                            if (rm && !mParts.some((pg) => pg.part === 'mixed')) out.push(`${L}: mixed:true printed no Mixed practice page`);
+                            // LEAD: the lesson skill holds at least half the Mixed page's items (mixed.js `leadHalf`)
+                            { const its = mParts.filter((pg) => pg.part === 'mixed').flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model); const ld = its.filter((it) => (it.q.requestedSkillId || it.q.skillId) === skillId).length; if (its.length && ld * 2 < its.length) out.push(`${L} LEAD: the Mixed practice part holds ${ld} of ${its.length} items of the lesson skill (at least half)`); }
+                            const prior = [], mixW = [];
+                            mParts.forEach((pg, pi) => pupilWins(pg.items).forEach((w, wi) => (pg.part === 'mixed' ? mixW : prior).push({ w, at: `p${pi + 1} window ${wi + 1}`, pi })));
+                            out.push(`LESSON-MIXED-INFO ${L.slice(13)}: ${mParts.length} page(s) (${mParts.map((pg) => pg.part + ':' + pg.items.length).join(' ')}), ${prior.length} earlier pupil window(s), ${mixW.length} mixed window(s)`);
+                            const keyOf = (w) => `${w.rows.join('.')}|${w.cols.join('.')}|${w.gaps.slice().sort((a, b) => a - b).join('.')}`;
+                            const sq = (w) => { const z = new Set(); for (const rr of w.rows) for (const c of w.cols) z.add(rr * 10 + c + 1); return z; };
+                            if (on('LESSON-MIXED') || on('SHEET-ANSWER-SET')) {
+                                const byPage = new Map();
+                                mixW.forEach((m) => { const k = m.w.gaps.slice().sort((a, b) => a - b).join(', '); if (!k) return; const pk = `${m.pi}|${k}`; if (byPage.has(pk)) out.push(`${L} SHEET-ANSWER-SET: mixed ${m.at} answers ${k}, as ${byPage.get(pk)} on the same page`); else byPage.set(pk, m.at); });
+                            }
+                            mixW.forEach((m, i) => {
+                                for (const o of prior.concat(mixW.slice(0, i))) {
+                                    if (keyOf(o.w) === keyOf(m.w)) { out.push(`${L} LESSON-TWIN: mixed ${m.at} is ${o.at} again (the same squares and gaps)`); continue; }
+                                    const A = sq(o.w), B = sq(m.w), sh = [...A].filter((n) => B.has(n));
+                                    if (sh.length * 10 < Math.max(A.size, B.size) * 6) continue;
+                                    const gA = sh.filter((n) => o.w.gaps.includes(n)).sort((a, b) => a - b).join(', '), gB = sh.filter((n) => m.w.gaps.includes(n)).sort((a, b) => a - b).join(', ');
+                                    if (gA && gA === gB) out.push(`${L} NEAR-TWIN: mixed ${m.at} shares ${sh.length} of ${Math.max(A.size, B.size)} squares with ${o.at}, the same gaps (${gA}) in them`);
+                                }
+                            });
+                            { const earlier = new Set(prior.flatMap((o) => o.w.gaps)); const gs = mixW.flatMap((m) => m.w.gaps); const re = gs.filter((n) => earlier.has(n)).length;
+                              if (gs.length && re * 3 > gs.length) out.push(`${L} ANSWER-REUSE: ${re} of ${gs.length} mixed-page answers were asked on an earlier page (at most a third)`); }
+                            mParts.forEach((pg, pi) => {
+                                if (pg.part !== 'mixed') return;
+                                const doc = new DOMParser().parseFromString(`<div>${(pg.htmls || []).join(' ')}</div>`, 'text/html');
+                                const stp = [...doc.querySelectorAll('.mq-lstrip li, .mq-lstepszone li, ol.mq-lsteps li')].map((e) => e.textContent).join(' | ');
+                                // (no Steps band on the Mixed page: the lesson's own steps - Look left / Look up / top row Look down - are what the pupil carries)
+                                const has = /Look (left|up)/i.test(stp) ? { L: /Look left/i.test(stp), U: /Look up/i.test(stp), D: /Look down/i.test(stp), R: /Look right/i.test(stp) } : { L: true, U: true, D: true, R: false };
+                                pupilWins(pg.items).forEach((w, wi) => {
+                                    const inW = (n) => w.rows.includes(Math.floor((n - 1) / 10)) && w.cols.includes((n - 1) % 10);
+                                    const pr = (n) => inW(n) && !w.gaps.includes(n);
+                                    const top = Math.min(...w.rows);
+                                    const bad = w.gaps.filter((n) => { const c = (n - 1) % 10, rr = Math.floor((n - 1) / 10); return !((has.L && c > 0 && pr(n - 1)) || (has.U && pr(n - 10)) || (has.D && rr === top && pr(n + 10)) || (has.R && c < 9 && pr(n + 1))); });
+                                    if (bad.length) out.push(`${L} STEP-COVER: mixed p${pi + 1} window ${wi + 1}: no step solves ${bad.join(', ')} from a printed neighbour`);
+                                });
+                            });
+                            // CROSS-GIVEAWAY / BLANK-COUNT on the mixed page: the shared judges, their findings re-labelled and kept only when a mixed window is involved
+                            if (rm) {
+                                const exQs = (rm.partPlans || []).flatMap((pp0) => (pp0.plans || []).flatMap((pl) => (pl && pl.meta && pl.meta.exampleQs) || [])).map((q) => ({ q, anchor: true }));
+                                const pItems = mParts.filter((pg) => pg.part !== 'mixed').flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model && winOf(it.q));
+                                const mItems = mParts.filter((pg) => pg.part === 'mixed').flatMap((pg) => pg.items).filter((it) => it && it.q && !it.anchor && !it.model && winOf(it.q));
+                                const base = exQs.filter((it) => winOf(it.q)).length + pItems.length;
+                                const n0 = out.length;
+                                judgeGiveaway(`${key} lesson packet mixed ${size} seed ${s}`, exQs.filter((it) => winOf(it.q)).concat(pItems, mItems));
+                                const cg = out.splice(n0).filter((f) => { const m = f.match(/window (\d+)'s missing .* window (\d+)/); return m && (Number(m[1]) > base || Number(m[2]) > base); });
+                                cg.forEach((f) => out.push(`${L} ${f.replace(/^CROSS-GIVEAWAY /, 'CROSS-GIVEAWAY ')}`));
+                                const n1 = out.length;
+                                judgeBlanks(`${key} lesson mixed page ${size} seed ${s}`, mItems, (w, b) => (w.rows.length === 3 && w.cols.length === 10 ? b.length : tilesWant));
+                                out.splice(n1).forEach((f) => out.push(`${L} ${f}`));
+                            }
+                        }
                         // GUIDED-TRY-COUNT (critic blanks B4): a Guided chart page deals at least two tries after its Model
                         if (role === 'guided' && on('GUIDED-TRY-COUNT') && /chart/.test(skillId)) {
                             const tries = scoredItems.filter((it) => winOf(it.q)).length;
@@ -561,7 +632,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             if (finalize && on('EA-PATTERN') && ea.multiCorrect + ea.multiFix >= 4 && (!ea.multiCorrect || !ea.multiFix)) out.push(`EA-PATTERN ${keys.join(',')}: windows of 2+ gaps judged Correct ${ea.multiCorrect}, Fix it ${ea.multiFix} - the judgement follows the gap count`);
             if (finalize) out.push(`OVERLAP-INFO ${st.overlap} answer(s) shared by overlapping (not identical) windows; TF ${tf.falseN}/${tf.all} False; EA multi-gap Correct ${ea.multiCorrect} / Fix it ${ea.multiFix}`);
             return { out, pages };
-        }, { keys: (part && part.keys) || keys, N, sizes: (part && part.sizes) || sizes, only, scoreTpl, scoreRoles, part });
+        }, { keys: (part && part.keys) || keys, N, sizes: (part && part.sizes) || sizes, only, scoreTpl, scoreRoles, part, noMixed, mixedBand });
         res = { out: [], pages: 0 };
         const add = (r) => { res.out.push(...r.out); res.pages += r.pages; };
         for (const key of keys) {
@@ -585,7 +656,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
       res.out = res.out.filter((f) => !/^MODEL-AT /.test(f));
       for (const [k, rows] of at) { const d = [...new Set(rows)].sort((x, y) => x - y); res.out.push(`MODEL-ROWS-INFO ${k}: ${rows.length} seeds, Model rows ${d.join(', ')}`); if (rows.length >= 10 && d.length < 3) res.out.push(`MODEL-ROWS ${k}: the Model sits on ${d.length} distinct row(s) over ${rows.length} seeds (at least 3)`); } }
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN|EDGE-SHARE|PAGE-COL-RUN|SKELETON-TWIN|MODEL-ROWS) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN|EDGE-SHARE|PAGE-COL-RUN|SKELETON-TWIN|MODEL-ROWS|LESSON-MIXED) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
