@@ -14477,10 +14477,30 @@
     "state": "critic lessons-browser r2 tree (84 s first-page build on the main thread)"
    },
    "pass": {
-    "commit": "d744efeeb",
-    "state": "lf-checks D11 revert (lead ruling A20)"
+    "commit": "c2f413dfb",
+    "state": "lf-checks stall fix: thumbnails drawn one step per task (profiled: 5,063 ms task -> 166 ms)"
    },
    "command": "node tests/scripts/ws-lessons-browse.mjs --only THUMB-NO-FREEZE --widths 1024",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lessons-passed-pending-kind",
+   "check": "ws-lessons-passed LP-PENDING-KIND (critic lessons-browser r2 D12): every PENDING_RECHECK entry carries an explicit kind 'changed' or 'fix', so its pending words never come from a regex over free text",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-passed LP-PENDING-KIND",
+   "browser": false,
+   "fail": {
+    "commit": "1c8bb3aa2",
+    "state": "critic lessons-browser r2 tree: the 5 pending entries have no kind (LP-PENDING-KIND fails 5, nothing else fails)"
+   },
+   "pass": {
+    "commit": "c2f413dfb",
+    "state": "every pending entry has kind: 'changed' or 'fix'"
+   },
+   "command": "node tests/scripts/ws-lessons-passed.mjs",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

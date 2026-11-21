@@ -1022,3 +1022,10 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   4. Add a backtest row for D12.
   5. Run the tiny critic on the D11 revert, D12 and THUMB-NO-FREEZE.
 - Spend on the lessons browser is about $170 of the $180 allowance (agent estimates).
+
+## 2026-11-21 — lessons browser stall profiled and fixed (rebuild after critic r2 fail, medium)
+- Profile (CPU x4, cold cache, 1024, grade 3 Thumbnails): each IntersectionObserver callback (teacher-wrm.js lessonThumbs) drew every card entering the viewport in one task, via drawLessonThumb -> mountCropped (teacher-chip.js:111). Each took 220-415 ms, mostly forced style flushes. On these screens a flush restyles the whole document because of `:has()` rules outside the subject in the shared sheets: about 35 ms a flush, 1 ms with them gone. Summary: design/status/lf-checks/lessons-browser/stall-profile.md.
+- Fix c2f413dfb: a queue runs one step of one thumbnail per task. mountBuilt and fit are built from the same steps, so the other callers are unchanged. No CSS change.
+- Before and after: longest task 6,429 -> 166 ms, frame gap 6,783 -> 300 ms. THUMB-NO-FREEZE passes; ws-lessons-browse passes all 14 rules at the 4 default widths.
+- Backtests: `lessons-browse-thumb-no-freeze` now passes on c2f413dfb. New row `lessons-passed-pending-kind` (D12: FAIL on 1c8bb3aa2 -> OK on c2f413dfb), with a ledger row.
+- Not done: the shared `:has()` rules (sheet-kit, screen-cell, ui-components) still make every flush cost a whole-document restyle on teacher screens. Route them to their owners.
