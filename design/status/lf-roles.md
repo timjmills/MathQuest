@@ -600,3 +600,26 @@ Built at medium (continuation of the first build of the Quick review section). E
   `--psccap` flag (pscCapBad and its self-test rows kept). It returns, blocking, with the PSC-QUADRANT-16 trim next week.
 - (lead A32) Review cells judged by EB-SIDE's wider-side < 27 % (review cells only); add_wp_20 M p1 32 % QUEUED (plan the review
   against the printed measure); frac-wall (compose_whole "1 whole" vs the tab at L) routed to the fractions family.
+
+### Quick review: critic qreview r1 FAIL 7/7/7/7 - rebuild at medium (round 2 of 2, 2026-11-21)
+Each finding check first: one check commit bd27ee70d (ws-psc-review gains five judges, each FAILS on 8b0d78056), then a fix
+commit each; backtest rows PASS (FAIL bd27ee70d -> OK fix).
+- KEYLABEL-GREY (`psc-keylabel-grey`, OK de58999de): tagKeyAnswers tagged the key-only label data-ws-key-ans (orange via the
+  !important key ink); it now passes [data-review-label] over - an untagged sibling in the cell, grey. No CSS changed.
+- KEYLABEL-WORDS (`psc-keylabel-words`, OK baedb54be; lead A32-2): one line in the foot (on the bottom edge) or the top strip
+  right of the tab; full "<domain> · <skill>", else the domain name alone; else the item is passed over. No side columns; nowrap.
+- REVIEW-TAG-ID (`psc-review-tag-id`, OK b8dc5c2e9): the tag cleans that category's own skill label (data.js cleanSkillLabel);
+  fractions:identify read placevalue:identify's "Name the Place". The check reads every candidate's tag (meta.reviewFit.cands).
+- PSC-REVIEW-ORDER (`psc-review-order`, OK e3db32ba6): review numbered after the whole check - sub_wp_20 L p1 review 9-10 -> 15-16,
+  p2 check 11-16 -> 9-14. sub_wp_20 L joins the default fixtures.
+- REVIEW-INSTR (`psc-review-instr`, OK 5d6597615): the role's prepare hook gives each review item its LIBRARY instruction as a
+  prompt line at the top of its cell (measured into the cell; pure compute instructions rely on the band line); its words sit in a
+  span so the bridge's ink reads the text width (EB-SIDE, a7-style follow-up commit).
+- Review-cell acceptance also caps the cell's total horizontal white at 50 % (REVIEW_EMPTY_MAX).
+- ws-psc-review's fixture judge accepts the ruled cases: a multi-strip check keeps per-prerequisite scores (no "Check __/n"); a page
+  whose room is under the shortest whole review row (second-shortest candidate at one column count) + strip has no band.
+- Gates (merged with origin/master ca8ab6adf): role hashes vs master - only Pre-skill Check pages differ (26 of 99), every other role
+  0 of 99; lesson baseline 334 identical; ws-layout-unit the same 31 failures as master; ws-empty-band --page-fill on the PSC fact +
+  word skills: EB-PAGE 1 (add_wp_20 M p1 32 %, QUEUED by A32; master 3), EB-STRETCH 4 / TAB-CLEAR 10 word-work (same on master,
+  lf-builds), EB-SIDE / EB-BAND / EB-LASTPAGE PASS.
+- Still red, by ruling: add_wp_20 M p1 32 % (queued). Fewer review items can be chosen now that a label needs one line in a strip.
