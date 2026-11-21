@@ -417,7 +417,9 @@ export function plan(input = {}) {
     const textOn = it.statesMeasured ? 0 : textH2;
     // (and the pages are dealt at the height the row is laid out at: the measure less what the ROW-STRETCH CAP below takes off -
     // dealt at the measure, a count row that fits one page at its capped 50 mm took two, or merged its steps)
-    const offMm = 2 + koMm(ctx.size);
+    // (a stepState state - stepStatesFor, lf-ops sizes r2 - is laid out at its measure less hMinAt's 2 mm only: with the tab
+    // keep-out taken off too, the area model's L states ran 1.3 mm past their cells, ws-cell-checks OVERFLOW)
+    const offMm = 2 + (stepStatesFor(it, steps) ? 0 : koMm(ctx.size));
     const laidH = (h) => (it.statesMeasured && cols === 1 ? Math.min(h, rowCapMm(h - offMm, [it])) : h);
     let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : laidH(h1 + textOn);
     let laid = !!it.statesMeasured && cols === 1;   // (H is already the laid-out height: the cap below is not taken twice)
@@ -526,7 +528,9 @@ export function plan(input = {}) {
     // room - hMinAt is the measure + 2 mm and the measure holds a tab keep-out a Model state does not draw (CL-14)
     // (a MEASURED beside state - measuredStates draws every state for the host - is drawn at its measure: only hMinAt's 2 mm come off,
     // not the tab keep-out; taken off too, the word-work state's ink ran 0.8 mm past its rule at L and covered the frame's foot in print)
-    if (!laid) { const off = 2 + (it.statesMeasured && cols === 2 && !across ? 0 : koMm(ctx.size)); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
+    // (a one-column stepState state - stepStatesFor, lf-ops sizes r2 - is drawn at its measure too: the area model's L states ran
+    // 1.3 mm past their cells with the keep-out taken off)
+    if (!laid) { const off = 2 + (it.statesMeasured && !across && (cols === 2 || stepStatesFor(it, steps)) ? 0 : koMm(ctx.size)); H = Math.min(H, Math.max(cols === 2 && !across ? textH2 : 0, rowCapMm(H - off, [it]))); }
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
