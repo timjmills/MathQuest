@@ -408,6 +408,16 @@ function main() {
         for (const x of c.above) { const m = hit(x); if (m) say(`MAIN-RED   ${x.id} ${x.size} ${x.rule}: ours ${x.n} (non-blocking: ${m.proof})`); else keep.push(x); }
         if (keep.length !== c.above.length) { c.above = keep; c.rowsAbove = new Set([...keep, ...c.noSibling].map((x) => x.id)); }
     } catch (e) { /* no mainRed list */ }
+    // FIRST-OF-DRAWING (lead ruling A25, 2026-11-21): a skill that is the FIRST of a new drawing has no approved sibling to
+    // compare with, so its NO-SIBLING rows are reported, not blocking - only when siblings.json `firstOfDrawing` names the
+    // skill with its proof (the signed card that made the drawing). Its own reds still block through precritic's other gates.
+    try {
+        const fd = (JSON.parse(fs.readFileSync(sf, 'utf8')).firstOfDrawing || []).filter((m) => m && m.skill && m.proof);
+        const first = (x) => fd.find((m) => x.id.split('|')[0] === m.skill);
+        const keepNo = [];
+        for (const x of c.noSibling) { const m = first(x); if (m) say(`FIRST      ${x.id} ${x.size} ${x.rule}: ours ${x.n} (non-blocking, first of its drawing: ${m.proof})`); else keepNo.push(x); }
+        if (keepNo.length !== c.noSibling.length) { c.noSibling = keepNo; c.rowsAbove = new Set([...c.above, ...keepNo].map((x) => x.id)); }
+    } catch (e) { /* no firstOfDrawing list */ }
     // ---- report
     const red = oursRows.filter((r) => r.status === 'RED').length;
     const noBase = oursRows.filter((r) => r.status === 'PENDING' && printed(r)).length;
