@@ -1117,6 +1117,18 @@ async function anyPartS2() {
     try { h = await openPlayer(1280, 'wedo', '&mode=pupil'); } catch (e) { fail(M, 'S2 resume: pupil did not open'); return; }
     try {
         const { page } = h;
+        // lead ruling A30-5: with no progress record for the lesson's practice skill, reaching a part creates NONE
+        const made = await page.evaluate(() => { const sk = window.lessonPlayerState().practice; const sp = (window.state && window.state.skillProgress) || {}; return { sk, has: !!sp[sk] }; });
+        if (!made.sk) fail(M, 'A30-5: the player exposes no practice skill');
+        else if (made.has) fail(M, `A30-5: reaching a part created a progress record for ${made.sk} (lead ruling: never create a 0-attempt record)`);
+        else ok(M, 'A30-5: no progress record is created just to store the part reached');
+        // resume needs a record the pupil already has (A30-5): give one, as a pupil who has practised the skill has, then reach We do again
+        await page.evaluate(async (lesson) => {
+            const sk = window.lessonPlayerState().practice;
+            window.state.skillProgress[sk] = window.state.skillProgress[sk] || { correct: 1, total: 1, streak: 1, bestStreak: 1, mastery: 0, lastPracticed: Date.now(), history: [] };
+            window.closeLessonPlayer(); await window.openLessonPlayer(`?lesson=${encodeURIComponent(lesson)}&part=wedo&mode=pupil`);
+        }, LESSON);
+        await H.waitFor(page, () => window.lessonPlayerState().ready, 90000, 'reopened at We do');
         await page.evaluate(async (lesson) => { history.replaceState({}, '', `/index.html?lesson=${encodeURIComponent(lesson)}&mode=pupil`); window.closeLessonPlayer(); await window.openLessonPlayer(`?lesson=${encodeURIComponent(lesson)}&mode=pupil`); }, LESSON);
         await H.waitFor(page, () => window.lessonPlayerState().ready, 90000, 'resumed');
         const s = await state(page);

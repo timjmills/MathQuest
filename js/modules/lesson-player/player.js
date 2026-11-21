@@ -123,6 +123,7 @@ export function lessonPlayerState() {
         chartExample: S.chartExample || '', spoke: S.spoke, visited: [...S.visited], title: S.plan ? S.plan.title : '',
         parts: S.plan ? S.plan.parts.map((p) => ({ part: p.part, built: !!p.built })) : [],
         autoSpoke: S.autoSpoke || '',
+        practice: (S.plan && S.plan.practice && S.plan.practice.skillId) || '',
         plan: S.plan ? { warmup: partPlan('warmup').items.map((x) => ({ text: x.text, ans: x.ans, seed: x.seed })), wedo: partPlan('wedo').items.map((x) => ({ text: x.text, ans: x.ans, seed: x.seed, rung: x.rung })) } : null,
         ...itemState(),
     };
@@ -685,7 +686,8 @@ function reachedOf(lesson) {
 }
 function saveReached(lesson, part) {
     try {
-        const rec = reachedRec(lesson, true);
+        // lead ruling A30-5: store only on a record the pupil already has; never create a 0-attempt record
+        const rec = reachedRec(lesson, false);
         if (!rec) return;
         rec.lessonReached = Object.assign({}, rec.lessonReached || {}, { [lesson]: part });
         savePersistentData();
