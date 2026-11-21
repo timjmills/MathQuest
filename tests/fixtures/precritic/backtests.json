@@ -16330,6 +16330,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-r2-lesson-chart-overflow",
+   "check": "ws-cell-checks OVERFLOW on the lesson at M and L for area_model_2by2 / area_model_3by2: the anchor chart's ink never crosses the body bottom (page 1: 'the body overflows by 22 mm')",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r1 F8",
+   "browser": true,
+   "fail": {
+    "commit": "c180eacc6",
+    "state": "chart.js perPage branch: chartMinZoom chose a zoom under 1 for a second panel row, but rowH stayed H(1) - 2 x 129.7 mm in a 239 mm body"
+   },
+   "pass": {
+    "commit": "77c7cddbb",
+    "state": "rowH = H(z) and lastPer by H(z): the rows are the panels' height at their zoom"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:area_model_2by2,multiplication:area_model_3by2 --roles lesson --size M --rules OVERFLOW",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
