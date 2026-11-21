@@ -1029,3 +1029,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Root cause: the lesson planner measured every band label strip as one line (Independent at 0.5 em/char); new stripWrapMm (compose.js) wraps per character at the strip's real width, used only in lesson.js's fill / free-height measure (no page moved: 2700 hashes identical). Plan vs print now within ~1 mm.
 - SHEET_FILL_MIN 0.76 -> 0.74 from an 810-sheet sweep (ws-partopts-unit --fill-sweep); new FILL-PRINT check (plan vs print <= 4 mm). ROWFIT anchors re-bracketed around 12 mm; DESIGN.md §8d updated.
 - Routed (A27): 6 good sheets at 0.728-0.739 still refused + ROWFIT foot-by-real-row-height -> lf-engine; mult_properties L Vocab-off sizing -> lf-ops; PO-CAP function_table_easy L / notice_patterns M -> lf-algebra.
+
+## 2026-11-21 — Deploy the pace board (owner request; lead build, critic pending)
+- pace.html (site root) + data/pace/pace.json from `node tests/scripts/ws-pace.cjs --write`: live and 8/10-passed skills and lessons, this week vs last, week-by-week trends, estimated time to finish, automatic checks added each week, checks still to build (from the weekly speed reflection), White Rose coverage by year, and a weekly log filterable by week / kind / search. Usage % is typed weekly into data/pace/usage.json.
+- Updates itself: .github/workflows/pace-board.yml rebuilds and commits pace.json on every master push, daily, and after the Thursday reset. `ws-pace --check` joins deploy session 1; `--self-test` covers the week maths and the log classifier.
+- Speed reflection 2026-11-20 merged (LESSONS_LEARNED process rules 11-20, speed-audit, metrics).
