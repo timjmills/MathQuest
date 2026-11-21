@@ -16370,6 +16370,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-n-model-final-complete",
+   "check": "ws-guided-echo MODEL-FINAL-COMPLETE: the last Scripted Model state and the last lesson anchor-chart panel of a template with its own stepState hold every number the item's answered drawing (the key) writes - no work place left empty",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r2 N1 (PT-MOD-1: the area model's 'Add the parts' state left the partial-sum lines blank on the Model and the chart)",
+   "browser": true,
+   "fail": {
+    "commit": "5c2ae8707",
+    "state": "area-model stepState drew the work row empty in every state (sv ? '' : ...): only the total box was traced"
+   },
+   "pass": {
+    "commit": "a4cadccb7",
+    "state": "area-model stepState writes sum-<i> (the parts on the work lines) in the total's ink at the add step"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills multiplication:area_model_4by1,multiplication:area_model_2by2,multiplication:area_model_3by2 --seeds 1 --sizes M --only MODEL-FINAL-COMPLETE --screen-seeds 0 --score-roles scripted-model,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
