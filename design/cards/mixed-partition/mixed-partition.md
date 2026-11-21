@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"mixed-partition","kind":"template","template":"frac-model","families":["fractions"],"match":{"templates":["frac-model"]},"config":"design/cards/mixed-partition/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"21109d2ba8a2d48e","format":2,"configSha":"55108a49fb4b"}
-{"cited":"AX-4 H1 H2 H4 H5 H7 H8 H10 H11 H12 H13 INK-5 L1 L6 L10 OC1 OC4 OC14 PT-RSN-1 RP-90 RP-91 SC-3 SP-2 SP-3 TY-7","rules":"AK-1 a0cc12 2 d4709f H13 36f579 RP-60 89c323 92 114d99 93 1c0c0e TY-7 e3e1e1 VQ-1 dea36a 2 f15b47 3 db17cc 4 b89965 9 0b5532 10 2ed85c RP-90 45cbc9 91 6e8da5 71 55103e 72 b10450 LS-3 62bf3d INK-1 0e2b59 3 b9f1f1 10 7755c0 SL-2 f404d5 3 f5cbcc 4 911174 7 1c59c4 11 fc569a CL-4 1a96ce 5 75480a 6 102a92 P-1 5a3076 7 aa3040 10 256ad3 SCC-01 8aa70b SCC-T15 fc9373 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H6 e90105 8 44c23b 14 395d48 15 cfa87a 16 ad15de 17 eabdac L1 4f7d0c 2 885b43 3 901e56 6 6e19d8 10 d2ca35 C1 a670d9 2 a51365 3 075ae0 4 e59efd AX-4 2eb6c1 H4 464c24 H5@RUBRIC b3892d H7 3d3d38 10 fbd802 11 bef034 12 2de4f7 INK-5 631a6d OC1 01f283 4 00a5e1 14 719519 PT-RSN-1 a3e2c1 SC-3 8e1ff4 SP-2 1f2df0 3 7b7bfb INK-20 fd5154 21 94038b 22 8838dd RP-1 d529bd 2 86e460 5 598d89","entries":"D%3AmnTask%3Dpartition bcefeb D%3AmnTask%3Dones bcefeb D%3AmnTask%3Dcompose bcefeb D%3AmnTask%3Dname bcefeb D%3AmnDenoms%3Dhalves-quarters 972948 D%3AmnDenoms%3Dto-8 972948 D%3AmnWholes%3D1 972948 D%3AmnWholes%3D2 972948 D%3AmnWholes%3D3 972948 D%3AmnWholes%3D5 972948 D%3Amodel%3Dbar 972948 D%3Amodel%3Dnone 972948 D%3AmnForm%3Ddiagram 972948 D%3AmnForm%3Deq 972948 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+{"card":"mixed-partition","kind":"template","template":"frac-model","families":["fractions"],"match":{"templates":["frac-model"]},"config":"design/cards/mixed-partition/card.json","indexSha":"5eb60f823a61d7bfbe0dd3dace6970f20a184b09","bodySha":"eb3ae0a870a9e578","format":2,"configSha":"55108a49fb4b"}
+{"cited":"AX-4 H1 H2 H4 H5 H7 H8 H10 H11 H12 H13 INK-5 L1 L6 L10 OC1 OC4 OC14 PT-RSN-1 RP-90 RP-91 SC-3 SP-2 SP-3 TY-7","rules":"AK-1 a0cc12 2 d4709f H13 36f579 RP-60 89c323 92 114d99 93 1c0c0e TY-7 e3e1e1 VQ-1 dea36a 2 f15b47 3 db17cc 4 b89965 9 0b5532 10 2ed85c RP-90 45cbc9 91 6e8da5 71 55103e 72 b10450 LS-3 62bf3d INK-1 0e2b59 3 b9f1f1 10 7755c0 SL-2 f404d5 3 f5cbcc 4 911174 7 1c59c4 11 fc569a CL-4 1a96ce 5 75480a 6 102a92 P-1 5a3076 7 aa3040 10 256ad3 SCC-01 8aa70b SCC-T15 fc9373 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H6 e90105 8 44c23b 14 395d48 15 cfa87a 16 ad15de 17 eabdac L1 4f7d0c 2 885b43 3 901e56 6 6e19d8 10 d2ca35 C1 a670d9 2 a51365 3 075ae0 4 e59efd AX-4 2eb6c1 H4 464c24 H5@RUBRIC b3892d H7 3d3d38 10 fbd802 11 bef034 12 2de4f7 INK-5 631a6d OC1 01f283 4 00a5e1 14 719519 PT-RSN-1 a3e2c1 SC-3 8e1ff4 SP-2 1f2df0 3 7b7bfb DN-10 91ac9d INK-20 fd5154 21 94038b 22 8838dd RP-1 d529bd 2 86e460 5 598d89","entries":"D%3AmnTask%3Dpartition bcefeb D%3AmnTask%3Dones bcefeb D%3AmnTask%3Dcompose bcefeb D%3AmnTask%3Dname bcefeb D%3AmnDenoms%3Dhalves-quarters 972948 D%3AmnDenoms%3Dto-8 972948 D%3AmnWholes%3D1 972948 D%3AmnWholes%3D2 972948 D%3AmnWholes%3D3 972948 D%3AmnWholes%3D5 972948 D%3Amodel%3Dbar 972948 D%3Amodel%3Dnone 972948 D%3AmnForm%3Ddiagram 972948 D%3AmnForm%3Deq 972948 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
 {"v": 1, "card": "mixed-partition",
@@ -43,11 +43,11 @@ ONE new skill, fractions:mixed_numbers_intro 'Partition a Mixed Number' (WRM Y4.
 
 - **fractions** (1): `mixed_numbers_intro`
 
-**CCSS** (SKILL_STANDARDS of those skills): (none)
+**CCSS** (SKILL_STANDARDS of those skills): 3.NF.A.1, 4.NF.B.3b
 
-**Essential Elements:** (none)
+**Essential Elements:** M.EE.3.NF.1, M.EE.4.NF.3
 
-**WRM small steps** (SKILL_WRM): (none)
+**WRM small steps** (SKILL_WRM): Y4.B7 S3
 
 ## 2. Problem types and progression
 
@@ -76,7 +76,7 @@ ONE new skill, fractions:mixed_numbers_intro 'Partition a Mixed Number' (WRM Y4.
 - `div_frac_frac` (new) Divide Fractions by Fractions — host `fraction_operations:div_frac_frac`
 - `frac_add_multi` (option) Add and Subtract More Fractions — host `fraction_operations:add_fractions_like`
 - `frac_amount_wp` (new) Fraction of an Amount Problems — host `fractions:fraction_of_amount_problems`
-- `frac_beyond_1` (new) Fractions Beyond 1 — host `fractions:mixed_numbers_intro`
+- `frac_beyond_1` (option) Fractions Beyond 1 — host `fractions:mixed_numbers_intro`
 - `frac_compare_gt1` (option) Compare and Order Fractions Greater Than 1 — host `fractions:compare`
 - `frac_find_whole` (option) Fraction of an Amount: Find the Whole — host `fractions:fraction_of_set_hard_nv`
 - `frac_nl_equiv` (option) Equivalent Fractions on a Number Line — host `fractions:equiv_frac_visual`
@@ -133,7 +133,7 @@ From the rule-id index (`design/cards/rule-index.json`, sha `5eb60f823a61`). An 
 - **RP-93** (WDS) Shade-it and partition-it items: parts are empty; each part is at least 6 mm at mid-radius or across. Denominator caps: circle 8 / 10 / 12 at S / M / L; bar 8 in 3 columns, 12 in 2 columns. Partition items show guide dots on the circumference (dotted semantics), never the partition lines. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **TY-7** (WDS) Fractions are always stacked over a bar, including inside story text. A slash fraction is a defect.
 
-### 4b. Also applies — ids only (66 rules)
+### 4b. Also applies — ids only (67 rules)
 
 Each id's full text is in `design/cards/rule-index.json` (look it up by id) and in the standard it names; open it when the rule is in play. Grouped by the heading that defines them:
 
@@ -147,6 +147,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - WDS · 11.1 Rules for every drawing — `RP-1` `RP-2` `RP-5`
 - WDS · 11.9 Schema diagrams — `RP-71` `RP-72`
 - WDS · 11.11 Fractions and decimals — `RP-90` `RP-91`
+- WDS · 12.2 The column x size rule — `DN-10`
 - WDS · 15.1 What must match — `SP-2` `SP-3`
 - WDS · 16. Accessibility — `AX-4`
 - WDS · 18. Visual quality bar — `VQ-1` `VQ-2` `VQ-3` `VQ-4` `VQ-9` `VQ-10`
@@ -261,15 +262,29 @@ Each runs as `node tests/scripts/<script> …`.
 10. **The model row leaves white right of the diagram at M (EB-SIDE risk). Fix?** Recommended: Centre the diagram in the width after the bars (as on the mock) and measure EB-SIDE; if a side still passes 30 %, widen the part-whole spacing (gap 22 -> 30 mm) rather than shrink anything.
 11. **The four new instruction strings and the iCan as worded in section 3?** Recommended: Yes.
 
-Signed: owner, 2026-11-20
+Signed: owner, 2026-11-21
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (3 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (17 lines; 0 undecided)
 
+- `mnTask=partition` Task [difficulty], default (all 1) [offered]
+- `mnTask=ones` Task [difficulty] (all 1) [offered]
+- `mnTask=compose` Task [difficulty] (all 1) [offered]
+- `mnTask=name` Task [difficulty] (all 1) [offered]
+- `mnDenoms=halves-quarters` Denominators [difficulty], default (all 1) [offered, PROPOSED]
+- `mnDenoms=to-8` Denominators [difficulty] (all 1) [offered, PROPOSED]
+- `mnWholes=1` Most wholes [difficulty] (all 1) [offered, PROPOSED]
+- `mnWholes=2` Most wholes [difficulty] (all 1) [offered, PROPOSED]
+- `mnWholes=3` Most wholes [difficulty], default (all 1) [offered, PROPOSED]
+- `mnWholes=5` Most wholes [difficulty] (all 1) [offered, PROPOSED]
+- `model=bar` Bar model [support], default (all 1) [offered, PROPOSED]
+- `model=none` Bar model [support] (all 1) [offered, PROPOSED]
+- `mnForm=diagram` Write the answer in [difficulty], default (all 1) [offered, PROPOSED]
+- `mnForm=eq` Write the answer in [difficulty] (all 1) [offered, PROPOSED]
 - `calculator=true` Calculator [play] (all 1) [out of scope, PROPOSED]
 - `calculator=false` Calculator [play], default (all 1) [out of scope, PROPOSED]
 - `skipAfter=*` Skip button (0 = off) [play] (all 1) [out of scope, PROPOSED]
@@ -279,9 +294,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:independent` — the skill's own items (all 1) [offered, PROPOSED]
 - `role:more-practice` — the skill's own items (all 1) [offered, PROPOSED]
 - `role:opener` (also lesson-opener) — provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 0/1 (default on mixed_numbers_intro); provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 0/1 (default on mixed_numbers_intro); provider misconceptions: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 1/1 (all 1) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 1/1; provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 1/1; provider misconceptions: real 1/1 (all 1) [offered, PROPOSED]
 - `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills); provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
 - `role:test` (also test-a, test-b) — provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 1) [offered, PROPOSED]
@@ -289,10 +304,10 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:fact-rows` — provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [out of scope, PROPOSED]
 - `role:fact-probe` — the skill's own items (all 1) [out of scope, PROPOSED]
 - `role:mixed-practice` (also mixed) — provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 0/1 (default on mixed_numbers_intro); provider wrongAnswer: real 0/1 (default on mixed_numbers_intro); provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 1/1 (all 1) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 1/1; provider wrongAnswer: real 1/1; provider stories: real 0/1 (default on mixed_numbers_intro) (all 1) [offered, PROPOSED]
 - `role:stretch` — the skill's own items (all 1) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 0/1 (FALLBACK, warm-up from the earlier skills in data.js order, on mixed_numbers_intro) (all 1) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 1/1 (all 1) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
@@ -305,5 +320,13 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 1) [offered, PROPOSED]
 - `host:race` — driven by ws-chromebook-fit (all 1) [out of scope, PROPOSED]
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
+**Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
+
+- `mnDenoms` Denominators: halves-quarters / to-8 (1)
+- `mnForm` Write the answer in: diagram / eq (1)
+- `mnTask` Task: partition / ones / compose / name (1)
+- `mnWholes` Most wholes: 1 / 2 / 3 / 5 (1)
+- `model` Bar model: bar / none (1)
+
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `fractions:name_mixed_from_model` → `fractions:mixed_numbers_intro` {"mnTask":"name"}; `fractions:write_mixed_from_parts` → `fractions:mixed_numbers_intro` {"mnTask":"compose"}
 <!-- /informational -->
