@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // ws-psc-review — the Pre-skill Check + Quick review checks (card design/cards/psc-review/PSC_REVIEW_CARD.md, signed by the
-// lead 2026-11-20). Check first: both FAIL on master (no Quick review band yet); next week's build makes them PASS.
+// lead 2026-11-20). Check first: each FAILS on master (no Quick review band yet); next week's build makes them PASS.
 //
-//   node tests/scripts/ws-psc-review.mjs                       # fixtures: add_facts M / L, div_facts M (the half-empty pages)
+//   node tests/scripts/ws-psc-review.mjs                       # fixtures: add_facts M / L, div_facts M / L, mult_facts M / L
 //   node tests/scripts/ws-psc-review.mjs --skills a:b,c:d --sizes M,L --seed 7
 //   node tests/scripts/ws-psc-review.mjs --self-test            # the pure judges on planted plans, no browser
+//   node tests/scripts/ws-psc-review.mjs --only PSC-SCORES      # judge only these rules (comma list)
 //
 // THE CONTRACT the build supplies (what these checks read):
 //   plan.meta.review   [{skill: 'cat:id', domain: 'CC'|'OA'|'NBT'|'NF'|'MD-m'|'MD-d'|'G', n}] - the review items, in page order
@@ -15,8 +16,10 @@
 // PSC-REVIEW-DOMAINS (fixture page with room left under the check):
 //   R1 a "Quick review" band exists; R2 its items rotate the grade's allowed domains, none repeated before every allowed domain
 //   has appeared (K: no NF; NF from grade 3); R3 no item is the lesson skill or a prerequisite; R4 two builds, same seed, identical.
-// PSC-SCORES: S1 "Check __/n" with n = the check items; S2 "Review __/m" with m = the review items; S3 the key labels every
-//   review item with its domain and skill.
+// PSC-SCORES: S1 "Check __/n" with n = the check items; S2 "Review __/m" with m = the review items (summed over the review
+//   bands: page 1 of a two-page check may carry one, lead A24 item 1b); S3 the key labels every review item with its domain and skill.
+// KEYLABEL-CLEAR (lead A24 item 5): on the key, each review label's box does not intersect its cell's ink box (the union of the
+//   cell's painted parts, the label and the number tab aside), measured in the DOM.
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -70,6 +73,47 @@ export function judge(b, own, grade) {
     return out;
 }
 
+/** KEYLABEL-CLEAR (lead A24 item 5, 2026-11-21): on every review answer in the key, the grey "<domain> · <skill>" label box
+ *  ([data-review-label]) does not intersect the cell's INK box - the union of the cell's painted parts (text, SVG shapes,
+ *  pictures, stroked boxes and answer slots), the label and the number tab aside. `cells` [{n, label: {l,t,r,b}, ink: {l,t,r,b}
+ *  | null}] in mm. Returns [{rule, msg}]. Pure. */
+export function keyLabelBad(cells, where = '') {
+    const out = [];
+    for (const c of cells) {
+        if (!c.ink || !c.label) continue;
+        const dx = Math.min(c.label.r, c.ink.r) - Math.max(c.label.l, c.ink.l);
+        const dy = Math.min(c.label.b, c.ink.b) - Math.max(c.label.t, c.ink.t);
+        if (dx > 0.05 && dy > 0.05) out.push({ rule: 'KEYLABEL-CLEAR', msg: `${where}review answer ${c.n}: the key label "${c.text || ''}" overlaps the cell's ink by ${dx.toFixed(1)} x ${dy.toFixed(1)} mm` });
+    }
+    return out;
+}
+/** In the key document: every [data-review-label] with its cell's ink box, in mm (runs in the browser). */
+function measureKeyLabels() {
+    const mm = 96 / 25.4;
+    const box = (r) => ({ l: r.left / mm, t: r.top / mm, r: r.right / mm, b: r.bottom / mm });
+    const out = [];
+    for (const lab of document.querySelectorAll('[data-review-label]')) {
+        const cell = lab.closest('[data-ws-cell]') || lab.closest('.ws-cell') || lab.parentElement;
+        let ink = null;
+        const add = (q) => { if (!q.width || !q.height) return; ink = ink ? { l: Math.min(ink.l, q.left), t: Math.min(ink.t, q.top), r: Math.max(ink.r, q.right), b: Math.max(ink.b, q.bottom) } : { l: q.left, t: q.top, r: q.right, b: q.bottom }; };
+        const skip = (d) => d === lab || lab.contains(d) || d.closest('[data-review-label], [data-ws-label], .ws-letter, .ws-tab');
+        for (const d of cell.querySelectorAll('*')) {
+            if (skip(d)) continue;
+            const st = getComputedStyle(d);
+            if (st.display === 'none' || st.visibility === 'hidden' || parseFloat(st.opacity || '1') <= 0.05) continue;
+            for (const nd of d.childNodes) if (nd.nodeType === 3 && nd.textContent.trim()) { const rg = document.createRange(); rg.selectNodeContents(nd); for (const q of rg.getClientRects()) add(q); }
+            const svg = d.namespaceURI === 'http://www.w3.org/2000/svg';
+            const tag = d.tagName.toLowerCase();
+            const shape = svg && /^(path|rect|circle|ellipse|line|polyline|polygon|text|use|image)$/.test(tag);
+            const pic = !svg && /^(img|canvas|input)$/.test(tag);
+            const stroked = !svg && ['Top', 'Right', 'Bottom', 'Left'].some((s2) => parseFloat(st[`border${s2}Width`]) > 0 && st[`border${s2}Style`] !== 'none');
+            if (shape || pic || stroked || d.hasAttribute('data-ws-slot')) add(d.getBoundingClientRect());
+        }
+        out.push({ text: lab.textContent.trim(), label: box(lab.getBoundingClientRect()), ink: ink ? { l: ink.l / mm, t: ink.t / mm, r: ink.r / mm, b: ink.b / mm } : null });
+    }
+    return out.map((c, i) => Object.assign(c, { n: i + 1 }));
+}
+
 function selfTest() {
     const ok = { plan: { meta: { items: 12, review: [{ skill: 'placevalue:identify', domain: 'NBT' }, { skill: 'geometry:x', domain: 'G' }] } },
         pupil: 'Quick review. Solve each one. Check __/12 Review __/2', key: '<i data-review-label>Base Ten · Place value<i data-review-label>Geometry · Shapes<', again: null };
@@ -82,6 +126,10 @@ function selfTest() {
         ['R2 repeat before all', rotationBad(['OA', 'OA'], allowedDomains(1)) !== null, true],
         ['R2 full cycle then repeat OK', rotationBad(allowedDomains(1).concat(['OA']), allowedDomains(1)), null],
         ['R2 NF at K not allowed', /not allowed/.test(rotationBad(['NF'], allowedDomains('K')) || ''), true],
+        // (KEYLABEL-CLEAR planted states: the label over the ink's top-right corner FAILS; above it, or beside it, passes)
+        ['KEYLABEL over the ink fails', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 3, r: 40, b: 40 } }]).length, 1],
+        ['KEYLABEL above the ink passes', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 4.5, r: 40, b: 40 } }]).length, 0],
+        ['KEYLABEL beside the ink passes', keyLabelBad([{ n: 1, label: { l: 41, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 0, r: 40, b: 40 } }]).length, 0],
     ];
     const bad = t.filter(([, got, want]) => got !== want);
     for (const [n, got, want] of bad) console.log(`  FAIL ${n}: got ${got}, want ${want}`);
@@ -93,7 +141,11 @@ async function main() {
     const H = require(path.join(__dirname, '..', 'lib', 'ws-harness.cjs'));
     const jobs = arg('skills', null)
         ? arg('skills').split(',').flatMap((k) => arg('sizes', 'M,L').split(',').map((size) => ({ k, size })))
-        : [{ k: 'addition:add_facts', size: 'M' }, { k: 'addition:add_facts', size: 'L' }, { k: 'division:div_facts', size: 'M' }];
+        : [{ k: 'addition:add_facts', size: 'M' }, { k: 'addition:add_facts', size: 'L' }, { k: 'division:div_facts', size: 'M' },
+            // (lead A24: the L fact pages the 3-column / side rule filled, and the grade-3 window)
+            { k: 'division:div_facts', size: 'L' }, { k: 'multiplication:mult_facts', size: 'M' }, { k: 'multiplication:mult_facts', size: 'L' }];
+    // (--only R1,R2: the rules to judge - an older backtest row pins the rules it was written for)
+    const only = arg('only', null) ? new Set(arg('only').split(',')) : null;
     const seed = Number(arg('seed', '7'));
     const app = await H.open({ seed: 1 });
     let fails = 0;
@@ -104,10 +156,24 @@ async function main() {
             const r = await window.buildSheet(req); const r2 = await window.buildSheet(req);
             const meta = r.plan && r.plan.meta ? r.plan.meta : {};
             return { plan: { meta: { items: meta.items, review: meta.review || null, prereqs: meta.prereqs || [] } }, pupil: r.pupilHtml, key: r.keyHtml, again: r2.pupilHtml,
+                keyDoc: r.keyHtml ? window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }) : null,
                 grade: (window.getSkillGrade && window.getSkillGrade(a.s)) || '' };
         }, { c: categoryId, s: skillId, size: j.size, seed });
         const own = [j.k].concat(b.plan.meta.prereqs || []);
         const out = judge(b, own, b.grade);
+        // KEYLABEL-CLEAR: the key rendered as printed, every review label against its cell's ink box
+        if (b.keyDoc) {
+            const kp = await app.browser.newPage();
+            try {
+                await kp.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+                await kp.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
+                await kp.setContent(b.keyDoc, { waitUntil: 'networkidle0', timeout: 60000 });
+                await kp.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+                await kp.emulateMediaType('print');
+                out.push(...keyLabelBad(await kp.evaluate(measureKeyLabels), ''));
+            } finally { await kp.close(); }
+        }
+        if (only) for (let i = out.length - 1; i >= 0; i--) if (!only.has(out[i].rule)) out.splice(i, 1);
         for (const x of out) console.log(`  FAIL ${x.rule} ${j.k} pre-skill-check ${j.size}: ${x.msg}`);
         fails += out.length;
     }
