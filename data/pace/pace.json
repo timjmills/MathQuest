@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T08:01:25.872Z",
- "head": "f8f0a379f",
+ "generated": "2026-11-21T08:47:40.715Z",
+ "head": "1efa6ee40",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 71,
    "usageEstimated": false,
-   "rev": "f8f0a379f",
+   "rev": "1efa6ee40",
    "skills": 742,
    "retired": 10,
    "presets": 130,
@@ -483,8 +483,8 @@
    "corePassed": 29,
    "passed": 33,
    "gates": 174,
-   "backtests": 801,
-   "ledger": 651,
+   "backtests": 802,
+   "ledger": 652,
    "lessons": 57,
    "lessonsPassed": 1,
    "lessonsPending": 5,
@@ -564,12 +564,12 @@
     "from": "2026-11-26"
    },
    "liveRecorded": true,
-   "ledgerAdded": 132,
+   "ledgerAdded": 133,
    "added": {
     "skills": 6,
     "passed": 1,
     "gates": 31,
-    "backtests": 199,
+    "backtests": 200,
     "lessons": 16,
     "lessonsPassed": null,
     "wrmCovered": 0
@@ -1755,6 +1755,13 @@
    }
   ],
   "2026-11-19": [
+   {
+    "date": "2026-11-21",
+    "title": "Deploy 8/10 filter chip on the Skills screen (owner request; lf-checks narrow critic r2 PASS 8/9/8/9)",
+    "detail": "Pressing the 8/10 chip shows only redesign-passed skills in every view (area, White Rose, Standard; filtered before the cut and before Add all); MAP shows the chip disabled with a note; \"What does 8/10 mean?\" beside the chip. Check PASS-CHIP-FILTER (every view, four widths). The Lessons-screen chip rides with the held lessons browser. Routed: D7 My sets note (next week).",
+    "kind": "skill",
+    "from": "STATUS.md"
+   },
    {
     "date": "2026-11-21",
     "title": "Deploy lf-ops steps hotfix (bug fix, no critic)",
