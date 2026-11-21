@@ -160,10 +160,6 @@ function _mnItem(q) {
     const model = reads || (o.model === 'bar' && o.form !== 'eq' && w <= 3 && (!paper || state.itemIndex < 2)) ? 'bar' : 'none';
     const form = o.form === 'eq' ? 'eq' : o.task === 'ones' ? 'ones' : o.task === 'compose' ? 'compose' : o.task === 'name' ? 'name' : 'two';
     const payload = { task: 'partition', w, n, d, form, model, answer: { w, n, d } };
-    // (lead ruling 2026-11-21 (1): at size L a printed page holds ONE model row - the bar model, a fading hint, on the page's
-    // first item only - so the model-off items stand two across under it and the page holds three or more. The size is the
-    // cell's (frac-model reads `modelL` at L on paper); compose / name read the bars and keep them on every item)
-    if (model === 'bar' && !reads && paper && state.itemIndex >= 1) payload.modelL = 'none';
     if (o.form === 'eq' && o.task === 'ones') payload.ones = true;
     const ones = o.task === 'ones';
     const frac = `${n}/${d}`;

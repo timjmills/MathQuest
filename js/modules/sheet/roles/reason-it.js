@@ -180,7 +180,10 @@ export function prepare(it, info = {}) {
     };
     // (critic cbt r1 D7, CL-40: a count row's A / B panels start below the cell label's keep-out - the A panel's corner painted
     // 3 mm across, 5 mm down at M / L; r3b's --ws-koin start was lost in the merge of master's three layouts)
-    const koTop = it.template === 'count-row' ? ';padding-top:max(0mm, var(--ws-koin, 0mm))' : '';
+    // (a mixed-number partition's A / B panels too: beside their response column the A panel's corner stood 0.7 mm under the cell's
+    // number tab at L - ws-empty-band TAB-CLEAR, lf-algebra mixed_numbers_intro)
+    const partition = !!(it.q && it.q.cell && it.q.cell.template === 'frac-model' && it.q.cell.payload && it.q.cell.payload.task === 'partition');
+    const koTop = it.template === 'count-row' || partition ? ';padding-top:max(0mm, var(--ws-koin, 0mm))' : '';
     const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}${koTop}">`
         + `<div class="mq-abbox"${boxAt(c, 1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
         + `<div class="mq-abbox"${boxAt(c, 1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`

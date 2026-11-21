@@ -9,9 +9,19 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-21 round 2 of precritic to green (Opus medium, lead rulings A29), branch lfa-mixed on 49a4b0021:
+  BACK TO THE SIGNED CARD (A29 (1)): the L one-model-row path (`modelL` / `pwAt`) is removed - L prints 2 model rows a page, M 3;
+  SIZE-ORDER clears (Independent M 3 >= L 2). PAGEFILL at L (~22-25 % white at its ceiling) accepted as a note (A29 (2)).
+  Own reds fixed at their cause: Scripted Model rows were laid 3 / 4 mm under the partition state they draw (the role took the
+  tab keep-out off a measure that holds none; in print the grid row grew and covered the frame's foot - RR-BOX, EB-CLIP):
+  frac-model `stateKeepOutMm` (partition: 0), read by scripted-model (additive hook, every other template unchanged). Reason It:
+  the partition's A / B panels start under the cell tab's keep-out (as count rows; TAB-CLEAR). Lesson Warm-up identify:
+  forms [0] (TAB-CLEAR in the half-width cell at L). Error Analysis M: shown work's joins 9 mm, three items a page (EB-LASTPAGE).
+  L model rows on practice pages: joins 21 mm, the diagram as tall as the 4-bar model (EB-STRETCH, lesson L practice); Model /
+  Guided / Opener states keep 18.
 - 2026-11-21 mixed_numbers_intro precritic fix (Opus medium, first skill on its drawing), branch lfa-mixed merged with master e0c90f8ad
   (4e1eba565). Codes unchanged: ZM / ZN / ZP (no clash: ws-code-snapshot OK, 744 codes, 0 moved).
-  DEPARTURE FROM THE CARD (lead ruling 2026-11-21 (1)): at size L a printed practice page holds ONE model row - the bar model
+  (REMOVED in round 2, A29 (1):) DEPARTURE FROM THE CARD (lead ruling 2026-11-21 (1)): at size L a printed practice page holds ONE model row - the bar model
   on the page's first item only (payload `modelL: 'none'` from item 2, read by frac-model at L, scaffold level 1); the
   model-off diagrams stand two (or three) across under it (their joins carry data-ws-natural on practice pages, so the measure
   no longer reads a two-across diagram as a shrunk picture). The card said "model on, wholes <= 2: L 2 a page".

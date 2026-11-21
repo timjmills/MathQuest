@@ -68,7 +68,9 @@ export const LESSONS = Object.freeze({
         warmup: [
             { key: 'fractions:write_fraction', opts: { model: ['bar'] }, why: 'The part bar is a fraction: the shaded parts of the parts in one whole.' },
             // (two cells of one height: a shade-it bar beside a write-it bar left a 35 % band under the shorter one at L)
-            { key: 'fractions:identify', opts: { model: ['bar'] }, why: 'A bar cut into equal parts: count the parts in one whole.' },
+            // ('What fraction is shaded?' only (forms [0]): the pick-a-model form's fraction stood 0.1 mm from the cell's number tab
+            // in the half-width Warm-up cell at L - ws-empty-band TAB-CLEAR - and the part's instruction named two tasks)
+            { key: 'fractions:identify', opts: { model: ['bar'], forms: [0] }, why: 'A bar cut into equal parts: count the parts in one whole.' },
         ],
         mixWith: [{ key: 'fractions:write_fraction', opts: { model: ['bar'] } }, { key: 'fractions:shade_fraction', opts: { model: ['bar'] } }],
     },

@@ -607,7 +607,11 @@ const PW = Object.freeze({
     M: { topW: 34, topH: 22, drop: 12, gap: 22, onesGap: 6, barW: 52, barH: 16 },
     // (`modelDrop`, L: beside the bars an 18 mm drop - the diagram as tall as the 4-bar model, so a model row's cell holds no
     // 30 % band, ws-empty-band; without the bars the 12 mm drop, so two Reason It pairs still fit a page)
-    L: { topW: 40, topH: 26, drop: 14, modelDrop: 18, gap: 22, onesGap: 6, barW: 56, barH: 18 },
+    // (21 mm, lf-algebra 2026-11-21: the diagram 82.2 mm, the 4-bar model's 82 - at 18 it stood 2 mm under it, so a 3-bar row
+    // beside a 4-bar row on one sheet was stretched past its drawing, ws-empty-band EB-STRETCH, lesson L practice)
+    // (`modelDropTeach`: a Model / Guided / Opener state (scaffold level 2-3) keeps 18 - its states are drawn one under another,
+    // never beside a 4-bar row, and at 21 two Scripted Model states no longer shared a page at L, ws-empty-band EB-PAGE)
+    L: { topW: 40, topH: 26, drop: 14, modelDrop: 21, modelDropTeach: 18, gap: 22, onesGap: 6, barW: 56, barH: 18 },
 });
 const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
 /** The part boxes' geometry at the ctx size (mm). */
@@ -616,7 +620,12 @@ function pwGeom(p, ctx) {
     // (on screen the joins drop 8 mm: the card fits the drawing to its height, and a taller diagram drew every digit smaller - ws-screen-ink-size)
     // (a lesson chart panel, `_barsUnder`: an anchor chart read, not written in - 6 mm joins and boxes 2 mm over their digits,
     // so two panels with their bars fit the chart page, lead ruling 2026-11-21 (2))
-    const G = isTwin(ctx) ? Object.assign({}, G0, { drop: 8 }) : p._barsUnder ? Object.assign({}, G0, { drop: 6 }) : p.model === 'bar' && G0.modelDrop && !p._barsUnder ? Object.assign({}, G0, { drop: G0.modelDrop }) : G0;
+    // (shown work at M - a made-up pupil's partition on Error Analysis, True or False?, Reason It (ctx.state 'wrong'): a picture
+    // read, never written in - joins 3 mm shorter (9 mm, the screen twin's 8 + 1), so an Error Analysis page at M holds three items where they fit; its 73.9 mm
+    // beside its decision boxes held two and left 32 % of the page white - ws-empty-band EB-LASTPAGE)
+    const shownM = !isTwin(ctx) && k === 'M' && ctx.state === 'wrong' && p.model !== 'bar';
+    const G = isTwin(ctx) ? Object.assign({}, G0, { drop: 8 }) : p._barsUnder ? Object.assign({}, G0, { drop: 6 }) : p.model === 'bar' && G0.modelDrop && !p._barsUnder ? Object.assign({}, G0, { drop: Number(ctx.scaffoldLevel) >= 2 && G0.modelDropTeach ? G0.modelDropTeach : G0.modelDrop })
+        : shownM ? Object.assign({}, G0, { drop: G0.drop - 3 }) : G0;
     const hw = SZ(ctx).writeMm;
     const wholeW = blankWidth(1, k) + 6, fracBar = blankWidth(2, k), fracW = fracBar + 6;
     const partH = 2 * hw + (p._barsUnder ? 2 : 8);
@@ -790,17 +799,8 @@ function pwEquation(p, ctx) {
     return `<span class="fm-pw-eq" data-ws-slot-group="answer"${join} style="display:inline-flex;align-items:center;gap:${L(ctx, 3)};flex:none;">`
         + `${pwMixed(ctx, p.w, p.n, p.d)}${sign('=')}${parts.join(sign('+'))}</span>`;
 }
-/**
- * The payload as this ctx draws it: at size L on paper a fading bar model stops after the page's first item
- * (`modelL: 'none'`, set by the generator from the item's place on the page; lead ruling 2026-11-21 (1)).
- */
-function pwAt(p, ctx) {
-    // (the practice pages only - scaffold level 1: a Model, Guided or Opener page (level 2-3) keeps the bars it teaches with)
-    return p && p.modelL && p.model === 'bar' && !isTwin(ctx) && pwSize(ctx) === 'L' && !(Number(ctx.scaffoldLevel) >= 2) ? Object.assign({}, p, { model: p.modelL }) : p;
-}
 /** The whole partition row: bars beside the diagram (model on), the diagram alone, or the equation. */
-function partitionRow(p0, ctx) {
-    const p = pwAt(p0, ctx);
+function partitionRow(p, ctx) {
     if (p.form === 'eq') {
         return `<div class="fm-row fm-pw-row"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:center;justify-content:center;">${pwEquation(p, ctx)}</div>`;
     }
@@ -823,8 +823,7 @@ function partitionRow(p0, ctx) {
         + `${pwBars(p, ctx)}<span style="flex:1 1 0;min-width:min-content;display:flex;justify-content:center;">${diagram}</span></div>`;
 }
 /** Natural size (mm) of a partition row at the ctx size. */
-function partitionSize(p0, ctx) {
-    const p = pwAt(p0, ctx);
+function partitionSize(p, ctx) {
     if (p.form === 'eq') {
         const g = pwGeom(Object.assign({}, p, { form: 'two' }), ctx);
         const dig = digitPt(ctx) * PT_MM;
@@ -875,6 +874,9 @@ register('frac-model', {
         });
         return { payload: { _marks: mk } };
     },
+    // (Scripted Model, roles/scripted-model.js: a partition state draws no top label keep-out - its tab keep-out is the bars' LEFT
+    // inset - so its measure is the state as drawn; every other task keeps the role's default)
+    stateKeepOutMm(p) { return p && p.task === 'partition' ? 0 : null; },
     // (a lesson chart panel passes its own width, `ctx.cellLiveMm`: a compose / name item draws its bars in a row under the
     // diagram there - lead ruling 2026-11-21 (2))
     stepState(p, steps, k, ctx) {

@@ -100,6 +100,9 @@ function statesOf(it) {
     return t && typeof t.statePayload === 'function' ? t : null;
 }
 
+/** The item's kit cell payload ({} when it has none). */
+const cellPayloadOf = (it) => (it && it.q && it.q.cell && it.q.cell.payload) || {};
+
 /** A state's step text: "(n) text" (the outlined circle marker). */
 const stepTextHtml = (steps, i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
 
@@ -398,7 +401,13 @@ export function plan(input = {}) {
     const textOn = it.statesMeasured ? 0 : textH2;
     // (and the pages are dealt at the height the row is laid out at: the measure less what the ROW-STRETCH CAP below takes off -
     // dealt at the measure, a count row that fits one page at its capped 50 mm took two, or merged its steps)
-    const offMm = 2 + koMm(ctx.size);
+    // (a template whose measured state holds NO top label keep-out - its tab keep-out is a LEFT inset, drawn on the state too -
+    // says so with `stateKeepOutMm(payload)` = 0: taking koMm off its measure laid the row 3 / 4 mm under the state it draws, and
+    // in print the grid row grew to the state and covered the Model frame's foot (lf-algebra mixed_numbers_intro, RR-BOX / EB-CLIP))
+    const tKo = stepTemplateOf(it);
+    const koOwn = tKo && typeof tKo.stateKeepOutMm === 'function' ? tKo.stateKeepOutMm(cellPayloadOf(it), ctx) : null;
+    const koState = koOwn !== null && koOwn !== undefined && Number.isFinite(Number(koOwn)) ? Math.max(0, Number(koOwn)) : koMm(ctx.size);
+    const offMm = 2 + koState;
     const laidH = (h) => (it.statesMeasured && cols === 1 ? Math.min(h, rowCapMm(h - offMm, [it])) : h);
     let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : laidH(h1 + textOn);
     let laid = !!it.statesMeasured && cols === 1;   // (H is already the laid-out height: the cap below is not taken twice)
