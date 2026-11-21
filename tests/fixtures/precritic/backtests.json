@@ -15911,65 +15911,85 @@
     "pass": "OK"
    }
   },
- {
-  "id": "lesson-player-hops-below",
-  "check": "ws-lesson-player --render --hops-below (A26, + A26b): at every width and I do step the count-on hops box never sits above the drawing, and where it shares the drawing's columns it starts >= 0.5 digit under the drawing's foot (beside is fine); at 820 portrait only, the answer row + the hops' room under it is reserved room (H13 <= 35 % without it, <= 47 % with it) that the last step inks in full",
-  "kind": "commit-pair",
-  "rule": "lf-hosts player critic r3 F1 (lead rulings A26 / A26b 2026-11-20)",
-  "browser": true,
-  "fail": {
-   "commit": "68b6ba366",
-   "state": "player r3: at 820 the stacked hops '5 6 7' sat 11 px above the sum's ringed 5, over its columns (306-470 px vs the drawing from 481 px): read as a top row of the addition"
+  {
+   "id": "lesson-player-hops-below",
+   "check": "ws-lesson-player --render --hops-below (A26, + A26b): at every width and I do step the count-on hops box never sits above the drawing, and where it shares the drawing's columns it starts >= 0.5 digit under the drawing's foot (beside is fine); at 820 portrait only, the answer row + the hops' room under it is reserved room (H13 <= 35 % without it, <= 47 % with it) that the last step inks in full",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r3 F1 (lead rulings A26 / A26b 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "68b6ba366",
+    "state": "player r3: at 820 the stacked hops '5 6 7' sat 11 px above the sum's ringed 5, over its columns (306-470 px vs the drawing from 481 px): read as a top row of the addition"
+   },
+   "pass": {
+    "commit": "862f96afe",
+    "state": "A26: stacked, the hops under the answer row, 0.6 digit below the drawing's foot; A26b reserved room at 820 portrait, inked by the last step"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --render --hops-below --widths 820,1024,1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "862f96afe",
-   "state": "A26: stacked, the hops under the answer row, 0.6 digit below the drawing's foot; A26b reserved room at 820 portrait, inked by the last step"
+  {
+   "id": "lesson-steps-panel-empty",
+   "check": "ws-lesson-pages STEPS-PANEL-EMPTY (lead via lf-ops 2026-11-21): no lesson page - pupil or key - prints a \"Steps:\" panel (a band's .ws-strip label, or the practice pages' [data-mq-lesson-strip]) whose content, with the label taken off, holds no text",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-pages STEPS-PANEL-EMPTY",
+   "browser": true,
+   "fail": {
+    "commit": "e0c90f8ad",
+    "state": "master e0c90f8ad: mult_2by1_column M and L seed 506061 (a preset of multiplication:multiply, which had no provider) - the Steps band beside Guided Practice drew its frame and no step, pupil p1 and key p1"
+   },
+   "pass": {
+    "commit": "477a7498f",
+    "state": "lf-ops-steps 477a7498f: a multiplication:multiply provider for stack items - column worked steps and four general Steps; the panel names them at M and L"
+   },
+   "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column --sizes M,L --seed 506061 --rules STEPS-PANEL-EMPTY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-lesson-player.mjs --render --hops-below --widths 820,1024,1280",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
+  {
+   "id": "lesson-role-set-column-mult",
+   "check": "ws-lesson-pages LESSON-ROLE-SET (lead A28 via lf-ops 2026-11-21): a lesson whose page roles are pinned (tests/fixtures/lesson-pages/role-sets.json, measured on master e0c90f8ad) prints exactly that set of data-ws-sheet roles, pupil and key - no new Model / anchor-chart page",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-pages LESSON-ROLE-SET",
+   "browser": true,
+   "fail": {
+    "commit": "617a2e92a",
+    "state": "lf-ops-steps 617a2e92a: multiply's new column worked steps made mult_2by1_column / mult_3by1_column lessons open with a lesson-chart (Model) page, pupil and key, at M and L - a page type they never printed"
+   },
+   "pass": {
+    "commit": "58cee626c",
+    "state": "lf-ops-steps 58cee626c: the multiply provider declares lessonChart: false (anchors.js lessonChartAllowed gates roles/lesson.js stateItems / secondItems); the lessons print master's roles plus the filled Steps panel"
+   },
+   "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column,multiplication:mult_3by1_column --sizes M,L --seed 506061 --rules LESSON-ROLE-SET",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pass-chip-filter-skills",
+   "check": "owner 2026-11-21 (lead ruling A33, critic r1 D1-D6): the Skills bar's 8/10 chip filters (aria-pressed, a count 8/10 · N skills) in EVERY view: pressed, Maths area shows exactly REDESIGN_PASSED; White Rose, Standard, MAP and My sets show no empty step / standard / grade grid or header, every Add all / Add whole grade carries passed keys only, every Show all N / + Add all N equals what it then lists, the Standard view shows exactly each standard's passed skills, MAP is filtered or the chip is disabled with its note, at most one empty note; unpress returns the same card ids; 'What does 8/10 mean?' on the chip's row at 1366/1280/1024/820; 48 px",
+   "kind": "commit-pair",
+   "rule": "ws-teacher-library PASS-CHIP-FILTER",
+   "browser": true,
+   "fail": {
+    "commit": "04ec06c32",
+    "state": "critic r1 state: White Rose / Standard keep empty steps and unpassed Add all (filter after the cut), MAP unfiltered, two notes in My sets, the info link wraps off the chip's row at 1280 / 820"
+   },
+   "pass": {
+    "commit": "8e918994e",
+    "state": "r2 fix: every view filtered before grouping and the cut, MAP chip disabled with its note, one empty note, chip and info link in one nowrap group"
+   },
+   "command": "node tests/scripts/ws-teacher-library.cjs --only PASS-CHIP-FILTER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
- },
- {
-  "id": "lesson-steps-panel-empty",
-  "check": "ws-lesson-pages STEPS-PANEL-EMPTY (lead via lf-ops 2026-11-21): no lesson page - pupil or key - prints a \"Steps:\" panel (a band's .ws-strip label, or the practice pages' [data-mq-lesson-strip]) whose content, with the label taken off, holds no text",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-pages STEPS-PANEL-EMPTY",
-  "browser": true,
-  "fail": {
-   "commit": "e0c90f8ad",
-   "state": "master e0c90f8ad: mult_2by1_column M and L seed 506061 (a preset of multiplication:multiply, which had no provider) - the Steps band beside Guided Practice drew its frame and no step, pupil p1 and key p1"
-  },
-  "pass": {
-   "commit": "477a7498f",
-   "state": "lf-ops-steps 477a7498f: a multiplication:multiply provider for stack items - column worked steps and four general Steps; the panel names them at M and L"
-  },
-  "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column --sizes M,L --seed 506061 --rules STEPS-PANEL-EMPTY",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-role-set-column-mult",
-  "check": "ws-lesson-pages LESSON-ROLE-SET (lead A28 via lf-ops 2026-11-21): a lesson whose page roles are pinned (tests/fixtures/lesson-pages/role-sets.json, measured on master e0c90f8ad) prints exactly that set of data-ws-sheet roles, pupil and key - no new Model / anchor-chart page",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-pages LESSON-ROLE-SET",
-  "browser": true,
-  "fail": {
-   "commit": "617a2e92a",
-   "state": "lf-ops-steps 617a2e92a: multiply's new column worked steps made mult_2by1_column / mult_3by1_column lessons open with a lesson-chart (Model) page, pupil and key, at M and L - a page type they never printed"
-  },
-  "pass": {
-   "commit": "58cee626c",
-   "state": "lf-ops-steps 58cee626c: the multiply provider declares lessonChart: false (anchors.js lessonChartAllowed gates roles/lesson.js stateItems / secondItems); the lessons print master's roles plus the filled Steps panel"
-  },
-  "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column,multiplication:mult_3by1_column --sizes M,L --seed 506061 --rules LESSON-ROLE-SET",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- }
  ]
 }

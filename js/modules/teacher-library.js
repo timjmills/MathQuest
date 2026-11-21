@@ -688,7 +688,7 @@ const SIZES = [['big', 'Big'], ['medium', 'Medium'], ['small', 'Small']];
 const LAYOUTS = [['thumb', 'Thumbnail', 'grid'], ['list', 'List', 'list'], ['chip', 'Chip', 'layers']];
 const GRADES = [['K', 'K', 'Kindergarten'], ['1', '1', 'Grade 1'], ['2', '2', 'Grade 2'], ['3', '3', 'Grade 3'], ['4', '4', 'Grade 4'], ['5', '5', 'Grade 5'], ['6', '6', 'Grade 6'], ['M', 'Mixed levels', 'Mixed levels']];
 
-const G = { q: '', browse: 'area', grade: '2', grades: ['2'], size: 'medium', layout: 'thumb', limit: G_PAGE, open: {}, fw: 'ccss', status: 'all', show: 'both' };
+const G = { q: '', browse: 'area', grade: '2', grades: ['2'], size: 'medium', layout: 'thumb', limit: G_PAGE, open: {}, fw: 'ccss', status: 'all', show: 'both', only: false };
 /** The grid's data-view: a card size for thumbnails, else 'list' / 'chip'. */
 const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
 (function restoreG() {
@@ -705,8 +705,15 @@ const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
     if (s.fw === 'ee') G.fw = 'ee';
     if (['all', 'gaps', 'covered'].includes(s.status)) G.status = s.status;
     if (s.show === 'plan') G.show = 'plan';
+    if (s.only === true) G.only = true;
 })();
-function persistG() { writeStore(G_KEY, { browse: G.browse, grade: G.grade, grades: G.grades, size: G.size, layout: G.layout, fw: G.fw, status: G.status, show: G.show }); }
+function persistG() { writeStore(G_KEY, { browse: G.browse, grade: G.grade, grades: G.grades, size: G.size, layout: G.layout, fw: G.fw, status: G.status, show: G.show, only: G.only }); }
+/** The 8/10 chip (owner 2026-11-21, lead ruling A33): a FILTER. Pressed, every view shows only the skills that passed
+ *  the 8/10 redesign (redesign-passed.js); the explanation sits behind "What does 8/10 mean?" beside it. */
+const passOk = (k) => !G.only || REDESIGN_PASSED.has(k);
+export function passChipHTML(on, n, noun, act = 'data-act="only"') {
+    return `<button type="button" class="ts-passchip" ${act} aria-pressed="${on ? 'true' : 'false'}" title="Show only the ${noun}s that passed the 8/10 quality check"><span class="ts-passchip-m" aria-hidden="true">✓</span><span>8/10 · ${n} ${noun}${n === 1 ? '' : 's'}</span></button>`;
+}
 
 let groot = null;
 const gkey = (s) => `${s.categoryId}:${s.skillId}`;
@@ -730,7 +737,7 @@ const stdSort = (x, y) => (stdOf(x) || 'zz').localeCompare(stdOf(y) || 'zz', 'en
 
 /** A WHOLE GRADE (or area): one of each skill — no Mixed pools, no Maths words cards, no "(No Pictures)" twin. */
 function wholeSet(g, a) {
-    return skillCatalogue().filter((s) => s.level === g && !adOf(s).pool && adOf(s).area !== 'WORDS' && (!a || adOf(s).area === a)
+    return skillCatalogue().filter((s) => s.level === g && passOk(gkey(s)) && !adOf(s).pool && adOf(s).area !== 'WORDS' && (!a || adOf(s).area === a)
         && !/\((no pictures|no visuals)\)/i.test(s.label)).map(gkey);
 }
 
@@ -763,7 +770,7 @@ function pickGrade(g) {
 function perGrade(fn) {
     const gs = realGrades().length ? realGrades() : G.grades;
     if (gs.length === 1) { G.grade = gs[0]; const h = fn(); G.grade = G.grades[0]; return h; }
-    const out = gs.map((g) => { G.grade = g; return `<h2 class="ts-grade-head ts-grade-sec">${gbadge(g, true)}</h2>${fn()}`; }).join('');
+    const out = gs.map((g) => { G.grade = g; const h = fn(); return G.only && !h.includes('class="ts-card') ? '' : `<h2 class="ts-grade-head ts-grade-sec">${gbadge(g, true)}</h2>${h}`; }).join('');
     G.grade = G.grades[0];
     return out;
 }
@@ -799,12 +806,13 @@ function gShellHTML() {
   <div class="ts-frow"><span class="ts-flabel" id="tsBrowseL">Browse by</span><div class="ts-seg ts-browse" role="group" aria-labelledby="tsBrowseL" id="tsBrowse"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsSizeL">Size</span><div class="ts-seg" role="group" aria-labelledby="tsSizeL" id="tsViews"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsShowL">Skills to make</span><div class="ts-seg" role="group" aria-labelledby="tsShowL" id="tsShow"></div>
-    <details class="ts-marks"><summary><span class="ts-pass" aria-hidden="true"></span>What the marks mean</summary>
+    <span class="ts-fsep" role="presentation"></span><span class="ts-passgrp"><span id="tsPassChip"></span>
+    <details class="ts-marks"><summary><span class="ts-marks-i" aria-hidden="true">i</span>What does 8/10 mean?</summary>
       <div class="ts-marks-pop" role="note">
         <p><b class="ts-marks-tick" aria-hidden="true">✓</b><span><b>Tick box, top right</b>: the skill is in your tray. Click it to add or take out.</span></p>
         <p><span class="ts-pass" aria-hidden="true"></span><span><b>8/10, bottom right</b>: the skill has been redesigned and passed our quality check. An independent reviewer scored every page type (lesson, practice, test …) and every screen at 8 or more out of 10 for how it looks, how it teaches and that it is correct. Skills without it still work: they are older designs waiting for their redesign.</span></p>
         <p><b class="ts-marks-plan" aria-hidden="true">&nbsp;</b><span><b>Orange outline, "Yet to be built"</b>: a planned skill, not in the app yet. Turn on "Yet to be built" to see them.</span></p>
-      </div></details></div>
+      </div></details></span></div>
 </div>
 <div id="tsList" class="ts-list"></div>`;
 }
@@ -819,6 +827,10 @@ function gSyncControls() {
     r.querySelector('#tsBrowse').innerHTML = BROWSE.map(([k, l]) => `<button type="button" data-act="browse" data-arg="${k}" ${pressedA(G.browse === k)}>${l}</button>`).join('');
     r.querySelector('#tsViews').innerHTML = SIZES.map(([k, l]) => `<button type="button" data-act="size" data-arg="${k}" ${pressedA(G.size === k)}${G.layout === 'thumb' ? '' : ' title="The size of the thumbnail cards"'}>${l}</button>`).join('');
     r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + GRADES.map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}" ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
+    r.querySelector('#tsPassChip').innerHTML = passChipHTML(G.only, REDESIGN_PASSED.size, 'skill');
+    // MAP tasks are not filtered (critic r1 D3): the chip says so by being disabled there, with a one-line note in the view
+    const pc = r.querySelector('#tsPassChip [aria-pressed]');
+    if (pc && G.browse === 'map' && !searching) { pc.setAttribute('aria-disabled', 'true'); pc.title = '8/10 filter: not available in MAP view'; }
     r.querySelector('#tsSearchNote').textContent = searching ? 'Searching all grades' : '';
     r.classList.toggle('ts-searching', searching);
 }
@@ -831,6 +843,7 @@ function layoutSegHTML() {
 /** A skill card: grade pill + tick, bold name, the real item, area word + icon. data-skill = 'category:skill'. */
 function gCard(s) {
     const k = gkey(s);
+    if (!passOk(k)) return '';
     const d = adOf(s);
     const a = d.area;
     const on = trayHas(k);
@@ -967,7 +980,7 @@ function gRender() {
     const eyebrow = groot.querySelector('#tsEyebrow');
     let html = '';
     if (q) {
-        const hits = rankByQuery(skillCatalogue(), q);
+        const hits = rankByQuery(skillCatalogue(), q).filter((x) => passOk(gkey(x)));
         eyebrow.textContent = `All grades • ${plural2(hits.length, 'skill')} ${hits.length === 1 ? 'matches' : 'match'}`;
         if (!hits.length) html = `<p class="ts-note">No skill matches “${esc(G.q)}”. Try fewer words.</p>`;
         else {
@@ -977,13 +990,13 @@ function gRender() {
                 + order.map((a) => gGroup(a, by[a], { cross: true, budget })).join('') + moreHTML(hits.length - G.limit);
         }
     } else if (G.browse === 'area') {
-        const list = skillCatalogue().filter((s) => G.grades.includes(s.level));
+        const list = skillCatalogue().filter((s) => G.grades.includes(s.level) && passOk(gkey(s)));
         eyebrow.textContent = `${gradesName()} • ${plural2(list.length, 'skill')}`;
         const { by } = byArea(list);
         const whole = wholeSetG();
         const nG = realGrades().length;
         const budget = { left: G.limit };
-        const plan = plannedByArea();
+        const plan = G.only ? {} : plannedByArea();   // a planned skill has not passed
         const order = AREA_ORDER.filter((a) => by[a] || plan[a]);
         order.forEach((a) => { by[a] = (by[a] || []).sort(stdSort); });
         html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>${nG > 1 ? `Add all ${nG} grades` : 'Add whole grade'}</span></button><span class="ts-note">Add ${whole.length} skills from ${esc(allOn() ? 'every grade' : nG > 1 ? gradesNameOf(realGrades()) : gradeName(realGrades()[0]))} to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
@@ -1003,6 +1016,11 @@ function gRender() {
         html = setsHTML();
     }
     box.innerHTML = html;
+    // the 8/10 filter on and nothing passed here: say so plainly
+    if (G.only && (q || (G.browse !== 'map' && G.browse !== 'sets')) && !box.querySelector('.ts-card[data-skill], .ts-task')) {
+        box.querySelectorAll('.ts-note').forEach((p) => { if (/^(No |Nothing )/.test(p.textContent.trim())) p.remove(); });
+        box.insertAdjacentHTML('afterbegin', '<p class="ts-note ts-pass-empty" data-ts-empty="only">No skill here has passed 8/10 yet. Press "8/10" again to see every skill.</p>');
+    }
     gThumbs(box);
 }
 
@@ -1022,7 +1040,7 @@ function wrmHTML() {
     const blocks = WRM.WRM_BLOCKS.filter((b) => b.id.startsWith(`${year.id}.`));
     const cat = new Map(skillCatalogue().map((s) => [gkey(s), s]));
     const out = blocks.map((b) => {
-        const steps = WRM.WRM_STEPS.filter((st) => st.id.startsWith(`${b.id}.`)).map((st) => ({ st, skills: WRM.skillsForWrmStep(st.id).map((k) => cat.get(k)).filter(Boolean) }));
+        const steps = WRM.WRM_STEPS.filter((st) => st.id.startsWith(`${b.id}.`)).map((st) => ({ st, skills: WRM.skillsForWrmStep(st.id).map((k) => cat.get(k)).filter((s) => s && passOk(gkey(s))) }));
         const withSkills = steps.filter((x) => x.skills.length);
         if (!withSkills.length) return '';
         const areaVotes = {};
@@ -1031,7 +1049,7 @@ function wrmHTML() {
         const a = code ? (areaOfCode(code, G.grade) || 'NOSTD') : Object.entries(areaVotes).sort((p, q) => q[1] - p[1])[0][0];
         const key = `w${b.id}`;
         const lim = G.open[key] ? withSkills.length : 3;
-        return `<section class="ts-group" data-domain="${a}">${bandHTML(a, `${b.term} block ${b.termBlock}: ${b.name}`, `${AREAS[a].name} · ${plural2(steps.length, 'step')}`, layoutSegHTML())}`
+        return `<section class="ts-group" data-domain="${a}">${bandHTML(a, `${b.term} block ${b.termBlock}: ${b.name}`, `${AREAS[a].name} · ${G.only ? `${plural2(withSkills.length, 'step')} with 8/10 skills` : plural2(steps.length, 'step')}`, layoutSegHTML())}`
             + withSkills.slice(0, lim).map(({ st, skills }) => `<div class="ts-step"><b>Step ${esc(st.id.split('.S')[1])}: ${esc(st.title)}</b>${(st.ccss || [])[0] ? `<span class="ts-gpill">${esc(st.ccss[0])}</span>` : ''}${skills.length > 1 ? `<button type="button" class="ts-btn ts-add" data-act="addkeys" data-arg="${esc(skills.map(gkey).join(','))}" data-what="Step ${esc(st.id.split('.S')[1])}">+ Add all ${skills.length}</button>` : ''}</div><div class="ts-grid ts-mb" data-view="${gv()}">${skills.map(gCard).join('')}</div>`).join('')
             + (withSkills.length > lim ? `<button type="button" class="ts-btn ts-more-btn" data-act="showall" data-arg="${esc(key)}">Show all ${withSkills.length} steps</button>` : '')
             + '</section>';
@@ -1054,10 +1072,11 @@ function stdHTML() {
     const rows = coverageRows(STDM, { fw: G.fw, grade: g });
     const covered = rows.filter((r) => r.covered).length;
     const cat = new Map(skillCatalogue().map((s) => [gkey(s), s]));
-    const shownRows = rows.filter((r) => G.status === 'all' || (G.status === 'gaps' ? !r.covered : r.covered));
+    const skillsOf = (r) => r.skills.map((k) => cat.get(k)).filter((s) => s && passOk(gkey(s)));
+    const shownRows = rows.filter((r) => (G.status === 'all' || (G.status === 'gaps' ? !r.covered : r.covered)) && (!G.only || skillsOf(r).length));
     const by = {};
     shownRows.forEach((r) => {
-        const first = r.skills.map((k) => cat.get(k)).find(Boolean);
+        const first = skillsOf(r)[0] || r.skills.map((k) => cat.get(k)).find(Boolean);
         const code = r.type === 'ee' && r.ccss && r.ccss[0] ? r.ccss[0] : r.code;
         const a = first ? adOf(first).area : (areaOfCode(String(code).replace(/^EE\./, ''), r.grade) || 'NOSTD');
         (by[a] = by[a] || []).push(r);
@@ -1069,7 +1088,7 @@ function stdHTML() {
         const lim = G.open[key] ? by[a].length : 4;
         return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(by[a].length, G.fw === 'ee' ? 'element' : 'standard'), layoutSegHTML())}`
             + by[a].slice(0, lim).map((r) => {
-                const skills = r.skills.map((k) => cat.get(k)).filter(Boolean);
+                const skills = skillsOf(r);
                 const sk = `k${r.code}`;
                 const slim = G.open[sk] ? skills.length : 4;
                 return `<div class="ts-std"><div class="ts-step"><span class="ts-gpill">${esc(r.short || r.code)}</span><span class="ts-badge${r.covered ? '' : ' quiet'}">${r.covered ? '✓ Covered' : 'Not yet'}</span>${skills.length > 1 ? `<button type="button" class="ts-btn ts-add" data-act="addkeys" data-arg="${esc(skills.map(gkey).join(','))}" data-what="${esc(r.short || r.code)}">+ Add all ${skills.length}</button>` : ''}</div><p class="ts-note">${esc(r.text)}</p>`
@@ -1098,7 +1117,7 @@ function mapHTML() {
     const by = {};
     MAPT.forEach((t, i) => { if (t.skills.length) (by[t.strand] = by[t.strand] || []).push({ t, i }); });
     const order = [...names.filter((n) => by[n]), ...Object.keys(by).filter((n) => !names.includes(n))];
-    return `<p class="ts-note ts-mb">Pick a MAP task: its skills go into the tray.</p>` + order.map((st) => {
+    return `<p class="ts-note ts-mb">Pick a MAP task: its skills go into the tray.</p><p class="ts-note ts-mb ts-pass-na">8/10 filter: not available in MAP view</p>` + order.map((st) => {
         const a = STRAND_AREA[st] || 'NOSTD';
         const key = `m${st}`;
         const lim = G.open[key] ? by[st].length : 6;
@@ -1291,6 +1310,7 @@ function gAction(act, arg, b) {
         case 'more': G.limit += G_PAGE; break;
         case 'showall': G.open[arg] = true; break;
         case 'show': G.show = arg === 'plan' ? 'plan' : 'both'; if (G.browse !== 'area') G.browse = 'area'; persistG(); break;
+        case 'only': if (G.browse === 'map' && !G.q.trim()) return; G.only = !G.only; G.limit = G_PAGE; persistG(); break;
         case 'addgrade': trayAddMany(wholeSetG(), realGrades().length > 1 ? gradesName() : `Whole ${gradeName(realGrades()[0])}`); return;
         case 'addarea': trayAddMany(wholeSetG(arg), `${AREAS[arg].name}, ${realGrades().length > 1 ? gradesName() : gradeName(realGrades()[0])}`); return;
         case 'addkeys': trayAddMany(arg.split(',').filter(Boolean), b.dataset.what || 'These skills'); return;
