@@ -27,11 +27,15 @@ export const LESSONS_PASSED = new Map([
     // Re-stamped by the narrow critic lessons-browser r1: master e7c418bd4 re-pinned its pages, and the change is class-only
     // (mq-pagecap on 12 grids, no CSS for it; engine <style> rules for classes these pages do not carry); all 54 pages at
     // seeds 4242 and 1 are pixel-identical to the d38308824 render the re-check graded.
-    ['g4-nbt1-ten-times-value', { evidence: RESTAMP, renderStamp: { source: 'lesson-baseline', commit: 'e7c418bd4', digests: { 4242: 'bf2a28db905c2d3d', 1: '0105df71052471f4' } } }],
 ]);
 
 /** id -> { evidence (the earlier pass), why (what the re-check found) } */
 export const PENDING_RECHECK = new Map([
+    ['g4-nbt1-ten-times-value', {
+        evidence: RESTAMP,
+        kind: 'changed',
+        why: 'Stale since the 2026-11-20/21 engine deploys (row cap, fill fix): its pages render differently from the graded e7c418bd4 render at seeds 1 and 4242 (ws-lessons-passed LP-STAMP). Moved here at the lessons-browser deploy (lead, 2026-11-21); a narrow critic re-check restores it.',
+    }],
     ['g3-oa5-mult-properties', {
         evidence: RECHECK,
         kind: 'changed',

@@ -1330,7 +1330,6 @@ function gAction(act, arg, b) {
         case 'browse': G.browse = arg; G.q = ''; G.limit = G_PAGE; persistG(); break;
         case 'grade': pickGrade(arg); G.q = ''; G.limit = G_PAGE; persistG(); break;
         case 'area': G.area = AREA_ORDER.includes(arg) ? arg : ''; G.limit = G_PAGE; break;
-        case 'only': G.only = !G.only; G.limit = G_PAGE; persistG(); break;
         case 'size': G.size = arg; if (G.layout !== 'thumb') G.layout = 'thumb'; persistG(); break;
         case 'layout': G.layout = arg; persistG(); break;
         case 'fw': G.fw = arg === 'ee' ? 'ee' : 'ccss'; persistG(); break;

@@ -1049,3 +1049,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 
 ## 2026-11-21 — Deploy 8/10 filter chip on the Skills screen (owner request; lf-checks narrow critic r2 PASS 8/9/8/9)
 - Pressing the 8/10 chip shows only redesign-passed skills in every view (area, White Rose, Standard; filtered before the cut and before Add all); MAP shows the chip disabled with a note; "What does 8/10 mean?" beside the chip. Check PASS-CHIP-FILTER (every view, four widths). The Lessons-screen chip rides with the held lessons browser. Routed: D7 My sets note (next week).
+
+## 2026-11-21 — Deploy the lessons browser (OWNER: "put it live and then we will fix later")
+- Lessons screen: curriculum order by unit with the 2026-27 unit dates (data/curriculum/pacing/2026-27.json, edited yearly), grade colours, thumbnails (item cards for detailed lessons, A20 waiver), the 8/10 lesson filter chip, D11/D12 fixes. Critic r3 C1-C3 8; C4 7 on the freeze margin only.
+- OWNER WAIVER (2026-11-21): shipped with the known THUMB-NO-FREEZE red (~166-221 ms main-thread task at CPU x4; cause :has() whole-document restyles + refreshActiveBox on teacher screens). Fix next week: lf-engine (sheet-kit.css :has), lf-hosts (ui-components / screen-cell :has, skip refreshActiveBox on teacher screens), then the gate re-run and the tiny C4 critic.
+- Lessons registry: g4-nbt1-ten-times-value moved to PENDING_RECHECK (its pages changed with the row-cap / fill-fix deploys; LP-STAMP stale). 0 lessons marked 8/10 until re-checks run; PASS-CHIP-FILTER (lessons) reds on an empty registry - the check must accept an empty passed set (lf-checks, next week).
+- Merge note: teacher-library.js conflict resolved to master's critic-r2 Skills chip; the duplicate 'only' case removed.
