@@ -167,3 +167,31 @@ Next-week item 1 now covers both:
 1. Step marks on every Model state.
 2. A filled Steps panel on the lesson.
 3. New check STEPS-PANEL-EMPTY: it FAILs when a lesson Steps panel draws no step text. Backtest it on master f8164ca5d (FAIL) and on the fix (OK).
+
+## 2026-11-21 round 2 (fresh builder, Opus 5.5 medium: the rebuild after critic r1 FAIL, root-cause rule)
+
+Step 0: merged origin/claude/sweet-newton-c8wrv1-lf-ops-steps (617a2e92a, then A28 c5436f798) and origin/master (575a6abe3,
+ws-merge-master). ONE `multiplication:multiply` provider: the hotfix's column steps (`columnMultiply`, stack items) and strings
+(`keyIsDefault`, practice.js), this branch's `longMultSteps` (long-multiplication grids), the stories, and A28 as
+`lessonChart: (q) => false` only for a 2- or 3-digit-by-1 stack item (mult_2by1 / 3by1: no chart, as master); the size presets
+keep the anchor chart they were graded with. Process rule 21 (new* precritic red is the branch's own) added to LESSONS_LEARNED.
+
+| item | root cause | check (check-first: FAIL on c180eacc6, OK on the fix) | backtest row |
+|---|---|---|---|
+| F1 Model states blank | scripted-model.js drew state marks only for TRACE_TEMPLATES / `statePayload`; MODEL-STATE-MARKS judged only TRACE_TEMPLATES | ws-guided-echo MODEL-STATE-MARKS extended to every `stepState` template (stack digits read from ink marks) + MODEL-STATE-CHANGE: 32 → 0 (8 presets x M/L x 3 seeds). Fix: `stepStatesFor` + registry.renderCell `modelState` draw state k with the template's own stepState (the anchor chart's drawing); a stepState state is laid out at its measure (L OVERFLOW 28 → 0) | `sizes-r2-model-state-marks` |
+| F2 / F12 incoherent area wrong work | areaWrong named mark ids (r0c1) the template does not draw, the page's commas grouped the total ("1,590" split 1 / 590), TF passed no slots | NEW ws-guided-echo EA-WORK-COHERENT: 29 → 0 (3 area presets, EA / TF / RI, M/L x 4 seeds). Fix: every `part-<k>` and `total` named, raw digits; area-model never splits a grouped total; TF draws a multi-box error's slots | `sizes-r2-ea-work-coherent` |
+| F3 / F4 "factors added" | multiply had no wrongAnswer: default "added" | NEW ws-guided-echo EA-WRONG-KIND (never a + b; 4+ wrong works show 2+ kinds): FAIL → OK. Fix: multiplyWrong - placeholder-zero (M-S4), last-carry-dropped (M-S2), regroup-not-added, sum-no-regroup, zero-as-one (M-S5), rotated by item; long-multiplication draws the pupil's wrong rows (`row1` / `row2`) | `sizes-r2-ea-wrong-kind` |
+| F5 Reason It L overprint | area-model has no true work width (workW 0) → BESIDE layout | ws-cell-checks OVERFLOW reason-it L (ruled pages included; Process rule 19): 12 → 0. Fix: FULL layout (A over B full width, the response under) for an area model wider than the panel beside the response; stacked copies drop the work lines (`noWork`) | `sizes-r2-ri-amodel-overflow-l` |
+| F6 screen clip | the quiz paper held 720 px, the 820 card pane 703 px; the screen meta measured only targets | NEW ws-screen-slots SCREEN-CLIP (on with --screen-digit, so on precritic's screen-slots gate): 5 → 0; SCREEN-DIGIT still 0 misses. Fix (screen-cell.css, additive): the quiz paper widens to the card for an area model; the card's side padding narrows below 1024 px. Digits keep their floor | `sizes-r2-screen-clip` |
+| F8 chart 22 mm into the footer | chart.js run-on branch chose a zoom < 1 (`chartMinZoom`) for a second panel row but kept rows H(1) tall | EXISTING ws-cell-checks OVERFLOW lesson (2by2 / 3by2 M page 1 "body overflows by 22 mm"): FAIL → OK. Fix: rowH and lastPer by H(z) | `sizes-r2-lesson-chart-overflow` |
+
+**area_model_4by1 Reason It L, measured (no ruling added, as briefed):** FULL layout, work lines off: each A / B panel 150.1 x 52.3 mm
+drawn (65.8 mm with its pad and tag), the response row 14 mm. One item = 2 x 65.8 + 3 + 14 ≈ 149 mm against L's 113.5 mm cell
+for two a page, so it prints ONE a page: LONE-PAGE (unruled). Needs a lead ruling (one a page, like A9b) or a smaller A/B form.
+Reason It M (4by1, 2by2, 3by2) moved from OVERFLOW (known open) to LONE-PAGE (one a page, legible); the M two-a-page item was
+not started (brief).
+
+**Not done (budget / brief):** F10 (tiles=null Model text: the non-sized deal still falls back to the default hint steps - the
+hotfix returned [] there; this branch kept its fallback), F9 (pre-skill check below each preset), F7, F11, F13-F15, M two-a-page.
+Lesson L remaining OVERFLOW: area_model_4by1 L p6 and area_model_3by2 L p5 (a Practice cell, 9.7-13.6 mm past it), and the
+master classes print-lint lists (2by2 ILLEGIBLE 20 / PG-12 8 on p1, TOPSTART 12 on the long-multiplication lessons).

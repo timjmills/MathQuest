@@ -196,7 +196,8 @@ export function prepare(it, info = {}) {
     };
     // (critic cbt r1 D7, CL-40: a count row's A / B panels start below the cell label's keep-out - the A panel's corner painted
     // 3 mm across, 5 mm down at M / L; r3b's --ws-koin start was lost in the merge of master's three layouts)
-    const koTop = it.template === 'count-row' ? ';padding-top:max(0mm, var(--ws-koin, 0mm))' : '';
+    // (and a FULL area model's A panel, which starts at the cell's top-left beside the number tab - ws-empty-band TAB-CLEAR)
+    const koTop = it.template === 'count-row' || amStacked ? ';padding-top:max(0mm, var(--ws-koin, 0mm))' : '';
     const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}${koTop}">`
         + `<div class="mq-abbox"${boxAt(c, 1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
         + `<div class="mq-abbox"${boxAt(c, 1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
