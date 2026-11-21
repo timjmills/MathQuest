@@ -725,6 +725,9 @@ export const REVIEW_INK_MIN = 0.72;
  *  fact (26 mm of ink in a 46.5 mm cell, 10 mm a side) passes; the same ink pinned to one side does not. (lead A24 item 1, the
  *  white filled with review items.) */
 export const REVIEW_SIDE_MAX = 0.27;
+/** ... and the cell's horizontal white in all (both sides beside the ink) stays under half its width (lf-roles critic qreview r1:
+ *  the 27 % side rule alone lets a narrow centred item stand in 26 % + 26 % of white - half an empty cell reads as a missing part). */
+export const REVIEW_EMPTY_MAX = 0.5;
 // (templates the review passes over: a legacy cell is no kit cell (card: each item its own kit cell); word-work at L draws its
 // number tab 1.6 mm from the story (TAB-CLEAR, also red on sub_wp_20's own L check on master - a template defect, not this band's)
 // (a review label is two digits - 9 to 20 - and these cells draw into a two-digit tab's gutter: fraction_number_line's line
@@ -811,7 +814,8 @@ export function reviewRows(input, ctx, m, room) {
             const me = it.measured && it.measured[cols];
             const w = me && me.inkMm;
             if (!(w > 0)) return true;
-            if (Number.isFinite(me.slackMm) && me.slackMm >= 0) return nominal - w - me.slackMm < REVIEW_SIDE_MAX * nominal;
+            // (and the two empty sides TOGETHER under REVIEW_EMPTY_MAX: two 26 % sides each pass EB-SIDE yet leave half the cell white)
+            if (Number.isFinite(me.slackMm) && me.slackMm >= 0) return nominal - w - me.slackMm < REVIEW_SIDE_MAX * nominal && nominal - w < REVIEW_EMPTY_MAX * nominal;
             return w >= REVIEW_INK_MIN * inner;
         });
         const pick = (from, k, acc) => {
