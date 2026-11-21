@@ -62,6 +62,21 @@ export function workedStepsOf(it) {
     } catch (e) { return []; }
 }
 
+/**
+ * May the lesson draw this item's worked steps as an ANCHOR CHART (the Model page)? A provider that declares
+ * `lessonChart: false` (or a function of the item's q returning false) keeps its worked steps for the Steps zone, the
+ * Guided band and the Practice strip, but its lessons open on no chart page (lf-ops A28, lead 2026-11-21: multiply's column
+ * presets gained worked steps; their lessons had never printed a chart and none is graded - ws-lesson-pages LESSON-ROLE-SET).
+ */
+export function lessonChartAllowed(it) {
+    const q = (it && it.q) || {};
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        if (!p || p.lessonChart === undefined) return true;
+        return typeof p.lessonChart === 'function' ? p.lessonChart(q) !== false : p.lessonChart !== false;
+    } catch (e) { return true; }
+}
+
 /** Does this skill get an anchor? Only a real provider with at least 2 worked steps (review note 3). */
 export const anchorEligible = (it) => workedStepsOf(it).length >= 2;
 
@@ -603,7 +618,7 @@ export const ANCHOR_CSS = `
 `;
 
 export default {
-    ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
+    ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, lessonChartAllowed, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
     anchorPlanItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, SIDE_BAND_ONLY, ANCHOR_PAGE_CSS, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
 };

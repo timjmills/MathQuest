@@ -21,6 +21,13 @@
 //                       had no Steps zone, and we-do.js drew the band's frame anyway). Every element labelled exactly "Steps:"
 //                       (a band's .ws-strip label, the practice pages' strip [data-mq-lesson-strip]) is judged: its band, with
 //                       the label taken off, holds text. Pupil and key pages.
+//   LESSON-ROLE-SET     a lesson whose page roles are pinned prints exactly those roles (lf-ops A28, lead 2026-11-21: the Steps
+//                       fix gave multiply's column presets worked steps, and their lessons OPENED WITH AN ANCHOR CHART / Model
+//                       page they had never printed and no critic had graded). The roles are the pages' data-ws-sheet values
+//                       (lesson-chart, lesson-sheet, lesson-practice, lesson-mixed; key pages as key:<role>), as a set; the pins
+//                       (skill/size -> set, measured on master) live in tests/fixtures/lesson-pages/role-sets.json of THIS
+//                       script's tree (a backtest runs it on an older checkout). Only --skills / --all-skills runs; a lesson
+//                       with no pin is not judged.
 //
 //   node tests/scripts/ws-lesson-pages.mjs --self-test                 # the rules on planted page summaries (node, no browser)
 //   node tests/scripts/ws-lesson-pages.mjs --grade 3                   # build every built lesson of school grade 3 (browser)
@@ -37,6 +44,7 @@
 //   --all-skills  ... for every key of lessons/prereqs.js LESSONS (the lessons master prints; ws-lesson-baseline --all-lessons)
 //   --rules LESSON-EMPTY-FIRST,LESSON-OPENER-SAME,STEPS-PANEL-EMPTY   (default: all three with --skills / --all-skills; the
 //                first two on a --grade sweep - `--grade all --rules STEPS-PANEL-EMPTY` is the full Steps-panel sweep)   --blocks Y4.B4,...  (only those WRM blocks)
+//   --pin-roles  (with --skills) print the measured page-role sets as role-sets.json pins (run on master to make the pins)
 //   --report-only (never exit 1)
 //   --warn  findings print `ws-lesson-pages: WARNING (n findings)` and exit 4 (the deploy gate's WARNING, ws-deploy-gates.sh
 //           nfn kind) - the deploy list runs it so until lf-engine's fix lands; then the flag comes off and it blocks.
@@ -51,12 +59,15 @@ const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.reso
 const argv = process.argv.slice(2);
 const arg = (k, d = null) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
-const ALL_RULES = ['LESSON-EMPTY-FIRST', 'LESSON-OPENER-SAME', 'STEPS-PANEL-EMPTY'];
+const ALL_RULES = ['LESSON-EMPTY-FIRST', 'LESSON-OPENER-SAME', 'STEPS-PANEL-EMPTY', 'LESSON-ROLE-SET'];
+// (LESSON-ROLE-SET's pins: this script's own tree, never MQ_ROOT - a backtest checks an older checkout against today's pins)
+const PIN_FILE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../fixtures/lesson-pages/role-sets.json');
+const loadPins = () => { try { return JSON.parse(fs.readFileSync(PIN_FILE, 'utf8')).pins || {}; } catch (e) { return {}; } };
 // (the WRM grade sweep keeps its two rules by default - STEPS-PANEL-EMPTY found 404 of the 843 WRM lessons at e0c90f8ad, every
 // one a skill with no provider worked steps, logged for their lanes in design/status/lf-ops-steps.md; it is asked for with
 // --rules there. A --skills / --all-skills run judges all three.)
 const SKILL_MODE = !!(arg('skills') || has('all-skills'));
-const RULES = (arg('rules', (SKILL_MODE ? ALL_RULES : ALL_RULES.filter((r) => r !== 'STEPS-PANEL-EMPTY')).join(',')) || '').split(',').map((x) => x.trim()).filter(Boolean);
+const RULES = (arg('rules', (SKILL_MODE ? ALL_RULES : ALL_RULES.filter((r) => r !== 'STEPS-PANEL-EMPTY' && r !== 'LESSON-ROLE-SET')).join(',')) || '').split(',').map((x) => x.trim()).filter(Boolean);
 const TOOL = 'ws-lesson-pages';
 
 /* ------------------------------------------------------------------ the rules (pure) */
@@ -83,10 +94,25 @@ export function sameOpener(a, b) {
 export function emptyStepsPages(lesson) {
     return (lesson.pages || []).map((p, i) => ({ i, p })).filter(({ p }) => p.stepsEmpty > 0).map(({ p, i }) => `${p.key ? 'key ' : ''}p${p.n || i + 1}`);
 }
+/** The page roles a lesson printed, as a sorted set: pupil pages' data-ws-sheet, key pages' as key:<role>. */
+export function roleSet(lesson) {
+    return [...new Set((lesson.pages || []).map((p) => (p.key ? 'key:' : '') + (p.sheet || '?')))].sort();
+}
 const stepNo = (s) => { const m = /\.S(\d+)$/.exec(String(s || '')); return m ? Number(m[1]) : 0; };
-/** → [{rule, msg, ids}] */
-export function judge(lessons, rules = ALL_RULES) {
+/** → [{rule, msg, ids}]  (`pins`: LESSON-ROLE-SET's {'cat:skill/size': [roles]}) */
+export function judge(lessons, rules = ALL_RULES, pins = {}) {
     const out = [];
+    if (rules.includes('LESSON-ROLE-SET')) {
+        for (const l of lessons) {
+            const want = pins[`${l.skill}/${l.size || ''}`];
+            if (!Array.isArray(want)) continue;
+            const got = roleSet(l), w = [...want].sort();
+            if (got.join(',') !== w.join(',')) {
+                const extra = got.filter((x) => !w.includes(x)), lost = w.filter((x) => !got.includes(x));
+                out.push({ rule: 'LESSON-ROLE-SET', ids: [l.id], msg: `${l.id}: prints page roles [${got.join(', ')}], master printed [${w.join(', ')}]${extra.length ? ` - NEW ${extra.join(', ')}` : ''}${lost.length ? ` - LOST ${lost.join(', ')}` : ''}` });
+            }
+        }
+    }
     if (rules.includes('LESSON-EMPTY-FIRST')) {
         for (const l of lessons) {
             const e = emptyPages(l);
@@ -134,10 +160,15 @@ function selfTest() {
         ['an empty Steps panel fails', [L('Y9.B1.S1', [P(4, 30), Object.assign(P(4, 30), { steps: 1, stepsEmpty: 1, key: true, n: 1 })], null)], 'STEPS-PANEL-EMPTY', 1],
         ['a Steps panel with its steps passes', [L('Y9.B1.S1', [Object.assign(P(4, 30), { steps: 1, stepsEmpty: 0 })], null)], 'STEPS-PANEL-EMPTY', 0],
         ['a page with no Steps panel passes', [L('Y9.B1.S1', [P(4, 30)], null)], 'STEPS-PANEL-EMPTY', 0],
+        ['a pinned lesson printing a new role fails', [Object.assign(L('m/M', [Object.assign(P(1, 9), { sheet: 'lesson-chart' }), Object.assign(P(4, 30), { sheet: 'lesson-sheet' })], null, 'x:y'), { size: 'M' })], 'LESSON-ROLE-SET', 1],
+        ['a pinned lesson printing its roles passes', [Object.assign(L('m/M', [Object.assign(P(4, 30), { sheet: 'lesson-sheet' }), Object.assign(P(4, 30), { sheet: 'lesson-sheet', key: true })], null, 'x:y'), { size: 'M' })], 'LESSON-ROLE-SET', 0],
+        ['a pinned lesson losing a role fails', [Object.assign(L('m/M', [], null, 'x:y'), { size: 'M' })], 'LESSON-ROLE-SET', 1],
+        ['an unpinned lesson is not judged', [Object.assign(L('m/L', [Object.assign(P(1, 9), { sheet: 'lesson-chart' })], null, 'x:y'), { size: 'L' })], 'LESSON-ROLE-SET', 0],
         ['one-number openers differ when the number differs', [L('Y9.B1.S2', [P(1, 1)], { template: 'count', text: 'Count 5' }), L('Y9.B1.S3', [P(1, 1)], { template: 'count', text: 'Count 7' })], 'LESSON-OPENER-SAME', 0],
     ];
     const bad = [];
-    for (const [name, ls, rule, want] of cases) { const got = judge(ls, [rule]).length; if (got !== want) bad.push(`${name}: ${got} finding(s), want ${want}`); }
+    const PINS = { 'x:y/M': ['key:lesson-sheet', 'lesson-sheet'] };
+    for (const [name, ls, rule, want] of cases) { const got = judge(ls, [rule], PINS).length; if (got !== want) bad.push(`${name}: ${got} finding(s), want ${want}`); }
     for (const b of bad) console.log(`  FAIL ${b}`);
     console.log(bad.length ? `${TOOL} --self-test: FAIL (${bad.length} of ${cases.length})` : `${TOOL} --self-test: OK (${cases.length} cases)`);
     return bad.length ? 1 : 0;
@@ -173,7 +204,7 @@ const SUMMARISE = `(res) => {
             const x = pg.cloneNode(true);
             x.querySelectorAll(FRAME + ', style, script').forEach((e) => e.remove());
             const ink = x.textContent.replace(/\\s+/g, '').length + x.querySelectorAll('svg, img, canvas, [data-ws-slot], [data-ws-aslot]').length;
-            return Object.assign({ cells, ink, n: i + 1 }, stepsOf(pg), key ? { key: true } : {});
+            return Object.assign({ cells, ink, n: i + 1, sheet: pg.getAttribute('data-ws-sheet') || '' }, stepsOf(pg), key ? { key: true } : {});
         });
     };
     const keyPages = pagesOf(res.keyHtml, true);
@@ -187,8 +218,11 @@ const SUMMARISE = `(res) => {
         opener = { template: c0.getAttribute('data-ws-cell') || '', text: y.textContent.replace(/\\s+/g, ' ').trim().slice(0, 240) };
     }
     host.remove();
-    // (LESSON-EMPTY-FIRST judges the pupil pages; STEPS-PANEL-EMPTY both)
-    return { pages: pages.concat(keyPages.filter((p) => p.steps > 0)), opener };
+    // (LESSON-EMPTY-FIRST judges the pupil pages; STEPS-PANEL-EMPTY both; LESSON-ROLE-SET both, by role: one key page
+    // of each role is kept)
+    const keyRoles = new Set();
+    const keyKept = keyPages.filter((p) => { const first = !keyRoles.has(p.sheet); keyRoles.add(p.sheet); return p.steps > 0 || first; });
+    return { pages: pages.concat(keyKept), opener };
 }`;
 
 async function openApp() {
@@ -211,7 +245,7 @@ async function measureSkills(skills, sizes, seed) {
                 return (0, eval)(SUM)(res);
             }, { categoryId, skillId, size, seed, SUM: SUMMARISE });
             const id = `${key}/${size}/${seed}`;
-            out.push(Object.assign({ id, step: '', block: '', title: key, skill: key }, r.error ? { pages: [], error: r.error } : r));
+            out.push(Object.assign({ id, step: '', block: '', title: key, skill: key, size }, r.error ? { pages: [], error: r.error } : r));
         }
         return out;
     } finally { await app.close(); }
@@ -267,8 +301,9 @@ async function main() {
     else lessons = await measure(arg('grade', '3'), blocks, arg('req', 'packet'));
     if (blocks) lessons = lessons.filter((l) => blocks.includes(l.block));
     if (arg('dump')) fs.writeFileSync(path.resolve(arg('dump')), JSON.stringify({ about: `${TOOL} page summaries (grade ${arg('grade', '3')}, size M, seed 4242, request ${arg('req', 'packet')})`, lessons }, null, 1) + '\n');
+    if (has('pin-roles')) console.log(JSON.stringify(Object.fromEntries(lessons.filter((l) => !l.error).map((l) => [`${l.skill}/${l.size}`, roleSet(l)])), null, 1));
     const errs = lessons.filter((l) => l.error);
-    const found = judge(lessons.filter((l) => !l.error), RULES);
+    const found = judge(lessons.filter((l) => !l.error), RULES, loadPins());
     for (const e of errs) console.log(`  ERROR ${e.id} (${e.skill}): buildSheet threw: ${e.error}`);
     for (const r of RULES) {
         const f = found.filter((x) => x.rule === r);

@@ -562,6 +562,10 @@ function columnMultSteps(a) {
 }
 
 registerSkill('multiplication:multiply', {
+    // (lead A28, 2026-11-21: the worked steps fill the lesson's Steps zone, the Guided band and the Practice strip only - the
+    // column presets' lessons print no anchor chart / Model page, a page type they never printed and no critic has graded;
+    // ws-lesson-pages LESSON-ROLE-SET pins their lessons' page roles to master's)
+    lessonChart: false,
     // (the default adapter's strings, with the column steps added for a column item; `keyIsDefault`: its instruction key
     // is still the default adapter's placeholder, so the page keeps the host's key - practice.js itemInstructionKey)
     strings: (ref = {}) => {
