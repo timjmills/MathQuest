@@ -532,10 +532,13 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     let room;
     if (perPage) {
         room = availP;
-        rowH = H(1);
+        // (lf-ops sizes r2, critic r1 F8: the rows are as tall as the panels AT THE ZOOM they draw - `chartMinZoom` took a zoom
+        // under 1 to put a second row on the page, but the rows stayed H(1) tall: 2 x 129.7 mm in a 239 mm body, the chart
+        // 22 mm into the footer on area_model_2by2 / 3by2 M and L; ws-cell-checks OVERFLOW lesson)
+        rowH = H(z);
         // (a page before the last has the Say and Rule bands' room too: perPage rows; the last page holds what fits above them)
         const per = perPage * cols;
-        const lastPer = Math.max(1, Math.floor(availP / H(1))) * cols;
+        const lastPer = Math.max(1, Math.floor(availP / H(z))) * cols;
         const cuts = [];
         for (let k = 0; k < states.length; k += per) cuts.push(states.slice(k, k + per));
         const tail0 = cuts[cuts.length - 1];
