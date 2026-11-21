@@ -59,10 +59,12 @@ export function judge(b, own, grade) {
     const ck = /Check\s*__\s*\/\s*(\d+)/.exec(b.pupil || '');
     if (!ck) F('PSC-SCORES', 'S1 no "Check __/n" score on the page');
     else if (rev && Number(ck[1]) !== items) F('PSC-SCORES', `S1 "Check __/${ck[1]}" but the check has ${items} items`);
-    const rs = /Review\s*__\s*\/\s*(\d+)/.exec(b.pupil || '');
+    // (lead A24 item 1b: page 1 of a two-page check may carry a review band too - each band scores its own items; they sum to m)
+    const rss = [...(b.pupil || '').matchAll(/Review\s*__\s*\/\s*(\d+)/g)].map((x) => Number(x[1]));
     const m = rev ? rev.reduce((t, r) => t + (Number(r.n) || 1), 0) : 0;
-    if (!rs) F('PSC-SCORES', 'S2 no "Review __/m" score on the page');
-    else if (Number(rs[1]) !== m) F('PSC-SCORES', `S2 "Review __/${rs[1]}" but the review has ${m} items`);
+    const rsum = rss.reduce((t, x) => t + x, 0);
+    if (!rss.length) F('PSC-SCORES', 'S2 no "Review __/m" score on the page');
+    else if (rsum !== m) F('PSC-SCORES', `S2 "Review __/${rss.join(' + ')}" but the review has ${m} items`);
     const labels = ((b.key || '').match(/data-review-label[^>]*>[^<]*·[^<]*</g) || []).length;
     if (!rev || labels < rev.length) F('PSC-SCORES', `S3 the key labels ${labels} of ${rev ? rev.length : 0} review answers with "<domain> · <skill>"`);
     return out;

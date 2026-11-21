@@ -76,7 +76,18 @@ function checkSources(skills, { earlier }) {
     // quadrants (a first skill checks itself once) rather than repeating one skill four times.
     return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
 }
-export const measureCols = () => [1, 2, 4];
+// (lead ruling A24 item 1a, 2026-11-21: a 3-column choice for the stacked check bands and the Quick review rows)
+export const measureCols = () => [1, 2, 3, 4];
+/** A stacked check band's columns: the widest that fit; 3 only when it takes fewer rows than 2 (4 items stay 2 + 2, never 3 + 1).
+ *  A lesson's check (perQuestion) keeps 4 / 2 / 1. Pure. */
+export function checkColsOf(q0, ctx, perQuestion) {
+    const n = q0.length;
+    for (const c of [4, 3, 2, 1]) {
+        if (c === 3 && (perQuestion || !(Math.ceil(n / 3) < Math.ceil(n / 2)))) continue;
+        if (fitsAt(q0, c, ctx)) return c;
+    }
+    return 1;
+}
 /** A check draws its items at level 0 (PAGE_TYPES 2.10: no supports), so it measures them at level 0 too (critic r1 D8). */
 export const MEASURE_LEVEL = () => 0;
 // The detailed lesson's check grows its rows to fill the body (critic r3 R7: no bordered empty strip
@@ -532,7 +543,7 @@ function planCheck(input, cut) {
             routedFits = lay.fits;
             routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
         } else for (const [j, q0] of quads.entries()) {
-            const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
+            const cols = checkColsOf(q0, ctx, input.perQuestion);
             // (ROW-STRETCH CAP stage 2: the grown row never passes what it draws + its writing room, layout.rowCapMm; hMinAt is the
             // measure + 2 mm, the cell draws its measure)
             const h0 = hMinAt(q0, cols, ctx);
@@ -562,6 +573,26 @@ function planCheck(input, cut) {
                 pgs = paginateBands(stacked, m.budget, 0);
             }
             fillBands(pgs, stacked, m, TAG, ctx, ceilingOf(ctx));
+            // PSC-REVIEW (card design/cards/psc-review): the Quick review rows under the check - on the LAST page first; then (lead
+            // A24 item 1b, 2026-11-21) on page 1 of a two-page check whose page 1 is still over REVIEW_PAGE_WHITE empty, from the
+            // domains the last page did not take (one domain cycle over the sheet). Chosen before the bands are drawn, so the
+            // numbering runs on in page order.
+            const reviewAt = new Map();
+            if (!routed && pgs.length) {
+                const lastPg = pgs[pgs.length - 1];
+                const fitOut = {};
+                const rv = reviewRows(Object.assign({}, input, { reviewFitOut: fitOut }), ctx, m, m.budget - (lastPg.used || 0));
+                reviewFit = fitOut.fit || null;
+                if (rv) reviewAt.set(lastPg, rv);
+                const p0 = pgs[0];
+                if (pgs.length === 2 && (m.budget - (p0.used || 0)) / m.budget > REVIEW_PAGE_WHITE) {
+                    const taken = rv ? rv.items.map((it) => it.reviewDomain) : [];
+                    const rv0 = reviewRows(Object.assign({}, input, { reviewSkipDomains: taken }), ctx, m, m.budget - (p0.used || 0));
+                    if (reviewFit) reviewFit.page1 = { room: +(m.budget - (p0.used || 0)).toFixed(1), items: rv0 ? rv0.items.length : 0 };
+                    if (rv0) reviewAt.set(p0, rv0);
+                }
+            }
+            const reviewItems = [];
             // (the bands are drawn only now, in order, at their filled counts: numbering runs on across the pages)
             // (critic d2d5 r1 D-1: two neighbouring bands of one instruction SHARE one strip - one instruction for one task
             // kind, never a label tail; the later band's grid joins the earlier band under it, each keeping its own score)
@@ -587,23 +618,21 @@ function planCheck(input, cut) {
                     delete sec.joined;
                 }
                 pg.sections = secs;
-            }
-            // PSC-REVIEW (card design/cards/psc-review): the Quick review band under the check, on the LAST page, whole rows only
-            if (!routed && pgs.length) {
-                const lastPg = pgs[pgs.length - 1];
-                const fitOut = {};
-                const rv = reviewRows(Object.assign({}, input, { reviewFitOut: fitOut }), ctx, m, m.budget - (lastPg.used || 0));
-                reviewFit = fitOut.fit || null;
+                // (the page's Quick review band, whole rows only; each band scores its own items, "Review __/k")
+                const rv = reviewAt.get(pg);
                 if (rv) {
                     const grids = rv.rows.map((r) => { const g = gridPart(r.its.map((it) => planItem(Object.assign({}, it, { keyTag: it.reviewTag }), { cols: r.cols, level: 0 })), { cols: r.cols, rows: 1, cellH: r.h, labels, start }); start += r.its.length; return g; });
-                    reviewMeta = rv.items.map((it) => ({ skill: it.reviewSkill, domain: it.reviewDomain, n: slotScore([it]), tag: it.reviewTag }));
-                    reviewN = slotScore(rv.items);
-                    lastPg.sections.push({ kind: 'band', label: '', instr: instructionText(REVIEW_INSTRUCTION_KEY, rv.items), instructionKey: REVIEW_INSTRUCTION_KEY, cls: 'mq-pscreview', reviewBand: true, extra: `<span class="mq-quadscore">Review __/${reviewN}</span>`, contents: grids });
-                    lastPg.used = (lastPg.used || 0) + rv.used;
-                    // (the check's own score names it, "Check __/n", when the check prints under one strip - PSC-SCORES S1)
-                    const checkBands = pgs.flatMap((pg) => pg.sections).filter((x) => x.kind === 'band' && x.cls !== 'mq-pscreview');
-                    if (checkBands.length === 1) checkBands[0].extra = `<span class="mq-quadscore">Check __/${kept}</span>`;
+                    reviewItems.push(...rv.items);
+                    pg.sections.push({ kind: 'band', label: '', instr: instructionText(REVIEW_INSTRUCTION_KEY, rv.items), instructionKey: REVIEW_INSTRUCTION_KEY, cls: 'mq-pscreview', reviewBand: true, extra: `<span class="mq-quadscore">Review __/${slotScore(rv.items)}</span>`, contents: grids });
+                    pg.used = (pg.used || 0) + rv.used;
                 }
+            }
+            if (reviewItems.length) {
+                reviewMeta = reviewItems.map((it) => ({ skill: it.reviewSkill, domain: it.reviewDomain, n: slotScore([it]), tag: it.reviewTag }));
+                reviewN = slotScore(reviewItems);
+                // (the check's own score names it, "Check __/n", when the check prints under one strip - PSC-SCORES S1)
+                const checkBands = pgs.flatMap((pg) => pg.sections).filter((x) => x.kind === 'band' && x.cls !== 'mq-pscreview');
+                if (checkBands.length === 1) checkBands[0].extra = `<span class="mq-quadscore">Check __/${kept}</span>`;
             }
             pages.push(...pgs);
         }
@@ -643,29 +672,41 @@ function planCheck(input, cut) {
 /**
  * PSC-REVIEW (card design/cards/psc-review, signed 2026-11-20): the Quick review's rows in `room` mm, or null. Items come from the
  * review pools (one item a candidate skill, `input.pools[].review`), at most ONE per domain (REVIEW_DOMAINS, the grade's allowed
- * ones), so no domain repeats before every allowed domain has appeared. A row is whole: 4 or 2 cells of like height (within
+ * ones), so no domain repeats before every allowed domain has appeared. A row is whole: 4, 3 or 2 cells of like height (within
  * REVIEW_ROW_SPREAD), each fitting its column width with ink across most of it (REVIEW_INK_MIN, EB-SIDE), at its measured height
  * - never stretched, never shrunk. A cell too tall for the room is passed over. The rows chosen hold the most items, then fill
  * the most room, then use the earliest candidates (8/10-passed skills first). The rows print in domain order. Pure, so seeded
  * and reproducible.
  */
 export const REVIEW_ROW_SPREAD = 1.25;
+/** Page 1 of a two-page check takes review rows too when more than this share of its body is empty (EB-PAGE's 30 %). */
+export const REVIEW_PAGE_WHITE = 0.3;
 /** A review row's room over its measure (hMinAt is the measure + 2 mm): 1 mm more keeps the ink off the row's rule (EB-CLIP) and
  *  stays within the row-stretch cap (drawn + 3 mm). */
 export const REVIEW_ROW_PAD_MM = 1;
-/** A review cell's ink fills at least this share of its cell's inner width at the band's columns (EB-SIDE: no side band of 30 %). */
+/** A review cell's ink fills at least this share of its cell's inner width at the band's columns (EB-SIDE: no side band of 30 %),
+ *  when the bridge did not read the ink's side room (slackMm). */
 export const REVIEW_INK_MIN = 0.72;
+/** ... and, where it did, the WIDER of the two empty sides beside the ink (the cell's width less the ink and the narrower side,
+ *  from the bridge's measure) stays under this share of the cell's width: EB-SIDE's own 30 % with 3 points to spare. A centred
+ *  fact (26 mm of ink in a 46.5 mm cell, 10 mm a side) passes; the same ink pinned to one side does not. (lead A24 item 1, the
+ *  white filled with review items.) */
+export const REVIEW_SIDE_MAX = 0.27;
 // (templates the review passes over: a legacy cell is no kit cell (card: each item its own kit cell); word-work at L draws its
 // number tab 1.6 mm from the story (TAB-CLEAR, also red on sub_wp_20's own L check on master - a template defect, not this band's)
 // (a review label is two digits - 9 to 20 - and these cells draw into a two-digit tab's gutter: fraction_number_line's line
 // touches tab "14" at M, TAB-CLEAR; a template fix, not this band's)
-const REVIEW_SKIP_TEMPLATES = { M: new Set(['legacy']), L: new Set(['legacy', 'word-work']) };
+// (the fraction wall's "1 whole" bar draws into a two-digit tab's gutter - TAB-CLEAR 0.0 mm on tab "13" at L, measured
+// 2026-11-21 when the side rule let composing:compose_whole into the review; a template fix, routed with the others)
+const REVIEW_SKIP_TEMPLATES = { M: new Set(['legacy', 'frac-wall']), L: new Set(['legacy', 'word-work', 'frac-wall']) };
 const REVIEW_SKIP_SKILLS = new Set(['composing:fraction_number_line']);
 const REVIEW_KEEP_PER_SET = 3;
 export function reviewRows(input, ctx, m, room) {
     const pools = (input.pools || []).filter((p) => p && p.review && REVIEW_POOL.test(p.id));
     if (!pools.length || !(room > m.strip)) return null;
-    const allowed = (pools[0].review.allowed || REVIEW_DOMAINS).filter((d) => REVIEW_DOMAINS.includes(d));
+    // (a second review band - page 1 of a two-page check - takes only the domains the first did not: lead A24 item 1b)
+    const skipD = new Set(input.reviewSkipDomains || []);
+    const allowed = (pools[0].review.allowed || REVIEW_DOMAINS).filter((d) => REVIEW_DOMAINS.includes(d) && !skipD.has(d));
     const cands = [];
     for (const p of pools.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.review.domain) - REVIEW_DOMAINS.indexOf(b.review.domain) || a.review.k - b.review.k)) {
         const it = poolItems(input, p.id)[0];
@@ -675,18 +716,21 @@ export function reviewRows(input, ctx, m, room) {
     const skipT = REVIEW_SKIP_TEMPLATES[ctx.size] || REVIEW_SKIP_TEMPLATES.M;
     const tplOf = (it) => { const c = it && it.q && it.q.cell; return c && c.template && hasCell(c.template) ? c.template : 'legacy'; };
     const fit = { room: +room.toFixed(1), strip: +m.strip.toFixed(1), cands: cands.map((it) => ({ skill: it.reviewSkill, d: it.reviewDomain, tpl: tplOf(it),
-        h4: fitsAt([it], 4, ctx) ? +hMinAt([it], 4, ctx).toFixed(1) : null, h2: fitsAt([it], 2, ctx) ? +hMinAt([it], 2, ctx).toFixed(1) : null,
-        ink2: it.measured && it.measured[2] && it.measured[2].inkMm ? +it.measured[2].inkMm.toFixed(1) : null })) };
+        h4: fitsAt([it], 4, ctx) ? +hMinAt([it], 4, ctx).toFixed(1) : null, h3: fitsAt([it], 3, ctx) ? +hMinAt([it], 3, ctx).toFixed(1) : null, h2: fitsAt([it], 2, ctx) ? +hMinAt([it], 2, ctx).toFixed(1) : null,
+        ink3: it.measured && it.measured[3] && it.measured[3].inkMm ? +it.measured[3].inkMm.toFixed(1) : null, ink2: it.measured && it.measured[2] && it.measured[2].inkMm ? +it.measured[2].inkMm.toFixed(1) : null })) };
     if (input.reviewFitOut) input.reviewFitOut.fit = fit;
     // 1. the rows that can be drawn: per set of domains, the few earliest-ranked rows of distinct height
     const rowsBySet = new Map();
-    for (const cols of [4, 2]) {
-        const inner = cellWidthMm(cols, LIVE_W_MM, ctx.look).inner;
+    for (const cols of [4, 3, 2]) {
+        const { inner, nominal } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
         const hOf = (it) => hMinAt([it], cols, ctx) + REVIEW_ROW_PAD_MM;
         const ok = cands.filter((it) => {
             if (skipT.has(tplOf(it)) || REVIEW_SKIP_SKILLS.has(it.reviewSkill) || !fitsAt([it], cols, ctx) || hOf(it) > space) return false;
-            const w = it.measured && it.measured[cols] && it.measured[cols].inkMm;
-            return !(w > 0) || w >= REVIEW_INK_MIN * inner;
+            const me = it.measured && it.measured[cols];
+            const w = me && me.inkMm;
+            if (!(w > 0)) return true;
+            if (Number.isFinite(me.slackMm) && me.slackMm >= 0) return nominal - w - me.slackMm < REVIEW_SIDE_MAX * nominal;
+            return w >= REVIEW_INK_MIN * inner;
         });
         const pick = (from, k, acc) => {
             if (acc.length === k) {
