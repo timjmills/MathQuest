@@ -1024,3 +1024,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - "I do" on the board for add-within-10 (?lesson=...&part=&mode=board): the anchor chart's own example drawn B&W by its stateDrawing (screen = paper), one-by-one reveal, Say band full width from step 1 (A22a), cell top-aligned with Steps, digits up to +25 % to fill the stage (A22b), read aloud on demand only, clicker keys, Leave on every stage, clickable part bar + direct part URLs (D11), unbuilt parts "coming soon".
 - New ws-lesson-player (unit/render/reveal/any-part/leave/stage-fill/hops-below) on precritic --teacher. A26b: player-only 820-portrait allowance (reserved answer + hops room, <= 47 %) scoped in the tool.
 - Next: slice 2 (We do).
+
+## 2026-11-20 — Deploy lf-engine fill fix (bug fix, no critic)
+- Root cause: the lesson planner measured every band label strip as one line (Independent at 0.5 em/char); new stripWrapMm (compose.js) wraps per character at the strip's real width, used only in lesson.js's fill / free-height measure (no page moved: 2700 hashes identical). Plan vs print now within ~1 mm.
+- SHEET_FILL_MIN 0.76 -> 0.74 from an 810-sheet sweep (ws-partopts-unit --fill-sweep); new FILL-PRINT check (plan vs print <= 4 mm). ROWFIT anchors re-bracketed around 12 mm; DESIGN.md §8d updated.
+- Routed (A27): 6 good sheets at 0.728-0.739 still refused + ROWFIT foot-by-real-row-height -> lf-engine; mult_properties L Vocab-off sizing -> lf-ops; PO-CAP function_table_easy L / notice_patterns M -> lf-algebra.
