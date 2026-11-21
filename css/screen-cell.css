@@ -2298,3 +2298,13 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     width: var(--mq-sg) !important; height: var(--mq-sg) !important; min-width: 48px !important; min-height: 48px !important;
     margin: calc((var(--mq-sd) - var(--mq-sg)) / 2) !important;
 }
+
+/* lf-ops sizes r2, critic r1 F6 (ws-screen-slots SCREEN-CLIP): a 4-part area model (area_model_4by1, 15.4 em at the 48 / 56 px
+   screen digit) is wider than the quiz's 720 px paper - its 4th part was cut off at 820 / 1024 / 1280. The paper widens to the
+   card for an area model, as it does for the ten-wide chart; the digits keep their floor. */
+.qt-question-card .mq-qtpaper:has(.ws-ops-area-model) { width: min(100%, 96vw, 990px); }
+/* ... and on the practice card at tablet width (820 px: the 15.4 em model at the 48 px digit is 729 px in a 703 px visual pane,
+   so its 4th part sat under a sideways scroll): the card's side padding narrows for an area model, the pane gets the room. */
+@media (max-width: 1023px) {
+    #gameView #questionCard.mq-card:has(.ws-ops-area-model) { padding-left: 8px !important; padding-right: 8px !important; }
+}

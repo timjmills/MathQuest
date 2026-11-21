@@ -197,6 +197,53 @@ function digitVerdict(m, width, bold = true, host = 'card', minPx = 0) {
 // overflow - no element in it scrolls sideways (scrollWidth > clientWidth: the old swipe row) and no ink runs past its cell's edge.
 // Runs with --screen-digit (beside it) or --train-fit alone; a page with no count-row train is not judged.
 const TRAIN_FIT = has('train-fit') || SCREEN_DIGIT;
+// ---- SCREEN-CLIP (lf-ops sizes r2, critic r1 F6: area_model_4by1's 4th part was cut off in the quiz at 820 / 1024 / 1280 and on
+// the 820 card): on the same renders, every kit cell's INK - each drawn element of nonzero size inside [data-ws-cell] - lies inside
+// the box that shows it: no ancestor between the cell and the host root (both included) that clips (overflow not visible)
+// hides any of it sideways. A miss is "host@width:clip". Runs with --screen-digit or --screen-clip alone.
+const SCREEN_CLIP = has('screen-clip') || SCREEN_DIGIT;
+/** In the page: the cells under `rootSel` whose ink a clipping box (or the root) cuts - [{tmpl, by, mm}] (empty when none). */
+function MEASURE_CLIP(rootSel) {
+    const root = document.querySelector(rootSel);
+    if (!root) return [];
+    const out = [];
+    const px2mm = 25.4 / 96;
+    // (a box that clips - overflow other than visible - between an ink element and the host root; a scroller the pupil pans,
+    // [data-mq-scroll], is not a clip; the host VIEW itself - #gameView, #worksheetView - is not judged: it re-lays out for a
+    // beat after a viewport change. The cell's own box is a bound too: ink outside the frame reads as cut off.)
+    const clipsCache = new Map();
+    const clipsOf = (el, cell) => {
+        if (clipsCache.has(el)) return clipsCache.get(el);
+        let r;
+        if (!el || el === root) r = [];
+        else {
+            const cs = getComputedStyle(el);
+            const own = el !== cell && !el.classList.contains('view') && !el.hasAttribute('data-mq-scroll') && !el.closest('[data-mq-scroll]') && (cs.overflowX !== 'visible' || cs.overflowY !== 'visible');
+            r = (own ? [el] : []).concat(el === cell ? [] : clipsOf(el.parentElement, cell));
+        }
+        clipsCache.set(el, r);
+        return r;
+    };
+    const name = (c) => `${c.tagName.toLowerCase()}${c.id ? '#' + c.id : ''}${c.classList[0] ? '.' + c.classList[0] : ''}`;
+    for (const cell of [...root.querySelectorAll('[data-ws-cell]')].filter((c) => c.getBoundingClientRect().width > 0 && !c.parentElement.closest('[data-ws-cell]'))) {
+        let worst = null;
+        const above = clipsOf(cell.parentElement, null);
+        for (const e of cell.querySelectorAll('*')) {
+            if (e.closest('[data-mq-scroll]')) continue;
+            const r = e.getBoundingClientRect();
+            if (r.width < 1 || r.height < 1) continue;
+            const cs = getComputedStyle(e);
+            if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) continue;
+            for (const c of [cell].concat(clipsOf(e.parentElement, cell), above)) {
+                const b = c.getBoundingClientRect();
+                const over = Math.max(b.left - r.left, r.right - b.right);
+                if (over > 2 && (!worst || over > worst.over)) worst = { over, by: name(c), el: name(e) };
+            }
+        }
+        if (worst) out.push({ tmpl: cell.getAttribute('data-ws-cell'), by: worst.by, el: worst.el, mm: Math.round(worst.over * px2mm * 10) / 10 });
+    }
+    return out;
+}
 // ---- ARRAY-ORIENT (owner 2026-11-13 "arrays landscape so they can be bigger"; lead ruling for arrays_groups, lf-ops-props r5; the
 // same rule id and semantics as the -divarray branch's ws-screen-support-eq): every dot array of 2 or more rows a kit cell draws is
 // LANDSCAPE (its dots span at least as wide as high) on the card at 390 / 820 / 1280, the online worksheet, the quiz, and the paper
@@ -755,7 +802,7 @@ if (arg('digit-fixture', null)) {
         }
     }
     // ---- SCREEN-DIGIT (opt-in): the item's numeral on the card, the worksheet's first card and the quiz, at three widths
-    if ((SCREEN_DIGIT || TRAIN_FIT || ARRAY_ORIENT) && !SWEEP) {
+    if ((SCREEN_DIGIT || TRAIN_FIT || ARRAY_ORIENT || SCREEN_CLIP) && !SWEEP) {
         const judged = skills.filter((s) => !RULE_SKILLS.length || RULE_SKILLS.includes(`${s.categoryId}:${s.skillId}`));
         for (const vp of DIGIT_VIEWPORTS) {
             await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: 1 });
@@ -775,7 +822,12 @@ if (arg('digit-fixture', null)) {
                         if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} ARRAY-ORIENT ${v}`; findings.push({ key, id: `${host}@${vp.w}:orient`, line: l }); console.log(l); }
                     }
                 };
+                const judgeClip = async (host, sel) => {
+                    if (!SCREEN_CLIP) return;
+                    for (const m of await page.evaluate(MEASURE_CLIP, sel)) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-CLIP the ${m.tmpl} cell's ${m.el} runs ${m.mm} mm past ${m.by} (cut off)`; findings.push({ key, id: `${host}@${vp.w}:clip`, line: l }); console.log(l); }
+                };
                 const judgeTrain = async (host, sel) => {
+                    await judgeClip(host, sel);
                     await judgeOrient(host, sel);
                     if (!TRAIN_FIT) return;
                     const v = trainVerdict(await page.evaluate(MEASURE_TRAIN, sel), vp.w, host);
@@ -836,6 +888,7 @@ if (arg('digit-fixture', null)) {
             }
             console.log(`ARRAY-ORIENT: ${findings.filter((f) => /:orient$/.test(f.id)).length} miss(es)`);
         }
+        if (SCREEN_CLIP) console.log(`SCREEN-CLIP: ${findings.filter((f) => /:clip$/.test(f.id)).length} miss(es)`);
         if (TRAIN_FIT) console.log(`TRAIN-FIT: ${findings.filter((f) => /:train$/.test(f.id)).length} miss(es)`);
         console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}, worksheet (>= ${WORKSHEET_DIGIT_PX} px): ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
     }
