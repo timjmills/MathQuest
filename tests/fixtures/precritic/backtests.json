@@ -16270,6 +16270,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-r2-ea-wrong-kind",
+   "check": "ws-guided-echo EA-WRONG-KIND: a column multiplication's wrong work on Error analysis / True or False? / Reason It is never the factors added, and 4+ wrong works of a skill show 2+ kinds of error",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r1 F3 / F4 (multiply long multiplication fell back to 'factors added'; mult_4by1_column used only 'added instead of multiplied')",
+   "browser": true,
+   "fail": {
+    "commit": "c180eacc6",
+    "state": "multiplication:multiply had no wrongAnswer: the default 'added' distractor on every item"
+   },
+   "pass": {
+    "commit": "f7aaadb18",
+    "state": "multiplyWrong: placeholder-zero, last-carry-dropped, regroup-not-added, sum-no-regroup, zero-as-one, rotated by item"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills multiplication:mult_4by1_column,multiplication:mult_3by2_standard --seeds 2 --sizes M --only EA-WRONG-KIND --screen-seeds 0 --score-roles error-analysis,true-false,reason-it",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

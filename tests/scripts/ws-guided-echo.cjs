@@ -279,10 +279,13 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         // column work - never the two factors ADDED (the default distractor) - and over a skill's thinking pages it shows
                         // at least two kinds of error (judged at the end of the skill, below)
                         if (on('EA-WRONG-KIND') && ['error-analysis', 'true-false', 'reason-it'].includes(role)) {
-                            for (const it of pp.flatMap((pg) => pg.items)) {
-                                const th = it && it.thinking; const cl = it && it.q && it.q.cell;
-                                if (!th || !cl || !(cl.template === 'long-multiplication' || (cl.template === 'stack' && cl.payload && cl.payload.op === '*'))) continue;
-                                const wv = th.wrong !== undefined ? th.wrong : th.isWrong ? th.shown : undefined;
+                            // (the wrong work each item's page shows is roles/compose.js wrongOf - the provider's wrongAnswer, as the roles use it)
+                            let CMP = null; try { CMP = await import(new URL('js/modules/sheet/roles/compose.js', location.href).href); } catch (e) { CMP = null; }
+                            for (const it of CMP ? pp.flatMap((pg) => pg.items) : []) {
+                                const cl = it && it.q && it.q.cell;
+                                if (!cl || !(cl.template === 'long-multiplication' || (cl.template === 'stack' && cl.payload && cl.payload.op === '*'))) continue;
+                                let w = null; try { w = CMP.wrongOf({ q: it.q }); } catch (e) { w = null; }
+                                const wv = w ? w.value : undefined; const th = { misconception: w && w.misconception };
                                 if (wv === undefined || wv === null || wv === '') continue;
                                 const ops = cl.template === 'long-multiplication' ? [Number(cl.payload.a), Number(cl.payload.b)] : (cl.payload.operands || []).map(Number);
                                 if (ops.length === 2 && Number(String(wv).replace(/,/g, '')) === ops[0] + ops[1]) out.push(`EA-WRONG-KIND ${key} ${role} ${size} seed ${s}: the wrong work for ${ops[0]} × ${ops[1]} is ${wv}, the factors added - not a column-multiplication error`);
