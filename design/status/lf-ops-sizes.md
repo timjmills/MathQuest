@@ -207,6 +207,7 @@ Gate reruns (round 2 head, the six skills, one browser gate at a time):
 | ws-backtest (six round-2 rows) | 6 PASS |
 | ws-roles-unit | OK (115) |
 | ws-boot-smoke | OK |
+| ws-lesson-baseline --all-lessons | NOT RUN to the end: stopped at the lead's budget stop (expect every lesson page hash to move from the additive lesson-css rules; the area lessons from chartRowFit + N1) |
 
 ## 2026-11-21: narrow critic r2. Criticals closed, parked at round cap 2
 Report: design/audit/runs/lf-ops/critic-sizes-r2-narrow.md (08ba25e01).
@@ -224,3 +225,37 @@ Report: design/audit/runs/lf-ops/critic-sizes-r2-narrow.md (08ba25e01).
 7. **N4:** count area wrong kinds per page set. **N6:** the screen focus line splits the part box. **N3:** True or False keys leave True sentences blank (role-wide, route to lf-roles).
 8. **A9c item 1:** area-model Reason It + word-problems at M, 2 a page.
 9. **Lesson TOPSTART ×12** (stack write-above); mult_4by1 Reason It L TAB-CLEAR 0.7 mm.
+
+## 2026-11-21 N-round (fresh builder, Opus 5.5 medium: the rebuild after critic r2, two rounds spent - check-first, root cause)
+
+Base 5c2ae8707. Each check FAILs on 5c2ae8707 and passes on its fix (ws-backtest PASS), is on precritic's path
+(ws-precritic-plan: the three rows OK) and has its ledger row in design/lessons-first/CHECKS_FROM_CRITICS.md.
+
+| item | check (before → after) | root cause | fix | backtest row |
+|---|---|---|---|---|
+| N1 the add step never shown | NEW ws-guided-echo MODEL-FINAL-COMPLETE (every stepState template: the last Model state / last chart panel holds every number the answered drawing writes): 6 → 0 (area presets, Model + chart, M seed 1); 0 over M/L x 3 seeds | area-model render drew the work row `sv ? '' : ...` - empty in every step state, so only the total box was traced | area-model stepState: the state that writes the total writes `sum-<i>` (the parts on the work lines) in the total's ink (a4cadccb7) | `sizes-n-model-final-complete` |
+| N5 chart 3 / 4 pages, run-on pages 36-51 % blank | NEW ws-empty-band EB-CHART (always on, lesson): CHART-PAGES (4 or fewer panels: at most 2 pages) + CHART-FILL (no chart page past the first 35 % or more empty): 18 → 0 | a full-width panel is head + drawing + words; two plus the Say / Rule bands never fit a page, so the run-on split 2 / 1 / 1 (4by1 1 / 1 / 1 / 1) | `chartRowFit` (lesson data, mult-area-1digit / -2digit): heads on top, the words beside the drawing at its own zoomed width (never under LR-15's 0.8), each panel its own height, fewest pages then largest zoom, packed evenly - 2 / 2 on every seed tried (40b32c086) | `sizes-n-chart-pages` |
+| N2 comma takes a digit column | NEW ws-guided-echo COLUMN-NO-GROUP (no grouping mark in a stack / long-multiplication digit row, pupil and key): FAIL → OK | error-analysis writes a shown value like the page ("21,763") and the stack split the string into its tracks | the stack drops grouping marks from any shown value it writes into digit tracks (f72d9c029) | `sizes-n-column-no-group` |
+
+**MODEL-FINAL-COMPLETE over the other stepState templates (140 skills, M seed 1; flagged, NOT fixed, not triaged):**
+addition:add_100_regroup (stack, Model), addition:add_column_multi (stack, Model + chart), addition:add_facts, multiplication:mult_facts,
+subtraction:sub_facts (fact, Model), division:div_facts (equation, Model), division:div_facts_long (division, Model),
+number_sense:round_nl_thousands / _ten_thousands / _hundred_thousands, number_sense:rounding_visual (pv, chart), placevalue:compare
+(pv, Model + chart), placevalue:mixed_placevalue (pv, chart). These now FAIL precritic's guided-echo gate for their own lanes.
+
+**Hash proof (pupil + key, styles stripped, M seed 1, scripted-model / lesson / EA / TF / Reason It / independent, 146 skills,
+5c2ae8707 vs head):** 24 changed, all from the two fixes: area_model_2by1 / 3by1 / mult / mult_hard Model + lesson (N1, the
+add step's work lines) and the error-analysis page of 19 stack skills with 4+ digit answers (N2: add / sub 10k / 100k / 1m
+presets, mixed_addition, mult_3by1_column - the same comma defect). Nothing else moved. The lesson CSS gained additive rules.
+
+| gate (head, the six skills, one browser gate at a time) | result |
+|---|---|
+| cell-checks --card | FAIL 53 (r2: 54): the r2 classes only - opener OVERFLOW, EA PUPILTAG 20, LONE-PAGE 5 (A9c), lesson L OVERFLOW = the open Practice cell (4by1 / 3by2, now page 4). Column presets clean |
+| ws-lesson-pages --skills (+ mult_2by1 / 3by1, M / L) | OK (16 lessons, 166 pages) |
+| empty-band (--hosts none) | FAIL 160 (r2: 165): EB-CHART PASS, TAB-CLEAR 7 → 2; EB-BAND 56, EB-SIDE 84, EB-EDGE 8, EB-STRETCH 3, EB-CLIP 7 as r2. Area lesson + Model: the same 9 findings as 5c2ae8707 (pages shifted by the shorter chart) |
+| ws-guided-echo --seeds 6 --variants | FAIL 66 = GUIDED-MODEL-ECHO on mult_4by1_column guided, identical on 5c2ae8707 (not this round's); MODEL-FINAL-COMPLETE / COLUMN-NO-GROUP 0 (base: 72 / 24) |
+| ws-backtest (the three N rows) | 3 PASS |
+| ws-precritic-plan | the three N rows OK; FAIL 1 = `sizes-area4-L-overflow` (2026-11-20 row, independent role not on --skill's plan), pre-existing |
+| ws-roles-unit | OK (115) |
+| ws-boot-smoke | OK |
+| ws-lesson-baseline --all-lessons | NOT RUN to the end: stopped at the lead's budget stop (expect every lesson page hash to move from the additive lesson-css rules; the area lessons from chartRowFit + N1) |
