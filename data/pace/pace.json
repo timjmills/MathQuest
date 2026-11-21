@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T05:57:10.839Z",
- "head": "3d222dabb",
+ "generated": "2026-11-21T05:58:01.385Z",
+ "head": "d6177c1b4",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 77,
    "usageEstimated": true,
-   "rev": "3d222dabb",
+   "rev": "d6177c1b4",
    "skills": 742,
    "retired": 10,
    "presets": 130,
@@ -1231,9 +1231,93 @@
    },
    {
     "date": "2026-11-03",
+    "title": "owner print/options decisions 2026-11-03; all-skills number options queued after the reset",
+    "detail": "",
+    "kind": "skill",
+    "from": "git"
+   },
+   {
+    "date": "2026-11-03",
+    "title": "simple print + Chromebook speed live",
+    "detail": "",
+    "kind": "feature",
+    "from": "git"
+   },
+   {
+    "date": "2026-11-03",
     "title": "Nov 3 deploys (simple print 2, student bar, fact families)",
     "detail": "",
     "kind": "skill",
+    "from": "git"
+   },
+   {
+    "date": "2026-11-02",
+    "title": "Chromebook load fix live",
+    "detail": "",
+    "kind": "other",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-31",
+    "title": "2026-10-31 live items, owner decisions, usage recalibration",
+    "detail": "",
+    "kind": "other",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-31",
+    "title": "visual quality live; pre-existing content-audit P-29 defect logged",
+    "detail": "",
+    "kind": "other",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-31",
+    "title": "owner confirms the mixed-pages S = M ruling; M2 paused to the reset",
+    "detail": "",
+    "kind": "other",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-31",
+    "title": "Lane D held to the reset (four passed, div_facts pending)",
+    "detail": "",
+    "kind": "skill",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-30",
+    "title": "wind-down for the day (owner)",
+    "detail": "",
+    "kind": "other",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-30",
+    "title": "teacher follow-ups, lesson 6 and Y4 site lessons live",
+    "detail": "",
+    "kind": "lesson",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-30",
+    "title": "facts card questions for the owner",
+    "detail": "",
+    "kind": "skill",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-30",
+    "title": "White Rose page live; lessons 6/7 share-link defect logged",
+    "detail": "",
+    "kind": "lesson",
+    "from": "git"
+   },
+   {
+    "date": "2026-10-30",
+    "title": "Skip-count fix held for a clean precritic + signed card; ops G1 fail and its lesson",
+    "detail": "",
+    "kind": "lesson",
     "from": "git"
    }
   ],
@@ -1325,6 +1409,13 @@
    {
     "date": "2026-11-07",
     "title": "STATUS + BUILD_LESSONS: owner scope = CCSS BUILD lessons only; wave 1 launched",
+    "detail": "",
+    "kind": "lesson",
+    "from": "git"
+   },
+   {
+    "date": "2026-11-07",
+    "title": "Deploy live-lesson fixes (lesson 2 builds, Practice pages restored, every seed builds); stamp; STATUS",
     "detail": "",
     "kind": "lesson",
     "from": "git"
