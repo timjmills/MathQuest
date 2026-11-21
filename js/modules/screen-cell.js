@@ -3745,6 +3745,64 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
  * below a floor that keeps numerals legible. Idempotent; run after mount and after a re-render.
  */
 const K2_FLOOR_PX = 2.4;
+// FIT-FLOOR (lane lf-hosts, lead / lf-algebra 2026-11-20): the fit never draws a twin's digits under the online worksheet's
+// 29 px (WORKSHEET_DESIGN_STANDARD SP table; tests/lib/ws-screen-widths.cjs WORKSHEET_DIGIT_PX) on any host. A row that does
+// not fit wraps first; a single item still too wide at the floor stacks its row into one column. Content never shrinks below.
+const FIT_DIGIT_FLOOR_PX = 29;
+
+/** The smallest numeral a twin draws as HTML text (SVG labels scale with their drawing, inputs keep their own floor). */
+function _twinDigitPx(twin) {
+    let px = 0;
+    const w = document.createTreeWalker(twin, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+        if (!/\d/.test(n.nodeValue || '')) continue;
+        const el = n.parentElement;
+        if (!el || el.closest('svg, .mq-sr, [aria-hidden="true"]') || !el.getClientRects().length) continue;
+        const f = parseFloat(getComputedStyle(el).fontSize) || 0;
+        if (f > 0 && (!px || f < px)) px = f;
+    }
+    return px;
+}
+
+/** The --mq-k2 below which the twin's digits would cross the floor (cur itself when they are already under it). */
+function _k2Floor(twin, cur) {
+    const d = _twinDigitPx(twin);
+    if (!(d > 0)) return 0;
+    return d <= FIT_DIGIT_FLOOR_PX ? cur : cur * FIT_DIGIT_FLOOR_PX / d;
+}
+
+/** A new fit key (cell width, element count): back to the drawing's own size and layout, then fit again (FIT-RESET). */
+function _fitReset(twin, key) {
+    if (twin.dataset.mqFitKey === key) return;
+    const first = twin.dataset.mqFitKey === undefined;
+    twin.dataset.mqFitKey = key;
+    if (first) { twin.dataset.mqK2Fit0 = twin.style.getPropertyValue('--mq-k2') || ''; return; }
+    if (twin.dataset.mqK2Fit0) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Fit0);
+    else twin.style.removeProperty('--mq-k2');
+    delete twin.dataset.mqClockMin;
+    twin.querySelectorAll('[data-mq-stacked="1"]').forEach((row) => {
+        row.style.removeProperty('flex-direction');
+        row.style.removeProperty('align-items');
+        delete row.dataset.mqStacked;
+    });
+}
+
+// FIT-RESET on the card and the quiz (the worksheet re-lays its grid on resize itself): one shared, debounced listener refits
+// every fitted twin at the window's new width, from the drawing's own size.
+let _fitResizeWired = false;
+function _wireFitResize() {
+    if (_fitResizeWired || typeof window === 'undefined') return;
+    _fitResizeWired = true;
+    let t = 0;
+    window.addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+            const cells = new Set();
+            document.querySelectorAll('.k2-twin[data-mq-fit-key]').forEach((tw) => { if (!tw.closest('#worksheetGrid')) cells.add(tw.closest('.mq-scell, #visualAid') || tw.parentElement); });
+            cells.forEach((c) => { try { if (c && c.isConnected) fitTwinRows(c); } catch (e) { /* keep the drawing as fitted */ } });
+        }, 200);
+    });
+}
 
 function _rowOverflows(el, box) {
     const r = el.getBoundingClientRect();
@@ -3762,6 +3820,7 @@ export function fitTwinRows(root) {
     if (!root || typeof getComputedStyle === 'undefined') return false;
     const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
     let changed = false;
+    _wireFitResize();
     wireDiskSwipe(root);
     // Long division (round 3, 390 px: "the fourth digit column is clipped"): the divisor's tracks
     // hold printed digits, not inputs, so in a narrow cell they close up to the digit's own width;
@@ -3789,6 +3848,9 @@ export function fitTwinRows(root) {
             if (pl || pr) box = { left: box.left + pl, right: box.right - pr, top: box.top, bottom: box.bottom, width: box.width - pl - pr, height: box.height };
         }
         if (box.width <= 0) return;
+        // (the key also holds the host's own --mq-k2 / --mq-digit: a media query raises them at 1200 px with the cell's width unchanged)
+        const hostCs = getComputedStyle(twin.parentElement || cell);
+        _fitReset(twin, `${Math.round(box.width)}:${twin.getElementsByTagName('*').length}:${hostCs.getPropertyValue('--mq-k2').trim()}:${hostCs.getPropertyValue('--mq-digit').trim()}`);
         // A clock face is read, so it keeps a reading size (about 120 px) - the row wraps instead
         // of shrinking three faces to 100 px each on a phone.
         if (twin.getAttribute('data-mq-template') === 'clock' && twin.dataset.mqClockMin !== '1') {
@@ -3843,7 +3905,7 @@ export function fitTwinRows(root) {
                 const r = slot ? slot.getBoundingClientRect() : null;
                 const small = r ? Math.min(r.width, r.height) : 0;       // the host's input is at least 44 px each way, so no tile shrinks below that
                 const floor = small > 0 ? cur * 44 / small : cur * 0.75;
-                const k = Math.max(Math.min(cur, floor), cur * have / need);
+                const k = Math.max(Math.min(cur, floor), cur * have / need, Math.min(cur, _k2Floor(twin, cur)));
                 if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
             }
             return;
@@ -3858,6 +3920,8 @@ export function fitTwinRows(root) {
         const fitW = `${Math.round(box.width)}:${twin.getElementsByTagName('*').length}`;
         if (twin.dataset.mqFitW === fitW) return;
         twin.dataset.mqFitW = fitW;
+        // (TWIN-FIT-RESET, lf-algebra for lf-hosts 2026-11-20: a new cell width fits from the twin's OWN drawing size - _fitReset above,
+        // run before the clock and count-row branches too, restores the --mq-k2 the twin had before its first fit)
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
@@ -3870,8 +3934,20 @@ export function fitTwinRows(root) {
         if (over > 1 || tw > avail + 1) {
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = Math.max(tw, avail + 2 * over);
-            const k = Math.max(K2_FLOOR_PX, cur * (avail / need));
+            const kFloor = Math.min(cur, _k2Floor(twin, cur));
+            const k = Math.max(K2_FLOOR_PX, kFloor, cur * (avail / need));
             if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
+            // FIT-FLOOR: the floor stopped the shrink and the drawing still runs past the cell - its overflowing rows stack into one
+            // column (their items keep their size and order), never a smaller drawing, never a sideways scroll
+            if (kFloor > 0 && cur * (avail / need) < kFloor - 0.01) {
+                rows.forEach((row) => {
+                    if (row.dataset.mqStacked === '1' || !_rowOverflows(row, box)) return;
+                    row.style.setProperty('flex-direction', 'column', 'important');
+                    row.style.setProperty('align-items', 'center', 'important');
+                    row.dataset.mqStacked = '1';
+                    changed = true;
+                });
+            }
         }
     });
     return changed;

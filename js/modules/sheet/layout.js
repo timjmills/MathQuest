@@ -134,6 +134,55 @@ export const FILL_CAP = 1.8;
  * (items) where the role's count allows, else stays under the grid.
  */
 export const CONTENT_FILL = 1.5;
+/**
+ * ROW-STRETCH CAP (lead ruling 2026-11-14, lf-placevalue vocabulary deploy item (d); lane lf-engine; stage 2 = critic
+ * lf-engine-rowcap r1 F4): a row stretches only to its DRAWN height plus writing room - ONE engine rule for EVERY template.
+ * Every template is capped by default with ROW_ROOM_DEFAULT_MM of writing room; ROW_ROOM_MM names a template whose room differs;
+ * ROW_STRETCH_EXEMPT names, with its reason, each template whose stretched row IS its drawing (never capped). Every row is held
+ * to `rowCapMm` by every composer that shares spare height into rows: the grid's fill and fill limit (resolveSectionLayout), the
+ * practice spread, the lesson bands' share (roles/lesson.js), the Opener's PT-ENG-3 grow, Review, Mixed practice, and the
+ * self-built rows of Guided, Scripted Model, Error Analysis and Pre-skill check. The height a cap refuses is never shrunk out of
+ * content and never passed into another row: it buys more rows where the role fills (the fill COUNTS rows at the cap height,
+ * ws-rowcap-fill), else stays white at the foot. ws-empty-band EB-STRETCH reads THESE literals (keep each one line of
+ * 'template': value pairs).
+ */
+export const ROW_ROOM_DEFAULT_MM = 3;
+export const ROW_ROOM_MM = Object.freeze({ 'vocab-match3': 2, 'lesson-vocab': 2, 'count-row': 3 });
+export const ROW_STRETCH_EXEMPT = Object.freeze({ 'division': 'LDIV-ROOM (owner 2026-11-14): the long-division writing boxes grow into the row, up to 2x', 'long-multiplication': 'the partial-product rows are the work area; the row is the working space (PT 2.4)', 'word': 'a story cell: the row under the story is the working space (PT 3.7)' });
+/**
+ * The LAYOUT engines that size their rows by their own owner rule and are not held to the row cap (named, each with its reason).
+ * ws-empty-band EB-STRETCH does not judge their cells (it reads the fact grid's class, `.ws-grid.facts`).
+ */
+export const ROW_STRETCH_EXEMPT_LAYOUTS = Object.freeze({ 'fact-rows': 'the fact-row engine (roles/fact-rows.js factRowsLayout): owner FULLPAGE / ROWSAME rules (facts-print-fix r4-r5) - one row height a page, every page but the last full, at most 1.3 x the fact' });
+/**
+ * The footprint classes whose spare row height IS the pupil's working space (PT 2.4's 93 x 114 long-division cell, PT 3.7's
+ * story): a row holding one of them is never capped (as resolveSectionLayout's `capped` exempts them from the fill limit).
+ */
+export const WORK_SPACE_CLASSES = Object.freeze(['word', 'long']);
+/**
+ * The DRAWN height of a row of `items` at `cols` (mm): the tallest host measurement + 1 mm (as measuredH), or 0 when any item is
+ * unmeasured. Never the skill's floor or a footprint guess (a Match 3 row asked 56 mm by its floor and drew 50).
+ */
+export const drawnRowMm = (items, cols) => {
+    const hs = (items || []).map((i) => { const m = i && i.measured && i.measured[cols]; return m && Number(m.hMm) > 0 ? Number(m.hMm) + 1 : 0; });
+    return hs.length && hs.every((h) => h > 0) ? Math.max(...hs) : 0;
+};
+/** The writing room a template gets (mm): its own, else the default; null when it is exempt (its row is its drawing). */
+export const rowRoomMm = (template) => (Object.prototype.hasOwnProperty.call(ROW_STRETCH_EXEMPT, template) ? null
+    : Object.prototype.hasOwnProperty.call(ROW_ROOM_MM, template) ? ROW_ROOM_MM[template] : ROW_ROOM_DEFAULT_MM);
+const templateOf = (it) => (typeof it === 'string' ? it : (it.template || (it.q && it.q.cell && it.q.cell.template) || ''));
+const workSpace = (it) => typeof it === 'object' && WORK_SPACE_CLASSES.includes(it.fclass);
+/**
+ * The tallest a row of `items` may be drawn (mm) when it measures `drawnMm`: drawn + the largest room its templates get (per
+ * row, `rows` rows); Infinity when an item is exempt (ROW_STRETCH_EXEMPT, WORK_SPACE_CLASSES) or nothing is measured.
+ */
+export const rowCapMm = (drawnMm, items, rows = 1) => {
+    const list = (Array.isArray(items) ? items : [items]).filter(Boolean);
+    if (!(drawnMm > 0) || !list.length) return Infinity;
+    if (list.some(workSpace)) return Infinity;
+    const rooms = list.map((it) => rowRoomMm(templateOf(it)));
+    return rooms.some((r) => r === null) ? Infinity : drawnMm + Math.max(1, rows) * Math.max(...rooms);
+};
 /** `noStretch` sections (div_facts' fade packet, owner 2026-11-08): a row takes its measured height and this much room. */
 export const NO_STRETCH_ROOM = 1.25;
 /** PT-GDP (design/PAGE_TYPES.md): a row is at most this multiple of its content where a page's shape is its count. */
@@ -189,7 +238,8 @@ export const DENSE_ROOM = 1.2;
  * `roomed`: room x (height - keep-out), never below the height itself.
  */
 export const koMm = (size) => Math.max(0, ((SIZES[size] || SIZES[DEFAULT_SIZE]).tabMm || 0) - 2);
-const roomed = (pc, room) => Math.max(pc.hMin, room * Math.max(0, pc.hMin - (pc.ko || 0)));
+// (ROW-STRETCH CAP stage 2: a row is never DRAWN past its cap, so it is never COUNTED past it either - room is kept up to the cap)
+const roomed = (pc, room) => Math.max(pc.hMin, Math.min(pc.capH > 0 ? pc.capH : Infinity, room * Math.max(0, pc.hMin - (pc.ko || 0))));
 export const DENSE_CEILING = Object.freeze({
     short: Object.freeze({ S: 30, M: 24, L: 16 }),
     // L1: 12 at every size printed a 3 x 4 page of tiny two-digit stacks at S; S and M hold more
@@ -387,7 +437,9 @@ export function itemInfo(item, ctx = {}) {
     if (!fp && it.q) {
         try { fp = cellFootprint(it.q, ctx); } catch (e) { fp = null; }
     }
-    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null, size: ctx.size || it.size || '' };
+    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null, size: ctx.size || it.size || '',
+        // (the template, for the ROW-STRETCH CAP: rowCapMm)
+        template: it.template || (it.q && it.q.cell && it.q.cell.template) || '' };
 }
 
 /**
@@ -621,7 +673,16 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         const res = infos.map((i) => fitAt(i, c, { size, look, availableWidthMm: W, auto }));
         const f = floor && floor[c];
         const fH = f && Number.isFinite(f.hMm) ? f.hMm : 0;
-        const hMin = Math.max(0, fH, ...res.map((r) => r.hMin));
+        const hMin0 = Math.max(0, fH, ...res.map((r) => r.hMin));
+        // ROW-STRETCH CAP (critic rowcap r1 F3): a row of capped templates is DRAWN at most drawn + room (rowCapMm), so it is
+        // COUNTED at that height too - never at a footprint guess taller than it (Match 3: a 48 mm footprint asked 58 mm, the
+        // work draws 50, so 3 rows printed with a 75 mm white foot where 4 fit). The floor (a wider sample's tallest measure)
+        // still holds: the cap is reckoned on the taller of it and these items' measure.
+        const dr = drawnRowMm(infos, c);
+        // (stage 2: a static footprint - no host measure - is drawn at its own height, so it is capped on that, as the fill limit is)
+        const capBase = dr > 0 ? Math.max(dr, fH > 0 ? fH + 1 : 0) : hMin0;
+        const capH = capBase > 0 ? rowCapMm(capBase, infos) : Infinity;
+        const hMin = Math.min(hMin0, capH);
         // r12c: the tallest cell is a host MEASUREMENT (it carries the label keep-out, see koMm)
         const meas = hMin > 0 && (fH === hMin || infos.some((i, k) => res[k].hMin === hMin && i.measured && i.measured[c] && i.measured[c].hMm === hMin));
         return {
@@ -631,11 +692,16 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             why: (res.find((r) => !r.fits) || {}).why || (f && f.fits === false ? 'width' : f && auto && f.autoFits === false ? 'fill' : ''),
             hMin,
             ko: meas ? koMm(size) : 0,
+            // (stage 2, critic rowcap r1 F4 (c): the row's cap - the fill and the dense pass COUNT rows at no more than it, roomed)
+            capH,
         };
     };
 
     let cols;
     let clamped = false;
+    // (`overflow`: a problem wider than its cell in 1 column, or taller than the page - a clamp the page fill never passes;
+    // a column count clamped to what fits is not one)
+    let overflow = false;
     let reason = '';
     if (requested === 'auto') {
         // DN-15: the largest N up to the Auto cap that fits with the Auto margins. It never
@@ -664,6 +730,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     let hMin = atCols.hMin;
     if (!atCols.fits) {
         clamped = true;
+        overflow = true;
         notes.push('A problem is wider than its cell even in 1 column.');
     }
     const hard = Math.max(1, Math.floor((G - SAFETY_H_MM) / Math.max(1, hMin)));
@@ -758,6 +825,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     if (cols === 1 && cls !== 'word' && cls !== 'wide' && rows < ONE_COL_ROWS.min) notes.push('Very tall problems: fewer than 3 rows fit.');
     if (hMin > G - SAFETY_H_MM) {
         clamped = true;
+        overflow = true;
         notes.push('A problem is taller than the page at this size.');
     }
 
@@ -849,15 +917,20 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     let filled = false;
     // Column stacks keep 12.1's grid too: their cell height is the pupil's regrouping space.
     const stacked = infos.some((i) => i.fp.tracks && !i.fp.factLike);
-    if (FILL_ROLES.has(role) && !clamped && !packed && !stacked && !gridOverride && hMin > 0 && cls !== 'word' && cls !== 'long') {
+    // (`section.fillClamped`, a lesson's Practice page - lf-engine vocabfix item 2: its [6, 2] shape clamped to 1 column took the
+    // 1-column target of 4 rows and, clamped, was never filled: follow_given_rule M p3 4 rows of 28.5 mm, 45 % white, and 2
+    // more on p4. A column clamp alone fills like any page; an overflow never does. The page cap still holds the count.)
+    // (and the grid height the lesson hands in under its step strip is the grid it fills)
+    if (FILL_ROLES.has(role) && (!clamped || (section.fillClamped && !overflow)) && !packed && !stacked && (!gridOverride || section.fillClamped) && hMin > 0 && cls !== 'word' && cls !== 'long') {
         // (the heights at the columns the page now has: dense packing above may have moved to more
         // columns, where a support box stacks under its problem - div_facts think at S measured 15 mm at
         // 2 columns and 25.5 mm at 3, and 10 rows of 3 ran 10.8 mm past the page; critic laned-restart R1-4)
         const atFill = probe(cols, false);
         const hFill = atFill.hMin || hMin;
-        const used = rows * Math.min(G / rows, fillLimit(hFill));
+        // (ROW-STRETCH CAP stage 2: the rows are drawn at most at their cap, so they USE at most that much of the grid)
+        const used = rows * Math.min(G / rows, fillLimit(hFill), atFill.capH > 0 ? atFill.capH : Infinity);
         const fit = Math.floor((G - SAFETY_H_MM) / roomed(atFill, DENSE_ROOM));
-        if (used < PAGE_FILL * G && fit >= 5 / cols) {
+            if (used < PAGE_FILL * G && fit >= 5 / cols) {
             let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
             if (cols === 2 && want > 1 && !section.freeRows) want = TWO_COL_ROWS.find((r) => r <= want) || want;
             if (want > rows) {
@@ -913,6 +986,12 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     if (capped && rows * cellH < 0.8 * G && !noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
     if ((capped || fpNoStretch) && noStretch) cellH = r3(Math.min(even, hMin * (typeof noStretch === 'number' ? noStretch : NO_STRETCH_ROOM)));
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
+    // ROW-STRETCH CAP (lead 2026-11-14): a row of declared templates stops at its drawn height + their writing room, whatever
+    // the fill above allowed; the height it refuses stays under the grid (the fill above already bought the rows that fit).
+    // Drawn = what THESE items measure at the page's columns (+ 1 mm, as measuredH), never the skill's floor (a wider sample's
+    // tallest item: the vocabulary floor of 56 mm held rows of 50 mm pictures, lf-placevalue (d)); the floor still sets the count.
+    const rowCap = rowCapMm(drawnRowMm(infos, cols) || hMin, infos);
+    if (cellH > rowCap) cellH = r3(rowCap);
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
     // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
     // five-frame - but a page that deals none of those keeps its cells to its own items. Never so short that the rows
@@ -944,7 +1023,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     return {
         role, cls, requested, cols, rows, perPage, pages, count,
         cellW: widths.nominal, innerW: widths.inner, cellH, hMin: r2(hMin), gridH: G, gridHCont: Gc,
-        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, reason, note, notes, inPlace,
+        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, overflow, reason, note, notes, inPlace,
         digitPt, trackMm, size, look, availableWidthMm: W,
     };
 }

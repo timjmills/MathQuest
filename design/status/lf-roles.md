@@ -471,3 +471,13 @@ on master, queued for next week's PSC layout pass (with the trim to the ceiling 
 - D2 sub_1k PSC title "Pre-skill check: subtracting sub 1k" (skill id leaks): check = PSC title lint for id fragments.
 - D3 sub_wp_20 M p1: two adjacent bands with the same "Subtract." instruction, ragged 8 / 4: check = adjacent-band identical-instruction lint.
 - D4 add_facts M seed 7: three items answer 12, a turnaround pair in one band: check = deal-diversity (<= 2 share an answer, no turnaround pair per band).
+
+### d2d5 (D3 / D4 / twin pools / Opener GROWCAP): narrow critic r2 PASS (2026-11-20, efe036cd5)
+Critic r1 FAIL (C1 6, C2 8, C3 6, C4 6: label-built instructions, lesson footer overprint, Form B sign floor, twin variety);
+r2 (fresh builder at medium) PASS 8 / 8 / 8 / 8, all four r1 findings closed; lesson baseline identical to master; hashes: only
+Pre-skill Check pages + count_by_tables / follow_given_rule Opener count rows. Capacity pin: 2 drops ruled by the twin merge
+(sub_2d_1d PSC M 6 -> 5, L 6 -> 4, 2 -> 1 page) - for the lead's --allow.
+Noted by the critic (not this lane, queued):
+- H16 doubled answer area in division:div_equation_parts' cell (inside div_facts_long's check; identical on master): division family.
+- D2's "subtracting sub 1k / sub 50" title comes from a NON-LIVE skill id (subtraction:sub_50): buildSheet builds it anyway. Check:
+  buildSheet / PSC title judge refuse an id not in SKILLS (next week, with the Quick review build).

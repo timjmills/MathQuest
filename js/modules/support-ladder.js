@@ -848,7 +848,7 @@ function plain(html) {
     return String(html || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-/** The provider's screen-only help (`screenHelp(q) -> {steps?, say?}`, HINT-NO-BLANK r2): never printed, S8-clean. */
+/** The provider's screen-only help (`screenHelp(q) -> {steps?, say?, hint?}`, HINT-NO-BLANK r2/r3): never printed, S8-clean. */
 function screenHelpOf(q, cat, skill) {
     try {
         const p = getProvider(cat, skill);
@@ -857,11 +857,122 @@ function screenHelpOf(q, cat, skill) {
     } catch (e) { return null; }
 }
 
+/** The hint the hint popup shows on screen: the skill's own screen hint (screenHelp.hint), else q.hint. */
+export function hintFor(q, ctx = {}) {
+    if (!q) return '';
+    const { cat, skill } = whereFrom(q, ctx);
+    const sh = screenHelpOf(q, cat, skill);
+    if (sh && typeof sh.hint === 'string' && sh.hint) return sh.hint;
+    return q.hint || '';
+}
+
+/* --------------------------------------------- HINT-NO-BLANK r3: the help is CHOSEN, never cut into shape */
+// Lead ruling r3 (critic r2 root cause): help made by cutting the answer out of steps written to state it shows the remains
+// of the cut (an orphan number, a heading with nothing under it, one term of the answer). So the box shows, in this order:
+//   1. the skill's own steps, when leaving the answer out drops NOTHING but the final sentence, and what is left is whole;
+//   2. else the skill's screen-only steps (provider screenHelp.steps);
+//   3. else the clean hint (hintFor): no answer, no gap;
+//   4. else no box.
+// The one S8 exception (q.fullWorked, placevalue:digit_value_unit_form) shows its steps as written.
+const HELP_BLANK = /_{2,}|\{[A-Za-z][\w.]*\}|[□☐▢]|(?:^|[\s(=+\-−×÷*/:,])\?(?=\s*(?:$|[=+\-−×÷*/),.;]|\s(?:[=+\-−×÷]|and|or)\b))/;
+const HELP_BARE = /^(?:(?:so|then|now)[,:]?\s+)?[\d\s().,/]*\d[\d\s().,/]*[+−×÷-][\d\s+−×÷().,/-]*\d\s*\.?$/i;
+const nums = (t) => (String(t == null ? '' : t).match(/\d[\d,]*(?:\.\d+)?(?:\/\d+)?/g) || []).map((x) => x.replace(/,/g, ''));
+const LIST_ANS = /^\s*-?[\d.\/]+(\s*,\s*-?[\d.\/]+)+\s*$/;
+
+/** The numbers the question shows as whole tokens (its text and operands): a value the question gives is no leak. */
+function givenSet(q) {
+    return new Set([...nums(plain(q && q.text)), ...(q && Array.isArray(q.operands) ? q.operands.map((v) => String(v).replace(/,/g, '')) : [])]);
+}
+
+/** The top-level terms of an expression answer ("4 × 100 + 0 × 10 + 9 × 1" -> "4 × 100", ...; "12x + 8" -> "12x", "8"). */
+function termsOf(a) {
+    if (typeof a !== 'string' || /[=;,(]/.test(a)) return [];
+    const parts = a.split(/\s+[+−-]\s+/).map((x) => x.trim()).filter(Boolean);
+    return parts.length >= 2 ? parts : [];
+}
+
+/** What a help text may not state: the answer's tokens (each term of an expression answer too), and the given-equal
+ *  elements of a list answer, stated as an operand ("1 × 80 = 80" fills the box beside 1). */
+function helpLeak(q, raw) {
+    const given = givenSet(q);
+    const terms = q && typeof q.ans === 'string' ? termsOf(q.ans).filter((x) => x !== '0') : [];
+    const tokens = [...new Set([...answerTokens(q, raw), ...terms])].filter((tok) => !given.has(tok.replace(/,/g, '')))
+        .sort((a, b) => b.length - a.length);
+    const ops = q && typeof q.ans === 'string' && LIST_ANS.test(q.ans)
+        ? q.ans.split(',').map((x) => x.trim()).filter((x) => x && x !== '0' && given.has(x.replace(/,/g, ''))) : [];
+    // (r3: a ONE-value answer equal to a given number is still stated as a result: "= 3 inches", "that's 2")
+    const a1 = q && (typeof q.ans === 'number' || typeof q.ans === 'string') ? String(q.ans).trim().replace(/,/g, '') : '';
+    if (/^-?\d+(?:\.\d+)?(?:\/\d+)?$/.test(a1) && a1 !== '0' && given.has(a1)) ops.push({ res: a1 });
+    const opRe = ops.map((e) => (typeof e === 'object' ? new RegExp(`[=≈]\\s*${reEsc(e.res)}(?![\\d/]|\\.\\d)|\\bthat(?:'s| is)\\s+${reEsc(e.res)}(?![\\d/]|\\.\\d)`, 'i') : new RegExp(`(^|[^\\d.,/])${reEsc(e)}\\s*[×÷+−*-]\\s*\\d|[×÷+−*-]\\s*${reEsc(e)}(?![\\d/]|\\.\\d)\\s*=`)));
+    return (t) => {
+        const x = String(t).replace(/(\d),(?=\d{3})/g, '$1');
+        // (a word answer in any case: "Odd" is stated by "it is odd"; "Less than 18" by "less than 18")
+        const wordHit = tokens.some((tok) => /[A-Za-z]{3}/.test(tok) && new RegExp(`(^|[^A-Za-z])${reEsc(tok)}(?![A-Za-z])`, 'i').test(x));
+        return wordHit || statesAnswer(t, tokens) || statesAnswer(x, tokens) || opRe.some((re) => re.test(x));
+    };
+}
+
+/** Is this help whole: no gap, no answer line, no bare or repeated step, no heading left alone, no orphan number? */
+function helpWhole(steps, q) {
+    const seen = new Set([...givenSet(q), ...nums(plain(q && q.visual)), ...nums(plain(q && q.question))]);
+    (q && Array.isArray(q.options) ? q.options : []).forEach((o) => nums(plain(o && typeof o === 'object' ? (o.label || o.text || o.value) : o)).forEach((v) => seen.add(v)));
+    const prim = (v) => typeof v === 'number' || (typeof v === 'string' && v.length < 40);
+    if (q && q.pv && typeof q.pv === 'object') Object.values(q.pv).forEach((v) => (Array.isArray(v) ? v : [v]).forEach((x) => { if (prim(x)) nums(String(x)).forEach((y) => seen.add(y)); }));
+    if (q) Object.entries(q).forEach(([k, v]) => { if (k !== 'ans' && typeof v === 'number') seen.add(String(v)); });
+    [...seen].forEach((v) => (v.match(/\d/g) || []).forEach((d) => seen.add(d)));
+    const known = (v) => seen.has(v) || v === '0' || v === '1' || v === '2' || /^10*$/.test(v);
+    const norm = (x) => x.replace(/\s+/g, '').replace(/\.$/, '').toLowerCase();
+    for (let k = 0; k < steps.length; k++) {
+        const t = steps[k];
+        if (HELP_BLANK.test(t) || /(^|\s)Answer\s*:|\[object /.test(t) || HELP_BARE.test(t)) return false;
+        if (steps.slice(0, k).some((y) => norm(y) === norm(t))) return false;
+        if (/:\s*$/.test(t) && !(steps[k + 1] && /^[\d(]/.test(steps[k + 1].trim()))) return false;
+        if (k === 0 && /^(it|its|is it|they|this|that|these|those|he|she)\b/i.test(t.trim())) return false;
+        const xx = /(\d[\d,.]*)\s*[−-]\s*(\d[\d,.]*)\s*=\s*0(?![\d.])/.exec(t);
+        if (xx && xx[1].replace(/,/g, '') === xx[2].replace(/,/g, '')) return false;
+        const tt = t.replace(/(\d),(?=\d{3})/g, '$1');
+        const eqRe = /(\d+(?:\.\d+)?(?:\/\d+)?)\s*[+−×÷*x-]\s*(\d+(?:\.\d+)?(?:\/\d+)?)\s*=\s*(\d+(?:\.\d+)?(?:\/\d+)?)/g;
+        const worked = new Set(); let m;
+        while ((m = eqRe.exec(tt))) { const v = [m[1], m[2], m[3]]; if (v.filter(known).length >= 2) v.forEach((x) => worked.add(x)); }
+        // ... and a sentence's LAST number, given by "is" / "=" from numbers it knows ("Halfway between 70 and 80 is 75.")
+        t.split(/(?<=[.!?])\s+/).forEach((sn) => {
+            const snc = sn.replace(/(\d),(?=\d{3})/g, '$1');
+            const ns = nums(snc); const un = ns.filter((v) => !known(v) && !worked.has(v));
+            if (un.length === 1 && ns[ns.length - 1] === un[0] && /\b(is|are|makes?)\b|=/.test(snc.slice(0, snc.lastIndexOf(un[0])))) worked.add(un[0]);
+        });
+        if (nums(t).some((v) => !known(v) && !worked.has(v))) return false;
+        nums(t).forEach((v) => seen.add(v));
+    }
+    return true;
+}
+
+/** The skill's own steps as written: the provider's workedSteps, else the solution popup's steps (no Problem / Answer line). */
+function ownRawSteps(q, cat, skill) {
+    let raw = [];
+    try {
+        const p = getProvider(cat, skill);
+        if (p && Array.isArray(p.real) && p.real.includes('workedSteps') && typeof p.workedSteps === 'function') {
+            const st = p.workedSteps(q);
+            if (Array.isArray(st)) raw = st.filter((s) => s && s.text);
+        }
+    } catch (e) { raw = []; }
+    if (raw.length < 2 && typeof window !== 'undefined' && typeof window.generateSolutionSteps === 'function') {
+        try {
+            const g = window.generateSolutionSteps(q) || [];
+            // (r2 F13: the popup's own "Answer: ..." line is the answer, never a step; its "Hint:" label is not one either)
+            if (Array.isArray(g)) raw = g.map(plain).filter((t) => t && !/^Problem:/i.test(t) && !/^Answer\s*:/i.test(t) && !/\[object /.test(t)).map((t) => ({ text: t.replace(/^Step \d+:\s*/i, '').replace(/^Hint:\s*/i, ''), marks: [] })).slice(0, 5);
+        } catch (e) { /* keep what there is */ }
+    }
+    return raw;
+}
+
+/** This item's "Here is how" steps, chosen whole (HINT-NO-BLANK r3); [] shows no box. */
+
+// ---- master r2 help (A12: skills without screenHelp keep it) ----
 const OP_WORD = { '+': 'plus', '×': 'times', '−': 'minus', '-': 'minus', '÷': 'divided by' };
 const NUM = String.raw`\d[\d,]*(?:\.\d+)?`;
 const GAP_RE = new RegExp(String.raw`(${NUM})\s*([+×−÷-])\s*(?:\?|_{2,})\s*=\s*(${NUM})|(?:\?|_{2,})\s*([+×−÷-])\s*(${NUM})\s*=\s*(${NUM})`);
 const BARE_RE = /^[\d\s().,/]*\d[\d\s().,/]*[+−×÷-][\d\s+−×÷().,/-]*\d\s*\.?$/;  // an expression with no '=' and no word
-// a step that tells the pupil what to do (an instruction verb first), for the HELP-THIN close
 const DOES = /^(?:now:?\s+|then:?\s+|so\s+)?(find|count|add|subtract|take|multiply|divide|work|look|read|point|write|think|start|make|use|say|split|circle|match|put|move|check|draw|mark|join|share|compare|ask|tap|choose|halve|double|partition|round|fill|shade|trace|touch|jump|regroup|exchange|cross|colou?r|place|name|show|turn|go|skip|group|sort|plot|measure|label|build|break|change|try|remember|cut|fold|order|list|keep|line up|hop|drag)\b/i;
 // any sentence or clause of the step starts with an instruction ("If you know one factor, divide 80 by it.")
 const saysWhatToDo = (t) => String(t).split(/[.,;:!?]\s+/).some((c) => DOES.test(c.trim()));
@@ -898,7 +1009,7 @@ function readable(steps) {
 }
 
 /** This item's worked steps, the sentence that states the answer left out (no blank). */
-export function workedStepsFor(q, ctx = {}) {
+function workedStepsR2(q, ctx = {}) {
     const { cat, skill } = whereFrom(q, ctx);
     let raw = [];
     const sh = q && q.fullWorked ? null : screenHelpOf(q, cat, skill);
@@ -961,6 +1072,51 @@ export function workedStepsFor(q, ctx = {}) {
         } catch (e) { /* none */ }
     }
     return out;
+}
+const R3_CATS = new Set(['placevalue']);
+
+export function workedStepsFor(q, ctx = {}) {
+    const { cat, skill } = whereFrom(q, ctx);
+    // lead ruling A12 (2026-11-20): the r3 choice rule holds only where a skill has its own screen help, or is this lane's
+    // (place value); every other skill keeps master's r2 help until its family lane writes screenHelp (EMPTY_PIN may not grow)
+    if (!(q && q.fullWorked) && !R3_CATS.has(cat) && !screenHelpOf(q, cat, skill)) return workedStepsR2(q, ctx);
+    const raw = ownRawSteps(q, cat, skill);
+    // owner bug fix 2026-11-15, the ONE S8 exception (ws-hint-no-blank S8_EXCEPTIONS): an item that asks for its help filled
+    // (q.fullWorked: the unit-form value of a digit) shows every step with the item's own numbers
+    if (q && q.fullWorked) {
+        const all = raw.length ? raw : (q.hint ? [{ text: plain(q.hint) }] : []);
+        return all.slice(0, 6).map((s) => plain(s.text)).filter(Boolean);
+    }
+    const leaks = helpLeak(q, raw);
+    // 1. the skill's own steps: only the FINAL sentence may go, and only because it states the answer
+    const texts = raw.slice(0, 6).map((s) => plain(s.text)).filter(Boolean);
+    if (texts.length) {
+        let own = texts.slice();
+        const sents = own[own.length - 1].split(/(?<=[.!?])\s+/);
+        const fin = sents[sents.length - 1];
+        let pure = true;
+        if (leaks(fin)) {
+            const rest = sents.slice(0, -1).join(' ').trim();
+            own = rest ? own.slice(0, -1).concat(rest) : own.slice(0, -1);
+            // ... and only when that sentence says nothing but the answer: every other number in it is one the pupil has
+            // already seen ("100 + 1 = 101." after "... to get 1."), never a step of its own ("so add 3 back: 38 + 3 = 41")
+            const had = new Set([...givenSet(q), ...own.flatMap((t) => nums(t))]);
+            const ansT = new Set(answerTokens(q, raw).map((t) => t.replace(/,/g, '')));
+            pure = nums(fin).every((v) => had.has(v) || ansT.has(v));
+        }
+        // (critic r3 R3-2, compensation: a cut box that no longer says what to do loses to the skill's own screenHelp)
+        const cut = own.length !== texts.length || own[own.length - 1] !== texts[texts.length - 1];
+        const shFirst = cut && screenHelpOf(q, cat, skill);
+        if (!(shFirst && Array.isArray(shFirst.steps) && shFirst.steps.length) && pure && own.length && !own.some(leaks) && helpWhole(own, q)) return own;
+    }
+    // 2. the skill's screen-only steps (written once, S8-clean)
+    const sh = screenHelpOf(q, cat, skill);
+    if (sh && Array.isArray(sh.steps) && sh.steps.length) return sh.steps.map((t) => String(t)).filter(Boolean);
+    // 3. the clean hint, as it is
+    const h = plain(hintFor(q, ctx));
+    if (h && !leaks(h) && !HELP_BLANK.test(h) && !/(^|\s)Answer\s*:|\[object /.test(h)) return [h];
+    // 4. no box
+    return [];
 }
 
 /** The numbers the question itself shows: its operands, else the numbers of its text (q.pv.n for place value), in order. */

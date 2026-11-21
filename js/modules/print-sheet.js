@@ -261,6 +261,8 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // (`fillClamped`, a lesson's Practice page: a column clamp alone still fills the page - layout.js PAGE FILL, LESSON-FILL)
+            ...(s && s.fillClamped ? { fillClamped: true } : {}),
             // (`capFillCont`, lesson 3a P1d - E12: a page-capped sheet over two pages fills its continuation page to the FIRST
             // page's grid height too, so every cell keeps one height; absent: unchanged)
             capFillCont: !!(s && s.capFillCont),
@@ -1977,6 +1979,15 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     return item;
 }
 
+/**
+ * The lesson player's host item of an already dealt question (lane lf-hosts, design/cards/lesson-player D2): the SAME
+ * item shape the anchor chart draws its states from (template, render, cellPrompt), so the I do on screen is the chart's
+ * own example drawn by the chart's own state renderer. No supports (the chart draws none).
+ */
+export function lessonPlayerItem(q, skill = null) {
+    return hostItem({ q, skill: skill || { categoryId: q.categoryId, skillId: q.skillId } }, 0, 'L', { supports: false });
+}
+
 /* ------------------------------------------------------ the cell's own instruction line */
 
 /** The first stem line of a legacy cell: a plain `<div>` straight after `.problem-content`. */
@@ -2955,7 +2966,7 @@ function heightClassOf(sec, items, gridMm) {
     if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
 }
 
-const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows, ...(section.noStretch ? { noStretch: section.noStretch } : {}) });
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows, ...(section.noStretch ? { noStretch: section.noStretch } : {}), ...(section.fillClamped ? { fillClamped: true } : {}) });
 
 /**
  * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
@@ -4262,7 +4273,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}), ...(s.noStretch ? { noStretch: s.noStretch } : {}) })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}), ...(s.noStretch ? { noStretch: s.noStretch } : {}), ...(s.fillClamped ? { fillClamped: true } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -5486,7 +5497,10 @@ async function buildLesson(n, metaOf) {
         for (const shape of facts || blocks ? [null] : stackShapes) {
             const r = await buildSheetInner(practiceReq(practicePages, true, shape || undefined, seed, sec));
             const f0 = r.fits && r.fits.sections && r.fits.sections[0];
-            const whole = f0 ? f0.clamped !== true : true;
+            // (LESSON-FILL, lf-engine vocabfix item 2: the LAST shape clamped to fewer columns only - no overflow - is whole: its
+            // page fills, fillClamped; a denser shape before it still gives way to the next)
+            const lastShape = shape === stackShapes[stackShapes.length - 1];
+            const whole = f0 ? f0.clamped !== true || (lastShape && !facts && !blocks && f0.overflow === false) : true;
             practiceTried.push({ shape, pages: r.pageCount, clamped: !whole, hMin: f0 && f0.hMin, cellH: f0 && f0.cellH, stripH: +stripH.toFixed(1) });
             if (r.pageCount <= practicePages && whole) { res = r; break; }
         }

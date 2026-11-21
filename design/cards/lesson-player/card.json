@@ -1,0 +1,315 @@
+{
+ "id": "lesson-player",
+ "kind": "template",
+ "title": "The interactive lesson player (`lesson-player`): a new SCREEN that runs a lesson as Warm-up, I do, We do, You do and Exit ticket, on the board or self-paced",
+ "template": {
+  "id": "lesson-player",
+  "source": "js/modules/screen-cell.js",
+  "also": "A SCREEN card (lane lf-hosts), not a print template: the player draws every question region with the existing screen cell (`screen-cell.js`, `.mq-scell`) and reads the lesson records in `js/modules/lessons/library.js` (lessonData / engineRecord), `sheet/roles/lesson.js` (pickExample, pickWeDo) and `sheet/anchors.js` (stepState, sayLineOf). Mock: `design/cards/lesson-player/mock-ido-board-1280.html` + `.png`."
+ },
+ "families": [],
+ "findingsMatch": {
+  "templates": [
+   "lesson-player"
+  ]
+ },
+ "skills": {
+  "include": []
+ },
+ "excerptChars": 160,
+ "summary": "ONE player runs a lesson on screen in five parts, Warm-up -> I do -> We do -> You do -> Exit ticket, in two modes: Board (teacher-led, whole class, big type, presenter controls, reveal on click, saves nothing about pupils) and Pupil (self-paced, part reached and exit score saved). Every part is GENERATED from the lesson record the print packet already uses and dealt through generateQuestionFor with seeds, so a lesson replays identically and matches its printed packet. Every question region is the black-and-white Andika screen cell (SP-1, SP-2); everything coloured is chrome outside it (SP-30; INK-30 for the step numerals only). One pure function planLesson(lessonId, {seed, mode}) -> {parts:[{part, items, steps?, say?}]} deals everything; no part generates on its own (P-ON-2). Skills: none of its own; it plays every library lesson's skills (lesson.practice, lesson.warmup), first add-within-10 (addition:add_facts band 10, constant 1-3).",
+ "teaches": "Whatever the lesson teaches: the player is the I do / We do / You do sequence of PEDAGOGY_STANDARD (P-1 one new thing per step, P-17 the Say band, P-LC-7 guided at level 2, P-LC-9 worked steps redrawn per step, P-ON-1 Learn runs worked -> guided -> own on the same cell) put on screen for one lesson, plus a 3-item scored exit ticket.",
+ "research": "From repo sources: PEDAGOGY_STANDARD section 11 (online modes mirror page roles, the hint ladder rungs 1-4, P-ON-1..8), WORKSHEET_DESIGN_STANDARD SP-1..SP-40 (screen parts), PAGE_TYPES PT-PKT-1 / PT-ANC-1 (packet parts, the anchor example), roles/lesson.js (the packet anatomy), the existing board display (teacher-shell.js tv-bigboard). Interactive grammar (IXL 'learn with an example', Boom Learning task-card reveal, presentation-clicker conventions): reveal one step per click, read aloud, then try one; ours keeps one boxed B&W cell and the Steps strip of the printed anchor chart.",
+ "problemTypes": [
+  "Warm-up: 1-3 cells, one per prerequisite skill (lesson.warmup, else routine.skills), each with its library instruction and its own input; feedback on Check; unscored; Board: Show answer per cell; a miss shows the Prerequisite Check's 'If missed -> Lesson ...' line in chrome.",
+  "I do (step reveal): state k of n = the cell redrawn as after step k (provider workedSteps + anchors.js stepState; P-LC-9: step k marks grey, earlier black), the step's own sentence under the drawing (L6), Steps strip row k outlined, later rows grey; Next reveals k+1, Back returns; no input. After the LAST step the Say band (BD-8, full width under the cell, cell ink) shows the real filled Say line (sayLineOf, e.g. 'Say: 6 plus 3 equals 9.'), read once; then 'Say it together' (chrome) waits. The routine's chant, if any, under Say.",
+  "We do (hint fade): 2-3 items (routine.guided cases via pickWeDo, else the practice skill) at level 2 (P-LC-7); item 1 at rung 1 (next step's marks grey + sentence), item 2 rung 2 (sentence), item 3 rung 3 ('What comes next?' + Steps row highlighted); a correct item moves the next one down a rung, a wrong Check keeps it (P-ON-7); a hint never fills a slot (P-ON-8); live per-digit feedback (SP-31). Board: teacher drives the rung with Hint / Next.",
+  "You do: the existing practice-card host embedded unchanged (D9): 6 items of lesson.practice (practiceBlocks[0] opts if present), Check, Skip, wrong-retry, end-of-run, hint ladder on request.",
+  "Exit ticket: 3 items of the practice skill (one per routine case where there are 3; a detailed lesson's 'exit' skill), Test level (scaffold 0, hints off, on Check once, no retry), score n/3 with accuracy only (P-ON-4); saved per D7; 0-1/3 shows 'Re-teach: replay I do' (chrome)."
+ ],
+ "progression": [
+  "Part order is fixed (P-1, P-ON-1): Warm-up -> I do -> We do -> You do -> Exit ticket; any part reachable from the part rail; repeat or skip any part.",
+  "Scaffold fades across the parts: I do level 3 (worked) -> We do level 2 with rungs 1 -> 2 -> 3 -> You do level 1 (hints on request) -> Exit level 0.",
+  "Build slices, smallest first (D8, D11, D12): 1 planLesson + I do, Board, add-within-10, URL launch, the part bar jumps (D11 built in: ?part=); 2 Warm-up + We do, both modes; 3 You do + Exit ticket + save + dashboard row; 4 launch buttons incl. 'Present' beside every part / page on the lesson print screen, printed pages presentable, detailed lessons, every library lesson swept; 5 (D12) itemsFor(req) shared by print and play + 'Open interactive' on the teacher print screen, role independent, one skill, card host, link; 6 D12 widened: every role, Mixed Review, Quick review, simple-print, board page, pupil code."
+ ],
+ "drawing": {
+  "sizes": "Board at 1280: cell digits 104 px, text 30 px, Steps 26 px, controls >= 64 px; board at 1920: x1.5; Pupil: the card scale of .mq-scell (40-56 px digits), digit inputs >= 48 px (SP-10, plan item 7). Tablet 820 / 1024: the Steps strip becomes one chip row above the cell (L11).",
+  "notes": [
+   "Frame: top bar (I Can title from the provider iCan as on the packet, mode pill, part rail of 5 pills >= 48 px, aria-current), stage (Steps strip from routine.steps with INK-30 numerals + the .mq-scell cell), bottom presenter / pupil bar (Back, Read aloud, step k of n, key legend, Next / Show answer / New numbers on Board).",
+   "BUILD REQUIREMENT (lead 2026-11-20, mock fix): the Say band shows the REAL filled Say line after the last I do step (never a placeholder); before it the band is absent, not a grey stub.",
+   "BUILD REQUIREMENT (lead 2026-11-20, mock fix): the Steps column has no empty band (H13): it is sized to its content (the Rule / chant line under the steps where the routine has one) and the column never stretches below its last row; --render measures it.",
+   "Content never shrinks to fit: a drawing too big for the stage takes the whole stage and the Steps strip collapses to chips. No colour, emoji or non-Andika type inside the cell (L7); feedback tints on the chrome frame only (SP-33)."
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "Screen cell (quoted)",
+   "core": true,
+   "chars": 320,
+   "rules": [
+    "SP-1",
+    "SP-2",
+    "SP-3",
+    "SP-10"
+   ]
+  },
+  {
+   "title": "Teaching sequence (quoted)",
+   "core": true,
+   "chars": 320,
+   "rules": [
+    "P-1",
+    "P-17",
+    "BD-8",
+    "P-LC-9",
+    "P-ON-1",
+    "P-ON-7"
+   ]
+  },
+  {
+   "title": "Screen feedback and hints",
+   "rules": [
+    "SP-4",
+    "SP-30",
+    "SP-31",
+    "SP-32",
+    "SP-33",
+    "SP-34",
+    "SP-40",
+    "P-ON-2",
+    "P-ON-3",
+    "P-ON-4",
+    "P-ON-5",
+    "P-ON-6",
+    "P-ON-8",
+    "P-LC-7"
+   ]
+  },
+  {
+   "title": "Packet, ink and quality bar",
+   "rules": [
+    "PT-PKT-1",
+    "PT-ANC-1",
+    "INK-30",
+    "H13",
+    "L5",
+    "L6",
+    "L7",
+    "L11",
+    "L13",
+    "L14",
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-11-20",
+   "ruling": "D1 Source APPROVED as recommended: Library lessons (lessonById + lessonData / engineRecord, library.js) drive all five parts; the 7 detailed lessons join in slice 4 through skills.used[].role (main / P0 / P1 / exit).",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D2 Seeds APPROVED as recommended: The packet seed S (default hash(lessonId)); part offsets Warm-up S+100+i, We do S+200+i, You do S+300+i, Exit S+900+i; the I do example is the anchor chart's own example (pickExample) for S, so screen = printed packet (P-ON-5); Board 'New numbers' bumps S by 1 and shows the seed in the teacher footer.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D3 Board launch APPROVED as recommended: A 'Teach on board' button on the lesson's row in the teacher Lessons / WRM screen and on the lesson print screen; it opens the existing board display (body.tv-bigboard, ?board=1 window, teacher-shell.js).",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D4 Pupil launch APPROVED as recommended: A 'Lesson' card in the student explorer / Quick start for any skill with a defaultFor lesson, and a share link ?lesson=<id>&s=<seed>; the pupil resumes at the last part reached.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D5 Hosts and targets? APPROVED as recommended: 820 / 1024 (tablet: Steps as a chip row above the cell), 1280 / 1366 (Steps strip beside the cell), 1920 board / projector (x1.5 board vars); every control >= 48 px, board controls >= 64 px; no 390 (plan item 7); no horizontal scroll; content never shrinks.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D6 Keys, clicker and read-aloud? APPROVED as recommended: Right / Space / PageDown = next, Left / PageUp = back (what clickers send), R = read again, H = hint, A = show answer (Board), Esc = leave; keys ignored inside a digit input except Enter and Tab. TTS (hints-speech.js speakExplanation / stopSpeaking, the settings toggle) reads each step sentence and the filled Say line: automatic in Pupil I do, on demand on the Board; speech stops on every navigation.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D7 Exit ticket save APPROVED as recommended: No new store: updateSkillProgress per item (progress.js) plus ONE state.sessionHistory row {type:'lesson-exit', lessonId, seed, score, of:3, date} through the game-flow saver; the teacher sees a 'Lesson exit' row in the dashboard session list and the skill's mastery bar; Board mode never saves. Consistent with P-ON-6.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D8 First slice? APPROVED as recommended: I do only, Board mode, lesson add-within-10 (Y1.B2.S9), launched by URL ?lesson=add-within-10&mode=board; full independent critic (first build of a new screen).",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D9 You do APPROVED as recommended: Embed the existing practice-card host unchanged: the same cell, Check, Skip, wrong-retry and end-of-run rules (game-control.js recordQuestionStatus, test-wrong-retry-skip.cjs); 6 items; hint ladder on request.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D10 Gate tool? APPROVED as recommended: A new tests/scripts/ws-lesson-player.mjs with --unit (node: planLesson deterministic, I do == anchor example, steps == workedSteps, Say has only the item's numbers), --render (every part, both modes, every host: no scroll, targets, B&W Andika cell, no emoji, H13), --reveal, --hints, --exit; on ws-precritic's path.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "Screen cards get a card.json and pass `ws-spec-card --check-signed` like every other card: no exemption for screen cards.",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D11 any part, any order: YES (owner requirement). The teacher or a pupil opens ANY part directly: the player parts (warmup, ido, wedo, youdo, exit) and any printed page of the packet (anchor chart, Model / scripted-model, Guided page, Independent page, Pre-skill Check, review, ...), by id: ?lesson=<id>&part=<partId>&s=<seed>. The part bar is clickable and never a forced sequence; every part steps on the board with the same Next / Back / clicker keys. The lesson print screen shows 'Present' beside each part / page. The first slice stays 'I do on the board' WITH the part bar jumping (D11 built in). Recommended for the open points: a printed page opens as its items one cell at a time in the board stage (its own instruction above, key revealed on A); a jump keeps each part's state for the session; no part is locked behind another.",
+   "source": "owner via coordinator, 2026-11-20 (added after the D1-D10 signature)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "D12 any worksheet -> interactive: YES (owner requirement), its own slice. Every print screen the app has (teacher print: any skill x any page role, Mixed Review, the Quick review section, simple prints, lessons) gets 'Open interactive'. It opens the SAME items: the request the print screen would send to buildSheet (role, sections, opts, seed) is dealt through the same path, so screen = paper (P-ON-5); one at a time (card host) or as a board page (online-worksheet host); answered with the existing keypad, feedback and Skip; teacher-led on the board, or pupil self-paced through a code / link (?sheet=<packed request>). Recommended: build a shared itemsFor(req) out of buildSheet (the generation half, no layout) that print AND play call, rather than re-dealing in the player; smallest first cut = the teacher print screen, role independent, one skill, card host, URL link; then other roles, Mixed Review / Quick review, simple-print, board page, pupil code.",
+   "source": "owner via coordinator, 2026-11-20 (added after the D1-D10 signature)"
+  },
+  {
+   "date": "2026-11-20",
+   "ruling": "Mock fixes are build requirements: the Say band shows the real Say line after the last step; the Steps column has no empty band (H13).",
+   "source": "lead via coordinator, 2026-11-20 (lane lf-hosts card review)"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M-LP1",
+   "error": "the player invents steps a provider does not give (workedSteps with 1 or 0 steps)",
+   "wrong": "a generic 'Think. Work. Check.' reveal"
+  },
+  {
+   "id": "M-LP2",
+   "error": "the screen example differs from the printed anchor chart for the same seed",
+   "wrong": "I do 5 + 2 on screen, 6 + 3 on the chart"
+  },
+  {
+   "id": "M-LP3",
+   "error": "a hint writes into the answer slot (P-ON-8)",
+   "wrong": "rung 1 shows 9 in the box"
+  },
+  {
+   "id": "M-LP4",
+   "error": "the board saves the class's answers as one pupil's exit score",
+   "wrong": "a 'Lesson exit 3/3' row from the board"
+  }
+ ],
+ "options": [
+  "The player has no skill options of its own: each part deals the lesson's skills with the option values the lesson record carries (lesson.practice.opts, warmup opts, practiceBlocks), unchanged and editable only in the lesson.",
+  "Player settings: mode (board | pupil), seed (Board 'New numbers'), read-aloud auto (on in Pupil I do, off on Board)."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --unit",
+   "note": "planLesson for every library lesson x 2 seeds byte-equal twice; I do == anchor example; steps == workedSteps; Say has only the item's numbers (P-ON-5, P-17, L6)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --render",
+   "note": "every part, both modes, 820 / 1024 / 1280 / 1366 / 1920: no horizontal scroll, controls >= 48 px (Board >= 64), cell ink #000 / #fff / #949494, Andika only, no emoji, no empty band >= 30 % incl. the Steps column (SP-2, SP-10, L7, H13)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --reveal",
+   "note": "n reveals = n distinct cell states, newest marks grey, Back restores, keys and clicker keys work, speech text == step sentence, Say band == sayLineOf after the last step (P-LC-9, BD-8)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --hints",
+   "note": "We do rungs 1 -> 2 -> 3 on correct items; no hint writes an input (P-ON-7, P-ON-8)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --exit",
+   "note": "3 items, one {type:'lesson-exit'} history row, score correct, Board saves nothing (D7)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --any-part",
+   "note": "PLAYER-ANY-PART: for every library lesson, every part id (warmup, ido, wedo, youdo, exit) and every packet page id opens directly by URL and renders its own items; the part bar jumps to every other part; Next / Back step it on the board; non-answerable roles open present-only (D11)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-lesson-player.mjs --sheet-to-play",
+   "note": "SHEET-TO-PLAY: for a sample of skills x roles (every role at least once, Mixed Review, Quick review, simple-print) the interactive item list equals the printed item list from buildSheet with the same seed and opts: same questions, order and answers (D12, P-ON-5)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-slots.cjs",
+   "note": "and ws-screen-answer on the player's cells (L5, L14, SP-3)"
+  },
+  {
+   "cmd": "node tests/scripts/test-wrong-retry-skip.cjs",
+   "note": "unchanged and green with the card host embedded (D9)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-boot-smoke.cjs",
+   "note": "and ws-stamp-assets --check"
+  },
+  {
+   "cmd": "node tests/scripts/ws-backtest.mjs",
+   "note": "row: the first mock's empty Steps column FAILS --render H13; the fixed mock passes"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "D1 Source: which lesson record drives the parts?",
+   "recommended": "Library lessons (lessonById + lessonData / engineRecord, library.js) drive all five parts; the 7 detailed lessons join in slice 4 through skills.used[].role (main / P0 / P1 / exit). **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D2 Seeds: how does a lesson replay identically?",
+   "recommended": "The packet seed S (default hash(lessonId)); part offsets Warm-up S+100+i, We do S+200+i, You do S+300+i, Exit S+900+i; the I do example is the anchor chart's own example (pickExample) for S, so screen = printed packet (P-ON-5); Board 'New numbers' bumps S by 1 and shows the seed in the teacher footer. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D3 Board launch: where is teacher/board mode started?",
+   "recommended": "A 'Teach on board' button on the lesson's row in the teacher Lessons / WRM screen and on the lesson print screen; it opens the existing board display (body.tv-bigboard, ?board=1 window, teacher-shell.js). **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D4 Pupil launch: where is pupil mode started?",
+   "recommended": "A 'Lesson' card in the student explorer / Quick start for any skill with a defaultFor lesson, and a share link ?lesson=<id>&s=<seed>; the pupil resumes at the last part reached. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D5 Hosts and targets?",
+   "recommended": "820 / 1024 (tablet: Steps as a chip row above the cell), 1280 / 1366 (Steps strip beside the cell), 1920 board / projector (x1.5 board vars); every control >= 48 px, board controls >= 64 px; no 390 (plan item 7); no horizontal scroll; content never shrinks. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D6 Keys, clicker and read-aloud?",
+   "recommended": "Right / Space / PageDown = next, Left / PageUp = back (what clickers send), R = read again, H = hint, A = show answer (Board), Esc = leave; keys ignored inside a digit input except Enter and Tab. TTS (hints-speech.js speakExplanation / stopSpeaking, the settings toggle) reads each step sentence and the filled Say line: automatic in Pupil I do, on demand on the Board; speech stops on every navigation. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D7 Exit ticket save: does it break P-ON-6?",
+   "recommended": "No new store: updateSkillProgress per item (progress.js) plus ONE state.sessionHistory row {type:'lesson-exit', lessonId, seed, score, of:3, date} through the game-flow saver; the teacher sees a 'Lesson exit' row in the dashboard session list and the skill's mastery bar; Board mode never saves. Consistent with P-ON-6. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D8 First slice?",
+   "recommended": "I do only, Board mode, lesson add-within-10 (Y1.B2.S9), launched by URL ?lesson=add-within-10&mode=board; full independent critic (first build of a new screen). **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D9 You do: reuse or new practice view?",
+   "recommended": "Embed the existing practice-card host unchanged: the same cell, Check, Skip, wrong-retry and end-of-run rules (game-control.js recordQuestionStatus, test-wrong-retry-skip.cjs); 6 items; hint ladder on request. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D10 Gate tool?",
+   "recommended": "A new tests/scripts/ws-lesson-player.mjs with --unit (node: planLesson deterministic, I do == anchor example, steps == workedSteps, Say has only the item's numbers), --render (every part, both modes, every host: no scroll, targets, B&W Andika cell, no emoji, H13), --reveal, --hints, --exit; on ws-precritic's path. **ANSWER: lead 2026-11-20: approved as recommended.**"
+  },
+  {
+   "q": "D11 Any part, any order: can a part or page be opened and presented on its own?",
+   "recommended": "YES (owner requirement). The teacher or a pupil opens ANY part directly: the player parts (warmup, ido, wedo, youdo, exit) and any printed page of the packet (anchor chart, Model / scripted-model, Guided page, Independent page, Pre-skill Check, review, ...), by id: ?lesson=<id>&part=<partId>&s=<seed>. The part bar is clickable and never a forced sequence; every part steps on the board with the same Next / Back / clicker keys. The lesson print screen shows 'Present' beside each part / page. The first slice stays 'I do on the board' WITH the part bar jumping (D11 built in). Recommended for the open points: a printed page opens as its items one cell at a time in the board stage (its own instruction above, key revealed on A); a jump keeps each part's state for the session; no part is locked behind another."
+  },
+  {
+   "q": "D12 Any worksheet -> interactive: can every printed sheet be played?",
+   "recommended": "YES (owner requirement), its own slice. Every print screen the app has (teacher print: any skill x any page role, Mixed Review, the Quick review section, simple prints, lessons) gets 'Open interactive'. It opens the SAME items: the request the print screen would send to buildSheet (role, sections, opts, seed) is dealt through the same path, so screen = paper (P-ON-5); one at a time (card host) or as a board page (online-worksheet host); answered with the existing keypad, feedback and Skip; teacher-led on the board, or pupil self-paced through a code / link (?sheet=<packed request>). Recommended: build a shared itemsFor(req) out of buildSheet (the generation half, no layout) that print AND play call, rather than re-dealing in the player; smallest first cut = the teacher print screen, role independent, one skill, card host, URL link; then other roles, Mixed Review / Quick review, simple-print, board page, pupil code."
+  },
+  {
+   "q": "Critic brief: what is graded?",
+   "recommended": "An independent critic (medium) grades the rendered PNGs of every part, both modes, at 820 / 1024 / 1280 / 1366 / 1920, for 3 lessons (add-within-10, one place-value, one detailed lesson): 1 Teaching (one new thing per step, steps follow the item, Say filled and spoken, real hint fade, exit at level 0); 2 Look (B&W Andika cell, big digits, chrome outside, nothing squeezed, no empty band); 3 Use (48 / 64 px targets, keyboard + clicker, TTS, resume, Skip / retry identical to the card host); 4 Truth to the lesson (every part traceable to record and seed, replay identical, matches the printed packet). Each >= 8; one 7 fails."
+  },
+  {
+   "q": "Risks and out of scope?",
+   "recommended": "Risks: uneven workedSteps (show the anchor's single state, report the skill, never invent steps); templates without stepState (sentence only, listed); board scale overflow on card-measured templates (Steps collapse, content never shrinks); SEED PARITY with print: buildSheet deals through generateQuestionFor with per-section / per-item seeds AND a role may then reorder, drop or re-deal items (pagination, PAGE_CAP, distinct-answer floors, the rebalanced last page), so a player that re-deals from the seed alone drifts from paper: the player takes its item list from the same function print uses (itemsFor(req), D12) and SHEET-TO-PLAY pins it; page roles whose items are NOT answerable on screen: the anchor chart and scripted Model (nothing is written: present-only, step reveal), Reason It written explanations and Stretch open answers (no machine check: present + reveal key, the teacher marks; pupil mode offers 'Show answer' and does not score them), the lesson Vocabulary 'draw a line to match' (tap-to-pair only where a screen matcher exists, else present-only), fact-probe timing (played untimed unless the timed mode is chosen, P-ON-4); each such role is listed with its fallback by --any-part and never turned into multiple choice (SP-3). Out of scope: phone width, authoring lessons, per-pupil live response, printing from the player, the paused long atomised lessons, new skills."
+  }
+ ],
+ "decisions": {
+  "options": [],
+  "roles": [],
+  "hosts": []
+ }
+}

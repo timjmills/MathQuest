@@ -126,3 +126,12 @@ Speed-ups: lf-checks `--lp` / `--sweep` with MQ_ROOT on any tree gives a 1-5 min
 - 19:50 UTC (3a live fix PASS, narrow critic r2 min 8; deploy list a0cca381 to the lead): session cost_usd $174.23 ≈ 8.7 %.
 - 18:52 UTC (P1d live round, lead's $60 cap): session cost_usd $156.04 ≈ 7.8 % (round ≈ $24).
 - 14:31 UTC (hand-over): session cost_usd $132.31 ≈ 6.6 % of the weekly limit ($20 ≈ 1 %), sub-agents included. P1 ≈ $85, P2 ≈ $25, coordination ≈ $20 (estimates from the running total).
+
+## fillfix (2026-11-20) - branch claude/sweet-newton-c8wrv1-lf-engine-fillfix (from master f8164ca5d)
+- Regression of the row-stretch cap deploy (lf-partopts bisect 2c42746aa..688f755a6): FILL-BT and ROWFIT-BT red on master.
+- Root cause: the lesson planner's used height missed its band STRIPS (one-line strips planned; the Independent strip by
+  compose.js stripExtraMm's 0.5 em full-width guess); the capped grids themselves print as planned. Fix: roles/lesson.js
+  counts the strips as they print (compose.js stripWrapMm, Andika advance widths; 443 / 444 strips right). Measures only:
+  ws-lesson-baseline OK (2700 hashes identical), no page changes.
+- SHEET_FILL_MIN 0.76 -> 0.74 from `ws-partopts-unit --fill-sweep` (810 sheets); FILL-PRINT new; FILL-BT / ROWFIT-BT
+  re-anchored; DESIGN §8d has the numbers. Backtests fillfix-* and the partopts BT rows.

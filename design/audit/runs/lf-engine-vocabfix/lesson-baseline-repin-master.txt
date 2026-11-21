@@ -1,0 +1,208 @@
+Re-pin on the merged head vs master 9ae9ccd5d pin: 1284 page hashes differ (lesson list identical).
+Master never carried the rowcap row-stretch cap (stages 1-2, lead-approved, pinned on the rowcap branch), so most of these are the cap;
+this branch's own lesson changes are the vocabfix list in lesson-baseline-changed.txt (Mixed packing item 1, LESSON-FILL item 2).
+add/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+add/L/4242 key-p2 key-p4 pupil-p2 pupil-p4
+add/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+add/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_facts/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+addition:add_facts/L/4242 key-p2 key-p4 pupil-p2 pupil-p4
+addition:add_facts/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_facts/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_wp_10/L/1 key-p2 key-p3 key-p5 pupil-p2 pupil-p3 pupil-p5
+addition:add_wp_10/L/4242 key-p2 key-p3 key-p4 key-p5 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 (gone)
+addition:add_wp_10/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_wp_10/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_wp_10_plain/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_wp_10_plain/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:add_wp_10_plain/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+addition:add_wp_10_plain/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+addition:add_wp_20/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+addition:add_wp_20/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+addition:add_wp_20/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+addition:add_wp_20/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+addition:add_wp_20_plain/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+addition:add_wp_20_plain/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+addition:add_wp_20_plain/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+addition:add_wp_20_plain/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+addition:fact_family_sort/L/1 key-p2 key-p4 key-p5 (gone) pupil-p2 pupil-p4 pupil-p5 (gone)
+addition:fact_family_sort/L/4242 key-p2 key-p4 key-p5 (gone) pupil-p2 pupil-p4 pupil-p5 (gone)
+addition:fact_family_sort/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+addition:fact_family_sort/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+algebra:function_table_easy/L/1 key-p2 key-p3 key-p4 key-p5 key-p6 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 (gone)
+algebra:function_table_easy/L/4242 key-p2 key-p3 key-p4 key-p5 key-p6 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 (gone)
+algebra:function_table_easy/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+algebra:function_table_easy/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+algebra:multi_step_word/L/1 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:multi_step_word/L/4242 key-p2 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:multi_step_word/M/1 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:multi_step_word/M/4242 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:multi_step_word_plain/L/1 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:multi_step_word_plain/L/4242 key-p2 key-p4 key-p5 key-p6 pupil-p2 pupil-p4 pupil-p5 pupil-p6
+algebra:multi_step_word_plain/M/1 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:multi_step_word_plain/M/4242 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_add_then_div/L/1 key-p2 pupil-p2
+algebra:two_step_add_then_div/L/4242 key-p10 key-p11 key-p2 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p10 pupil-p11 pupil-p2 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:two_step_add_then_div/M/1 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_add_then_div/M/4242 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_add_then_mult/L/1 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:two_step_add_then_mult/L/4242 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:two_step_add_then_mult/M/1 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_add_then_mult/M/4242 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_estimate_check/L/1 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_estimate_check/L/4242 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_estimate_check/M/1 key-p3 pupil-p3
+algebra:two_step_letter_equation/L/1 key-p6 key-p7 key-p8 pupil-p6 pupil-p7 pupil-p8
+algebra:two_step_letter_equation/L/4242 key-p6 key-p7 key-p8 pupil-p6 pupil-p7 pupil-p8
+algebra:two_step_letter_equation/M/1 key-p6 key-p7 key-p8 pupil-p6 pupil-p7 pupil-p8
+algebra:two_step_letter_equation/M/4242 key-p6 key-p7 key-p8 pupil-p6 pupil-p7 pupil-p8
+algebra:two_step_mult_div_first/L/1 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:two_step_mult_div_first/L/4242 key-p2 key-p3 key-p4 key-p5 key-p6 key-p7 key-p8 key-p9 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 pupil-p9
+algebra:two_step_mult_div_first/M/1 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+algebra:two_step_mult_div_first/M/4242 key-p2 key-p3 key-p4 key-p5 key-p6 pupil-p2 pupil-p3 pupil-p4 pupil-p5 pupil-p6
+composing:number_word_form/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+composing:number_word_form/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+composing:number_word_form/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+composing:number_word_form/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+detailed/g1-oa1-bar-model-wp-20/1 html p04 p05 p06 p08 p09 p10 p11 p14 p15 p18 p21 p22
+detailed/g1-oa1-bar-model-wp-20/4242 html p04 p05 p06 p08 p09 p10 p11 p14 p15 p18 p21 p22
+detailed/g2-nbt3-read-write-1000/1 html p04 p05 p09 p11 p12 p13 p14 p19 p20 p21 p22 p25 p30 p31 p32 p33
+detailed/g2-nbt3-read-write-1000/4242 html p04 p05 p09 p11 p12 p13 p14 p19 p20 p21 p22 p25 p30 p31 p32 p33
+detailed/g3-oa5-mult-properties/1 html p04 p05 p06 p08 p11 p14 p17 p20 p23 p26
+detailed/g3-oa5-mult-properties/4242 html p04 p05 p06 p08 p11 p14 p17 p20 p23 p26
+detailed/g3-oa8-two-step-wp/1 html p04 p05 p12 p13 p14 p20 p21 p22 p23 p26 p32 p33 p34 p35
+detailed/g3-oa8-two-step-wp/4242 html p04 p05 p14 p24
+detailed/g3-oa9-input-output-rule/1 html p04 p05 p06 p08 p09 p10 p11 p14 p15 p16 p19 p22 p23 p24
+detailed/g3-oa9-input-output-rule/4242 html p04 p05 p06 p08 p09 p10 p11 p14 p15 p16 p19 p22 p23 p24
+detailed/g3-oa9-mult-table-patterns/1 html p04 p05 p06 p08 p09 p10 p11 p14 p15 p18 p21 p22
+detailed/g3-oa9-mult-table-patterns/4242 html p04 p05 p06 p08 p09 p10 p11 p14 p15 p18 p21 p22
+detailed/g4-nbt1-ten-times-value/1 html p06 p08 p09 p10 p14 p15 p16 p22 p23 p24
+detailed/g4-nbt1-ten-times-value/4242 html p06 p08 p09 p10 p14 p15 p16 p22 p23 p24
+division:div_facts/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+division:div_facts/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+division:div_facts/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+division:div_facts/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+multiplication:arrays_groups/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+multiplication:arrays_groups/L/4242 key-p2 key-p3 key-p4 key-p5 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 (gone)
+multiplication:arrays_groups/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+multiplication:arrays_groups/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+multiplication:count_by_tables/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+multiplication:count_by_tables/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+multiplication:count_by_tables/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+multiplication:count_by_tables/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+multiplication:mult_properties/L/1 key-p3 key-p4 key-p5 (gone) pupil-p3 pupil-p4 pupil-p5 (gone)
+multiplication:mult_properties/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+multiplication:mult_properties/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+multiplication:mult_properties/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+number_sense:nearest_10/L/1 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+number_sense:nearest_10/L/4242 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+number_sense:nearest_10/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+number_sense:nearest_10/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+patterns:follow_given_rule/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+patterns:follow_given_rule/L/4242 key-p2 key-p3 key-p4 key-p5 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 (gone)
+patterns:follow_given_rule/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+patterns:follow_given_rule/M/4242 key-p2 key-p3 key-p4 key-p5 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 (gone)
+patterns:growing_shape_patterns/L/1 key-p2 key-p5 pupil-p2 pupil-p5
+patterns:growing_shape_patterns/L/4242 key-p2 key-p5 pupil-p2 pupil-p5
+patterns:growing_shape_patterns/M/1 key-p2 key-p3 key-p4 key-p5 pupil-p2 pupil-p3 pupil-p4 pupil-p5
+patterns:growing_shape_patterns/M/4242 key-p2 key-p3 key-p4 key-p5 pupil-p2 pupil-p3 pupil-p4 pupil-p5
+patterns:notice_patterns/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+patterns:notice_patterns/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+patterns:notice_patterns/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+patterns:notice_patterns/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+patterns:number_patterns_rule/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+patterns:number_patterns_rule/L/4242 key-p2 key-p3 key-p4 key-p5 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 (gone)
+patterns:number_patterns_rule/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+patterns:number_patterns_rule/M/4242 key-p2 key-p3 key-p4 key-p5 (gone) pupil-p2 pupil-p3 pupil-p4 pupil-p5 (gone)
+patterns:pattern_features/L/1 key-p2 key-p3 key-p4 key-p5 pupil-p2 pupil-p3 pupil-p4 pupil-p5
+patterns:pattern_features/L/4242 key-p2 key-p3 key-p4 key-p5 pupil-p2 pupil-p3 pupil-p4 pupil-p5
+patterns:pattern_features/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+patterns:pattern_features/M/4242 key-p2 key-p3 key-p4 key-p5 pupil-p2 pupil-p3 pupil-p4 pupil-p5
+placevalue:combine/L/1 key-p2 pupil-p2
+placevalue:combine/L/4242 key-p2 pupil-p2
+placevalue:combine/M/1 key-p2 pupil-p2
+placevalue:combine/M/4242 key-p2 pupil-p2
+placevalue:compare/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:compare/L/4242 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:compare/M/1 key-p2 pupil-p2
+placevalue:compare/M/4242 key-p2 pupil-p2
+placevalue:expand/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:expand/L/4242 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:expand/M/1 key-p4 pupil-p4
+placevalue:expand/M/4242 key-p4 pupil-p4
+placevalue:identify/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+placevalue:identify/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+placevalue:identify/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+placevalue:identify/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+placevalue:unit_form/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:unit_form/L/4242 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:unit_form/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:unit_form/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:value/L/1 key-p2 pupil-p2
+placevalue:value/L/4242 key-p2 pupil-p2
+placevalue:value/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+placevalue:value/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+round/L/1 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+round/L/4242 key-p3 key-p4 key-p5 pupil-p3 pupil-p4 pupil-p5
+round/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+round/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+sub/L/1 key-p4 pupil-p4
+sub/L/4242 key-p4 pupil-p4
+sub/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+sub/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_100_no_regroup/L/1 key-p2 pupil-p2
+subtraction:sub_100_no_regroup/L/4242 key-p2 pupil-p2
+subtraction:sub_100_no_regroup/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_100_no_regroup/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_100_regroup/L/1 key-p4 pupil-p4
+subtraction:sub_100_regroup/L/4242 key-p4 pupil-p4
+subtraction:sub_100_regroup/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_100_regroup/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_100k_no_regroup/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_100k_no_regroup/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_100k_no_regroup/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_100k_no_regroup/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_10k_no_regroup/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_10k_no_regroup/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_10k_no_regroup/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_10k_no_regroup/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_1k_no_regroup/L/1 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_1k_no_regroup/L/4242 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_1k_no_regroup/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_1k_no_regroup/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_1m_no_regroup/L/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_1m_no_regroup/L/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_1m_no_regroup/M/1 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_1m_no_regroup/M/4242 key-p2 key-p3 pupil-p2 pupil-p3
+subtraction:sub_2d_1d/L/1 key-p2 pupil-p2
+subtraction:sub_2d_1d/L/4242 key-p2 pupil-p2
+subtraction:sub_2d_1d/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_2d_1d/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_50_no_regroup/L/1 key-p2 pupil-p2
+subtraction:sub_50_no_regroup/L/4242 key-p2 pupil-p2
+subtraction:sub_50_no_regroup/M/1 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_50_no_regroup/M/4242 key-p2 key-p3 key-p4 pupil-p2 pupil-p3 pupil-p4
+subtraction:sub_wp_10/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_10/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_10/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_10/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_10_plain/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_10_plain/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_10_plain/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_10_plain/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_20/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_20/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_20/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_20/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_20_plain/L/1 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_20_plain/L/4242 key-p3 key-p4 pupil-p3 pupil-p4
+subtraction:sub_wp_20_plain/M/1 key-p2 key-p4 pupil-p2 pupil-p4
+subtraction:sub_wp_20_plain/M/4242 key-p2 key-p4 pupil-p2 pupil-p4
+vocabulary:vocab_grade_pictures/L/1 key-p4 key-p5 key-p6 key-p7 key-p8 (gone) key-p9 (gone) pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 (gone) pupil-p9 (gone)
+vocabulary:vocab_grade_pictures/L/4242 key-p4 key-p5 key-p6 key-p7 key-p8 (gone) key-p9 (gone) pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 (gone) pupil-p9 (gone)
+vocabulary:vocab_grade_pictures/M/1 key-p4 key-p5 key-p6 key-p7 key-p8 (gone) pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 (gone)
+vocabulary:vocab_grade_pictures/M/4242 key-p4 key-p5 key-p6 key-p7 key-p8 (gone) pupil-p4 pupil-p5 pupil-p6 pupil-p7 pupil-p8 (gone)
+vocabulary:vocab_pick3_words/L/1 key-p2 key-p4 key-p6 key-p7 (gone) pupil-p2 pupil-p4 pupil-p6 pupil-p7 (gone)
+vocabulary:vocab_pick3_words/L/4242 key-p2 key-p4 key-p6 key-p7 (gone) pupil-p2 pupil-p4 pupil-p6 pupil-p7 (gone)
+vocabulary:vocab_pick3_words/M/1 key-p5 key-p6 pupil-p5 pupil-p6
+vocabulary:vocab_pick3_words/M/4242 key-p5 key-p6 pupil-p5 pupil-p6

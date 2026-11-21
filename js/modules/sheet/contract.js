@@ -50,7 +50,7 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `preSkillsWhy: '...'`: why a hand-named preSkills list checks fewer than three skills (ws-node-lint PRE-QUADRANTS, critic
     // cbt r2 E2: a list of one drew one quadrant on a 75 % empty page). Absent: the list names three or more.
     'preSkillsWhy',
-    // `screenHelp(q) -> {steps?: string[], say?: string}`: the on-screen help only (support-ladder.js "Here is how" and its
+    // `screenHelp(q) -> {steps?: string[], say?: string, hint?: string}`: the on-screen help only (support-ladder.js "Here is how", its hint popup and its
     // Say line), for a skill whose printed worked steps state the answer (S8): steps that teach the route without it and a
     // Say line with the answer as its one gap. Never read by a page role (HINT-NO-BLANK r2, lf-placevalue 2026-11-20).
     'screenHelp',
