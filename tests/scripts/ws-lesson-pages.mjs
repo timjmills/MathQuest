@@ -15,6 +15,12 @@
 //                       groups of 6" and "11 × 9 is 11 groups of 9" are the same opener; "3 × 4" and "6 × 7" are not).
 //                       A one-number opener is the same only when the number is equal too.
 //                       Reported as pairs, with each lesson's skill.
+//   STEPS-PANEL-EMPTY   no lesson page prints a Steps panel with no step text (lf-ops, lead 2026-11-21: the
+//                       multiplication:mult_2by1_column lesson at M, seed 506061, drew its "Steps:" band beside Guided Practice
+//                       EMPTY - the skill (a preset of multiplication:multiply) had no provider workedSteps, so roles/lesson.js
+//                       had no Steps zone, and we-do.js drew the band's frame anyway). Every element labelled exactly "Steps:"
+//                       (a band's .ws-strip label, the practice pages' strip [data-mq-lesson-strip]) is judged: its band, with
+//                       the label taken off, holds text. Pupil and key pages.
 //
 //   node tests/scripts/ws-lesson-pages.mjs --self-test                 # the rules on planted page summaries (node, no browser)
 //   node tests/scripts/ws-lesson-pages.mjs --grade 3                   # build every built lesson of school grade 3 (browser)
@@ -25,7 +31,12 @@
 //   --req print  teacher-wrm.js printLesson's request: the FIRST live direct skill only, mixed: false
 //   (both: the lesson's own seed and lessonVariant, wrm-links.js wrmLessonSeed / wrmLessonVariant, as printLesson sends them
 //    since lf-engine 2026-11-19; was seed 4242 for every lesson)
-//   --rules LESSON-EMPTY-FIRST,LESSON-OPENER-SAME   (default both)   --blocks Y4.B4,...  (only those WRM blocks)
+//   --grade all   every school grade's WRM lessons (K, 1 .. 6)
+//   --skills cat:skill,...  the lessons the master prints for these skills (ws-lesson-baseline's request: role 'lesson', the
+//                skill's default options, practicePages 1, mixed, key on) at --seed n (default 4242) x --sizes M,L (default M)
+//   --all-skills  ... for every key of lessons/prereqs.js LESSONS (the lessons master prints; ws-lesson-baseline --all-lessons)
+//   --rules LESSON-EMPTY-FIRST,LESSON-OPENER-SAME,STEPS-PANEL-EMPTY   (default: all three with --skills / --all-skills; the
+//                first two on a --grade sweep - `--grade all --rules STEPS-PANEL-EMPTY` is the full Steps-panel sweep)   --blocks Y4.B4,...  (only those WRM blocks)
 //   --report-only (never exit 1)
 //   --warn  findings print `ws-lesson-pages: WARNING (n findings)` and exit 4 (the deploy gate's WARNING, ws-deploy-gates.sh
 //           nfn kind) - the deploy list runs it so until lf-engine's fix lands; then the flag comes off and it blocks.
@@ -40,14 +51,18 @@ const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.reso
 const argv = process.argv.slice(2);
 const arg = (k, d = null) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
-const ALL_RULES = ['LESSON-EMPTY-FIRST', 'LESSON-OPENER-SAME'];
-const RULES = (arg('rules', ALL_RULES.join(',')) || '').split(',').map((x) => x.trim()).filter(Boolean);
+const ALL_RULES = ['LESSON-EMPTY-FIRST', 'LESSON-OPENER-SAME', 'STEPS-PANEL-EMPTY'];
+// (the WRM grade sweep keeps its two rules by default - STEPS-PANEL-EMPTY found 404 of the 843 WRM lessons at e0c90f8ad, every
+// one a skill with no provider worked steps, logged for their lanes in design/status/lf-ops-steps.md; it is asked for with
+// --rules there. A --skills / --all-skills run judges all three.)
+const SKILL_MODE = !!(arg('skills') || has('all-skills'));
+const RULES = (arg('rules', (SKILL_MODE ? ALL_RULES : ALL_RULES.filter((r) => r !== 'STEPS-PANEL-EMPTY')).join(',')) || '').split(',').map((x) => x.trim()).filter(Boolean);
 const TOOL = 'ws-lesson-pages';
 
 /* ------------------------------------------------------------------ the rules (pure) */
-/** A lesson summary: {id, step, block, title, skill, pages: [{cells, ink}], opener: {template, text} | null}. */
+/** A lesson summary: {id, step, block, title, skill, pages: [{cells, ink, steps?, stepsEmpty?, key?}], opener: {template, text} | null}. */
 export function emptyPages(lesson) {
-    return (lesson.pages || []).map((p, i) => ({ i, p })).filter(({ p }) => !(p.cells > 0) && !(p.ink > 0)).map(({ i }) => i + 1);
+    return (lesson.pages || []).filter((p) => !p.key).map((p, i) => ({ i, p })).filter(({ p }) => !(p.cells > 0) && !(p.ink > 0)).map(({ i }) => i + 1);
 }
 export function openerSig(op) {
     if (!op) return null;
@@ -64,6 +79,10 @@ export function sameOpener(a, b) {
     const swaps = new Set(x.numbers.map((n, k) => (n !== y.numbers[k] ? `${n}>${y.numbers[k]}` : null)).filter(Boolean));
     return swaps.size === 0 || (swaps.size === 1 && x.numbers.length >= 2);
 }
+/** The pages (1-based, 'key p' for a key page) printing a Steps panel with no step text. */
+export function emptyStepsPages(lesson) {
+    return (lesson.pages || []).map((p, i) => ({ i, p })).filter(({ p }) => p.stepsEmpty > 0).map(({ p, i }) => `${p.key ? 'key ' : ''}p${p.n || i + 1}`);
+}
 const stepNo = (s) => { const m = /\.S(\d+)$/.exec(String(s || '')); return m ? Number(m[1]) : 0; };
 /** → [{rule, msg, ids}] */
 export function judge(lessons, rules = ALL_RULES) {
@@ -71,7 +90,13 @@ export function judge(lessons, rules = ALL_RULES) {
     if (rules.includes('LESSON-EMPTY-FIRST')) {
         for (const l of lessons) {
             const e = emptyPages(l);
-            if (e.length) out.push({ rule: 'LESSON-EMPTY-FIRST', ids: [l.id], msg: `${l.id} (${l.skill}): page${e.length > 1 ? 's' : ''} ${e.join(', ')} of ${l.pages.length} print${e.length > 1 ? '' : 's'} only the title / header, no content cell or ink below it` });
+            if (e.length) out.push({ rule: 'LESSON-EMPTY-FIRST', ids: [l.id], msg: `${l.id} (${l.skill}): page${e.length > 1 ? 's' : ''} ${e.join(', ')} of ${l.pages.filter((p) => !p.key).length} print${e.length > 1 ? '' : 's'} only the title / header, no content cell or ink below it` });
+        }
+    }
+    if (rules.includes('STEPS-PANEL-EMPTY')) {
+        for (const l of lessons) {
+            const e = emptyStepsPages(l);
+            if (e.length) out.push({ rule: 'STEPS-PANEL-EMPTY', ids: [l.id], msg: `${l.id} (${l.skill}): ${e.join(', ')} print${e.length > 1 ? '' : 's'} a "Steps:" panel with no step text` });
         }
     }
     if (rules.includes('LESSON-OPENER-SAME')) {
@@ -106,6 +131,9 @@ function selfTest() {
         ['a different skeleton passes', [L('Y9.B1.S2', [P(1, 1)], { template: 'equation', text: '11 × 3 = ' }), L('Y9.B1.S3', [P(1, 1)], { template: 'equation', text: '44 ÷ 4 = ' })], 'LESSON-OPENER-SAME', 0],
         ['non-consecutive steps are not compared', [L('Y9.B1.S2', [P(1, 1)], { template: 'equation', text: '11 × 3 = ' }), L('Y9.B1.S4', [P(1, 1)], { template: 'equation', text: '2 + 2' }), L('Y9.B1.S5', [P(1, 1)], { template: 'equation', text: '11 × 4 = ' })], 'LESSON-OPENER-SAME', 0],
         ['other blocks are not compared', [L('Y9.B1.S2', [P(1, 1)], { template: 'equation', text: '11 × 3 = ' }), L('Y9.B2.S3', [P(1, 1)], { template: 'equation', text: '11 × 4 = ' })], 'LESSON-OPENER-SAME', 0],
+        ['an empty Steps panel fails', [L('Y9.B1.S1', [P(4, 30), Object.assign(P(4, 30), { steps: 1, stepsEmpty: 1, key: true, n: 1 })], null)], 'STEPS-PANEL-EMPTY', 1],
+        ['a Steps panel with its steps passes', [L('Y9.B1.S1', [Object.assign(P(4, 30), { steps: 1, stepsEmpty: 0 })], null)], 'STEPS-PANEL-EMPTY', 0],
+        ['a page with no Steps panel passes', [L('Y9.B1.S1', [P(4, 30)], null)], 'STEPS-PANEL-EMPTY', 0],
         ['one-number openers differ when the number differs', [L('Y9.B1.S2', [P(1, 1)], { template: 'count', text: 'Count 5' }), L('Y9.B1.S3', [P(1, 1)], { template: 'count', text: 'Count 7' })], 'LESSON-OPENER-SAME', 0],
     ];
     const bad = [];
@@ -116,10 +144,81 @@ function selfTest() {
 }
 
 /* ------------------------------------------------------------------ the measurement (browser) */
-async function measure(grade, blocks, reqKind) {
+/** In the page: a built sheet's page summaries (pupil pages, then key pages flagged `key`) and its opener. */
+const SUMMARISE = `(res) => {
+    const host = document.createElement('div');
+    host.style.cssText = 'position:absolute;left:-99999px;top:0;width:210mm';
+    document.body.appendChild(host);
+    const FRAME = '.ws-head, .ws-header, .ws-tab, .ws-strand, .ws-ican, .ws-title, .ws-foot, .ws-footer, header, footer';
+    // STEPS-PANEL-EMPTY: every element labelled exactly "Steps:" - a band's strip label (.ws-strip > b: the band is the
+    // strip's parent, the strip comes off) or a strip of its own ([data-mq-lesson-strip] > b: the label comes off)
+    const stepsOf = (pg) => {
+        let n = 0, empty = 0;
+        for (const lab of pg.querySelectorAll('b, strong, .ws-strip > *')) {
+            if (lab.children.length || lab.textContent.trim() !== 'Steps:') continue;
+            const strip = lab.parentElement;
+            const inBand = strip && strip.classList.contains('ws-strip') && strip.parentElement;
+            const panel = (inBand ? strip.parentElement : strip).cloneNode(true);
+            if (inBand) [...panel.children].filter((c) => c.classList.contains('ws-strip')).forEach((c) => c.remove());
+            else [...panel.children].filter((c) => c.textContent.trim() === 'Steps:').forEach((c) => c.remove());
+            n++;
+            if (!panel.textContent.replace(/\\s+/g, '').length) empty++;
+        }
+        return { steps: n, stepsEmpty: empty };
+    };
+    const pagesOf = (html, key) => {
+        host.innerHTML = String(html || '');
+        return [...host.querySelectorAll('.ws-page')].map((pg, i) => {
+            const cells = pg.querySelectorAll('[data-ws-cell]').length;
+            const x = pg.cloneNode(true);
+            x.querySelectorAll(FRAME + ', style, script').forEach((e) => e.remove());
+            const ink = x.textContent.replace(/\\s+/g, '').length + x.querySelectorAll('svg, img, canvas, [data-ws-slot], [data-ws-aslot]').length;
+            return Object.assign({ cells, ink, n: i + 1 }, stepsOf(pg), key ? { key: true } : {});
+        });
+    };
+    const keyPages = pagesOf(res.keyHtml, true);
+    const pages = pagesOf(res.pupilHtml, false);
+    const c0 = host.querySelector('.ws-page [data-ws-cell]');
+    let opener = null;
+    if (c0) {
+        const y = c0.cloneNode(true);
+        y.querySelectorAll('[data-ws-slot], [data-ws-aslot]').forEach((e) => { e.textContent = ''; });
+        y.querySelectorAll('.ws-modeltab, [data-ws-label], .ws-letter').forEach((e) => e.remove());
+        opener = { template: c0.getAttribute('data-ws-cell') || '', text: y.textContent.replace(/\\s+/g, ' ').trim().slice(0, 240) };
+    }
+    host.remove();
+    // (LESSON-EMPTY-FIRST judges the pupil pages; STEPS-PANEL-EMPTY both)
+    return { pages: pages.concat(keyPages.filter((p) => p.steps > 0)), opener };
+}`;
+
+async function openApp() {
     const require = createRequire(import.meta.url);
     const H = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
-    const app = await H.open({ seed: 1 });
+    return H.open({ seed: 1 });
+}
+
+/** --skills / --all-skills: the lesson master prints for each skill (ws-lesson-baseline's request) x sizes at one seed. */
+async function measureSkills(skills, sizes, seed) {
+    const app = await openApp();
+    try {
+        if (skills === 'all') skills = await app.page.evaluate(async () => Object.keys((await import(new URL('js/modules/lessons/prereqs.js', location.href).href)).LESSONS));
+        const out = [];
+        for (const key of skills) for (const size of sizes) {
+            const [categoryId, skillId] = key.split(':');
+            const r = await app.page.evaluate(async ({ categoryId, skillId, size, seed, SUM }) => {
+                let res;
+                try { res = await window.buildSheet({ role: 'lesson', sections: [{ skills: [{ categoryId, skillId }] }], size, paper: 'A4', seed, key: true, practicePages: 1, mixed: true }); } catch (e) { return { error: String(e && e.message || e) }; }
+                return (0, eval)(SUM)(res);
+            }, { categoryId, skillId, size, seed, SUM: SUMMARISE });
+            const id = `${key}/${size}/${seed}`;
+            out.push(Object.assign({ id, step: '', block: '', title: key, skill: key }, r.error ? { pages: [], error: r.error } : r));
+        }
+        return out;
+    } finally { await app.close(); }
+}
+
+async function measure(grade, blocks, reqKind) {
+    const app = await openApp();
     try {
         const list = await app.page.evaluate(async ({ grade }) => {
             const W = await import(new URL('js/modules/wrm-links.js', location.href).href);
@@ -128,7 +227,7 @@ async function measure(grade, blocks, reqKind) {
             for (const y of Object.values(d.years)) W.addCuratedYear(y);
             const data = await import(new URL('js/modules/data.js', location.href).href);
             const live = (k) => { const [c, s] = String(k).split(':'); return !!(data.SKILLS[c] || []).some((x) => x && x.v === s && !x.retired && !x.tombstone); };
-            return W.allLessons().filter((l) => l.type !== 'assessment' && String(l.gradeLabel || '').replace(/^Grade\s*/i, '') === String(grade)).map((l) => {
+            return W.allLessons().filter((l) => l.type !== 'assessment' && (String(grade) === 'all' || String(l.gradeLabel || '').replace(/^Grade\s*/i, '') === String(grade))).map((l) => {
                 const ds = (W.linksFor(l).direct || []).filter((x) => live(x.key)).map((x) => ({ key: x.key, opts: x.opts || {} }));
                 // (the lesson's own seed and variant, as teacher-wrm.js printLesson sends them - lf-engine 2026-11-19; a tree
                 // without them builds with 4242 and no variant, as the screen did)
@@ -139,7 +238,7 @@ async function measure(grade, blocks, reqKind) {
         const todo = list.filter((l) => !blocks || blocks.includes(l.block));
         const out = [];
         for (const l of todo) {
-            const r = await app.page.evaluate(async ({ l, reqKind }) => {
+            const r = await app.page.evaluate(async ({ l, reqKind, SUM }) => {
                 const sk = (reqKind === 'print' ? l.skills.slice(0, 1) : l.skills).map((d) => { const [c, s] = d.key.split(':'); return { categoryId: c, skillId: s, opts: d.opts }; });
                 const req = reqKind === 'print'
                     ? { role: 'lesson', sections: [{ skills: sk }], practicePages: 1, mixed: false, size: 'M', look: 'auto', paper: 'A4',
@@ -148,29 +247,8 @@ async function measure(grade, blocks, reqKind) {
                 if (l.variant !== null && l.variant !== undefined) req.lessonVariant = l.variant;
                 let res;
                 try { res = await window.buildSheet(req); } catch (e) { return { error: String(e && e.message || e) }; }
-                const host = document.createElement('div');
-                host.style.cssText = 'position:absolute;left:-99999px;top:0;width:210mm';
-                host.innerHTML = String(res.pupilHtml || '');
-                document.body.appendChild(host);
-                const FRAME = '.ws-head, .ws-header, .ws-tab, .ws-strand, .ws-ican, .ws-title, .ws-foot, .ws-footer, header, footer';
-                const pages = [...host.querySelectorAll('.ws-page')].map((pg) => {
-                    const cells = pg.querySelectorAll('[data-ws-cell]').length;
-                    const x = pg.cloneNode(true);
-                    x.querySelectorAll(`${FRAME}, style, script`).forEach((e) => e.remove());
-                    const ink = x.textContent.replace(/\s+/g, '').length + x.querySelectorAll('svg, img, canvas, [data-ws-slot], [data-ws-aslot]').length;
-                    return { cells, ink };
-                });
-                const c0 = host.querySelector('.ws-page [data-ws-cell]');
-                let opener = null;
-                if (c0) {
-                    const y = c0.cloneNode(true);
-                    y.querySelectorAll('[data-ws-slot], [data-ws-aslot]').forEach((e) => { e.textContent = ''; });
-                    y.querySelectorAll('.ws-modeltab, [data-ws-label], .ws-letter').forEach((e) => e.remove());
-                    opener = { template: c0.getAttribute('data-ws-cell') || '', text: y.textContent.replace(/\s+/g, ' ').trim().slice(0, 240) };
-                }
-                host.remove();
-                return { pages, opener };
-            }, { l, reqKind });
+                return (0, eval)(SUM)(res);
+            }, { l, reqKind, SUM: SUMMARISE });
             const skill = reqKind === 'print' ? l.skill : l.skills.map((x) => x.key).join('+');
             out.push(Object.assign({ id: l.id, step: l.step, block: l.block, title: l.title, skill }, r.error ? { pages: [], error: r.error } : r));
         }
@@ -184,6 +262,8 @@ async function main() {
     const blocks = arg('blocks') ? arg('blocks').split(',').map((x) => x.trim()) : null;
     let lessons;
     if (arg('fixture')) lessons = JSON.parse(fs.readFileSync(path.resolve(arg('fixture')), 'utf8')).lessons || [];
+    else if (arg('skills') || has('all-skills')) lessons = await measureSkills(has('all-skills') ? 'all' : arg('skills').split(',').map((x) => x.trim()).filter(Boolean),
+        (arg('sizes', 'M') || 'M').split(',').map((x) => x.trim()).filter(Boolean), Number(arg('seed', '4242')));
     else lessons = await measure(arg('grade', '3'), blocks, arg('req', 'packet'));
     if (blocks) lessons = lessons.filter((l) => blocks.includes(l.block));
     if (arg('dump')) fs.writeFileSync(path.resolve(arg('dump')), JSON.stringify({ about: `${TOOL} page summaries (grade ${arg('grade', '3')}, size M, seed 4242, request ${arg('req', 'packet')})`, lessons }, null, 1) + '\n');

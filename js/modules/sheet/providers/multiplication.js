@@ -7,9 +7,10 @@
 // groups and rows on arrays, partial products on the area model, row-meets-column on the chart.
 
 import { registerSkill, defaultAdapters } from '../contract.js';
-import { num, arr, obj, operands, countList, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
+import { num, arr, obj, fmt, operands, countList, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
 import { storiesFor } from './stories.js';
 import { optionICan } from '../../skill-options.js';
+import { defaultStrings } from '../adapters.js';
 
 /** A strings() function whose I Can line follows the options a page is built with (ref.opts), as division.js does
  *  (critic t15 D1: the 15 x 15 page read "I Can multiply facts to 12"). */
@@ -357,7 +358,22 @@ function sizedColumn(q) {
 }
 
 registerSkill('multiplication:multiply', {
+    // (lf-ops-steps: the default adapter's strings, with the column steps added for a column item; `keyIsDefault`: its
+    // instruction key is still the default adapter's placeholder, so the page keeps the host's key - practice.js
+    // itemInstructionKey)
+    strings: (ref = {}) => {
+        const out = Object.assign(defaultStrings(ref), { keyIsDefault: true });
+        const ops = columnMultOps(ref && ref.q);
+        if (ops) out.steps = columnMultSteps(ops[0]);
+        return out;
+    },
     workedSteps: (q) => {
+        // a stack item: lf-ops-steps' column algorithm (columnMultiply); a 2-digit multiplier: longMultSteps
+        const ops = columnMultOps(q);
+        if (ops) {
+            const col = columnMultiply(ops[0], ops[1]);
+            return clampSteps(col.steps.concat(step(`The product is ${fmt(col.product)}.`, [{ slot: 'answer', value: String(col.product) }])));
+        }
         const s = sizedColumn(q);
         if (!s) return defaultAdapters().workedSteps(q);
         return clampSteps(s.long ? longMultSteps(s.a, s.b) : shortMultSteps(s.a, s.b));
@@ -594,3 +610,56 @@ function mpWrong(q) {
             { value: r + c, misconception: 'turn-product-factor', slot: 'answer', explain: `Added ${r} and ${c}. The product is ${P}.` },
         ]);
 }
+
+/* ============================================== multiply: the column (stack) algorithm, n-digit x 1-digit */
+// lf-ops-steps (lead 2026-11-21): `multiplication:multiply` and its presets mult_2by1_column / mult_3by1_column had no
+// provider, so a column-multiplication lesson had no worked steps: roles/lesson.js built no Steps zone and the band beside
+// Guided Practice printed EMPTY (ws-lesson-pages STEPS-PANEL-EMPTY). This provider supplies the column algorithm's steps
+// for a STACK item (a multi-digit number x a 1-digit number) only; every other multiply item - a fact, a 2-digit
+// multiplier - answers as the default adapter did (no worked steps, the default strings), so those pages are unchanged.
+const MPLACE_ONE = ['one', 'ten', 'hundred', 'thousand', 'ten thousand'];
+const mPlaceWord = (i, n) => (n === 1 ? MPLACE_ONE[i] : MPLACE[i]);
+
+/** The column item's [top, multiplier] when `q` is a stack x item of a whole number by ONE digit, else null. */
+function columnMultOps(q) {
+    const c = q && q.cell;
+    const p = (c && c.payload) || {};
+    if (!c || c.template !== 'stack' || p.op !== '*') return null;
+    const ops = Array.isArray(p.operands) ? p.operands.map(Number) : operands(q);
+    if (ops.length !== 2 || !ops.every((n) => Number.isInteger(n) && n >= 0)) return null;
+    const [a, b] = ops;
+    if (b > 9 || a < 10 || String(a).length > MPLACE.length) return null;
+    return [a, b];
+}
+
+/** The column algorithm worked place by place: "Ones: 6 × 4 = 24. Write 4. Regroup 2 tens." (marks: the stack's slots). */
+export function columnMultiply(a, b) {
+    const ds = String(a).split('').reverse().map(Number);
+    const steps = [];
+    let carry = 0;
+    ds.forEach((d, i) => {
+        const raw = d * b, total = raw + carry, last = i === ds.length - 1;
+        // (no-break spaces: an expression never wraps after its operator - ws-print-lint WRAP-OP on the Model's narrow states)
+        const sum = `${cap(MPLACE[i])}: ${d}\u00a0×\u00a0${b}\u00a0=\u00a0${raw}${carry ? `. ${raw}\u00a0+\u00a0${carry}\u00a0regrouped\u00a0=\u00a0${total}` : ''}`;
+        if (last || total < 10) {
+            steps.push(step(`${sum}. Write ${total}.`, [{ slot: MPLACE[i], value: String(total) }]));
+            carry = 0;
+        } else {
+            const up = Math.floor(total / 10);
+            steps.push(step(`${sum}. Write ${total % 10}. Regroup ${up} ${mPlaceWord(i + 1, up)}.`,
+                [{ slot: MPLACE[i], value: String(total % 10) }, { slot: `regroup:${MPLACE[i + 1]}`, value: String(up) }]));
+            carry = up;
+        }
+    });
+    return { steps, product: a * b };
+}
+
+/** The Steps a column item's page names (no example numbers: they stand beside every item of the page). */
+function columnMultSteps(a) {
+    // (3 digits: one regroup step for every place, so the list stays 4 steps - five wrapped steps stood the Guided cells
+    // beside them 32 % empty, ws-empty-band EB-BAND)
+    if (String(a).length >= 3) return ['Multiply the ones.', '10 or more? Regroup to the next place.', 'Multiply the tens. Add any regrouped tens.', 'Multiply the hundreds. Add any regrouped hundreds.'];
+    return ['Multiply the ones.', '10 or more? Write the ones. Regroup the tens.', 'Multiply the tens. Add the regrouped tens.', 'Write the product.'];
+}
+// (the one multiplication:multiply provider is registered above, after `sizedColumn`: lf-ops-sizes r2 merged the column
+// steps of lf-ops-steps into it.)

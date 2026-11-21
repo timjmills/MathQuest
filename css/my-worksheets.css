@@ -1,0 +1,77 @@
+/* my-worksheets.css — the My Worksheets screen and its dialogs (design/my-worksheets/CARD.md).
+   Loaded by js/modules/my-worksheets.js when first used. The CURRENT teacher look (lead ruling A19, owner 2026-11-20): the
+   screen reuses the teacher classes (.tv-btn, .tv-btn-primary, .tv-card, .tv-chip, .tv-menu, .tv-input, .tv-select) and only
+   the existing custom properties (--tv-* and css/teacher-tokens.css); no colour is written here (ws-my-worksheets THEME).
+   Layout and 48 px targets only (card §7). */
+
+.mws { display: flex; flex-direction: column; gap: 16px; }
+#teacherApp .mws .mws-b, .mws .mws-b { height: 48px; min-height: 48px; padding: 0 16px; }
+.mws-top { align-items: center; }
+.mws-acts-top { gap: 8px; }
+.mws-note, .mws-cap { margin: 0; padding: 10px 14px; border: 1px solid var(--tv-border); border-radius: 12px; background: var(--tv-surface); color: var(--tv-text-2); font-size: 14px; line-height: 20px; }
+.mws-cap { border-color: var(--key); color: var(--tv-text); }
+.mws-cap[hidden] { display: none; }
+.mws-wrap { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; }
+.mws .mws-side { padding: 10px; gap: 2px; }
+.mws-side-h { margin: 10px 8px 4px; font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--tv-text-2); font-weight: 700; }
+.mws-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 4px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--tv-text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.mws-f:hover { background: var(--tv-subtle); }
+.mws-f[aria-current="true"] { background: var(--tv-subtle); box-shadow: inset 3px 0 0 var(--tv-selected); font-weight: 700; }
+.mws-f small { color: var(--tv-text-2); font-size: 12px; flex: none; }
+.mws-f-new { justify-content: flex-start; color: var(--tv-accent); font-weight: 700; }
+.mws-main { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.mws-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mws-pick-l { display: none; }
+.mws .tv-select.mws-pick { width: auto; max-width: 100%; height: 48px; min-height: 48px; }
+.mws .tv-input.mws-search { flex: 1 1 240px; width: auto; min-width: 0; height: 48px; min-height: 48px; }
+.mws-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mws .tv-chip.mws-chip { height: 48px; min-height: 48px; padding: 0 16px; }
+.mws-folderline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mws-folderline[hidden] { display: none; }
+.mws-folderline b { margin-right: 8px; color: var(--tv-text); }
+.mws-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.mws-empty { margin: 0; padding: 24px; color: var(--tv-text-2); background: var(--tv-surface); border: 1px dashed var(--tv-border); border-radius: 12px; }
+.mws .tv-card.mws-card { position: relative; overflow: visible; }
+.mws-card.is-open { z-index: 20; }
+.mws-thumb { height: 170px; display: flex; justify-content: center; padding: 12px; background: var(--tv-page); border-bottom: 1px solid var(--tv-rule); border-radius: 12px 12px 0 0; overflow: hidden; }
+.mws-thumb img { width: 120px; height: auto; align-self: flex-start; background: var(--paper); border: 1px solid var(--paper-grey); box-shadow: var(--shadow-1); }
+.mws-page { width: 120px; height: 170px; background: var(--paper); border: 1px solid var(--paper-grey); }
+.mws-meta { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px 4px; }
+.mws-meta b { font-size: 15px; line-height: 20px; color: var(--tv-text); overflow-wrap: anywhere; }
+.mws-meta span { font-size: 13px; line-height: 18px; color: var(--tv-text-2); }
+.mws-meta .mws-gone { color: var(--tv-danger); font-weight: 700; }
+.mws-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 12px; }
+.mws-tag { font-size: 12px; line-height: 16px; padding: 2px 8px; border: 1px solid var(--tv-control-soft); border-radius: 999px; color: var(--tv-text-2); }
+.mws-acts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 48px; gap: 6px; padding: 10px 12px 12px; margin-top: auto; }
+.mws-acts .mws-send { grid-column: 1 / -1; }
+.mws-acts .mws-b { padding: 0 8px; justify-content: center; font-size: 14px; }
+.mws-acts .mws-more { width: 48px; padding: 0; }
+.mws-menu-wrap { position: relative; }
+.mws .tv-menu.mws-menu { z-index: 30; min-width: 220px; }
+.mws .tv-menu.mws-menu.mws-menu-up { top: auto; bottom: calc(100% + 4px); }
+.mws .tv-menu.mws-menu button { height: 48px; min-height: 48px; font-size: 15px; }
+.mws-undo { position: sticky; bottom: 16px; align-self: center; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; background: var(--tv-selected); color: var(--tv-on-selected); border-radius: 12px; box-shadow: var(--shadow-2); z-index: 40; }
+.mws-undo[hidden] { display: none; }
+
+/* the dialogs (Save, Rename / Move / Tags, a shared link) sit above every view, the simple print included */
+.mws-overlay { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.mws-scrim { position: absolute; inset: 0; background: var(--scrim); }
+.mws-overlay .tv-card.mws-dialog { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow: auto; gap: 6px; padding: 20px 24px; box-shadow: var(--shadow-2); color: var(--tv-text); font-family: var(--tv-font); }
+.mws-dh { margin: 0 0 8px; font-size: 20px; line-height: 28px; color: var(--tv-text); }
+.mws-p { margin: 0 0 8px; color: var(--tv-text-2); }
+.mws-overlay .mws-dialog .mws-in { width: 100%; margin-bottom: 8px; box-sizing: border-box; font-size: 16px; }
+.mws-overlay .mws-dialog .mws-b { height: 48px; min-height: 48px; }
+.mws-overlay .mws-dialog .tv-input.mws-in, .mws-overlay .mws-dialog .tv-select.mws-in { height: 48px; min-height: 48px; }
+.mws-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mws-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.mws-dfoot { justify-content: flex-end; margin-top: 8px; }
+
+@media (max-width: 900px) {
+    .mws-wrap { grid-template-columns: minmax(0, 1fr); }
+    .mws-side { display: none; }
+    .mws .mws-side { display: none; }
+    .mws-pick-l { display: inline-flex; }
+}
+@media (max-width: 1100px) {
+    .mws-top .tv-h1 { font-size: 24px; }
+}

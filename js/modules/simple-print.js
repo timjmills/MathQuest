@@ -898,6 +898,7 @@ async function buildFacts(list, amounts, o) {
         // what page 1 really holds (critic r2: a 6 x 6 grid that printed 30 said "36 a page")
         cols: f.cols || 0, rows: f.cols ? Math.ceil(p1 / f.cols) : f.rows || 0, perPage: p1, pageCounts: out.perPage,
         colsList: [f.cols || 0], notes: out.notes, divMax9: colsAsked(o) > DIV_MAX_COLS && list.some(isDivisionFact), firstHtml: first, grids: out.grids,
+        firstPlan: (r0 && r0.plan) || null,
         capped: colsAsked(o) && f.cols && f.cols < colsAsked(o) ? f.cols : 0, colsMode: modeOf(o),
         // the page plan (each group's layout, the rows a page, the one stretch) and each page's grids' row heights, for the gate
         factPlan, factPages: out.factPages,
@@ -960,6 +961,8 @@ function finish(res, { counts, arrangement, notes, list, capped = [], o = {} }) 
         notes: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t)))
             ? [...notes, FELL_BACK_NOTE, ...engineNotes.filter((t) => !/prints in sections/i.test(t))] : [...notes, ...engineNotes],
         firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
+        // (My Worksheets: page 1's plan, so Open interactive deals the items page 1 prints)
+        firstPlan: res.plan || null,
     };
 }
 
@@ -1451,7 +1454,7 @@ function render() {
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
     h += `</div></details>`;
 
-    h += `</div><footer class="sp-foot"><button type="button" class="sp-btn sp-btn-2" data-sp="preview" aria-label="Preview every page"><span class="sp-wide">Preview every page</span><span class="sp-narrow">Preview</span></button><button type="button" class="sp-btn sp-btn-1" data-sp="print"${S.busy && !b ? ' aria-disabled="true"' : ''}>Print</button></footer>`;
+    h += `</div><footer class="sp-foot">${isTeacher() ? `<button type="button" class="sp-btn sp-btn-2" data-sp="save" aria-label="Save to My Worksheets">Save to My Worksheets</button>` : ''}<button type="button" class="sp-btn sp-btn-2" data-sp="preview" aria-label="Preview every page"><span class="sp-wide">Preview every page</span><span class="sp-narrow">Preview</span></button><button type="button" class="sp-btn sp-btn-1" data-sp="print"${S.busy && !b ? ' aria-disabled="true"' : ''}>Print</button></footer>`;
     dlg.innerHTML = h;
     showThumb();
     if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') { if (caret) el.setSelectionRange(Math.min(caret[0], el.value.length), Math.min(caret[1], el.value.length), caret[2]); else el.setSelectionRange(el.value.length, el.value.length); } } catch (e) { /* */ } } }
@@ -1602,6 +1605,8 @@ function onClick(e) {
         return;
     }
     if (quickAct(act, v, render)) return;
+    // My Worksheets (design/my-worksheets/CARD.md S-1; teacher-only, A15 #2)
+    if (act === 'save') { if (isTeacher()) saveToLibrary(); return; }
     if (act === 'newnums') { S.seed = 100000 + Math.floor(Math.random() * 900000); schedule(0); return; }
     if (act === 'titlepos') { S.titlePos = v === 'above' ? 'above' : 'below'; render(); schedule(0); return; }
     if (act === 'full') { const more = S.ctx.more; closeSimplePrint(); more(); return; }
@@ -1649,6 +1654,9 @@ function onChange(e) {
 }
 function onKey(e) {
     if (!S) return;
+    // (My Worksheets critic r1 F1) a My Worksheets dialog open over this one owns the keyboard: its own handler keeps Tab
+    // inside it and Esc closes only it
+    if (document.querySelector('.mws-overlay')) return;
     if (S.root.contains(e.target) && quickRenameKey(e, render)) return;
     if (e.key === 'Escape' && qpMenu) { e.preventDefault(); e.stopPropagation(); qpMenu = null; render(); return; }
     if (e.key === 'Escape' && S.zoomOn) { e.preventDefault(); e.stopPropagation(); hideZoom(); return; }
@@ -1705,6 +1713,41 @@ function doPreview(e) {
         load: async () => { const b = await ready(); return b ? { doc: b.doc } : null; },
         print: async () => { const b = await ready(); if (b) await printHtml(b.doc, title, 'A4'); },
     });
+}
+
+/* ============================================ My Worksheets (design/my-worksheets/CARD.md) */
+
+/** Build the open dialog's sheet now and return it (the Save check and Save use it). */
+export async function simpleBuiltNow() { return ready(); }
+/** What Save keeps: the dialog's skills and build options (buildSets(list, o) reprints it). null with no dialog open. */
+export function simpleSaveDraft() {
+    if (!S) return null;
+    const list = S.list.map((x) => Object.assign({ categoryId: x.categoryId, skillId: x.skillId }, x.opts && Object.keys(x.opts).length ? { opts: x.opts } : {}, x.label ? { label: x.label } : {}, x.amt ? { amt: x.amt } : {}));
+    return { host: 'simple-print', req: JSON.parse(JSON.stringify({ list, o: opts() })), firstHtml: (S.built && S.built.firstHtml) || '', pages: (S.built && S.built.pages) || 0 };
+}
+async function saveToLibrary() {
+    await ready();
+    const draft = simpleSaveDraft();
+    if (!draft) return;
+    try {
+        const M = await import('./my-worksheets.js');
+        await M.openSaveDialog(draft, { editingId: (S && S.ctx && S.ctx.sheetId) || null, onSaved: (rec) => { if (S && S.ctx) S.ctx.sheetId = rec.id; } });
+    } catch (e) { console.warn('[simple-print] save failed', e); }
+}
+/** Open a saved simple print in this dialog, every setting loaded (My Worksheets › Edit). */
+export function openSimpleFromRecord(rec) {
+    const o = (rec && rec.req && rec.req.o) || {};
+    for (const k of ['how', 'sets', 'cols', 'colsMode', 'key', 'arrange', 'mixLayout']) if (o[k] !== undefined) P[k] = o[k];
+    P.size = offeredSize(o.size || P.size, 'M');
+    if (o.how === 'pages') P.nPages = o.n; else if (o.n) P.nProblems = o.n;
+    openSimplePrint((rec.req.list || []).map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, opts: x.opts, label: x.label })), { from: 'tray', title: typeof o.title === 'string' ? o.title : undefined, sheetId: rec.id });
+    if (!S) return;
+    (rec.req.list || []).forEach((x, i) => { if (S.list[i]) S.list[i].amt = x.amt || ''; });
+    S.seed = o.seed >>> 0;
+    S.pageTitle = o.pageTitle || '';
+    S.titlePos = o.titlePos === 'above' ? 'above' : 'below';
+    render();
+    schedule(0);
 }
 
 /* ============================================ larger preview and hover zoom (owner 2026-11-05) */

@@ -218,6 +218,11 @@ export const ROUTINES = Object.freeze({
         archetype: 'fact',
         // a full-width drawing: the anchor chart's panels one column (chart.js chartLayout; precritic render gate r1)
         chartWide: true,
+        // (the Practice page: Match 3 is one cell across, so the default [6, 2] dealt 6 rows to a one-page Practice and ran
+        // overleaf - 3 + 3 at the old 72 mm rows, 4 + 2 once the row-stretch cap held them to 52.5 mm, a near-empty page 2
+        // (lf-placevalue vocab deploy, L-LONE / PAGEFILL). Four rows: the page holds four (a Match 3 cell is 186 mm wide, so the
+        // layout reports it clamped and the page prints without the Steps strip, as before - print-sheet.js buildPracticeOwn).)
+        practiceShapes: [[4, 1]],
         casesPending: 'Lane lf-vocab: the cases are the lesson word sets (sheet/lesson-pages/vocab-words.js); carded in design/cards/vocabulary.',
         concepts: [
             { id: 'picture', text: 'Each picture shows one math word.' },

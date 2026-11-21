@@ -260,6 +260,41 @@ fixed almost every count (F2). Resolved:
     placevalue:value M We Do 1 (11.4 mm, foot 35.0 >= 33.7 row, no rows) and placevalue:combine L rows 0 (13.5 mm, foot 28.5 <
     29.4). The same sweep shows one no-rows sheet whose foot holds a row at 12.4 mm (placevalue:identify L We Do off, foot 68.9
     >= 64.8): over the 12 mm margin, so the safe-side claim above needs the lane to re-check the margin on master's sheets.
+  - **lf-engine fillfix (2026-11-20): the planner counts what prints; `SHEET_FILL_MIN` 0.76 -> 0.74; ROWFIT-BT re-anchored.**
+    After the row-stretch cap (2c42746aa..688f755a6) FILL-BT and ROWFIT-BT went red on master. *Root cause:* the capped bands
+    print exactly as planned (every grid's planned height is its printed one); the sheet's used height missed its **band
+    strips**. Every band is planned with a one-line strip and the Independent band with compose.js `stripExtraMm` (0.5 em a
+    character over the full width). A Guided strip that wraps beside its Steps (122.9 mm wide) printed 5.8 mm more than
+    planned; an Independent strip planned on two lines printed one, 5.7 mm less. Without the cap the bands' growth hid it.
+    With the cap, sheets end on their real foot: add_wp_10_plain L Vocabulary off + rows 0 planned 170.3 mm and printed
+    175.3 (+5.0, 0.734: a 27 % foot the 0.76 floor refused), while identify M We Do off planned 207.4 and printed 200.5
+    (-6.9, the 0.055 gap). No single floor could sit between the two.
+    *Fix:* `roles/lesson.js` counts each sheet page's strips as they print, with compose.js `stripWrapMm`. That is a word
+    wrap on Andika's own advance widths at the strip's real width (a Guided strip beside its Steps is 1fr). On 444
+    lesson-sheet strips it gets 443 line counts right. It feeds `sheetFill` and `sheetFreeMm` (the offer gate) and never
+    lays out, so no page moves. **FILL-PRINT** (new) pins plan = print within 4 mm on both sheets: now -1.1 and -0.6 mm.
+    *The sweep* (`ws-partopts-unit --fill-sweep`): every live lesson x M / L x 9 sheet states, 810 sheets built as asked and
+    printed, 677 of them one page. The plan's fill minus the printed fill runs 0.003 to 0.137, median 0.031, p10 0.019, p90
+    0.041. The ~0.025 core of that is the two denominators: the plan's 232 mm budget against the printed 239 mm body.
+    Printed minus planned used height, on the 167 one-page sheets planned 0.66-0.86: -7.2 to +4.6 mm, p5 -3.9, median -1.4,
+    p95 -0.2. FILL-PRINT's 4 mm is that p5-p95 spread.
+    *Re-derived floor:* no one-page sheet planned 0.74 or more prints a 30 % foot. The highest-planned sheet that does is
+    patterns:follow_given_rule M rows 0 (planned 0.738, printed 0.701), so the floor is above 0.738. Over 0.738 the
+    lowest-planned good sheets are division:div_facts M Remember off + rows 0 (0.739, 29 % empty) and
+    subtraction:sub_1m_no_regroup M Vocabulary off + rows 0 (0.743, 28 %). **0.74** keeps a 0.002 margin over the highest
+    bad sheet. It refuses six good sheets planned 0.728-0.739, each printing a 28-29 % foot (0.739 would keep one of them).
+    add_wp_10_plain L now plans 0.758 and is kept. The old near-floor "0.70 + largest gap" rule would ask for 0.751: its
+    largest near-floor gap is fact_family_sort L Vocabulary off + rows 0 (0.051, a 33 % foot, refused at any floor over
+    0.717), and its rule ignores which side of 30 % a sheet prints. The floor is read off the printed side instead.
+    **FILL-BT**: 0.73 and 0.75 both FAIL; add_facts M Vocabulary off (0.705, 32 %) stays as the regression guard.
+    *ROWFIT-BT:* the old must-keep, placevalue:combine L rows 0, now prints a 31.3 mm foot that holds its 29.4 mm row at a
+    10.8 mm plan gap. The gate refuses it rightly; the anchor was stale. The same sweep's no-rows sheets give the new pair.
+    Must refuse: patterns:number_patterns_rule L rows 0 (free 39.3 / row 51.1, 11.8 mm, printed foot 50.0 >= 42.0). Must
+    keep: placevalue:expand L Remember off (free 18.7 / row 31.9, 13.2 mm, foot 28.2 < 29.4). So 10, 11 and 14 mm FAIL.
+    *Open, not this lane's (the margin's safe side, as at the deploy merge):* the sweep has no-rows sheets whose foot holds a
+    row above 12 mm. They are identify L Vocabulary off (12.7, 70.6 >= 70.6), growing_shape_patterns M standard (12.7) and
+    two_step_estimate_check L We Do off (15.9). A row also fails to fit at 6.3-6.5 mm (two_step_estimate_check M rows 0,
+    notice_patterns M rows 0). The sets overlap, so no margin separates them. The next fix is the row planner's (EB-ROWFIT+, R3 above).
   - **`BAND_SLACK_MM` 2 mm** (`part-opts.js`, new in 3b). A planned cell's band is its height less the bridge's measured
     needed height (`measured[c].neededMm`: its lowest ink plus its bottom padding, read with `measureCells`' own ink rule).
     Near the 30 % line it reads up to 1.0 mm narrower than the printed band (div_facts M Vocabulary + Remember off: planned

@@ -254,6 +254,37 @@ registerSkill('placevalue:value', {
             last,
         ];
     },
+    // HINT-NO-BLANK r3 (lead ruling: the help is chosen, never cut): screen-only help where the printed steps write the answer.
+    // digit_value_notation (form notation): the place from its letter, never the digit × place; ten_times_story: the route to
+    // "how many times", never the 10. Every other form keeps its own steps (null): unit form is the ONE S8 exception.
+    screenHelp: (q) => {
+        const p = pvOf(q);
+        if (p.kind === 'times') {
+            if (!p.story || p.dir !== 'times' || !Number.isFinite(p.n) || !Number.isFinite(p.m)) return null;
+            const big = f(Math.max(p.n, p.m)), small = f(Math.min(p.n, p.m));
+            return {
+                steps: [`Find the ${p.digit} in ${big} and in ${small}.`, `Count how many places the ${p.digit} moved to the left.`,
+                    `Write ${big} ÷ ${small} in the boxes. Then ask: how many ${small}s make ${big}?`],
+                say: `${big} is ___ times ${small}.`,
+                hint: `Count how many places the ${p.digit} moved. Then ask: how many ${small}s make ${big}?`,
+            };
+        }
+        const v = valueParts(q);
+        if (!v || !LETTER[v.place] || !Number.isInteger(v.digit)) return null;
+        if (v.form === 'value') {
+            return {
+                steps: [`Find the underlined digit. Read the letter above it: ${LETTER[v.place]}.`, `${LETTER[v.place]} is the ${v.word} place.`,
+                    'Say the digit with its place name. Then write what it is worth.'],
+                say: 'The underlined digit is worth ___.',
+            };
+        }
+        if (v.form !== 'notation') return null;
+        return {
+            steps: [`Find the underlined digit. Read the letter above it: ${LETTER[v.place]}.`, `${LETTER[v.place]} is the ${v.word} place.`,
+                `Write the digit in the first box. In the second box, write what 1 ${placeWord(v.place, 1)} is worth.`],
+            say: 'The underlined digit is worth ___.',
+        };
+    },
     wrongAnswer: (q) => {
         if (pvOf(q).kind === 'times') return timesWrong(q);
         const v = valueParts(q);
@@ -294,6 +325,31 @@ registerSkill('placevalue:expand', {
         const ans = String(q.ans);
         out.push(step(`So ${f(p.n)} = ${ans}.`, [{ slot: p.frame === 'line' ? 'answer' : (p.form === 'notation' ? `b${ds.length - 1}` : `part${ds.length - 1}`), value: p.frame === 'line' ? ans : (p.form === 'notation' ? String(ds[ds.length - 1]) : f(parts[parts.length - 1])) }]));
         return clampSteps(out.length >= 3 ? out : [step(`Read ${f(p.n)}.`)].concat(out));
+    },
+    // HINT-NO-BLANK r3 (critic r2 R2-3): the printed steps write every part ("The 7 is in the hundreds place: 7 × 100."), so the
+    // screen teaches the route on the item's number and leaves every part to the pupil
+    screenHelp: (q) => {
+        const p = pvOf(q);
+        const n = Number(p.n);
+        if (!Number.isInteger(n) || n < 10) return null;
+        const places = placesOf(n);
+        const words = places.map((pl) => PLACE_WORD[pl]);
+        if (words.some((w) => !w)) return null;
+        const list = `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
+        const zeros = ['', 'one zero', 'two zeros', 'three zeros', 'four zeros', 'five zeros', 'six zeros'][places.length - 1];
+        const say = `I read ${f(n)} from the left: ${words.join(', ')}.`;
+        if (p.form === 'notation') {
+            return {
+                steps: [`Read ${f(n)} from the left: ${list}.`, `The ${words[0]} digit goes in the box before × ${f(places[0])}.`,
+                    'Do the same for each place. Write each digit in its box.'],
+                say,
+            };
+        }
+        return {
+            steps: [`Read ${f(n)} from the left: ${list}.`, `The ${words[0]} digit is worth ${words[0]}: write it with ${zeros} after it.`,
+                'Do the same for each digit. A 0 digit makes a part of 0. Write the parts, biggest first.'],
+            say,
+        };
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
@@ -348,6 +404,7 @@ registerSkill('placevalue:combine', {
         sayValues: (q) => { const p = pvOf(q); return p.n ? [arr(p.parts).map(f).join(' plus '), p.n] : null; },
     }),
     misconceptions: ['M-V7', 'M-V6', 'M-V14'],
+    screenHelp: combineScreen,
     workedSteps: (q) => {
         const p = pvOf(q);
         if (!p.n) return [];
@@ -626,6 +683,7 @@ registerSkill('placevalue:place_value_10x', {
         sayValues: (q) => { const p = pvOf(q); return p.power ? [`${f(p.n)} ${p.op === 'x' ? 'times' : 'divided by'} ${f(p.power)}`, f(q.ans)] : null; },
     }),
     misconceptions: ['M-Z2', 'M-Z4', 'M-Z1'],
+    screenHelp: x10Screen,
     workedSteps: (q) => {
         const p = pvOf(q);
         if (!p.power) return [];
@@ -666,6 +724,7 @@ const wordNameN = (q) => { const n = num(pvOf(q).n); return Number.isFinite(n) ?
 registerSkill('placevalue:number_word_names', {
     strings: stringsBy((q) => (wordNameN(q) < 1000 ? WORD_NAME_SMALL : WORD_NAME_BIG), WORD_NAME_BIG),
     misconceptions: ['M-V9', 'M-V10'],
+    screenHelp: wordNameScreen,
     workedSteps: (q) => {
         const n = wordNameN(q);
         const first = n >= 1000
@@ -727,6 +786,19 @@ registerSkill('placevalue:compare', {
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
     misconceptions: ['M-C1', 'M-C2', 'M-C3'],
+    // HINT-NO-BLANK r3 (critic r2 R2-7): the printed steps write the sign; the screen teaches the order of the checks on the
+    // item's two numbers, and the Say line keeps the relation as its one gap
+    screenHelp: (q) => {
+        const p = pvOf(q);
+        if (p.a === undefined || p.b === undefined) return null;
+        const A = f(p.a), B = f(p.b);
+        return {
+            steps: [`Count the digits in ${A} and in ${B}. More digits is bigger.`,
+                'Same number of digits: look from the left for the first digit that is different.',
+                'The bigger digit makes the bigger number. Now write the sign in the box.'],
+            say: `${A} is ___ ${B}.`,
+        };
+    },
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
@@ -784,6 +856,7 @@ for (const id of ['order_least_to_greatest', 'order_greatest_to_least']) {
             sayValues: (q) => [String(q.ans).split(',').map((v) => f(v)).join(', ')],
         }),
         misconceptions: ['M-O1', 'M-O2'],
+        screenHelp: orderScreen,
         workedSteps: (q) => {
             const list = String(q.ans).split(',').map(Number).filter(Number.isFinite);
             if (!list.length) return [];
@@ -912,6 +985,7 @@ for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000'
             return p.scope === 'notation' ? ROUND_NOTATE : p.scope === 'decision' ? ROUND_DECIDE : p.scope === 'judge' ? ROUND_JUDGE : null;
         }, main),
         misconceptions: ['M-R1', 'M-R2', 'M-R3', 'M-R4', 'M-R5', 'M-R7'],
+        screenHelp: nearestScreen,
         workedSteps: (q) => (pvOf(q).kind === 'circle'
             ? [step(`The numbers that round to ${f(pvOf(q).target)} go from ${f(pvOf(q).target - P / 2)} up to ${f(pvOf(q).target + P / 2 - 1)}.`),
                 step('Halfway rounds up.'), step(`Circle ${String(q.printAnswer || '')}.`, [{ slot: 'answer', value: String(q.printAnswer || '') }])]
@@ -951,6 +1025,23 @@ function roundNlSteps(q) {
             : step(`${f(p.n)} is ${p.n > half ? 'after' : 'before'} halfway, so it is nearer ${f(r)}.`);
     return [place, step(`Halfway between ${f(lo)} and ${f(hi)} is ${f(half)}.`), decide,
         step(`Write ${f(r)}.`, [{ slot: 'answer', value: f(r) }])];
+}
+// HINT-NO-BLANK r3: the screen help never names the line's ends (one of them IS the answer) - the dot, halfway, the rule
+function roundNlScreen(q) {
+    const p = pvOf(q);
+    if (!p.place || !Number.isFinite(p.n)) return null;
+    const N = f(p.n), P = f(p.place);
+    const first = p.lineMode === 'plotted' ? `Find the dot for ${N}.` : `Put a dot for ${N} on the line.`;
+    const say = `${N} rounded to the nearest ${P} is ___.`;
+    if (p.n % p.place === 0) {
+        return { steps: [first, `${N} is on a mark for a multiple of ${P}.`, 'A number on that mark stays the same. Write it.'], say,
+            hint: `${N} is on a mark for a multiple of ${P}. It stays the same.` };
+    }
+    return {
+        steps: [first, 'Find the halfway point between the two ends.', `Is ${N} before or after halfway? Before: round down. Halfway or after: round up.`],
+        say,
+        hint: `Put a dot for ${N}. Find the halfway point. Before halfway: round down. Halfway or after: round up.`,
+    };
 }
 function roundNlWrong(q) {
     const p = pvOf(q);
@@ -1009,6 +1100,7 @@ for (const id of Object.keys(RNL_SIZE)) {
         }, RNL_MARK),
         misconceptions: ['M-R1', 'M-R2', 'M-R3', 'M-R4', 'M-R5', 'M-R8'],
         workedSteps: roundNlSteps,
+        screenHelp: roundNlScreen,
         wrongAnswer: roundNlWrong,
     });
 }
@@ -1083,6 +1175,7 @@ for (const [id, P] of SORTS) {
             sayValues: (q) => { const t = arr(q.tiles)[0]; const a = obj(q.ans) || {}; const b = arr(q.bins).find((x) => x.id === a[t && t.id]); return t && b ? [t.label, b.label] : null; },
         }),
         misconceptions: ['M-R7', 'M-R2'],
+        screenHelp: sortScreen,
         workedSteps: (q) => {
             const bins = arr(q.bins);
             const a = obj(q.ans) || {};
@@ -1130,6 +1223,7 @@ registerSkill('number_sense:rounding_table', {
         sayValues: (q) => { const p = pvOf(q); const rows = arr(p.rows); const pl = arr(p.places); return rows.length ? [pl[0], rows[0], roundTo(rows[0], pl[0])] : null; },
     }),
     misconceptions: ['M-R6', 'M-R5', 'M-R1'],
+    screenHelp: tableScreen,
     workedSteps: (q) => {
         const p = pvOf(q);
         const cells = arr(p.cells);
@@ -1268,6 +1362,7 @@ for (const [id, iCan] of EST) {
     registerSkill(`number_sense:${id}`, {
         strings: stringsBy((q) => (pvOf(q).task === 'closest' ? EST_CLOSEST : pvOf(q).task === 'reasonable' ? EST_REASONABLE : null), main),
         misconceptions: ['M-G1', 'M-G2', 'M-G3', 'M-G4', 'M-R1'],
+        screenHelp: estimateScreen,
         workedSteps: estimateSteps,
         wrongAnswer: estimateWrong,
     });
@@ -1435,3 +1530,153 @@ registerSkill('composing:number_word_form', {
     // (every misconception's form, the box-unfit ones too: the detailed lesson quotes "3005 for 305" in its mistake rows)
     wrongAnswers: (q) => wordsWrongs(q).map((x) => ({ value: x.value, display: String(x.value), misconception: x.misconception, explain: x.explain })),
 });
+
+/* =============================================================================== strategy facts: screen help only */
+// HINT-NO-BLANK r3 (lf-placevalue owns number_sense): make_a_ten, doubles_near_doubles (and its preset near_doubles) and
+// compensation have no kit provider (P4 strategy ids, see the head of this file); their hint stated the answer ("... = 10 + 4
+// = 14"). These registrations carry ONLY screenHelp - the on-screen hint, steps and Say line - so print is unchanged
+// (getProvider fills every other member from the default adapters, as before).
+const factOf = (q) => {
+    const m = /(\d+)\s*([+\-−])\s*(\d+)/.exec(String((q && q.text) || '').replace(/<[^>]*>/g, ' '));
+    return m ? { a: Number(m[1]), op: m[2] === '+' ? '+' : '-', b: Number(m[3]) } : null;
+};
+registerSkill('number_sense:make_a_ten', {
+    screenHelp: (q) => {
+        const x = factOf(q);
+        if (!x || x.op !== '+' || x.a >= 10) return null;
+        const c = 10 - x.a, r = x.b - c;
+        if (q.answerType === 'multiple-choice') {
+            return { steps: [`${x.a} needs how many more to make 10?`, `Split ${x.b} into that many and the rest.`, `Find the choice that starts ${x.a} + that number.`],
+                say: `${x.a} plus ${x.b} is the same as ___.`, hint: `${x.a} needs some more to make 10. Split ${x.b} into that many and the rest.` };
+        }
+        if (r <= 0) return null;
+        return { steps: [`Start with ${x.a}. ${x.a} + ${c} = 10.`, `Take ${c} from ${x.b}: ${x.b} − ${c} = ${r}.`, `Now add 10 + ${r}.`],
+            say: `${x.a} plus ${x.b} equals ___.`, hint: `Make 10 first: ${x.a} + ${c} = 10. Then add what is left of ${x.b}.` };
+    },
+});
+registerSkill('number_sense:doubles_near_doubles', {
+    screenHelp: (q) => {
+        const x = factOf(q);
+        if (!x || x.op !== '+') return null;
+        const { a, b } = x;
+        const say = `${a} plus ${b} equals ___.`;
+        if (a === b) {
+            return { steps: [`${a} + ${a} is a double: two groups of ${a}.`, `Count on ${a} more from ${a}.`, 'Now write the sum.'], say,
+                hint: `${a} + ${a} means two groups of ${a}. Count on ${a} more from ${a}.` };
+        }
+        if (Math.abs(a - b) !== 1) return null;
+        const d = 2 * a;
+        return b > a
+            ? { steps: [`Think of a double: ${a} + ${a} = ${d}.`, `${b} is 1 more than ${a}.`, `Now add 1 more to ${d}.`], say, hint: `Think: ${a} + ${a} = ${d}, then add 1 more.` }
+            : { steps: [`Think of a double: ${a} + ${a} = ${d}.`, `${b} is 1 less than ${a}.`, `Now take 1 away from ${d}.`], say, hint: `Think: ${a} + ${a} = ${d}, then take 1 away.` };
+    },
+});
+registerSkill('number_sense:compensation', {
+    screenHelp: (q) => {
+        const x = factOf(q);
+        if (!x) return null;
+        if (x.op === '+') {
+            const T = Math.ceil(x.a / 10) * 10, d = T - x.a, adj = x.b - d;
+            if (d <= 0 || adj < 0) return null;
+            return { steps: [`${x.a} is close to ${T}: ${x.a} + ${d} = ${T}.`, `Take ${d} from ${x.b}: ${x.b} − ${d} = ${adj}.`, `Now add ${T} + ${adj}.`],
+                say: `${x.a} plus ${x.b} equals ___.`, hint: `Make ${x.a} into ${T}: add ${d}. Take ${d} from ${x.b}. Then add.` };
+        }
+        const T = Math.ceil(x.b / 10) * 10, d = T - x.b, adj = x.a - T;
+        if (d <= 0 || adj < 0) return null;
+        return { steps: [`${x.b} is close to ${T}: ${x.b} + ${d} = ${T}.`, `Take away ${T} instead: ${x.a} − ${T} = ${adj}.`, `You took away ${d} too many. Now add ${d} back to ${adj}.`],
+            say: `${x.a} minus ${x.b} equals ___.`, hint: `Take away ${T} instead of ${x.b}. Then add back the ${d} extra you took away.` };
+    },
+});
+
+/* ------------------------------------------------- HINT-NO-BLANK r3: screen-only help of the family's other skills */
+// The printed steps of these skills write the answer in more than their last sentence, so the help is chosen from here
+// (support-ladder.js workedStepsFor, lead ruling r3): the route on THIS item's numbers, the answer left to the pupil.
+const PLACE_ZEROS = ['no zeros', 'one zero', 'two zeros', 'three zeros', 'four zeros', 'five zeros', 'six zeros'];
+function nearestScreen(q) {
+    const p = pvOf(q);
+    if (p.kind !== 'round' || !Number.isInteger(p.n) || !(p.place >= 10) || !PLACE_WORD[p.place]) return null;
+    const N = f(p.n), P = f(p.place);
+    return {
+        steps: [`Find the ${PLACE_WORD[p.place]} digit of ${N}.`, `Look at the digit just after it: ${digitAt(p.n, p.place / 10)}.`,
+            'Five or more: round up. Four or less: round down. Now write the rounded number.'],
+        say: `${N} rounded to the nearest ${P} is ___.`,
+    };
+}
+function sortScreen(q) {
+    const p = pvOf(q);
+    const bins = arr(p.bins).map(Number);
+    if (p.kind !== 'sort' || bins.length < 2 || !Number.isFinite(p.place)) return null;
+    const lo = bins[0], hi = bins[1], half = lo + (hi - lo) / 2;
+    const h = (x) => f(Math.round(x * 1000) / 1000);
+    return {
+        steps: [`Halfway between ${h(lo)} and ${h(hi)} is ${h(half)}.`, `Less than ${h(half)}: it rounds down. ${h(half)} or more: it rounds up.`,
+            'Drag each number to the column it rounds to.'],
+    };
+}
+function estimateScreen(q) {
+    const p = pvOf(q);
+    if (p.kind !== 'estimate' || p.task !== 'compute' || !['+', '−'].includes(p.op) || !Number.isFinite(p.a) || !Number.isFinite(p.b) || !(p.place >= 10)) return null;
+    const P = f(p.place), A = f(p.a), B = f(p.b);
+    return {
+        steps: [`Round ${A} to the nearest ${P}.`, `Round ${B} to the nearest ${P}.`, `Now ${p.op === '+' ? 'add' : 'subtract'} the two rounded numbers.`],
+        say: `${A} ${p.op === '+' ? 'plus' : 'minus'} ${B} is about ___.`,
+    };
+}
+function tableScreen(q) {
+    const p = pvOf(q);
+    const rows = arr(p.rows).map(Number);
+    if (p.kind !== 'table' || !rows.length) return null;
+    return {
+        steps: [`Start from ${f(rows[0])} in the first row, and from the row's own number every time.`,
+            'Find the place you round to. Look at the digit just after it.',
+            'Five or more: round up. Four or less: round down. Write each answer in its box.'],
+    };
+}
+function combineScreen(q) {
+    const p = pvOf(q);
+    const parts = arr(p.parts).map(Number).filter((x) => Number.isFinite(x) && x > 0);
+    if (p.kind !== 'combine' || parts.length < 2) return null;
+    const words = parts.map((x) => PLACE_WORD[10 ** (String(x).length - 1)]);
+    if (words.some((w) => !w)) return null;
+    return {
+        steps: [`Find the place of each part: ${parts.map((x, i) => `${f(x)} is ${words[i]}`).join(', ')}.`, 'A place with no part gets a 0.',
+            'Write the digits in order, the biggest place first.'],
+        say: `${parts.map(f).join(' plus ')} is ___.`,
+    };
+}
+function wordNameScreen(q) {
+    const n = wordNameN(q);
+    if (!Number.isInteger(n) || n < 1000) return null;
+    return {
+        steps: [`Find the comma${n >= 1e6 ? 's' : ''} in ${f(n)}.`,
+            n >= 1e6 ? 'Read each group before a comma, then say its name: million, then thousand.' : 'Read the group before the comma, then say "thousand".',
+            'Read the last group. Circle the choice with the same words.'],
+    };
+}
+function orderScreen(q) {
+    const p = pvOf(q);
+    const ns = arr(p.nums).map(Number).filter(Number.isFinite);
+    if (p.kind !== 'order' || ns.length < 2) return null;
+    const up = p.dir !== 'desc';
+    // (never the numbers themselves: each one is an element of the answer list - their first digits, which the pupil reads off)
+    const lens = new Set(ns.map((x) => String(Math.trunc(Math.abs(x))).length));
+    const firsts = ns.map((x) => String(Math.trunc(Math.abs(x)))[0]);
+    const tie = new Set(firsts).size < firsts.length;
+    const word = up ? 'least' : 'greatest';
+    return {
+        steps: [lens.size > 1 ? 'Count the digits of each number. More digits is bigger.' : `Look at the first digit of each number: ${firsts.slice(0, -1).join(', ')} and ${firsts[firsts.length - 1]}.`,
+            tie ? 'Two first digits are the same: compare the next digit.' : `The ${up ? 'smallest' : 'biggest'} first digit is the ${word} number.`,
+            `Write the ${word} number first, then the next one.`],
+    };
+}
+function x10Screen(q) {
+    const p = pvOf(q);
+    const zeros = Number.isFinite(p.power) ? String(p.power).length - 1 : 0;
+    if (p.kind !== 'x10' || !Number.isFinite(p.n) || !/^10+$/.test(String(p.power)) || !PLACE_ZEROS[zeros]) return null;
+    const times = p.op === 'x' || p.op === '×';
+    return {
+        steps: [`${f(p.power)} has ${PLACE_ZEROS[zeros]}.`, `${times ? 'Times' : 'Divide'}: each digit moves ${zeros === 1 ? 'one place' : `${PLACE_ZEROS[zeros].replace(/ zeros?$/, '')} places`} to the ${times ? 'left' : 'right'}.`,
+            `Write ${f(p.n)} with its digits moved.${times ? ' Fill the empty places with 0.' : ''}`],
+        say: `${f(p.n)} ${times ? 'times' : 'divided by'} ${f(p.power)} equals ___.`,
+    };
+}

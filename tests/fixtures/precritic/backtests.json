@@ -6686,17 +6686,17 @@
   },
   {
    "id": "partopts-fill-bt-low",
-   "check": "SHEET_FILL_MIN may not drop: the plan reads up to 0.052 fuller than the print near the floor (identify M We Do off), so a floor of 0.75 lets a sheet planned at the floor print a 30 % foot (critic A r3, DESIGN §8d). The two states are the same tree with the threshold judged as moved - the backtest sheets are built as asked, not through the offer gate, so what they print does not depend on it",
+   "check": "SHEET_FILL_MIN may not drop: at 0.73 the offer gate lets patterns:follow_given_rule M rows 0 through - planned 0.738, it prints a 30 % foot (the highest-planned bad sheet of the lf-engine fillfix sweep, 810 sheets; DESIGN §8d). The two states are the same tree with the threshold judged as moved - the backtest sheets are built as asked, not through the offer gate, so what they print does not depend on it",
    "kind": "fixture",
    "rule": "ws-partopts-unit FILL-BT",
    "browser": true,
    "fail": {
-    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.75.json",
-    "state": "SHEET_FILL_MIN 0.75 - under 0.70 + the measured gap"
+    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.73.json",
+    "state": "SHEET_FILL_MIN 0.73 - under the highest-planned bad sheet (0.738)"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
-    "state": "the live 0.76"
+    "state": "the live 0.74"
    },
    "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT --bt-k-file {fixture}",
    "expect": {
@@ -6706,17 +6706,17 @@
   },
   {
    "id": "partopts-fill-bt-high",
-   "check": "SHEET_FILL_MIN may not rise either: 0.77 refuses add_wp_10_plain L (planned 0.762, prints 24 % empty - a good sheet) (DESIGN §8d)",
+   "check": "SHEET_FILL_MIN may not rise either: 0.75 refuses subtraction:sub_1m_no_regroup M Vocabulary off + rows 0 (planned 0.743, prints 28 % empty - a good sheet) (lf-engine fillfix sweep; DESIGN §8d)",
    "kind": "fixture",
    "rule": "ws-partopts-unit FILL-BT",
    "browser": true,
    "fail": {
-    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.77.json",
-    "state": "SHEET_FILL_MIN 0.77 - over the lowest-planned good sheet"
+    "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.75.json",
+    "state": "SHEET_FILL_MIN 0.75 - over the lowest-planned good sheet over the floor"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
-    "state": "the live 0.76"
+    "state": "the live 0.74"
    },
    "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT --bt-k-file {fixture}",
    "expect": {
@@ -6726,7 +6726,7 @@
   },
   {
    "id": "partopts-rowfit-bt-low",
-   "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers placevalue:value M We Do 1, whose printed foot (35.0 mm) holds a whole row and its head (33.7 mm) at a plan gap of 11.4 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from expand L Remember off, which master moved to 15.9 mm)",
+   "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers patterns:number_patterns_rule L rows 0, whose printed foot (50.0 mm) holds a whole row and its head (42.0 mm) at a plan gap of 11.8 mm (DESIGN §8d; re-anchored by lf-engine fillfix 2026-11-20 from placevalue:value M We Do 1, whose plan gap the strip-counting planner reads as 8.4 mm)",
    "kind": "fixture",
    "rule": "ws-partopts-unit ROWFIT-BT",
    "browser": true,
@@ -6746,13 +6746,93 @@
   },
   {
    "id": "partopts-rowfit-bt-high",
-   "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:combine L rows 0, whose printed foot (28.5 mm) holds no row (29.4 mm needed) at a plan gap of 13.5 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from value L rows 0, which master moved to 26.4 mm)",
+   "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:expand L Remember off, whose printed foot (28.2 mm) holds no row (29.4 mm needed) at a plan gap of 13.2 mm (DESIGN §8d; re-anchored by lf-engine fillfix 2026-11-20 from placevalue:combine L rows 0, whose 31.3 mm foot now holds its row)",
    "kind": "fixture",
    "rule": "ws-partopts-unit ROWFIT-BT",
    "browser": true,
    "fail": {
     "fixture": "tests/fixtures/precritic/partopts/bt-rowfit-14.json",
     "state": "ROWFIT_SLACK_MM 14 - over the must-keep gap"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+    "state": "the live 12 mm"
+   },
+   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only ROWFIT-BT --bt-k-file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-fill-print",
+   "check": "The lesson planner's used height of the sheet is the printed one within 4 mm (FILL-PRINT): master's row-stretch-capped sheets planned their band strips on one line (the Independent strip with a 0.5 em full-width guess), so placevalue:identify M We Do off planned 207.4 mm and printed 200.5 (-6.9) and add_wp_10_plain L Vocabulary off + rows 0 planned 170.3 and printed 175.3 (+5.0) - the drift that put FILL-BT out of reach of any floor (lf-partopts bisect 2c42746aa..688f755a6). Fix: roles/lesson.js counts the strips as they print (compose.js stripWrapMm): -1.1 / -0.6 mm",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-unit FILL-PRINT",
+   "browser": true,
+   "fail": {
+    "commit": "f8164ca5d",
+    "state": "master: -6.9 / +5.0 mm"
+   },
+   "pass": {
+    "commit": "cd9261b5f",
+    "state": "the strip-counting planner: -1.1 / -0.6 mm"
+   },
+   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-PRINT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-fill-bt-floor",
+   "check": "FILL-BT green on the re-derived floor: master's 0.76 refuses add_wp_10_plain L Vocabulary off + rows 0 (planned 0.734 there, a 27 % foot - a good sheet); on the fix it plans 0.758 and SHEET_FILL_MIN 0.74 (fillfix sweep: the highest-planned bad one-page sheet 0.738, the lowest good over it 0.739 / 0.743) keeps it and refuses follow_given_rule M rows 0",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-unit FILL-BT",
+   "browser": true,
+   "fail": {
+    "commit": "f8164ca5d",
+    "state": "master: 0.76, add_wp_10_plain L planned 0.734 - refused"
+   },
+   "pass": {
+    "commit": "cd9261b5f",
+    "state": "0.74, add_wp_10_plain L planned 0.758 - kept"
+   },
+   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-rowfit-bt-anchor",
+   "check": "ROWFIT-BT AS COMMITTED is green: master's own anchor placevalue:combine L rows 0 (must keep: foot holds no row) now prints a 31.3 mm foot that holds its 29.4 mm row at a 10.8 mm plan gap - the gate refuses it rightly, the anchor was stale. The fix re-anchors on the fillfix sweep (must refuse number_patterns_rule L rows 0 at 11.8 mm, must keep expand L Remember off at 13.2 mm). This row runs EACH commit's own script ({root}), since today's script carries the new anchor",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-unit ROWFIT-BT (the committed anchor)",
+   "browser": true,
+   "fail": {
+    "commit": "f8164ca5d",
+    "state": "master's script: the stale combine L anchor - FAIL"
+   },
+   "pass": {
+    "commit": "cd9261b5f",
+    "state": "the re-anchored pair - PASS"
+   },
+   "command": "node {root}/tests/scripts/ws-partopts-unit.cjs --bt-only --only ROWFIT-BT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fillfix-rowfit-bt-11",
+   "check": "ROWFIT_SLACK_MM may not drop to 11 mm: the new must-refuse anchor number_patterns_rule L rows 0 sits at an 11.8 mm plan gap (its printed foot holds a row), so 11 mm already offers it - the re-anchored pair pins 12 within (11.8, 13.2]",
+   "kind": "fixture",
+   "rule": "ws-partopts-unit ROWFIT-BT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/partopts/bt-rowfit-11.json",
+    "state": "ROWFIT_SLACK_MM 11 - under the must-refuse gap 11.8"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
@@ -14533,6 +14613,1339 @@
     "state": "every paper box train gives up spare air before it wraps"
    },
    "command": "node tests/scripts/ws-patterns-cells.mjs --skill patterns:number_patterns_rule --rules TRAIN-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-stretch-rowcap",
+   "check": "ws-empty-band EB-STRETCH: a print row of a template that declares its writing room (layout.js ROW_ROOM_MM) is never taller than the cell's natural height (laid out with no row stretch) + that room, + 1.5 mm. Lead ruling 2026-11-14 (lf-placevalue vocabulary deploy item (d)): spare page height was shared into rows - the Match 3 practice row 57 mm for a 50 mm work, the Opener count row 31.7 -> 39.2 / 43.4 mm, the lesson Vocabulary 39.4 -> 50.7 mm",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH (lead ruling 2026-11-14, ROW-STRETCH CAP)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "EB-STRETCH fires on vocab_grade_pictures (Match 3) independent M / L: 57 mm rows for 50 mm works, 5 mm over the 52 mm cap"
+   },
+   "pass": {
+    "commit": "893d95d16",
+    "state": "0 findings: the rows are held to 52.5 mm (drawn 50 + 2 mm room); the spare height is white at the foot"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --sizes M,L --roles independent --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-fill",
+   "check": "ws-rowcap-fill ROWCAP-FILL: a capped template's section (layout.js ROW_ROOM_MM) counts its rows at the height they are drawn (rowCapMm: drawn + room), so rows x cellH leaves at most one row of the grid free. Critic lf-engine-rowcap r1 F1 / F2 / F3: Review L (master) and Match 3 L (31d41507 + fix) printed 3 rows of 52.5 mm and a ~75 mm white foot where 4 fit - the fill counted on the 48 mm footprint (58 mm asked), the cap drew 50 + 2",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL (critic rowcap r1 F3)",
+   "fail": {
+    "commit": "1b5c3b9c9",
+    "state": "Match 3 footprint 48 mm at M and L: 3 rows of 53 mm leave 68-69 mm of a 227-228 mm grid free"
+   },
+   "pass": {
+    "commit": "f5c025e4c",
+    "state": "4 rows of 53 mm: under one row free at M and L"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --r1 --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-stretch-selfbuilt",
+   "check": "ws-empty-band EB-STRETCH (stage 2, critic lf-engine-rowcap r1 F4): every template not in layout.js ROW_STRETCH_EXEMPT is capped at drawn + its room (ROW_ROOM_MM, else ROW_ROOM_DEFAULT_MM), and the self-built rows of Guided, Scripted Model, Error Analysis and Pre-skill check are a FAIL over it, not a note (on master they were 5-12 mm over)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH stage 2 (critic rowcap r1 F4)",
+   "browser": true,
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: Guided / Scripted Model / Error Analysis / Pre-skill check rows stretched past drawn + room (count_by_tables)"
+   },
+   "pass": {
+    "commit": "28e9e9d1f",
+    "state": "0 EB-STRETCH findings: those composers hold each row to layout.rowCapMm"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:count_by_tables --sizes M,L --roles guided,scripted-model,error-analysis,pre-skill-check --hosts none --no-baseline --only EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-fill-all",
+   "check": "ws-rowcap-fill ROWCAP-FILL over EVERY registered template (stage 2, critic rowcap r1 F4 (c)): rows are never drawn past drawn + room, and counted at that height, so a page never ends with more than one row free unless the deal or the role caps the count",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill ROWCAP-FILL every template (critic rowcap r1 F4)",
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: every unlisted template's rows stretched past the cap (e.g. add-three 57-76 mm for a 50 mm drawing), 294 findings"
+   },
+   "pass": {
+    "commit": "28e9e9d1f",
+    "state": "53 templates x 6 shapes: every row at most its cap, at most one row free"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rowcap-unlisted",
+   "check": "ws-rowcap-fill --only UNLISTED (stage 2 unit assertion): a template missing from every table is capped by the tree's rowCapMm at drawn + the default room, never Infinity; an exempt template is not capped",
+   "kind": "commit-pair",
+   "rule": "ws-rowcap-fill UNLISTED (critic rowcap r1 F4 (a))",
+   "fail": {
+    "commit": "3b0fdbcbb",
+    "state": "stage 1: rowCapMm(50, an unlisted template) = Infinity"
+   },
+   "pass": {
+    "commit": "28e9e9d1f",
+    "state": "rowCapMm(50, an unlisted template) = 53"
+   },
+   "command": "node tests/scripts/ws-rowcap-fill.mjs --only UNLISTED --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-clip-guided",
+   "check": "ws-empty-band EB-CLIP (critic lf-engine-rowcap-s2 F1 / F2, the second side of EB-STRETCH): every print cell's ink - legacy and template-less cells too - ends at least 0.5 mm above its row's rule",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-CLIP",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_wp_10_plain Guided L p2: rows held under the tries' ink (the cap took a tab keep-out off rows that draw it), ink 0.2 mm off the rule"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "every Guided row at least its measured ink + 1 mm"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10_plain --sizes L --roles guided --hosts none --no-baseline --only EB-CLIP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "tab-clear-ea",
+   "check": "ws-empty-band TAB-CLEAR (critic lf-engine-rowcap-s2 F3): a cell's number tab stands >= 2 mm from the text it numbers (CL-40's 1 mm from a one-line fact or a box), pupil page and key",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band TAB-CLEAR",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "fact_family_sort Error Analysis M: the tab 0.0 mm from \"Sam chose:\" (the held row no longer centred the work low enough)"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "the work keeps the tab's height + 0.75 mm over it, in its own markup"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:fact_family_sort --sizes M --roles error-analysis --hosts none --no-baseline --only TAB-CLEAR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-ink-floor",
+   "check": "ws-roles-unit GUIDED-INK-FLOOR (critic lf-engine-rowcap-s2 F2): every Guided row is at least its measured ink + 1 mm",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-INK-FLOOR",
+   "fail": {
+    "commit": "661965d43",
+    "state": "a continuation page of 93 mm tries held to 92-93 mm rows"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "rows of at least 94 mm"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-INK-FLOOR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pagefill-capped-roles",
+   "check": "ws-print-lint PAGEFILL on review / test / error-analysis / opener (critic lf-engine-rowcap-s2 F4 / F5): a strip over 20 % of the problem area is major under the role's ceiling, and over 30 % at the ceiling (a reshape fills it)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (capped roles)",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_facts Test L 4 x 3 at its ceiling of 12: a 91 mm strip, 39 %"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "3 x 4: 53 mm, 23 % (minor at the ceiling)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles test --fill-roles test --size L --lints L-DENSITY --skills addition:add_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "white-row-review",
+   "check": "ws-capacity-pin WHITE-ROW (critic lf-engine-rowcap-s2 F4): a one-page Review / Test / Error Analysis under its ceiling leaves at most one row of white under its last row",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin WHITE-ROW",
+   "browser": true,
+   "fail": {
+    "commit": "661965d43",
+    "state": "add_facts Review M: 10 of 12 items under 100 mm of white (3 main columns, the earlier share's 20 % floor)"
+   },
+   "pass": {
+    "commit": "d8d3e9fc5",
+    "state": "12 items (4 main columns): at the ceiling"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills addition:add_facts --roles review",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rr-box-frame",
+   "check": "ws-role-raster RR-BOX (critic lf-engine-rowcap-s2 F1 / F2): every dark frame edge the printed PDF draws is inked over at least 70 % of its length - a frame cut by its cell or painted over (the Say band over the Model frame) FAILS",
+   "kind": "fixture",
+   "rule": "ws-role-raster RR-BOX",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/rr-box/rr-box.fail.pdf",
+    "state": "count_by_tables Scripted Model L printed on 661965d43: the Model frame's bottom edge covered by the Say band (64 % inked), the Say line cut"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/rr-box/rr-box.pass.pdf",
+    "state": "count_by_tables Guided L printed on d8d3e9fc5: every frame edge inked"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --raster-pdf {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-pack-lesson",
+   "check": "ws-vocab-unit --browser V-PACK: each vocabulary lesson packet (practicePages 1, mixed; M / L; seeds 4242 and 1) prints its Practice on the one page asked for and its Mixed page on the pages its packing counted. Critic lf-engine-rowcap r2 F1: with the row-stretch cap the vocab_grade_pictures L lesson ran 9 -> 10 pages - Practice 4 + 2 one-across Match 3 rows (the default [6, 2] shape), and a 4th Match 3 Mixed shelf counted without its strip spilled the anchor chart (Mixed 3 -> 4 pages, one Match 3 cell alone on page 2: L-LONE / PAGEFILL)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-vocab-unit --browser V-PACK (precritic gate vocab-unit-browser); node twin ws-layout-unit MIX-PAGES",
+   "fail": {
+    "commit": "9b97befbb",
+    "state": "lf-placevalue + master + lf-engine rowcap merged: vocab_grade_pictures L packet 10 pages (Practice 2 pages, Mixed 4 pages)"
+   },
+   "pass": {
+    "commit": "fbca1a582",
+    "state": "Practice one page of 4 Match 3 rows; Mixed packing counts a page-opening shelf with its strip: L packet 8 pages"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-PACK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-pages",
+   "check": "ws-mix-pages MIX-PAGES (the node twin of ws-layout-unit MIX-PAGES, runnable on an old tree): a library lesson Mixed page dealt the counts counts() chose prints as many pages as the same page with one lead shelf fewer. Critic lf-engine-rowcap r2 F1: the packing (mixed-practice.js pagesOf) counted a lead shelf that starts a page without its strip, so a 4th Match 3 shelf joined the anchor chart page on paper only and the chart spilled: vocab_grade_pictures L Mixed 3 -> 4 pages, one Match 3 cell alone on page 2",
+   "kind": "commit-pair",
+   "rule": "ws-mix-pages MIX-PAGES (precritic node gate mix-pages; twin ws-layout-unit MIX-PAGES)",
+   "fail": {
+    "commit": "9b97befbb",
+    "state": "parent of fbca1a582: lead 4 shelves -> 4 pages, one shelf fewer -> 3 pages"
+   },
+   "pass": {
+    "commit": "fbca1a582",
+    "state": "pagesOf counts the strip: lead 3 shelves -> 3 pages"
+   },
+   "command": "node tests/scripts/ws-mix-pages.mjs --root {root} --only MIX-PAGES",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-model-onepage",
+   "check": "vocab_grade_pictures Scripted Model: no page before the last leaves 30 % or more of its body empty (EB-PAGE --page-fill). Builder vocab-blockers 2026-11-19: 3 Match 3 states dealt 2 + 1 (M p1 36 %, L p1 32 %) because roles/scripted-model.js reserves two step-text lines (textH2) on a one-line full-width state",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE (--page-fill; precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "b77b1dd9b",
+    "state": "OPEN RED: Scripted Model M p1 36 %, L p1 32 % empty (2 pages)"
+   },
+   "pass": {
+    "commit": "5054c8748",
+    "state": "MEASURED STATES: a full-width state is measured as drawn (step text, marks, wide state); the 3 Match 3 states print on one page at M and L"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles scripted-model --hosts none --page-fill --no-baseline --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "mix-drop",
+   "check": "ws-mix-pages MIX-DROP / MIX-SHELVES: a shelf that fits is never dropped - dealt one lead item more, plan() must not lay that shelf out on the pages the chosen counts print; meta.packedPages / packedShelves equal plan()'s pages and shelves. lf-placevalue vocab deploy blocker 1: packing counted every shelf at the pool's tallest uncapped shelf (the probe's tallest item) while plan() lays each out at its own items' capped height: add_wp_10 L lesson Mixed 14 -> 12 items (p5 45 % white), two_step_letter_equation M Mixed 6 -> 5",
+   "kind": "commit-pair",
+   "rule": "ws-mix-pages MIX-DROP (precritic node gate mix-pages)",
+   "fail": {
+    "commit": "414a0e108",
+    "state": "counts 2 lead shelves; dealt 3, plan() fits all 3 on the same 2 pages"
+   },
+   "pass": {
+    "commit": "fd80e5c9d",
+    "state": "shelfRow: packing counts each shelf at plan()'s laid-out height; counts 4 lead, the 5th does not fit"
+   },
+   "command": "node tests/scripts/ws-mix-pages.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-fill",
+   "check": "ws-lesson-fill LESSON-FILL: a lesson's Practice over two pages never leaves a page more white than the next page's first item needs (+ 2 mm). lf-placevalue vocab deploy blocker 2: follow_given_rule / number_patterns_rule lesson p3-p4 at M and L - the [6, 2] shape clamped to 1 column took the 1-column target of 4 rows and was never filled (PAGE FILL skipped a clamped section and a grid under the step strip): p3 82-121 mm white, p4 2 more items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-fill LESSON-FILL (precritic gate lesson-fill)",
+   "browser": true,
+   "fail": {
+    "commit": "414a0e108",
+    "state": "Practice 2 pages at seed 4242 (M / L, both lessons): 4 FAIL"
+   },
+   "pass": {
+    "commit": "d79fb5d7d",
+    "state": "fillClamped: Practice 1 page of 6 under its step strip"
+   },
+   "command": "node tests/scripts/ws-lesson-fill.cjs --lessons patterns:follow_given_rule,patterns:number_patterns_rule --sizes M,L --seeds 4242",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-measured-states",
+   "check": "ws-empty-band EB-STRETCH / EB-PAGE on the full-width Scripted Model states: a state row is sized from the state as DRAWN (its step text over it, its marks), never a two-line text estimate. lf-engine vocabfix item 3: vocab_pick3_words Model rows 88.7 / 93 mm held cells drawn 70.1 / 73.6 mm (15.5-16.4 mm over the cap), vocab_grade_pictures 2.6-3.7 mm over and p1 36 % / 39 % empty",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-STRETCH / EB-PAGE (precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "414a0e108",
+    "state": "9 EB-PAGE / EB-STRETCH findings on the vocabulary Models (M / L)"
+   },
+   "pass": {
+    "commit": "5054c8748",
+    "state": "0 findings: rows from the measured state"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words --roles scripted-model --sizes M,L --hosts none --page-fill --no-baseline --only EB-PAGE,EB-STRETCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-beside-clip",
+   "check": "ws-empty-band EB-CLIP on the two-column (state beside its step) Scripted Model: the beside state is measured as drawn and its row keeps that height. Critic rowcap-s2 F1 class / vocabfix resume: add_wp_10_plain L word-work states ran 0.8 mm past the row rule, fact_family_sort L family-check 0.1 mm above it (and the frame's foot covered in print, RR-BOX)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-CLIP (precritic empty-band row)",
+   "browser": true,
+   "fail": {
+    "commit": "d2306451c",
+    "state": "EB-CLIP 5 on add_wp_10_plain L / fact_family_sort L Scripted Model"
+   },
+   "pass": {
+    "commit": "dd5e01659",
+    "state": "beside states measured as drawn: EB-CLIP 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10_plain,addition:fact_family_sort --roles scripted-model --sizes L --hosts none --no-baseline --only EB-CLIP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "twin-fit-reset",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-twin-fit-reset TWIN-FIT-RESET: a worksheet kit twin narrowed and fitted, then widened and fitted, returns to its own --mq-k2",
+   "rule": "TWIN-FIT-RESET (lf-algebra for lf-hosts, lead 2026-11-20; ws-worksheet-reflow WS-DIGIT number_patterns_rule@1024 22.9 px)",
+   "fail": {
+    "commit": "8caa04f3b",
+    "state": "fitTwinRows only lowered --mq-k2: a fit run at the 3-column try kept the shrunk drawing in the 2-up card (22.9 px digits)"
+   },
+   "pass": {
+    "commit": "958abe1e6",
+    "state": "a new fit key starts from the twin's base --mq-k2; the worksheet refits its twins once its columns settle (26.5 px)"
+   },
+   "command": "node tests/scripts/ws-twin-fit-reset.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fit-floor",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "ws-fit-floor FIT-FLOOR + FIT-RESET: the host twin fit never draws a twin numeral under 29 px (or under its own size), no sideways scroll; a host resized 820 -> 1280 draws its twins at a fresh 1280 size",
+   "rule": "FIT-FLOOR / FIT-RESET (lane lf-hosts, lead / lf-algebra 2026-11-20: host fit digit floor; fit only ever lowers)",
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "fitTwinRows shrank the word-work twin 27.1 -> 25.6 px in a 300 px quiz cell, and kept the 820 fit after a resize to 1280 (sub_word_problems 27.3 vs 32 px, ten frame 51.7 vs 60.8, money 45 vs 52.8)"
+   },
+   "pass": {
+    "commit": "291eedf74",
+    "state": "the shrink stops at the 29 px floor (none under a drawing already below it) and stacks rows instead; every new fit key (width, element count, host --mq-k2 / --mq-digit) refits from the drawing own size; a shared resize listener refits the card and quiz"
+   },
+   "command": "node tests/scripts/ws-fit-floor.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-cols-1024",
+   "check": "placevalue:expand online worksheet at a 1024 tablet lays out in at least 2 columns, its sentence on one line, every box input >= 48 x 48 (lead expand-2col 2026-11-20)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-COLS",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "1 column at 1024: 101 px boxes, card 972 px wide"
+   },
+   "pass": {
+    "commit": "72f61f850",
+    "state": "2 columns at 1024: boxes 78 x 74, card 478 px wide"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-list-operand",
+   "check": "ws-hint-no-blank STEPS-LEAK (R2-1): a given-equal element of a LIST answer is stated when a step writes it as an operand",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: factors_identify \"1 × 80 = 80\" fills the box beside 1"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: the help is the hint \"a × b = 80 ... divide 80 by it\""
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_theory:factors_identify --only STEPS-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-dangling-head",
+   "check": "ws-hint-no-blank DANGLING-HEAD (R2-2): a shown step ending in \":\" with no continuation row",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: factors_identify (24) \"Factor pairs:\" then the hint"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: no heading: the hint alone"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_theory:factors_identify --only DANGLING-HEAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-expr-terms",
+   "check": "ws-hint-no-blank STEPS-LEAK (R2-3): an expression answer is read term by term",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: expanded_notation \"The 9 is in the ones place: 9 × 1.\"; combine_like_terms \"6x + 2x = 8x\""
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: expanded_notation screenHelp \"The hundreds digit goes in the box before × 100.\"; combine_like_terms no box"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill placevalue:expanded_notation,algebra:combine_like_terms --only STEPS-LEAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-orphan",
+   "check": "ws-hint-no-blank ORPHAN (R2-6): a number neither seen nor worked; a first step opening with a pronoun; x − x = 0",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: volume_missing_edge \"How many times does 20 go into 80?\"; round_nl_ten_thousands \"Is it before or after the halfway point ...\""
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: round_nl screenHelp \"Put a dot for 88,208 on the line.\" ...; volume_missing_edge no box"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill area_perimeter:volume_missing_edge,number_sense:round_nl_ten_thousands --only ORPHAN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-help-generic",
+   "check": "ws-hint-no-blank HELP-GENERIC (R2-7): every item of a skill shows the same help word for word",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: compare \"Both have three digits. | Now: count the digits ...\" on every item"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: compare screenHelp names the item's two numbers"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill placevalue:compare --only HELP-GENERIC",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-bare-so",
+   "check": "ws-hint-no-blank BARE-STEP (R2-8): a leading So / Then / Now does not make an expression a step",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: sub_facts \"So 15 − 9.\""
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: sub_facts shows its clean hint"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill subtraction:sub_facts --only BARE-STEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-strict-pins",
+   "check": "ws-hint-no-blank --strict-pins (R2-4): a --skill run is never satisfied by a pin",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r2 FAIL (lf-placevalue 2026-11-20, design/audit/runs/lf-placevalue/critic-hint-no-blank-r2.md); lead ruling r3: help chosen whole, never cut",
+   "browser": true,
+   "fail": {
+    "commit": "9ae9ccd5d",
+    "state": "master: make_a_ten passes only through its HINT-LEAK pin (\"... = 10 + 4 = 14\")"
+   },
+   "pass": {
+    "commit": "bffa4010a",
+    "state": "r3: make_a_ten screenHelp hint \"Make 10 first: 9 + 1 = 10. Then add what is left of 5.\""
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_sense:make_a_ten --strict-pins",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-a12-r2-keep",
+   "check": "ws-hint-no-blank R2-KEEP: a skill with no screenHelp keeps master's r2 'Here is how' box (add_facts / sub_facts keep their own steps, not a one-line hint)",
+   "kind": "commit-pair",
+   "rule": "lead ruling A12 (2026-11-20): the r3 choice rule applies only to skills with screenHelp plus this lane's; pins only shrink",
+   "browser": true,
+   "fail": {
+    "commit": "b5e2205e6",
+    "state": "r3 app-wide: add_facts shows 1 step (its hint)"
+   },
+   "pass": {
+    "commit": "df3899387",
+    "state": "guard: r2 steps kept"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill addition:add_facts,subtraction:sub_facts --only R2-KEEP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "hint-no-blank-r3-prefer-sh",
+   "check": "ws-hint-no-blank PREFER-SH: a skill with screenHelp whose own steps had to be cut shows its screenHelp, never the cut steps (critic r3 R3-2, compensation ended without 'Now add')",
+   "kind": "commit-pair",
+   "rule": "HINT-NO-BLANK critic r3 FAIL (design/audit/runs/lf-placevalue/critic-hint-no-blank-r3.md R3-2)",
+   "browser": true,
+   "fail": {
+    "commit": "4fadf6e5b",
+    "state": "compensation: 'Add 3 to 7 to make 10. Subtract 3 from 29 to get 26.'"
+   },
+   "pass": {
+    "commit": "41a5e20f0",
+    "state": "compensation shows its screenHelp ending 'Now add ...'"
+   },
+   "command": "node tests/scripts/ws-hint-no-blank.cjs --skill number_sense:compensation --only PREFER-SH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sol-object",
+   "check": "ws-solution-text SOL-OBJECT: no Show Solution step prints \"[object\", \"undefined\" or \"NaN\"",
+   "kind": "commit-pair",
+   "rule": "SOL-OBJECT (HINT-NO-BLANK critic r3 R3-3, lf-placevalue 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master: round_sort_* \"Answer: [object Object]\" (89 skills, 209 items app-wide)"
+   },
+   "command": "node tests/scripts/ws-solution-text.cjs --skill number_sense:round_sort_10,number_sense:round_sort_1000,number_sense:round_sort_100000 --only SOL-OBJECT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pass": {
+    "commit": "a55a7aaaa",
+    "state": "object answers read as text (\"70: 73, 74 · 80: 78, 75\"); broken lines left out: 0 skills"
+   }
+  },
+  {
+   "id": "sol-problem",
+   "check": "ws-solution-text SOL-PROBLEM: the Show Solution \"Problem:\" line restates the question (no gap \"?\", no \"__\", \"=\" kept)",
+   "kind": "commit-pair",
+   "rule": "SOL-PROBLEM (HINT-NO-BLANK critic r3 R3-4, lf-placevalue 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master: \"675 + ? + ___\", \"770 × 100 + ? × 10 + ___ × 1\", \"mark 7,207: ? Round it ...: ___\" (54 skills, 172 items app-wide)"
+   },
+   "command": "node tests/scripts/ws-solution-text.cjs --skill placevalue:expand,placevalue:expanded_notation,number_sense:round_nl_thousands --only SOL-PROBLEM",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pass": {
+    "commit": "a55a7aaaa",
+    "state": "a broken Problem line becomes the question as asked: 0 skills"
+   }
+  },
+  {
+   "id": "mws-save-reproduce",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "12 sheets (teacher Print independent M/L, lesson M/L, Mixed Review, fact rows, More Practice, Test + a second section; simple print x3; the interactive player) saved through each host, then reprinted from the stored record: pupil and key HTML byte-identical; New mix = other items, same settings; a page-1 thumbnail <= 25 KB; the Save button on each host, teacher-only; the 450 warning and the 500 cap (card 8 SAVE-REPRODUCE, A15 #2 #3)",
+   "rule": "ws-my-worksheets SAVE-REPRODUCE (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SAVE-REPRODUCE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "every case byte-identical, the dialog pre-filled (name, unit folder), pupils see no Save, 455 warns, 500 stops"
+   }
+  },
+  {
+   "id": "mws-library-roundtrip",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Export -> clear -> Import gives the same records (deep equal, thumbnails included); Import twice adds nothing; a version-0 record (no v, size S) loads as v1 at M and builds; Import through the screen button (a real file); Export library writes every sheet (card 8 LIBRARY-ROUNDTRIP)",
+   "rule": "ws-my-worksheets LIBRARY-ROUNDTRIP (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only LIBRARY-ROUNDTRIP --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "merge-by-id import, migrate() fills v / tags / cls and reads S as M"
+   }
+  },
+  {
+   "id": "mws-sheet-code",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "every saved sheet's ?sheet= code decodes to its request and prints the same HTML; an unknown field is ignored; a teacher device is offered Save and Print (Save stores it); a pupil window plays page 1's items (card 8 SHEET-CODE, 6)",
+   "rule": "ws-my-worksheets SHEET-CODE (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SHEET-CODE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "SH1.<base64url {v,n,h,req}>; init.js routes ?sheet= to openSheetCode"
+   }
+  },
+  {
+   "id": "mws-interactive-same",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "the card's Play (Open interactive) deals page 1's items in print order (text and answer) for a teacher Print independent sheet, a simple-print fact sheet and a lesson (card 8 INTERACTIVE-SAME, 5)",
+   "rule": "ws-my-worksheets INTERACTIVE-SAME (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only INTERACTIVE-SAME --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "state.worksheetPreset: the online worksheet deals the plan's page-1 items"
+   }
+  },
+  {
+   "id": "mws-organise",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "rename, a new folder + move, tags and class, duplicate, New mix, search (name, class), Newest first / By unit, delete with Undo after 7 s, the default unit folder, the class / tag chips; all after a reload (card 8 ORGANISE, 4)",
+   "rule": "ws-my-worksheets ORGANISE (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only ORGANISE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "every change written to the sheets store and its sheetFolders record"
+   }
+  },
+  {
+   "id": "mws-no-loss",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "a seeded version-1 mathquest_quizzes (tests / results) and My sets (mq_teacher_sets) are byte-unchanged after the DB_VERSION 2 upgrade and a save; the quiz list still lists the old quiz (card 8 NO-LOSS, 3)",
+   "rule": "ws-my-worksheets NO-LOSS (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only NO-LOSS --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "quiz-storage DB_VERSION 2 only adds the sheets store"
+   }
+  },
+  {
+   "id": "mws-touch-width",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "every control of the screen, the open menu, the Rename dialog and the Save dialog >= 48 px and hit at its centre, by a real click at 1280 x 1000 and 1366 x 768 and a real tap at 1024 x 768 and 820 x 1180; no sideways scroll; the folders fold into the Folder picker under 900 px (card 8 TOUCH / WIDTH, 7)",
+   "rule": "ws-my-worksheets TOUCH-WIDTH (lane lf-partopts, My Worksheets card design/my-worksheets/CARD.md)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only TOUCH-WIDTH --widths 1280,1366,1024,820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "903f2780e",
+    "state": "the signed card only: no sheet store, no My Worksheets screen, no Save on the print hosts, no ?sheet= link"
+   },
+   "pass": {
+    "commit": "c7bbb5a9c",
+    "state": "48 px controls (#teacherApp .mws .mws-b), the 900 px fold"
+   }
+  },
+  {
+   "id": "mws-theme",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "My Worksheets in the current app look (lead ruling A19, owner 2026-11-20: \"the purple theme looks like the old website\"): css/my-worksheets.css and the screen markup write no colour literal outside var(--…) tokens; the screen primary buttons compute the same colours, font and corners as the Print worksheets primary",
+   "rule": "ws-my-worksheets THEME (lane lf-partopts, My Worksheets, ruling A19)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only THEME --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "c7bbb5a9c",
+    "state": "the first build: hex / rgba fallbacks in css/my-worksheets.css (#fff, #c2410c, #fafafa, rgba shadows), own purple accent tint"
+   },
+   "pass": {
+    "commit": "5d028d66b",
+    "state": "teacher classes (.tv-card, .tv-chip, .tv-menu, .tv-input, .tv-select) and --tv-* / token variables only"
+   }
+  },
+  {
+   "id": "mws-keys",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "On each Save host (Print worksheets, simple print, online worksheet) focus stays in the Save dialog after every Tab and Shift+Tab; Esc closes only the dialog and focus returns to the host's Save button",
+   "rule": "ws-my-worksheets KEYS (lane lf-partopts, My Worksheets critic r1 F1)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only KEYS --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): over the simple print Shift+Tab leaves the dialog and Esc closes the simple print underneath (its document capture-phase onKey runs first)"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "the simple print ignores keys while a My Worksheets dialog is open; focus returns by the Save button's selector"
+   }
+  },
+  {
+   "id": "mws-menu-reach",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The ⋯ menu of the LAST card, opened by a real tap with the page at the bottom, at 1024x768, 1366x768 and 820x1180: every item inside the viewport and hit by elementFromPoint",
+   "rule": "ws-my-worksheets MENU-REACH (lane lf-partopts, My Worksheets critic r1 F2)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only MENU-REACH --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): the 9-item menu always opens downward: Edit to Delete are below the fold"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "the menu opens upward when there is more room above, and is scrolled whole into view"
+   }
+  },
+  {
+   "id": "mws-card-box",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Every element of every My Worksheets card lies inside the card's box (1 px), at every width",
+   "rule": "ws-my-worksheets CARD-BOX (lane lf-partopts, My Worksheets critic r1 F3)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only CARD-BOX --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): at 1366 the ⋯ button sticks out of each card by 5 px (1fr 1fr 48px)"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "minmax(0,1fr) columns; Send code on its own row"
+   }
+  },
+  {
+   "id": "mws-player-fresh",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Save on a freshly played online worksheet keeps the sheet on screen: the on-screen items equal page 1 of the saved sheet, in order (SAVE-REPRODUCE player-fresh)",
+   "rule": "ws-my-worksheets SAVE-REPRODUCE (lane lf-partopts, My Worksheets critic r1 F4)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SAVE-REPRODUCE --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): playerSaveDraft saves the skills with its own seed: other items than the ones on screen"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "a teacher's fresh online worksheet is dealt from the request Save keeps (page 1, its seed)"
+   }
+  },
+  {
+   "id": "mws-play-lesson-msg",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Play on a saved detailed lesson either deals page 1's items or says \"Play opens the practice pages of this lesson.\" (INTERACTIVE-SAME tp-detailed)",
+   "rule": "ws-my-worksheets INTERACTIVE-SAME (lane lf-partopts, My Worksheets critic r1 F5)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only INTERACTIVE-SAME --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): a detailed lesson has no page-1 items; Play deals fresh practice silently"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "the lead's plain message as a toast"
+   }
+  },
+  {
+   "id": "mws-send-set",
+   "kind": "fixture",
+   "browser": true,
+   "check": "Send as a set puts one new set first in My sets with the sheet's de-duplicated skills and options, and leaves every other set byte-identical (ORGANISE)",
+   "rule": "ws-my-worksheets ORGANISE (lane lf-partopts, My Worksheets critic r1 F6)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only ORGANISE --widths 1280 --inject {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mws-send-set.fail.js",
+    "state": "a mutation: writing My sets keeps only the newest set (Send as a set worked on 35bc9ebb5, so the check is proved on an injected defect)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mws-send-set.pass.js",
+    "state": "no mutation: My Worksheets as built"
+   }
+  },
+  {
+   "id": "mws-save-label",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The Save control reads \"Save to My Worksheets\" on Print worksheets, the simple print and the online worksheet, at 1280 and 820",
+   "rule": "ws-my-worksheets SAVE-LABEL (lane lf-partopts, My Worksheets critic r1 F7)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only SAVE-LABEL --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): the simple print and the online worksheet read a bare \"Save\""
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "\"Save to My Worksheets\" on every host"
+   }
+  },
+  {
+   "id": "mws-card-conform",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "Card S-3: Print, Play, Send code and ⋯ are visible buttons on each card face (F8); every record with a thumbnail has a page count, New mix included, and the meta line never repeats a phrase of the name (F9)",
+   "rule": "ws-my-worksheets CARD-CONFORM (lane lf-partopts, My Worksheets critic r1 F8, F9)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only CARD-CONFORM --widths 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): Send code only in the ⋯ menu; the meta line repeats the page type and date of the default name; New mix copies lose their page count"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "Send code on the card; meta drops phrases in the name; the page count is made again with the thumbnail"
+   }
+  },
+  {
+   "id": "mws-touch-save",
+   "kind": "commit-pair",
+   "browser": true,
+   "check": "The simple print's and the online worksheet's Save buttons are at least 48 x 48 at 820 and 1024 (TOUCH-WIDTH)",
+   "rule": "ws-my-worksheets TOUCH-WIDTH (lane lf-partopts, My Worksheets critic r1 F10)",
+   "command": "node tests/scripts/ws-my-worksheets.cjs --only TOUCH-WIDTH --widths 820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "35bc9ebb5",
+    "state": "the round-1 build the critic failed (35bc9ebb5): the online worksheet's Save is 70 x 44"
+   },
+   "pass": {
+    "commit": "6190e015a",
+    "state": "min-height and min-width 48 px"
+   }
+  },
+  {
+   "id": "psc-instr-adjacent",
+   "kind": "commit-pair",
+   "check": "lf-roles critic D3: no two adjacent Pre-skill Check bands print the same instruction",
+   "rule": "ws-psc-lint PSC-INSTR",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_wp_20,addition:add_wp_20 --form A --only PSC-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "9b475efe6",
+    "state": "sub_wp_20 M bands 1-2 'Subtract.' twice, bands 3-4 the story line twice"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "neighbouring bands of one instruction share one strip (critic d2d5 r1 D-1: 42310a2a3's label-built lines, its first pass state, now FAIL PSC-INSTR's tag rule)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-deal-dupes",
+   "kind": "commit-pair",
+   "check": "lf-roles critic D4: in a Pre-skill Check band at most 2 items share an answer and no turnaround pair",
+   "rule": "ws-psc-lint PSC-DEAL",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills addition:add_facts,subtraction:sub_50_no_regroup,addition:add_wp_10 --form A --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "9b475efe6",
+    "state": "add_facts M seed 7: three 12s and 8 + 4 / 4 + 8 in one band"
+   },
+   "pass": {
+    "commit": "42310a2a3",
+    "state": "dedupeDeal() per prerequisite, seeded order"
+   },
+   "browser": true
+  },
+  {
+   "id": "opener-countrow-growcap",
+   "kind": "commit-pair",
+   "check": "lf-roles item 5 (lead 2026-11-20): an Opener's count-row box rows keep their measured height (no 8 mm growth of air)",
+   "rule": "ws-empty-band EB-BAND",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:follow_given_rule --roles opener --sizes M --hosts none --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "8b1974587",
+    "state": "follow_given_rule Opener M count row 33.1 mm cell, 11.5 mm band (34.6 %)"
+   },
+   "pass": {
+    "commit": "816734000",
+    "state": "GROWCAP 0 for every count row (roles/opener.js)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-twin-pools",
+   "kind": "commit-pair",
+   "check": "lead A10: a Pre-skill Check never prints two bands dealt from one skill (twin pools merge)",
+   "rule": "ws-psc-lint PSC-TWIN",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills division:div_facts_long,subtraction:sub_2d_1d,vocabulary:vocab_pick3_words --form A --only PSC-TWIN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "e41e5ecc8",
+    "state": "div_word_problems / sub_word_problems / vocab_grade_pictures dealt by two pools, two bands with one instruction"
+   },
+   "pass": {
+    "commit": "a6fc9407a",
+    "state": "planCheck merges pools of one skill into one band (pre-skill-check.js)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-sign-floor",
+   "kind": "commit-pair",
+   "check": "lead A10: a Pre-skill Check compare band shows at least 2 signs and never one sign 3 times in a row",
+   "rule": "ws-psc-lint PSC-DEAL",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills placevalue:expand,placevalue:unit_form --form A --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "c2a50c33c",
+    "state": "expand band 4 and unit_form band 2: '>' three times in a row"
+   },
+   "pass": {
+    "commit": "0c1790e77",
+    "state": "dedupeDeal() sign floor, seeded order"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-instr-label-tail",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 D-1: no Pre-skill Check strip carries a skill label or a parenthesised option tag; neighbouring bands of one instruction share one strip",
+   "rule": "ws-psc-lint PSC-INSTR",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_2d_1d,subtraction:sub_wp_20 --sizes M,L --form A --only PSC-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "'Write the answer: subtraction number line.' / '...: number line subtraction (b&w).', 'Solve: subtraction word problems (within 10)'"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "label tails dropped; the later band joins its neighbour's strip"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-lesson-footer",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 L1: a detailed lesson's Prerequisite Check strips print on one line and its frame ends above the footer (DOM)",
+   "rule": "ws-psc-lint PSC-LESSON",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills subtraction:sub_2d_1d --sizes M --form A --lessons g3-oa8-two-step-wp --lesson-seeds 4242,1 --only PSC-LESSON",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "g3-oa8-two-step-wp check strips wrap to 2 lines; the frame ends 5.9 mm below the footer top"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "a lesson's perQuestion check prints master's one-line strips"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-formb-sign-floor",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 M1: Form B keeps the sign floor (no sign 3 times in a row)",
+   "rule": "ws-psc-lint PSC-DEAL (--form B)",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills placevalue:unit_form,placevalue:combine --seeds 5,6,1,3 --form B --only PSC-DEAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "unit_form seeds 5/6 '< < < =', combine seeds 1/3 '> > > <' (dedupe before Form B's shuffle)"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "signOrder() on each band's final items, after any shuffle: a search for the earliest order that keeps the floor"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-twin-mix",
+   "kind": "commit-pair",
+   "check": "critic d2d5 r1 M2: a band merged from twin pools holds items of both pools",
+   "rule": "ws-psc-lint PSC-TWIN-MIX",
+   "command": "node tests/scripts/ws-psc-lint.mjs --skills division:div_facts_long,multiplication:count_by_tables --form A --only PSC-TWIN-MIX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "a9010cd18",
+    "state": "div_facts_long div_word_problems band prints q2 (partitive) only; count_by_tables number_seq_fill band q0 only"
+   },
+   "pass": {
+    "commit": "48d381cf1",
+    "state": "twin pools interleave round robin"
+   },
+   "browser": true
+  },
+  {
+   "id": "lesson-player-any-part",
+   "check": "ws-lesson-player --any-part PLAYER-ANY-PART: every player part id (warmup, ido, wedo, youdo, exit) opens directly by ?lesson=&part= and the part bar jumps to every other part, the URL following (design/cards/lesson-player D11)",
+   "kind": "commit-pair",
+   "rule": "PLAYER-ANY-PART (lesson-player card D10 / D11, lane lf-hosts slice 1)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master before slice 1: no lesson player - a ?lesson= link opens nothing"
+   },
+   "pass": {
+    "commit": "58cadd3f8",
+    "state": "lesson player slice 1: every part opens by URL, the part bar jumps"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --any-part",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-seed-parity",
+   "check": "ws-lesson-player --unit: the I do example equals the printed anchor chart's example for the same seed on both print screens (M-LP2, D2), I do steps == the provider's workedSteps (M-LP1), the Say line holds only the example's numbers",
+   "kind": "commit-pair",
+   "rule": "M-LP1 / M-LP2 (lesson-player card D2, D10)",
+   "browser": true,
+   "fail": {
+    "commit": "2c42746aa",
+    "state": "master before slice 1: no player plan - no I do to compare with the chart"
+   },
+   "pass": {
+    "commit": "58cadd3f8",
+    "state": "lesson player slice 1: the I do is the chart's own example (5 + 2 at seed 75513)"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --unit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-leave",
+   "check": "ws-lesson-player --leave: a visible [data-act=leave] >= 64 px (board) / 48 px (tablet) on every part stage and on the 'No such lesson' stage, which shows no dead part pills; Leave closes the player as Esc does (also F6 name escaped once, F7 pupil -> Board, F8 tick after the last step)",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F1 (+F6, F7, F8)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: no Leave control; the message stage leaves 5 dead pills; '<b>x' shown as '&lt;b&gt;x'; I do tick after any visit"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "Leave on every stage, closes the player; pills hidden on the message stage"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --leave",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-ink-still",
+   "check": "ws-lesson-player --reveal: every black mark of the I do drawing (digits, rule, ring, dots, hops) keeps its box (+-1 px) from step k to k+1 at 1280 / 1920 / 820",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F3 (ink never moves)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: the sum's digits shift left 61-69 px from step 1 to step 2 (the drawing re-centred when the dot card appeared)"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "every box at its largest state's size from step 1: no mark moves"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --reveal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-stage-h13-digits",
+   "check": "ws-lesson-player --render: the cell keeps one height from step 1, the board digits are >= the signed size (156 px at 1920, 104 at 1280 / 1366, 83 on tablets) and the stage keeps no empty band >= 30 % (rows or columns), 820 portrait included",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F4 (cell grows, wasted stage, digits under the signed size)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: cell 521 -> 751 px at 1920, digits 130 px of 156, 820 portrait stage band 53.6 %"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "fixed cell at its largest state, digits 156 / 104 px, stage band <= 21 %"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --render --widths 1920,820",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-dot-card",
+   "check": "ws-lesson-player --reveal: on every I do state the digits sit where the printed anchor chart panel of the same state puts them, measured from the dot card's centre in card heights (the chart drawn in its own sheetDocument), within 0.35",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r1 F2 (dot card beside its addend, as on paper; +F5 chart step notes on screen)",
+   "browser": true,
+   "fail": {
+    "commit": "77a755931",
+    "state": "player r1: the 2-dot card under the answer, below the '+', not beside the addend 2 (no engine stylesheet on screen)"
+   },
+   "pass": {
+    "commit": "5c8eed882",
+    "state": "the engine stylesheet on screen: the card beside the addend as on the chart"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --reveal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-stage-fill",
+   "check": "ws-lesson-player --render --reveal --stage-fill (A22): at 820 / 1024 / 1280 / 1366 / 1920, every I do step: the cell top == the Steps top +-4 px (or directly under the chip row), < 30 % of the stage outside the cell and the Steps, .mq-lp-say >= 95 % of the cell's inner width below the drawing with its frame and 'Say:' label from step 1 and its line only after the last step, digits in [signed, 1.25 x signed], the cell inside the stage; no orphan mode pill on the 'No such lesson' screen",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r2 F1 / F2 (root cause, cap rule; lead ruling A22 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "0cdd280a8",
+    "state": "player r2: the cell centred 144 px below the Steps' top with 47 % of the 1280 stage empty; the Say band moved into the words column (46 % of the cell's width) and absent before the last step; a lone 'Board' pill on the unknown-lesson screen"
+   },
+   "pass": {
+    "commit": "d43d8f222",
+    "state": "A22: the cell top-aligned with the Steps (or under the chips), stage empty <= 28.4 %, the Say band full width under the drawing from step 1, digits 126 / 128 / 175 / 104 / 104 px, no mode pill on the message stage"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --render --reveal --stage-fill",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-player-hops-below",
+   "check": "ws-lesson-player --render --hops-below (A26, + A26b): at every width and I do step the count-on hops box never sits above the drawing, and where it shares the drawing's columns it starts >= 0.5 digit under the drawing's foot (beside is fine); at 820 portrait only, the answer row + the hops' room under it is reserved room (H13 <= 35 % without it, <= 47 % with it) that the last step inks in full",
+   "kind": "commit-pair",
+   "rule": "lf-hosts player critic r3 F1 (lead rulings A26 / A26b 2026-11-20)",
+   "browser": true,
+   "fail": {
+    "commit": "68b6ba366",
+    "state": "player r3: at 820 the stacked hops '5 6 7' sat 11 px above the sum's ringed 5, over its columns (306-470 px vs the drawing from 481 px): read as a top row of the addition"
+   },
+   "pass": {
+    "commit": "862f96afe",
+    "state": "A26: stacked, the hops under the answer row, 0.6 digit below the drawing's foot; A26b reserved room at 820 portrait, inked by the last step"
+   },
+   "command": "node tests/scripts/ws-lesson-player.mjs --render --hops-below --widths 820,1024,1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-steps-panel-empty",
+   "check": "ws-lesson-pages STEPS-PANEL-EMPTY (lead via lf-ops 2026-11-21): no lesson page - pupil or key - prints a \"Steps:\" panel (a band's .ws-strip label, or the practice pages' [data-mq-lesson-strip]) whose content, with the label taken off, holds no text",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-pages STEPS-PANEL-EMPTY",
+   "browser": true,
+   "fail": {
+    "commit": "e0c90f8ad",
+    "state": "master e0c90f8ad: mult_2by1_column M and L seed 506061 (a preset of multiplication:multiply, which had no provider) - the Steps band beside Guided Practice drew its frame and no step, pupil p1 and key p1"
+   },
+   "pass": {
+    "commit": "477a7498f",
+    "state": "lf-ops-steps 477a7498f: a multiplication:multiply provider for stack items - column worked steps and four general Steps; the panel names them at M and L"
+   },
+   "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column --sizes M,L --seed 506061 --rules STEPS-PANEL-EMPTY",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

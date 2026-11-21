@@ -51,7 +51,7 @@
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-student-opts, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-student-opts, ws-my-worksheets, ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/, plus
 #            ws-detailed-lesson --lesson <id> --check for every PASSED long lesson (data/curriculum/detailed-lessons.json
 #            critic verdict PASS: the gate-drift guard, lf-checks 2026-11-07: a kit ruling or a merge cannot silently turn a
@@ -879,6 +879,9 @@ build_list() {
   browser_gate 1 ws-share-options ws-share-options.cjs
   # the pupil options sheet (lf-studentopts 2026-11-19; ~4 min): CARRY / COUNT / PUPIL at 1280, 1366, 1024, 820 + the node UNIT
   browser_gate 1 ws-student-opts ws-student-opts.cjs
+  # My Worksheets (lf-partopts 2026-11-20; ~5 min): save → reprint byte-identical, library round trip, ?sheet= codes, Open
+  # interactive = page 1, organise, no loss of quizzes / My sets, 48 px at 1280, 1366, 1024, 820
+  browser_gate 1 ws-my-worksheets ws-my-worksheets.cjs
   # SCREEN-INK-SIZE on every redesign-passed skill (lead 2026-11-13), against its pin: screen pictures at print size, drawings wide before tall
   browser_gate 1 "ws-screen-ink-size --passed" ws-screen-ink-size.cjs --passed
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
@@ -897,6 +900,7 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 "ws-pace --check" ws-pace.cjs --check   # owner 2026-11-21: the pace board (pace.html) has every finished week, matching git; run --write each week
   node_gate 1 "ws-empty-band --pin-check" ws-empty-band.cjs --pin-check   # critic eblast r4 P1: the blocking-role list may only grow (merge-base pin, fails closed)
   node_gate 1 "ws-empty-band --capacity-check" ws-empty-band.cjs --capacity-check   # every role used by a passed skill declares its ceiling, no drift
   node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
