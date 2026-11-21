@@ -15930,6 +15930,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-steps-panel-empty",
+  "check": "ws-lesson-pages STEPS-PANEL-EMPTY (lead via lf-ops 2026-11-21): no lesson page - pupil or key - prints a \"Steps:\" panel (a band's .ws-strip label, or the practice pages' [data-mq-lesson-strip]) whose content, with the label taken off, holds no text",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-pages STEPS-PANEL-EMPTY",
+  "browser": true,
+  "fail": {
+   "commit": "e0c90f8ad",
+   "state": "master e0c90f8ad: mult_2by1_column M and L seed 506061 (a preset of multiplication:multiply, which had no provider) - the Steps band beside Guided Practice drew its frame and no step, pupil p1 and key p1"
+  },
+  "pass": {
+   "commit": "477a7498f",
+   "state": "lf-ops-steps 477a7498f: a multiplication:multiply provider for stack items - column worked steps and four general Steps; the panel names them at M and L"
+  },
+  "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column --sizes M,L --seed 506061 --rules STEPS-PANEL-EMPTY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-role-set-column-mult",
+  "check": "ws-lesson-pages LESSON-ROLE-SET (lead A28 via lf-ops 2026-11-21): a lesson whose page roles are pinned (tests/fixtures/lesson-pages/role-sets.json, measured on master e0c90f8ad) prints exactly that set of data-ws-sheet roles, pupil and key - no new Model / anchor-chart page",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-pages LESSON-ROLE-SET",
+  "browser": true,
+  "fail": {
+   "commit": "617a2e92a",
+   "state": "lf-ops-steps 617a2e92a: multiply's new column worked steps made mult_2by1_column / mult_3by1_column lessons open with a lesson-chart (Model) page, pupil and key, at M and L - a page type they never printed"
+  },
+  "pass": {
+   "commit": "58cee626c",
+   "state": "lf-ops-steps 58cee626c: the multiply provider declares lessonChart: false (anchors.js lessonChartAllowed gates roles/lesson.js stateItems / secondItems); the lessons print master's roles plus the filled Steps panel"
+  },
+  "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column,multiplication:mult_3by1_column --sizes M,L --seed 506061 --rules LESSON-ROLE-SET",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
