@@ -195,3 +195,15 @@ not started (brief).
 hotfix returned [] there; this branch kept its fallback), F9 (pre-skill check below each preset), F7, F11, F13-F15, M two-a-page.
 Lesson L remaining OVERFLOW: area_model_4by1 L p6 and area_model_3by2 L p5 (a Practice cell, 9.7-13.6 mm past it), and the
 master classes print-lint lists (2by2 ILLEGIBLE 20 / PG-12 8 on p1, TOPSTART 12 on the long-multiplication lessons).
+
+Gate reruns (round 2 head, the six skills, one browser gate at a time):
+
+| gate | result |
+|---|---|
+| cell-checks --card | column presets (mult_4by1_column, mult_3by2_standard, mult_2by2_standard) OK. Area presets 54 findings in all (r1: 79): opener OVERFLOW and EA PUPILTAG (on master and on c180eacc6 too), lesson L OVERFLOW (4by1 p6, 3by2 p5: a Practice cell), LONE-PAGE Reason It M x3 / 4by1 L (no ruling), WP M x2 (A9c item 1, deferred). Scripted-model and Reason It L OVERFLOW 0 |
+| print-lint lesson L / M | L 91 / M 74 findings: the r1 classes (TOPSTART 12 on each long-multiplication lesson, WRAP-OP, DN-2 / H13, 2by2 p1 ILLEGIBLE 20 + PG-12 8), plus area L Practice PG-12 2. mult_4by1_column L clean, area_model_4by1 M clean |
+| ws-lesson-pages --skills (the six + mult_2by1 / 3by1, M / L) | OK (16 lessons, 174 pages; STEPS-PANEL-EMPTY and LESSON-ROLE-SET 0) |
+| empty-band (--hosts none) | 165 (r1 rerun: 298). MOD-MARKS PASS. EB-BAND 56, EB-SIDE 84, EB-STRETCH 3, EB-CLIP 7, EB-EDGE 8, TAB-CLEAR 7. After the last fix, scripted-model + reason-it on the area presets + mult_4by1_column: EB-EDGE 0 and TAB-CLEAR 2 (mult_4by1_column reason-it L, 0.7 mm tab clearance, stack) |
+| ws-backtest (six round-2 rows) | 6 PASS |
+| ws-roles-unit | OK (115) |
+| ws-boot-smoke | OK |
