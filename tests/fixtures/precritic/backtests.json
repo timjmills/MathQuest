@@ -16318,6 +16318,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pass-chip-filter-lessons",
+   "check": "owner 2026-11-21 (lead ruling A33): the Lessons bar's 8/10 chip IS the filter toggle (one chip-styled control, aria-pressed, 8/10 · N lesson(s)), pressed it shows only LESSONS_PASSED rows; 'What does 8/10 mean?' beside it; the Skills bar carries the same chip, no separate switch; 48 px",
+   "kind": "commit-pair",
+   "rule": "ws-lessons-browse PASS-CHIP-FILTER",
+   "browser": true,
+   "fail": {
+    "commit": "1d1ee8791",
+    "state": "lessons browser r3 tree: an 'Only 8/10 ✓ (n)' switch, a separate control from any 8/10 chip"
+   },
+   "pass": {
+    "commit": "460b570ef",
+    "state": "the 8/10 chip is the toggle on both bars"
+   },
+   "command": "node tests/scripts/ws-lessons-browse.mjs --only PASS-CHIP-FILTER --widths 1366",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
