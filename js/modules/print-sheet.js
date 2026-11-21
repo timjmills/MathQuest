@@ -2547,22 +2547,27 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         // read by ws-empty-band measureCells' own ink rule (text runs, a drawing, a stroked box, an answer slot; labels aside).
         // A cell drawn H tall leaves H - neededMm empty under its ink: the lesson's offer gate predicts EB-BAND with it.)
         let neededPx = 0;
-        if (state === 'blank') {
+        // (KEYLABEL-CLEAR, lead A24 item 5: the ink's top and bottom from the cell's top, in BOTH states - the key's answered cell
+        // too - so a role can lay a key label in the clear strip above or under the ink without moving the cell's content)
+        let inkTopPx = Infinity, inkBotPx = -Infinity, inkLeftPx = Infinity, inkRightPx = Infinity;
+        {
             const isSvg = (d) => d.namespaceURI === 'http://www.w3.org/2000/svg';
-            let inkB = -Infinity;
+            let inkB = -Infinity, inkT = Infinity, inkL = Infinity, inkR = -Infinity;
+            const take = (q) => { inkB = Math.max(inkB, q.bottom); inkT = Math.min(inkT, q.top); inkL = Math.min(inkL, q.left); inkR = Math.max(inkR, q.right); };
             for (const d of cell.querySelectorAll('*')) {
                 if (d.closest('[data-ws-label], .ws-letter, .ws-tab')) continue;
                 const st = getComputedStyle(d);
                 if (st.display === 'none' || parseFloat(st.opacity || '1') <= 0.05) continue;
                 const ownText = [...d.childNodes].some((nd) => nd.nodeType === 3 && nd.textContent.trim());
-                if (ownText) { const rg = d.ownerDocument.createRange(); rg.selectNodeContents(d); for (const q of rg.getClientRects()) if (q.width && q.height) inkB = Math.max(inkB, q.bottom); continue; }
+                if (ownText) { const rg = d.ownerDocument.createRange(); rg.selectNodeContents(d); for (const q of rg.getClientRects()) if (q.width && q.height) take(q); continue; }
                 const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
                 const drawn = isSvg(d) ? d.tagName.toLowerCase() === 'svg' : /^(img|canvas|input)$/i.test(d.tagName);
-                if (drawn || stroked || d.hasAttribute('data-ws-slot')) { const q = d.getBoundingClientRect(); if (q.width && q.height) inkB = Math.max(inkB, q.bottom); }
+                if (drawn || stroked || d.hasAttribute('data-ws-slot')) { const q = d.getBoundingClientRect(); if (q.width && q.height) take(q); }
             }
-            if (inkB > -Infinity) { const cs0 = getComputedStyle(cell); neededPx = (inkB - r.top) + parseFloat(cs0.paddingBottom || 0) + parseFloat(cs0.borderBottomWidth || 0); }
+            if (inkB > -Infinity && state === 'blank') { const cs0 = getComputedStyle(cell); neededPx = (inkB - r.top) + parseFloat(cs0.paddingBottom || 0) + parseFloat(cs0.borderBottomWidth || 0); }
+            if (inkB > -Infinity) { inkTopPx = inkT - r.top; inkBotPx = inkB - r.top; inkLeftPx = inkL - r.left; inkRightPx = r.right - inkR; }
         }
-        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx: inkHi > inkLo ? inkHi - inkLo : 0, neededPx };
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx: inkHi > inkLo ? inkHi - inkLo : 0, neededPx, inkTopPx, inkBotPx, inkLeftPx, inkRightPx };
     };
     /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
     const fold = (it, c, inner, m) => {
@@ -2601,7 +2606,11 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         const modes = Object.assign({}, b0.modes || {});
         for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
         best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
-            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM), inkMm: Math.max(b0.inkMm || 0, (m.inkPx || 0) / PX_PER_MM), neededMm: Math.max(b0.neededMm || 0, (m.neededPx || 0) / PX_PER_MM) });
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM), inkMm: Math.max(b0.inkMm || 0, (m.inkPx || 0) / PX_PER_MM), neededMm: Math.max(b0.neededMm || 0, (m.neededPx || 0) / PX_PER_MM),
+            inkTopMm: Math.min(b0.inkTopMm === undefined ? Infinity : b0.inkTopMm, Number.isFinite(m.inkTopPx) ? m.inkTopPx / PX_PER_MM : Infinity),
+            inkBotMm: Math.max(b0.inkBotMm === undefined ? -Infinity : b0.inkBotMm, Number.isFinite(m.inkBotPx) ? m.inkBotPx / PX_PER_MM : -Infinity),
+            inkLeftMm: Math.min(b0.inkLeftMm === undefined ? Infinity : b0.inkLeftMm, Number.isFinite(m.inkLeftPx) ? m.inkLeftPx / PX_PER_MM : Infinity),
+            inkRightMm: Math.min(b0.inkRightMm === undefined ? Infinity : b0.inkRightMm, Number.isFinite(m.inkRightPx) ? m.inkRightPx / PX_PER_MM : Infinity) });
     };
     try {
         cols.forEach((c, ci) => {
@@ -2633,6 +2642,9 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (b.inkMm > 0) it.measured[c].inkMm = Math.ceil(b.inkMm * 10) / 10;
                 // (lf-partopts A r3: the blank cell's needed height - its ink's bottom and bottom padding; the offer gate's EB-BAND)
                 if (b.neededMm > 0) it.measured[c].neededMm = Math.floor(b.neededMm * 10) / 10;
+                // (KEYLABEL-CLEAR: the ink's top and bottom from the cell's top over both states - a key label's clear strips)
+                if (Number.isFinite(b.inkTopMm) && Number.isFinite(b.inkBotMm)) { it.measured[c].inkTopMm = Math.floor(b.inkTopMm * 10) / 10; it.measured[c].inkBotMm = Math.ceil(b.inkBotMm * 10) / 10; }
+                if (Number.isFinite(b.inkLeftMm) && Number.isFinite(b.inkRightMm)) { it.measured[c].inkLeftMm = Math.floor(b.inkLeftMm * 10) / 10; it.measured[c].inkRightMm = Math.floor(b.inkRightMm * 10) / 10; }
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;

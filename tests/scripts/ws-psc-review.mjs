@@ -83,7 +83,10 @@ export function keyLabelBad(cells, where = '') {
         if (!c.ink || !c.label) continue;
         const dx = Math.min(c.label.r, c.ink.r) - Math.max(c.label.l, c.ink.l);
         const dy = Math.min(c.label.b, c.ink.b) - Math.max(c.label.t, c.ink.t);
+        if (process.env.KL_DEBUG) console.log(`   dbg ${c.n} ${c.text} top ${(c.ink.t - (c.cell ? c.cell.t : 0)).toFixed(1)} bot ${((c.cell ? c.cell.b : 0) - c.ink.b).toFixed(1)} lab ${(c.label.b - c.label.t).toFixed(1)}x${(c.label.r - c.label.l).toFixed(1)} cellw ${c.cell ? (c.cell.r - c.cell.l).toFixed(1) : ""} inkw ${(c.ink.r - c.ink.l).toFixed(1)} inkL ${(c.ink.l - (c.cell ? c.cell.l : 0)).toFixed(1)} inkR ${((c.cell ? c.cell.r : 0) - c.ink.r).toFixed(1)} labL ${(c.label.l - (c.cell ? c.cell.l : 0)).toFixed(1)} labT ${(c.label.t - (c.cell ? c.cell.t : 0)).toFixed(1)} cellH ${c.cell ? (c.cell.b - c.cell.t).toFixed(1) : ""}`);
         if (dx > 0.05 && dy > 0.05) out.push({ rule: 'KEYLABEL-CLEAR', msg: `${where}review answer ${c.n}: the key label "${c.text || ''}" overlaps the cell's ink by ${dx.toFixed(1)} x ${dy.toFixed(1)} mm` });
+        // (clear space is INSIDE the cell: a label running over the cell's border lands on its neighbour)
+        if (c.cell && (c.label.l < c.cell.l - 0.05 || c.label.r > c.cell.r + 0.05 || c.label.t < c.cell.t - 0.05 || c.label.b > c.cell.b + 0.05)) out.push({ rule: 'KEYLABEL-CLEAR', msg: `${where}review answer ${c.n}: the key label "${c.text || ''}" runs outside its cell` });
     }
     return out;
 }
@@ -109,7 +112,7 @@ function measureKeyLabels() {
             const stroked = !svg && ['Top', 'Right', 'Bottom', 'Left'].some((s2) => parseFloat(st[`border${s2}Width`]) > 0 && st[`border${s2}Style`] !== 'none');
             if (shape || pic || stroked || d.hasAttribute('data-ws-slot')) add(d.getBoundingClientRect());
         }
-        out.push({ text: lab.textContent.trim(), label: box(lab.getBoundingClientRect()), ink: ink ? { l: ink.l / mm, t: ink.t / mm, r: ink.r / mm, b: ink.b / mm } : null });
+        out.push({ text: lab.textContent.trim(), label: box(lab.getBoundingClientRect()), cell: box(cell.getBoundingClientRect()), ink: ink ? { l: ink.l / mm, t: ink.t / mm, r: ink.r / mm, b: ink.b / mm } : null });
     }
     return out.map((c, i) => Object.assign(c, { n: i + 1 }));
 }
@@ -129,6 +132,7 @@ function selfTest() {
         // (KEYLABEL-CLEAR planted states: the label over the ink's top-right corner FAILS; above it, or beside it, passes)
         ['KEYLABEL over the ink fails', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 3, r: 40, b: 40 } }]).length, 1],
         ['KEYLABEL above the ink passes', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 4.5, r: 40, b: 40 } }]).length, 0],
+        ['KEYLABEL outside its cell fails', keyLabelBad([{ n: 1, label: { l: 30, t: 41, r: 52, b: 44 }, ink: { l: 5, t: 3, r: 40, b: 30 }, cell: { l: 0, t: 0, r: 46, b: 46 } }]).length, 1],
         ['KEYLABEL beside the ink passes', keyLabelBad([{ n: 1, label: { l: 41, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 0, r: 40, b: 40 } }]).length, 0],
     ];
     const bad = t.filter(([, got, want]) => got !== want);
@@ -173,6 +177,7 @@ async function main() {
                 out.push(...keyLabelBad(await kp.evaluate(measureKeyLabels), ''));
             } finally { await kp.close(); }
         }
+        if (process.env.KL_DEBUG) for (const r of b.plan.meta.review || []) console.log('   meta', r.tag, JSON.stringify(r.label));
         if (only) for (let i = out.length - 1; i >= 0; i--) if (!only.has(out[i].rule)) out.splice(i, 1);
         for (const x of out) console.log(`  FAIL ${x.rule} ${j.k} pre-skill-check ${j.size}: ${x.msg}`);
         fails += out.length;

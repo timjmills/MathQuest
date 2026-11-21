@@ -341,9 +341,18 @@ function itemHtml(item, ctx, report) {
             inner += keyStamp(words, ctx);
         }
         // (PSC-REVIEW, card design/cards/psc-review: a Quick review answer names its domain and skill on the key, in the one grey;
-        // drawn over the cell's top-right corner so no cell moves between the pupil page and its key - AK-1)
-        if (item.keyTag) inner += `<span class="ws-revlabel" data-review-label style="position:absolute;right:1.5mm;top:0.8mm;`
-            + `font-size:${ctx.metrics.letterPt}pt;line-height:1;color:var(--ws-grey);white-space:nowrap">${esc(item.keyTag)}</span>`;
+        // laid over the cell so no cell moves between the pupil page and its key - AK-1. KEYLABEL-CLEAR (lead A24 item 5): in the
+        // clear strip the role chose from the measured ink, `keyTagAt` {at: 'top' (right of the number tab) | 'bottom', off mm},
+        // right-aligned and held inside the cell's width)
+        if (item.keyTag) {
+            const t = item.keyTagAt || {};
+            const at = t.at === 'top' || t.at === 'side' ? 'top' : 'bottom';
+            const off = Number.isFinite(t.off) ? t.off : 0.8;
+            // (`side`: a column right of the ink, `w` mm wide, from the cell's top)
+            const room = t.at === 'side' && t.w > 0 ? `${t.w}mm` : at === 'top' ? `calc(100% - 3mm - ${2 * (ctx.metrics.tabMm || 5) + 1}mm)` : 'calc(100% - 3mm)';
+            inner += `<span class="ws-revlabel" data-review-label style="position:absolute;right:1.5mm;${at}:${off}mm;max-width:${room};`
+                + `overflow-wrap:anywhere;text-align:right;font-size:${ctx.metrics.letterPt}pt;line-height:1;color:var(--ws-grey)">${esc(item.keyTag)}</span>`;
+        }
     }
 
     if (item.work) inner += workBox(item, ctx);

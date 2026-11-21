@@ -274,6 +274,7 @@ export function planItem(it, { cols, level = 1, render, key, model = false, nola
         style: it.cellStyle || '',
         model, nolabel,
         ...(it.keyTag ? { keyTag: it.keyTag } : {}),
+        ...(it.keyTag && it.keyTagAt ? { keyTagAt: it.keyTagAt } : {}),
     };
 }
 

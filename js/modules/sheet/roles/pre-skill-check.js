@@ -621,14 +621,14 @@ function planCheck(input, cut) {
                 // (the page's Quick review band, whole rows only; each band scores its own items, "Review __/k")
                 const rv = reviewAt.get(pg);
                 if (rv) {
-                    const grids = rv.rows.map((r) => { const g = gridPart(r.its.map((it) => planItem(Object.assign({}, it, { keyTag: it.reviewTag }), { cols: r.cols, level: 0 })), { cols: r.cols, rows: 1, cellH: r.h, labels, start }); start += r.its.length; return g; });
+                    const grids = rv.rows.map((r) => { const g = gridPart(r.its.map((it) => planItem(Object.assign({}, it, { keyTag: it.reviewTag, keyTagAt: it.keyTagAt }), { cols: r.cols, level: 0 })), { cols: r.cols, rows: 1, cellH: r.h, labels, start }); start += r.its.length; return g; });
                     reviewItems.push(...rv.items);
                     pg.sections.push({ kind: 'band', label: '', instr: instructionText(REVIEW_INSTRUCTION_KEY, rv.items), instructionKey: REVIEW_INSTRUCTION_KEY, cls: 'mq-pscreview', reviewBand: true, extra: `<span class="mq-quadscore">Review __/${slotScore(rv.items)}</span>`, contents: grids });
                     pg.used = (pg.used || 0) + rv.used;
                 }
             }
             if (reviewItems.length) {
-                reviewMeta = reviewItems.map((it) => ({ skill: it.reviewSkill, domain: it.reviewDomain, n: slotScore([it]), tag: it.reviewTag }));
+                reviewMeta = reviewItems.map((it) => ({ skill: it.reviewSkill, domain: it.reviewDomain, n: slotScore([it]), tag: it.reviewTag, ...(it.keyTagAt ? { label: it.keyTagAt } : {}) }));
                 reviewN = slotScore(reviewItems);
                 // (the check's own score names it, "Check __/n", when the check prints under one strip - PSC-SCORES S1)
                 const checkBands = pgs.flatMap((pg) => pg.sections).filter((x) => x.kind === 'band' && x.cls !== 'mq-pscreview');
@@ -701,6 +701,50 @@ export const REVIEW_SIDE_MAX = 0.27;
 const REVIEW_SKIP_TEMPLATES = { M: new Set(['legacy', 'frac-wall']), L: new Set(['legacy', 'word-work', 'frac-wall']) };
 const REVIEW_SKIP_SKILLS = new Set(['composing:fraction_number_line']);
 const REVIEW_KEEP_PER_SET = 3;
+/**
+ * KEYLABEL-CLEAR (lead A24 item 5, 2026-11-21): where a review answer's grey key label lies - in the clear strip ABOVE the ink
+ * (right of the number tab) or UNDER it (the cell's foot), whichever holds the label's lines with REVIEW_LABEL_GAP_MM to spare
+ * on each side - from the bridge's measure of the ink's top and bottom in the blank and the answered cell (measured[cols]
+ * .inkTopMm / inkBotMm) in a cell `h` mm tall. {at: 'top'|'bottom', off} (mm from that edge, inside the border), or null when
+ * neither strip holds it (the review passes the item over: the cell's content is never moved for its label). An item the bridge
+ * did not measure keeps the foot. The label's width is estimated at REVIEW_LABEL_EM of its letter size a character. Pure.
+ */
+export const REVIEW_LABEL_GAP_MM = 0.4;
+export const REVIEW_LABEL_EM = 0.52;
+export const REVIEW_LABEL_DRAW_MM = 1.3;
+export const REVIEW_LABEL_SIDE_MM = 3;
+export function keyTagPlace(it, cols, h, ctx) {
+    const me = it && it.measured && it.measured[cols];
+    const s = (ctx && ctx.s) || {};
+    const pt = s.letterPt || 9;
+    const lineMm = pt * 0.3528;
+    const wMm = String(it.reviewTag || it.keyTag || '').length * REVIEW_LABEL_EM * lineMm;
+    const nominal = cellWidthMm(cols, LIVE_W_MM, ctx && ctx.look).nominal;
+    const border = 0.3;
+    const G = REVIEW_LABEL_GAP_MM;
+    const linesIn = (avail) => Math.max(1, Math.ceil(wMm / Math.max(1, avail)));
+    if (!me || !Number.isFinite(me.inkTopMm) || !Number.isFinite(me.inkBotMm)) return { at: 'bottom', off: 0.8 };
+    const opts = [];
+    // (the drawn cell stands up to 0.5 mm shorter than its row and its content up to 0.8 mm lower than the measure read it -
+    // measured on div_facts L, Analog and Digital Time: REVIEW_LABEL_DRAW_MM comes off the foot's strip, 0.3 mm off the top's)
+    const strip = (at, avail, free) => { const lines = linesIn(avail); const lh = lines * lineMm; if (free - lh >= 2 * G) opts.push({ at, lines, off: Math.max(border, (free - lh) / 2 - border) }); };
+    strip('bottom', nominal - 3 - 2 * border, h - me.inkBotMm - REVIEW_LABEL_DRAW_MM);
+    strip('top', nominal - 3 - 2 * border - (2 * (s.tabMm || 5) + 1), me.inkTopMm - 0.3);
+    // ... or a column BESIDE the ink, right of it from the cell's top (under the tab line), when the ink leaves the right side clear
+    if (Number.isFinite(me.inkRightMm)) {
+        // (the key's written answers can draw wider than the measure's answered cell - placevalue:identify at L by 2.3 mm a side,
+        // its ink centred: REVIEW_LABEL_SIDE_MM comes off the side's room)
+        const w = me.inkRightMm - 2 * G - 1.5 - border - REVIEW_LABEL_SIDE_MM;
+        const lines = w >= 8 ? linesIn(w) : 99;
+        if (lines * lineMm + 2 <= h - REVIEW_LABEL_DRAW_MM) opts.push({ at: 'side', lines, off: 1, w: +w.toFixed(1) });
+    }
+    if (!opts.length) return null;
+    // (the fewest lines; the foot, then the top, then the side, on a tie)
+    const order = { bottom: 0, top: 1, side: 2 };
+    opts.sort((a, b) => a.lines - b.lines || order[a.at] - order[b.at]);
+    const o = opts[0];
+    return Object.assign({ at: o.at, off: +o.off.toFixed(2) }, o.w ? { w: o.w } : {});
+}
 export function reviewRows(input, ctx, m, room) {
     const pools = (input.pools || []).filter((p) => p && p.review && REVIEW_POOL.test(p.id));
     if (!pools.length || !(room > m.strip)) return null;
@@ -726,6 +770,8 @@ export function reviewRows(input, ctx, m, room) {
         const hOf = (it) => hMinAt([it], cols, ctx) + REVIEW_ROW_PAD_MM;
         const ok = cands.filter((it) => {
             if (skipT.has(tplOf(it)) || REVIEW_SKIP_SKILLS.has(it.reviewSkill) || !fitsAt([it], cols, ctx) || hOf(it) > space) return false;
+            // (KEYLABEL-CLEAR: its key label must have a clear strip at its own height - a taller row only adds room at the foot)
+            if (!keyTagPlace(it, cols, hOf(it), ctx)) return false;
             const me = it.measured && it.measured[cols];
             const w = me && me.inkMm;
             if (!(w > 0)) return true;
@@ -750,6 +796,7 @@ export function reviewRows(input, ctx, m, room) {
             }
         };
         pick(0, cols, []);
+        fit[`ok${cols}`] = ok.map((it) => it.reviewSkill.split(":")[1]).join(" ");
     }
     const rows = [];
     for (const list of rowsBySet.values()) {
@@ -774,7 +821,8 @@ export function reviewRows(input, ctx, m, room) {
     };
     dfs(0, [], 0, 0, 0, new Set());
     if (!best) return null;
-    const ordered = best.rows.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.domains[0]) - REVIEW_DOMAINS.indexOf(b.domains[0]));
+    const ordered = best.rows.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.domains[0]) - REVIEW_DOMAINS.indexOf(b.domains[0]))
+        .map((r) => Object.assign({}, r, { its: r.its.map((it) => Object.assign({}, it, { keyTagAt: Object.assign({ cols: r.cols, h: +r.h.toFixed(1), inkTop: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkTopMm : null, inkBot: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkBotMm : null, inkR: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkRightMm : null }, keyTagPlace(it, r.cols, hMinAt([it], r.cols, ctx) + REVIEW_ROW_PAD_MM, ctx) || { at: 'bottom', off: 0.8 }) })) }));
     return { rows: ordered, n: best.n, used: best.used + m.strip, items: ordered.flatMap((r) => r.its) };
 }
 
