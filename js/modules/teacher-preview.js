@@ -191,31 +191,38 @@ const CROP_SCALE = 0.45;
 
 /** Fit the stage inside its frame: scale down (never up), centred. Shared (window.tvFitSample): the options popover re-fits with it. */
 export function fit(frame) {
+    for (const step of fitSteps(frame)) step();
+}
+/** fit as its two halves (each forces one style flush and layout): a caller that must not block runs them in two tasks. */
+function fitSteps(frame) {
     const stage = frame.querySelector(':scope > .tvp-stage');
-    if (!stage) return;
-    stage.style.transform = 'translate(-50%, -50%)';
-    // A drawing wider than the stage (a printed number track) widens the stage, so the whole
-    // drawing is centred and scaled instead of overflowing one side.
-    if (stage.scrollWidth > stage.offsetWidth + 1) {
-        stage.style.maxWidth = 'none';
-        stage.style.width = `${stage.scrollWidth}px`;
-    }
-    const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
-    const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);
-    const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
-    if (fw <= 0 || fh <= 0) return;
-    const s = Math.min(1, fw / w, fh / h);
-    // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop.
-    // The option panel's sample (.tv-sko-sample) is not one: skill-options-ui _tidySample centres and scales it
-    // (translate(-50%,-50%) scale(k)), and a top-left crop under that transform put the stage off the frame
-    // (lf-algebra F8/G11: a blank sample for growing_shape_patterns and pattern_features).
-    if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop, .tv-sko-sample')) {
-        frame.classList.add('is-cropped');
-        stage.style.transform = `scale(${CROP_SCALE})`;
-        return;
-    }
-    frame.classList.remove('is-cropped');
-    stage.style.transform = `translate(-50%, -50%) scale(${s.toFixed(4)})`;
+    if (!stage) return [];
+    return [() => {
+        stage.style.transform = 'translate(-50%, -50%)';
+        // A drawing wider than the stage (a printed number track) widens the stage, so the whole
+        // drawing is centred and scaled instead of overflowing one side.
+        if (stage.scrollWidth > stage.offsetWidth + 1) {
+            stage.style.maxWidth = 'none';
+            stage.style.width = `${stage.scrollWidth}px`;
+        }
+    }, () => {
+        const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
+        const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);
+        const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
+        if (fw <= 0 || fh <= 0) return;
+        const s = Math.min(1, fw / w, fh / h);
+        // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop.
+        // The option panel's sample (.tv-sko-sample) is not one: skill-options-ui _tidySample centres and scales it
+        // (translate(-50%,-50%) scale(k)), and a top-left crop under that transform put the stage off the frame
+        // (lf-algebra F8/G11: a blank sample for growing_shape_patterns and pattern_features).
+        if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop, .tv-sko-sample')) {
+            frame.classList.add('is-cropped');
+            stage.style.transform = `scale(${CROP_SCALE})`;
+            return;
+        }
+        frame.classList.remove('is-cropped');
+        stage.style.transform = `translate(-50%, -50%) scale(${s.toFixed(4)})`;
+    }];
 }
 
 /**
@@ -244,43 +251,89 @@ export function mountQuestion(frame, q, sk, opts = {}) {
 // opts (the pupil explorer's thumbnails, 2026-11-07): `fit: false` leaves the scaling to the caller, and `onSettled(cell)`
 // runs once the mono pass has let go (~0.9 s). Every teacher caller passes no opts and keeps the behaviour it had.
 function mountBuilt(frame, s, name, what = 'Sample question', opts = {}) {
+    const steps = mountSteps(frame, s, name, what, opts);
+    if (!steps) return false;
+    for (const step of steps) step();
+    return true;
+}
+/**
+ * The work of mountBuilt as ordered steps (lf-checks 2026-11-21, THUMB-NO-FREEZE): each step forces one or two style
+ * flushes, and a flush costs a whole-document restyle on these screens, so a caller that must not block (the Lessons
+ * thumbnails) runs one step per task. mountBuilt runs the same steps back to back. Returns null when unavailable.
+ */
+function mountSteps(frame, s, name, what = 'Sample question', opts = {}) {
     const doFit = opts.fit !== false;
+    // opts.split (the staged path only): the settle pass after 900 ms also runs as three tasks, not one
+    const later = opts.split ? (f) => setTimeout(f, 0) : (f) => f();
     frame.classList.remove('is-unavailable');
     if (!s.ok) {
         frame.classList.add('is-unavailable');
         frame.setAttribute('role', 'img');
         frame.setAttribute('aria-label', `Preview unavailable for ${name}`);
         frame.innerHTML = `<span class="tvp-unavail">${icon('eye', 18)}<span>Preview unavailable</span></span>`;
-        return false;
+        return null;
     }
     frame.setAttribute('role', 'img');
     frame.setAttribute('aria-label', s.text ? `${what}: ${s.text}` : `${what} for ${name}`);
-    frame.innerHTML = `<div class="tvp-stage" inert aria-hidden="true">${scopeIds(s.html)}</div>`;
-    const cell = frame.querySelector('.tvp-cell');
-    try {
-        hideScreenOnlyCaptions(cell);
-        tidySample(cell);
-        const line = cell.querySelector('.tvp-q');
-        if (line) {
-            screenTextLine(line);
-            // (a legacy printed item says its own prompt inside `.tvp-printed`)
-            const vis = cell.querySelector('.tvp-visual') || cell.querySelector('.tvp-printed');
-            // Said once, as live play does (question-render's mq-dup): a copy inside the visual is hidden, or, when the
-            // visual says it as part of a larger block (a word problem's story, one sentence a line), the line is hidden
-            // instead (critic-panel-r2 F6: the sample printed the story twice).
-            // (judged on what the visual SHOWS: a copy already marked screen-only counts as found but stays drawn)
-            if (vis) { hideRepeatedPrompt(vis, line.textContent); if (visualRepeatsText({ textContent: vis.innerText || '' }, line.textContent)) line.style.display = 'none'; }
-        }
-        monoCell(cell);
-        // The mono pass re-reads the cell for ~0.7 s while styles settle; a static sample then
-        // needs no observer.
-        setTimeout(() => {
-            unmonoCell(cell);
-            if (frame.isConnected && doFit) fit(frame);
-            if (typeof opts.onSettled === 'function') { try { opts.onSettled(cell); } catch (e) { /* the caller's own */ } }
-        }, 900);
-    } catch (e) { /* a preview never breaks the screen */ }
-    if (doFit) fit(frame);
+    let cell = null;
+    let failed = false;
+    let fitNow = [];
+    return [
+        () => {
+            frame.innerHTML = `<div class="tvp-stage" inert aria-hidden="true">${scopeIds(s.html)}</div>`;
+            cell = frame.querySelector('.tvp-cell');
+            try {
+                hideScreenOnlyCaptions(cell);
+                tidySample(cell);
+                const line = cell.querySelector('.tvp-q');
+                if (line) {
+                    screenTextLine(line);
+                    // (a legacy printed item says its own prompt inside `.tvp-printed`)
+                    const vis = cell.querySelector('.tvp-visual') || cell.querySelector('.tvp-printed');
+                    // Said once, as live play does (question-render's mq-dup): a copy inside the visual is hidden, or, when the
+                    // visual says it as part of a larger block (a word problem's story, one sentence a line), the line is hidden
+                    // instead (critic-panel-r2 F6: the sample printed the story twice).
+                    // (judged on what the visual SHOWS: a copy already marked screen-only counts as found but stays drawn)
+                    if (vis) { hideRepeatedPrompt(vis, line.textContent); if (visualRepeatsText({ textContent: vis.innerText || '' }, line.textContent)) line.style.display = 'none'; }
+                }
+            } catch (e) { failed = true; /* a preview never breaks the screen */ }
+        },
+        () => {
+            if (failed) return;
+            try {
+                monoCell(cell);
+                // The mono pass re-reads the cell for ~0.7 s while styles settle; a static sample then
+                // needs no observer.
+                setTimeout(() => {
+                    unmonoCell(cell);
+                    later(() => {
+                        const fs = frame.isConnected && doFit ? fitSteps(frame) : [];
+                        if (fs[0]) fs[0]();
+                        later(() => {
+                            if (fs[1]) fs[1]();
+                            if (typeof opts.onSettled === 'function') { try { opts.onSettled(cell); } catch (e) { /* the caller's own */ } }
+                        });
+                    });
+                }, 900);
+            } catch (e) { /* a preview never breaks the screen */ }
+        },
+        () => { fitNow = doFit ? fitSteps(frame) : []; if (fitNow[0]) fitNow[0](); },
+        () => { if (fitNow[1]) fitNow[1](); },
+    ];
+}
+/**
+ * mountSample as steps, for a caller that runs one per task: a generator that yields step functions (the first generates
+ * the sample, the rest draw it) and returns true, or false when the sample is unavailable. Run back to back, they draw
+ * exactly what mountSample draws.
+ */
+export function* mountSampleSteps(frame, cat, sk, opts, index = 0) {
+    let rest = null;
+    yield () => {
+        const hit = findSkill(cat, sk);
+        rest = mountSteps(frame, sampleFor(cat, sk, opts, index), hit ? hit.label : sk, 'Sample question', { split: true });
+    };
+    if (!rest) return false;
+    for (const step of rest) yield step;
     return true;
 }
 

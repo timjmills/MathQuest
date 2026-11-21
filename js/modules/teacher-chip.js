@@ -13,7 +13,7 @@
 
 import { icon, esc, findSkill } from './teacher-ui.js';
 import { areaOf, AREAS, areaIcon } from './teacher-areas.js';
-import { mountSample } from './teacher-preview.js';
+import { mountSample, mountSampleSteps } from './teacher-preview.js';
 import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions } from './skill-options.js';
 import {
     registerSkillOptionsHost, groupedOptionRowsHTML, optionControlHTML, optionHelpLine, optionTipHTML,
@@ -119,6 +119,23 @@ export function mountCropped(frame, c, s, opts, example = 0, size = 'medium') {
     cropFrame(frame, false);
     // the preview path settles its styles for ~0.9 s and re-fits then: crop again after it (measuring again the first time)
     setTimeout(() => cropFrame(frame, fresh), 950);
+    return true;
+}
+/**
+ * mountCropped as steps, for a caller that runs one per task (the Lessons thumbnails, THUMB-NO-FREEZE): a generator that
+ * yields step functions and returns true when drawn. Run back to back, they draw exactly what mountCropped draws.
+ */
+export function* mountCroppedSteps(frame, c, s, opts, example = 0, size = 'medium') {
+    if (!frame) return false;
+    frame.dataset.tcKey = mkey(c, s, opts, example);
+    frame.dataset.tcSize = size;
+    const ok = yield* mountSampleSteps(frame, c, s, opts, example);
+    if (!ok) return false;
+    yield () => {
+        const fresh = !MEAS.has(frame.dataset.tcKey);
+        cropFrame(frame, false);
+        setTimeout(() => cropFrame(frame, fresh), 950);
+    };
     return true;
 }
 /** Fit a drawn frame again (its box changed size). */

@@ -49,7 +49,7 @@ import { gradeWord as gradeChipWord, gradeLong } from './grade-of.js';
 import { GRADE_COLORS } from './data.js';
 /** The grade's colour (0b: data.js GRADE_COLORS; a grade it has no colour for keeps the teacher token): a swatch only. */
 const grStyle = (g) => (GRADE_COLORS[g] && GRADE_COLORS[g].bg ? ` style="--gr:${GRADE_COLORS[g].bg}"` : '');
-import { mountCropped, croppedReady, mountLessonPage } from './teacher-chip.js';
+import { mountCroppedSteps, croppedReady, mountLessonPage } from './teacher-chip.js';
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -561,11 +561,39 @@ function drawLessonThumb(host) {
     try { opts = host.dataset.wThumbOpts ? JSON.parse(host.dataset.wThumbOpts) : undefined; } catch (e) { opts = undefined; }
     const frame = document.createElement('span');
     frame.className = 'tvp-frame ts-frame';
+    // not shown until every step has run (no half-drawn item on screen between tasks)
+    frame.style.opacity = '0';
     host.appendChild(frame);
-    // the whole item, scaled to fit (never cut: critic r1 D6)
-    mountCropped(frame, c, s, opts, 0, 'preview');
-    // after the preview path settles (mountCropped re-fits at ~950 ms), anything still outside the box is fitted again
-    setTimeout(() => fitWhole(host, frame), 1100);
+    // the whole item, scaled to fit (never cut: critic r1 D6); drawn one step per task (THUMB-NO-FREEZE)
+    THUMB_Q.push({ host, frame, it: mountCroppedSteps(frame, c, s, opts, 0, 'preview') });
+    pumpThumbs();
+}
+/* THUMB-NO-FREEZE (critic lessons-browser r2 D11, profiled 2026-11-21): each step of a thumbnail forces a style flush, and on
+   the teacher screens a flush restyles the whole document (the :has() rules of the shared sheets), about 35 ms at CPU x4.
+   A thumbnail is 6 to 10 flushes, and the observer handed a whole row of them to one task: 3 to 6 s with no frame. Now the
+   thumbnails wait in a queue and ONE step of ONE thumbnail runs per task, so the screen paints and scrolls between them. */
+const THUMB_Q = [];
+let thumbTimer = 0;
+function thumbDone(job) {
+    job.frame.style.opacity = '';
+    // after the preview path settles (the crop re-fits at ~950 ms), anything still outside the box is fitted again
+    setTimeout(() => fitWhole(job.host, job.frame), 1100);
+}
+function pumpThumbs() {
+    if (thumbTimer) return;
+    thumbTimer = setTimeout(() => {
+        thumbTimer = 0;
+        while (THUMB_Q.length) {
+            const job = THUMB_Q[0];
+            if (!job.host.isConnected) { THUMB_Q.shift(); continue; }
+            let r;
+            try { r = job.it.next(); } catch (e) { r = { done: true }; }
+            if (r.done) { THUMB_Q.shift(); thumbDone(job); continue; }
+            try { r.value(); } catch (e) { THUMB_Q.shift(); thumbDone(job); }
+            break;
+        }
+        if (THUMB_Q.length) pumpThumbs();
+    }, 0);
 }
 /** Scale a drawn preview so every visible part of it sits inside its thumbnail box (4 px margin); marks it settled. */
 function fitWhole(host, frame) {
