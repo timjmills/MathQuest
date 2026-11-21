@@ -16390,6 +16390,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-n-chart-pages",
+   "check": "ws-empty-band EB-CHART on the lesson role: CHART-PAGES - an anchor chart of 4 or fewer step panels takes at most 2 pages; CHART-FILL - no chart page past the first is 35 % or more empty under its last block",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r2 N5 (H5 wasted space: the F8 fix moved the chart overflow into page count - 3 chart pages, p2 / p3 one panel each and 40-45 % blank)",
+   "browser": true,
+   "fail": {
+    "commit": "5c2ae8707",
+    "state": "the area chart took one full-width panel (head + drawing + words) a row; the run-on split 2 / 1 / 1 (4by1: 1 / 1 / 1 / 1)"
+   },
+   "pass": {
+    "commit": "40b32c086",
+    "state": "chartRowFit: the words beside the drawing, each panel its own height, the fewest pages then the largest zoom (>= 0.8), packed evenly: 2 / 2"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:area_model_2by2,multiplication:area_model_3by2,multiplication:area_model_4by1 --roles lesson --hosts none --only EB-CHART --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
