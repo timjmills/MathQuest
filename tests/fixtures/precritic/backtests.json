@@ -15930,6 +15930,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lf-engine-nosteps-steps-band",
+  "check": "ws-lesson-pages STEPS-PANEL-EMPTY on the WRM lessons (lead ruling A28, lf-engine nosteps 2026-11-21): a lesson whose skill has no provider worked steps draws NO \"Steps:\" band - never an empty one - pupil and key",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-pages STEPS-PANEL-EMPTY",
+  "browser": true,
+  "fail": {
+   "commit": "e4bfb7a93",
+   "state": "master 5a51918eb + the check: we-do.js drew the 62 mm Steps band beside Guided Practice with no Steps zone - the full sweep FAIL (404 of 843 lessons); Y4.B5 (factors, divide, mult_zeros ...) p1 and key p1 empty"
+  },
+  "pass": {
+   "commit": "8c222ffeb",
+   "state": "lf-engine nosteps 8c222ffeb: no Steps zone, the Guided band alone at the page's width - the full sweep OK (843 lessons)"
+  },
+  "command": "node tests/scripts/ws-lesson-pages.mjs --grade 3 --blocks Y4.B5 --rules STEPS-PANEL-EMPTY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
