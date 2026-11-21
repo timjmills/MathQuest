@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T05:57:10.839Z",
- "head": "3d222dabb",
+ "generated": "2026-11-21T05:58:30.423Z",
+ "head": "d6177c1b4",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 77,
    "usageEstimated": true,
-   "rev": "3d222dabb",
+   "rev": "d6177c1b4",
    "skills": 742,
    "retired": 10,
    "presets": 130,
@@ -555,7 +555,7 @@
    ],
    "todoChecks": 24,
    "targets": {
-    "note": "Planned weekly pace, set by the lead and confirmed by the owner. The board shows the finish date at this pace beside the finish date at the pace actually reached. Proposed 2026-11-21 for the weeks from 2026-11-26 (two-thirds of the budget on new skills and lessons); owner to confirm.",
+    "note": "Planned weekly pace, set by the lead and confirmed by the owner. The board shows the finish date at this pace beside the finish date at the pace actually reached. Owner confirmed 2026-11-21 for the weeks from 2026-11-26 (two-thirds of the budget on new skills and lessons).",
     "corePassed": 12,
     "lessonsPassed": 6,
     "wrmGap": 8,
