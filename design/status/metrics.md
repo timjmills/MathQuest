@@ -575,3 +575,24 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | r14 | Opus medium builder (V-NUM single, V-PLACE, V-TWIN runs, screen size fixes); narrow critic r14 PASS min 8. Narrow rounds after r5: r6-r14 = 9 (r6, r7, r9-r14), 1 pass |
 | 2026-11-13 | lf-placevalue | compare r1 | critic FAIL (6 holding) | builder ~$30 + critic ~$12 | 2 builder passes cleared machine reds but not teaching: chant / M6 / deal depth are not machine-checked yet |
 | 2026-11-13 | lf-placevalue | placevalue:compare | 4 critic rounds (r4 PASS) | session +$33 of the $170 allocation since the reset (earlier rounds before the reset) | the wrap class recurred because the fix was keyed to one string and the check to the default band: fix the class (one helper), check every option band |
+
+### 7.x Week 2026-11-19 → 2026-11-20 (weekly speed reflection, auditor 2026-11-21; detail in speed-audit.md "Weekly reflection 2026-11-20")
+
+| Date | Lane | Template / family | Builder profile | Round | Verdict | Rounds to PASS | Hours (first commit → PASS) | Findings by class (critic tags, RUBRIC §6) | Skills passed | Lane-weeks |
+|---|---|---|---|--:|---|--:|--:|---|--:|--:|
+| 2026-11-19 | lf-checks | ws-merge-master (tool) | mq-opus-medium | 5 | PASS 9/9/9/8 | 5 | - | lost rows, CRLF, stale backtest cases, vacuous --only | - | - |
+| 2026-11-20 | lf-checks | EB-LASTPAGE / CAP-PARITY (tool) | mq-opus-medium (fresh r3) | 5 | PASS 9/8/9/8 | 5 | - | inferred capacity (root cause r2), drift, gate not on path | - | - |
+| 2026-11-20 | lf-checks | key-json / tof-stem retry (tool) | mq-opus-medium | 1 | PASS 9/8/9/8 | 1 | - | - | - | - |
+| 2026-11-20 | lf-checks (lf-tools-lessons) | lessons browser (screen) | mq-opus-medium | 2 | FAIL, HELD (THUMB-NO-FREEZE red) | - | - | D1-D10 screen/48 px/widths; D11 84 s main-thread freeze; ≈ $170 (≈ 6.1 %) | - | - |
+| 2026-11-20 | lf-engine | rowcap + vocabfix, lessonfirst, fillfix | mq-opus-medium | 1 each | PASS (round-cap / shared narrow); fillfix no critic | 1 | - | post-deploy regression in lf-partopts FILL-BT / ROWFIT-BT | - | - |
+| 2026-11-20 | lf-roles | Guided r13-r18, PSC fill, d2d5 | mq-opus-medium | d2d5 2; PSC 1; Guided 6 fix rounds | PASS ×3 | 1-2 | - | ruling conflict (R13), fixture tagging (PT-PRE-1), stale expectation (PT-PRE-3), claimed-not-run layout-unit 33 | - | - |
+| 2026-11-20 | lf-roles | qreview (PSC + Quick review) | mq-opus-medium | 0 | PARKED, red by design | - | - | EB-PAGE rulings (A24) | - | - |
+| 2026-11-20 | lf-ops | count_by_tables | mq-opus-medium | 4 | PASS 8/8/8/8 | 4 | - | - | 1 (redesign-passed 33) | - |
+| 2026-11-20 | lf-ops | sizes (6 multiplication presets) | mq-opus-medium | 1 | FAIL (15 findings, 7 critical), PARKED at budget | - | - | new* red parked as master's (step marks), capacity ruling over an overflow, wrong work, screen clip; caps $35 + $12 | - | - |
+| 2026-11-20 | lf-placevalue | HINT-NO-BLANK (every skill) | mq-opus-medium (fresh r2, r3) | 3 | FAIL on change 1; deployed as a strict improvement (A14) | - | - | token-rule patches, removed output broke ws-support-ladder, leaks | - | - |
+| 2026-11-20 | lf-placevalue | expand-2col; Show Solution fix | mq-opus-medium | 1 | PASS 9/9/8/9; sol fix no critic | 1 | - | - | - | - |
+| 2026-11-20 | lf-algebra | two-step GUIDED-NO-MID; patterns | mq-opus-medium | 2; r3→r4 | PASS 8/8/8/8; PASS | 2; 4 | - | story ≠ work (STORY-WORK); unnamed slot kind (INSTR-SLOTS) | - | - |
+| 2026-11-20 | lf-algebra | mult3; mixed numbers | mq-opus-low → mq-opus-medium (mult3) | 0 critic | PARKED (precritic red; ZM code clash) | - | - | low build on an uncertified pair hit the cap | - | - |
+| 2026-11-20 | lf-hosts | Skip; lesson player slice 1 | mq-opus-medium | 2; 4 | PASS; PASS (narrow 820 r4) | 2; 4 | - | flake on wall-clock waits; stage fill vs hops vs PT-MOD-3 at 820 (ruling conflict) | - | - |
+| 2026-11-20 | lf-partopts | student options; My Worksheets | mq-opus-medium | 2; 2 | PASS; PASS (both at the round cap) | 2; 2 | - | hand list instead of every skill; KEYS / reach / box; N1, N2 pending | - | - |
+| 2026-11-20 | lf-builds | chart blanks (chartwindow lessons) | mq-opus-medium, low r5-r6 | r2-r7 (+ r8 checks only) | FAIL, PARKED at the $775.37 stop | - | - | answer repetition ×4 rounds, infeasible constraint set found at r8; ≈ $79 (≈ 2.8 %) | - | - |

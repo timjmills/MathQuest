@@ -173,6 +173,42 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    brief says so (`design/lessons-first/briefs/README.md` "Critic briefs"). *Check:* ws-screen-ink-size SCREEN-INK-SIZE (every
    screen host and every skill in redesign-passed.js: a drawn element at least its print size in CSS mm; a drawing uses at least
    60 % of the cell's free width before it grows taller). Backtest rows fail on master 73e96fc1 (div_facts array).
+11. **A DEPLOY message pastes the last line of every gate it claims, produced on the exact head (weekly reflection, 2026-11-20).**
+   "OK" without the pasted line and the head sha is not a gate result. A gate that crashes is reported as the crash.
+   *Why:* a lane reported "layout-unit OK" on a deploy head without running it. It was failing 33 (31 known + PT-PRE-1 +
+   PT-PRE-3), and the lead caught it at deploy. *Check:* GATE-LINE (proposed, lf-checks).
+12. **A precritic red on a page type master never drew (new\*) is the branch's own red; it is never parked as master's.**
+   *Why:* lf-ops-sizes classed the Model step-marks blank as new\* and left it. Critic r1 F1 failed it. On master the role
+   does not print at all (lead's check on f8164ca5d). *Check:* STEPS-PANEL-EMPTY / Model state ink (proposed, lf-ops).
+13. **Before issuing a layout ruling, the lead checks it against the existing EB / PT caps it touches, and states the
+   allowance in the same ruling.** *Why:* at 820 portrait, A22 (stage < 30 % empty), A26 (hops below) and PT-MOD-3 (35 %)
+   could not all hold. The lesson player lost a critic round before A26b (<= 47 %) was written. lf-roles r13 lost a round
+   the same way: a page-1 fill against R13 / PSC-2PG-BALANCE.
+14. **Share codes are taken at merge time from the live tail, never reserved on a branch (lead ruling A25).** Whichever
+   branch ships second re-takes its codes after ws-merge-master, and ws-code-snapshot shows 0 moved. *Why:* -lf-algebra-mixed
+   and -lf-algebra-mult3 both gave ZM to a new skill. *Check:* CODE-TAIL in ws-merge-master (proposed, lf-checks).
+15. **Any feature that renders sheets on page load ships with a CPU ×4, cold-cache main-thread budget check from its first
+   build.** *Why:* the lessons-browser thumbnail fix built first pages on the main thread (an 84 s freeze, critic r2 D11).
+   THUMB-NO-FREEZE was written only after the critic found it, and the head is still held. *Check:* THUMB-NO-FREEZE (on
+   -lf-tools-lessons, not on master).
+16. **Test fixtures mirror the bridge's item tagging.** A fixture that builds pools or items by hand tags them as
+   print-sheet.js does. *Why:* the PSC twin merge failed ws-layout-unit PT-PRE-1 because the fixture tagged every pool with
+   the host skill, so four prerequisites read as twins (fixed in 78179be5d).
+17. **A shared-engine deploy runs the dependent lanes' backtest suites before it pushes:** ws-partopts-unit --bt-only, the
+   My Worksheets (mws-*) rows and the lesson-player rows. *Why:* the row-cap deploy broke FILL-BT and ROWFIT-BT. lf-partopts
+   found it only after the deploy, by bisect, and a fill-fix deploy followed. *Check:* DEPLOY-BT in ws-deploy-gates.sh
+   (proposed, lf-checks).
+18. **Merging master into a lane is `ws-merge-master --commit` (union3 for ledgers, backtests and status files).** An
+   index.html conflict takes the branch side and is restamped; a both-sides row is resolved by the lane, never dropped.
+   *Why:* the procedure carried every merge of the week with no lost ledger or backtest row, after r1-r4 of the tool found
+   lost rows, CRLF and stale cases.
+19. **A capacity ruling never clears an overflow.** "One a page" rules how many items a page holds. Ink outside its cell
+   or page is still a defect. *Why:* lf-ops-sizes critic r1 F5: area-model Reason It at L overprinted, and the run read it
+   as covered by the A9 rulings.
+20. **A ruling or fix that removes an output greps for every gate that asserts that output, and runs them in the same
+   round.** *Why:* the HINT-NO-BLANK "no box" choice contradicted ws-support-ladder (time_quarter, compare_groups) and cost a
+   round. A layout search that proves a layout exists under every check together comes before any deal redesign. lf-builds
+   chart blanks found the constraint set infeasible only at r8.
 
 ### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
 - **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
