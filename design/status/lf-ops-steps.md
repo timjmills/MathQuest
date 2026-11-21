@@ -60,6 +60,42 @@ mult_2by2_standard, mult_facts, mult_2by1_column; guided multiplication:multiply
 - Guided page of the column presets: a Steps band over the Guided cells.
 - None of the 2700 pinned lesson pages.
 
+## A28 follow-up (lead ruling, 2026-11-21): no Model page on the column presets
+**Cause.** The anchor chart (the lesson's Model page, `data-ws-sheet="lesson-chart"`) is drawn whenever the lesson's example
+has worked steps: `roles/lesson.js extras()` pushed `stateItems(ex)` (lesson-pages/chart.js, from `workedStepsOf`), and
+`plan()` draws the chart page whenever `states.length`. On master `multiply` had no workedSteps, so no states and no chart;
+477a7498f gave it workedSteps, so mult_2by1_column / mult_3by1_column lessons opened with a chart (pupil + key) at M and L.
+
+**Fix (58cee626c).** A new optional provider member `lessonChart` (contract.js OPTIONAL_MEMBERS; `false` or `(q) -> boolean`),
+read by `anchors.js lessonChartAllowed(it)`; `roles/lesson.js extras()` builds `stateItems` / `secondItems` only when it
+allows. The `multiplication:multiply` provider declares `lessonChart: false`. The workedSteps stay: the Steps zone beside
+Guided Practice, the first Guided cell's trace, the Guided page's Steps band and the Practice page's Steps strip are as
+before. The opt-in `anchors` feature of other roles (print-sheet.js `anchorEligible`) is untouched.
+
+**Check first.** `ws-lesson-pages` LESSON-ROLE-SET: a lesson with pinned page roles prints exactly that set of
+`data-ws-sheet` roles (pupil; key pages as `key:<role>`). Pins: `tests/fixtures/lesson-pages/role-sets.json` (read from the
+script's own tree), measured on master e0c90f8ad with the new `--pin-roles` (seeds 506061 and 4242 alike): mult_2by1_column
+and mult_3by1_column at M and L = lesson-sheet, lesson-practice, lesson-mixed (+ their keys). Self-test 20 cases (4 new).
+Default rule in `--skills` mode; on precritic's path (gate `lesson-pages-skills` now runs `STEPS-PANEL-EMPTY,LESSON-ROLE-SET`).
+Backtest row `lesson-role-set-column-mult` (FAIL 617a2e92a: NEW lesson-chart, key:lesson-chart on all four -> OK 58cee626c;
+ws-backtest PASS); ledger row in CHECKS_FROM_CRITICS.md.
+
+| Gate (on 58cee626c) | Result |
+|---|---|
+| ws-lesson-pages --skills 2by1+3by1 --sizes M,L --seed 506061 (all four rules) | OK (4 lessons, 24 pages); on 617a2e92a LESSON-ROLE-SET FAIL 4 |
+| ws-lesson-baseline --all-lessons M,L seeds 4242,1 --per-lesson --unpinned --check | OK (2700 identical) |
+| ws-roles-unit | OK (115) |
+| ws-anchors-unit | OK (322) |
+| ws-boot-smoke | OK |
+| ws-backtest --row lesson-role-set-column-mult | PASS |
+| node --input-type=module --check (anchors.js, contract.js, roles/lesson.js, providers/multiplication.js, ws-lesson-pages.mjs) | OK |
+
+PNGs (deviceScaleFactor 2, seed 506061, size M) in `design/status/lf-ops-steps/`:
+- `guided-mult_2by1_column-M.png`: the Guided page - the four-step Steps band over nine column cells, the Model cell traced 41 x 7 = 287.
+- `lesson-practice-mult_2by1_column-M.png`: the lesson's Practice page - the Steps strip (four steps) over six column items.
+- `lesson-sheet-steps-panel-mult_2by1_column-M.png`: the lesson sheet (now its first page) - Warm-up, the Steps panel with its
+  four steps beside Guided Practice (first cell traced: regroup 1, ones 8), Independent Practice.
+
 ## Other skills the check flags (logged, not fixed: a provider each)
 The `--grade all` sweep of e0c90f8ad (843 WRM lessons, packet request, size M, each lesson's own seed): 840 print a Steps
 panel, **404 print it empty**, 145 distinct first skills. Same cause class (no provider worked steps for the item the

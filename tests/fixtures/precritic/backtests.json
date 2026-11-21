@@ -15950,6 +15950,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-role-set-column-mult",
+  "check": "ws-lesson-pages LESSON-ROLE-SET (lead A28 via lf-ops 2026-11-21): a lesson whose page roles are pinned (tests/fixtures/lesson-pages/role-sets.json, measured on master e0c90f8ad) prints exactly that set of data-ws-sheet roles, pupil and key - no new Model / anchor-chart page",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-pages LESSON-ROLE-SET",
+  "browser": true,
+  "fail": {
+   "commit": "617a2e92a",
+   "state": "lf-ops-steps 617a2e92a: multiply's new column worked steps made mult_2by1_column / mult_3by1_column lessons open with a lesson-chart (Model) page, pupil and key, at M and L - a page type they never printed"
+  },
+  "pass": {
+   "commit": "58cee626c",
+   "state": "lf-ops-steps 58cee626c: the multiply provider declares lessonChart: false (anchors.js lessonChartAllowed gates roles/lesson.js stateItems / secondItems); the lessons print master's roles plus the filled Steps panel"
+  },
+  "command": "node tests/scripts/ws-lesson-pages.mjs --skills multiplication:mult_2by1_column,multiplication:mult_3by1_column --sizes M,L --seed 506061 --rules LESSON-ROLE-SET",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
