@@ -1054,7 +1054,9 @@ export function itemInstructionKey(it) {
         // Only a skill's own strings (the default adapter's key is a placeholder).
         const real = p && Array.isArray(p.real) && p.real.includes('strings');
         const raw = real && (typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings);
-        if (raw && raw.instructionKey) return raw.instructionKey;
+        // (a provider whose strings keep the default adapter's placeholder key says so - `keyIsDefault`, lf-ops-steps: the
+        // column multiply provider - and the host's key stands)
+        if (raw && raw.instructionKey && !raw.keyIsDefault) return raw.instructionKey;
     } catch (e) { /* the host's key */ }
     return it.instructionKey || '';
 }
