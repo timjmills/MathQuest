@@ -1,4 +1,12 @@
 {
- "2026-10-22": { "pct": 61, "estimated": true, "note": "61 % by 2026-10-24 10:30 (owner's figure + session costs); the week's final figure was not recorded" },
- "2026-11-19": { "pct": 77, "estimated": true, "note": "owner: 52 % on 11-20 afternoon; +25 % allocated to lanes that day (≈ $700); final figure to confirm" }
+ "2026-10-22": {
+  "pct": 61,
+  "estimated": true,
+  "note": "61 % by 2026-10-24 10:30 (owner's figure + session costs); the week's final figure was not recorded"
+ },
+ "2026-11-19": {
+  "pct": 71,
+  "estimated": false,
+  "note": "owner 2026-11-21: 71 % used; owner allowed about 15 % more this week for fixes"
+ }
 }
