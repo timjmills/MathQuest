@@ -6,6 +6,7 @@
 //                tagging lanes' files are merged. Without it the computed fallbacks are tested.
 //   node tests/scripts/ws-teacher-wrm.cjs --grade 3                 # the every-lesson sweeps cover grade 3 only
 //   node tests/scripts/ws-teacher-wrm.cjs --lesson 3:D4:2            # ... only this lesson (its key, site id or WRM step id)
+//   node tests/scripts/ws-teacher-wrm.cjs --send [what|set|tray]     # only SEND-WHAT / SET-LESSON / TRAY-SOURCE-LABEL (lf-wrmsend)
 //     --grade / --lesson (ws-precritic --teacher, IMPROVEMENT_PLAN §1.4 S1) narrow the two every-lesson sweeps (the
 //     rendered-text sweep and the detailed lessons) to the lessons a lane touched; every scenario check still runs.
 //     Grade ids: PK, K, 1-6 ("Grade 3" and "G3" are read as 3). A filter that matches no lesson FAILS.
@@ -25,6 +26,11 @@ const { open, waitFor } = require('../lib/ws-harness.cjs');
 // MQ_ROOT (ws-backtest commit-pair rows): the tree under test; the check itself is always this script
 const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.join(__dirname, '..', '..');
 const SHOTS = process.argv.includes('--shots');
+// --send: only the lf-wrmsend scenarios (SEND-WHAT, SET-LESSON, TRAY-SOURCE-LABEL), each in its own fresh page
+const SEND_ONLY = process.argv.includes('--send');
+// --send what | set | tray: only that one (the backtest rows prove each check alone)
+const SEND_PART = ((i) => (i > 0 && /^(what|set|tray)$/.test(process.argv[i + 1] || '') ? process.argv[i + 1] : ''))(process.argv.indexOf('--send'));
+const sendRuns = (part) => !SEND_PART || SEND_PART === part;
 const CUR_AT = process.argv.indexOf('--curated');
 const CUR_DIR = CUR_AT > 0 ? path.resolve(process.argv[CUR_AT + 1]) : '';
 // --fallback: serve an empty index.json, so the computed fallbacks are tested (as shipped, the page reads the
@@ -218,7 +224,315 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     check(!r.over.length, `${tag}: clipped past the right edge: ${r.over.join(', ')}`);
     check(!r.small.length, `${tag}: targets under 44 px: ${r.small.join(', ')}`);
   };
+  /* ==================================================================== lf-wrmsend (owner ruling A34, 2026-11-21)
+   * SEND-WHAT: the "What to send" choice (This lesson | These N skills | Lesson + N skills) × Print / Share / Tray / Set
+   *   receives exactly the stated items, with their options (compare_groups {band:5, level:[1]}); real clicks at 1280,
+   *   real taps at 820; the labels and the toasts name what goes.
+   * SET-LESSON: a set holding a lesson ({kind:'lesson', key}, stored once) round-trips (save, reload, link encode /
+   *   decode) and is shown by Home's "Your skill sets" and My sets; old sets and old links load unchanged.
+   * TRAY-SOURCE-LABEL: with older items in the tray the lesson page's tray bar says they are from earlier, and one tap on
+   *   Clear tray empties it; the What-to-send card stays in view after scrolling at 1280 / 1366 / 1024, in flow at 820.
+   * Each scenario runs in its own fresh page (no tray or sets from the scenarios above). --send runs only these. */
+  const SEND_HASH = '#wrm/PK/CC1/compareamounts';
+  const sendLesson = all.find((l) => links.lessonHash(l) === SEND_HASH);
+  const sendWhatChecks = async () => {
+    check(!!sendLesson, `SEND-WHAT: no lesson at ${SEND_HASH}`);
+    if (!sendLesson) return;
+    const lr = links.linksFor(sendLesson);
+    const liveOf = (x) => !!x;   // the page drops dead keys itself; the lesson's tagged skills are all live
+    const teach = lr.direct.filter(liveOf).map((x) => ({ key: x.key, opts: x.opts && Object.keys(x.opts).length ? x.opts : null }));
+    const cg = teach.find((x) => x.key === 'comparing:compare_groups');
+    check(cg && JSON.stringify(cg.opts) === JSON.stringify({ band: 5, level: [1] }), `SEND-WHAT: compare_groups is not a teaching skill with {band:5, level:[1]} (${JSON.stringify(teach)})`);
+    const fresh = async (W, H, touch) => {
+      const a = await open({ seed: 11, viewport: { width: W, height: H, deviceScaleFactor: 1, isMobile: !!touch, hasTouch: !!touch } });
+      const p = a.page;
+      await p.evaluate(() => {
+        window.__copied = ''; navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); };
+        try { localStorage.setItem('mq_teacher_skill_view', JSON.stringify('list')); } catch (e) {}
+        window.setUserRole('teacher');
+      });
+      await sleep(250);
+      return a;
+    };
+    const go = async (p, hash) => {
+      await p.evaluate((h) => { location.hash = h; }, hash);
+      await waitFor(p, () => !!document.querySelector('[data-screen="wrm"].is-active #tvwBar'), 20000, `lesson ${hash}`);
+      await sleep(300);
+    };
+    const press = async (p, sel, touch) => {
+      await p.$eval(sel, (el) => el.scrollIntoView({ block: 'center' }));
+      await sleep(60);
+      if (touch) await p.tap(sel); else await p.click(sel);
+      await sleep(120);
+    };
+    // the print frame's print() is recorded, not run (the lesson document is still made and written into it)
+    const stubPrint = (p) => p.evaluate(() => {
+      window.__printed = [];
+      let f = document.getElementById('tvPrintFrame');
+      if (!f) { f = document.createElement('iframe'); f.id = 'tvPrintFrame'; f.title = 'Print'; f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;'; document.body.appendChild(f); }
+      f.contentWindow.print = function () { window.__printed.push(this.document.title || 'untitled'); };
+    });
+    const state = (p) => p.evaluate(() => {
+      const bar = document.querySelector('#tvwBar');
+      const lab = (a) => ((bar && bar.querySelector(`[data-w-act="${a}"]`)) || { textContent: '' }).textContent.replace(/\s+/g, ' ').trim();
+      return {
+        pressed: bar ? [...bar.querySelectorAll('[data-w-send][aria-pressed="true"]')].map((b) => b.dataset.wSend) : [],
+        cap: ((bar && bar.querySelector('#tvwSendCap')) || { textContent: '' }).textContent,
+        print: lab('print'), link: lab('link'), tray: lab('tray'), set: lab('set'),
+        ticked: [...document.querySelectorAll('[data-screen="wrm"].is-active .tvw-tick[aria-checked="true"]')].map((b) => b.dataset.wTick.replace('|', ':')),
+      };
+    });
+    const queue = (p) => p.evaluate(() => (window.skillQueue || []).map((x) => ({ key: `${x.categoryId}:${x.skillId}`, opts: x.opts && Object.keys(x.opts).length ? x.opts : null })));
+    const toastText = (p) => p.evaluate(() => ['#tvToast', '#tvTrayToast'].map((s) => document.querySelector(s)).filter((e) => e && !e.hidden && (e.id !== 'tvToast' || e.classList.contains('is-on'))).map((e) => e.textContent.replace(/\s+/g, ' ').trim()).join(' | '));
+    // options compared as the skill reads them (a default such as level [1] may be left out of a code or the tray)
+    const SO = await import(path.join(ROOT, 'js/modules/skill-options.js'));
+    const normO = (k, o) => { const [c, sk] = k.split(':'); return JSON.stringify(SO.normalizeOptions(c, sk, o || {})); };
+    const same = (got, want) => !!got && JSON.stringify([...got].map((x) => [x.key, normO(x.key, x.opts)]).sort()) === JSON.stringify([...want].map((x) => [x.key, normO(x.key, x.opts)]).sort()) && got.length === want.length;
+    const clearTray = (p) => p.evaluate(() => { const b = document.querySelector('#tvTray [data-act="tray-clear"]'); if (b) b.click(); });
+
+    /* ---------------- SEND-WHAT at 1280 (clicks) and 820 (taps) */
+    for (const [W, H, touch] of sendRuns('what') ? [[1280, 720, false], [820, 1180, true]] : []) {
+      const tag = `SEND-WHAT @${W}`;
+      const a = await fresh(W, H, touch);
+      const p = a.page;
+      try {
+        await go(p, SEND_HASH);
+        await stubPrint(p);
+        // tick one skill to do first and one that goes with it: 1 that teaches + 2 = 3 ticked
+        for (const g of ['prereq', 'related']) {
+          const sel = `[data-w-group="${g}"] .tvw-tick[aria-checked="false"]`;
+          if (await p.$(sel)) await press(p, sel, touch);
+        }
+        const s0 = await state(p);
+        const n = s0.ticked.length;
+        const lname = (await p.$eval('.tvw-title', (h) => h.textContent.replace(/\s+/g, ' ').trim())).replace(/^(Lesson \d+) /, '$1: ');
+        check(n === 3 && s0.ticked.includes('comparing:compare_groups'), `${tag}: ${n} ticked (${s0.ticked}), want compare_groups + 2`);
+        const optsOf = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('[data-screen="wrm"].is-active .tvw-row[data-tvp]')].map((r) => [r.dataset.tvp.replace('|', ':'), r.dataset.tvpOpts ? JSON.parse(r.dataset.tvpOpts) : null])));
+        const tickedItems = s0.ticked.map((k) => ({ key: k, opts: optsOf[k] && Object.keys(optsOf[k]).length ? optsOf[k] : null }));
+        check(s0.pressed.join() === 'both', `${tag}: the default with ticks is ${s0.pressed} (want Lesson + ${n} skills)`);
+        const nSk = `${n} skills`;
+        const want = {
+          lesson: { print: 'Print lesson', link: 'Share lesson practice', tray: 'Add lesson to tray', what: lname, items: teach, lesson: true, skills: [] },
+          skills: { print: `Print ${nSk}`, link: `Share ${nSk}`, tray: `Add ${nSk} to tray`, what: nSk, items: tickedItems, lesson: false, skills: tickedItems },
+          both: { print: `Print lesson + ${nSk}`, link: `Share lesson + ${nSk}`, tray: `Add lesson + ${nSk} to tray`, what: `${lname} + ${nSk}`, items: [...teach, ...tickedItems.filter((x) => !teach.some((t) => t.key === x.key))], lesson: true, skills: tickedItems },
+        };
+        let setId = '';
+        for (const c of ['lesson', 'skills', 'both']) {
+          const w = want[c];
+          const t = `${tag} ${c}`;
+          await press(p, `#tvwBar [data-w-send="${c}"]`, touch);
+          const s = await state(p);
+          check(s.pressed.join() === c, `${t}: pressed ${s.pressed}`);
+          check(s.print === w.print && s.link === w.link && s.tray === w.tray && s.set === 'Add to a set', `${t}: labels ${JSON.stringify([s.print, s.link, s.tray, s.set])} want ${JSON.stringify([w.print, w.link, w.tray])}`);
+          check(s.cap.includes(c === 'skills' ? `${n} ticked skills only` : lname) && (c === 'lesson' || s.cap.includes(`${n} ticked skill`)), `${t}: caption "${s.cap}"`);
+          // Share: the link carries exactly the stated skills with their options
+          await press(p, '#tvwBar [data-w-act="link"]', touch);
+          await waitFor(p, () => !!document.querySelector('#tvwLink') && !!window.__copied, 5000, `${t} link`);
+          const link = await p.$eval('#tvwLink', (i) => i.value);
+          const dec = await p.evaluate((u) => window.parseSkillCodeParts((new URL(u).searchParams.get('c') || '').split('|')[0]).map((x) => ({ key: `${x.categoryId}:${x.skillId}`, opts: x.opts && Object.keys(x.opts).length ? x.opts : null })), link);
+          check(same(dec, w.items), `${t} Share: link holds ${JSON.stringify(dec)} want ${JSON.stringify(w.items)}`);
+          const shareToast = await toastText(p);
+          check(shareToast.includes(c === 'lesson' ? `${lname} practice` : w.what), `${t} Share: toast "${shareToast}" does not name ${w.what}`);
+          // Tray: an empty tray receives exactly the stated skills (with options), as this lesson's group
+          await clearTray(p);
+          await sleep(150);
+          await press(p, '#tvwBar [data-w-act="tray"]', touch);
+          await sleep(200);
+          const q = await queue(p);
+          check(same(q, w.items), `${t} Tray: holds ${JSON.stringify(q)} want ${JSON.stringify(w.items)}`);
+          const trayToast = await toastText(p);
+          check(trayToast.includes(`Added to tray: ${w.what}`), `${t} Tray: toast "${trayToast}" not "Added to tray: ${w.what}"`);
+          await clearTray(p);
+          await sleep(150);
+          // Print: the lesson's own document (This lesson, Lesson + N) and / or the Print sheet on ONLY the ticked skills
+          await p.evaluate(() => { window.__printed = []; window.tvwLastLessonPrint = null; });
+          await press(p, '#tvwBar [data-w-act="print"]', touch);
+          if (w.lesson) await waitFor(p, () => (window.__printed || []).length > 0, 30000, `${t} lesson printed`).catch(() => {});
+          if (w.skills.length) await waitFor(p, () => !!document.querySelector('#tvSheet .tvs-sheet'), 30000, `${t} print sheet`).catch(() => {});
+          const pr = await p.evaluate(() => ({ printed: window.__printed || [], lp: window.tvwLastLessonPrint, sheet: !!document.querySelector('#tvSheet .tvs-sheet'), st: window.tvSheetState ? window.tvSheetState() : null }));
+          const pq = pr.sheet ? await queue(p) : [];
+          check(w.lesson ? pr.printed.length === 1 && pr.lp && pr.lp.lesson === sendLesson.key : !pr.printed.length, `${t} Print: lesson printed ${JSON.stringify(pr.printed)} ${JSON.stringify(pr.lp)} (want ${w.lesson ? 'the lesson once' : 'no lesson'})`);
+          check(w.skills.length ? pr.sheet && pr.st && pr.st.sheet === 'print' && same(pq, w.skills) : !pr.sheet, `${t} Print: sheet ${pr.sheet} holds ${JSON.stringify(pq)} want ${JSON.stringify(w.skills)}`);
+          if (pr.sheet) { await p.keyboard.press('Escape'); await sleep(300); }
+          // Set: the popover names what goes; New set… (first) then the same set again: skills once, the lesson once
+          await press(p, '#tvwBar [data-w-act="set"]', touch);
+          const pop = await p.evaluate(() => { const e = document.querySelector('#tvwSetPop'); return e ? { sum: e.querySelector('.tvw-setpop-sum').textContent.replace(/\s+/g, ' ').trim(), sets: [...e.querySelectorAll('[data-w-setto]')].map((b) => b.dataset.wSetto), neu: !!e.querySelector('[data-w-setnew]') } : null; });
+          check(pop && pop.sum === `Adds: ${w.what}` && pop.neu, `${t} Set: popover ${JSON.stringify(pop)} want "Adds: ${w.what}" and New set…`);
+          if (!pop) continue;
+          await p.evaluate(() => localStorage.removeItem('mq_teacher_sets'));
+          // the list is drawn when it opens: close and open it on an empty My sets
+          await press(p, '#tvwBar [data-w-act="set"]', touch);
+          await press(p, '#tvwBar [data-w-act="set"]', touch);
+          await press(p, '#tvwSetPop [data-w-setnew]', touch);
+          await p.$eval('#tvwSetName', (i) => { i.value = ''; });
+          await p.type('#tvwSetName', `Send ${c}`);
+          await press(p, '#tvwSetPop [data-w-setsave]', touch);
+          const setToast = await toastText(p);
+          check(setToast.includes(`Send ${c}`) && setToast.includes(w.what), `${t} Set: toast "${setToast}" does not name the set and ${w.what}`);
+          // again into the same set: nothing doubles
+          await press(p, '#tvwBar [data-w-act="set"]', touch);
+          const sid = await p.evaluate(() => (document.querySelector('#tvwSetPop [data-w-setto]') || { dataset: {} }).dataset.wSetto || '');
+          if (sid) await press(p, `#tvwSetPop [data-w-setto="${sid}"]`, touch);
+          const sets = await p.evaluate(() => JSON.parse(localStorage.getItem('mq_teacher_sets') || '[]'));
+          const st = sets.find((x) => x.name === `Send ${c}`);
+          const stSkills = st ? st.skills.map((x) => ({ key: `${x.categoryId}:${x.skillId}`, opts: x.opts && Object.keys(x.opts).length ? x.opts : null })) : null;
+          const ents = st && Array.isArray(st.entries) ? st.entries : [];
+          check(st && sets.length === 1 && same(stSkills, w.skills), `${t} Set: the set holds ${JSON.stringify(stSkills)} want ${JSON.stringify(w.skills)} (${sets.length} sets)`);
+          check(w.lesson ? ents.length === 1 && ents[0].kind === 'lesson' && ents[0].key === sendLesson.key : !ents.length, `${t} Set: lesson entries ${JSON.stringify(ents)} want ${w.lesson ? `one {kind:'lesson', key:'${sendLesson.key}'}` : 'none'}`);
+          if (c === 'both') setId = st ? st.id : '';
+        }
+        // This lesson is refused, with its reason, on a lesson the app cannot make (a lesson no skill teaches)
+        const noMade = all.find((l) => l.grade === 'PK' && l.type === 'wr' && l.step && !links.linksFor(l).direct.length);
+        if (noMade) {
+          await go(p, links.lessonHash(noMade));
+          const nm = await p.evaluate(() => { const b = document.querySelector('#tvwBar [data-w-send="lesson"]'); return b ? { dis: b.getAttribute('aria-disabled'), why: b.dataset.why || '' } : null; });
+          check(nm && nm.dis === 'true' && /no lesson to print/.test(nm.why), `${tag}: "This lesson" on ${noMade.key} (no made lesson) ${JSON.stringify(nm)}`);
+        }
+        // 48 px targets for every choice and action
+        await go(p, SEND_HASH);
+        const small = await p.evaluate(() => [...document.querySelectorAll('#tvwBar [data-w-send], #tvwBar [data-w-act]')].filter((b) => b.getClientRects().length && b.getBoundingClientRect().height < 48).map((b) => `${b.textContent.trim()} ${Math.round(b.getBoundingClientRect().height)}`));
+        check(!small.length, `${tag}: targets under 48 px: ${small.join(', ')}`);
+        const sc = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+        check(sc <= 0, `${tag}: page scrolls sideways by ${sc}px`);
+        if (SHOTS && W === 1280) {
+          await press(p, '#tvwBar [data-w-act="set"]', touch);
+          await p.$eval('#tvwBar', (e) => e.scrollIntoView({ block: 'start' }));
+          await sleep(200);
+          fs.mkdirSync(OUT, { recursive: true });
+          await p.screenshot({ path: path.join(OUT, 'send-set-popover-1280.png') });
+          await press(p, '#tvwBar [data-w-act="set"]', touch);
+        }
+        if (SHOTS && W === 820) { fs.mkdirSync(OUT, { recursive: true }); await p.$eval('#tvwBar', (e) => e.scrollIntoView({ block: 'center' })); await sleep(200); await p.screenshot({ path: path.join(OUT, 'send-820.png') }); }
+
+        // the set the page made holds the lesson once and the ticked skills (SET-LESSON reads it back after a reload)
+        if (!touch) {
+          await p.reload({ waitUntil: 'networkidle0' });
+          await sleep(400);
+          const back = await p.evaluate(() => JSON.parse(localStorage.getItem('mq_teacher_sets') || '[]'));
+          const bs = back.find((x) => x.id === setId);
+          check(bs && (bs.entries || []).length === 1 && bs.entries[0].key === sendLesson.key && bs.skills.length === n, `SEND-WHAT: after reload the set made here is ${JSON.stringify(bs)}`);
+        }
+        // (a lesson document written into the print frame twice aborts the first one's style sheets: not an error)
+        const probs = a.problems.filter((x) => !(x.type === 'requestfailed' && /ERR_ABORTED/.test(x.text)));
+        if (probs.length) failures.push(`${tag}: console/page errors: ${probs.slice(0, 5).map((x) => `[${x.type}] ${x.text}`).join(' | ')}`);
+      } catch (e) { failures.push(`${tag}: ${e.stack || e.message}`); } finally { await a.close(); }
+    }
+
+
+    /* ---------------- SET-LESSON: a set holding a lesson round-trips; old sets and old links load unchanged */
+    if (sendRuns('set')) {
+      const tag = 'SET-LESSON';
+      const a = await fresh(1280, 720, false);
+      const p = a.page;
+      try {
+        const lname = `Lesson 7: ${sendLesson.title}`;
+        const NEW = { id: 'set_les1', name: 'With a lesson', createdAt: 2, lastUsed: 2, skills: [{ categoryId: 'comparing', skillId: 'compare_groups', weight: 1, opts: { band: 5, level: [1] } }, { categoryId: 'comparing', skillId: 'classify_count', weight: 1 }], entries: [{ kind: 'lesson', key: sendLesson.key, name: lname }] };
+        const ONLY = { id: 'set_les2', name: 'Lesson only', createdAt: 3, lastUsed: 3, skills: [], entries: [{ kind: 'lesson', key: sendLesson.key, name: lname }] };
+        const OLD = { id: 'set_old1', name: 'Old set', createdAt: 1, lastUsed: 1, skills: [{ categoryId: 'comparing', skillId: 'compare_groups', weight: 1, opts: { band: 5, level: [1] } }, { categoryId: 'comparing', skillId: 'classify_count', weight: 1 }] };
+        await p.evaluate((l) => localStorage.setItem('mq_teacher_sets', JSON.stringify(l)), [NEW, ONLY, OLD]);
+        await p.reload({ waitUntil: 'networkidle0' });
+        await p.evaluate(() => window.setUserRole('teacher'));
+        await sleep(400);
+        await p.evaluate(() => window.tvGo('home'));
+        await waitFor(p, () => !!document.querySelector('[data-open-set]'), 10000, 'home sets');
+        const home = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('[data-open-set]')].map((b) => [b.dataset.openSet, b.parentElement.textContent.replace(/\s+/g, ' ').trim()])));
+        check((home.set_les1 || '').includes(`${lname} + 2 skills`), `${tag}: Home "Your skill sets" shows "${home.set_les1}" (want "${lname} + 2 skills")`);
+        check((home.set_les2 || '').includes(lname) && !/0 skills/.test(home.set_les2 || ''), `${tag}: Home shows the lesson-only set as "${home.set_les2}"`);
+        check(/2 skills/.test(home.set_old1 || '') && !/Lesson/.test(home.set_old1 || ''), `${tag}: Home shows the old set as "${home.set_old1}"`);
+        await p.evaluate(() => window.tvGo('skills'));
+        await sleep(400);
+        if (await p.$('[data-act="browse"][data-arg="sets"]')) {
+          await p.click('[data-act="browse"][data-arg="sets"]');
+          await waitFor(p, () => !!document.querySelector('.ts-set-saved'), 10000, 'my sets');
+          const lib = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.ts-set-saved')].map((e) => [e.dataset.setId, e.querySelector('.ts-note').textContent.replace(/\s+/g, ' ').trim()])));
+          check((lib.set_les1 || '').includes(`${lname} + 2 skills`) && (lib.set_les2 || '').startsWith(lname) && /^2 skills/.test(lib.set_old1 || ''), `${tag}: My sets shows ${JSON.stringify(lib)}`);
+          // playing a set that holds a lesson: it goes in the tray with its skills (Print from My sets), no error
+          const i = await p.evaluate(() => [...document.querySelectorAll('.ts-set-saved')].findIndex((e) => e.dataset.setId === 'set_les1'));
+          const pb = await p.$(`.ts-set-saved[data-set-id="set_les1"] [data-act="setprint"]`);
+          if (pb) { await pb.click(); await sleep(500); const q = await queue(p); check(q.length === 2, `${tag}: Print from My sets put ${q.length} skills in the tray (want 2)`); await p.keyboard.press('Escape'); await sleep(200); }
+          else check(i >= 0, `${tag}: no Print on the set`);
+        } else check(false, `${tag}: no Browse by › My sets`);
+        // still stored as written (nothing rewrote the entries away)
+        const kept = await p.evaluate(() => JSON.parse(localStorage.getItem('mq_teacher_sets') || '[]').find((x) => x.id === 'set_les1'));
+        check(kept && JSON.stringify(kept.entries) === JSON.stringify(NEW.entries), `${tag}: after reload and play the set reads ${JSON.stringify(kept && kept.entries)}`);
+        // the link: a set with a lesson round-trips; an old set's link is byte-for-byte the old link and decodes unchanged
+        const mod = await p.evaluate(() => { const l = document.querySelector('link[rel="modulepreload"][href*="/teacher-ui.js"]'); return l ? l.href : new URL('js/modules/teacher-ui.js', location.href).href; });
+        const oldLink = Buffer.from(JSON.stringify({ v: 1, n: OLD.name, s: OLD.skills })).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        const rt = await p.evaluate(async (u, rec, only, old, oldLinkIn) => {
+          const m = await import(u);
+          const enc = m.encodeSetParam(rec);
+          const encOnly = m.encodeSetParam(only);
+          return { enc: !!enc, dec: m.decodeSetParam(enc), decOnly: encOnly ? m.decodeSetParam(encOnly) : null, oldEnc: m.encodeSetParam(old), oldDec: m.decodeSetParam(oldLinkIn) };
+        }, mod, NEW, ONLY, OLD, oldLink);
+        check(rt.enc && rt.dec && JSON.stringify(rt.dec.entries) === JSON.stringify(NEW.entries) && JSON.stringify(rt.dec.skills) === JSON.stringify(NEW.skills), `${tag}: link round trip ${JSON.stringify(rt.dec)}`);
+        check(rt.decOnly && JSON.stringify(rt.decOnly.entries) === JSON.stringify(ONLY.entries), `${tag}: a lesson-only set's link ${JSON.stringify(rt.decOnly)}`);
+        check(rt.oldEnc === oldLink, `${tag}: an old set's link changed: ${rt.oldEnc} vs ${oldLink}`);
+        check(rt.oldDec && !('entries' in rt.oldDec) && JSON.stringify(rt.oldDec.skills) === JSON.stringify(OLD.skills) && rt.oldDec.name === 'Old set', `${tag}: an old link decodes to ${JSON.stringify(rt.oldDec)}`);
+        const probs = a.problems.filter((x) => !(x.type === 'requestfailed' && /ERR_ABORTED/.test(x.text)));
+        if (probs.length) failures.push(`${tag}: console/page errors: ${probs.slice(0, 5).map((x) => `[${x.type}] ${x.text}`).join(' | ')}`);
+      } catch (e) { failures.push(`${tag}: ${e.stack || e.message}`); } finally { await a.close(); }
+    }
+
+    /* ---------------- TRAY-SOURCE-LABEL and the card in view */
+    for (const [W, H, touch] of sendRuns('tray') ? [[1280, 720, false], [1366, 768, false], [1024, 768, false], [820, 1180, true]] : []) {
+      const tag = `TRAY-SOURCE-LABEL @${W}`;
+      const a = await fresh(W, H, touch);
+      const p = a.page;
+      try {
+        if (W === 1280) {
+          // older items: another lesson's skills go in the tray first
+          const other = all.find((l) => l.grade === 'PK' && l.key !== sendLesson.key && links.linksFor(l).direct.length >= 1);
+          await go(p, links.lessonHash(other));
+          if (await p.$('#tvwBar [data-w-send="skills"]')) await press(p, '#tvwBar [data-w-send="skills"]', touch);
+          await press(p, '#tvwBar [data-w-act="tray"]', touch);
+          await sleep(200);
+          const nOld = (await queue(p)).length;
+          await go(p, SEND_HASH);
+          await sleep(200);
+          const lab = await p.evaluate(() => ((document.querySelector('#tvTray') || {}).textContent || '').replace(/\s+/g, ' '));
+          check(nOld > 0 && lab.includes(`${nOld} skill${nOld === 1 ? '' : 's'} from earlier (not this lesson)`), `${tag}: tray bar "${lab.slice(0, 160)}" does not say its ${nOld} skills are from earlier`);
+          await press(p, '#tvwBar [data-w-act="tray"]', touch);
+          await sleep(200);
+          const lab2 = await p.evaluate(() => ((document.querySelector('#tvTray [data-tt-src]') || {}).textContent || '').replace(/\s+/g, ' '));
+          check(lab2.includes('Compare amounts') && lab2.includes(`${nOld} skill${nOld === 1 ? '' : 's'} from earlier`), `${tag}: after adding this lesson the bar says "${lab2}"`);
+          if (SHOTS) { fs.mkdirSync(OUT, { recursive: true }); await p.screenshot({ path: path.join(OUT, 'send-tray-source-1280.png') }); }
+          const clr = await p.evaluate(() => { const b = document.querySelector('#tvTray [data-act="tray-clear"]'); return b ? b.textContent.replace(/\s+/g, ' ').trim() : ''; });
+          check(/Clear tray/.test(clr), `${tag}: no "Clear tray" on the bar ("${clr}")`);
+          await press(p, '#tvTray [data-act="tray-clear"]', touch);
+          await sleep(200);
+          const after = await queue(p);
+          check(!after.length, `${tag}: Clear tray left ${after.length} skills`);
+        } else await go(p, SEND_HASH);
+        // the card in view after scrolling (sticky at >= 1024), in flow at 820: the box that scrolls the lesson (the page,
+        // or the lesson panel's own scroll box) is scrolled to its end
+        const SCROLLER = `(() => { for (let e = document.querySelector('#tvwBar').parentElement; e && e !== document.body; e = e.parentElement) { const o = getComputedStyle(e).overflowY; if ((o === 'auto' || o === 'scroll') && e.scrollHeight > e.clientHeight + 1) return e; } return document.scrollingElement; })()`;
+        const before = await p.evaluate((S) => { const sc = eval(S); const b = document.querySelector('#tvwBar'); return { top: b.getBoundingClientRect().top + sc.scrollTop }; }, SCROLLER);
+        await p.evaluate((S) => { const sc = eval(S); sc.scrollTop = sc.scrollHeight; }, SCROLLER);
+        await sleep(250);
+        const r = await p.evaluate((S) => {
+          const sc = eval(S);
+          const b = document.querySelector('#tvwBar').getBoundingClientRect();
+          const t = document.querySelector('#tvTray');
+          const tt = t && t.getClientRects().length ? t.getBoundingClientRect().top : innerHeight;
+          const st = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
+          const sb = sc === document.scrollingElement ? innerHeight : sc.getBoundingClientRect().bottom;
+          return { top: Math.round(b.top), bottom: Math.round(b.bottom), h: Math.round(b.height), tray: Math.round(Math.min(tt, sb)), viewTop: Math.round(st), H: innerHeight, y: Math.round(sc.scrollTop), pos: getComputedStyle(document.querySelector('#tvwBar')).position, box: sc === document.scrollingElement ? 'page' : (sc.id || sc.className) };
+        }, SCROLLER);
+        if (W >= 1024) {
+          check(r.y > 0 && r.pos === 'sticky' && r.top >= r.viewTop && r.bottom <= r.tray, `${tag}: the What-to-send card is not in view after scrolling ${JSON.stringify(r)}`);
+          check(r.h <= 0.5 * (r.tray - r.viewTop), `${tag}: the sticky card covers ${r.h}px of ${r.tray}px (over half the page)`);
+          if (SHOTS && W === 1280) { fs.mkdirSync(OUT, { recursive: true }); await p.screenshot({ path: path.join(OUT, 'send-sticky-1280.png') }); }
+        } else {
+          check(r.y > 0 && r.pos !== 'sticky' && r.pos !== 'fixed' && Math.abs((r.top + r.y) - Math.round(before.top)) <= 2, `${tag}: the card is not in flow at 820 ${JSON.stringify(r)} (was at ${Math.round(before.top)})`);
+        }
+        // (a lesson document written into the print frame twice aborts the first one's style sheets: not an error)
+        const probs = a.problems.filter((x) => !(x.type === 'requestfailed' && /ERR_ABORTED/.test(x.text)));
+        if (probs.length) failures.push(`${tag}: console/page errors: ${probs.slice(0, 5).map((x) => `[${x.type}] ${x.text}`).join(' | ')}`);
+      } catch (e) { failures.push(`${tag}: ${e.stack || e.message}`); } finally { await a.close(); }
+    }
+  };
   try {
+    if (SEND_ONLY) await sendWhatChecks(); else {
     check(gapLesson && buildLesson && rich, 'data: could not pick the test lessons');
     await page.evaluate(() => { window.__copied = ''; navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; });
     await page.evaluate(() => { try { localStorage.setItem('mq_teacher_skill_view', JSON.stringify('list')); } catch (e) {} window.setUserRole('teacher'); });
@@ -1485,6 +1799,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     }
     await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
 
+    await sendWhatChecks();
+    }
     if (app.problems.length) failures.push(`console/page errors: ${app.problems.slice(0, 5).map((p) => `[${p.type}] ${p.text}`).join(' | ')}`);
   } catch (e) {
     failures.push(e.stack || e.message);
