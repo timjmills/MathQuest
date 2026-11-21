@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T07:21:09.816Z",
- "head": "2a0df9acf",
+ "generated": "2026-11-21T08:01:25.872Z",
+ "head": "f8f0a379f",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 71,
    "usageEstimated": false,
-   "rev": "2a0df9acf",
+   "rev": "f8f0a379f",
    "skills": 742,
    "retired": 10,
    "presets": 130,
@@ -483,8 +483,8 @@
    "corePassed": 29,
    "passed": 33,
    "gates": 174,
-   "backtests": 799,
-   "ledger": 649,
+   "backtests": 801,
+   "ledger": 651,
    "lessons": 57,
    "lessonsPassed": 1,
    "lessonsPending": 5,
@@ -564,12 +564,12 @@
     "from": "2026-11-26"
    },
    "liveRecorded": true,
-   "ledgerAdded": 130,
+   "ledgerAdded": 132,
    "added": {
     "skills": 6,
     "passed": 1,
     "gates": 31,
-    "backtests": 197,
+    "backtests": 199,
     "lessons": 16,
     "lessonsPassed": null,
     "wrmCovered": 0
@@ -1755,6 +1755,13 @@
    }
   ],
   "2026-11-19": [
+   {
+    "date": "2026-11-21",
+    "title": "Deploy lf-ops steps hotfix (bug fix, no critic)",
+    "detail": "Column multiplication lessons (mult_2by1 / 3by1) printed an EMPTY Steps panel: multiply had no provider. Now a multiply provider for column items fills the lesson Steps panel (4 steps), the Guided Steps band and the Practice strip; `lessonChart: false` keeps the lesson's page set exactly as master (A28: no new Model page without a critic).",
+    "kind": "fix",
+    "from": "STATUS.md"
+   },
    {
     "date": "2026-11-21",
     "title": "Bug fix: shared gates (lead; no critic)",
