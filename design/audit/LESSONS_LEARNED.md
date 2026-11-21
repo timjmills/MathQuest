@@ -209,6 +209,10 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    round.** *Why:* the HINT-NO-BLANK "no box" choice contradicted ws-support-ladder (time_quarter, compare_groups) and cost a
    round. A layout search that proves a layout exists under every check together comes before any deal redesign. lf-builds
    chart blanks found the constraint set infeasible only at r8.
+21. **A precritic red on a page type master never drew (new\*) is the branch's own red; it is never parked as master's.**
+   (lead-adopted 2026-11-20, sizes r1 F1.) *Why:* lf-ops-sizes critic r1 F1: ws-empty-band MOD-MARKS flagged the new
+   scripted-model pages of the size presets as "new\*", the lane filed it as a master class, and every Model state but the
+   last printed empty boxes.
 
 ### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
 - **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
