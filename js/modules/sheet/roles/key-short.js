@@ -147,6 +147,9 @@ export function tagKeyAnswers(pupilHtml, keyHtml) {
         n++;
         const tagged = (extra) => `<${tag} data-ws-key-ans${extra}${attrs}>${text}`;
         if (/\sdata-ws-key-ans\b/.test(attrs)) return m;
+        // (lf-roles critic qreview r1 KEYLABEL-GREY: a Quick review answer's key label is the teacher's note, never an answer -
+        // left untagged it keeps the one grey; tagged, the key ink's !important rule printed it orange)
+        if (/\sdata-review-label\b/.test(attrs)) return m;
         const t = kTok[n];
         if (t.inCells && worked(t.cell)) return m;
         const words = /\sdata-ws-key="(?:words|short)"/.test(attrs);
