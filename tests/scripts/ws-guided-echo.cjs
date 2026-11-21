@@ -473,7 +473,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             if (on('PAGE-COL-RUN')) for (let c = 0; c < 10; c++) { const k = gs.reduce((t, w) => t + w.rows.filter((rr) => w.gaps.includes(rr * 10 + c + 1)).length, 0); if (k > 4) out.push(`PAGE-COL-RUN ${key} lesson ${size} seed ${s} p${pi + 1}: column ${c + 1} blank in ${k} of ${gs.length * 3} rows (at most 4)`); }
                             if (on('SKELETON-TWIN')) {
                                 const sk = (w) => new Set(w.gaps.map((n) => `${Math.floor((n - 1) / 10) - Math.min(...w.rows)}:${(n - 1) % 10}`));
-                                for (let i = 0; i < gs.length; i++) for (let j = i + 1; j < gs.length; j++) { const A = sk(gs[i]), B = sk(gs[j]); const sh = [...A].filter((x) => B.has(x)).length; if (sh >= 4) out.push(`SKELETON-TWIN ${key} lesson ${size} seed ${s} p${pi + 1}: grids ${i + 1} and ${j + 1} share ${sh} gap places (at most 3)`); }
+                                for (let i = 0; i < gs.length; i++) for (let j = i + 1; j < gs.length; j++) { const A = sk(gs[i]), B = sk(gs[j]); let sh = 0, sd = 0; for (const d of [-2, -1, 0, 1, 2]) { const k = [...A].filter((x) => { const [rr, cc] = x.split(':'); return B.has(`${Number(rr) + d}:${cc}`); }).length; if (k > sh) { sh = k; sd = d; } } if (sh >= 4) out.push(`SKELETON-TWIN ${key} lesson ${size} seed ${s} p${pi + 1}: grids ${i + 1} and ${j + 1} share ${sh} gap places${sd ? ` after a ${sd > 0 ? '+' : ''}${sd} row shift` : ''} (at most 3)`); }
                             }
                         });
                         // MODEL-ROWS (lead ruling A23): each seed reports its teaching sheet's Model row; the sweep is judged in node

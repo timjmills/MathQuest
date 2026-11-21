@@ -12607,11 +12607,11 @@
    "kind": "commit-pair",
    "browser": true,
    "rule": "ws-guided-echo SKELETON-TWIN",
-   "check": "no two rows-of-ten grids of a lesson practice page share 4+ gap places (critic blanks r7 H4)",
-   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,4242 --only SKELETON-TWIN",
+   "check": "no two rows-of-ten grids of a lesson practice page share 4+ gap places, also under a row shift of -2..+2 (critic blanks r7 H4; r8 F1 seed 17)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,4242,17 --only SKELETON-TWIN --no-mixed",
    "fail": {
     "commit": "5ae71ee5b",
-    "state": "seed 4242 grid 2 is grid 1 shifted 30 (5 places); seed 1 shares 4"
+    "state": "seed 4242 grid 2 is grid 1 shifted 30 (5 places); seed 1 shares 4; seed 17 grids 2 and 3 share 4 after a one-row shift"
    },
    "pass": {
     "commit": "f051558d8",

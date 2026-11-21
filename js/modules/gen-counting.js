@@ -1233,7 +1233,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                         if (Array.from({ length: 10 }, (_, c) => c).some((c) => prev.reduce((t, k) => t + inCol(k.gaps, c), 0) + inCol(gN, c) > 4)) continue;
                         const skel = (rs, ns) => new Set(ns.map((n) => `${Math.floor((n - 1) / 10) - Math.min(...rs)}:${(n - 1) % 10}`));
                         const me = skel(rows, gN);
-                        if (prev.some((k) => { const o = skel(k.rows, k.gaps); return [...me].filter((x) => o.has(x)).length >= 4; })) continue;
+                        // (critic blanks r8 F1: compared under a row shift of -2..+2 too - 37 39 48 50 60 and 80 87 89 98 100 are twins
+                        // one row apart)
+                        const shiftSh = (o) => Math.max(...[-2, -1, 0, 1, 2].map((d) => [...me].filter((x) => { const [r, c] = x.split(':'); return o.has(`${Number(r) + d}:${c}`); }).length));
+                        if (prev.some((k) => shiftSh(skel(k.rows, k.gaps)) >= 4)) continue;
                     }
                 }
                 // (critic blanks r4 F1 / F2: in a lesson packet no pupil window repeats a kept one's answer set, nor shares 60 % of
