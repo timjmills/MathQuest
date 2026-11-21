@@ -45,7 +45,7 @@ const fails = {};
 const check = (rule, ok, msg) => { if (!ok) (fails[rule] = fails[rule] || []).push(msg); };
 const RULES = ['LESSON-DOMAIN', 'AREA-LABELS', 'FILTER-PASSED', 'LESSON-BROWSE', 'SCREEN',
     // critic lessons-browser r1 (2026-11-20): one rule per defect, so each has its own backtest row
-    'THUMB-DETAILED-ITEM', 'THUMB-NO-FREEZE', 'SKILLS-VIEWS', 'PENDING-WORDS', 'UNIT-NOW-ON-HASH', 'THUMB-NO-CLIP', 'HEAD-NO-REPEAT', 'ROUNDTRIP-VIEW', 'SKILLS-GRADE-PILLS'];
+    'THUMB-DETAILED-ITEM', 'THUMB-NO-FREEZE', 'SKILLS-VIEWS', 'PASS-CHIP-FILTER', 'PENDING-WORDS', 'UNIT-NOW-ON-HASH', 'THUMB-NO-CLIP', 'HEAD-NO-REPEAT', 'ROUNDTRIP-VIEW', 'SKILLS-GRADE-PILLS'];
 // --plant <what>: plant a known-bad state in the CHECK's own reading, to prove an assertion can fail (ws-backtest args rows):
 //   roundtrip-thumbs  the "list" round trip starts from a link with no view= after the thumbnails (the r1 D9 state)
 //   drop-grade-pill   one Skills grade pill (grade 3) is removed before the pills are read (r1 D10)
@@ -427,6 +427,46 @@ try {
             await go('#wrm/3?view=list');
         }
 
+        /* ---------------- PASS-CHIP-FILTER (owner 2026-11-21, lead ruling A33): the bar's 8/10 chip IS the filter toggle
+           (one control, chip-styled, aria-pressed, "8/10 · N lesson(s)"), "What does 8/10 mean?" beside it, 48 px */
+        if (want('PASS-CHIP-FILTER')) {
+            await go('#wrm/4?view=list');
+            await page.evaluate(() => window.scrollTo(0, 0));
+            const n = LESSONS_PASSED.size;
+            const bar = () => page.evaluate(() => { const c = document.querySelectorAll('#tvwFilters [data-w-only]'); const b = c[0]; const s = document.querySelector('#tvwFilters .ts-marks > summary'); return { controls: c.length, chip: !!b && b.classList.contains('ts-passchip'), pressed: b ? b.getAttribute('aria-pressed') : null, text: b ? b.textContent.replace(/\s+/g, ' ').trim() : '', h: b ? b.getBoundingClientRect().height : 0, info: s ? s.textContent.trim() : '', ih: s ? s.getBoundingClientRect().height : 0 }; });
+            const b0 = await bar();
+            check('PASS-CHIP-FILTER', b0.controls === 1 && b0.chip && b0.pressed === 'false' && b0.text.endsWith(`8/10 · ${n} lesson${n === 1 ? '' : 's'}`) && b0.h >= 47.5, `@${w} the Lessons bar's 8/10 control is not one chip-styled toggle reading "8/10 · ${n} lesson${n === 1 ? '' : 's'}": ${JSON.stringify(b0)}`);
+            check('PASS-CHIP-FILTER', /What does 8\/10 mean\?/.test(b0.info) && b0.ih >= 47.5, `@${w} no 48 px "What does 8/10 mean?" beside the chip: ${JSON.stringify(b0)}`);
+            await page.evaluate(() => document.querySelector('#tvwFilters').scrollIntoView({ block: 'start' }));
+            await shot('pass-chip-lessons-unpressed', w);
+            if (b0.controls) {
+                await click('#tvwFilters [data-w-only]');
+                const b1 = await bar();
+                const rows = await domRows();
+                check('PASS-CHIP-FILTER', b1.pressed === 'true' && rows.length && rows.every((r) => r.pass), `@${w} pressed, the chip ${b1.pressed} shows ${rows.length} rows, not only the passed lessons`);
+                await page.evaluate(() => document.querySelector('#tvwFilters').scrollIntoView({ block: 'start' }));
+                await shot('pass-chip-lessons-pressed', w);
+                await click('#tvwFilters [data-w-only]');
+            }
+            // the Skills bar: the same chip (teacher-library.js passChipHTML)
+            await page.evaluate(() => window.tvGo('skills'));
+            await waitFor(page, () => !!document.querySelector('[data-screen="skills"].is-active #tsList'), 20000, 'skills screen');
+            const sk = await page.evaluate(() => { const c = document.querySelector('#tsPassChip [aria-pressed]'); return { chip: !!c && c.classList.contains('ts-passchip'), text: c ? c.textContent.replace(/\s+/g, ' ').trim() : '', switchLeft: !!document.querySelector('#tsOnly, #tsOnlyRow') }; });
+            check('PASS-CHIP-FILTER', sk.chip && /8\/10 · \d+ skills?$/.test(sk.text) && !sk.switchLeft, `@${w} the Skills bar's 8/10 control: ${JSON.stringify(sk)}`);
+            await page.evaluate(() => document.querySelector('[data-screen="skills"] .ts-filters').scrollIntoView({ block: 'start' }));
+            await shot('pass-chip-skills-unpressed', w);
+            if (sk.chip) {
+                await page.$eval('#tsPassChip [aria-pressed]', (b) => b.click());
+                await sleep(500);
+                await page.evaluate(() => document.querySelector('[data-screen="skills"] .ts-filters').scrollIntoView({ block: 'start' }));
+                await shot('pass-chip-skills-pressed', w);
+                await page.$eval('#tsPassChip [aria-pressed]', (b) => b.click());
+                await sleep(300);
+            }
+            await page.evaluate(() => window.tvGo('wrm'));
+            await go('#wrm/3?view=list');
+        }
+
         /* ---------------- FILTER-PASSED / PENDING-WORDS */
         if (want('FILTER-PASSED') || want('PENDING-WORDS') || want('HEAD-NO-REPEAT') || want('SCREEN')) {
             await go('#wrm/all?view=list');
@@ -508,15 +548,15 @@ try {
         /* ---------------- the Skills screen: generated grades, area chips, Only 8/10 ✓ (FILTER-PASSED, SKILLS-VIEWS, SKILLS-GRADE-PILLS) */
         if (want('FILTER-PASSED') || want('SKILLS-VIEWS') || want('SKILLS-GRADE-PILLS') || want('AREA-LABELS') || want('SCREEN')) {
             await page.evaluate(() => window.tvGo('skills'));
-            await waitFor(page, () => !!document.querySelector('[data-screen="skills"].is-active #tsOnly button'), 20000, 'skills screen');
+            await waitFor(page, () => !!document.querySelector('[data-screen="skills"].is-active #tsPassChip [aria-pressed]'), 20000, 'skills screen');
             await page.evaluate(() => { const s = document.querySelector('#tsSearch'); if (s && s.value) { s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true })); } });
             await sleep(300);
             await page.evaluate(() => { const b = document.querySelector('#tsBrowse [data-arg="area"]'); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); });
             await sleep(300);
             const allBtn = await page.$('#tsGrades [data-arg="ALL"]');
             if (allBtn && (await allBtn.evaluate((b) => b.getAttribute('aria-pressed'))) !== 'true') { await allBtn.evaluate((b) => b.click()); await sleep(300); }
-            const onAlready = await page.$eval('#tsOnly button', (b) => b.getAttribute('aria-pressed') === 'true');
-            if (!onAlready) { await page.$eval('#tsOnly button', (b) => b.click()); await sleep(500); }
+            const onAlready = await page.$eval('#tsPassChip [aria-pressed]', (b) => b.getAttribute('aria-pressed') === 'true');
+            if (!onAlready) { await page.$eval('#tsPassChip [aria-pressed]', (b) => b.click()); await sleep(500); }
             for (let i = 0; i < 6; i++) { const more = await page.$('#tsList [data-act="showall"], #tsList [data-act="more"]'); if (!more) break; await more.evaluate((b) => b.click()); await sleep(300); }
             const sk = await page.$$eval('#tsList .ts-card[data-skill]', (c) => c.map((x) => x.dataset.skill));
             check('FILTER-PASSED', sk.length && sk.every((k) => REDESIGN_PASSED.has(k)), `@${w} Skills with Only 8/10: ${sk.filter((k) => !REDESIGN_PASSED.has(k)).slice(0, 3)} not passed (of ${sk.length})`);
@@ -539,7 +579,7 @@ try {
             // SKILLS-VIEWS (critic r1 D2): in every Browse-by view and while searching, the switch is not offered, or every
             // card shown is a passed skill
             if (want('SKILLS-VIEWS') && w === WIDTHS[0]) {
-                const probe = () => page.evaluate(() => ({ offered: !!document.querySelector('#tsOnly button')?.getClientRects().length, on: document.querySelector('#tsOnly button')?.getAttribute('aria-pressed') === 'true', cards: [...document.querySelectorAll('#tsList .ts-card[data-skill]')].map((c) => c.dataset.skill) }));
+                const probe = () => page.evaluate(() => ({ offered: !!document.querySelector('#tsPassChip [aria-pressed]')?.getClientRects().length, on: document.querySelector('#tsPassChip [aria-pressed]')?.getAttribute('aria-pressed') === 'true', cards: [...document.querySelectorAll('#tsList .ts-card[data-skill]')].map((c) => c.dataset.skill) }));
                 for (const v of ['wrm', 'std', 'map', 'sets']) {
                     await page.evaluate((v) => document.querySelector(`#tsBrowse [data-arg="${v}"]`)?.click(), v);
                     await sleep(900);
@@ -555,7 +595,7 @@ try {
                 await page.evaluate(() => { const s = document.querySelector('#tsSearch'); s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true })); });
                 await sleep(500);
             }
-            await page.evaluate(() => { const b = document.querySelector('#tsOnly button'); if (b && b.getAttribute('aria-pressed') === 'true') b.click(); });
+            await page.evaluate(() => { const b = document.querySelector('#tsPassChip [aria-pressed]'); if (b && b.getAttribute('aria-pressed') === 'true') b.click(); });
             await sleep(300);
             await page.evaluate(() => window.tvGo('wrm'));
             await go('#wrm/3?view=list');

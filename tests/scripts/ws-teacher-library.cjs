@@ -1,5 +1,6 @@
 // Teacher Skills library + MAP tests screens (teacher-library.js, teacher-map.js).
 //   node tests/scripts/ws-teacher-library.cjs
+//   node tests/scripts/ws-teacher-library.cjs --only PASS-CHIP-FILTER [--shots <dir>]   the 8/10 chip rule alone (backtests)
 //
 // Drives both screens as a teacher in a real browser: search, filters, List | Thumbnails, select a
 // skill (paper-cell preview), every action (Practise now, Add to skill set, Print, Copy pupil link,
@@ -11,6 +12,71 @@ const { open, waitFor } = require('../lib/ws-harness.cjs');
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const ONLY = (() => { const i = process.argv.indexOf('--only'); return i > -1 ? process.argv[i + 1] : ''; })();
+const SHOTS = (() => { const i = process.argv.indexOf('--shots'); return i > -1 ? process.argv[i + 1] : ''; })();
+
+/* PASS-CHIP-FILTER (owner 2026-11-21, lead ruling A33): the Skills bar's 8/10 chip is a FILTER toggle (aria-pressed, a
+   count "8/10 · N skills"); pressed, the cards shown in every view are exactly the passed skills (REDESIGN_PASSED) - all of
+   them in the Maths area view at all grades; an empty result says so; "What does 8/10 mean?" beside it; 48 px targets. */
+async function passChipFilter(page, check, { shots = '' } = {}) {
+  const tag = 'PASS-CHIP-FILTER';
+  const fs = require('fs');
+  const shot = async (name) => { if (shots) { fs.mkdirSync(shots, { recursive: true }); await page.screenshot({ path: require('path').join(shots, name) }); } };
+  await page.evaluate(() => { try { localStorage.removeItem('mq_teacher_skills_ui'); } catch (e) {} window.tvGo('skills'); });
+  await waitFor(page, () => !!document.querySelector('[data-screen="skills"].is-active #tsList'), 20000, 'skills screen');
+  await sleep(400);
+  const passed = await page.evaluate(() => import(new URL('js/modules/redesign-passed.js', location.href).href).then((m) => [...m.REDESIGN_PASSED]));
+  const P = new Set(passed);
+  const chipSel = '[data-screen="skills"].is-active #tsPassChip [aria-pressed]';
+  const chip0 = await page.$(chipSel);
+  check(!!chip0, `${tag}: no 8/10 chip with aria-pressed on the Skills bar`);
+  if (!chip0) return;
+  const click = async (sel) => { await page.$eval(sel, (b) => b.click()); await sleep(450); };
+  await page.evaluate(() => { const b = document.querySelector('#tsBrowse [data-arg="area"]'); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); });
+  await sleep(300);
+  if ((await page.$eval('#tsGrades [data-arg="ALL"]', (b) => b.getAttribute('aria-pressed'))) !== 'true') await click('#tsGrades [data-arg="ALL"]');
+  const info = await page.evaluate(() => { const s = document.querySelector('[data-screen="skills"].is-active .ts-marks > summary'); const c = document.querySelector('#tsPassChip [aria-pressed]'); return { text: s ? s.textContent.trim() : '', h: s ? s.getBoundingClientRect().height : 0, ch: c.getBoundingClientRect().height, label: c.textContent.replace(/\s+/g, ' ').trim(), pressed: c.getAttribute('aria-pressed') }; });
+  check(/What does 8\/10 mean\?/.test(info.text) && info.h >= 47.5, `${tag}: no "What does 8/10 mean?" beside the chip (or under 48 px): ${JSON.stringify(info)}`);
+  check(info.ch >= 47.5 && info.pressed === 'false', `${tag}: the chip is under 48 px or starts pressed: ${JSON.stringify(info)}`);
+  check(info.label === `✓8/10 · ${P.size} skills` || info.label === `✓ 8/10 · ${P.size} skills` || info.label.endsWith(`8/10 · ${P.size} skills`), `${tag}: the chip reads "${info.label}", want "8/10 · ${P.size} skills"`);
+  await shot('skills-bar-unpressed.png');
+  await click(chipSel);
+  check((await page.$eval(chipSel, (b) => b.getAttribute('aria-pressed'))) === 'true', `${tag}: the chip is not pressed after a click`);
+  for (let i = 0; i < 8; i++) { const more = await page.$('#tsList [data-act="showall"], #tsList [data-act="more"]'); if (!more) break; await more.evaluate((b) => b.click()); await sleep(300); }
+  const shown = await page.$$eval('#tsList .ts-card[data-skill]', (c) => [...new Set(c.map((x) => x.dataset.skill))]);
+  const wrong = shown.filter((k) => !P.has(k));
+  const missing = passed.filter((k) => !shown.includes(k));
+  check(!wrong.length && !missing.length, `${tag}: pressed, the Maths area view (all grades) shows ${shown.length} skills: ${wrong.length} not passed (${wrong.slice(0, 3)}), ${missing.length} passed ones missing (${missing.slice(0, 3)})`);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await shot('skills-bar-pressed.png');
+  for (const v of ['wrm', 'std', 'sets']) {
+    await click(`#tsBrowse [data-arg="${v}"]`);
+    await sleep(500);
+    const c = await page.$$eval('#tsList .ts-card[data-skill]', (x) => x.map((y) => y.dataset.skill));
+    check(c.every((k) => P.has(k)), `${tag}: pressed, the "${v}" view shows skills that did not pass: ${c.filter((k) => !P.has(k)).slice(0, 3)}`);
+  }
+  await click('#tsBrowse [data-arg="area"]');
+  await page.evaluate(() => { const s = document.querySelector('#tsSearch'); s.value = 'add within 20'; s.dispatchEvent(new Event('input', { bubbles: true })); });
+  await sleep(700);
+  const hits = await page.$$eval('#tsList .ts-card[data-skill]', (x) => x.map((y) => y.dataset.skill));
+  check(hits.every((k) => P.has(k)), `${tag}: pressed, a search shows skills that did not pass: ${hits.filter((k) => !P.has(k)).slice(0, 3)}`);
+  await page.evaluate(() => { const s = document.querySelector('#tsSearch'); s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true })); });
+  await sleep(500);
+  // an empty result says so: a grade with no passed skill
+  const levels = await page.evaluate(() => import(new URL('js/modules/teacher-ui.js', location.href).href).then((m) => m.skillCatalogue().map((s) => [`${s.categoryId}:${s.skillId}`, s.level])));
+  const emptyG = ['6', '5', '4', 'K'].find((g) => !levels.some(([k, l]) => l === g && P.has(k)));
+  if (emptyG) {
+    await click(`#tsGrades [data-arg="${emptyG}"]`);
+    const em = await page.evaluate(() => ({ cards: document.querySelectorAll('#tsList .ts-card[data-skill]').length, note: (document.querySelector('#tsList [data-ts-empty="only"]') || {}).textContent || '' }));
+    check(!em.cards && /No skill here has passed 8\/10 yet/.test(em.note), `${tag}: grade ${emptyG} with the chip pressed: ${JSON.stringify(em)}`);
+    await click('#tsGrades [data-arg="ALL"]');
+  }
+  await click(chipSel);
+  check((await page.$eval(chipSel, (b) => b.getAttribute('aria-pressed'))) === 'false', `${tag}: the chip does not turn off`);
+  const after = await page.$$eval('#tsList .ts-card[data-skill]', (c) => c.length);
+  check(after > shown.length, `${tag}: unpressed, the view did not come back (${after} cards)`);
+}
+
 (async () => {
   const failures = [];
   const check = (ok, msg) => { if (!ok) failures.push(msg); };
@@ -20,6 +86,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const onScreen = (key) => page.evaluate((k) => document.body.classList.contains('tv-on-screen')
     && !!document.querySelector(`#teacherMain .tv-screen.is-active[data-screen="${k}"]`), key);
   try {
+    if (ONLY === 'PASS-CHIP-FILTER') {
+      await page.evaluate(() => window.setUserRole('teacher'));
+      await sleep(200);
+      for (const w of SHOTS ? [1366, 1024] : [1366]) {
+        await page.setViewport({ width: w, height: 768, deviceScaleFactor: 1 });
+        const n0 = failures.length;
+        await passChipFilter(page, check, { shots: SHOTS ? require('path').join(SHOTS, String(w)) : '' });
+        if (failures.length > n0) break;
+      }
+      throw Object.assign(new Error('done'), { done: true });
+    }
     // Record what the screens copy (headless Chrome has no real clipboard).
     await page.evaluate(() => { window.__copied = ''; navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; });
     await page.evaluate(() => window.setUserRole('teacher'));
@@ -319,9 +396,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     check(!pupilErrors.length, `pupil: console errors ${pupilErrors.slice(0, 3).join(' | ')}`);
     await ctx.close();
 
+    await passChipFilter(page, check);
+
     if (app.problems.length) failures.push(`console/page errors: ${app.problems.slice(0, 5).map((p) => `[${p.type}] ${p.text}`).join(' | ')}`);
   } catch (e) {
-    failures.push(e.stack || e.message);
+    if (e && e.done) { if (app.problems.length) failures.push(`console/page errors: ${app.problems.slice(0, 5).map((p) => `[${p.type}] ${p.text}`).join(' | ')}`); }
+    else failures.push(e.stack || e.message);
   } finally {
     await app.close();
   }

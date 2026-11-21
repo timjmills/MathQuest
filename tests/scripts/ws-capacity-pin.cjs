@@ -11,6 +11,10 @@
 //     each support. --no-test-eq-ind turns it off (--test-eq-ind is still accepted).
 //   default pin design/audit/baselines/capacity.json; skills: js/modules/redesign-passed.js; roles: EVERY grid role of
 //   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes M,L (S dropped 2026-11-13); seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
+//   WHITE-ROW (critic lf-engine-rowcap-s2 F4/F5): a one-page Review / Test / Error Analysis under its ceiling leaves at most one row of
+//     white under its last row (rows count at the cap); --no-white-row turns it off.
+//     ROLE-CAPPED REVIEW (lead ruling 2026-11-20): a one-page Review AT its ceiling is role-capped (its length is the teacher's
+//     choice); its white is reported by name (`role-capped ...`), never failed and never passed silently.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -111,6 +115,66 @@ const ALLOW = new Set(list(arg('allow', '')));
         }
         return out;
     }, { ...call, ROLES, SIZES }));
+    // WHITE-ROW (critic lf-engine-rowcap-s2 F4 / F5): rows are drawn at their cap, so a one-page Review, Test or Error Analysis
+    // whose count is BELOW its §12.1 ceiling must not leave more than one row of white under its last row - the page counts rows at the
+    // cap and takes the ones that fit (add_facts Review M: 10 of 12 under 100 mm of white). Read on the printed page (print media);
+    // the ceilings are read from each role's own `const CEILING = {...}`. --no-white-row turns it off.
+    const whiteRow = [];
+    // pages that held this white before the check existed, each with its reason and owner (WHITE-ROW reports them, never fails them)
+    const WHITE_ROW_KNOWN = {
+        'algebra:two_step_mult_div_first test L': 'pre-existing on master: one two-step story a Test page at L; routed to lf-roles with critic rowcap-s2 N3',
+        'division:div_facts_long review M': 'the Mixed Review share (20-45 %) and whole rows cap it: its long-division earlier row is 84-94 mm, so a third main row with the mixed row passes the ceiling or the share (rose 8 -> 10 this round); a lead call',
+        'division:div_facts_long review L': 'as M: 8 a page (4 main columns do not fit at L); a lead call',
+    };
+    if (has('check') && !has('no-white-row')) {
+        const ceilOf = {};
+        for (const [role, file] of [['review', 'review.js'], ['test', 'test.js'], ['error-analysis', 'error-analysis.js']]) {
+            try { const m = /const CEILING = \{([^}]*)\}/.exec(fs.readFileSync(path.join(H.ROOT, 'js/modules/sheet/roles', file), 'utf8')); if (m) ceilOf[role] = Object.fromEntries([...m[1].matchAll(/([SML])\s*:\s*(\d+)/g)].map((x) => [x[1], Number(x[2])])); } catch (e) { /* no ceiling: not judged */ }
+        }
+        const keys = Object.keys(now).filter((k) => { const [sk, role, size] = k.split(' '); const v = now[k]; return !v.na && !v.opts && !v.optProbe && inFilter(sk) && ceilOf[role] && Number(v.pages) === 1 && (v.items < (ceilOf[role][size] || Infinity) || role === 'review'); });   // (a Review AT its ceiling: ROLE-CAPPED REVIEW, reported below)
+        if (keys.length) {
+            const app2 = await H.open({});
+            const sh = await app2.browser.newPage();
+            await sh.setViewport({ width: 900, height: 1300, deviceScaleFactor: 1 });
+            for (const k of keys) {
+                const [sk, role, size] = k.split(' ');
+                const [cat, id] = sk.split(':');
+                const html = await app2.page.evaluate(async ({ cat, id, role, size }) => {
+                    const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+                    try { const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: cat, skillId: id }], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed: hash(`${cat}__${id}:${role}`) % 1000000, form: 'A', key: false, anchors: 'off' });
+                        return window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }); } catch (e) { return null; }
+                }, { cat, id, role, size });
+                if (!html) continue;
+                if (!sh.url().startsWith('http')) await sh.goto(app2.page.url(), { waitUntil: 'domcontentloaded' });
+                await sh.setContent(html, { waitUntil: 'load', timeout: 60000 });
+                await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+                await sh.emulateMediaType('print');
+                const w = await sh.evaluate(() => {
+                    const MM = 96 / 25.4; const p = document.querySelector('section.ws-page, .ws-page'); if (!p) return null;
+                    const foot = p.querySelector('.ws-footer, footer'); const fTop = foot ? foot.getBoundingClientRect().top : p.getBoundingClientRect().bottom;
+                    const cells = [...p.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                    if (!cells.length) return null;
+                    const low = Math.max(...[...p.querySelectorAll('[data-ws-cell], .ws-grid')].map((e) => e.getBoundingClientRect().bottom).filter((b) => b <= fTop + 2));
+                    const rowMm = Math.min(...cells.map((c) => c.getBoundingClientRect().height)) / MM;
+                    // (the cells of the LAST row: one more such row is what the page could take)
+                    const lastTop = Math.max(...cells.map((c) => c.getBoundingClientRect().top));
+                    const perRow = cells.filter((c) => Math.abs(c.getBoundingClientRect().top - lastTop) < 2).length;
+                    return { whiteMm: +((fTop - low) / MM).toFixed(1), rowMm: +rowMm.toFixed(1), perRow };
+                });
+                // (the role caps the count when one more row would pass its ceiling - "unless the deal or the role caps the count")
+                const known = WHITE_ROW_KNOWN[k];
+                // (one more row FITS when the white holds it with the roles' own room - 1.15 x its height, the Error Analysis / Guided need -
+                // plus the grid's rules; a story row of 112 mm under 120 mm of white does not)
+                const more = w && w.whiteMm > 1.15 * w.rowMm + 3;
+                // ROLE-CAPPED REVIEW (lead ruling 2026-11-20): a Review AT its ceiling with a row of white left is accepted - its length is
+                // the teacher's choice - and reported by name, never passed silently
+                if (more && role === 'review' && now[k].items + Math.max(1, w.perRow) > ceilOf[role][size]) console.log(`  role-capped ${k}: WHITE-ROW ${w.whiteMm} mm at the review ceiling ${ceilOf[role][size]} (ROLE-CAPPED REVIEW, lead 2026-11-20: a review's length is the teacher's choice)`);
+                if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size] && known) console.log(`  known ${k}: WHITE-ROW ${w.whiteMm} mm (${known})`);
+                else if (more && now[k].items + Math.max(1, w.perRow) <= ceilOf[role][size]) whiteRow.push(`${k}: ${now[k].items} items (under the ${role} ceiling ${ceilOf[role][size]}) leave ${w.whiteMm} mm of white under the last row - more than one ${w.rowMm} mm row (WHITE-ROW)`);
+            }
+            await app2.close();
+        }
+    }
     await app.close();
     if (has('write')) {
         fs.mkdirSync(path.dirname(PIN), { recursive: true });
@@ -172,7 +236,7 @@ const ALLOW = new Set(list(arg('allow', '')));
         if (z.M !== undefined && z.L !== undefined && z.M < z.L) order.push(`${g}: M ${z.M} < L ${z.L} items (SIZE-ORDER-OPT)`);
         if (z.S !== undefined && z.L !== undefined && z.S <= z.L) order.push(`${g}: S ${z.S} not greater than L ${z.L} items - the option page is the same at every size (SIZE-ORDER-OPT, D3)`);
     }
-    drops.push(...order);
+    drops.push(...order, ...whiteRow);
     // TEST-EQ-IND (critic divarray r1 Q1; lead ruling 2026-11-13, on by default): a fact skill's Test count follows its
     // Independent count on each support (div_facts and mult_facts).
     if (testEqOn) {

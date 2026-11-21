@@ -50,6 +50,7 @@ import { GRADE_COLORS } from './data.js';
 /** The grade's colour (0b: data.js GRADE_COLORS; a grade it has no colour for keeps the teacher token): a swatch only. */
 const grStyle = (g) => (GRADE_COLORS[g] && GRADE_COLORS[g].bg ? ` style="--gr:${GRADE_COLORS[g].bg}"` : '');
 import { mountCroppedSteps, croppedReady, mountLessonPage } from './teacher-chip.js';
+import { passChipHTML } from './teacher-library.js';   // the ONE 8/10 chip (owner 2026-11-21, lead ruling A33)
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -461,7 +462,9 @@ function filtersHTML() {
         <div class="ts-frow" role="group" aria-labelledby="tvwDomH"><span class="ts-flabel" id="tvwDomH">Maths area</span><div class="ts-pills tvw-areas" id="tvwAreas">${areas}</div></div>
         <div class="ts-fdiv" role="presentation"></div>
         <div class="ts-frow tvw-showrow"><span class="ts-flabel" id="tvwShowH">Show</span>
-          <button type="button" class="tvw-only" data-w-only="1" aria-pressed="${B.only}" aria-describedby="tvwShowH">${sw(B.only)}<span>Only 8/10 ✓ (${LESSONS_PASSED.size})</span></button>
+          ${passChipHTML(B.only, LESSONS_PASSED.size, 'lesson', 'data-w-only="1"')}
+          <details class="ts-marks tvw-marks"><summary><span class="ts-marks-i" aria-hidden="true">i</span>What does 8/10 mean?</summary>
+            <div class="ts-marks-pop" role="note"><p><span><b>8/10</b>: an independent reviewer graded every page of the lesson at 8 or more out of 10 for how it looks, how it teaches and that it is correct. Press "8/10" to show only these lessons. "Pending re-check" means a lesson passed before and waits for a reviewer to check it again.</span></p></div></details>
           <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tvwViewH">View</span>
           <div class="ts-seg tvw-viewseg" role="group" aria-labelledby="tvwViewH">${views}</div></div>`;
 }
@@ -503,7 +506,7 @@ function listHTML() {
         const pend = gradeRows().filter((r) => r.pending && (!B.area || r.area === B.area));
         return `<div class="tv-card tvw-bempty" data-w-empty="only"><p class="tv-h3">No lesson here has passed 8/10 yet.</p>
           ${pend.length ? `<p class="tv-cap">Pending re-check:</p><ul class="tvw-pendlist">${pend.map((r) => `<li data-w-pend="${esc(r.pending)}"><b>${esc(r.lesson.title)}</b>: ${esc(pendingWords(r.pending))}.</li>`).join('')}</ul>` : ''}
-          <p class="tv-cap">Turn off "Only 8/10 ✓" to see every lesson.</p></div>`;
+          <p class="tv-cap">Press "8/10" again to see every lesson.</p></div>`;
     }
     return '<p class="tv-cap tvw-pad" data-w-empty="none">No lessons match. Choose another grade or area.</p>';
 }

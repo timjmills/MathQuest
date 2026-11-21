@@ -719,9 +719,15 @@ const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
     if (s.fw === 'ee') G.fw = 'ee';
     if (['all', 'gaps', 'covered'].includes(s.status)) G.status = s.status;
     if (s.show === 'plan') G.show = 'plan';
-    if (s.only === true) G.only = true;   // "Only 8/10 ✓" is kept per viewer and across grade / area changes (§4)
+    if (s.only === true) G.only = true;
 })();
 function persistG() { writeStore(G_KEY, { browse: G.browse, grade: G.grade, grades: G.grades, size: G.size, layout: G.layout, fw: G.fw, status: G.status, show: G.show, only: G.only }); }
+/** The 8/10 chip (owner 2026-11-21, lead ruling A33): a FILTER. Pressed, every view shows only the skills that passed
+ *  the 8/10 redesign (redesign-passed.js); the explanation sits behind "What does 8/10 mean?" beside it. */
+const passOk = (k) => !G.only || REDESIGN_PASSED.has(k);
+export function passChipHTML(on, n, noun, act = 'data-act="only"') {
+    return `<button type="button" class="ts-passchip" ${act} aria-pressed="${on ? 'true' : 'false'}" title="Show only the ${noun}s that passed the 8/10 quality check"><span class="ts-passchip-m" aria-hidden="true">✓</span><span>8/10 · ${n} ${noun}${n === 1 ? '' : 's'}</span></button>`;
+}
 
 let groot = null;
 const gkey = (s) => `${s.categoryId}:${s.skillId}`;
@@ -745,7 +751,7 @@ const stdSort = (x, y) => (stdOf(x) || 'zz').localeCompare(stdOf(y) || 'zz', 'en
 
 /** A WHOLE GRADE (or area): one of each skill — no Mixed pools, no Maths words cards, no "(No Pictures)" twin. */
 function wholeSet(g, a) {
-    return skillCatalogue().filter((s) => s.level === g && !adOf(s).pool && adOf(s).area !== 'WORDS' && (!a || adOf(s).area === a)
+    return skillCatalogue().filter((s) => s.level === g && passOk(gkey(s)) && !adOf(s).pool && adOf(s).area !== 'WORDS' && (!a || adOf(s).area === a)
         && !/\((no pictures|no visuals)\)/i.test(s.label)).map(gkey);
 }
 
@@ -812,12 +818,12 @@ function gShellHTML() {
   <div class="ts-frow"><span class="ts-flabel" id="tsGradeL">Grade</span><div class="ts-pills" role="group" aria-labelledby="tsGradeL" id="tsGrades"></div><span class="ts-note" id="tsSearchNote"></span></div>
   <div class="ts-fdiv" role="presentation"></div>
   <div class="ts-frow" id="tsAreaRow"><span class="ts-flabel" id="tsAreaL">Maths area</span><div class="ts-pills ts-areas" role="group" aria-labelledby="tsAreaL" id="tsAreas"></div></div>
-  <div class="ts-frow" id="tsOnlyRow"><span class="ts-flabel" id="tsOnlyL">Show</span><div id="tsOnly"></div></div>
   <div class="ts-fdiv" role="presentation"></div>
   <div class="ts-frow"><span class="ts-flabel" id="tsBrowseL">Browse by</span><div class="ts-seg ts-browse" role="group" aria-labelledby="tsBrowseL" id="tsBrowse"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsSizeL">Size</span><div class="ts-seg" role="group" aria-labelledby="tsSizeL" id="tsViews"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsShowL">Skills to make</span><div class="ts-seg" role="group" aria-labelledby="tsShowL" id="tsShow"></div>
-    <details class="ts-marks"><summary><span class="ts-pass" aria-hidden="true"></span>What the marks mean</summary>
+    <span class="ts-fsep" role="presentation"></span><span id="tsPassChip"></span>
+    <details class="ts-marks"><summary><span class="ts-marks-i" aria-hidden="true">i</span>What does 8/10 mean?</summary>
       <div class="ts-marks-pop" role="note">
         <p><b class="ts-marks-tick" aria-hidden="true">✓</b><span><b>Tick box, top right</b>: the skill is in your tray. Click it to add or take out.</span></p>
         <p><span class="ts-pass" aria-hidden="true"></span><span><b>8/10, bottom right</b>: the skill has been redesigned and passed our quality check. An independent reviewer scored every page type (lesson, practice, test …) and every screen at 8 or more out of 10 for how it looks, how it teaches and that it is correct. Skills without it still work: they are older designs waiting for their redesign.</span></p>
@@ -836,18 +842,16 @@ function gSyncControls() {
     if (sh) sh.innerHTML = `<button type="button" class="ts-show-plan" data-act="show" data-arg="${G.show === 'plan' ? 'both' : 'plan'}" ${pressedA(G.show === 'plan')}>Yet to be built: ${G.show === 'plan' ? 'On' : 'Off'}</button>`;
     r.querySelector('#tsBrowse').innerHTML = BROWSE.map(([k, l]) => `<button type="button" data-act="browse" data-arg="${k}" ${pressedA(G.browse === k)}>${l}</button>`).join('');
     r.querySelector('#tsViews').innerHTML = SIZES.map(([k, l]) => `<button type="button" data-act="size" data-arg="${k}" ${pressedA(G.size === k)}${G.layout === 'thumb' ? '' : ' title="The size of the thumbnail cards"'}>${l}</button>`).join('');
-    // the Maths area chips (AREA_LABELS, the one label table) and the "Only 8/10 ✓" switch: they filter the Maths area view
+    // the Maths area chips (AREA_LABELS, the one label table) filter the Maths area view; the 8/10 chip (passChipHTML) filters every view
     const inGrades = skillCatalogue().filter((s) => G.grades.includes(s.level));
     const carried = AREA_ORDER.filter((a) => inGrades.some((s) => adOf(s).area === a));
     if (G.area && !carried.includes(G.area)) G.area = '';
     const nA = (a) => inGrades.filter((s) => adOf(s).area === a && (!G.only || REDESIGN_PASSED.has(gkey(s)))).length;
     r.querySelector('#tsAreas').innerHTML = `<button type="button" class="ts-pill ts-area-all" data-act="area" data-arg="" ${pressedA(!G.area)}>All areas</button>`
         + carried.map((a) => `<button type="button" class="ts-pill ts-areabtn" data-act="area" data-arg="${a}" data-domain="${a}" ${pressedA(G.area === a)}><i class="tvw-adot" aria-hidden="true"></i><span class="ts-area-l">${esc(AREA_LABELS[a])}</span> <span class="tvw-n">${nA(a)}</span></button>`).join('');
-    r.querySelector('#tsOnly').innerHTML = `<button type="button" class="tvw-only ts-only" data-act="only" ${pressedA(G.only)} aria-describedby="tsOnlyL"><span class="tvw-sw${G.only ? ' is-on' : ''}" aria-hidden="true"></span><span>Only 8/10 ✓ (${REDESIGN_PASSED.size})</span></button>`;
     r.querySelector('#tsAreaRow').hidden = G.browse !== 'area' || searching;
-    // the switch filters the Maths area view only: it is not offered where it would filter nothing (critic r1 D2)
-    r.querySelector('#tsOnlyRow').hidden = G.browse !== 'area' || searching;
     r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + gradesList().map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}"${GRADE_COLORS[g] && GRADE_COLORS[g].bg && g !== 'M' ? ` style="--gr:${GRADE_COLORS[g].bg}"` : ''} ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
+    r.querySelector('#tsPassChip').innerHTML = passChipHTML(G.only, REDESIGN_PASSED.size, 'skill');
     r.querySelector('#tsSearchNote').textContent = searching ? 'Searching all grades' : '';
     r.classList.toggle('ts-searching', searching);
 }
@@ -860,6 +864,7 @@ function layoutSegHTML() {
 /** A skill card: grade pill + tick, bold name, the real item, area word + icon. data-skill = 'category:skill'. */
 function gCard(s) {
     const k = gkey(s);
+    if (!passOk(k)) return '';
     const d = adOf(s);
     const a = d.area;
     const on = trayHas(k);
@@ -996,7 +1001,7 @@ function gRender() {
     const eyebrow = groot.querySelector('#tsEyebrow');
     let html = '';
     if (q) {
-        const hits = rankByQuery(skillCatalogue(), q);
+        const hits = rankByQuery(skillCatalogue(), q).filter((x) => passOk(gkey(x)));
         eyebrow.textContent = `All grades • ${plural2(hits.length, 'skill')} ${hits.length === 1 ? 'matches' : 'match'}`;
         if (!hits.length) html = `<p class="ts-note">No skill matches “${esc(G.q)}”. Try fewer words.</p>`;
         else {
@@ -1006,8 +1011,8 @@ function gRender() {
                 + order.map((a) => gGroup(a, by[a], { cross: true, budget })).join('') + moreHTML(hits.length - G.limit);
         }
     } else if (G.browse === 'area') {
-        // the area chips and "Only 8/10 ✓" combine (AND) with the grades (design/cards/lessons-browser §4, §6)
-        const list = skillCatalogue().filter((s) => G.grades.includes(s.level) && (!G.area || adOf(s).area === G.area) && (!G.only || REDESIGN_PASSED.has(gkey(s))));
+        // the area chips and the 8/10 chip combine (AND) with the grades (design/cards/lessons-browser §4, §6)
+        const list = skillCatalogue().filter((s) => G.grades.includes(s.level) && (!G.area || adOf(s).area === G.area) && passOk(gkey(s)));
         eyebrow.textContent = `${gradesName()} • ${plural2(list.length, 'skill')}${G.only ? ' with 8/10 ✓' : ''}`;
         const { by } = byArea(list);
         const whole = wholeSetG();
@@ -1019,7 +1024,7 @@ function gRender() {
         order.forEach((a) => { by[a] = (by[a] || []).sort(stdSort); });
         html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>${nG > 1 ? `Add all ${nG} grades` : 'Add whole grade'}</span></button><span class="ts-note">Add ${whole.length} skills from ${esc(allOn() ? 'every grade' : nG > 1 ? gradesNameOf(realGrades()) : gradeName(realGrades()[0]))} to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
             + (order.map((a) => gGroup(a, by[a], { cross: multi() || G.grade === 'M', addArea: nG > 0, budget, planned: plan[a] || [], perArea: true })).join('')
-                || `<p class="ts-note" data-ts-empty="${G.only ? 'only' : 'none'}">${G.only ? 'No skill here has passed 8/10 yet. Turn off "Only 8/10 ✓" to see every skill.' : G.show === 'plan' ? 'Nothing is planned for these grades yet.' : 'No skills here.'}</p>`);
+                || `<p class="ts-note" data-ts-empty="${G.only ? 'only' : 'none'}">${G.only ? 'No skill here has passed 8/10 yet. Press "8/10" again to see every skill.' : G.show === 'plan' ? 'Nothing is planned for these grades yet.' : 'No skills here.'}</p>`);
     } else if (G.browse === 'wrm') {
         eyebrow.textContent = `${gradesName()} · White Rose steps`;
         html = perGrade(wrmHTML);
@@ -1034,6 +1039,8 @@ function gRender() {
         html = setsHTML();
     }
     box.innerHTML = html;
+    // the 8/10 filter on and nothing passed here: say so plainly
+    if (G.only && !box.querySelector('.ts-card[data-skill], .ts-task, [data-ts-empty]')) box.insertAdjacentHTML('afterbegin', '<p class="ts-note ts-pass-empty" data-ts-empty="only">No skill here has passed 8/10 yet. Press "8/10" again to see every skill.</p>');
     gThumbs(box);
 }
 

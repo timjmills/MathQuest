@@ -124,6 +124,14 @@ export function init() {
 export function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
 
+    // Check ?lesson= (the lesson player, design/cards/lesson-player D8 / D11: ?lesson=<id or slug>&part=&s=&mode=board)
+    if (urlParams.get('lesson')) {
+        if (typeof window.openLessonPlayer === 'function') {
+            Promise.resolve(window.openLessonPlayer(window.location.search)).catch((e) => console.warn('[lesson-player] did not open:', e));
+        }
+        return;
+    }
+
     // Check ?map= (Teacher MAP share-link — auto-launch a MAP session)
     const mapParam = urlParams.get('map');
     if (mapParam) {
@@ -215,6 +223,16 @@ export function checkURLParameters() {
             const rec = importQuickPrint(qpParam);
             if (rec && typeof window.showToast === 'function') window.showToast(`“${rec.name}” is in Print › Quick prints`, 'info');
         }).catch((e) => { console.warn('[init] could not read the quick print in the link', e); });
+    }
+
+    // A saved worksheet link ?sheet=SH1.… (My Worksheets, design/my-worksheets/CARD.md §6): a teacher is offered Save and
+    // Print, a pupil plays it. Old ?c= / ?set= / ?qp= links are unchanged.
+    const sheetParam = urlParams.get('sheet');
+    if (sheetParam) {
+        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+        import('./my-worksheets.js').then(({ openSheetCode }) => openSheetCode(sheetParam))
+            .catch((e) => { console.warn('[init] could not open the worksheet in the link', e); });
+        return;
     }
 
     // Check ?c= or ?code= (Direct Play link)

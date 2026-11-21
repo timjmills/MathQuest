@@ -2300,7 +2300,9 @@ function geomFindings(geo, F) {
     const at = (x) => { const o = { page: x.page, el: `<${x.tpl === '?' ? 'cell' : x.tpl}>${x.before ? ` "${x.before}"` : x.a ? ` "${x.a} ${x.b}"` : ''}` }; if (x.cell) o.cell = x.cell; if (x.skill) o.skill = x.skill; return o; };
     for (const x of geo.narrow) F('L-ANSAREA', 'TY-21', 'major', at(x), `answer ${x.kind} ${x.w} mm wide as printed${x.key ? ' (key page)' : ''}: under ${MIN_SEG_MM} mm a pupil cannot write a digit in it (TY-21, VA-12)`, `narrow answer ${x.kind}`);
     for (const x of geo.overlaps) F('L-OVERLAP', 'H2', 'major', at(x), `head labels "${x.a}" / "${x.b}" ${x.gap < 0 ? `overlap by ${-x.gap} mm` : `sit ${x.gap} mm apart`}: neighbouring heads need ${HEAD_GAP_MM} mm between them or they read as one run (H2)`, 'heads too close');
-    for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, `wrap after ${x.op}`);
+    for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), x.side === 'before'
+        ? `a wrapped line starts with "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks before its operator either (join the whole expression with no-break spaces) (C1, TY rules, critic r3 R3-5)`
+        : `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, x.side === 'before' ? `wrap before ${x.op}` : `wrap after ${x.op}`);
 }
 
 // =============================================================================================
@@ -2489,7 +2491,25 @@ function lintKitGeometry(dom, pdf, info, F) {
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
                 const body = p.footRect[1] - p.gridTop;
                 const strip = p.footRect[1] - p.gridBottom;
-                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+                // (critic lf-engine-rowcap-s2 ruling on F4 / F5: on the row-capped roles that are not practice pages - Review, Test, Error
+                // Analysis, Opener - a strip is the page's MAJOR only while the count is under the role's §12.1 ceiling; at the ceiling (or
+                // on a role whose count is its own design, the Opener) the role caps the count and the strip is reported, minor)
+                const capRole = /^(review|test|error-analysis|opener|lesson-opener)\b/.test(p.role || '');
+                const cl = capRole ? ceilingFor(p.role, p.size, false) : null;   // (the role's own §12.1 base: test.js holds a one-symbol Test to it too)
+                const roleCapped = capRole && (!cl || p.items >= cl.n);
+                // (at the ceiling a strip over 30 % is still MAJOR: the same count in fewer columns and more rows would fill it - F5, the
+                // add_facts Test L 4 x 3 at its ceiling of 12 left 39 %; 3 x 4 leaves 23 %)
+                // ROLE-CAPPED REVIEW / ERROR-ANALYSIS (lead rulings 2026-11-20): a Review or an Error Analysis at its §12.1 ceiling is role-capped like a Test - its length is the
+                // teacher's choice, not a fill target - so its strip over 30 % is NOT reshaped into a finding; it is reported, named, on every
+                // page it applies to (never a silent pass). Test / Opener keep the F5 rule below.
+                // (an Error Analysis page's count is the role's own - how many worked errors a page teaches - so every EA page over 20 % is
+                // the named note, whatever its count; ROLE-CAPPED ERROR-ANALYSIS, lead 2026-11-20)
+                const eaCapped = capRole && /^error-analysis\b/.test(p.role || '');
+                if (body > 0 && strip > 0.2 * body && eaCapped) console.log(`  note: PAGEFILL ROLE-CAPPED ERROR-ANALYSIS (lead 2026-11-20; not a finding) ${p.role} ${p.size} page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area), ${p.items} item(s) (ceiling ${cl ? cl.n : '-'}) - its length is a teaching choice`);
+                else if (body > 0 && strip > 0.3 * body && roleCapped && cl && /^review\b/.test(p.role || '')) console.log(`  note: PAGEFILL ROLE-CAPPED REVIEW (lead 2026-11-20; not a finding) ${p.role} ${p.size} page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) at the ${p.role} ceiling ${cl.n} - its length is the teacher's choice`);
+                else if (body > 0 && strip > 0.3 * body && roleCapped && cl) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) at the ${p.role} ceiling ${cl.n}: over 30 % - reshape the grid (fewer columns, more rows) to fill it (critic rowcap-s2 F5)`, 'empty strip under a capped page');
+                else if (body > 0 && strip > 0.2 * body && roleCapped) console.log(`  note: PAGEFILL (not a finding) ${p.role} ${p.size} `+`page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area) - the ${p.role} count ${p.items} is at its ceiling${cl ? ` ${cl.n}` : ' (the role sets its own count)'}: a lead call, not a fill defect`);
+                else if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
             }
             // L-SUPPORT NOT-SLOT (critic divarray r1 D1): a support draws no empty closed box the size/shape of the answer
             // slot, and a frame drawn on only some cells of an array band (the × zero empty frame, the lone framed support)
@@ -2979,7 +2999,9 @@ const NA_DOCS = [];
 // plus N - 1 derived ones (hash(cat__skill:print:k)), or at the seeds listed; every other skill keeps its one
 // seed. Each extra page is its own document (`cat:skill@seed`), so PAGEFILL, L-KEY and the rest are judged
 // page by page. (--kind single only.)
-const poolSkill = (s) => /^mixed_|_all$/.test(s.skillId) || s.skillId === 'all_domains_mixed';
+// A MIXED POOL skill deals several skills; mixed_numbers_intro / mixed_improper_visual are about mixed NUMBERS and are not
+// pools (lead 2026-11-21, lf-algebra: the old /^mixed_/ read them as pools and applied POOL-MIN).
+const poolSkill = (s) => (/^mixed_|_all$/.test(s.skillId) && !/^mixed_(numbers?|improper|fraction)/.test(s.skillId)) || s.skillId === 'all_domains_mixed';
 function seedsOf(s) {
     const SEEDS_N = Math.max(1, parseInt(arg('seeds', '1'), 10) || 1);
     const SEED_LIST = (arg('seed-list', '') || '').split(',').map(x => x.trim()).filter(Boolean).map(Number).filter(Number.isFinite);
@@ -3438,6 +3460,7 @@ const SELF_TESTS = [
     // L-WRAP (critic r2 N6 / N7): a line that wraps after its operator; the control is the same kind of text joined
     // with no-break spaces in a box wide enough for it.
     { name: 'a line wrapped after its operator (L-WRAP)', expect: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:24mm;font-size:16pt">12 + 345678</div>'); } },
+    { name: 'a line wrapped before its operator (L-WRAP, R3-5)', expect: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:30mm;font-size:16pt">1234 67 +&nbsp;6</div>'); } },
     { name: 'an expression joined with no-break spaces (L-WRAP control)', expect: [], absent: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:60mm;font-size:16pt">Then 12&nbsp;+&nbsp;3&nbsp;=&nbsp;15 and 4&nbsp;&#8722;&nbsp;1&nbsp;=&nbsp;3.</div>'); } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');
