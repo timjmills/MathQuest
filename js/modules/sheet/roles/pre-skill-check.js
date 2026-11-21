@@ -593,6 +593,7 @@ function planCheck(input, cut) {
                 }
             }
             const reviewItems = [];
+            let rStart = start + pgs.reduce((t, pg) => t + pg.sections.reduce((u, j) => u + stacked[j].its.length, 0), 0);
             // (the bands are drawn only now, in order, at their filled counts: numbering runs on across the pages)
             // (critic d2d5 r1 D-1: two neighbouring bands of one instruction SHARE one strip - one instruction for one task
             // kind, never a label tail; the later band's grid joins the earlier band under it, each keeping its own score)
@@ -621,7 +622,9 @@ function planCheck(input, cut) {
                 // (the page's Quick review band, whole rows only; each band scores its own items, "Review __/k")
                 const rv = reviewAt.get(pg);
                 if (rv) {
-                    const grids = rv.rows.map((r) => { const g = gridPart(r.its.map((it) => planItem(Object.assign({}, it, { keyTag: it.reviewTag, keyTagAt: it.keyTagAt }), { cols: r.cols, level: 0 })), { cols: r.cols, rows: 1, cellH: r.h, labels, start }); start += r.its.length; return g; });
+                    // (PSC-REVIEW-ORDER, critic qreview r1: the review is numbered after the LAST check item, even on page 1 of a
+                    // two-page check - rStart, not the running check number)
+                    const grids = rv.rows.map((r) => { const g = gridPart(r.its.map((it) => planItem(Object.assign({}, it, { keyTag: (it.keyTagAt && it.keyTagAt.text) || it.reviewTag, keyTagAt: it.keyTagAt }), { cols: r.cols, level: 0 })), { cols: r.cols, rows: 1, cellH: r.h, labels, start: rStart }); rStart += r.its.length; return g; });
                     reviewItems.push(...rv.items);
                     pg.sections.push({ kind: 'band', label: '', instr: instructionText(REVIEW_INSTRUCTION_KEY, rv.items), instructionKey: REVIEW_INSTRUCTION_KEY, cls: 'mq-pscreview', reviewBand: true, extra: `<span class="mq-quadscore">Review __/${slotScore(rv.items)}</span>`, contents: grids });
                     pg.used = (pg.used || 0) + rv.used;
