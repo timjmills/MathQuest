@@ -84,6 +84,9 @@ const LESSON = arg('--lesson', 'add-within-10');
 const A22 = argv.includes('--stage-fill') || !process.env.MQ_ROOT;
 // A26 (lead ruling 2026-11-20): the hops go below the answer row (or beside the drawing), never above it; see --hops-below
 const A26 = argv.includes('--hops-below') || !process.env.MQ_ROOT;
+// A30-5 (lead ruling 2026-11-21): pupil mode never creates a progress record to store the part reached; on by default on
+// this tree, a backtest checkout runs it only with --a30 (so lesson-player-s2-any-part keeps judging deac66eaa's contract)
+const A30 = argv.includes('--a30') || !process.env.MQ_ROOT;
 const BOARD_W = 1920;
 const WIDTHS = SW.widthsArg(process.argv, [...SW.SCREEN_WIDTHS, BOARD_W]);
 const HEIGHT = (w) => (w === BOARD_W ? 1080 : SW.heightOf(w));
@@ -1119,7 +1122,8 @@ async function anyPartS2() {
         const { page } = h;
         // lead ruling A30-5: with no progress record for the lesson's practice skill, reaching a part creates NONE
         const made = await page.evaluate(() => { const sk = window.lessonPlayerState().practice; const sp = (window.state && window.state.skillProgress) || {}; return { sk, has: !!sp[sk] }; });
-        if (!made.sk) fail(M, 'A30-5: the player exposes no practice skill');
+        if (!A30) { /* A30-5 off on this backtest checkout */ }
+        else if (!made.sk) fail(M, 'A30-5: the player exposes no practice skill');
         else if (made.has) fail(M, `A30-5: reaching a part created a progress record for ${made.sk} (lead ruling: never create a 0-attempt record)`);
         else ok(M, 'A30-5: no progress record is created just to store the part reached');
         // resume needs a record the pupil already has (A30-5): give one, as a pupil who has practised the skill has, then reach We do again

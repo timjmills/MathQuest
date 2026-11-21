@@ -16010,6 +16010,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-player-a30-no-record",
+  "check": "ws-lesson-player --any-part A30-5: reaching a part in pupil mode creates no progress record (the part reached is kept only on a record the pupil already has); pupil resume still works",
+  "kind": "commit-pair",
+  "rule": "lead ruling A30-5 (lesson player slice 2)",
+  "browser": true,
+  "fail": {
+   "commit": "0201f77b9",
+   "state": "saveReached created a 0-attempt progress record for the practice skill (add_facts)"
+  },
+  "pass": {
+   "commit": "c92602377",
+   "state": "reachedRec(lesson, false): no record is created; resume works from an existing record"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --any-part --slice2 --a30",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
