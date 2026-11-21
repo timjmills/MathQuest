@@ -16282,7 +16282,7 @@
     "state": "multiplication:multiply had no wrongAnswer: the default 'added' distractor on every item"
    },
    "pass": {
-    "commit": "f7aaadb18",
+    "commit": "7ac1861a6",
     "state": "multiplyWrong: placeholder-zero, last-carry-dropped, regroup-not-added, sum-no-regroup, zero-as-one, rotated by item"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills multiplication:mult_4by1_column,multiplication:mult_3by2_standard --seeds 2 --sizes M --only EA-WRONG-KIND --screen-seeds 0 --score-roles error-analysis,true-false,reason-it",
