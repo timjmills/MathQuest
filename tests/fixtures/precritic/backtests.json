@@ -16030,6 +16030,106 @@
     "state": "print-sheet.js reviewCandidates skips a skill below the pupil's grade minus 2 (REVIEW_GRADE_SPAN), 12 candidates a domain"
    },
    "browser": true
+  },
+  {
+   "id": "psc-keylabel-grey",
+   "kind": "commit-pair",
+   "check": "KEYLABEL-GREY (lf-roles critic qreview r1 #1): every Quick review key label prints in the one grey (computed colour = the --ws-grey token) and has no [data-ws-key-ans] on it or an ancestor",
+   "rule": "ws-psc-review KEYLABEL-GREY",
+   "command": "node tests/scripts/ws-psc-review.mjs --only KEYLABEL-GREY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "bd27ee70d",
+    "state": "8b0d78056 + the check (and the tag diagnostic in meta.reviewFit): tagKeyAnswers tagged the key-only label as an added mark (data-ws-key-ans data-ws-key-add), so the key ink !important rule printed it rgb(194,65,12): 44 labels on the default fixtures"
+   },
+   "pass": {
+    "commit": "de58999de",
+    "state": "key-short.js tagKeyAnswers passes [data-review-label] over; the label stays an untagged sibling in the cell, grey (no CSS change)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-keylabel-words",
+   "kind": "commit-pair",
+   "check": "KEYLABEL-WORDS (critic qreview r1 #2, lead A32-2): each key label is one line and no word of it spans two line boxes (Range rects)",
+   "rule": "ws-psc-review KEYLABEL-WORDS",
+   "command": "node tests/scripts/ws-psc-review.mjs --only KEYLABEL-WORDS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "bd27ee70d",
+    "state": "8b0d78056 + the check (and the tag diagnostic in meta.reviewFit): side-column labels 10-15 mm wide under overflow-wrap:anywhere: 53 findings, e.g. \"Counting · More/Fewer/Same Groups\" on 8 lines, \"Operations\" broken"
+   },
+   "pass": {
+    "commit": "baedb54be",
+    "state": "keyTagPlace lays one line in the foot or the top strip (full tag, then the domain name alone), else passes the item over; answer-key draws it nowrap"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-review-tag-id",
+   "kind": "commit-pair",
+   "check": "REVIEW-TAG-ID (critic qreview r1 #3): each review tag (chosen items and every candidate in meta.reviewFit.cands) names the label of that category + skill in SKILLS",
+   "rule": "ws-psc-review REVIEW-TAG-ID",
+   "command": "node tests/scripts/ws-psc-review.mjs --only REVIEW-TAG-ID",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "bd27ee70d",
+    "state": "8b0d78056 + the check (and the tag diagnostic in meta.reviewFit): reviewCandidates read SKILL_FULL_LABELS[id] (keyed by id alone): fractions:identify tagged \"Name the Place\" (placevalue:identify) on div/mult_facts M and L"
+   },
+   "pass": {
+    "commit": "b8dc5c2e9",
+    "state": "the tag cleans the skill's own l (data.js cleanSkillLabel, shared with SKILL_FULL_LABELS)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-review-instr",
+   "kind": "commit-pair",
+   "check": "REVIEW-INSTR (critic qreview r1 #4): a Quick review cell answering in a choice / check / shade / circle slot prints its own verb prompt ([data-review-prompt])",
+   "rule": "ws-psc-review REVIEW-INSTR",
+   "command": "node tests/scripts/ws-psc-review.mjs --only REVIEW-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "bd27ee70d",
+    "state": "8b0d78056 + the check (and the tag diagnostic in meta.reviewFit): 13 review cells (fact family Yes/No, odd/even boxes, a.m./p.m., more/fewer groups) under only \"Quick review. Solve each one.\""
+   },
+   "pass": {
+    "commit": "5d6597615",
+    "state": "pre-skill-check prepare gives each review item its library instruction as a measured prompt line at the top of its cell (pure compute instructions excepted)"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-review-order",
+   "kind": "commit-pair",
+   "check": "PSC-REVIEW-ORDER (critic qreview r1 #5): every review number is after every check number, on two-page checks too",
+   "rule": "ws-psc-review PSC-REVIEW-ORDER",
+   "command": "node tests/scripts/ws-psc-review.mjs --only PSC-REVIEW-ORDER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "bd27ee70d",
+    "state": "8b0d78056 + the check (and the tag diagnostic in meta.reviewFit): sub_wp_20 L: review 9-10 on page 1, check 11-16 on page 2"
+   },
+   "pass": {
+    "commit": "e3db32ba6",
+    "state": "review grids start after the whole check (rStart): sub_wp_20 L page 1 review 15-16, page 2 check 9-14"
+   },
+   "browser": true
   }
  ]
 }
