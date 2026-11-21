@@ -161,7 +161,8 @@ function lmFootprint(p, ctx) {
 register('long-multiplication', {
     render(p, ctx) {
         const g = geo(ctx);
-        const { w, n, slots: keySlots } = lmKey(p);
+        const { w: w0, n, slots: keySlots } = lmKey(p);
+        let w = w0;
         const lvl = Number(p.level) || 0;
         const tr = trackOf(ctx, g);
         const ink = inkOf(ctx);
@@ -240,6 +241,17 @@ register('long-multiplication', {
             for (let pl = 1; pl < w.A.length; pl++) places.push(pl);
             carryRow(w.rows[0].carries, places, row, 'row 1', inkAt(0));
         }
+        // (lf-ops sizes r2, EA-WORK-COHERENT: the pupil's wrong work names the rows it got wrong - `row1` / `row2` in the wrong
+        // state's slots - and those rows are drawn as written, with no carries of the right work over them; the sum's carries go too)
+        const wr = ctx.state === 'wrong' && ctx.wrong && ctx.wrong.slots ? ctx.wrong.slots : null;
+        const ownRow = (idx) => (wr && wr[`row${idx + 1}`] !== undefined && /^\d+$/.test(String(wr[`row${idx + 1}`])) ? Number(wr[`row${idx + 1}`]) : null);
+        const pupilRows = !single && w.rows.some((rw, idx) => ownRow(idx) !== null && ownRow(idx) !== rw.value);
+        if (pupilRows) w = Object.assign({}, w, {
+            rows: w.rows.map((rw, idx) => (ownRow(idx) !== null && ownRow(idx) !== rw.value ? Object.assign({}, rw, { value: ownRow(idx), carries: {},
+                // (a tens row written with no placeholder 0 - M-S4 - has no placeholder place: its last digit sits in the ones)
+                k: rw.k > 0 && ownRow(idx) % 10 ** rw.k !== 0 ? 0 : rw.k }) : rw)),
+            sumCarries: {},
+        });
         if (!single) w.rows.forEach((rw, idx) => {
             if (lvl >= 1) {
                 row++;

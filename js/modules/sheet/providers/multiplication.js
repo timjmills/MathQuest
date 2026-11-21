@@ -365,7 +365,73 @@ function sizedColumn(q) {
     return null;
 }
 
+/**
+ * The column methods' wrong answers (lf-ops sizes r2, critic r1 F3 / F4; card mult-sizes M-S1..M-S5): a real pupil's error in
+ * the column work, never the factors added. Every candidate names the boxes its work changes, so the shown work is coherent
+ * (EA-WORK-COHERENT): a long-multiplication row the pupil got wrong is drawn as written (`row1` / `row2`), the answer strip
+ * holds that work's sum. chooseWrong rotates by item, so a page shows several kinds.
+ */
+/** a with its first zero digit (never the leading one) written as a 1 - M-S5, "treats a zero digit as 1" - else null. */
+function zeroAsOne(a) {
+    const d = String(a);
+    const i = d.indexOf('0', 1);
+    return i < 0 ? null : Number(d.slice(0, i) + '1' + d.slice(i + 1));
+}
+/** The column product with every regrouped number left out: each place writes only its ones (the last place its whole product). */
+function noCarryProduct(a, m) {
+    const ds = String(a).split('').reverse().map(Number);
+    let out = '';
+    ds.forEach((d, i) => { out = (i === ds.length - 1 ? String(d * m) : String((d * m) % 10)) + out; });
+    return Number(out);
+}
+/** The product with its last regrouped number dropped (M-S2): the new top place is missing. null when there is none. */
+function lastCarryDropped(a, m) {
+    const p = a * m;
+    const lim = 10 ** String(a).length;
+    return p >= lim ? p % lim : null;
+}
+/** Two rows added with no regrouping: each place keeps only the ones of its sum. */
+function sumNoRegroup(x, y) {
+    const X = String(x).split('').reverse(), Y = String(y).split('').reverse();
+    let out = '';
+    for (let i = 0; i < Math.max(X.length, Y.length); i++) out = String((Number(X[i] || 0) + Number(Y[i] || 0)) % 10) + out;
+    return Number(out);
+}
+function multiplyWrong(q) {
+    const s = sizedColumn(q);
+    if (!s) return null;
+    const { a, b } = s;
+    const c = [];
+    if (!s.long) {
+        const ld = lastCarryDropped(a, b);
+        if (ld !== null) c.push({ value: ld, misconception: 'last-carry-dropped', explain: `Did not write the last regrouped number: ${fmt(a)} × ${b} is ${fmt(a * b)}.` });
+        const nc = noCarryProduct(a, b);
+        if (nc !== a * b) c.push({ value: nc, misconception: 'regroup-not-added', explain: `Did not add the regrouped numbers. ${fmt(a)} × ${b} is ${fmt(a * b)}.` });
+        const z = zeroAsOne(a);
+        if (z !== null) c.push({ value: z * b, misconception: 'zero-as-one', explain: `Multiplied the 0 in ${fmt(a)} as if it were 1.` });
+        return chooseWrong(q, c);
+    }
+    const ones = b % 10, tens = Math.floor(b / 10);
+    const r1 = a * ones, r2 = a * tens * 10;
+    const rows = (x, y) => ({ row1: String(x), row2: String(y) });
+    // M-S4: no placeholder 0 - the tens row written one place to the right
+    if (tens) c.push({ value: r1 + a * tens, misconception: 'placeholder-zero', slots: rows(r1, a * tens), explain: `Left out the 0 in the tens row: it is ${fmt(a)} × ${tens * 10} = ${fmt(r2)}.` });
+    // M-S2: the last regrouped number of the ones row left out
+    const ld = lastCarryDropped(a, ones);
+    if (ld !== null) c.push({ value: ld + r2, misconception: 'last-carry-dropped', slots: rows(ld, r2), explain: `Did not write the last regrouped number in the ones row: ${fmt(a)} × ${ones} = ${fmt(r1)}.` });
+    // the rows added with no regrouping
+    const nr = sumNoRegroup(r1, r2);
+    if (nr !== r1 + r2) c.push({ value: nr, misconception: 'sum-no-regroup', slots: rows(r1, r2), explain: `Added the rows without regrouping: ${fmt(r1)} + ${fmt(r2)} = ${fmt(r1 + r2)}.` });
+    // M-S5: a zero digit multiplied as 1
+    const z = zeroAsOne(a);
+    if (z !== null) c.push({ value: z * ones + z * tens * 10, misconception: 'zero-as-one', slots: rows(z * ones, z * tens * 10), explain: `Multiplied the 0 in ${fmt(a)} as if it were 1.` });
+    return chooseWrong(q, c);
+}
+
 registerSkill('multiplication:multiply', {
+    // (lf-ops sizes r2: the card's misconceptions M-S1..M-S5 - never the default "added the factors")
+    misconceptions: ['placeholder-zero', 'last-carry-dropped', 'regroup-not-added', 'sum-no-regroup', 'zero-as-one'],
+    wrongAnswer: multiplyWrong,
     // (lf-ops-steps: the default adapter's strings, with the column steps added for a column item; `keyIsDefault`: its
     // instruction key is still the default adapter's placeholder, so the page keeps the host's key - practice.js
     // itemInstructionKey)

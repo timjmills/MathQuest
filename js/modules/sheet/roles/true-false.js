@@ -79,7 +79,7 @@ export function prepare(it, info = {}) {
         // The judgement column sits beside the work, so a cell is at most half the page wide; a
         // word problem or a wide picture keeps its own single column (PT-WPR-1).
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
-        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong: isFalse, frame: place.kind },
+        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong: isFalse, frame: place.kind, misconception: isFalse ? wrong.misconception || '' : '' },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }

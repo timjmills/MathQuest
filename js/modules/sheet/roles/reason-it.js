@@ -129,7 +129,7 @@ export function prepare(it, info = {}) {
         return Object.assign({}, it, {
             render: renderT, key, measured: null, drawsAnswer: true,
             footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),
-            fclass: 'standard', thinking: { correct, wrong: wrong.value, right, text: true },
+            fclass: 'standard', thinking: { correct, wrong: wrong.value, right, text: true, misconception: wrong.misconception || '' },
             cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
         });
     }
@@ -203,7 +203,7 @@ export function prepare(it, info = {}) {
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),
-        fclass: 'standard', thinking: { correct, wrong: wrong.value, right },
+        fclass: 'standard', thinking: { correct, wrong: wrong.value, right, misconception: wrong.misconception || '' },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }

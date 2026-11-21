@@ -37,6 +37,8 @@
 //   EA-WORK-COHERENT   (lf-ops sizes r2, critic r1 F2 / F12) on Error analysis, True or False? and Reason It, an area model's
 //                      shown work is coherent: no box holds a grouped number, and the total is the parts' sum or that sum less one
 //                      part ("1,590" split as "1" | "590"; a "dropped zeros" total beside the right part).
+//   EA-WRONG-KIND      (lf-ops sizes r2, critic r1 F3 / F4) a column multiplication's wrong work on EA / TF / Reason It is never
+//                      the two factors added, and over a skill's pages its 4+ wrong works show at least two kinds of error.
 //   SAY-AGREE          every Say frame a page prints - the opener's UNFILLED one among them - agrees in number with the page's
 //                      Model item (N3: "The missing number is __." under a two-gap Model): an item of k > 1 answer parts
 //                      (`keyParts`) prints a plural frame, with k blanks when it is unfilled. Judged on chart windows.
@@ -74,7 +76,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0 } = part || {};
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'EA-WORK-COHERENT'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'EA-WORK-COHERENT', 'EA-WRONG-KIND'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -273,6 +275,20 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                 if (T !== S && !P.some((x) => S - x === T)) out.push(`EA-WORK-COHERENT ${lab}: the parts ${parts.join(' + ')} = ${S} do not make the total ${tot} (nor does any part left out)`);
                             });
                         }
+                        // EA-WRONG-KIND (lf-ops sizes r2, critic r1 F3 / F4): a column multiplication's wrong work is a pupil's error in the
+                        // column work - never the two factors ADDED (the default distractor) - and over a skill's thinking pages it shows
+                        // at least two kinds of error (judged at the end of the skill, below)
+                        if (on('EA-WRONG-KIND') && ['error-analysis', 'true-false', 'reason-it'].includes(role)) {
+                            for (const it of pp.flatMap((pg) => pg.items)) {
+                                const th = it && it.thinking; const cl = it && it.q && it.q.cell;
+                                if (!th || !cl || !(cl.template === 'long-multiplication' || (cl.template === 'stack' && cl.payload && cl.payload.op === '*'))) continue;
+                                const wv = th.wrong !== undefined ? th.wrong : th.isWrong ? th.shown : undefined;
+                                if (wv === undefined || wv === null || wv === '') continue;
+                                const ops = cl.template === 'long-multiplication' ? [Number(cl.payload.a), Number(cl.payload.b)] : (cl.payload.operands || []).map(Number);
+                                if (ops.length === 2 && Number(String(wv).replace(/,/g, '')) === ops[0] + ops[1]) out.push(`EA-WRONG-KIND ${key} ${role} ${size} seed ${s}: the wrong work for ${ops[0]} × ${ops[1]} is ${wv}, the factors added - not a column-multiplication error`);
+                                (window.__geKinds = window.__geKinds || {})[key] = (window.__geKinds[key] || []).concat([th.misconception || 'unnamed']);
+                            }
+                        }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
@@ -329,6 +345,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             }
             if (finalize && on('TF-FALSE') && tf.all) { const sh = tf.falseN / tf.all; if (sh < 0.35 || sh > 0.65) out.push(`TF-FALSE ${keys.join(',')}: ${tf.falseN} of ${tf.all} statements False over ${tf.pages} pages (${Math.round(sh * 100)} %, PT-TOF-1 40-60 %)`); }
             if (finalize && on('EA-PATTERN') && ea.multiCorrect + ea.multiFix >= 4 && (!ea.multiCorrect || !ea.multiFix)) out.push(`EA-PATTERN ${keys.join(',')}: windows of 2+ gaps judged Correct ${ea.multiCorrect}, Fix it ${ea.multiFix} - the judgement follows the gap count`);
+            if (finalize && on('EA-WRONG-KIND')) for (const [k, ks] of Object.entries(window.__geKinds || {})) { const kinds = new Set(ks); if (ks.length >= 4 && kinds.size < 2) out.push(`EA-WRONG-KIND ${k}: all ${ks.length} wrong works show one kind of error (${[...kinds].join(', ')}) - a page tests more than one misconception`); }
             if (finalize) out.push(`OVERLAP-INFO ${st.overlap} answer(s) shared by overlapping (not identical) windows; TF ${tf.falseN}/${tf.all} False; EA multi-gap Correct ${ea.multiCorrect} / Fix it ${ea.multiFix}`);
             return { out, pages };
         }, { keys: (part && part.keys) || keys, N, sizes: (part && part.sizes) || sizes, only, scoreTpl, scoreRoles, part });
@@ -348,7 +365,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|EA-WORK-COHERENT) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|EA-WORK-COHERENT|EA-WRONG-KIND) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
