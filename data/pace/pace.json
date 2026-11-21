@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T08:47:40.715Z",
- "head": "1efa6ee40",
+ "generated": "2026-11-21T09:26:39.101Z",
+ "head": "d94a4a886",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,20 +475,20 @@
    "done": false,
    "usagePct": 71,
    "usageEstimated": false,
-   "rev": "1efa6ee40",
+   "rev": "d94a4a886",
    "skills": 742,
    "retired": 10,
    "presets": 130,
    "core": 602,
    "corePassed": 29,
    "passed": 33,
-   "gates": 174,
-   "backtests": 802,
-   "ledger": 652,
+   "gates": 178,
+   "backtests": 821,
+   "ledger": 672,
    "lessons": 57,
-   "lessonsPassed": 1,
-   "lessonsPending": 5,
-   "lessonsPassedSource": "lessons-browser branch (not live yet)",
+   "lessonsPassed": 0,
+   "lessonsPending": 6,
+   "lessonsPassedSource": "master",
    "wrm": {
     "covered": 513,
     "partial": 151,
@@ -564,12 +564,12 @@
     "from": "2026-11-26"
    },
    "liveRecorded": true,
-   "ledgerAdded": 133,
+   "ledgerAdded": 153,
    "added": {
     "skills": 6,
     "passed": 1,
-    "gates": 31,
-    "backtests": 200,
+    "gates": 35,
+    "backtests": 219,
     "lessons": 16,
     "lessonsPassed": null,
     "wrmCovered": 0
@@ -1755,6 +1755,13 @@
    }
   ],
   "2026-11-19": [
+   {
+    "date": "2026-11-21",
+    "title": "Deploy the lessons browser (OWNER: \"put it live and then we will fix later\")",
+    "detail": "Lessons screen: curriculum order by unit with the 2026-27 unit dates (data/curriculum/pacing/2026-27.json, edited yearly), grade colours, thumbnails (item cards for detailed lessons, A20 waiver), the 8/10 lesson filter chip, D11/D12 fixes. Critic r3 C1-C3 8; C4 7 on the freeze margin only.",
+    "kind": "lesson",
+    "from": "STATUS.md"
+   },
    {
     "date": "2026-11-21",
     "title": "Deploy 8/10 filter chip on the Skills screen (owner request; lf-checks narrow critic r2 PASS 8/9/8/9)",
