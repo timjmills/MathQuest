@@ -27,7 +27,7 @@ const OUT = path.join(ROOT, 'data', 'pace', 'pace.json');
 const USAGE = path.join(ROOT, 'data', 'pace', 'usage.json');
 const FIRST_WEEK = Date.UTC(2026, 9, 15, 22, 0); // Thu 2026-10-15 22:00 UTC: the first reset in the program's records
 const WEEK = 7 * 24 * 3600 * 1000;
-const FROZEN = ['wrm', 'grades', 'lessonsPassed', 'lessonsPending', 'lessonsPassedSource', 'todoChecks'];
+const FROZEN = ['targets', 'wrm', 'grades', 'lessonsPassed', 'lessonsPending', 'lessonsPassedSource', 'todoChecks'];
 const arg = (k) => process.argv.includes(k);
 
 function weekStarts(nowMs) {
@@ -60,7 +60,17 @@ function measure(rev, live) {
     const data = show(rev, 'js/modules/data.js') || '';
     const skills = (data.match(/\{\s*v:\s*["']/g) || []).length;
     const rp = show(rev, 'js/modules/redesign-passed.js') || '';
-    const passed = new Set(rp.match(/'[a-z_0-9]+:[a-z_0-9]+'/g) || []).size;
+    const passedIds = new Set((rp.match(/'[a-z_0-9]+:[a-z_0-9]+'/g) || []).map((x) => x.slice(1, -1)));
+    const passed = passedIds.size;
+    // Skills that count toward the redesign: live (not retired) and not presets. A preset (an option recorded as a skill,
+    // CLAUDE.md 2026-10-17) opens its host with option values set; it is counted on its own line, not as a separate redesign.
+    const retired = (data.match(/retired:\s*true/g) || []).length;
+    const ps = show(rev, 'js/modules/skill-presets.js') || '';
+    const pi = ps.indexOf('SKILL_PRESETS = Object.freeze({');
+    const presetIds = pi < 0 ? [] : (ps.slice(pi, ps.indexOf('});', pi)).match(/^\s*'[a-z_0-9]+:[a-z_0-9]+'\s*:/gm) || []).map((x) => x.trim().slice(1).split("'")[0]);
+    const presets = presetIds.length;
+    const core = skills - retired - presets;
+    const corePassed = [...passedIds].filter((id) => !presetIds.includes(id)).length;
     let gates = 0;
     try { gates = sh(`git ls-tree --name-only ${rev} tests/scripts/`).split('\n').filter((f) => /\/ws-[^/]+\.(c|m)?js$/.test(f)).length; } catch {}
     let backtests = 0;
@@ -77,7 +87,7 @@ function measure(rev, live) {
     const m = cov.match(/Covered (\d+) \((\d+)%\), partial only (\d+) \(\d+%\), gap (\d+)/);
     const wrm = m ? { covered: +m[1], partial: +m[3], gap: +m[4], total: +m[1] + +m[3] + +m[4] } : null;
     const gr = grades(cov);
-    return { rev: rev.slice(0, 9), skills, passed, gates, backtests, ledger, lessons, lessonsPassed: lp.passed, lessonsPending: lp.pending, lessonsPassedSource: lp.source, wrm, grades: gr };
+    return { rev: rev.slice(0, 9), skills, retired, presets, core, corePassed, passed, gates, backtests, ledger, lessons, lessonsPassed: lp.passed, lessonsPending: lp.pending, lessonsPassedSource: lp.source, wrm, grades: gr };
 }
 // Whole lessons at 8/10 live in js/modules/lessons-passed.js (the ONE place, owner 2026-11-19). Until that file reaches
 // master it is read from the lessons-browser branch and marked so; a week before either exists counts null.
@@ -163,6 +173,7 @@ function build(nowMs) {
         const u = usage[iso(s)] || null;
         const w = { start: iso(s), end: iso(end), done, usagePct: u ? u.pct : null, usageEstimated: u ? !!u.estimated : null, ...measure(rev, !done) };
         if (!done) w.todoChecks = todoChecks(show('WORKTREE', 'design/status/speed-audit.md')).length;
+        if (!done) { try { w.targets = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'pace', 'targets.json'), 'utf8')); } catch {} }
         const old = (prevFile.weeks || []).find((x) => x.start === w.start);
         // A finished week keeps what was measured live while it ran (White Rose coverage is regenerated live each run, the
         // committed report can lag): FROZEN fields are copied from the board as it stood, never recomputed from git.
