@@ -18,6 +18,7 @@
 //   has appeared (K: no NF; NF from grade 3); R3 no item is the lesson skill or a prerequisite; R4 two builds, same seed, identical.
 // PSC-SCORES: S1 "Check __/n" with n = the check items; S2 "Review __/m" with m = the review items (summed over the review
 //   bands: page 1 of a two-page check may carry one, lead A24 item 1b); S3 the key labels every review item with its domain and skill.
+// PSC-REVIEW-GRADE (lead A24 item 5): every review item's grade lies in the pupil's grade down to two grades below.
 // KEYLABEL-CLEAR (lead A24 item 5): on the key, each review label's box does not intersect its cell's ink box (the union of the
 //   cell's painted parts, the label and the number tab aside), measured in the DOM.
 import { createRequire } from 'module';
@@ -117,6 +118,16 @@ function measureKeyLabels() {
     return out.map((c, i) => Object.assign(c, { n: i + 1 }));
 }
 
+/** PSC-REVIEW-GRADE (lead A24 item 5, 2026-11-21): review items come only from the pupil's grade down to two grades below
+ *  (a grade-3 page takes grades 1-3, never K counting). `items` [{skill, grade}], `grade` the pupil's. Returns [{rule, msg}]. Pure. */
+export const gradeRank = (g) => (g === 'K' || g === 'k' || g === 0 ? 0 : /^\d$/.test(String(g)) ? Number(g) : null);
+export function gradeWindowBad(items, grade, where = '') {
+    const own = gradeRank(grade);
+    if (own === null) return [];
+    return (items || []).filter((x) => { const g = gradeRank(x.grade); return g === null || g < own - 2 || g > own; })
+        .map((x) => ({ rule: 'PSC-REVIEW-GRADE', msg: `${where}review item ${x.skill} is grade ${x.grade || '?'}, outside the grade-${grade} window (grades ${Math.max(0, own - 2) || 'K'}-${grade})` }));
+}
+
 function selfTest() {
     const ok = { plan: { meta: { items: 12, review: [{ skill: 'placevalue:identify', domain: 'NBT' }, { skill: 'geometry:x', domain: 'G' }] } },
         pupil: 'Quick review. Solve each one. Check __/12 Review __/2', key: '<i data-review-label>Base Ten · Place value<i data-review-label>Geometry · Shapes<', again: null };
@@ -130,6 +141,10 @@ function selfTest() {
         ['R2 full cycle then repeat OK', rotationBad(allowedDomains(1).concat(['OA']), allowedDomains(1)), null],
         ['R2 NF at K not allowed', /not allowed/.test(rotationBad(['NF'], allowedDomains('K')) || ''), true],
         // (KEYLABEL-CLEAR planted states: the label over the ink's top-right corner FAILS; above it, or beside it, passes)
+        ['GRADE K item on a grade-3 page fails', gradeWindowBad([{ skill: 'counting:count_objects', grade: 'K' }], 3).length, 1],
+        ['GRADE 1 item on a grade-3 page passes', gradeWindowBad([{ skill: 'addition:add_facts', grade: '1' }], 3).length, 0],
+        ['GRADE K item on a grade-2 page passes', gradeWindowBad([{ skill: 'counting:count_objects', grade: 'K' }], 2).length, 0],
+        ['GRADE above the pupil fails', gradeWindowBad([{ skill: 'x:y', grade: '4' }], 3).length, 1],
         ['KEYLABEL over the ink fails', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 3, r: 40, b: 40 } }]).length, 1],
         ['KEYLABEL above the ink passes', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 4.5, r: 40, b: 40 } }]).length, 0],
         ['KEYLABEL outside its cell fails', keyLabelBad([{ n: 1, label: { l: 30, t: 41, r: 52, b: 44 }, ink: { l: 5, t: 3, r: 40, b: 30 }, cell: { l: 0, t: 0, r: 46, b: 46 } }]).length, 1],
@@ -161,10 +176,12 @@ async function main() {
             const meta = r.plan && r.plan.meta ? r.plan.meta : {};
             return { plan: { meta: { items: meta.items, review: meta.review || null, prereqs: meta.prereqs || [] } }, pupil: r.pupilHtml, key: r.keyHtml, again: r2.pupilHtml,
                 keyDoc: r.keyHtml ? window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }) : null,
+                reviewGrades: (meta.review || []).map((x) => { const [c2, s2] = x.skill.split(':'); return { skill: x.skill, grade: String((window.getSkillGrade && window.getSkillGrade(s2, c2)) || '') }; }),
                 grade: (window.getSkillGrade && window.getSkillGrade(a.s)) || '' };
         }, { c: categoryId, s: skillId, size: j.size, seed });
         const own = [j.k].concat(b.plan.meta.prereqs || []);
         const out = judge(b, own, b.grade);
+        out.push(...gradeWindowBad(b.reviewGrades, b.grade));
         // KEYLABEL-CLEAR: the key rendered as printed, every review label against its cell's ink box
         if (b.keyDoc) {
             const kp = await app.browser.newPage();
