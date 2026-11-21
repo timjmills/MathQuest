@@ -82,7 +82,7 @@ export function prepare(it, info = {}) {
     // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
     // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
     const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
-    let work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: twoCol ? 1 : sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
+    let work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: twoCol ? 1 : sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}, amStacked ? { payload: { noWork: true } } : {}));
     const story = (c) => (sentence || column ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: column ? { storyOnly: true } : { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
@@ -92,11 +92,15 @@ export function prepare(it, info = {}) {
     // `footprint.inkWMm` is a template's true work width (pv supplies it); equation / stack / word-work footprints are their
     // true width already, other templates' wMm carries slack (a pv item at 70 mm fits a 62 mm panel)
     const fp = it.footprint || {};
+    // (FULL below: an area model too wide for the panel beside the response; its A and B copies drop the work lines)
+    const fullAm = it.template === 'area-model' && (Number(fp.wMm) || 0) > LIVE_W_MM - 52 - 16;
+    // (any area model A over B - wider than half the cell - draws its two copies without the work lines)
+    const amStacked = it.template === 'area-model' && (Number(fp.wMm) || 0) > (LIVE_W_MM - 5) / 2 - 4;
     // (lead ruling A9 (1), 2026-11-20, mult_3by2_standard Reason It L OVERFLOW: a long-multiplication grid's footprint wMm is its
     // true width, but BESIDE it the response column is wider than its 52 mm floor - "The answer is" and a 5-6 box strip, ~78 mm at
     // L - so the 52.8 mm grid ran 3.7 mm out of each 45 mm panel. It counts the panel pads and that wider column: at L the grid takes
     // the UNDER layout (one a page, ruled capacity); at M its narrower grid still fits beside, two a page.)
-    const workW = Number(fp.inkWMm) || (TRUE_W.has(it.template) ? Number(fp.wMm) || 0 : it.template === 'long-multiplication' ? (Number(fp.wMm) || 0) + 12 : 0);
+    const workW0 = Number(fp.inkWMm) || (TRUE_W.has(it.template) ? Number(fp.wMm) || 0 : it.template === 'long-multiplication' ? (Number(fp.wMm) || 0) + 12 : 0);
     // Three layouts (critic r6c D1 / D3): beside (A | B | response) when the work fits half of the room left of the response
     // column; UNDER (A | B side by side at half the cell each, the response a full-width row under them) when it fits half the
     // cell; STACKED (A over B, the response beside, top start) only when it does not. The sentence story and the across
@@ -136,17 +140,25 @@ export function prepare(it, info = {}) {
     // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A, centred, as before - lf-vocab r5, ws-empty-band)
     // (a chart window past 100 - chart_120's band 120, three-digit squares, 85 mm at L - states its true width as footprint
     // inkWMm, so it takes the UNDER layout: A | B at half the cell each, the response under them; stacked it held one a page)
-    const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && workW > halfBeside);
-    const under = !legacy && !twoCol && (story1 ? true : workW > halfBeside && workW <= halfCell);
-    const wide = legacy || twoCol || (!under && workW > halfBeside);
+    const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && workW0 > halfBeside);
+    // FULL (lf-ops sizes r2, critic r1 F5): an area model wider than the panel beside the response column - the 2-row and 4-part
+    // models, 120-190 mm - stands A over B at the cell's FULL width with the response a row under them. BESIDE (the template has
+    // no true ink width, workW 0) A and B ran over each other and off the page at L; one a page there is a capacity ruling, never
+    // a licence to overflow (Process rule 19).
+    const amW = it.template === 'area-model' ? Number(fp.wMm) || 0 : 0;
+    const full = fullAm && !legacy && !twoCol && !story1;
+    const workW = workW0 || amW;
+    const under = !full && !legacy && !twoCol && (story1 ? true : workW > halfBeside && workW <= halfCell);
+    const wide = !full && (legacy || twoCol || (!under && workW > halfBeside));
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
-    const abStyle = under ? 'margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm'
+    const abStyle = full ? 'margin-top:0;margin-bottom:auto;grid-template-columns:1fr;row-gap:3mm'
+        : under ? 'margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm'
         : twoCol ? 'margin-top:0;margin-bottom:auto;grid-template-columns:1fr;row-gap:3mm'
         : wide ? `${legacy ? 'margin-top:auto;margin-bottom:auto' : 'margin-top:0;margin-bottom:auto'};grid-template-columns:1fr ${!legacy && place.kind !== 'one' ? 'auto' : 'minmax(52mm,auto)'};row-gap:3mm`
             : 'margin-top:auto;margin-bottom:auto';
-    const respStyle = under ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm'
+    const respStyle = under || full ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm'
         : wide ? 'grid-column:2;grid-row:1 / 3;justify-content:flex-start' : 'justify-content:flex-start';
     // (UNDER, the response row centres under the pair - critic r6d N1. A column STORY puts the response BESIDE the story instead:
     // the story takes two thirds of the line, and the row under the panels held a Grade 2 story to one item a page at L, critic

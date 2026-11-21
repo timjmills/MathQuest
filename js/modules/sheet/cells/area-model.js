@@ -87,7 +87,9 @@ function extGeom(p, g) {
     // A grid's rows are shorter (box + 2.5 mm a side): two rows and two work lines still fit a
     // half page at L (r12b: a 2 x 3 grid overflowed its half-page cell on the Test role).
     const hMm = g.stripMm + (R.length > 1 ? 5 : 8);
-    const work = !g.twin && partials.length >= 2;
+    // (`noWork`: a JUDGED copy - Reason It's A and B, lf-ops sizes r2 F5 - shows the parts and the total only; the work lines are
+    // the pupil's place to add, and two copies of them ran A over B past the page at L)
+    const work = !g.twin && partials.length >= 2 && !p.noWork;
     return { R, C, blank, partials, bw, ew, colMm, sideMm, hMm, work };
 }
 function extFootprint(p, ctx) {
@@ -237,7 +239,7 @@ register('area-model', {
                 return `${j || lead ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
                     + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
             }).join('') + '</div>';
-        const workRow = twin || parts.length < 2 ? '' : parts.length >= 4
+        const workRow = twin || parts.length < 2 || p.noWork ? '' : parts.length >= 4
             ? workLine(parts.map((_, i) => i).slice(0, 2), false) + workLine(parts.map((_, i) => i).slice(2), true)
             : `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:0.45em;margin-left:${g.em(mulMm)}">`
             + parts.map((_, i) => {
@@ -275,7 +277,7 @@ register('area-model', {
         const four = p.parts.length >= 4;
         const colMm = bw + (four ? 2 : 6);
         // R3: the work row + top pad (four parts: two lines)
-        const work = !g.twin && p.parts.length >= 2 ? (four ? 2 * (g.stripMm + 0.45 * g.E) + 6 : g.stripMm + 0.45 * g.E + 3) : 0;
+        const work = !g.twin && p.parts.length >= 2 && !p.noWork ? (four ? 2 * (g.stripMm + 0.45 * g.E) + 6 : g.stripMm + 0.45 * g.E + 3) : 0;
         return {
             wMm: Math.ceil((four ? p.parts.length * colMm : Math.max(p.parts.length * colMm, p.parts.length * (bw + g.E))) + String(p.multiplier).length * 0.62 * g.E + 12),
             hMm: Math.ceil(g.E * 1.2 + g.stripMm + 8 + g.stripMm + 10 + work),
