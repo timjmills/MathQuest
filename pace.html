@@ -69,6 +69,14 @@ details p, details li { color: var(--muted); font-size: 14px; }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); margin-top: 6px; }
 .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
 .err { color: var(--bad); }
+@media (max-width: 640px) {
+  #etaTable thead { display: none; }
+  #etaTable, #etaTable tbody, #etaTable tr, #etaTable td, #etaTable th { display: block; width: 100%; }
+  #etaTable tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+  #etaTable td { border: 0; padding: 2px 0; text-align: left; }
+  #etaTable td.nm { font-weight: 600; }
+  #etaTable td[data-l]::before { content: attr(data-l) ": "; color: var(--muted); font-weight: 400; }
+}
 @media (max-width: 560px) { .log li { grid-template-columns: 1fr; gap: 2px; } header h1 { font-size: 23px; } }
 </style>
 </head>
@@ -184,7 +192,7 @@ details p, details li { color: var(--muted); font-size: 14px; }
       ['Live lessons', cur.lessons, ch(cur.lessons, prev.lessons), 'pinned, page by page'],
       ['Proved checks', cur.backtests, ch(cur.backtests, prev.backtests), 'fail-then-pass tests'],
       ['Check tools', cur.gates, ch(cur.gates, prev.gates), 'automatic checkers'],
-      ['Findings → checks', cur.ledgerAdded, ch(cur.ledgerAdded, prev.ledgerAdded), 'ledger rows this week'],
+      ['Findings → checks', cur.ledgerAdded, null, 'critic findings turned into checks this week'],
       ['White Rose covered', cur.wrm ? cur.wrm.covered : null, cur.wrm && prev.wrm ? cur.wrm.covered - prev.wrm.covered : null, cur.wrm ? `of ${cur.wrm.total} steps` : ''],
       ['Usage', cur.usagePct, ch(cur.usagePct, prev.usagePct), cur.usageEstimated ? 'about, of the weekly limit' : 'of the weekly limit'],
     ];
@@ -273,8 +281,10 @@ details p, details li { color: var(--muted); font-size: 14px; }
     const all = D.weeks, cur = all[all.length - 1];
     const n = +$('#win').value;
     // the pace = change per week between the start of the window and now (the live week counts as far as it has got)
-    const span = all.slice(-Math.min(n, all.length - 1) - 1);
-    const weeksIn = (a, b) => Math.max(0.5, (Date.parse(b.done ? b.end + 'T22:00:00Z' : D.generated) - Date.parse(a.end + 'T22:00:00Z')) / (7 * 864e5));
+    // the pace uses FINISHED weeks only (a week a few days old would drag it down): last n finished weeks
+    const fin = all.filter((w) => w.done);
+    const span = fin.slice(-Math.min(n, fin.length - 1) - 1);
+    const weeksIn = (a, b) => Math.max(1, (Date.parse(b.end + 'T22:00:00Z') - Date.parse(a.end + 'T22:00:00Z')) / (7 * 864e5));
     const pace = (f, down) => {
       const pts = span.filter((w) => f(w) != null); if (pts.length < 2) return null;
       const a = pts[0], b = pts[pts.length - 1]; const d = (f(b) - f(a)) * (down ? -1 : 1);
@@ -287,7 +297,7 @@ details p, details li { color: var(--muted); font-size: 14px; }
       { group: 'Skills', name: 'Skills through the 8/10 redesign (not counting presets or retired)', done: (w) => w.corePassed != null ? w.corePassed : w.passed, left: (w) => w.core != null ? w.core - w.corePassed : w.skills - w.passed, up: true, target: 'corePassed' },
       { group: 'Lessons', name: 'Lessons through the 8/10 critic', done: (w) => w.lessonsPassed, left: (w) => (w.lessons != null && w.lessonsPassed != null) ? w.lessons - w.lessonsPassed : null, up: true, target: 'lessonsPassed' },
       { group: 'White Rose', name: 'Small steps fully covered (all years)', done: (w) => w.wrm ? w.wrm.covered : null, left: (w) => w.wrm ? w.wrm.partial + w.wrm.gap : null, up: true, target: 'wrmCovered' },
-      { group: 'White Rose', name: 'Gap steps: lessons with no skill yet', done: (w) => w.wrm ? w.wrm.total - w.wrm.gap : null, left: (w) => w.wrm ? w.wrm.gap : null, up: true, target: 'wrmGap' },
+      { group: 'White Rose', name: 'Gap steps (no skill yet); Done = steps that have a skill', done: (w) => w.wrm ? w.wrm.total - w.wrm.gap : null, left: (w) => w.wrm ? w.wrm.gap : null, up: true, target: 'wrmGap' },
       ...['Reception', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6'].map((y) => {
         const g = (D.grades || []).find((r) => r.year === y); const label = g ? `${y} (${g.grade}) gap steps` : `${y} gap steps`;
         return { group: 'By year', name: label, done: (w) => { const gg = (w.grades || []).find((r) => r.year === y); return gg ? gg.steps - gg.gap : null; }, left: yr(y), up: true };
@@ -303,21 +313,25 @@ details p, details li { color: var(--muted); font-size: 14px; }
       const tw = r.up ? thisWeek((w) => r.done ? r.done(w) : null) : thisWeek(r.left, true);
       const tr = document.createElement('tr');
       const doneV = r.done ? r.done(cur) : null;
-      [r.name, doneV == null ? '—' : fmt.format(doneV), left == null ? '—' : fmt.format(left), tw == null ? '—' : (tw > 0 ? '+' : '') + fmt.format(tw), p == null ? '—' : (Math.round(p * 10) / 10).toString()].forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i) td.className = 'n'; tr.appendChild(td); });
-      const td = document.createElement('td'); td.className = 'eta';
+      const LB = ['', 'Done', 'Left', 'This week', 'Pace / week'];
+      [r.name, doneV == null ? '—' : fmt.format(doneV), left == null ? '—' : fmt.format(left), tw == null ? '—' : (tw > 0 ? '+' : '') + fmt.format(tw), p == null ? '—' : (Math.round(p * 10) / 10).toString()].forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i) { td.className = 'n'; td.dataset.l = LB[i]; } else td.className = 'nm'; tr.appendChild(td); });
+      const td = document.createElement('td'); td.className = 'eta'; td.dataset.l = 'At the pace reached';
       if (left == null) { td.textContent = 'Not measured yet'; td.classList.add('flat'); }
       else if (left <= 0) { td.textContent = 'Done'; td.classList.add('up'); }
       else if (p == null) { td.textContent = 'Pace shows after one more measured week'; td.classList.add('flat'); }
       else if (p <= 0) { td.textContent = 'No progress at the current pace'; td.classList.add('down'); }
       else { const wks = Math.ceil(left / p); const end = new Date(Date.parse(D.generated) + wks * 7 * 864e5); td.textContent = `about ${wks} week${wks === 1 ? '' : 's'} · ${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`; if (wks <= 12) td.classList.add('up'); }
       tr.appendChild(td);
-      const tg = (cur.targets || {})[r.target]; const td2 = document.createElement('td'); td2.className = 'eta';
+      const tg = (cur.targets || {})[r.target]; const td2 = document.createElement('td'); td2.className = 'eta'; td2.dataset.l = 'At the planned pace';
       if (left == null || left <= 0 || !tg) { td2.textContent = left != null && left <= 0 ? 'Done' : '—'; td2.classList.add('flat'); }
-      else { const wks = Math.ceil(left / tg); const end = new Date(Date.parse(D.generated) + wks * 7 * 864e5); td2.textContent = `${tg}/week: about ${wks} week${wks === 1 ? '' : 's'} · ${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`; }
+      else { const wks = Math.ceil(left / tg); const from = Math.max(Date.parse(D.generated), Date.parse(((cur.targets || {}).from || '2026-11-26') + 'T22:00:00Z')); const end = new Date(from + wks * 7 * 864e5); td2.textContent = `${tg}/week: about ${wks} week${wks === 1 ? '' : 's'} · ${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`; }
       tr.appendChild(td2); tb.appendChild(tr);
     }
-    const nW = D.weeks.filter((w) => w.done).length;
-    $('#etaNote').textContent = `Based on ${nW} finished weeks of records. The pace reached includes weeks spent on tools, checks and features, so it is slower than a week spent on new skills. The planned pace is the target for the coming weeks (two-thirds of the budget on new skills and lessons); it is the goal the owner set (12 skills, 6 lessons and 8 White Rose gap steps a week), not a measurement.`;
+    const t = cur.targets || {};
+    const a = span[0], b = span[span.length - 1];
+    $('#etaNote').textContent = (a && b ? `Pace reached = the average weekly progress over the ${span.length - 1} finished week${span.length === 2 ? '' : 's'} from ${dFmt(a.end)} to ${dFmt(b.end)}. ` : '') +
+      `Those weeks went mostly on tools, automatic checks and features, so skills and White Rose steps moved slowly and their dates at that pace run into 2028 and beyond. That is a warning about the old pace, not a plan. ` +
+      `The planned pace is the owner's target from ${dFmt(t.from || '2026-11-26')}: ${t.corePassed || '—'} skills, ${t.lessonsPassed || '—'} lessons, ${t.wrmGap || '—'} gap steps, ${t.wrmCovered || '—'} covered steps and ${t.todoChecks || '—'} checks a week. If a week meets it, the two columns move together.`;
   }
 
   function checks() {
