@@ -9,6 +9,16 @@ Builder profile: mq-opus-medium
 Critic rounds: 3, PASS r3 (8/8/8/8 card, worksheet, quiz)
 
 ## Now
+- 2026-11-21 PARKED (budget): lesson player SLICE 2 (Warm-up + We do, both modes) on claude/sweet-newton-c8wrv1-lf-hosts-player-s2 (build 0201f77b9; A30-5 fix c92602377 + 7c18dbafa: the part reached is stored only on an existing progress record). Lead rulings A30 1-6 recorded (keypad deferred: must land before pupil mode is promoted).
+  Critic r1 FAIL (C2 7 everywhere; board C4 7; desktop C3 7). FIX LIST for the next round (each with its --hints / --render check first):
+  1. MAJOR: pupil autofocus lands on the TENS box and a ones digit typed there is accepted (valueOf joins the boxes) -> autofocus the ones box (SP-32) and grade per column.
+  2. MAJOR: board ink moves 69 px between hint rungs (side words change length) -> ink-still on the board run too; fix the words column width.
+  3. "Show me" after 2 wrong Checks must land on rung 1 (P-ON-7), not one rung down.
+  4. Rung 1 draws the dot card (step 2's mark) -> rung-1 marks = the chart's state-1 marks.
+  5. Board Warm-up bond at 1366: 75 px vs signed 104 and part boxes flush on the cell border -> digits >= signed, bottom padding >= 0.25 digit (critic rejects deviation 3 for the bond).
+  6. Feedback relies on colour ("The red box is wrong"; the empty tens box crossed) -> words + mark, no cross on an unused box.
+  7. Critic on deviation 2: pupil card on desktop fills ~45 % of the screen -> scale up as A22b.
+  Gate gap that let 1-3 through: --hints typed only the right digits in the right boxes and ran ink-still in pupil mode only.
 - 2026-11-20: lesson player slice 1 LIVE (I do, board, add-within-10, D11 part bar; 4 critic rounds: r1 FAIL, r2 FAIL, cap root cause -> stage-fill check, r3 FAIL at 820 only, A26/A26b fix, narrow 820 PASS; all widths >= 8). Parked. NEXT WEEK: slice 2 (We do) at medium, then the remaining parts; D12 itemsFor(req) stays a clean public function for My Worksheets.
 - 2026-11-20 STOPPED at the round cap: lesson player slice 1 (claude/sweet-newton-c8wrv1-lf-hosts-player-s1 @ 68b6ba366). Critic r3: board 1920, desktop 1280/1366 and tablet 1024 all >= 8; FAIL only at 820 (C2 7 / C4 7): in the stacked layout the count-on hops (5 6 7) sit directly above the sum and can read as a top row of the addition (paper puts them beside). Fix: hops below the answer row or beside the drawing at 820; check: --render asserts hops never above / overlapping the drawing in a stacked layout. Lead decides: fix next round, or ship without 820.
 - Digit-floor fix (35f9fc8ae) with the lead for deploy.
