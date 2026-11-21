@@ -135,3 +135,26 @@ Speed-ups: lf-checks `--lp` / `--sweep` with MQ_ROOT on any tree gives a 1-5 min
   ws-lesson-baseline OK (2700 hashes identical), no page changes.
 - SHEET_FILL_MIN 0.76 -> 0.74 from `ws-partopts-unit --fill-sweep` (810 sheets); FILL-PRINT new; FILL-BT / ROWFIT-BT
   re-anchored; DESIGN §8d has the numbers. Backtests fillfix-* and the partopts BT rows.
+
+## Resume here: nosteps (A28), BUDGET STOP 2026-11-21
+
+Branch claude/sweet-newton-c8wrv1-lf-engine-nosteps. The fix commits (e4bfb7a93, 8c222ffeb, plus the backtest and ledger commit) passed the unit gates below. The branch as a whole is **ungated, do not deploy**: the baseline has not been re-pinned and master has not been merged.
+
+Done:
+- Check first: lf-ops-steps' STEPS-PANEL-EMPTY was copied into ws-lesson-pages.mjs (477a7498f, the check only). It is on precritic in two places: `lesson-pages-steps` (`--grade all --rules STEPS-PANEL-EMPTY`) on the --role lesson path, and lesson-pages-skills on --skill runs. On master 5a51918eb it gives FAIL (404 findings), and after the fix it gives OK (843 lessons, 5015 pages).
+- Fix 8c222ffeb: in lesson-pages/we-do.js, when a lesson has no Steps zone there is no Steps band. The Guided band is drawn alone at 186 mm, and the cell count, width checks and measure columns use that width.
+- Backtest row `lf-engine-nosteps-steps-band` (FAIL e4bfb7a93 → OK 8c222ffeb, Y4.B5) and a CHECKS_FROM_CRITICS row. ws-precritic-plan: OK (556 rows on path). ws-backtest has not been run on the row.
+- Gates: ws-roles-unit OK (115). ws-lesson-unit FAIL 4 of 329, the same 4 as master. ws-layout-unit FAIL 31 of 1748, the same as master.
+- Finding counts over the 106 empty-Steps skills, lesson role, M and L (master → fix):
+  - ws-lesson-cellfits: 115 → 104 pages.
+  - ws-empty-band: total 487 → 444. EB-BAND 221→205, EB-SIDE 159→147, EB-EDGE 24→15, EB-CLIP 23→18, EB-STRETCH 5→7.
+  - No new kinds. The 2 new EB-STRETCH are addition:add_sub_10s M p1 cells 4 and 5: a 21.5 mm row holds a 16 mm fact, against a 20.5 mm limit. Look at this first.
+  - ws-print-lint lesson role: master M is FAIL with 3418 findings in 100 documents. Master L is done. Fix M was cut off part-way and fix L was never run.
+
+Not done: print-lint on the fix at M and L, the EB-STRETCH add_sub_10s check, the lesson baseline re-pin, the 8 PNGs, ws-boot-smoke, ws-capacity-pin --check, the master merge, and ws-backtest --row lf-engine-nosteps-steps-band.
+
+Next commands, one at a time:
+1. `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M --skills <the 106 first skills of the STEPS-PANEL-EMPTY master list>`, then the same at `--size L`, and compare the per-kind columns with master.
+2. `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check design/audit/baselines/lesson-baseline.json`, then `--write`.
+3. PNGs at M of R.B10.S1 p1, Y1.B5.S1 p1, Y4.B5.S3 p1 and Y6.B1.S8 p1, before and after, into design/audit/runs/lf-engine-nosteps/.
+4. ws-boot-smoke, ws-capacity-pin --check, then ws-merge-master.mjs --commit.
