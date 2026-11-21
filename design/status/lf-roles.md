@@ -569,3 +569,30 @@ key labels `[data-review-label]` "<domain> · <skill>" in grey. EB-PSCCAP counts
    grade window: review items only from the pupil's grade down to 2 grades below; a domain with nothing in the window is skipped
    (a grade-3 page takes no K counting). Both check first.
 Then: critic; then PSC-QUADRANT-16, the EB-PSCCAP trim, R3-6 (growing_shape_patterns doubled answer areas), the non-live-id guard.
+
+### Quick review: lead rulings A24 items 1 and 5 built (2026-11-21, 352c8244a)
+Built at medium (continuation of the first build of the Quick review section). Each check first (FAIL commit, fix, backtest row).
+- Item 1 (EB-PAGE reds), row `psc-review-ebpage-l` FAIL 39cdc584e -> OK d8ff5a1c6: (a) `measureCols` [1, 2, 3, 4]; stacked check
+  bands take 3 columns only when it needs fewer rows than 2 (`checkColsOf`: 4 items stay 2 + 2); review rows of 4, 3 or 2. 3 columns
+  alone filled nothing (no three like-height grade-3 cells passed the 72 % ink rule), so the review's ink rule now reads EB-SIDE's own
+  measure where the bridge has it: the wider empty side (cell width - ink - narrower side) < 27 % of the cell (`REVIEW_SIDE_MAX`); the
+  72 % rule stays only for an item without a side reading. (b) page 1 of a two-page check takes review rows when it is > 30 % white,
+  from the domains the last page did not take (one domain cycle over the sheet); numbering runs in page order; each band scores its
+  own items and PSC-SCORES S2 sums them. White before -> after: mult_facts L 31 -> 5 %, div_facts L 33 -> 4 %, sub_wp_20 L p1 51 ->
+  16 % (p2 23 %); add/sub_facts L 24 %, M pages 4-13 %. ws-empty-band prints every PSC page's white as a note.
+  Template skip added: frac-wall (its "1 whole" bar sits 0.0 mm from a two-digit tab, TAB-CLEAR at L) - routed like the others.
+- Item 5a KEYLABEL-CLEAR (ws-psc-review), row `psc-keylabel-clear` FAIL 4b78a07ef (8 overlaps, none planted) -> OK 8b520fd20: the
+  bridge measures each cell's ink box (inkTop/Bot/Left/RightMm, blank and answered states); `keyTagPlace` lays the label in the foot,
+  the top (right of the tab) or a column beside the ink, the fewest lines first, with measured tolerances (drawn cell 0.5 mm shorter,
+  content 0.8 mm lower, key answers up to 2.3 mm wider a side); an item with no clear strip is passed over. Many labels are side
+  columns (2-4 lines) - for the critic's eye.
+- Item 5b PSC-REVIEW-GRADE (ws-psc-review), row `psc-review-grade` FAIL 87fb8dcf5 (div/mult_facts take K classify_count /
+  count_objects) -> OK 352c8244a: `reviewCandidates` skips grade < pupil - 2; 12 candidates a domain (was 6) keeps the L pages full;
+  a review row keeps every cell's band under the ink < 27 % of the row (EB-BAND 33.9 % on a 20.5 mm equation cell, mult_facts M).
+- `psc-review-band` pinned to its own rules (`--only PSC-REVIEW-DOMAINS,PSC-SCORES`), so the new judges do not fail its
+  older pass commit.
+- Gates (352c8244a + rows): role hashes vs origin/master e0c90f8ad - only Pre-skill Check pages differ (29 of 99; every other role 0 of
+  99); lesson baseline 2700 hashes identical; ws-layout-unit the same 31 failures as master; capacity pin OK (74 rises, 0 drops).
+  Still red, same on master: word-work EB-STRETCH / TAB-CLEAR on sub_wp_20 and add_wp_20's own check cells (lf-builds); add_wp_20 M p1
+  32 % (a 2-page check whose page 1 the plan reads under 30 %: not briefed, master 32 % too); ws-empty-band --self-test rule coverage
+  (EB-PSCCAP has no backtest row - its trim is next).

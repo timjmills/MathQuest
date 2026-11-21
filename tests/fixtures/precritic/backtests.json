@@ -15936,7 +15936,7 @@
    "kind": "commit-pair",
    "check": "card design/cards/psc-review (owner ruling 2026-11-20): a Pre-skill Check with room under its check prints a Quick review band of earlier skills, one per CCSS domain in turn (the grade's), never the lesson skill or a prerequisite, seeded; two scores Check __/n and Review __/m; the key labels each review answer <domain> · <skill>",
    "rule": "ws-psc-review PSC-REVIEW-DOMAINS / PSC-SCORES",
-   "command": "node tests/scripts/ws-psc-review.mjs --skills addition:add_facts --sizes M,L --only PSC-REVIEW-DOMAINS,PSC-SCORES && node tests/scripts/ws-psc-review.mjs --skills division:div_facts --sizes M --only PSC-REVIEW-DOMAINS,PSC-SCORES",
+   "command": "node tests/scripts/ws-psc-review.mjs --only PSC-REVIEW-DOMAINS,PSC-SCORES",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
