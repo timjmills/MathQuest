@@ -2582,16 +2582,20 @@ export const CALCULATOR_SKILLS = new Set([
 // ===== FULL SKILL LABELS (auto-built from SKILLS) =====
 // Used by print system for full-length skill labels instead of abbreviations
 export const SKILL_FULL_LABELS = {};
+/** A skill's print label: its `l` without the "(Visual)" / "(No Visuals)" suffix and the leading emoji. SKILL_FULL_LABELS is keyed
+ *  by skill id ALONE (a later category's id wins), so a caller that knows the category cleans that skill's own `l` with this. */
+export function cleanSkillLabel(l) {
+    return String(l || '')
+        .replace(/\s*\(Visual\)\s*$/i, '')
+        .replace(/\s*\(No Visuals?\)\s*$/i, '')
+        .replace(/^[🟢🟡🟠🔴🎲🔢🥧📐📊🔤📏🔀🎯🔬🧮📍📈⬜🔷½]+\s*/, '');
+}
 (function buildFullLabels() {
     for (const [categoryId, skills] of Object.entries(SKILLS)) {
         if (!Array.isArray(skills)) continue;
         for (const skill of skills) {
             // Clean up: strip "(Visual)" and "(No Visuals)" suffixes for cleaner print labels
-            let label = skill.l
-                .replace(/\s*\(Visual\)\s*$/i, '')
-                .replace(/\s*\(No Visuals?\)\s*$/i, '')
-                .replace(/^[🟢🟡🟠🔴🎲🔢🥧📐📊🔤📏🔀🎯🔬🧮📍📈⬜🔷½]+\s*/, '');
-            SKILL_FULL_LABELS[skill.v] = label;
+            SKILL_FULL_LABELS[skill.v] = cleanSkillLabel(skill.l);
         }
     }
 })();

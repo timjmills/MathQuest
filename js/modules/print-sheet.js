@@ -32,7 +32,7 @@ const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), r
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole, factTableTop } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, cleanSkillLabel, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { SKILL_STANDARDS } from './standards.js';
 import { REDESIGN_PASSED } from './redesign-passed.js';
 import { kitCellSpec } from './print-generate.js';
@@ -4639,7 +4639,9 @@ function reviewCandidates(sk, exclude = [], perDomain = 12) {
             const domain = reviewDomainOf(cat, s.v);
             if (!domain || !out[domain]) continue;
             all.push({ categoryId: cat, skillId: s.v, domain, rank: [REDESIGN_PASSED.has(key) ? 0 : 1, g < own ? own - g : 99, order],
-                tag: `${REVIEW_DOMAIN_NAMES[domain]} \u00b7 ${String(SKILL_FULL_LABELS[s.v] || s.t || s.v).replace(/\s*\([^)]*\)/g, "").trim()}` });
+                // (critic qreview r1 REVIEW-TAG-ID: the label of THIS category's skill - SKILL_FULL_LABELS is keyed by id alone, and
+                // fractions:identify took placevalue:identify's "Name the Place")
+                tag: `${REVIEW_DOMAIN_NAMES[domain]} \u00b7 ${String(cleanSkillLabel(s.l) || s.t || s.v).replace(/\s*\([^)]*\)/g, "").trim()}`, domainName: REVIEW_DOMAIN_NAMES[domain] });
         }
     }
     all.sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.rank[2] - b.rank[2]);
