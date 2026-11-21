@@ -4648,7 +4648,7 @@ function reviewCandidates(sk, exclude = [], perDomain = 12) {
     // (card: each review item keeps its own KIT cell - a skill still drawn by the legacy print path is passed over - and is never a
     // preset dealt by a prerequisite's host (sub_2d_1d under sub_100_no_regroup, PSC-TWIN-MIX); one seeded question tells, unmeasured)
     const kit = (c) => { try { const q = generateQuestionFor({ category: c.categoryId, skill: c.skillId, seed: 1 }); return !!kitCellSpec(q) && !(q && (skipIds.has(q.skillId) || skipIds.has(q.presetId)));  } catch (e) { return false; } };
-    for (const c of all) if (out[c.domain].length < perDomain && kit(c)) out[c.domain].push({ categoryId: c.categoryId, skillId: c.skillId, domain: c.domain, tag: c.tag });
+    for (const c of all) if (out[c.domain].length < perDomain && kit(c)) out[c.domain].push({ categoryId: c.categoryId, skillId: c.skillId, domain: c.domain, tag: c.tag, short: c.domainName });
     return out;
 }
 

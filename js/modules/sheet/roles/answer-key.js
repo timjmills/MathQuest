@@ -348,10 +348,11 @@ function itemHtml(item, ctx, report) {
             const t = item.keyTagAt || {};
             const at = t.at === 'top' || t.at === 'side' ? 'top' : 'bottom';
             const off = Number.isFinite(t.off) ? t.off : 0.8;
-            // (`side`: a column right of the ink, `w` mm wide, from the cell's top)
+            // (`side`: a column right of the ink, `w` mm wide, from the cell's top - kept for an older plan; the role lays one-line
+            // labels in the foot or top strip only, critic qreview r1 KEYLABEL-WORDS: a label never wraps, so no word breaks)
             const room = t.at === 'side' && t.w > 0 ? `${t.w}mm` : at === 'top' ? `calc(100% - 3mm - ${2 * (ctx.metrics.tabMm || 5) + 1}mm)` : 'calc(100% - 3mm)';
             inner += `<span class="ws-revlabel" data-review-label style="position:absolute;right:1.5mm;${at}:${off}mm;max-width:${room};`
-                + `overflow-wrap:anywhere;text-align:right;font-size:${ctx.metrics.letterPt}pt;line-height:1;color:var(--ws-grey)">${esc(item.keyTag)}</span>`;
+                + `white-space:nowrap;text-align:right;font-size:${ctx.metrics.letterPt}pt;line-height:1;color:var(--ws-grey)">${esc(item.keyTag)}</span>`;
         }
     }
 

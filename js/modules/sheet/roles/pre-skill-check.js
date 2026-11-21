@@ -33,7 +33,7 @@ import { getProvider } from '../contract.js';
 import { estimateTitleLines } from './practice.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed, stripExtraMm,
+    instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed, stripExtraMm, textEm,
 } from './compose.js';
 import { slotScore } from '../paginate.js';
 import { rowCapMm, cellWidthMm, LIVE_W_MM } from '../layout.js';
@@ -57,7 +57,7 @@ export function sources(skills, { earlier, review } = {}) {
     const cand = review(skills[0], checks.flatMap((p) => p.skills)) || {};
     const out = checks.slice();
     for (const d of REVIEW_DOMAINS) for (const [k, c] of (cand[d] || []).entries()) {
-        out.push({ id: `rv|${d}|${k}`, skills: [{ categoryId: c.categoryId, skillId: c.skillId }], probe: 1, review: { domain: d, k, tag: c.tag, skill: `${c.categoryId}:${c.skillId}`, allowed: REVIEW_DOMAINS.filter((x) => cand[x]) } });
+        out.push({ id: `rv|${d}|${k}`, skills: [{ categoryId: c.categoryId, skillId: c.skillId }], probe: 1, review: { domain: d, k, tag: c.tag, short: c.short || '', skill: `${c.categoryId}:${c.skillId}`, allowed: REVIEW_DOMAINS.filter((x) => cand[x]) } });
     }
     return out;
 }
@@ -712,42 +712,41 @@ const REVIEW_KEEP_PER_SET = 3;
  * neither strip holds it (the review passes the item over: the cell's content is never moved for its label). An item the bridge
  * did not measure keeps the foot. The label's width is estimated at REVIEW_LABEL_EM of its letter size a character. Pure.
  */
-export const REVIEW_LABEL_GAP_MM = 0.4;
+export const REVIEW_LABEL_GAP_MM = 0.2;
 export const REVIEW_LABEL_EM = 0.52;
-export const REVIEW_LABEL_DRAW_MM = 1.3;
+// (critic qreview r1: the key's measured foot under the ink, in the DOM, was 0.4-0.5 mm less than the bridge's measure on
+// fact_family_sort, equiv_frac_visual and time_hour at L - 0.6 mm comes off; KEYLABEL-CLEAR proves each label in the DOM)
+export const REVIEW_LABEL_DRAW_MM = 0.6;
 export const REVIEW_LABEL_SIDE_MM = 3;
 export const REVIEW_BAND_MAX = 0.27;
 export function keyTagPlace(it, cols, h, ctx) {
+    // (lf-roles critic qreview r1 KEYLABEL-WORDS, lead ruling A32-2: the label is ONE line in the foot strip, or the top strip right
+    // of the tab - never a side column, where 11-12 mm widths broke "Operat/ions"; the full "<domain> · <skill>" first, then the
+    // short tag (the domain name alone); an item neither holds is passed over. Widths on Andika's advance widths (textEm) + 5 %.)
     const me = it && it.measured && it.measured[cols];
     const s = (ctx && ctx.s) || {};
     const pt = s.letterPt || 9;
-    const lineMm = pt * 0.3528;
-    const wMm = String(it.reviewTag || it.keyTag || '').length * REVIEW_LABEL_EM * lineMm;
+    const lineMm = pt * PT_MM;
+    const texts = [String(it.reviewTag || it.keyTag || ''), String(it.reviewShort || '')].filter(Boolean);
+    const wOf = (t) => textEm(t) * pt * PT_MM * 1.05;
     const nominal = cellWidthMm(cols, LIVE_W_MM, ctx && ctx.look).nominal;
     const border = 0.3;
     const G = REVIEW_LABEL_GAP_MM;
-    const linesIn = (avail) => Math.max(1, Math.ceil(wMm / Math.max(1, avail)));
-    if (!me || !Number.isFinite(me.inkTopMm) || !Number.isFinite(me.inkBotMm)) return { at: 'bottom', off: 0.8 };
-    const opts = [];
+    const footW = nominal - 3 - 2 * border;
+    const topW = footW - (2 * (s.tabMm || 5) + 1);
     // (the drawn cell stands up to 0.5 mm shorter than its row and its content up to 0.8 mm lower than the measure read it -
     // measured on div_facts L, Analog and Digital Time: REVIEW_LABEL_DRAW_MM comes off the foot's strip, 0.3 mm off the top's)
-    const strip = (at, avail, free) => { const lines = linesIn(avail); const lh = lines * lineMm; if (free - lh >= 2 * G) opts.push({ at, lines, off: Math.max(border, (free - lh) / 2 - border) }); };
-    strip('bottom', nominal - 3 - 2 * border, h - me.inkBotMm - REVIEW_LABEL_DRAW_MM);
-    strip('top', nominal - 3 - 2 * border - (2 * (s.tabMm || 5) + 1), me.inkTopMm - 0.3);
-    // ... or a column BESIDE the ink, right of it from the cell's top (under the tab line), when the ink leaves the right side clear
-    if (Number.isFinite(me.inkRightMm)) {
-        // (the key's written answers can draw wider than the measure's answered cell - placevalue:identify at L by 2.3 mm a side,
-        // its ink centred: REVIEW_LABEL_SIDE_MM comes off the side's room)
-        const w = me.inkRightMm - 2 * G - 1.5 - border - REVIEW_LABEL_SIDE_MM;
-        const lines = w >= 8 ? linesIn(w) : 99;
-        if (lines * lineMm + 2 <= h - REVIEW_LABEL_DRAW_MM) opts.push({ at: 'side', lines, off: 1, w: +w.toFixed(1) });
+    const footFree = me && Number.isFinite(me.inkBotMm) ? h - me.inkBotMm - REVIEW_LABEL_DRAW_MM : null;
+    const topFree = me && Number.isFinite(me.inkTopMm) ? me.inkTopMm - 0.3 : null;
+    for (const text of texts) {
+        const w = wOf(text);
+        // (an item the bridge did not measure keeps the foot, on one line where it fits the width)
+        if (footFree === null) { if (w <= footW) return { at: 'bottom', off: 0.8, text }; continue; }
+        // (the foot's label stands on the cell's bottom edge, `border` above it, so the whole strip under the ink less the gap holds it)
+        if (w <= footW && footFree - lineMm - border >= G) return { at: 'bottom', off: border, text };
+        if (topFree !== null && w <= topW && topFree - lineMm >= 2 * G) return { at: 'top', off: +Math.max(border, (topFree - lineMm) / 2 - border).toFixed(2), text };
     }
-    if (!opts.length) return null;
-    // (the fewest lines; the foot, then the top, then the side, on a tie)
-    const order = { bottom: 0, top: 1, side: 2 };
-    opts.sort((a, b) => a.lines - b.lines || order[a.at] - order[b.at]);
-    const o = opts[0];
-    return Object.assign({ at: o.at, off: +o.off.toFixed(2) }, o.w ? { w: o.w } : {});
+    return null;
 }
 export function reviewRows(input, ctx, m, room) {
     const pools = (input.pools || []).filter((p) => p && p.review && REVIEW_POOL.test(p.id));
@@ -760,7 +759,7 @@ export function reviewRows(input, ctx, m, room) {
     const cands = [];
     for (const p of pools.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.review.domain) - REVIEW_DOMAINS.indexOf(b.review.domain) || a.review.k - b.review.k)) {
         const it = poolItems(input, p.id)[0];
-        if (it && allowed.includes(p.review.domain)) cands.push(Object.assign({}, it, { reviewSkill: p.review.skill, reviewDomain: p.review.domain, reviewTag: p.review.tag, reviewRank: p.review.k }));
+        if (it && allowed.includes(p.review.domain)) cands.push(Object.assign({}, it, { reviewSkill: p.review.skill, reviewDomain: p.review.domain, reviewTag: p.review.tag, reviewShort: p.review.short || '', reviewRank: p.review.k }));
     }
     const space = room - m.strip;
     const skipT = REVIEW_SKIP_TEMPLATES[ctx.size] || REVIEW_SKIP_TEMPLATES.M;
@@ -832,7 +831,7 @@ export function reviewRows(input, ctx, m, room) {
     dfs(0, [], 0, 0, 0, new Set());
     if (!best) return null;
     const ordered = best.rows.slice().sort((a, b) => REVIEW_DOMAINS.indexOf(a.domains[0]) - REVIEW_DOMAINS.indexOf(b.domains[0]))
-        .map((r) => Object.assign({}, r, { its: r.its.map((it) => Object.assign({}, it, { keyTagAt: Object.assign({ cols: r.cols, h: +r.h.toFixed(1), inkTop: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkTopMm : null, inkBot: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkBotMm : null, inkR: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkRightMm : null }, keyTagPlace(it, r.cols, hMinAt([it], r.cols, ctx) + REVIEW_ROW_PAD_MM, ctx) || { at: 'bottom', off: 0.8 }) })) }));
+        .map((r) => Object.assign({}, r, { its: r.its.map((it) => Object.assign({}, it, { keyTagAt: Object.assign({ cols: r.cols, h: +r.h.toFixed(1), inkTop: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkTopMm : null, inkBot: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkBotMm : null, inkR: it.measured && it.measured[r.cols] ? it.measured[r.cols].inkRightMm : null }, keyTagPlace(it, r.cols, hMinAt([it], r.cols, ctx) + REVIEW_ROW_PAD_MM, ctx) || { at: 'bottom', off: 0.8, text: it.reviewShort || it.reviewTag }) })) }));
     return { rows: ordered, n: best.n, used: best.used + m.strip, items: ordered.flatMap((r) => r.its) };
 }
 

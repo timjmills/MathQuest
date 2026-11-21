@@ -175,6 +175,8 @@ export function stripExtraMm(ctx, label, text) {
 const ANDIKA_W = '27,37,50,59,59,75,60,30,39,39,50,59,32,42,31,49,59,59,59,59,59,59,59,59,59,59,31,32,59,59,59,51,83,68,63,66,70,57,56,69,72,48,47,64,53,88,73,71,58,72,64,57,62,70,67,102,65,64,60,39,49,39,42,62,28,56,56,50,58,53,37,55,57,28,29,51,28,82,58,56,57,55,43,47,41,58,52,76,53,52,51,49,34,49,54'.split(',').map(Number);
 const ANDIKA_WB = '27,38,53,61,61,76,66,31,42,42,51,59,32,44,35,53,61,61,61,61,61,61,61,61,61,61,35,35,59,59,59,53,85,73,68,68,73,59,59,72,74,51,50,70,55,91,75,73,62,75,67,61,62,73,72,104,67,67,61,42,53,42,43,63,31,61,59,50,62,54,39,58,60,31,33,56,31,86,61,57,60,59,49,51,43,61,54,77,58,54,52,51,34,51,54'.split(',').map(Number);
 /** A string's width in em (Andika; any other character as a digit). */
+/** A text's width in em of Andika's own advance widths (exported for a one-line label's fit - pre-skill-check keyTagPlace). */
+export const textEm = (t, bold) => emWidth(t, bold);
 const emWidth = (t, bold) => { const tab = bold ? ANDIKA_WB : ANDIKA_W; let w = 0; for (const c of String(t)) { const i = c.charCodeAt(0) - 32; w += i >= 0 && i < 95 ? tab[i] : 59; } return w / 100; };
 
 /**
