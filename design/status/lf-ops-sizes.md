@@ -218,7 +218,7 @@ Report: design/audit/runs/lf-ops/critic-sizes-r2-narrow.md (08ba25e01).
 1. **N1 (major):** the area-model Model and anchor chart never fill the partial-sum lines before "Add the parts". Check: MODEL-FINAL-COMPLETE.
 2. **N5 (major):** the F8 fix moved the overflow into page count. The 4-step chart takes 3 pages, and p2/p3 are 40–45 % blank. Checks: empty-band on chart pages; at most 2 pages for a chart of 4 or fewer steps.
 3. **N2 (major):** the comma in mult_4by1 error-analysis wrong work takes a digit column. Check: extend NO-GROUPED-SLOT to digit rows.
-4. **area_model_4by1 Reason It L:** one a page, unruled (waiting on the lead); 9/8/7/8.
+4. **area_model_4by1 Reason It L:** ruled one a page (A9d, 2026-11-21).
 5. **F11:** the mult_4by1 Model takes about 60 mm plus half a page blank. area_model_4by1 takes 3 pages for 6 states.
 6. **F9, F10, F7, F13–F15**, and lesson L p5/p6 Practice OVERFLOW.
 7. **N4:** count area wrong kinds per page set. **N6:** the screen focus line splits the part box. **N3:** True or False keys leave True sentences blank (role-wide, route to lf-roles).

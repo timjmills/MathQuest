@@ -3574,6 +3574,10 @@
    "items": 1,
    "reason": "a 4-part area model + its judgement is 117 mm at L, the body 210 mm: one a page (lead ruling A9, 2026-11-20)"
   },
+  "multiplication:area_model_4by1 reason-it L": {
+   "items": 1,
+   "reason": "the A-over-B item is 149 mm, and 2 a page allows 113.5 mm: one a page (lead ruling A9d, 2026-11-21)"
+  },
   "multiplication:area_model_2by2 reason-it L": {
    "items": 1,
    "reason": "4-part model under-layout; A9b (lead ruling A9b, 2026-11-20)"
