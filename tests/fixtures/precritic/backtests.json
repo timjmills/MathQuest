@@ -15930,6 +15930,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "wrmsend-send-what",
+  "check": "SEND-WHAT: each What-to-send choice x Print / Share / Tray / Set receives exactly the stated items with their options; labels and toasts name what goes (1280 clicks, 820 taps)",
+  "kind": "commit-pair",
+  "rule": "ws-teacher-wrm SEND-WHAT (lf-wrmsend, owner ruling A34)",
+  "browser": true,
+  "fail": {
+   "commit": "48bca8da2",
+   "state": "master: no What-to-send choice; Print / Share / Add to tray send only the ticked skills, no Add to a set"
+  },
+  "pass": {
+   "commit": "62b4b036b",
+   "state": "the choice, the labels, the four actions and the toasts"
+  },
+  "command": "node tests/scripts/ws-teacher-wrm.cjs --send what",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "wrmsend-set-lesson",
+  "check": "SET-LESSON: a set holding a lesson round-trips (reload, Home, My sets, play, link encode/decode); old sets and old links load unchanged",
+  "kind": "commit-pair",
+  "rule": "ws-teacher-wrm SET-LESSON (lf-wrmsend, owner ruling A34)",
+  "browser": true,
+  "fail": {
+   "commit": "48bca8da2",
+   "state": "master: the lesson entry is dropped from the link and not shown in Home / My sets"
+  },
+  "pass": {
+   "commit": "62b4b036b",
+   "state": "entries {kind:'lesson', key} kept, shown and carried by the link field e"
+  },
+  "command": "node tests/scripts/ws-teacher-wrm.cjs --send set",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "wrmsend-tray-source",
+  "check": "TRAY-SOURCE-LABEL: the lesson page's tray bar says its older skills are from earlier, one-tap Clear tray empties it; the What-to-send card stays in view after scrolling at 1280/1366/1024 and is in flow at 820",
+  "kind": "commit-pair",
+  "rule": "ws-teacher-wrm TRAY-SOURCE-LABEL (lf-wrmsend, owner ruling A34)",
+  "browser": true,
+  "fail": {
+   "commit": "48bca8da2",
+   "state": "master: no source label, the button says Clear, the action card scrolls away"
+  },
+  "pass": {
+   "commit": "62b4b036b",
+   "state": "the source label, Clear tray, the card sticky at >= 1024"
+  },
+  "command": "node tests/scripts/ws-teacher-wrm.cjs --send tray",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
