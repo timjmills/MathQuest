@@ -4595,7 +4595,7 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
  * PSC-REVIEW (card design/cards/psc-review, signed 2026-11-20): the Quick review's candidate skills for a Pre-skill Check of `sk`,
  * per CCSS domain - {domain: [{categoryId, skillId, domain, tag}]}, each list in pool order: the 8/10-passed skills
  * (redesign-passed.js) first, then the earlier grades nearest first, then the pupil's own grade. A skill is a candidate when it
- * is live, tagged (SKILL_STANDARDS, its primary CCSS code gives the domain), at or below the pupil's grade, and is neither the
+ * is live, tagged (SKILL_STANDARDS, its primary CCSS code gives the domain), at the pupil's grade or up to two below, and is neither the
  * lesson skill nor one of `exclude` (its prerequisites: they are the check). Pure over the app's tables, so reproducible.
  */
 const REVIEW_DOMAIN_NAMES = Object.freeze({ CC: 'Counting', OA: 'Operations', NBT: 'Base Ten', NF: 'Fractions', 'MD-m': 'Measurement', 'MD-d': 'Data', G: 'Geometry' });
@@ -4611,7 +4611,8 @@ export function reviewDomainOf(categoryId, skillId) {
     if (d === 'SP') return 'MD-d';
     return REVIEW_DOMAIN_NAMES[d] ? d : '';
 }
-function reviewCandidates(sk, exclude = [], perDomain = 6) {
+const REVIEW_GRADE_SPAN = 2;
+function reviewCandidates(sk, exclude = [], perDomain = 12) {
     const own = (() => { try { return GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { return null; } })();
     if (own === null) return {};
     const out = Object.fromEntries(Object.keys(REVIEW_DOMAIN_NAMES).map((d) => [d, []]));
@@ -4632,7 +4633,9 @@ function reviewCandidates(sk, exclude = [], perDomain = 6) {
             try { if (isMixedMetaSkill(s.v)) continue; } catch (e) { /* keep */ }
             let g = null;
             try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
-            if (g === null || g > own) continue;
+            // (lead A24 item 5, 2026-11-21: the 2-grade window - the pupil's grade down to two grades below; a domain with nothing
+            // in it is skipped, so a grade-3 page takes no K counting)
+            if (g === null || g > own || g < own - REVIEW_GRADE_SPAN) continue;
             const domain = reviewDomainOf(cat, s.v);
             if (!domain || !out[domain]) continue;
             all.push({ categoryId: cat, skillId: s.v, domain, rank: [REDESIGN_PASSED.has(key) ? 0 : 1, g < own ? own - g : 99, order],

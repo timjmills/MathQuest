@@ -713,6 +713,7 @@ export const REVIEW_LABEL_GAP_MM = 0.4;
 export const REVIEW_LABEL_EM = 0.52;
 export const REVIEW_LABEL_DRAW_MM = 1.3;
 export const REVIEW_LABEL_SIDE_MM = 3;
+export const REVIEW_BAND_MAX = 0.27;
 export function keyTagPlace(it, cols, h, ctx) {
     const me = it && it.measured && it.measured[cols];
     const s = (ctx && ctx.s) || {};
@@ -784,6 +785,9 @@ export function reviewRows(input, ctx, m, room) {
                 if (Math.max(...hs) > Math.min(...hs) * REVIEW_ROW_SPREAD) return;
                 const h = hMinAt(acc, cols, ctx) + REVIEW_ROW_PAD_MM;
                 if (h > space) return;
+                // (EB-BAND, measured 2026-11-21 on mult_facts M: a 20.5 mm equation cell under a 3 mm row room left 33.9 % empty under its
+                // ink - every cell of the row keeps its empty band under REVIEW_BAND_MAX of the row, from the measured ink bottom)
+                if (acc.some((it) => { const me = it.measured && it.measured[cols]; return me && Number.isFinite(me.inkBotMm) && h - me.inkBotMm >= REVIEW_BAND_MAX * h; })) return;
                 const key = acc.map((it) => it.reviewDomain).join('+');
                 const list = rowsBySet.get(key) || [];
                 list.push({ its: acc.slice(), cols, h, domains: acc.map((it) => it.reviewDomain), rank: acc.reduce((t, it) => t + it.reviewRank, 0) });
