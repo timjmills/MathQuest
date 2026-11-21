@@ -12561,6 +12561,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120b-edge-share",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo EDGE-SHARE",
+   "check": "a lesson practice page's edge-column gaps are at most half its gaps (critic blanks r7 H4)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,2,4242 --only EDGE-SHARE",
+   "fail": {
+    "commit": "5ae71ee5b",
+    "state": "11-13 of 19 practice gaps on columns 1 and 10: the pinned windows left only the edge columns fresh"
+   },
+   "pass": {
+    "commit": "f051558d8",
+    "state": "STEP-COVER-aware layout searched with a simulated practice deal, Model kept on searched places (A23), practice caps"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-page-col-run",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo PAGE-COL-RUN",
+   "check": "no column of a lesson practice page is blank in more than 4 of its 9 rows (critic blanks r7 H4)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,2,4242 --only PAGE-COL-RUN",
+   "fail": {
+    "commit": "5ae71ee5b",
+    "state": "column 10 blank in 7-8 of 9 rows"
+   },
+   "pass": {
+    "commit": "f051558d8",
+    "state": "STEP-COVER-aware layout searched with a simulated practice deal, Model kept on searched places (A23), practice caps"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120b-skeleton-twin",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-guided-echo SKELETON-TWIN",
+   "check": "no two rows-of-ten grids of a lesson practice page share 4+ gap places (critic blanks r7 H4)",
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --sizes M --screen-seeds 0 --score-roles lesson --seed-list 1,4242 --only SKELETON-TWIN",
+   "fail": {
+    "commit": "5ae71ee5b",
+    "state": "seed 4242 grid 2 is grid 1 shifted 30 (5 places); seed 1 shares 4"
+   },
+   "pass": {
+    "commit": "f051558d8",
+    "state": "STEP-COVER-aware layout searched with a simulated practice deal, Model kept on searched places (A23), practice caps"
+   },
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
