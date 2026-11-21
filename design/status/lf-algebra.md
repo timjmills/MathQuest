@@ -9,6 +9,17 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-21 mixed_numbers_intro precritic fix (Opus medium, first skill on its drawing), branch lfa-mixed merged with master e0c90f8ad
+  (4e1eba565). Codes unchanged: ZM / ZN / ZP (no clash: ws-code-snapshot OK, 744 codes, 0 moved).
+  DEPARTURE FROM THE CARD (lead ruling 2026-11-21 (1)): at size L a printed practice page holds ONE model row - the bar model
+  on the page's first item only (payload `modelL: 'none'` from item 2, read by frac-model at L, scaffold level 1); the
+  model-off diagrams stand two (or three) across under it (their joins carry data-ws-natural on practice pages, so the measure
+  no longer reads a two-across diagram as a shrunk picture). The card said "model on, wholes <= 2: L 2 a page".
+  Ruling (2): compose / name lesson chart panels draw the bars in one row under the diagram (frac-model `_barsUnder`, from
+  stepState with a chart ctx), `headFirst` on both byOption entries (two drawn panels). Stretch: provider `figure` (the
+  number's bars beside its printed part-whole, form 'shown') and `closingUnder` at M for 3-4 rows (stretch.js opt-in,
+  additive). Reason It: footprint inkWMm of a model-off diagram is its least width, so A | B stand beside the response
+  column (two pairs a page at L).
 - 2026-11-20 ~14:00 PATTERNS r4 PASS (narrow, critic-r4/verdict.md) on 70b163833: all 22 versions that failed r3 with fixes in this lane now
   >= 8 on every criterion. r3 (57 / 85) -> fix round (INSTR-SLOTS general check ws-instr-slots + 9 backtest rows) -> r4 PASS. Closed:
   R3-1/2/3/5/8/9/10; part: R3-6 ("Drag" fixed; doubled answer areas -> lf-roles PSC build), R3-7 (Term 10 named; chart example in

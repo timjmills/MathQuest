@@ -614,10 +614,12 @@ const pwSize = (ctx) => (sizeOf(ctx) === 'L' ? 'L' : 'M');
 function pwGeom(p, ctx) {
     const k = pwSize(ctx), G0 = PW[k];
     // (on screen the joins drop 8 mm: the card fits the drawing to its height, and a taller diagram drew every digit smaller - ws-screen-ink-size)
-    const G = isTwin(ctx) ? Object.assign({}, G0, { drop: 8 }) : p.model === 'bar' && G0.modelDrop ? Object.assign({}, G0, { drop: G0.modelDrop }) : G0;
+    // (a lesson chart panel, `_barsUnder`: an anchor chart read, not written in - 6 mm joins and boxes 2 mm over their digits,
+    // so two panels with their bars fit the chart page, lead ruling 2026-11-21 (2))
+    const G = isTwin(ctx) ? Object.assign({}, G0, { drop: 8 }) : p._barsUnder ? Object.assign({}, G0, { drop: 6 }) : p.model === 'bar' && G0.modelDrop && !p._barsUnder ? Object.assign({}, G0, { drop: G0.modelDrop }) : G0;
     const hw = SZ(ctx).writeMm;
     const wholeW = blankWidth(1, k) + 6, fracBar = blankWidth(2, k), fracW = fracBar + 6;
-    const partH = 2 * hw + 8;
+    const partH = 2 * hw + (p._barsUnder ? 2 : 8);
     const ones = p.form === 'ones' ? Math.max(1, Math.round(Number(p.w) || 1)) : 1;
     const gap = ones > 1 ? G.onesGap : 16;
     const parts = [...Array.from({ length: ones }, () => wholeW), fracW];
@@ -704,11 +706,17 @@ function pwMixed(ctx, w, n, d) {
     return `<span class="fm-mixed" style="display:inline-flex;align-items:center;gap:${L(ctx, 1.2)};${KEY_FEATURES}">${whole}${frac}</span>`;
 }
 /** The mixed number's bar model: one bar per whole and the part bar, stacked 3 mm apart (WRM R50). */
-function pwBars(p, ctx) {
+function pwBars(p, ctx, rowMm = 0) {
     const g = PW[pwSize(ctx)];
-    const geom = fracModelGeom({ kind: 'bar', n: p.n, d: p.d, w: p.w, size: pwSize(ctx), wholeMm: null, perRow: 1, hatch: !!ctx.photocopySafe });
+    // `rowMm` (a lesson chart panel, lead ruling 2026-11-21 (2)): the bars in ONE ROW across that width under the diagram
+    // (RP-92's row of wholes, 3 mm apart), each whole as wide as the row allows up to the bar's own width, a part >= 5 mm
+    const k = Math.round(Number(p.w) || 0) + 1;
+    const rowWhole = rowMm ? Math.min(g.barW, Math.max(Number(p.d) * 5, (rowMm - (k - 1) * GAP_MM - 1) / k)) : 0;
+    // (in the row the bars are read, never shaded: a slim strip, 10 mm tall at M / L - fracModelGeom `barH`)
+    const geom = fracModelGeom({ kind: 'bar', n: p.n, d: p.d, w: p.w, size: pwSize(ctx), wholeMm: rowMm ? rowWhole / (WHOLE_K[pwSize(ctx)] || 1) : null,
+        perRow: rowMm ? k : 1, hatch: !!ctx.photocopySafe, ...(rowMm ? { barH: 10 / (WHOLE_K[pwSize(ctx)] || 1) } : {}) });
     return `<svg class="fm-svg fm-pw-bars" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(geom.wMm)} ${f2(geom.hMm)}" role="img" aria-label="${esc(geom.aria)}" `
-        + `data-frac-model="bar" style="display:block;width:${L(ctx, Math.max(g.barW, geom.wMm))};height:auto;max-width:100%;overflow:visible;flex:none;">${geom.body}</svg>`;
+        + `data-frac-model="bar"${rowMm ? ' data-fm-bars="row"' : ''} style="display:block;width:${L(ctx, rowMm ? geom.wMm : Math.max(g.barW, geom.wMm))};height:auto;max-width:100%;overflow:visible;flex:none;">${geom.body}</svg>`;
 }
 /** The part-whole diagram (RP-60). */
 function pwDiagram(p, ctx) {
@@ -734,7 +742,10 @@ function pwDiagram(p, ctx) {
     // the joins: from the whole box's foot to each part box's top, drawn across the part row in percent of its width
     // (the row stretches with its cell); 1 CSS px = 0.75 pt, held at that width whatever the stretch
     const n = g.parts.length;
-    const joins = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${f2(g.G.drop)}" preserveAspectRatio="none" `
+    // (`data-ws-natural`: the joins stretch with the row on purpose - held to the diagram's least width, never to its 1-column
+    // width, so the measure does not read a two-across diagram as a shrunk picture; print-sheet DN-10. Practice pages only
+    // (scaffold level 1): a Scripted Model / Guided page keeps its one-column rows)
+    const joins = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${f2(g.G.drop)}" preserveAspectRatio="none"${Number(ctx.scaffoldLevel) >= 2 ? '' : ` data-ws-natural="${f2(g.minW)}"`} `
         + `style="display:block;width:100%;height:${L(ctx, g.G.drop)};overflow:visible;">`
         + g.parts.map((_, i) => `<line x1="50" y1="0" x2="${f2(((i + 0.5) / n) * 100)}" y2="${f2(g.G.drop)}" stroke="${INK.ink}" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join('')
         + `</svg>`;
@@ -743,7 +754,9 @@ function pwDiagram(p, ctx) {
     const partBox = (inner, w, printed) => `<span class="fm-pw-part" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};`
         + `min-height:${L(ctx, g.partH)};border:${B(ctx, 0.75)} solid ${INK.ink};${printed ? '' : `border-radius:${L(ctx, SLOT.slotRadiusMm[g.k])};`}background:#fff;">${inner}</span>`;
     const cols = [];
-    if (compose) {
+    // 'shown' (the Stretch's picture of its number, lf-algebra 2026-11-21): the mixed number AND its parts printed - the
+    // standard partition the open task starts from; nothing to write
+    if (compose || p.form === 'shown') {
         // the parts are printed (square boxes: not writing places)
         cols.push(`${partBox(pwMixed(ctx, a.w, 0, 1), g.wholeW, true)}${lab('wholes')}`);
         cols.push(`${partBox(pwMixed(ctx, 0, a.n, a.d), g.fracW, true)}${lab('fraction')}`);
@@ -777,8 +790,17 @@ function pwEquation(p, ctx) {
     return `<span class="fm-pw-eq" data-ws-slot-group="answer"${join} style="display:inline-flex;align-items:center;gap:${L(ctx, 3)};flex:none;">`
         + `${pwMixed(ctx, p.w, p.n, p.d)}${sign('=')}${parts.join(sign('+'))}</span>`;
 }
+/**
+ * The payload as this ctx draws it: at size L on paper a fading bar model stops after the page's first item
+ * (`modelL: 'none'`, set by the generator from the item's place on the page; lead ruling 2026-11-21 (1)).
+ */
+function pwAt(p, ctx) {
+    // (the practice pages only - scaffold level 1: a Model, Guided or Opener page (level 2-3) keeps the bars it teaches with)
+    return p && p.modelL && p.model === 'bar' && !isTwin(ctx) && pwSize(ctx) === 'L' && !(Number(ctx.scaffoldLevel) >= 2) ? Object.assign({}, p, { model: p.modelL }) : p;
+}
 /** The whole partition row: bars beside the diagram (model on), the diagram alone, or the equation. */
-function partitionRow(p, ctx) {
+function partitionRow(p0, ctx) {
+    const p = pwAt(p0, ctx);
     if (p.form === 'eq') {
         return `<div class="fm-row fm-pw-row"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:center;justify-content:center;">${pwEquation(p, ctx)}</div>`;
     }
@@ -786,15 +808,23 @@ function partitionRow(p, ctx) {
     if (p.model !== 'bar') {
         return `<div class="fm-row fm-pw-row" style="display:flex;align-items:flex-start;justify-content:center;width:100%;">${diagram}</div>`;
     }
+    // a lesson chart panel (lead ruling 2026-11-21 (2): compose / name keep their bars on every panel): the diagram, then the
+    // bars in one row the panel's full width UNDER it - beside it the pair was wider than the panel and the chart overflowed
+    if (!isTwin(ctx) && Number(p._barsUnder) > 0) {
+        const rowMm = Math.max(60, Math.min(Number(p._barsUnder) - 8, 170));
+        return `<div class="fm-row fm-pw-row" data-fm-model="bar" data-fm-bars-under="1" style="display:flex;flex-direction:column;align-items:center;width:100%;box-sizing:border-box;gap:${L(ctx, 2.5)};">`
+            + `${diagram}${pwBars(p, ctx, rowMm)}</div>`;
+    }
     // model on: the bars at the left, the diagram centred in the width after them (card Q10, EB-SIDE); on a narrow
     // screen card the bars stand above the diagram (flex-wrap)
     return `<div class="fm-row fm-pw-row" data-fm-model="bar" style="display:flex;flex-wrap:${isTwin(ctx) ? 'nowrap' : 'wrap'};align-items:flex-start;row-gap:${L(ctx, 4)};justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};width:100%;box-sizing:border-box;gap:${L(ctx, 6)};`
         // the tab keep-out on paper: the bars start after the item's tab
         + `${isTwin(ctx) ? '' : `padding-left:${L(ctx, SZ(ctx).tabMm + 3)};`}">`
-        + `${pwBars(p, ctx)}<span style="flex:1 1 auto;display:flex;justify-content:center;">${diagram}</span></div>`;
+        + `${pwBars(p, ctx)}<span style="flex:1 1 0;min-width:min-content;display:flex;justify-content:center;">${diagram}</span></div>`;
 }
 /** Natural size (mm) of a partition row at the ctx size. */
-function partitionSize(p, ctx) {
+function partitionSize(p0, ctx) {
+    const p = pwAt(p0, ctx);
     if (p.form === 'eq') {
         const g = pwGeom(Object.assign({}, p, { form: 'two' }), ctx);
         const dig = digitPt(ctx) * PT_MM;
@@ -803,7 +833,9 @@ function partitionSize(p, ctx) {
         return { w: dig * 1.8 + 3 + dig * 0.7 + 3 + k * (g.wholeW - 6 + 3 + dig * 0.7 + 3) + g.fracBar, h: 2 * g.hw + 4 };
     }
     const g = pwGeom(p, ctx);
-    if (p.model !== 'bar') return { w: g.W, h: g.H };
+    // (`ink`: the least width the diagram draws at - its boxes 4 mm apart; Reason It sets A and B beside their response column
+    // when the work fits there, and a 78 mm natural row put the response under them, one pair a page at L - ws-cell-checks LONE-PAGE)
+    if (p.model !== 'bar') return { w: g.W, h: g.H, ink: g.minW + 2 };
     const G = PW[pwSize(ctx)];
     const bars = (Math.round(Number(p.w) || 0) + 1);
     const barsH = bars * G.barH + (bars - 1) * GAP_MM + 1;
@@ -843,7 +875,15 @@ register('frac-model', {
         });
         return { payload: { _marks: mk } };
     },
-    stepState(p, steps, k, ctx) { return this.render(Object.assign({}, p, this.statePayload(p, steps, k).payload), ctx); },
+    // (a lesson chart panel passes its own width, `ctx.cellLiveMm`: a compose / name item draws its bars in a row under the
+    // diagram there - lead ruling 2026-11-21 (2))
+    stepState(p, steps, k, ctx) {
+        // (`ctx.step`: every chart drawing - its panels and the drawings the chart measures for its zoom - so the measure and the
+        // print are one drawing)
+        const chart = ctx && (Number(ctx.cellLiveMm) > 0 || Number.isFinite(ctx.step));
+        const under = p && p.task === 'partition' && p.model === 'bar' && chart ? { _barsUnder: Number(ctx.cellLiveMm) > 0 ? Number(ctx.cellLiveMm) : 178 } : {};
+        return this.render(Object.assign({}, p, this.statePayload(p, steps, k).payload, under), ctx);
+    },
     answerKey(p) {
         const a = p.answer || {};
         if (p.task === 'partition') {

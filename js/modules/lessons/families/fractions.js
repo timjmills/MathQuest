@@ -41,17 +41,18 @@ export const ROUTINES = {
         example: { match: 'wholes' },
     },
 };
-// (mnTask compose / name - A18: the bars stay beside the diagram, too wide for half a page, so every chart panel is a full-width
-// row, the step's words over the drawing (lesson.js chartLayout; beside it the bars stood over the diagram and ran out); their own
-// four steps, the provider's worked steps)
+// (mnTask compose / name - A18: every chart panel is a full-width row, the step's words over the drawing; the bars stand in one
+// row UNDER the diagram (lead ruling 2026-11-21 (2): beside it the pair ran the chart over the page). `headFirst`: the opening
+// step writes nothing, so it is the numbered line over the two panels (chart.js) - two drawings fit the chart page at zoom 1.
+// Their own four steps, the provider's worked steps)
 ROUTINES['mixed-partition'].byOption = {
     mnTask: {
         compose: {
-            chartWide: true, chartRow: false, guidedRows: 1,
+            chartWide: true, chartRow: false, guidedRows: 1, headFirst: true,
             steps: [{ icon: 'look', text: 'Read the parts.' }, { icon: 'write', text: 'Write the wholes.' }, { icon: 'write', text: 'Write the fraction.' }, { icon: 'say', text: 'Say it.' }],
         },
         name: {
-            chartWide: true, chartRow: false, guidedRows: 1,
+            chartWide: true, chartRow: false, guidedRows: 1, headFirst: true,
             steps: [{ icon: 'count', text: 'Count the bars.' }, { icon: 'write', text: 'Write the mixed number.' }, { icon: 'write', text: 'Write the parts.' }, { icon: 'say', text: 'Say it.' }],
         },
     },

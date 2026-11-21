@@ -697,7 +697,7 @@ registerSkill('fractions:mixed_numbers_intro', {
     wrongAnswers: (q) => mnWrongs(q).map((c) => chooseWrong(q, [c], { rotate: false })).filter(Boolean),
     // Stretch (card Q8): the flexible partitions of the item's mixed number - a whole number and a mixed number (2 3/4 =
     // 1 + 1 3/4), or a mixed number and a fraction (2 3/4 = 2 1/4 + 2/4); the standard partition is the example row
-    open: (q) => {
+    open: (q, info = {}) => {
         const p = partitionOf(q);
         if (!p) return null;
         const { w, n, d } = p;
@@ -709,6 +709,13 @@ registerSkill('fractions:mixed_numbers_intro', {
         return {
             prompt: [`Write ${mxw(w, n, d)} as two parts in different ways.`, 'Write one way in each row.'],
             columns: ['part', 'part'], example: [String(w), frw(n, d)], keyRows: rows, total: rows.length + 1,
+            // the number's picture over the table (stretch.js `figure`): its bars beside the part-whole of the standard partition,
+            // printed - the pupil reads the wholes and parts off it to find the other ways (and the page is not a lone table in a
+            // 230 mm cell: ws-empty-band EB-BAND 42-50 %)
+            figure: { template: 'frac-model', payload: { task: 'partition', w, n, d, form: 'shown', model: w <= 3 ? 'bar' : 'none', answer: { w, n, d } } },
+            // (a table of three or four ways at M: the closing frames under it, so the cell is not a 30 % band; at L the figure and
+            // the larger rows fill it, and the frames under it would run past the cell)
+            closingUnder: info.size !== 'L' && rows.length <= 4,
         };
     },
     // capacity (card Q9, measured by ws-empty-band): a model row is a full-width row (M 3 / L 2 a page), a model-off

@@ -37,7 +37,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, planItem, gridPart, instructionPart, assemble, poolItems,
     answerOf, opOf, operandsOf, esc, blank, writeLine, checkLine, slotKey,    judgeGroup,
 } from './compose.js';
-import { getProvider } from '../index.js';
+import { getProvider, renderCell } from '../index.js';
 
 export const ROLE_ID = 'stretch';
 
@@ -58,6 +58,11 @@ function providerTask(q, size) {
         example: Array.isArray(t.example) ? t.example : [],
         keyRows: Array.isArray(t.keyRows) ? t.keyRows : [],
         rule: t.rule || '', total: t.total === undefined ? Infinity : t.total, basic: !!t.basic,
+        // (optional, lf-algebra 2026-11-21: a provider's picture of the problem - a kit cell {template, payload} - drawn between
+        // the prompt and the table; a task without one draws as before)
+        figure: t.figure && typeof t.figure === 'object' && t.figure.template ? t.figure : null,
+        // (optional, the same: the closing frames UNDER the table rather than beside it - a short table under a figure)
+        closingUnder: !!t.closingUnder,
     };
 }
 
@@ -134,6 +139,11 @@ export function openTask(it, size = 'L') {
     return null;
 }
 
+/** A provider's figure (a kit cell) as printed: the pupil's blank state (it shows the problem, never an answer). */
+function figureHtml(fig, c) {
+    try { return renderCell({ cell: { template: fig.template, payload: fig.payload || {}, v: 1 } }, Object.assign({}, c, { state: 'blank' })); } catch (e) { return ''; }
+}
+
 export function prepare(it, info = {}) {
     const size = info.size || 'L';
     const task = openTask(it, size);
@@ -173,7 +183,8 @@ export function prepare(it, info = {}) {
         }
         return `<div class="mq-stretch">`
             + `<div class="ws-story mq-prompt">${task.prompt.map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
-            + `<div class="mq-stretch-main"><table class="mq-table mq-cols${task.columns.length}">${head}${ex}${body}</table>`
+            + (task.figure ? `<div class="mq-stfig" style="display:block;width:100%">${figureHtml(task.figure, c)}</div>` : '')
+            + `<div class="mq-stretch-main"${task.closingUnder ? ' style="flex-direction:column;align-items:flex-start;gap:6mm"' : ''}><table class="mq-table mq-cols${task.columns.length}">${head}${ex}${body}</table>`
             + `<div class="mq-closing"><div class="mq-frame">I found ${writeLine('st-found', c, key, 2, { graded: !task.basic })} answers.</div>`
             + judgeGroup('st-judge', `${checkLine('st-more', 'There are more.', c, key, { graded: false })}${checkLine('st-all', 'I found them all.', c, key, { graded: false })}`, 'mq-stjudge')
             + `</div></div></div>`;
