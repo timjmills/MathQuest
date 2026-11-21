@@ -1,0 +1,42 @@
+# Keeps the owner's pace board (pace.html, data/pace/pace.json) up to date without anyone running a command
+# (owner 2026-11-21: "make sure this page is set to automatically update").
+# Runs after every push to master, every day, and right after the weekly usage reset (Thursday 22:00 UTC).
+name: Pace board
+on:
+  push:
+    branches: [master]
+    paths-ignore: ['data/pace/pace.json']
+  schedule:
+    - cron: '20 22 * * 4'   # 20 minutes after the Thursday 22:00 UTC reset: closes the finished week
+    - cron: '7 6 * * *'     # once a day
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: pace-board
+  cancel-in-progress: false
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch the lessons-browser branch (lessons passed 8/10, until it reaches master)
+        run: git fetch origin 'claude/sweet-newton-c8wrv1-lf-tools-lessons:refs/remotes/origin/claude/sweet-newton-c8wrv1-lf-tools-lessons' || true
+      - name: Rebuild the board
+        run: node tests/scripts/ws-pace.cjs --write
+      - name: Check it
+        run: node tests/scripts/ws-pace.cjs --check
+      - name: Commit if it changed
+        run: |
+          if git diff --quiet -- data/pace/pace.json; then echo "pace board unchanged"; exit 0; fi
+          git config user.name "pace-board"
+          git config user.email "pace-board@users.noreply.github.com"
+          git add data/pace/pace.json
+          git commit -m "pace board: automatic update"
+          for i in 1 2 3; do git pull --rebase origin master && git push origin HEAD:master && break; sleep 10; done

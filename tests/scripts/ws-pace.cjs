@@ -68,10 +68,22 @@ function measure(rev) {
         const k = JSON.parse(show(rev, 'design/audit/baselines/lesson-baseline.json') || 'null');
         if (k) { const h = k.hashes || k; const ids = new Set(); for (const x of Object.keys(h)) { const p = x.split('/'); ids.add(p[0] === 'detailed' ? p[0] + '/' + p[1] : p[0]); } lessons = ids.size; }
     } catch {}
+    const lp = lessonsPassed(rev);
     const cov = show(rev, 'design/WRM_COVERAGE.md') || '';
     const m = cov.match(/Covered (\d+) \((\d+)%\), partial only (\d+) \(\d+%\), gap (\d+)/);
     const wrm = m ? { covered: +m[1], partial: +m[3], gap: +m[4], total: +m[1] + +m[3] + +m[4] } : null;
-    return { rev: rev.slice(0, 9), skills, passed, gates, backtests, ledger, lessons, wrm };
+    return { rev: rev.slice(0, 9), skills, passed, gates, backtests, ledger, lessons, lessonsPassed: lp.passed, lessonsPending: lp.pending, lessonsPassedSource: lp.source, wrm };
+}
+// Whole lessons at 8/10 live in js/modules/lessons-passed.js (the ONE place, owner 2026-11-19). Until that file reaches
+// master it is read from the lessons-browser branch and marked so; a week before either exists counts null.
+const LP_BRANCH = 'origin/claude/sweet-newton-c8wrv1-lf-tools-lessons';
+function lessonsPassed(rev) {
+    let src = show(rev, 'js/modules/lessons-passed.js'), source = 'master';
+    if (!src && rev === sh('git rev-parse HEAD').trim().slice(0, rev.length)) { src = show(LP_BRANCH, 'js/modules/lessons-passed.js'); source = src ? 'lessons-browser branch (not live yet)' : null; }
+    if (!src) return { passed: null, pending: null, source: null };
+    const block = (name) => { const i = src.indexOf(name); if (i < 0) return ''; const j = src.indexOf(']);', i); return src.slice(i, j); };
+    const ids = (b) => (b.match(/^\s*\['[a-zA-Z0-9:._-]+',/gm) || []).length;
+    return { passed: ids(block('LESSONS_PASSED = new Map(')), pending: ids(block('PENDING_RECHECK = new Map(')), source };
 }
 function grades(cov) {
     const rows = [];
@@ -148,7 +160,7 @@ function build(nowMs) {
     weeks.forEach((w, i) => {
         const prev = weeks[i - 1];
         w.ledgerAdded = ledgerByWeek[w.start] || 0;
-        w.added = prev ? { skills: w.skills - prev.skills, passed: w.passed - prev.passed, gates: w.gates - prev.gates, backtests: w.backtests - prev.backtests, lessons: (w.lessons != null && prev.lessons != null) ? w.lessons - prev.lessons : null, wrmCovered: (w.wrm && prev.wrm) ? w.wrm.covered - prev.wrm.covered : 0 } : null;
+        w.added = prev ? { skills: w.skills - prev.skills, passed: w.passed - prev.passed, gates: w.gates - prev.gates, backtests: w.backtests - prev.backtests, lessons: (w.lessons != null && prev.lessons != null) ? w.lessons - prev.lessons : null, lessonsPassed: (w.lessonsPassed != null && prev.lessonsPassed != null) ? w.lessonsPassed - prev.lessonsPassed : null, wrmCovered: (w.wrm && prev.wrm) ? w.wrm.covered - prev.wrm.covered : 0 } : null;
     });
     return {
         generated: new Date(nowMs).toISOString(),

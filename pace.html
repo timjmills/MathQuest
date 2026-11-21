@@ -34,6 +34,7 @@ header p { margin: 4px 0 0; color: var(--muted); }
 .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-width: 0; }
 .tile .lbl { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
 .tile .num { font-size: 30px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 4px; }
+.sl .bar { margin-top: 8px; }
 .tile .chg { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--muted); }
 .up { color: var(--good) !important; } .flat { color: var(--muted) !important; } .down { color: var(--bad) !important; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
@@ -78,6 +79,12 @@ details p, details li { color: var(--muted); font-size: 14px; }
     <p id="genLine">Loading the weekly numbers…</p>
     <p class="lead" id="summary"></p>
   </header>
+
+  <section class="card" aria-labelledby="hSL">
+    <h2 id="hSL">Skills and lessons</h2>
+    <p class="sub">Live means a teacher can use it today. Passed means an independent critic scored it 8 or more on every criterion.</p>
+    <div class="tiles" id="slTiles"></div>
+  </section>
 
   <section aria-labelledby="hThis">
     <h2 id="hThis" style="margin:0 0 10px;font-size:18px">This week against last week</h2>
@@ -138,11 +145,11 @@ details p, details li { color: var(--muted); font-size: 14px; }
     <ul>
       <li><b>Live skills</b>: every skill in the app's skill list (retired ones stay listed so share codes keep working).</li>
       <li><b>Redesign passed</b>: skills an independent critic scored 8 or more on every criterion, every page type and every screen.</li>
-      <li><b>Lessons</b>: lessons the app prints, each pinned page by page so an unplanned change is caught.</li>
+      <li><b>Live lessons</b>: lessons the app prints, each pinned page by page so an unplanned change is caught. <b>Lessons passed 8/10</b>: whole lessons an independent critic scored 8 or more on every page (the lessons registry); a lesson whose pages change after its pass waits for a re-check and is not counted.</li>
       <li><b>Check tools</b>: the automatic check programs. <b>Proved checks</b>: each one shown to fail on the bad page and pass on the fix. <b>Critic findings turned into checks</b>: rows in the findings ledger, dated by the week the finding came in.</li>
       <li><b>White Rose steps</b>: the 872 small steps; covered when a live skill teaches the whole step.</li>
       <li><b>Usage</b>: the share of the weekly limit used, typed in each week; marked "about" where it is an estimate.</li>
-      <li>The board is rebuilt each week by <code>node tests/scripts/ws-pace.cjs --write</code>; the deploy check <code>--check</code> fails if a finished week is missing or its numbers differ from the project history.</li>
+      <li>The board rebuilds itself after every change to the app, once a day, and right after the Thursday reset (an automatic job runs <code>node tests/scripts/ws-pace.cjs --write</code>); the usage figure is the one number typed in by hand each week; the deploy check <code>--check</code> fails if a finished week is missing or its numbers differ from the project history.</li>
     </ul>
   </details>
 </div>
@@ -158,7 +165,7 @@ details p, details li { color: var(--muted); font-size: 14px; }
   const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
   const KINDS = [['all', 'All'], ['skill', 'Skills'], ['lesson', 'Lessons'], ['feature', 'Features'], ['fix', 'Fixes'], ['check', 'Checks & tools'], ['other', 'Other']];
   const METRICS = [
-    ['passed', 'Redesign passed'], ['skills', 'Live skills'], ['lessons', 'Lessons'],
+    ['passed', 'Skills passed 8/10'], ['skills', 'Live skills'], ['lessons', 'Live lessons'], ['lessonsPassed', 'Lessons passed 8/10'],
     ['backtests', 'Proved checks'], ['gates', 'Check tools'], ['ledger', 'Critic findings → checks'],
     ['wrmCovered', 'White Rose steps covered'], ['usagePct', 'Usage %'],
   ];
@@ -171,9 +178,9 @@ details p, details li { color: var(--muted); font-size: 14px; }
     const W = D.weeks, cur = W[W.length - 1], prev = W[W.length - 2];
     const ch = (a, b) => (a == null || b == null) ? null : a - b;
     const items = [
-      ['Redesign passed', cur.passed, ch(cur.passed, prev.passed), 'skills at 8/10'],
+      ['Skills passed 8/10', cur.passed, ch(cur.passed, prev.passed), 'redesign'],
       ['Live skills', cur.skills, ch(cur.skills, prev.skills), 'in the app'],
-      ['Lessons', cur.lessons, ch(cur.lessons, prev.lessons), 'pinned, page by page'],
+      ['Live lessons', cur.lessons, ch(cur.lessons, prev.lessons), 'pinned, page by page'],
       ['Proved checks', cur.backtests, ch(cur.backtests, prev.backtests), 'fail-then-pass tests'],
       ['Check tools', cur.gates, ch(cur.gates, prev.gates), 'automatic checkers'],
       ['Findings → checks', cur.ledgerAdded, ch(cur.ledgerAdded, prev.ledgerAdded), 'ledger rows this week'],
@@ -196,13 +203,35 @@ details p, details li { color: var(--muted); font-size: 14px; }
     }
   }
 
+  function slTiles() {
+    const W = D.weeks, cur = W[W.length - 1], prev = W[W.length - 2];
+    const pct = (a, b) => (a == null || !b) ? '' : ` · ${Math.round(100 * a / b)}% of live`;
+    const d = (a, b) => (a == null || b == null) ? '' : `${a - b >= 0 ? '+' : '−'}${Math.abs(a - b)} this week`;
+    const items = [
+      ['Live skills', cur.skills, d(cur.skills, prev.skills), null],
+      ['Skills passed 8/10', cur.passed, d(cur.passed, prev.passed) + pct(cur.passed, cur.skills), cur.skills ? cur.passed / cur.skills : null],
+      ['Live lessons', cur.lessons, d(cur.lessons, prev.lessons), null],
+      ['Lessons passed 8/10', cur.lessonsPassed, cur.lessonsPassed == null ? 'not recorded yet' : `${cur.lessonsPending || 0} waiting for a re-check` + pct(cur.lessonsPassed, cur.lessons) + (cur.lessonsPassedSource && cur.lessonsPassedSource !== 'master' ? ' · from the lessons browser, not live yet' : ''), cur.lessons && cur.lessonsPassed != null ? cur.lessonsPassed / cur.lessons : null],
+    ];
+    const box = $('#slTiles'); box.replaceChildren();
+    for (const [lbl, n, note, frac] of items) {
+      const t = document.createElement('div'); t.className = 'tile sl';
+      const a = document.createElement('div'); a.className = 'lbl'; a.textContent = lbl;
+      const b = document.createElement('div'); b.className = 'num'; b.textContent = n == null ? '—' : fmt.format(n);
+      const c = document.createElement('div'); c.className = 'chg'; c.textContent = note;
+      t.append(a, b, c);
+      if (frac != null) { const bar = document.createElement('div'); bar.className = 'bar'; bar.setAttribute('role', 'img'); bar.setAttribute('aria-label', Math.round(frac * 100) + '% passed'); const i = document.createElement('i'); i.style.width = Math.max(1, frac * 100) + '%'; i.style.background = 'var(--good)'; bar.appendChild(i); t.appendChild(bar); }
+      box.appendChild(t);
+    }
+  }
+
   function summary() {
     const W = D.weeks, cur = W[W.length - 1], prev = W[W.length - 2];
     const live = (D.log[cur.start] || []).length;
     const pd = cur.passed - prev.passed, bt = cur.backtests - prev.backtests;
     $('#summary').textContent = `Week of ${dFmt(cur.start)}${cur.done ? '' : ' (in progress)'}: ${live} items went live or were decided, ` +
       `${pd >= 0 ? pd : 0} more skill${pd === 1 ? '' : 's'} passed the 8/10 redesign, and ${fmt.format(Math.max(0, bt))} proved checks were added.`;
-    $('#genLine').textContent = `Updated ${new Date(D.generated).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })} · project version ${D.head}`;
+    $('#genLine').textContent = `Updates by itself after every change and once a day · last updated ${new Date(D.generated).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })} · project version ${D.head}`;
   }
 
   function trend() {
@@ -250,7 +279,8 @@ details p, details li { color: var(--muted); font-size: 14px; }
       ['White Rose steps fully covered', cur.wrm ? cur.wrm.covered : null, cur.wrm ? cur.wrm.partial + cur.wrm.gap : null, rate((w) => w.wrm ? w.wrm.covered : null)],
       ['White Rose gap steps (lessons with no skill)', cur.wrm ? cur.wrm.total - cur.wrm.gap : null, cur.wrm ? cur.wrm.gap : null, rate((w) => w.wrm ? w.wrm.total - w.wrm.gap : null)],
       ['Grade 3 gap steps (WRM Year 4)', gap3 ? gap3.steps - gap3.gap : null, gap3 ? gap3.gap : null, null],
-      ['Lessons pinned', cur.lessons, null, rate((w) => w.lessons)],
+      ['Lessons through the 8/10 critic', cur.lessonsPassed, (cur.lessons != null && cur.lessonsPassed != null) ? cur.lessons - cur.lessonsPassed : null, rate((w) => w.lessonsPassed)],
+      ['Live lessons', cur.lessons, null, rate((w) => w.lessons)],
     ];
     const tb = $('#etaTable tbody'); tb.replaceChildren();
     for (const [name, done, left, r] of rows) {
@@ -342,7 +372,7 @@ details p, details li { color: var(--muted); font-size: 14px; }
   }
 
   fetch('data/pace/pace.json', { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then((d) => {
-    D = d; controls(); summary(); tiles(); trend(); eta(); checks(); todo(); wrm(); logView();
+    D = d; controls(); summary(); slTiles(); tiles(); trend(); eta(); checks(); todo(); wrm(); logView();
   }).catch((e) => { $('#genLine').textContent = 'The weekly numbers could not be loaded (' + e.message + '). Run node tests/scripts/ws-pace.cjs --write and reload.'; $('#genLine').className = 'err'; });
 })();
 </script>
