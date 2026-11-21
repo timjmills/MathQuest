@@ -155,6 +155,11 @@ export function renderCell(q, ctx = {}) {
     const tpl = resolveTemplate(spec.template);
     const payload = payloadFor(tpl, q, spec);
     try {
+        // (a Model state - roles/scripted-model.js stepStatesFor, MODEL-STATE-MARKS: the template's own step state k, the
+        // drawing the lesson anchor chart uses, so the state shows the marks of steps 1..k)
+        if (c.modelState && typeof tpl.stepState === 'function' && tpl !== FALLBACK) {
+            return tpl.stepState(payload, c.modelState.steps, c.modelState.k, Object.assign({}, c, { modelState: undefined }));
+        }
         const html = tpl.render(payload, c);
         if (!SUPPORTS || tpl === FALLBACK || !SUPPORTS.supportsOf(payload)) return html;
         // The problem's own footprint (without its supports, less its cell padding) decides beside

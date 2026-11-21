@@ -30,6 +30,10 @@
 //                      in that state's drawing, and each state adds one mark group: what it draws newly is trace grey, what an
 //                      earlier state drew is solid. Judged when the Model's template is one of scripted-model.js TRACE_TEMPLATES
 //                      (N1: a two-gap chart window's "Write 101." state drew no 101, and its last state traced 101 and 104 both).
+//                      Also judged (lf-ops sizes r2, critic r1 F1) for every template with its own `stepState` (stack, long-
+//                      multiplication, area-model ...), whose Scripted Model states must also CHANGE: a state whose step has an
+//                      "=" or a "Write" draws something the state before it did not (the column / area Models drew every state
+//                      but the last blank).
 //   SAY-AGREE          every Say frame a page prints - the opener's UNFILLED one among them - agrees in number with the page's
 //                      Model item (N3: "The missing number is __." under a two-gap Model): an item of k > 1 answer parts
 //                      (`keyParts`) prints a plural frame, with k blanks when it is unfilled. Judged on chart windows.
@@ -71,13 +75,30 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
+            // (lf-ops sizes r2, critic r1 F1: the templates with their own `stepState` - stack, long-multiplication, area-model ...,
+            // the drawing the lesson anchor chart uses - are judged too; the Model drew their states blank and the check never looked)
+            let REG = null;
+            try { REG = await import(new URL('js/modules/sheet/registry.js', location.href).href); } catch (e) { REG = null; }
+            const hasStepState = (id) => { try { return !!(REG && REG.hasCell(id) && typeof REG.getCell(id).stepState === 'function'); } catch (e) { return false; } };
             // MODEL-STATE-MARKS: states = [{text, drawn: Map(value -> ink)}] in order
             const writeVals = (t) => { const m = String(t).match(/\bWrite ((?:\d[\d,]*)(?:(?:, | and )\d[\d,]*)*)\./); return m ? m[1].split(/, | and /).map((x) => x.replace(/,/g, '')) : []; };
-            const drawnOf = (el) => { const d = new Map(); el.querySelectorAll('[data-ws-slot], [data-ws-aslot]').forEach((e) => { const v = e.textContent.replace(/[,\s]/g, ''); if (!v) return; const inkEl = e.hasAttribute('data-ws-ink') ? e : e.querySelector('[data-ws-ink]'); d.set(v, inkEl ? inkEl.getAttribute('data-ws-ink') : (/949494/i.test(e.getAttribute('style') || '') ? 'trace' : 'solid')); }); return d; };
-            const judgeStates = (label, states) => {
+            const drawnOf = (el) => { const d = new Map(); el.querySelectorAll('[data-ws-slot], [data-ws-aslot]').forEach((e) => { const v = e.textContent.replace(/[,\s]/g, ''); if (!v) return; const inkEl = e.hasAttribute('data-ws-ink') ? e : e.querySelector('[data-ws-ink]'); d.set(v, inkEl ? inkEl.getAttribute('data-ws-ink') : (/949494/i.test(e.getAttribute('style') || '') ? 'trace' : 'solid')); });
+                // (lf-ops sizes r2: a stack / long-multiplication writes a step's digits as ink marks inside ONE slot - each digit in its
+                // own place box - so the marks are read too: every ink mark, the newest (trace) digits joined in reading order - "Write
+                // 13." over two place boxes - and the state's ink signature, which MODEL-STATE-CHANGE compares)
+                const inks = [...el.querySelectorAll('[data-ws-ink]')].filter((e) => !e.querySelector('[data-ws-ink]')).map((e) => [e.textContent.replace(/[,\s]/g, ''), e.getAttribute('data-ws-ink')]).filter(([v]) => v);
+                Object.defineProperty(d, 'inkVals', { value: new Set(inks.map(([v]) => v)) });
+                Object.defineProperty(d, 'traceJoin', { value: inks.filter(([, ink]) => ink === 'trace').map(([v]) => v).join('') });
+                Object.defineProperty(d, 'sig', { value: inks.map(([v, ink]) => `${v}:${ink}`).join('|') });
+                return d; };
+            const judgeStates = (label, states, stepTpl) => {
                 let prev = new Map();
                 states.forEach((st, k) => {
-                    const miss = writeVals(st.text).filter((v) => !st.drawn.has(v));
+                    // MODEL-STATE-CHANGE (stepState templates): a state whose step does arithmetic ("4 × 4 = 16", "Write ...")
+                    // draws something the state before it did not - the Model's states change step by step
+                    const sameAsPrev = (st.drawn.sig || '') === (prev.sig || '') && st.drawn.size === prev.size && [...st.drawn.keys()].every((v) => prev.has(v));
+                    if (stepTpl && k > 0 && /=|\bWrite\b/.test(st.text) && sameAsPrev) out.push(`MODEL-STATE-MARKS ${label} state ${k + 1}: "${st.text}" draws nothing new - its drawing is state ${k}'s`);
+                    const miss = writeVals(st.text).filter((v) => !st.drawn.has(v) && !(st.drawn.inkVals && st.drawn.inkVals.has(v)) && !(st.drawn.traceJoin || '').includes(v));
                     if (miss.length) out.push(`MODEL-STATE-MARKS ${label} state ${k + 1}: "${st.text}" but its drawing shows no ${miss.join(', ')}`);
                     const oldGrey = [...st.drawn].filter(([v, ink]) => prev.has(v) && ink === 'trace').map(([v]) => v);
                     const newSolid = [...st.drawn].filter(([v, ink]) => !prev.has(v) && ink !== 'trace' && writeVals(st.text).includes(v)).map(([v]) => v);
@@ -235,7 +256,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
-                        if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl))) {
+                        if (on('MODEL-STATE-MARKS') && (role === 'scripted-model' || role === 'lesson') && modelTpl && (!TRACE || TRACE.has(modelTpl) || hasStepState(modelTpl))) {
                             const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');
                             const states = [];
                             if (role === 'lesson') {
@@ -250,7 +271,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                     else if (t && states.length && !states[states.length - 1].text) states[states.length - 1].text = t.textContent.trim();
                                 });
                             }
-                            if (states.length >= 2) judgeStates(`${key} ${role} ${size} seed ${s}`, states);
+                            if (states.length >= 2) judgeStates(`${key} ${role} ${size} seed ${s}`, states, role === 'scripted-model' && !!TRACE && !TRACE.has(modelTpl) && hasStepState(modelTpl));
                         }
                         if (on('SAY-AGREE') && modelIt && /chartwindow/.test(String(modelTpl))) {
                             const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');

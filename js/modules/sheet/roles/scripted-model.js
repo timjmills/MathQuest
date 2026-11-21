@@ -100,6 +100,24 @@ function statesOf(it) {
     return t && typeof t.statePayload === 'function' ? t : null;
 }
 
+/**
+ * STEP-STATE MARKS (lf-ops sizes r2, critic r1 F1, MODEL-STATE-MARKS): a template with its own `stepState` (stack,
+ * long-multiplication, area-model ...: the drawing the lesson anchor chart already uses) draws state k with the marks of the
+ * provider's steps 1..k, step k's grey. Without this only the TRACE_TEMPLATES and `statePayload` templates drew a state's
+ * marks, and a column or area Model printed every state but the last with empty boxes beside "Write 6, regroup 1".
+ * Returns the provider's steps as {marks} (one per Model state), or null (that template keeps its other path).
+ */
+export function stepStatesFor(it, steps) {
+    const q = (it && it.q) || {};
+    if (!q.cell || TRACE_TEMPLATES.has(q.cell.template) || statesOf(it) || isSentenceStory(it) || drawnSteps(it)) return null;
+    if (!stepTemplateOf(it)) return null;
+    const worked = providerWorkedSteps(it, 6).filter((s) => s.text.length <= 90);
+    if (worked.length !== steps.length || !worked.some((s) => (s.marks || []).length)) return null;
+    return worked.map((s) => ({ marks: (s.marks || []).slice() }));
+}
+/** The ctx a state draws with: a step-state template's state k (registry.renderCell reads `modelState`). */
+const stateCtx = (c, ss, i) => (ss ? Object.assign({}, c, { modelState: { steps: ss, k: i } }) : c);
+
 /** A state's step text: "(n) text" (the outlined circle marker). */
 const stepTextHtml = (steps, i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
 
@@ -107,10 +125,10 @@ const stepTextHtml = (steps, i) => `<div class="mq-steptext"><em>${i + 1}</em><s
  * What a full-width state draws for step i besides its cell (plan's stateItem): the 1 picture, 3 words state drawn wide, a trace
  * template's marks of steps 1..i, the last state answered in trace grey.
  */
-function stateOpts(it, o, i, steps, marks, ans) {
+function stateOpts(it, o, i, steps, marks, ans, ss) {
     const payload = Object.assign({}, o && o.payload, it.template === 'vocab-pick3' ? { wideState: true } : {});
     if (marks) return Object.keys(marks[i]).length ? Object.assign({}, o, { payload: Object.assign(payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) }) : Object.assign({}, o, { payload });
-    return Object.assign({}, o, { payload }, i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {});
+    return Object.assign({}, o, { payload }, i === steps.length - 1 && ans && !ss ? { shown: ans, ink: 'trace' } : {});
 }
 
 /**
@@ -125,6 +143,7 @@ function measuredStates(it) {
     const steps = stepsFor(it);
     if (!steps.length || typeof it.render !== 'function') return it;
     const marks = marksFor(it, steps);
+    const ss = marks ? null : stepStatesFor(it, steps);
     const ans = answerOf(it);
     const base = it.render;
     const drawn = !!drawnSteps(it);
@@ -133,9 +152,9 @@ function measuredStates(it) {
         // model's items - drawn steps - keep their own measure: factModel adds its text and jots itself)
         if (!o || o.cols !== 1) {
             if (drawn) return base(c, o);
-            return `<div style="display:grid">${steps.map((_, i) => `<div style="grid-area:1/1;min-width:0">${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`).join('')}</div>`;
+            return `<div style="display:grid">${steps.map((_, i) => `<div style="grid-area:1/1;min-width:0">${base(stateCtx(c, ss, i), stateOpts(it, o, i, steps, marks, ans, ss))}</div>`).join('')}</div>`;
         }
-        const one = (i) => `<div style="grid-area:1/1;min-width:0"><div class="mq-steptop">${stepTextHtml(steps, i)}</div>${base(c, stateOpts(it, o, i, steps, marks, ans))}</div>`;
+        const one = (i) => `<div style="grid-area:1/1;min-width:0"><div class="mq-steptop">${stepTextHtml(steps, i)}</div>${base(stateCtx(c, ss, i), stateOpts(it, o, i, steps, marks, ans, ss))}</div>`;
         return `<div style="display:grid">${steps.map((_, i) => one(i)).join('')}</div>`;
     };
     return Object.assign({}, it, { render, stateRender: base, statesMeasured: true, measured: null });
@@ -517,6 +536,8 @@ export function plan(input = {}) {
     const stT = !marks && !story ? statesOf(it) : null;
     const stWs = stT ? providerWorkedSteps(it, 6) : [];
     const stAt = (i) => (stT && stWs.length === steps.length ? stT.statePayload(it.q.cell.payload || {}, stWs, i) : null);
+    // (a stepState template's state i - stepStatesFor: the provider's marks of steps 1..i; MODEL-STATE-MARKS)
+    const ssW = !marks && !story && !stT ? stepStatesFor(it, steps) : null;
     const smState = (x) => Object.assign(x, { cls: [x.cls || '', 'mq-smstate'].filter(Boolean).join(' ') });
     // (lead ruling 2026-11-14, cbt r3: a state cell is the teacher's worked model, blank by design - `mq-smstate` marks it, so the
     // key lint's AK-2 skips its slots and judges every other key slot)
@@ -525,10 +546,10 @@ export function plan(input = {}) {
     const stateItem = (i) => smState(planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop"${tightTop ? ' style="height:calc(1.3em + 4mm)"' : ''}>${stepText(i)}</div>` : '')
-            + (story ? sentenceFrameAt(itRender(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : itRender(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
+            + (story ? sentenceFrameAt(itRender(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : itRender(stateCtx(Object.assign({}, c, { state: 'blank' }), ssW, i), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : stAt(i) ? Object.assign({ payload: Object.assign({}, o && o.payload, stAt(i).payload) }, stAt(i).answer && ans ? { shown: ans, ink: 'trace' } : {})
-                        : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
+                        : i === steps.length - 1 && ans && !ssW ? { shown: ans, ink: 'trace' } : {}))),
     }));
     const textItem = (i) => ({
         render: () => stepText(i),
