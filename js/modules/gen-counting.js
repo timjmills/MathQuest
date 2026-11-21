@@ -365,20 +365,28 @@ function _kPageDeal(key, n) {
     return _kPageHeld[key];
 }
 
-/* The band-100 lesson teaching sheet's four 3 x 5 windows (Guided, Guided, Independent, Independent), keyed by the shown Model's
- * place (its first chart row and column, '-' for none): `row col` digit pairs. Searched offline (chart blanks r7) over every set
- * of four windows: each window's own squares - held by no other window nor the Model - take its 5 gaps spread 2/2/1; then the
- * best three practice rows-of-ten bands each hold 6 blanks or more spread evenly over the squares the sheet leaves fresh; then
- * the least overlap, then the most practice blanks. */
-const HCF100_LAYOUT = Object.fromEntries(('-:01144065 00:31346174 01:14306174 02:31346174 03:31346174 04:11356174 05:31346174 10:34416471 ' +
-    '11:04356174 12:41447174 13:41447174 14:01306174 15:31446174 20:02427174 21:04345174 22:00406471 23:01456174 24:01315471 25:03437174 ' +
-    '30:01146174 31:00346174 32:01046174 33:01046174 34:00316174 35:04116174 40:01146471 41:00346471 42:01147174 43:01147174 44:00316174 ' +
-    '45:01146174 50:01043272 51:01043474 52:01143070 53:04113571 54:01043171 55:01043373 60:01043144 61:01143074 62:01043134 63:01043134 ' +
-    '64:01143071 65:01043441 70:01043144 71:01143064 72:01043144 73:01043144 74:01143061 75:01043144').split(' ').map((e) => e.split(':')));
+/* The band-100 lesson teaching sheet's four 3 x 5 windows (Guided, Guided, Independent, Independent) and the practice page's three
+ * rows-of-ten bands, keyed by the shown Model's place (its first chart row and column, '-' for none): `row col` digit pairs, then
+ * the bands' first rows. Searched offline (chart blanks r9) over every set of four windows: each window's own squares - held by no
+ * other window nor the Model - take its 5 gaps spread 2/2/1 under STEP-COVER (a column-1 gap needs the square above printed; top
+ * row, below); then the practice deal is SIMULATED - three grids of 5+ blanks, rows even, edge-column gaps at most half and two a
+ * column, no column blank in more than 4 page rows, no two grids with 4 gap places alike - and must succeed every run; then a
+ * window on columns 1-5 and one on 6-10, the least overlap. Only these Model places have such a layout: lead ruling A23 lets the
+ * dealer keep the Model on them (hcf100ModelOk). */
+const HCF100_LAYOUT = Object.fromEntries(('-:00244065037 00:24305175047 05:21355470047 20:04345275047 21:05355470047 22:05405470037 ' +
+    '23:05445074037 24:00305175047 25:01315074047 30:00245175047 35:05215470047 40:05215470037 45:00245175037 50:01253174047 ' +
+    '51:00243075047 52:00243075047 53:04203475047 54:05213570047 55:04203471047 70:05214054037 75:00244551037').split(' ').map((e) => e.split(':')));
 function hcf100Layout(key) {
     const s = HCF100_LAYOUT[key];
     return s ? [0, 1, 2, 3].map((i) => [Number(s[2 * i]), Number(s[2 * i + 1])]) : null;
 }
+/** The practice page's three rows-of-ten bands (first chart rows) for the Model at `key`. */
+function hcf100Bands(key) {
+    const s = HCF100_LAYOUT[key];
+    return s ? [8, 9, 10].map((i) => Number(s[i])) : null;
+}
+/** Lead ruling A23: may a band-100 lesson Model (a shown 3 x 5 window) sit at chart row r, column c? */
+const hcf100ModelOk = (r, c) => HCF100_LAYOUT[`${r}${c}`] !== undefined;
 
 /* ================================================================================ the generator */
 
@@ -951,6 +959,16 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // crossing - critic blanks r2 R2-1)
         const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0 && !chartEdge();
         let _tw100 = 0, _tri100 = null, _rank100 = null, _lay100 = null;
+        // (chart blanks r9: the practice bands searched with the sheet's layout - the Model whose pinned windows the teaching sheet dealt)
+        const hcf100KeptBands = () => {
+            for (const md of kept.filter((k) => k.shows && k.rows.length === 3 && k.cols.length === 5)) {
+                const key = `${md.rows[0]}${md.cols[0]}`, lay = hcf100Layout(key);
+                // (every teaching window the sheet dealt is a pinned one - at L the sheet deals fewer than four)
+                const tw = kept.filter((k) => !k.shows && k.ext && k.rows.length === 3 && k.cols.length === 5);
+                if (lay && tw.length && tw.every((k) => lay.some(([x, y]) => k.rows[0] === x && k.cols[0] === y))) return hcf100Bands(key);
+            }
+            return null;
+        };
         const pickWin = () => {
             // (the lesson's practice page: its first three rows of ten are 91-120, the crossing; each later one another stretch of
             // the chart - 61-90, 31-60 - so the page fills with grids that share no square: critic blanks r2 R2-1, PAGEFILL)
@@ -963,16 +981,26 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 const fr2 = band === 100 && free.length > 1 ? free.filter((a) => reused(a) === Math.min(...free.map(reused))) : free;
                 let r1 = fr2.length ? fr2[rng(0, fr2.length - 1)] : k10[0].rows[0];
                 // (critic blanks r6 H2: band 100 takes the next band of the triple chosen with the first grid - by fresh squares)
-                if (band === 100 && _tri100) { const nx = _tri100.find((a) => !k10.some((k) => k.rows.includes(a))); if (nx !== undefined) r1 = nx; }
+                // (chart blanks r9: and the sheet's searched bands, read again each call - the bands of the first grid's call are gone)
+                const tb = band === 100 ? (_tri100 || hcf100KeptBands()) : null;
+                if (tb) { const nx = tb.find((a) => !k10.some((k) => k.rows.includes(a))); if (nx === undefined) throw new Error('hundreds chart lesson: the three practice bands are dealt'); r1 = nx; }
                 return { rows: [r1, r1 + 1, r1 + 2], cols: Array.from({ length: C }, (_, k) => k) };
             }
             let r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
             let c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
+            // (lead ruling A23, chart blanks r9: a band-100 lesson window dealt outside the teaching sheet and the practice page - the
+            // chart page, whose first example is the sheet's Model - sits only where the Model has a searched layout (HCF100_LAYOUT);
+            // seeded, so the packet is reproducible)
+            if (!big && band === 100 && chartLesson() && !_lp && _grid === 'window' && R === 3 && C === 5) {
+                for (let t = 0; t < 200 && !hcf100ModelOk(r0, c0); t++) { r0 = rng(0, rowHi - (R - 1)); c0 = rng(0, 10 - C); }
+            }
             // (the band-100 lesson practice page's first rows of ten: 1-30, the band the teaching sheet leaves fresh)
             if (_lessonRows && band === 100) r0 = 0;
             // (critic blanks r6 H2: band 100's three rows-of-ten grids are the three disjoint bands with the most FRESH squares - squares
             // no earlier page printed or asked (A13 givens are printed, so not fresh); the weakest band decides, then the total)
             if (_lessonRows && band === 100) {
+                // (chart blanks r9: the bands searched with the sheet's layout - the Model whose pinned windows the teaching sheet dealt)
+                if (!_tri100) _tri100 = hcf100KeptBands();
                 if (!_tri100) {
                     const used = new Set();
                     for (const k of kept) if (!(k.cols.length === 10 && !k.ext)) for (const r of k.rows) for (const c of k.cols) used.add(r * 10 + c + 1);
@@ -1090,6 +1118,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         let runLast = null;
         // (critic blanks r6 H2: a band-100 lesson rows-of-ten grid holds at least 5 blanks - never fewer, silently)
         const _wantMin = _lessonRows && band === 100 ? 5 : 1;
+        // (chart blanks r8, critic r7 H4: a band-100 practice grid is first dealt under the page caps - EDGE-SHARE, PAGE-COL-RUN,
+        // SKELETON-TWIN - and only when no grid meets them, without)
+        const _want0 = want;
+        let _caps100 = false;
+        for (let _cp = 0; _cp < 2 && !pickIdx.length; _cp++) {
+        _caps100 = _lessonRows && band === 100 && _cp === 0; want = _want0;
+        if (_cp && !(_lessonRows && band === 100)) break;
         for (; want >= _wantMin && !pickIdx.length; want--) {
         for (let w = 0; w < (kept.length ? 24 : keptRun.length ? 150 : 1) && !pickIdx.length; w++) {
             const win = pickWin();
@@ -1186,6 +1221,21 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 if (_lessonRows && _to120 && t < 50 && !cand.some((i) => [100, 101, 110, 111].includes(atW(i)))) continue;
                 // (critic blanks r6 H3, COL-RUN: at most one column of a rows-of-ten grid blank all the way down)
                 if (_lessonRows && Array.from({ length: C }, (_, c) => c).filter((c) => Array.from({ length: R }, (_, r) => r).every((r) => set.has(r * C + c))).length > 1) continue;
+                // (chart blanks r8, critic r7 H4: edge-column gaps at most half the grid's and two a column; no column blank in more
+                // than 4 of the page's rows; no two grids of the page with 4 gap places alike)
+                if (_caps100) {
+                    const gN = cand.map(atW);
+                    const c10 = gN.filter((n) => n % 10 === 0).length, c1 = gN.filter((n) => n % 10 === 1).length;
+                    if ((c10 + c1) * 2 > gN.length || c10 > 2 || c1 > 2) continue;
+                    const prev = kept.filter((k) => !k.ext && !k.shows && k.cols.length === 10 && k.rows.length === 3);
+                    if (prev.length) {
+                        const inCol = (ns, c) => ns.filter((n) => (n - 1) % 10 === c).length;
+                        if (Array.from({ length: 10 }, (_, c) => c).some((c) => prev.reduce((t, k) => t + inCol(k.gaps, c), 0) + inCol(gN, c) > 4)) continue;
+                        const skel = (rs, ns) => new Set(ns.map((n) => `${Math.floor((n - 1) / 10) - Math.min(...rs)}:${(n - 1) % 10}`));
+                        const me = skel(rows, gN);
+                        if (prev.some((k) => { const o = skel(k.rows, k.gaps); return [...me].filter((x) => o.has(x)).length >= 4; })) continue;
+                    }
+                }
                 // (critic blanks r4 F1 / F2: in a lesson packet no pupil window repeats a kept one's answer set, nor shares 60 % of
                 // the larger one's squares with the same gaps there - NEAR-TWIN, SHEET-ANSWER-SET)
                 if (chartLesson()) {
@@ -1204,10 +1254,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         }
             if (!_lessonRows || pickIdx.length) break;
         }
+        }
         // (no run fitted the sheet: the first one drawn - the dealer passes it over, it prints another window's gap)
         if (!pickIdx.length && runLast) { rows = runLast.rows; cols = runLast.cols; at = runLast.at; pickIdx = runLast.idx; }
         // (critic blanks r6 H2: no band leaves the floor of 5 fresh blanks - fail loudly, never print a grid with fewer)
-        if (!pickIdx.length && _lessonRows && band === 100) { const m = `hundreds chart lesson: rows-of-ten grid ${rows ? rows[0] * 10 + 1 : '?'}-${rows ? rows[2] * 10 + 10 : '?'} cannot hold 5 fresh blanks (critic blanks r6 H2)`; console.error(m); throw new Error(m); }
+        if (!pickIdx.length && _lessonRows && band === 100) { const m = `hundreds chart lesson: rows-of-ten grid ${rows ? rows[0] * 10 + 1 : '?'}-${rows ? rows[2] * 10 + 10 : '?'} cannot hold 5 fresh blanks (critic blanks r6 H2)`; throw new Error(m); }
         // Fallback (never expected): alternate squares of each row honour every rule, up to the cap.
         if (!pickIdx.length) pickIdx = Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0 && i % C < C - 1).sort((x, y) => (x % C) - (y % C) || x - y).slice(0, Math.max(1, want));
         const blanks = pickIdx.sort((x, y) => x - y).map(at);

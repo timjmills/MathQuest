@@ -1023,6 +1023,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // solved facts, the last row only its edge facts - the sheet's FIRST page, the one the set was solved for (a probe's longer deal past it
         // deals as before); absent on every other ref: skH is sk)
         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
+        // (chart blanks r8 N1: a band-100 practice grid's search throws quietly; only an item no try could deal logs it)
+        let _rowsErr = null;
         const pass = (rotate, relaxLast, soft, words = true) => {
             let got = null, altCw = null;
             for (let k = 0; k <= tries; k++) {
@@ -1045,7 +1047,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 // window the sheet deals after it keeps its gaps off the example's squares; pickExample takes the pinned item)
                 if (_cwForceFirst && i === 0 && _cwPart === 'sheet' && key === _cwForceFirst.key) return Object.assign({}, _cwForceFirst.q, { cwExample: true });
                 setChartSheet(_cwAll(seen));
-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && (_cwRoleTiles || (_cwEdge && _cw120(sk))) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles || 3 }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); setChartSheet(null); }
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && (_cwRoleTiles || (_cwEdge && _cw120(sk))) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles || 3 }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; if (e && /rows-of-ten grid/.test(String(e.message))) _rowsErr = String(e.message); } finally { if (pin) setDealPin(null); setChartSheet(null); }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
@@ -1093,7 +1095,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         const wordsOff = () => (sk.lr6 ? (sk.lr6Names ? pass(true, false, true, 'names') : null) || pass(true, false, true, false) || pass(true, false, true, 'none') : null);
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
-        if (!q) return;
+        if (!q) { if (_rowsErr) console.error(_rowsErr); return; }
         // (CROSS-GIVEAWAY: every try drew a window of squares already on the sheet - a one-window chart, or more items than the
         // chart has windows - so this item is not dealt)
         if (!q.cwExample && chartGivesAway(q, _cwAll(seen))) return;

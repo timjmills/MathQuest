@@ -64,6 +64,7 @@
 //   COL-RUN            at most one column of a lesson rows-of-ten grid is blank in every row (r6 H3).
 //   EDGE-SHARE         a lesson practice page's rows-of-ten gaps on edge columns (1, 10) are at most half its gaps (r7 H4).
 //   PAGE-COL-RUN       no column of a lesson practice page's rows-of-ten grids is blank in more than 4 of its rows (r7 H4).
+//   MODEL-ROWS         over a seed sweep (10+ seeds), the hcf lesson teaching sheet's Model sits on 3+ distinct chart rows (A23 guard).
 //   SKELETON-TWIN      no two rows-of-ten grids of a lesson practice page share 4+ gap places (row in grid, column) (r7 H4).
 //   LESSON-SECTIONS    a chart lesson teaching sheet prints at least 1 Guided and, at M, 2 Independent windows (critic blanks r5 G1).
 //   BLANK-COUNT        the band-120 lesson's practice page prints three rows of ten (the ruled fallback): its count is what the
@@ -103,7 +104,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const tilesWant = tilesOpt || 5;
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN', 'EDGE-SHARE', 'PAGE-COL-RUN', 'SKELETON-TWIN'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'BLANK-COUNT', 'LESSON-EMPTY-PAGE', 'GUIDED-TRY-COUNT', 'OPTION-ITEMS', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'LESSON-TWIN', 'ANSWER-VARIETY', 'CROSSING-IN-PLAY', 'STEP-COVER', 'SHEET-ANSWER-SET', 'ANSWER-REUSE', 'NEAR-TWIN', 'PRACTICE-FILL', 'LESSON-SECTIONS', 'SHEET-REASK', 'GRID-BLANK-FLOOR', 'COL-RUN', 'EDGE-SHARE', 'PAGE-COL-RUN', 'SKELETON-TWIN', 'MODEL-ROWS'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -466,6 +467,13 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                 for (let i = 0; i < gs.length; i++) for (let j = i + 1; j < gs.length; j++) { const A = sk(gs[i]), B = sk(gs[j]); const sh = [...A].filter((x) => B.has(x)).length; if (sh >= 4) out.push(`SKELETON-TWIN ${key} lesson ${size} seed ${s} p${pi + 1}: grids ${i + 1} and ${j + 1} share ${sh} gap places (at most 3)`); }
                             }
                         });
+                        // MODEL-ROWS (lead ruling A23): each seed reports its teaching sheet's Model row; the sweep is judged in node
+                        if (packet && on('MODEL-ROWS') && skillId === 'hundreds_chart_fill') {
+                            const tp = (r.partPlans || []).filter((x) => x.part === 'teach').flatMap((x) => x.plans || []);
+                            const ex = tp[0] && tp[0].meta && Array.isArray(tp[0].meta.exampleQs) ? tp[0].meta.exampleQs[0] : null;
+                            const w = ex && ex.chartWindow;
+                            if (w && Array.isArray(w.rows)) out.push(`MODEL-AT ${key} lesson ${size} seed ${s}: row ${Math.min(...w.rows)} col ${Math.min(...w.cols)}`);
+                        }
                         // LESSON-SECTIONS (critic blanks r5 G1): the chart lesson teaching sheet prints Guided (>= 1 window) and
                         // Independent (>= 2 windows) - a placement that drops a section fails here, never silently.
                         if (packet && on('LESSON-SECTIONS') && /chart/.test(skillId)) {
@@ -572,8 +580,12 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
         add(await call({ finalize: true }));
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
+    // MODEL-ROWS (lead ruling A23): over a sweep of 10+ seeds, the Model sits on at least 3 distinct chart rows per skill and size
+    { const at = new Map(); for (const f of res.out) { const m = f.match(/^MODEL-AT (\S+) lesson (\S+) seed \d+: row (\d+)/); if (m) { const k = `${m[1]} ${m[2]}`; if (!at.has(k)) at.set(k, []); at.get(k).push(Number(m[3])); } }
+      res.out = res.out.filter((f) => !/^MODEL-AT /.test(f));
+      for (const [k, rows] of at) { const d = [...new Set(rows)].sort((x, y) => x - y); res.out.push(`MODEL-ROWS-INFO ${k}: ${rows.length} seeds, Model rows ${d.join(', ')}`); if (rows.length >= 10 && d.length < 3) res.out.push(`MODEL-ROWS ${k}: the Model sits on ${d.length} distinct row(s) over ${rows.length} seeds (at least 3)`); } }
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN|EDGE-SHARE|PAGE-COL-RUN|SKELETON-TWIN) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|BLANK-COUNT|LESSON-EMPTY-PAGE|GUIDED-TRY-COUNT|OPTION-ITEMS|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|LESSON-TWIN|ANSWER-VARIETY|CROSSING-IN-PLAY|STEP-COVER|SHEET-ANSWER-SET|ANSWER-REUSE|NEAR-TWIN|PRACTICE-FILL|LESSON-SECTIONS|SHEET-REASK|GRID-BLANK-FLOOR|COL-RUN|EDGE-SHARE|PAGE-COL-RUN|SKELETON-TWIN|MODEL-ROWS) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
