@@ -12614,7 +12614,7 @@
     "state": "seed 4242 grid 2 is grid 1 shifted 30 (5 places); seed 1 shares 4; seed 17 grids 2 and 3 share 4 after a one-row shift"
    },
    "pass": {
-    "commit": "f051558d8",
+    "commit": "150a92181",
     "state": "STEP-COVER-aware layout searched with a simulated practice deal, Model kept on searched places (A23), practice caps"
    },
    "expect": {
