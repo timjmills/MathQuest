@@ -100,11 +100,11 @@ details p, details li { color: var(--muted); font-size: 14px; }
 
   <section class="card" aria-labelledby="hEta">
     <h2 id="hEta">Estimated time to finish</h2>
-    <p class="sub">Remaining work divided by the average weekly pace. Change the window to see how the estimate moves.</p>
+    <p class="sub">Live: recalculated every time the board updates. What is left, divided by the current pace (the average weekly progress over the window you choose).</p>
     <div class="row"><label for="win">Average over</label>
       <select id="win"><option value="2">the last 2 weeks</option><option value="3" selected>the last 3 weeks</option><option value="4">the last 4 weeks</option><option value="99">every week</option></select>
     </div>
-    <div class="scroll"><table id="etaTable" aria-label="Estimated time to finish"><thead><tr><th>Work</th><th class="n">Done</th><th class="n">Left</th><th class="n">Per week</th><th>Estimate</th></tr></thead><tbody></tbody></table></div>
+    <div class="scroll"><table id="etaTable" aria-label="Estimated time to finish"><thead><tr><th>Part of the work</th><th class="n">Done</th><th class="n">Left</th><th class="n">This week</th><th class="n">Pace / week</th><th>Finish at the current pace</th></tr></thead><tbody></tbody></table></div>
   </section>
 
   <section class="card" aria-labelledby="hChecks">
@@ -269,30 +269,46 @@ details p, details li { color: var(--muted); font-size: 14px; }
   }
 
   function eta() {
-    const W = D.weeks.filter((w) => w.done || w === D.weeks[D.weeks.length - 1]);
-    const n = +$('#win').value; const cur = W[W.length - 1];
-    const span = W.slice(-Math.min(n, W.length - 1) - 1);
-    const rate = (f) => { const a = span[0], b = span[span.length - 1]; const va = f(a), vb = f(b); if (va == null || vb == null) return null; const weeks = span.length - 1; return weeks ? (vb - va) / weeks : null; };
-    const g = D.grades || []; const gap3 = g.find((r) => r.year === 'Year 4');
+    const all = D.weeks, cur = all[all.length - 1];
+    const n = +$('#win').value;
+    // the pace = change per week between the start of the window and now (the live week counts as far as it has got)
+    const span = all.slice(-Math.min(n, all.length - 1) - 1);
+    const weeksIn = (a, b) => Math.max(0.5, (Date.parse(b.done ? b.end + 'T22:00:00Z' : D.generated) - Date.parse(a.end + 'T22:00:00Z')) / (7 * 864e5));
+    const pace = (f, down) => {
+      const pts = span.filter((w) => f(w) != null); if (pts.length < 2) return null;
+      const a = pts[0], b = pts[pts.length - 1]; const d = (f(b) - f(a)) * (down ? -1 : 1);
+      return d / weeksIn(a, b);
+    };
+    const prevW = all[all.length - 2];
+    const thisWeek = (f, down) => (f(cur) == null || !prevW || f(prevW) == null) ? null : (f(cur) - f(prevW)) * (down ? -1 : 1);
+    const yr = (name) => (w) => { const g = (w.grades || []).find((r) => r.year === name); return g ? g.gap : null; };
     const rows = [
-      ['Skills through the 8/10 redesign', cur.passed, cur.skills - cur.passed, rate((w) => w.passed)],
-      ['White Rose steps fully covered', cur.wrm ? cur.wrm.covered : null, cur.wrm ? cur.wrm.partial + cur.wrm.gap : null, rate((w) => w.wrm ? w.wrm.covered : null)],
-      ['White Rose gap steps (lessons with no skill)', cur.wrm ? cur.wrm.total - cur.wrm.gap : null, cur.wrm ? cur.wrm.gap : null, rate((w) => w.wrm ? w.wrm.total - w.wrm.gap : null)],
-      ['Grade 3 gap steps (WRM Year 4)', gap3 ? gap3.steps - gap3.gap : null, gap3 ? gap3.gap : null, null],
-      ['Lessons through the 8/10 critic', cur.lessonsPassed, (cur.lessons != null && cur.lessonsPassed != null) ? cur.lessons - cur.lessonsPassed : null, rate((w) => w.lessonsPassed)],
-      ['Live lessons', cur.lessons, null, rate((w) => w.lessons)],
+      { group: 'Skills', name: 'Skills through the 8/10 redesign', done: (w) => w.passed, left: (w) => w.skills - w.passed, up: true },
+      { group: 'Lessons', name: 'Lessons through the 8/10 critic', done: (w) => w.lessonsPassed, left: (w) => (w.lessons != null && w.lessonsPassed != null) ? w.lessons - w.lessonsPassed : null, up: true },
+      { group: 'White Rose', name: 'Small steps fully covered (all years)', done: (w) => w.wrm ? w.wrm.covered : null, left: (w) => w.wrm ? w.wrm.partial + w.wrm.gap : null, up: true },
+      { group: 'White Rose', name: 'Gap steps: lessons with no skill yet', done: (w) => w.wrm ? w.wrm.total - w.wrm.gap : null, left: (w) => w.wrm ? w.wrm.gap : null, up: true },
+      ...['Reception', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6'].map((y) => {
+        const g = (D.grades || []).find((r) => r.year === y); const label = g ? `${y} (${g.grade}) gap steps` : `${y} gap steps`;
+        return { group: 'By year', name: label, done: (w) => { const gg = (w.grades || []).find((r) => r.year === y); return gg ? gg.steps - gg.gap : null; }, left: yr(y), up: true };
+      }),
+      { group: 'Checks', name: 'Automatic checks still to build', done: null, left: (w) => w.todoChecks != null ? w.todoChecks : null, up: false },
     ];
     const tb = $('#etaTable tbody'); tb.replaceChildren();
-    for (const [name, done, left, r] of rows) {
+    let lastGroup = '';
+    for (const r of rows) {
+      if (r.group !== lastGroup) { lastGroup = r.group; const gr = document.createElement('tr'); const th = document.createElement('th'); th.colSpan = 6; th.textContent = r.group; th.style.paddingTop = '14px'; gr.appendChild(th); tb.appendChild(gr); }
+      const left = r.left(cur);
+      const p = r.up ? pace((w) => r.done ? r.done(w) : null) : pace(r.left, true);
+      const tw = r.up ? thisWeek((w) => r.done ? r.done(w) : null) : thisWeek(r.left, true);
       const tr = document.createElement('tr');
-      const cells = [name, done == null ? '—' : fmt.format(done), left == null ? '—' : fmt.format(left), r == null ? '—' : (Math.round(r * 10) / 10).toString()];
-      cells.forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i) td.className = 'n'; tr.appendChild(td); });
+      const doneV = r.done ? r.done(cur) : null;
+      [r.name, doneV == null ? '—' : fmt.format(doneV), left == null ? '—' : fmt.format(left), tw == null ? '—' : (tw > 0 ? '+' : '') + fmt.format(tw), p == null ? '—' : (Math.round(p * 10) / 10).toString()].forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i) td.className = 'n'; tr.appendChild(td); });
       const td = document.createElement('td'); td.className = 'eta';
-      if (left == null) td.textContent = 'Total keeps growing as lessons are added';
-      else if (left === 0) { td.textContent = 'Done'; td.classList.add('up'); }
-      else if (r == null) { td.textContent = 'Starts next week: no pace yet'; td.classList.add('flat'); }
-      else if (r <= 0) { td.textContent = 'No progress in this window'; td.classList.add('down'); }
-      else { const wks = Math.ceil(left / r); const end = new Date(Date.parse(cur.start + 'T22:00:00Z') + wks * 7 * 864e5); td.textContent = `about ${wks} week${wks === 1 ? '' : 's'} (${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })})`; }
+      if (left == null) { td.textContent = 'Not measured yet'; td.classList.add('flat'); }
+      else if (left <= 0) { td.textContent = 'Done'; td.classList.add('up'); }
+      else if (p == null) { td.textContent = 'Pace shows after one more measured week'; td.classList.add('flat'); }
+      else if (p <= 0) { td.textContent = 'No progress at the current pace'; td.classList.add('down'); }
+      else { const wks = Math.ceil(left / p); const end = new Date(Date.parse(D.generated) + wks * 7 * 864e5); td.textContent = `about ${wks} week${wks === 1 ? '' : 's'} · ${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`; if (wks <= 12) td.classList.add('up'); }
       tr.appendChild(td); tb.appendChild(tr);
     }
   }

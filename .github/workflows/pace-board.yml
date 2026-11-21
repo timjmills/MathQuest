@@ -28,12 +28,15 @@ jobs:
           node-version: '22'
       - name: Fetch the lessons-browser branch (lessons passed 8/10, until it reaches master)
         run: git fetch origin 'claude/sweet-newton-c8wrv1-lf-tools-lessons:refs/remotes/origin/claude/sweet-newton-c8wrv1-lf-tools-lessons' || true
+      - name: Recount White Rose coverage live (the committed report can lag)
+        run: node tests/scripts/ws-wrm.cjs --report-only || true
       - name: Rebuild the board
         run: node tests/scripts/ws-pace.cjs --write
       - name: Check it
         run: node tests/scripts/ws-pace.cjs --check
       - name: Commit if it changed
         run: |
+          git checkout -- design/WRM_COVERAGE.md 2>/dev/null || true
           if git diff --quiet -- data/pace/pace.json; then echo "pace board unchanged"; exit 0; fi
           git config user.name "pace-board"
           git config user.email "pace-board@users.noreply.github.com"

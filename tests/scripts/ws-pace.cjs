@@ -27,6 +27,7 @@ const OUT = path.join(ROOT, 'data', 'pace', 'pace.json');
 const USAGE = path.join(ROOT, 'data', 'pace', 'usage.json');
 const FIRST_WEEK = Date.UTC(2026, 9, 15, 22, 0); // Thu 2026-10-15 22:00 UTC: the first reset in the program's records
 const WEEK = 7 * 24 * 3600 * 1000;
+const FROZEN = ['wrm', 'grades', 'lessonsPassed', 'lessonsPending', 'lessonsPassedSource', 'todoChecks'];
 const arg = (k) => process.argv.includes(k);
 
 function weekStarts(nowMs) {
@@ -50,9 +51,12 @@ const KINDS = [
 function kindOf(title) { for (const [k, re] of KINDS) if (re.test(title)) return k; return 'other'; }
 
 function sh(cmd) { return execSync(cmd, { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] }); }
-function show(rev, p) { try { return sh(`git show ${rev}:${p}`); } catch { return null; } }
+function show(rev, p) {
+    if (rev === 'WORKTREE') { try { return fs.readFileSync(path.join(ROOT, p), 'utf8'); } catch { return null; } }
+    try { return sh(`git show ${rev}:${p}`); } catch { return null; }
+}
 
-function measure(rev) {
+function measure(rev, live) {
     const data = show(rev, 'js/modules/data.js') || '';
     const skills = (data.match(/\{\s*v:\s*["']/g) || []).length;
     const rp = show(rev, 'js/modules/redesign-passed.js') || '';
@@ -69,17 +73,18 @@ function measure(rev) {
         if (k) { const h = k.hashes || k; const ids = new Set(); for (const x of Object.keys(h)) { const p = x.split('/'); ids.add(p[0] === 'detailed' ? p[0] + '/' + p[1] : p[0]); } lessons = ids.size; }
     } catch {}
     const lp = lessonsPassed(rev);
-    const cov = show(rev, 'design/WRM_COVERAGE.md') || '';
+    const cov = show(live ? 'WORKTREE' : rev, 'design/WRM_COVERAGE.md') || '';
     const m = cov.match(/Covered (\d+) \((\d+)%\), partial only (\d+) \(\d+%\), gap (\d+)/);
     const wrm = m ? { covered: +m[1], partial: +m[3], gap: +m[4], total: +m[1] + +m[3] + +m[4] } : null;
-    return { rev: rev.slice(0, 9), skills, passed, gates, backtests, ledger, lessons, lessonsPassed: lp.passed, lessonsPending: lp.pending, lessonsPassedSource: lp.source, wrm };
+    const gr = grades(cov);
+    return { rev: rev.slice(0, 9), skills, passed, gates, backtests, ledger, lessons, lessonsPassed: lp.passed, lessonsPending: lp.pending, lessonsPassedSource: lp.source, wrm, grades: gr };
 }
 // Whole lessons at 8/10 live in js/modules/lessons-passed.js (the ONE place, owner 2026-11-19). Until that file reaches
 // master it is read from the lessons-browser branch and marked so; a week before either exists counts null.
 const LP_BRANCH = 'origin/claude/sweet-newton-c8wrv1-lf-tools-lessons';
 function lessonsPassed(rev) {
     let src = show(rev, 'js/modules/lessons-passed.js'), source = 'master';
-    if (!src && rev === sh('git rev-parse HEAD').trim().slice(0, rev.length)) { src = show(LP_BRANCH, 'js/modules/lessons-passed.js'); source = src ? 'lessons-browser branch (not live yet)' : null; }
+    if (!src && rev === sh('git rev-parse HEAD').trim()) { src = show(LP_BRANCH, 'js/modules/lessons-passed.js'); source = src ? 'lessons-browser branch (not live yet)' : null; }
     if (!src) return { passed: null, pending: null, source: null };
     const block = (name) => { const i = src.indexOf(name); if (i < 0) return ''; const j = src.indexOf(']);', i); return src.slice(i, j); };
     const ids = (b) => (b.match(/^\s*\['[a-zA-Z0-9:._-]+',/gm) || []).length;
@@ -136,7 +141,7 @@ function logFor(starts, headRev) {
     return log;
 }
 function checksByWeek(starts, headRev) {
-    const led = show(headRev, 'design/lessons-first/CHECKS_FROM_CRITICS.md') || '';
+    const led = show('WORKTREE', 'design/lessons-first/CHECKS_FROM_CRITICS.md') || '';
     const by = {};
     for (const s of starts) by[iso(s)] = 0;
     for (const m of led.matchAll(/^\| (20\d\d-\d\d-\d\d)/gm)) { const w = weekOf(m[1]); if (w != null && by[iso(w)] != null) by[iso(w)]++; }
@@ -146,6 +151,8 @@ function checksByWeek(starts, headRev) {
 function build(nowMs) {
     const head = sh('git rev-parse HEAD').trim();
     const starts = weekStarts(nowMs);
+    let prevFile = {};
+    try { prevFile = JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch {}
     let usage = {};
     try { usage = JSON.parse(fs.readFileSync(USAGE, 'utf8')); } catch {}
     const weeks = starts.map((s) => {
@@ -154,7 +161,13 @@ function build(nowMs) {
         let rev = head;
         if (done) { try { rev = sh(`git rev-list -1 --before=@${end / 1000} ${head}`).trim() || head; } catch {} }
         const u = usage[iso(s)] || null;
-        return { start: iso(s), end: iso(end), done, usagePct: u ? u.pct : null, usageEstimated: u ? !!u.estimated : null, ...measure(rev) };
+        const w = { start: iso(s), end: iso(end), done, usagePct: u ? u.pct : null, usageEstimated: u ? !!u.estimated : null, ...measure(rev, !done) };
+        if (!done) w.todoChecks = todoChecks(show('WORKTREE', 'design/status/speed-audit.md')).length;
+        const old = (prevFile.weeks || []).find((x) => x.start === w.start);
+        // A finished week keeps what was measured live while it ran (White Rose coverage is regenerated live each run, the
+        // committed report can lag): FROZEN fields are copied from the board as it stood, never recomputed from git.
+        if (done && old) for (const k of FROZEN) if (old[k] !== undefined && old[k] !== null) w[k] = old[k];
+        return w;
     });
     const ledgerByWeek = checksByWeek(starts, head);
     weeks.forEach((w, i) => {
@@ -166,8 +179,8 @@ function build(nowMs) {
         generated: new Date(nowMs).toISOString(),
         head: head.slice(0, 9),
         weeks,
-        grades: grades(show(head, 'design/WRM_COVERAGE.md')),
-        todoChecks: todoChecks(show(head, 'design/status/speed-audit.md')),
+        grades: grades(show('WORKTREE', 'design/WRM_COVERAGE.md')),
+        todoChecks: todoChecks(show('WORKTREE', 'design/status/speed-audit.md')),
         log: logFor(starts, head),
     };
 }

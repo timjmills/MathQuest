@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T05:35:07.946Z",
- "head": "1f4343b08",
+ "generated": "2026-11-21T05:44:15.813Z",
+ "head": "c291746a6",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -24,6 +24,64 @@
     "gap": 210,
     "total": 872
    },
+   "grades": [
+    {
+     "year": "Reception",
+     "grade": "PK",
+     "steps": 119,
+     "covered": 58,
+     "partial": 28,
+     "gap": 33
+    },
+    {
+     "year": "Year 1",
+     "grade": "K",
+     "steps": 116,
+     "covered": 72,
+     "partial": 24,
+     "gap": 20
+    },
+    {
+     "year": "Year 2",
+     "grade": "Grade 1",
+     "steps": 124,
+     "covered": 80,
+     "partial": 18,
+     "gap": 26
+    },
+    {
+     "year": "Year 3",
+     "grade": "Grade 2",
+     "steps": 134,
+     "covered": 78,
+     "partial": 24,
+     "gap": 32
+    },
+    {
+     "year": "Year 4",
+     "grade": "Grade 3",
+     "steps": 129,
+     "covered": 81,
+     "partial": 18,
+     "gap": 30
+    },
+    {
+     "year": "Year 5",
+     "grade": "Grade 4",
+     "steps": 136,
+     "covered": 81,
+     "partial": 22,
+     "gap": 33
+    },
+    {
+     "year": "Year 6",
+     "grade": "Grade 5",
+     "steps": 114,
+     "covered": 63,
+     "partial": 15,
+     "gap": 36
+    }
+   ],
    "ledgerAdded": 0,
    "added": null
   },
@@ -49,6 +107,64 @@
     "gap": 210,
     "total": 872
    },
+   "grades": [
+    {
+     "year": "Reception",
+     "grade": "PK",
+     "steps": 119,
+     "covered": 58,
+     "partial": 28,
+     "gap": 33
+    },
+    {
+     "year": "Year 1",
+     "grade": "K",
+     "steps": 116,
+     "covered": 72,
+     "partial": 24,
+     "gap": 20
+    },
+    {
+     "year": "Year 2",
+     "grade": "Grade 1",
+     "steps": 124,
+     "covered": 80,
+     "partial": 18,
+     "gap": 26
+    },
+    {
+     "year": "Year 3",
+     "grade": "Grade 2",
+     "steps": 134,
+     "covered": 78,
+     "partial": 24,
+     "gap": 32
+    },
+    {
+     "year": "Year 4",
+     "grade": "Grade 3",
+     "steps": 129,
+     "covered": 81,
+     "partial": 18,
+     "gap": 30
+    },
+    {
+     "year": "Year 5",
+     "grade": "Grade 4",
+     "steps": 136,
+     "covered": 81,
+     "partial": 22,
+     "gap": 33
+    },
+    {
+     "year": "Year 6",
+     "grade": "Grade 5",
+     "steps": 114,
+     "covered": 63,
+     "partial": 15,
+     "gap": 36
+    }
+   ],
    "ledgerAdded": 0,
    "added": {
     "skills": 1,
@@ -82,6 +198,64 @@
     "gap": 210,
     "total": 872
    },
+   "grades": [
+    {
+     "year": "Reception",
+     "grade": "PK",
+     "steps": 119,
+     "covered": 58,
+     "partial": 28,
+     "gap": 33
+    },
+    {
+     "year": "Year 1",
+     "grade": "K",
+     "steps": 116,
+     "covered": 72,
+     "partial": 24,
+     "gap": 20
+    },
+    {
+     "year": "Year 2",
+     "grade": "Grade 1",
+     "steps": 124,
+     "covered": 80,
+     "partial": 18,
+     "gap": 26
+    },
+    {
+     "year": "Year 3",
+     "grade": "Grade 2",
+     "steps": 134,
+     "covered": 78,
+     "partial": 24,
+     "gap": 32
+    },
+    {
+     "year": "Year 4",
+     "grade": "Grade 3",
+     "steps": 129,
+     "covered": 81,
+     "partial": 18,
+     "gap": 30
+    },
+    {
+     "year": "Year 5",
+     "grade": "Grade 4",
+     "steps": 136,
+     "covered": 81,
+     "partial": 22,
+     "gap": 33
+    },
+    {
+     "year": "Year 6",
+     "grade": "Grade 5",
+     "steps": 114,
+     "covered": 63,
+     "partial": 15,
+     "gap": 36
+    }
+   ],
    "ledgerAdded": 0,
    "added": {
     "skills": 9,
@@ -115,6 +289,64 @@
     "gap": 210,
     "total": 872
    },
+   "grades": [
+    {
+     "year": "Reception",
+     "grade": "PK",
+     "steps": 119,
+     "covered": 58,
+     "partial": 28,
+     "gap": 33
+    },
+    {
+     "year": "Year 1",
+     "grade": "K",
+     "steps": 116,
+     "covered": 72,
+     "partial": 24,
+     "gap": 20
+    },
+    {
+     "year": "Year 2",
+     "grade": "Grade 1",
+     "steps": 124,
+     "covered": 80,
+     "partial": 18,
+     "gap": 26
+    },
+    {
+     "year": "Year 3",
+     "grade": "Grade 2",
+     "steps": 134,
+     "covered": 78,
+     "partial": 24,
+     "gap": 32
+    },
+    {
+     "year": "Year 4",
+     "grade": "Grade 3",
+     "steps": 129,
+     "covered": 81,
+     "partial": 18,
+     "gap": 30
+    },
+    {
+     "year": "Year 5",
+     "grade": "Grade 4",
+     "steps": 136,
+     "covered": 81,
+     "partial": 22,
+     "gap": 33
+    },
+    {
+     "year": "Year 6",
+     "grade": "Grade 5",
+     "steps": 114,
+     "covered": 63,
+     "partial": 15,
+     "gap": 36
+    }
+   ],
    "ledgerAdded": 41,
    "added": {
     "skills": 0,
@@ -148,6 +380,64 @@
     "gap": 210,
     "total": 872
    },
+   "grades": [
+    {
+     "year": "Reception",
+     "grade": "PK",
+     "steps": 119,
+     "covered": 58,
+     "partial": 28,
+     "gap": 33
+    },
+    {
+     "year": "Year 1",
+     "grade": "K",
+     "steps": 116,
+     "covered": 72,
+     "partial": 24,
+     "gap": 20
+    },
+    {
+     "year": "Year 2",
+     "grade": "Grade 1",
+     "steps": 124,
+     "covered": 80,
+     "partial": 18,
+     "gap": 26
+    },
+    {
+     "year": "Year 3",
+     "grade": "Grade 2",
+     "steps": 134,
+     "covered": 78,
+     "partial": 24,
+     "gap": 32
+    },
+    {
+     "year": "Year 4",
+     "grade": "Grade 3",
+     "steps": 129,
+     "covered": 81,
+     "partial": 18,
+     "gap": 30
+    },
+    {
+     "year": "Year 5",
+     "grade": "Grade 4",
+     "steps": 136,
+     "covered": 81,
+     "partial": 22,
+     "gap": 33
+    },
+    {
+     "year": "Year 6",
+     "grade": "Grade 5",
+     "steps": 114,
+     "covered": 63,
+     "partial": 15,
+     "gap": 36
+    }
+   ],
    "ledgerAdded": 478,
    "added": {
     "skills": 3,
@@ -165,7 +455,7 @@
    "done": false,
    "usagePct": 77,
    "usageEstimated": true,
-   "rev": "1f4343b08",
+   "rev": "c291746a6",
    "skills": 742,
    "passed": 33,
    "gates": 174,
@@ -181,6 +471,65 @@
     "gap": 208,
     "total": 872
    },
+   "grades": [
+    {
+     "year": "Reception",
+     "grade": "PK",
+     "steps": 119,
+     "covered": 58,
+     "partial": 28,
+     "gap": 33
+    },
+    {
+     "year": "Year 1",
+     "grade": "K",
+     "steps": 116,
+     "covered": 72,
+     "partial": 24,
+     "gap": 20
+    },
+    {
+     "year": "Year 2",
+     "grade": "Grade 1",
+     "steps": 124,
+     "covered": 80,
+     "partial": 19,
+     "gap": 25
+    },
+    {
+     "year": "Year 3",
+     "grade": "Grade 2",
+     "steps": 134,
+     "covered": 78,
+     "partial": 24,
+     "gap": 32
+    },
+    {
+     "year": "Year 4",
+     "grade": "Grade 3",
+     "steps": 129,
+     "covered": 81,
+     "partial": 18,
+     "gap": 30
+    },
+    {
+     "year": "Year 5",
+     "grade": "Grade 4",
+     "steps": 136,
+     "covered": 81,
+     "partial": 23,
+     "gap": 32
+    },
+    {
+     "year": "Year 6",
+     "grade": "Grade 5",
+     "steps": 114,
+     "covered": 63,
+     "partial": 15,
+     "gap": 36
+    }
+   ],
+   "todoChecks": 24,
    "ledgerAdded": 130,
    "added": {
     "skills": 6,
@@ -1260,6 +1609,13 @@
    }
   ],
   "2026-11-19": [
+   {
+    "date": "2026-11-21",
+    "title": "Deploy the pace board (owner request; lead build, critic pending)",
+    "detail": "pace.html (site root) + data/pace/pace.json from `node tests/scripts/ws-pace.cjs --write`: live and 8/10-passed skills and lessons, this week vs last, week-by-week trends, estimated time to finish, automatic checks added each week, checks still to build (from the weekly speed reflection), White Rose coverage by year, and a weekly log filterable by week / kind / search. Usage % is typed weekly into",
+    "kind": "check",
+    "from": "STATUS.md"
+   },
    {
     "date": "2026-11-20",
     "title": "Deploy lf-engine fill fix (bug fix, no critic)",
