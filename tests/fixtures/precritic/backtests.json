@@ -16250,6 +16250,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-r2-ea-work-coherent",
+   "check": "ws-guided-echo EA-WORK-COHERENT: on Error analysis, True or False? and Reason It an area model's shown work holds no grouped number in a box, and its total is the parts' sum or that sum less one part",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r1 F2 / F12 (the wrong total '1,590' split on its comma into the part boxes; a dropped-zeros total beside the right part)",
+   "browser": true,
+   "fail": {
+    "commit": "c180eacc6",
+    "state": "areaWrong named mark ids (r0c1) the template does not draw and no full slot map; the page's commas grouped the total; TF drew no slots"
+   },
+   "pass": {
+    "commit": "8877abc08",
+    "state": "areaWrong names every part-<k> and total (raw digits); area-model never splits a grouped total; TF passes a multi-box error's slots"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills multiplication:area_model_4by1,multiplication:area_model_2by2,multiplication:area_model_3by2 --seeds 2 --sizes M --only EA-WORK-COHERENT --screen-seeds 0 --score-roles error-analysis,true-false",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
