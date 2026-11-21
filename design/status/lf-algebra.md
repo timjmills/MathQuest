@@ -9,6 +9,22 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-21 PARKED on the lead's budget STOP: mixed_numbers_intro WIP head ec976fba9, on claude/sweet-newton-c8wrv1-lf-algebra-mixed.
+  No precritic ran on it, and the lesson baseline is not re-pinned.
+  Round 3 fixed:
+  - Lesson M PAGEFILL: an opt-in split in paginate.js plus per-size lesson shapes.
+  - roleOpts now returns null on roles that don't judge.
+  - TY-7 slash fractions in the key.
+  - compose Reason It / Opener overflow.
+  Still red or unchecked:
+  - compose / name lesson M PAGEFILL and L DN-2.
+  - compose M practice PAGEFILL and EB-STRETCH: two rows at the 16 mm bar minimum fill about 70 % (needs a lead call).
+  - Opener name M 1.3 mm overflow.
+  - mnForm=eq EB-BAND on Guided, Opener and Scripted Model.
+  - eq lesson PAGEFILL 24-27 %.
+  - Scripted Model L lone-state fix not yet linted.
+  - Re-pin our lesson hashes.
+  NEXT: finish those, re-pin, run the 3 precritics in the foreground, then the critic. #1 is still parked.
 - 2026-11-20 lead rulings (A25):
   - "Write the mixed number as…" is ACCEPTED.
   - The 14 mm L joins and the diagram up to 140 mm are ACCEPTED, as long as cell-fit and EB pass.
