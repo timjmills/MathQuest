@@ -459,6 +459,22 @@ function judge(g, run, p) {
 const PARSE = {
     // ws-student-opts (lane lf-studentopts, 2026-11-19): its own verdict line, and a browser run must say it checked every width
     // it was asked for (`  @<w>: checked`), a --unit run its `  unit:` line - else it checked something else
+    // ws-my-worksheets (lane lf-partopts, My Worksheets 2026-11-20): PASS only when every check it was asked for printed
+    // "<ID>: OK" and TOUCH-WIDTH measured every asked width ("@<w>: checked"); a check line missing judged nothing.
+    myWorksheets(g, out, code) {
+        const m = [...out.matchAll(/^ws-my-worksheets: (OK|FAIL)\b(.*)$/gm)];
+        if (!m.length) return unparsed('no "ws-my-worksheets: OK|FAIL" line', out);
+        const bad = [...out.matchAll(/^([A-Z][A-Z-]+): FAIL (\d+)/gm)].map((x) => `${x[1]} (${x[2]})`);
+        const fl = out.split('\n').filter((l) => /^\s+- /.test(l)).map((l) => l.trim().replace(/^- /, ''));
+        if (m[m.length - 1][1] === 'FAIL') return { result: 'FAIL', findings: `${bad.join(', ') || 'FAIL'}: ${fl.slice(0, 2).join(' | ')}`, detail: fl.slice(0, 12), explainsExit: code !== 0 };
+        const checks = (g.expect && g.expect.checks) || [];
+        const missing = checks.filter((c) => !new RegExp(`^${c}: OK\\b`, 'm').test(out));
+        if (missing.length) return { result: 'FAIL', findings: `no "OK" line for ${missing.join(', ')} (judged nothing for it)`, detail: tailLines(out), explainsExit: false };
+        const want = (g.expect && g.expect.widths) || [];
+        const miss = want.filter((w) => !new RegExp(`^\\s+@${w}: checked`, 'm').test(out));
+        if (miss.length) return { result: 'FAIL', findings: `TOUCH-WIDTH measured nothing at ${miss.join(', ')} px`, detail: tailLines(out), explainsExit: false };
+        return { result: 'PASS', findings: `${checks.join(' / ')} at ${want.join(', ')} px`, detail: [], explainsExit: code === 0 };
+    },
     studentOpts(g, out, code) {
         const m = [...out.matchAll(/^ws-student-opts: (OK|FAIL)\b(.*)$/gm)];
         if (!m.length) return unparsed('no "ws-student-opts: OK|FAIL" line', out);
@@ -923,6 +939,7 @@ function applyOptIn(rows, keys) {
  * Every finding of critic rounds A r1-r3 is backtested on these commands (tests/fixtures/precritic/backtests.json,
  * rows partopts-*); design/lessons-first/CHECKS_FROM_CRITICS.md names each row's check, backtest id and precritic row.
  */
+const MY_WORKSHEETS_CHECKS = ['SAVE-REPRODUCE', 'LIBRARY-ROUNDTRIP', 'SHEET-CODE', 'INTERACTIVE-SAME', 'ORGANISE', 'NO-LOSS', 'TOUCH-WIDTH', 'THEME'];
 const PARTOPTS_LESSONS = 'number_sense:nearest_10,addition:add_wp_10,placevalue:identify,division:div_facts,addition:fact_family_sort';
 /**
  * --student (lane lf-studentopts, 2026-11-19): the pupil home. The options sheet (ws-student-opts: CARRY, COUNT, PUPIL at the
@@ -944,8 +961,8 @@ function addPartOpts(add, ctx) {
     add(gate('partopts-unit', 'ws-partopts-unit (lesson parts: PO-2a-e, EB-ROWFIT, PO-NOROOM, PO-REM, PO-CAP, PO-VOC + the PO-2w step walk)', sub, 'browser', 'ws-partopts-unit',
         ['--lessons', PARTOPTS_LESSONS, '--sizes', 'M,L', '--walk-depth', '1'],
         { parse: PARSE.partOpts, needFlags: ['lessons', 'walk-depth'], expect: { must: ['PO-2d', 'PO-CAP', 'PO-2w walk'] } }));
-    add(gate('partopts-bt', 'ws-partopts-unit --bt-only (the §8d thresholds two-sided: FILL-BT, ROWFIT-BT, BAND-BT)', 'fixed sheets either side of each threshold', 'browser', 'ws-partopts-unit',
-        ['--bt-only'], { parse: PARSE.partOpts, needFlags: ['bt-only'], expect: { must: ['FILL-BT', 'ROWFIT-BT', 'BAND-BT'] } }));
+    add(gate('partopts-bt', 'ws-partopts-unit --bt-only (the §8d thresholds two-sided: FILL-PRINT, FILL-BT, ROWFIT-BT, BAND-BT)', 'fixed sheets either side of each threshold', 'browser', 'ws-partopts-unit',
+        ['--bt-only'], { parse: PARSE.partOpts, needFlags: ['bt-only'], expect: { must: ['FILL-PRINT', 'FILL-BT', 'ROWFIT-BT', 'BAND-BT'] } }));
     add(gate('partopts-coverage', 'ws-partopts-unit --coverage-only (PO-2e: the We Do / Practice ranges vs their floors, the We Do floor a ratchet)', 'every library lesson × M / L', 'browser', 'ws-partopts-unit',
         ['--coverage-only'], { parse: PARSE.partOpts, needFlags: ['coverage-only'], expect: { must: ['PO-2e'] } }));
     add(gate('partopts-shots', 'ws-partopts-shots (the Print screen: F3-F10, N3 captions, N5 / R1 lock text, N6 range text, R2 clamp note, R4 no sideways scroll, 44 px)', 'Print screen at 1280 and 390', 'browser', 'ws-partopts-shots',
@@ -1543,7 +1560,15 @@ function buildPlan(ctx) {
         // (critic title r1 T1 / T4 / T5: the title boxes driven by real keystrokes - the cursor survives the redraw; Title off
         // disables its controls; the simple print box is wide enough)
         add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
+        // (lane lf-hosts, lesson player slice 1, design/cards/lesson-player D10: seed parity with the anchor chart, the I do
+        // render at 820 / 1024 / 1280 / 1366 + 1920 board, the step reveal and keys, PLAYER-ANY-PART; browser, ~2 min)
+        add(gate('lesson-player', 'ws-lesson-player --unit --render --reveal --any-part (I do on the board, the part bar)', 'lesson player', 'browser', 'ws-lesson-player', ['--unit', '--render', '--reveal', '--any-part'], { missingMsg: 'no tests/scripts/ws-lesson-player.mjs' }));
         addPartOpts(add, ctx);
+        // (lane lf-partopts, My Worksheets 2026-11-20, card design/my-worksheets/CARD.md §8: save → reprint byte-identical, the
+        // library round trip, ?sheet= codes, Open interactive = page 1, organise, no loss of quizzes / My sets, 48 px at the four
+        // widths; ~5 min)
+        add(gate('my-worksheets', 'ws-my-worksheets (SAVE-REPRODUCE, LIBRARY-ROUNDTRIP, SHEET-CODE, INTERACTIVE-SAME, ORGANISE, NO-LOSS, THEME, TOUCH-WIDTH at 1280 / 1366 / 1024 / 820)', 'My Worksheets + the three Save hosts', 'browser', 'ws-my-worksheets', [],
+            { parse: PARSE.myWorksheets, expect: { checks: MY_WORKSHEETS_CHECKS, widths: [1280, 1366, 1024, 820] }, missingMsg: 'no tests/scripts/ws-my-worksheets.cjs' }));
     }
     if (ctx.student) addStudent(add);
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails

@@ -443,6 +443,9 @@ function hostPlan(roleId, skills, make, extra = {}) {
             const pr = typeof mod.prepare === 'function' ? mod.prepare(it, { index: out.length, seed: 42, wrong: !!flags[out.length], size: 'L' }) : it;
             if (!pr) continue;
             pr.pool = pool.id;
+            // (lf-roles 2026-11-20: a Pre-skill check pool is ONE prerequisite skill; the bridge tags its items with that skill, so
+            // the fixture does too - else four distinct prerequisites read as one skill dealt four times and merge as twins, A10)
+            if (roleId === 'pre-skill-check' && pool.skills && pool.skills[0]) pr.skill = `${pool.skills[0].categoryId}:${pool.skills[0].skillId}`;
             pr.measured = pr.measured || it.measured;
             out.push(pr);
         }
@@ -762,7 +765,8 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
 // PT-PRE-1: four quadrants with their own small score.
 {
     const { plan, r } = hostPlan('pre-skill-check', [ADD_SKILL], addMake);
-    eq((r.pupilHtml.match(/class="mq-quadscore"/g) || []).length, 4, 'PT-PRE-1: four quadrants, each with its own __/4');
+    // (lead ruling A21-2, 2026-11-20: same-instruction quadrants stack under ONE strip whose score names each prerequisite's item range)
+    eq((r.pupilHtml.replace(/<[^>]+>/g, ' ').match(/\d+\s*[–-]\s*\d+\s*__\s*\/\s*4/g) || []).length, 4, 'PT-PRE-1: four prerequisites, each with its own __/4 (item-range sub-scores, A21-2)');
     eq(plan.meta.scoreOutOf, 16, 'PT-PRE-1: Score /16');
     // A skill with one earlier skill checks one quadrant, never the same skill four times.
     const one = hostPlan('pre-skill-check', [SUB_SKILL], (pool, sk, i) => subQ(500 + i * 11, 123 + i));

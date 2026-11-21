@@ -92,6 +92,7 @@ node tests/scripts/ws-precritic.cjs --role lesson --strict       #   ... and per
 node tests/scripts/ws-spec-card.mjs --check-signed design/cards/<family>/<family>.md   # GATE at build start: card signed, every hosts-and-roles line decided
 node tests/scripts/ws-backtest.mjs           # every check FAILS on the state a critic failed and PASSES on its fix, and is on precritic's path (ws-precritic-plan)
 bash tests/scripts/ws-deploy-gates.sh        # BEFORE EVERY DEPLOY: the deploy gate sessions (--list for the plan)
+node tests/scripts/ws-pace.cjs --write        # EVERY WEEK after the Thursday reset: rebuild the owner's pace board (pace.html; --check is a deploy gate)
 ```
 
 "Clean before critic" means precritic `--strict` plus the unit gates green on the lane branch MERGED WITH the current main branch.

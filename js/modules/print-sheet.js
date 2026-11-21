@@ -1981,6 +1981,15 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     return item;
 }
 
+/**
+ * The lesson player's host item of an already dealt question (lane lf-hosts, design/cards/lesson-player D2): the SAME
+ * item shape the anchor chart draws its states from (template, render, cellPrompt), so the I do on screen is the chart's
+ * own example drawn by the chart's own state renderer. No supports (the chart draws none).
+ */
+export function lessonPlayerItem(q, skill = null) {
+    return hostItem({ q, skill: skill || { categoryId: q.categoryId, skillId: q.skillId } }, 0, 'L', { supports: false });
+}
+
 /* ------------------------------------------------------ the cell's own instruction line */
 
 /** The first stem line of a legacy cell: a plain `<div>` straight after `.problem-content`. */

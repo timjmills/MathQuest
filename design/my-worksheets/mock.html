@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Worksheets — mock</title>
+<style>
+:root{--bg:#f6f6f8;--surface:#fff;--text:#1d1b26;--text2:#4a4560;--rule:#d9d7e0;--accent:#5b3fd1;--sel:#ece8fb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+.top{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--rule)}
+.top h1{font-size:20px;margin:0;flex:1}
+.btn{min-height:48px;padding:0 16px;border:1px solid var(--rule);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.note{margin:12px 20px 0;padding:10px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--surface);color:var(--text2);font-size:14px}
+.wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;padding:16px 20px 24px}
+.side{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:10px;align-self:start}
+.side h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--text2);margin:10px 8px 6px}
+.f{display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;font-size:14px}
+.f.on{background:var(--sel);font-weight:700}
+.f small{color:var(--text2)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.search{flex:1 1 260px;min-height:48px;border:1px solid var(--rule);border-radius:10px;padding:0 14px;font:inherit;background:var(--surface)}
+.chip{min-height:40px;padding:0 14px;border:1px solid var(--rule);border-radius:999px;background:var(--surface);font:inherit;font-size:14px;display:inline-flex;align-items:center}
+.chip.on{background:var(--text);color:#fff;border-color:var(--text)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.thumb{height:170px;background:#fafafa;border-bottom:1px solid var(--rule);display:flex;justify-content:center;padding:12px}
+.page{width:120px;background:#fff;border:1px solid #bbb;box-shadow:0 1px 3px rgba(0,0,0,.12);padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px;align-content:start;font-family:Andika,serif}
+.page .hd{grid-column:1/-1;height:10px;border-bottom:1px solid #000;font-size:6px;font-weight:700}
+.page .c{border:1px solid #000;height:24px;font-size:9px;display:flex;align-items:center;justify-content:center}
+.meta{padding:10px 12px 4px}
+.meta b{display:block;font-size:15px}
+.meta span{font-size:13px;color:var(--text2)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;padding:6px 12px}
+.tag{font-size:12px;border:1px solid var(--rule);border-radius:999px;padding:2px 8px;color:var(--text2)}
+.acts{display:grid;grid-template-columns:1fr 1fr 48px;gap:6px;padding:10px 12px 12px;margin-top:auto}
+.acts .btn{padding:0 8px;justify-content:center;font-size:14px}
+.acts .more{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.picker{display:none}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}.side{display:none}.picker{display:inline-flex}}
+</style></head><body>
+<div class="top"><h1>My Worksheets</h1>
+  <button class="btn">Import</button><button class="btn">Export library</button><button class="btn primary">+ New worksheet</button></div>
+<p class="note">Saved on this device. Use <b>Export library</b> to keep a copy or to move your worksheets to another computer.</p>
+<div class="wrap">
+  <nav class="side" aria-label="Folders">
+    <div class="f on">All worksheets <small>23</small></div>
+    <h2>By unit</h2>
+    <div class="f">Y4 · B3 · Multiplication &amp; division <small>9</small></div>
+    <div class="f">Y3 · B1 · Place value <small>6</small></div>
+    <div class="f">Y5 · B3 · Fractions <small>4</small></div>
+    <h2>My folders</h2>
+    <div class="f">Friday review <small>3</small></div>
+    <div class="f">Intervention group <small>1</small></div>
+    <div class="f" style="color:var(--accent);font-weight:600">+ New folder</div>
+  </nav>
+  <main>
+    <div class="bar">
+      <button class="chip picker">Folder: All ▾</button>
+      <input class="search" placeholder="Search name, skill, tag or class">
+      <button class="chip on">Newest first</button><button class="chip">By unit</button>
+      <button class="chip">Class 5T</button><button class="chip">#homework</button>
+    </div>
+    <div class="grid">
+      <article class="card"><div class="thumb"><div class="page"><div class="hd">Multiply by 4</div><div class="c">4 × 3 =</div><div class="c">4 × 7 =</div><div class="c">4 × 5 =</div><div class="c">4 × 9 =</div><div class="c">4 × 2 =</div><div class="c">4 × 6 =</div></div></div>
+        <div class="meta"><b>Independent · Mult Facts × 4</b><span>Independent practice · M · 2 pages · 20 Nov</span></div>
+        <div class="tags"><span class="tag">5T</span><span class="tag">#homework</span></div>
+        <div class="acts"><button class="btn primary">Print</button><button class="btn">Play</button><button class="btn" aria-label="More">⋯</button>
+          <div class="more"><button class="btn">Send code</button><button class="btn">New mix</button></div></div></article>
+      <article class="card"><div class="thumb"><div class="page"><div class="hd">Lesson · Equal groups</div><div class="c" style="grid-column:1/-1;height:40px">I do</div><div class="c">We do</div><div class="c">We do</div></div></div>
+        <div class="meta"><b>Lesson · Equal Groups · 18 Nov</b><span>Lesson packet · L · 6 pages · Y4 · B3</span></div>
+        <div class="tags"><span class="tag">5T</span></div>
+        <div class="acts"><button class="btn primary">Print</button><button class="btn">Play</button><button class="btn" aria-label="More">⋯</button></div></article>
+      <article class="card"><div class="thumb"><div class="page"><div class="hd">Mixed review</div><div class="c">352</div><div class="c">7 × 8</div><div class="c">½ + ¼</div><div class="c">45 ÷ 5</div></div></div>
+        <div class="meta"><b>Mixed Review · 4 skills · 15 Nov</b><span>Mixed review · M · 1 page</span></div>
+        <div class="tags"><span class="tag">#friday</span></div>
+        <div class="acts"><button class="btn primary">Print</button><button class="btn">Play</button><button class="btn" aria-label="More">⋯</button></div></article>
+      <article class="card"><div class="thumb"><div class="page"><div class="hd">Place value</div><div class="c">3 4 6</div><div class="c">5 0 9</div><div class="c">7 1 2</div><div class="c">8 8 0</div></div></div>
+        <div class="meta"><b>Model · Place Value · 12 Nov</b><span>Model page · L · 1 page · Y3 · B1</span></div>
+        <div class="tags"><span class="tag">Intervention</span></div>
+        <div class="acts"><button class="btn primary">Print</button><button class="btn">Play</button><button class="btn" aria-label="More">⋯</button></div></article>
+    </div>
+  </main>
+</div>
+</body></html>

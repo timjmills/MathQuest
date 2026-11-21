@@ -1009,3 +1009,29 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Show Solution: SOL-OBJECT 209 items / 89 skills → 0, SOL-PROBLEM 172 items / 54 skills → 0 (ws-solution-text, precritic gate). Fixes R3-3 / R3-4 app-wide.
 - Routed: mult_break_apart SAYLESS → lf-ops (Say line).
 - Gates: boot-smoke, code-snapshot 741, no-size-s, solution-text, hint-no-blank, support-ladder, redesign-passed, fit-floor, worksheet-reflow, roles-unit, precritic-plan, capacity-pin, simple-print, key-json, lesson-baseline 2700 identical — all OK.
+
+## 2026-11-20 — Deploy lf-roles d2d5 (Pre-skill Check D2-D5; narrow critic r2 PASS 8/8/8/8)
+- PSC instructions without label tails, shared strips for same-instruction bands (item-range sub-scores), de-dupe (no answer x3, no turnarounds), compare-sign floor (>= 2 signs, never 3 in a row), twin pools merged ("Division Word Problems"), Opener GROWCAP 0 for count rows. New ws-psc-lint (PSC-TITLE/INSTR/STRIP1/LESSON/DEAL/TWIN/TWIN-MIX, forms A/B).
+- Rulings A10, A21 (strip reprints on a new page; stacked quadrants under one strip; lesson per-question check as master). Capacity re-pinned: sub_2d_1d PSC M 6->5, L 6->4 (2 pages -> 1). PT-PRE-3 expectation 8 (lead ruling 1c); PT-PRE-1 fixture tags each pool with its own skill.
+- ws-layout-unit 31 (the known list; master's extra PT-PRE-3 fixed). Queued: H16 div_equation_parts doubled answer area (division family); buildSheet/PSC title must refuse a non-live id.
+
+## 2026-11-20 — Deploy My Worksheets (lf-partopts; critic r2 PASS, every width ≥ 8)
+- Save to My Worksheets on Print worksheets / simple print / online worksheet (teacher-only); library screen (Me menu): unit folders + own folders, tags, search, sorts, Print / Play / Send code / New mix / Edit (overwrite + Save as a copy) / Rename / Move / Duplicate / Delete + Undo; .mqsheets export/import; ?sheet= codes; 450 warn / 500 cap. Storage: new `sheets` store in mathquest_quizzes (DB v2, add-only). Look per A19 (current teacher shell; owner approved).
+- New ws-my-worksheets (13 checks) on precritic --teacher + deploy session 1. Deferred: N1 (top-bar button heights), N2 (late-deal save edge) - ledger rows exempt with their checks specified.
+- Master reds routed to lf-engine: ws-partopts-unit FILL-BT / ROWFIT-BT (row-cap drift; fix in progress).
+
+## 2026-11-20 — Deploy lesson player slice 1 (lf-hosts; critic r3 + narrow 820 r4 PASS, every width >= 8)
+- "I do" on the board for add-within-10 (?lesson=...&part=&mode=board): the anchor chart's own example drawn B&W by its stateDrawing (screen = paper), one-by-one reveal, Say band full width from step 1 (A22a), cell top-aligned with Steps, digits up to +25 % to fill the stage (A22b), read aloud on demand only, clicker keys, Leave on every stage, clickable part bar + direct part URLs (D11), unbuilt parts "coming soon".
+- New ws-lesson-player (unit/render/reveal/any-part/leave/stage-fill/hops-below) on precritic --teacher. A26b: player-only 820-portrait allowance (reserved answer + hops room, <= 47 %) scoped in the tool.
+- Next: slice 2 (We do).
+
+## 2026-11-20 — Deploy lf-engine fill fix (bug fix, no critic)
+- Root cause: the lesson planner measured every band label strip as one line (Independent at 0.5 em/char); new stripWrapMm (compose.js) wraps per character at the strip's real width, used only in lesson.js's fill / free-height measure (no page moved: 2700 hashes identical). Plan vs print now within ~1 mm.
+- SHEET_FILL_MIN 0.76 -> 0.74 from an 810-sheet sweep (ws-partopts-unit --fill-sweep); new FILL-PRINT check (plan vs print <= 4 mm). ROWFIT anchors re-bracketed around 12 mm; DESIGN.md §8d updated.
+- Routed (A27): 6 good sheets at 0.728-0.739 still refused + ROWFIT foot-by-real-row-height -> lf-engine; mult_properties L Vocab-off sizing -> lf-ops; PO-CAP function_table_easy L / notice_patterns M -> lf-algebra.
+
+## 2026-11-21 — Deploy the pace board (owner request; lead build, critic pending)
+- pace.html (site root) + data/pace/pace.json from `node tests/scripts/ws-pace.cjs --write`: live and 8/10-passed skills and lessons, this week vs last, week-by-week trends, estimated time to finish, automatic checks added each week, checks still to build (from the weekly speed reflection), White Rose coverage by year, and a weekly log filterable by week / kind / search. Usage % is typed weekly into data/pace/usage.json.
+- Updates itself: .github/workflows/pace-board.yml rebuilds and commits pace.json on every master push, daily, and after the Thursday reset. `ws-pace --check` joins deploy session 1; `--self-test` covers the week maths and the log classifier.
+- Speed reflection 2026-11-20 merged (LESSONS_LEARNED process rules 11-20, speed-audit, metrics).
+- 2026-11-21 (owner: "estimates into 2029 cannot be correct"): the board now counts the redesign against 602 skills (presets and retired skills apart), shows the finish at the pace reached AND at a planned pace (data/pace/targets.json, owner confirmed 12 skills / 6 lessons / 8 gap steps a week), and says how many weeks of records the pace rests on.

@@ -105,6 +105,7 @@ export const ALLOW = [
     { file: 'tests/scripts/ws-node-lint.mjs', has: "S: fpAt(q, 'S')", rule: 'GATE-TOKEN', why: 'L1 footprint rule: the kit S token against L, in node' },
     { file: 'tests/scripts/ws-node-lint.mjs', has: "const S = lay('S'), L = lay('L');", rule: 'GATE-TOKEN', why: 'L1 layout rule: the kit S token against L, in node' },
     { file: 'tests/scripts/ws-student-explorer.cjs', has: "for (const size of ['L', 'W', 'B', 'M', 'S'])", rule: 'GATE-TOKEN', why: 'the explorer card plate sizes (a screen layout), not a print size' },
+    { file: 'tests/scripts/ws-my-worksheets.cjs', has: "old.req.parts[0].size = 'S'", rule: 'GATE-TOKEN', why: 'LIBRARY-ROUNDTRIP fixture: an old saved worksheet record at S must load as M (My Worksheets card §2); no page is printed at S' },
     // DOC (round-cap r3): CLAUDE.md is the owner's file - lanes do not edit it. Its two S lines are reported to the lead for the
     // owner; when the owner rewrites them these entries go stale and FAIL (ALLOW-STALE), so they cannot outlive the fix
     { file: 'CLAUDE.md', has: '(Size S ignored, wasted space,', rule: 'DOC', why: 'owner file, reported to the lead 2026-11-13: names failure class L1 by its old title' },

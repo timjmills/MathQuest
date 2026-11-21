@@ -600,6 +600,12 @@ const STUDENT_OPTS_NAMES = ['openStudentOptions', 'closeStudentOptions', 'studen
 window.__mqLoadStudentOpts = makeLazy('student options', (n) => (n ? import(`./modules/student-options.js?retry=${n}`) : import('./modules/student-options.js'))
     .then((m) => Object.fromEntries(STUDENT_OPTS_NAMES.map((k) => [k, m[k]]))), STUDENT_OPTS_NAMES);
 
+// The lesson player (design/cards/lesson-player, lane lf-hosts): a ?lesson= link opens it (init.js checkURLParameters);
+// loaded on that first call only.
+const LESSON_PLAYER_NAMES = ['openLessonPlayer', 'closeLessonPlayer', 'lessonPlayerState'];
+window.__mqLoadLessonPlayer = makeLazy('lesson player', (n) => (n ? import(`./modules/lesson-player/player.js?retry=${n}`) : import('./modules/lesson-player/player.js'))
+    .then((m) => Object.fromEntries(LESSON_PLAYER_NAMES.map((k) => [k, m[k]]))), LESSON_PLAYER_NAMES);
+
 // Who needs the deferred half BEFORE init runs (so they see exactly what they saw before the split):
 //   a MAP or quiz link (?map= / ?quiz=), a Send link's &set=, the teacher board (?board=1 on a teacher device),
 //   a teacher-site hash route, or a device that opens in teacher view ("Open the site in: Last view used").

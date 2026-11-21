@@ -1128,3 +1128,96 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
   (3) the strict choice rule moved our own skills to a generic hint (HELP-GENERIC): the family's screenHelp had to be written for 20
   skills, not the 8 the brief named - a rule change that degrades help should be swept over the lane's own categories first.
 - Speed-up: ws-hint-no-blank runs every skill in ~17 s; `--lists` re-cuts every pin in one run.
+
+## Weekly reflection 2026-11-20 (week 2026-11-19 → 2026-11-20; independent auditor, Opus medium)
+
+Sources: design/STATUS.md deploy entries 2026-11-19/20; design/status/lf-*.md on master 4d7c09f63; CHECKS_FROM_CRITICS.md rows
+dated 2026-11-19/20; the parked branches -lf-ops-sizes (c180eacc6), -lf-algebra-mixed (6bc11d096), -lf-algebra-mult3
+(20ee0eeac), -lf-roles-qreview (d4fd40db1), -lf-tools-lessons (2db6cd1b4), -lf-builds (399dca204). Spend is quoted only where a
+lane file states it ($28 ≈ 1 % of the weekly limit). Every fix below is due **week of 2026-11-26**.
+
+### Week in one line
+17 deploys in two days, 11 of them after an independent PASS. Seven lanes reached the round cap. Six work items are parked
+(sizes, mixed, mult3, qreview, lessons browser, chart blanks). Most lost rounds were not caused by builder effort. They came
+from checks written only after a critic found the defect, from lead rulings that clashed with existing caps, and from reds
+put in the wrong class.
+
+### Per lane
+
+| Lane / item | Rounds (critic) | Result | Spend (stated) | Causes of lost rounds | Fix (owner, due week of 2026-11-26) |
+|---|---|---|---|---|---|
+| lf-checks ws-merge-master | r1-r4 FAIL, r5 PASS 9/9/9/8 | deployed 11-19 | not stated | a different hole each round: same-id rows lost (r1), CRLF (r2), a backtest row ran newer cases against the older tool (r3), `--only` matching nothing passed (r4) | Rule 18 (the merge procedure is now the standard). For a merge tool, plant line endings, empty filters and stale cases in the first self-test, before r1 (lf-checks) |
+| lf-checks EB-LASTPAGE / CAP-PARITY | r1-r4 FAIL, r5 PASS 9/8/9/8 | deployed 11-20 | not stated | root cause at r2: the rule INFERRED capacity from white space instead of reading each role's declared ceiling; r4: the pin / capacity checks were on no gate path and failed open | a new rule reads declared design data first, never inference (now role-capacity.js). Every new check lands on the precritic path in the same commit (ws-precritic-plan; lf-checks) |
+| lf-checks key-json / tof-stem retry | 1, PASS 9/8/9/8 | deployed | - | - | - |
+| lf-checks lessons browser (lf-tools-lessons) | r1 FAIL D1-D10, r2 FAIL D11, HELD | not deployed; THUMB-NO-FREEZE still fails (6.4 s task at CPU ×4) | about $170 of the $180 allowance | D11: the first-page thumbnail build ran on the main thread (84 s freeze). The freeze check was written only after the critic found it. D8: the gate never ran 1280 / 820 | Rule 15; next week: CPU profile first, name the function, then fix (lf-checks) |
+| lf-checks content-audit / lesson-pages checks | no critic (bug fix, checks) | deployed | - | content-audit crash masked a real red (grade_4_mixed P-29) for a day | content-audit --self-test loads skill-options.js and its imports (done); bisect grade_4_mixed (lf-checks) |
+| lf-engine rowcap + vocabfix | round-cap critic r1 PASS | deployed | not stated | the deploy broke lf-partopts FILL-BT / ROWFIT-BT. Found only after the deploy (lesson 7) | Rule 17 (lf-engine + lf-checks: add the dependent suites to ws-deploy-gates.sh) |
+| lf-engine lessonfirst | shared narrow critic 1, PASS | deployed | not stated | layout-unit crashed at :918 on master, so the lane could not read it | rule 11 makes the crash visible at deploy (lf-engine) |
+| lf-engine fillfix | no critic (bug fix) | deployed | - | regression of rowcap, see above | FILL-PRINT (built) |
+| lf-roles Guided r13-r18 + W2 mask | 6 fix rounds against narrow critics r13-r15 + lead items; PASS | deployed | not stated | r13: a lead item (identify L page-1 fill) conflicted with ruling R13 and PSC-2PG-BALANCE and was reverted. A ruling that ignored an existing rule cost one round. r17→r18: the W2 mask overmasked given numbers (a check written only after the lead saw it) | Rule 13 (lead) |
+| lf-roles PSC fill | narrow critic 1, PASS 9/8/8/8 | deployed | not stated | PT-PRE-3 still expected the old ceiling after 1c; PT-PRE-1 fixture tagged every pool with the host skill (lesson 6) | Rule 16 (lf-roles, lf-checks) |
+| lf-roles d2d5 | r1 FAIL 6/8/6/6, r2 PASS 8/8/8/8 | deployed | not stated | layout-unit was claimed OK on the deploy head and was failing 33 (31 known + PT-PRE-1 + PT-PRE-3); the lead caught it (lesson 1) | Rule 11 (every lane) |
+| lf-roles qreview (PSC + Quick review) | built, no critic | PARKED (red on purpose) | not stated | EB-PAGE reds that need a ruling (A24); "capped A" conflicts with EB-STRETCH | KEYLABEL-CLEAR + grade-window checks first (A24 item 5) (lf-roles) |
+| lf-ops count_by_tables | r4 PASS 8/8/8/8 | deployed, redesign-passed 33 | not stated | re-grade of the L PSC queued after the 1c ruling moved it | - |
+| lf-ops-sizes (6 multiplication sizes) | sharded precritic + fix round, critic r1 FAIL (15 findings, 7 critical) | PARKED at budget (≈ $58 left at the $1,618.37 stop) | builder cap $35, checker cap $12 | F1: a new* page-type red (Model step marks blank) was classed as master's and never fixed (lesson 2). F5: a capacity ruling (A9) was treated as clearing an overflow | Rule 12; Rule 19; STEPS-PANEL-EMPTY check first (lf-ops) |
+| lf-placevalue HINT-NO-BLANK | r1 FAIL, r2 FAIL (root-cause stop), r3 FAIL on change 1 | r3 deployed as a strict improvement (A14); round cap reached | stopped at budget stop | token rules patched one by one until r2, when help was chosen whole instead. The ruling removed an output and broke ws-support-ladder: no grep for gates that assert that output | Rule 20 (lf-placevalue) |
+| lf-placevalue expand-2col, sol-fix | 1, PASS 9/9/8/9; sol-fix no critic | deployed | - | - | start the 2-column rule at ~1000 px (lf-placevalue) |
+| lf-algebra two-step GUIDED-NO-MID | r1 FAIL F1, r2 PASS 8/8/8/8 | deployed | not stated | F1 story numbers did not match the work: no check existed until the critic | STORY-WORK (built) |
+| lf-algebra patterns | r3 FAIL (57 / 85 versions), r4 PASS | deployed, cards re-signed | not stated | instructions that name no slot kind on 22 versions: one general check (INSTR-SLOTS) closed them all at once | INSTR-SLOTS app-wide after slot tagging (lf-algebra) |
+| lf-algebra mult3 | low build hit the round cap, medium rebuild (EB 116 → 19), still red | PARKED | not stated | built at low on a new (template, kind) pair, against rule 0a | Rule 0a holds as written: the first build on an uncertified pair is medium (lead, when briefing) |
+| lf-algebra mixed numbers | no critic (precritic 13 FAIL) | PARKED | not stated | share code ZM also claimed by mult3 (lesson 4); POOL-MIN at L conflicts with the card | Rule 14; CODE-TAIL (lf-checks); POOL-MIN ruling (lead) |
+| lf-hosts Skip | r1 FAIL F1-F6, r2 PASS | deployed | not stated | r2 F1: wall-clock waits flapped under load | ws-skip waits on state (done) |
+| lf-hosts lesson player slice 1 | r1 FAIL F1-F9, r2 FAIL (stage 44-47 % empty), r3 FAIL (A26 hops), narrow 820 r4 PASS | deployed | not stated | at 820 portrait, A22 (stage < 30 % empty), A26 (hops below the drawing) and the 35 % allowance of PT-MOD-3 could not all hold. A26b (≤ 47 %) was added only after r3 (lesson 3) | Rule 13 (lead) |
+| lf-hosts digit floor | no critic (bug fix) | deployed | - | - | FIT-FLOOR / FIT-RESET (built) |
+| lf-partopts student options | r1 FAIL F1-F7, r2 PASS 8 (round cap) | deployed | not stated | F1 the gate checked a hand list rather than every skill (43-100 skills per width) | sweep every skill from r1 (STUDENT-OPTS-SWEEP, built) |
+| lf-partopts My Worksheets | r1 FAIL F1-F10, r2 PASS (round cap) | deployed | not stated | 10 screen findings in r1. Keyboard trap, reach and box checks were not in the first gate | first build of a screen carries KEYS / MENU-REACH / CARD-BOX by default (lf-partopts) |
+| lf-builds chart blanks | r2 FAIL, r3 precritic regressions, r4 FAIL, r5 FAIL (G1), r6 partial, r7 FAIL (H4), r8 checks only | PARKED at $705 of the $775.37 stop (≈ $79 this week ≈ 2.8 %) | ≈ $79 | the answer-repetition class came back in r2, r4, r5 and r7. Each patch fixed one page. The proof that no 4-window layout meets floor + edge share came only at r8. Three lead rulings (A11, A13, A23) were needed mid-loop. r5-r6 were built at low | before a deal redesign, run a layout search that proves a layout exists (or not) under every check together. Escalate at once after a regression (lf-builds) |
+
+### Q9: round caps, and would a medium builder at r1 have saved rounds?
+Round cap reached: lf-checks merge-master and eblast, lf-placevalue HINT-NO-BLANK, lf-builds chart blanks, lf-algebra mult3,
+lf-partopts student options and My Worksheets.
+
+- **Medium at r1 would have saved about one round in two cases:**
+  - mult3 was built at low. The medium rebuild cut EB 116 → 19 in one pass.
+  - chart blanks r5-r6 were built at low after the un-park. The r7 medium escalation went green on H1-H3.
+- **The other five were already medium from r1.** Their rounds were lost to:
+  - checks the critic had to invent (D11 freeze, KEYS, `--only` empty, CRLF);
+  - capacity inferred instead of declared;
+  - rulings that collided with existing caps.
+
+  More effort would not have fixed these. Writing the checks first and reading the ruling against the caps would have.
+
+### Checks proposed but not yet on master
+Verified by grep on tests/scripts at master 4d7c09f63: 0 hits unless noted.
+
+| check | owner | where specified |
+|---|---|---|
+| STEPS-PANEL-EMPTY (lesson Steps panel draws step text) + Model state ink (step marks on every Model state) | lf-ops | -lf-ops-sizes: design/status/lf-ops-sizes.md "F1 master check" (backtest on master f8164ca5d FAIL) |
+| KEYLABEL-CLEAR (review key label box clear of the cell's ink) + review grade window | lf-roles | -lf-roles-qreview: design/status/lf-roles.md "Quick review A24" item 5 |
+| CODE-TAIL (ws-merge-master: two branches claiming one share code) | lf-checks | -lf-algebra-mult3: design/status/lf-algebra.md A25 |
+| THUMB-NO-FREEZE (CPU ×4 main-thread budget) | lf-checks | **-lf-tools-lessons branch only** (ws-lessons-browse.mjs, row lessons-browse-thumb-no-freeze); fails on its own head 0e0811755 |
+| LESSON-MIXED (lesson checks rerun with mixed:true) | lf-builds | -lf-builds: design/status/lf-builds.md A11 item 1 |
+| NEAR-TWIN-smaller (measured against the smaller window; row c120b-near-twin-small) | lf-builds | -lf-builds: lf-builds.md A11 (2). NEAR-TWIN itself is only on the lf-builds branch |
+| EDGE-SHARE / PAGE-COL-RUN / SKELETON-TWIN | lf-builds | -lf-builds 67cf59870 (no backtest rows; no pass commit) |
+| GUIDED-TAB | lf-engine | design/STATUS.md 2026-11-20 rowcap deploy, routed minor m1 |
+| STATE-PROGRESS on vocab_grade_pictures Scripted Model | lf-vocab | STATUS rowcap deploy m2. Exists in ws-patterns-cells, but for patterns skills only |
+| MIN-PT (EA name tag) | lf-engine | STATUS rowcap deploy m3 |
+| SOL leftovers: a pinned, shrink-only count of the Problem / "[object" lines ws-solution-text's wrapper drops; sub_facts Show Solution method = card (R3-6); nearest_10000 box wording (R3-5) | lf-placevalue (tool), lf-ops (R3-6) | design/status/lf-placevalue.md "HINT-NO-BLANK r3 critic" + "Show Solution text fix" |
+| N1 My Worksheets: every button in #wsSaveSheet's bar the same height, ≥ 48 px at 820 / 1024 | lf-partopts | CHECKS_FROM_CRITICS 2026-11-20 (PENDING) |
+| N2 My Worksheets: late deal (5 s) answered at 4.5 s then saved = screen, or a message | lf-partopts | CHECKS_FROM_CRITICS 2026-11-20 (PENDING) |
+| STUDENT-OPTS-WORDS over mixed `members` names (bans B&W, mc, q\d, ", visual") | lf-partopts | CHECKS_FROM_CRITICS 2026-11-20 (planned; STUDENT-OPTS-WORDS exists without it) |
+| PSC-REVIEW-DOMAINS / PSC-SCORES / EB-PAGE on every PSC page / EB-PSCCAP | lf-roles | -lf-roles-qreview / -psc2 branches only (red on purpose) |
+| PSC-QUADRANT-16 (declared 16-item quadrant exception read by EB-PSCCAP) | lf-roles | lf-roles.md (qreview branch) "item 2, option iii" |
+| NON-LIVE-ID (buildSheet / PSC title refuse an id not in SKILLS) | lf-roles | design/status/lf-roles.md d2d5 notes |
+| LINE-ORPHAN (Guided Model line ending on a lone word) | lf-roles | CHECKS_FROM_CRITICS 2026-11-20 (deferred, lead) |
+| Model-state change step by step, wrong work coherent, screen clipping (area_model_4by1), PSC tests the size below | lf-ops | lf-ops-sizes.md critic r1 next-week list F1, F2/F12, F6, F9 |
+| ws-chart-offer (exists on -lf-builds only; not on master or its precritic path) | lf-builds | CHECKS_FROM_CRITICS 2026-11-20 c120b-gaps-row-hidden |
+| DEPLOY-BT: ws-partopts-unit --bt-only, the mws-* and lesson-player backtest rows in ws-deploy-gates.sh for a shared-engine deploy | lf-checks | this audit (lesson 7); ws-deploy-gates.sh has no partopts-unit / lesson-player entry |
+| GATE-LINE: the deploy gate log prints each gate's last line with the head sha, and the lead's deploy note quotes it | lf-checks | this audit (lesson 1, rule 11) |
+| LESSON-OPENER-SAME signature fix (5 misfires: compare cells, not masked text) | lf-checks | STATUS 2026-11-20 lesson first-page deploy |
+| nested mq-browser-run slot guard | lf-checks | LESSONS_LEARNED rule 8a ("Check: none yet") |
+
+### Top speed-ups for the week of 2026-11-26
+1. **Checks before builds, and they cover the whole surface.** The critic should never be the first to find a class: the freeze, keyboard traps, every width, every skill. Most round-cap lanes lost their rounds this way.
+2. **Rulings and codes are checked against what already exists.** A layout ruling states its cap allowance. A share code is taken from the live tail at merge. A ruling that removes an output greps for the gates that assert it.
+3. **Deploy claims are pasted, never asserted.** Each claim is the gate's last line on the exact head. A shared-engine deploy runs the dependent lanes' backtests first. A new* red is the branch's own.
