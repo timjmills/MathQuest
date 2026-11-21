@@ -34,7 +34,23 @@
 //                ON by default on this tree; a backtest checkout (MQ_ROOT set) runs it only with --hops-below.
 //                A26b (lead 2026-11-20): at 820 portrait ONLY, the answer row + the hops' room under it is reserved room (H13:
 //                <= 35 % without it, <= 47 % with it, and the last step inks all of it - a check of its own).
-//   --hints / --exit / --sheet-to-play / packet page ids: later slices (2, 3, 5 / 4) - reported NOT IN SLICE 1, never passed
+//   --slice2     (lane lf-hosts slice 2: Warm-up + We do, both modes) - ON by default on this tree; a backtest checkout (MQ_ROOT
+//                set) runs it only with --slice2, so the slice-1 rows keep judging the contract their commits were built to. Adds:
+//                --render  Warm-up and We do (every item, every rung) and the I do, in BOARD and PUPIL mode, at every width: the
+//                          slice-1 checks (no scroll, cell ink, Andika, emoji, H13, Leave) + stage-fill (cell top level with the Steps /
+//                          the stage top, < 30 % of the stage empty, the cell inside the stage), the digit window [signed, 1.25 x]
+//                          (board 156 / 104 / 83, pupil the card scale 56 / 48), every button AND answer input >= 64 px (board) /
+//                          48 px (pupil)
+//                --hints   We do: items open at rungs 1 -> 2 -> 3, a correct Check moves the next item down a rung, a wrong Check
+//                          keeps it (P-ON-7), Hint never writes into an input (P-ON-8), live per-digit marks (SP-31), the black ink
+//                          never moves between rungs; rung 1 = grey working + the next step's sentence, rung 2 = the sentence,
+//                          rung 3 = "What comes next?" + its Steps row highlighted; the board drives the rung with Hint / Next;
+//                          Warm-up: Check marks it, a miss shows the "If missed" line; pupil I do reads itself only with sound on (A17)
+//                --any-part  Warm-up and We do open as cells by URL in both modes; pupil mode resumes at the last part reached;
+//                          You do / Exit ticket stay "coming soon" and navigable
+//                --unit    D2: partSeed(S, part, i) = S+100+i / S+200+i / S+300+i / S+900+i; the player's Warm-up and We do items ==
+//                          the printed packet's own Warm-up and Guided items for the same seed (buildSheet, P-ON-5)
+//   --exit / --sheet-to-play / packet page ids: later slices (3, 5 / 4) - reported NOT IN THIS SLICE, never passed
 //
 //   --widths 1280,1920   override the widths (default SCREEN_WIDTHS + 1920)   --shots <dir>  write PNGs (dsf 2)
 //   --lesson <id|slug>   default add-within-10 (the slice-1 lesson, D8)
@@ -56,7 +72,10 @@ const TOOL = 'ws-lesson-player';
 const argv = process.argv.slice(2);
 const arg = (k, d = null) => { const i = argv.indexOf(k); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const MODES = ['unit', 'render', 'reveal', 'any-part', 'leave'];
-const LATER = { hints: 'slice 2 (We do)', exit: 'slice 3 (Exit ticket)', 'sheet-to-play': 'slice 5 (D12 itemsFor)' };
+// SLICE 2 (Warm-up + We do, both modes): on by default on this tree; a backtest checkout runs it only with --slice2
+const S2 = argv.includes('--slice2') || !process.env.MQ_ROOT;
+const LATER = Object.assign(S2 ? {} : { hints: 'slice 2 (We do)' }, { exit: 'slice 3 (Exit ticket)', 'sheet-to-play': 'slice 5 (D12 itemsFor)' });
+if (S2 && !MODES.includes('hints')) MODES.push('hints');
 let modes = MODES.filter((m) => argv.includes(`--${m}`));
 const later = Object.keys(LATER).filter((m) => argv.includes(`--${m}`));
 if (!modes.length && !later.length) modes = MODES.slice();
@@ -190,7 +209,8 @@ function measureInPage() {
         out.stageBandY = band(sq.top, sq.bottom, blocks.map((q) => [q.top, q.bottom]));
         out.stageBandX = band(sq.left, sq.right, blocks.map((q) => [q.left, q.right]));
     }
-    out.small = [...r.querySelectorAll('button')].filter((b) => b.offsetParent !== null).map((b) => { const q = b.getBoundingClientRect(); return { t: b.textContent.trim(), w: q.width, h: q.height }; });
+    out.small = [...r.querySelectorAll('button, .mq-lp-cell input')].filter((b) => b.offsetParent !== null && getComputedStyle(b).visibility !== 'hidden').map((b) => { const q = b.getBoundingClientRect(); return { t: b.tagName === 'INPUT' ? `input ${b.getAttribute('aria-label') || ''}` : b.textContent.trim(), w: q.width, h: q.height }; });
+    out.part = r.dataset.part || '';
     const EMOJI = /\p{Extended_Pictographic}/u;
     const walker = document.createTreeWalker(r, NodeFilter.SHOW_TEXT);
     const emo = [];
@@ -212,6 +232,8 @@ function measureInPage() {
     for (const el of cell.querySelectorAll('*')) {
         const cs = getComputedStyle(el);
         if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+        // (SP-30: feedback marks are chrome, data-ws-feedback, outside INK-1)
+        if (el.closest('[data-ws-feedback]')) continue;
         const hasText = [...el.childNodes].some((c) => c.nodeType === 3 && c.nodeValue.trim());
         if (hasText) { if (!allowed.has(cs.color)) bad.add(`color ${cs.color}`); fonts.add(cs.fontFamily.split(',')[0].replace(/["']/g, '').trim()); }
         for (const s of ['Top', 'Right', 'Bottom', 'Left']) if (parseFloat(cs[`border${s}Width`]) > 0 && cs[`border${s}Style`] !== 'none' && !allowed.has(cs[`border${s}Color`])) bad.add(`border ${cs[`border${s}Color`]}`);
@@ -266,7 +288,17 @@ function measureInPage() {
         for (let a = el; a && a !== r; a = a.parentElement) z *= parseFloat(getComputedStyle(a).zoom) || 1;
         dpx = Math.max(dpx, parseFloat(getComputedStyle(el).fontSize) * z);
     }
+    for (const el of r.querySelectorAll('.mq-lp-draw input')) {
+        let z = 1;
+        for (let a = el; a && a !== r; a = a.parentElement) z *= parseFloat(getComputedStyle(a).zoom) || 1;
+        dpx = Math.max(dpx, parseFloat(getComputedStyle(el).fontSize) * z);
+    }
     out.digitPx = dpx;
+    {
+        // how much of the cell's work area the drawing takes (card §3: a drawing too big for the stage takes the whole stage)
+        const wk = r.querySelector('.mq-lp-cell .mq-lp-work'), dz = r.querySelector('.mq-lp-cell .mq-lp-draw');
+        if (wk && dz) { const a = wk.getBoundingClientRect(), b = dz.getBoundingClientRect(), cs = getComputedStyle(wk); const ih = a.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom), iw = a.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); out.drawFill = { h: ih > 0 ? b.height / ih : 0, w: iw > 0 ? b.width / iw : 0 }; }
+    }
     out.k = parseFloat(getComputedStyle(r).getPropertyValue('--lp-k')) || 1;
     // the Say band: its frame, its label and its line (A22: the frame and label from step 1, the line after the last step)
     const sayEl = r.querySelector('.mq-lp-say');
@@ -294,7 +326,9 @@ function measureInPage() {
         const area = (q) => Math.max(0, Math.min(q.right, R) - Math.max(q.left, L)) * Math.max(0, Math.min(q.bottom, B) - Math.max(q.top, T));
         const stp = r.querySelector('.mq-lp-steps');
         const pq = stp ? stp.getBoundingClientRect() : null;
-        out.stageEmpty = 1 - (area(cr) + (pq ? area(pq) : 0)) / Math.max(1, (R - L) * (B - T));
+        const fbs = [...r.querySelectorAll('.mq-lp-stage .mq-lp-fb')].filter((e) => e.offsetParent !== null).map((e) => e.getBoundingClientRect());
+        out.stageEmpty = 1 - (area(cr) + (pq ? area(pq) : 0) + fbs.reduce((a, q) => a + area(q), 0)) / Math.max(1, (R - L) * (B - T));
+        out.stageTopD = cr.top - T;
         out.cellOut = Math.max(0, sq.left - cr.left, cr.right - sq.right, sq.top - cr.top, cr.bottom - sq.bottom);
         if (pq) {
             const beside = pq.right <= cr.left + 1;
@@ -713,7 +747,11 @@ async function leaveAndMarks() {
         if (h) {
             try {
                 const m = await h.page.evaluate(() => { const r = document.getElementById('mqLessonPlayer'); return { mode: r.dataset.mode, pill: (r.querySelector('.mq-lp-mode') || {}).textContent || '', url: location.search }; });
-                if (m.mode !== 'board' || /pupil/i.test(m.pill)) fail('leave', `F7 mode=pupil shows "${m.pill}" in the ${m.mode} layout (pupil mode is not built: Board, no Pupil pill)`);
+                if (S2) {
+                    // (slice 2 builds pupil mode: mode=pupil opens it, and says so)
+                    if (m.mode !== 'pupil' || !/pupil/i.test(m.pill) || !/mode=pupil/.test(m.url)) fail('leave', `S2 mode=pupil opened the ${m.mode} layout (pill "${m.pill}", url ${m.url})`);
+                    else ok('leave', 'S2 mode=pupil opens pupil mode (Pupil pill, the URL keeps mode=pupil)');
+                } else if (m.mode !== 'board' || /pupil/i.test(m.pill)) fail('leave', `F7 mode=pupil shows "${m.pill}" in the ${m.mode} layout (pupil mode is not built: Board, no Pupil pill)`);
                 else ok('leave', 'F7 mode=pupil opens the Board (pupil mode not built), no Pupil pill');
             } finally { await h.close(); }
         }
@@ -754,7 +792,7 @@ async function anyPart() {
             const s = await state(page);
             const cur = await page.evaluate(() => (document.querySelector('.mq-lp-pill[aria-current]') || {}).dataset?.part || '');
             const shows = await page.evaluate(() => (document.querySelector('.mq-lp-cell') ? 'cell' : document.querySelector('[data-soon]') && document.querySelector('.mq-lp-stage [data-soon]') ? 'soon' : 'none'));
-            const want = part === 'ido' ? 'cell' : 'soon';
+            const want = part === 'ido' || (S2 && (part === 'warmup' || part === 'wedo')) ? 'cell' : 'soon';
             if (s.part !== part || cur !== part || shows !== want) fail('any-part', `?part=${part} opened ${s.part} (bar ${cur}, stage ${shows})`);
             // the part bar jumps to every other part; the URL follows
             for (const to of parts.filter((x) => x !== part)) {
@@ -772,6 +810,8 @@ async function anyPart() {
     try { h = await openPlayer(1280, 'warmup'); } catch (e) { fail('any-part', 'warmup did not open'); return; }
     try {
         const { page } = h;
+        // (S2: Next steps through the Warm-up's items first, as through the I do's steps)
+        if (S2) { const w0 = await state(page); for (let i = 1; i < (w0.items || 1); i++) await press(page, 'ArrowRight'); }
         await press(page, 'ArrowRight');
         let s = await state(page);
         if (s.part !== 'ido' || s.step !== 0) fail('any-part', `Next from Warm-up went to ${s.part} step ${s.step + 1}`);
@@ -790,15 +830,340 @@ async function anyPart() {
     notes.push('PLAYER-ANY-PART packet page ids (anchor chart, Guided, Independent ...): slice 4, not in slice 1');
 }
 
+
+/* ================================================================ slice 2: Warm-up + We do, both modes (S2) */
+const PUPIL_DIGIT = (w) => (w >= 1200 ? 56 : 48);
+const targetOf = (w, mode) => (mode === 'pupil' ? PUPIL_DIGIT(w) : DIGIT_TARGET(w));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const gotoPart = async (page, part) => { await page.click(`.mq-lp-pill[data-part="${part}"]`); await sleep(160); };
+/** Press a presenter-bar control by its act (a hidden or disabled one is a miss: false). */
+const act = async (page, a) => { const okd = await page.evaluate((x) => { const b = document.querySelector(`#mqLessonPlayer .mq-lp-bar [data-act="${x}"]`); if (!b || b.disabled || b.hidden || b.offsetParent === null) return false; b.click(); return true; }, a); await sleep(160); return okd; };
+const inputsOf = (page) => page.evaluate(() => [...document.querySelectorAll('#mqLessonPlayer .mq-lp-cell input')].map((i) => i.value));
+/** Type an answer into the cell's boxes, right-aligned (one box: the whole answer), as the pupil does. */
+const fillAns = (page, v) => page.evaluate((val) => {
+    const ins = [...document.querySelectorAll('#mqLessonPlayer .mq-lp-cell input')];
+    const d = String(val);
+    const set = (e, x) => { e.value = x; e.dispatchEvent(new Event('input', { bubbles: true })); };
+    if (ins.length === 1) { set(ins[0], d); return ins.length; }
+    const pad = ins.length - d.length;
+    ins.forEach((e, i) => set(e, i >= pad ? d.charAt(i - pad) : ''));
+    return ins.length;
+}, v);
+/** The live per-digit marks (SP-31): each box's data-mq-lp ('ok' / 'bad' / ''), and a badge drawn for each mark. */
+const liveMarks = (page) => page.evaluate(() => [...document.querySelectorAll('#mqLessonPlayer .mq-lp-cell input')].map((i) => ({ v: i.value, mark: i.dataset.mqLp || '', badge: !!(i.parentElement && i.parentElement.querySelector(`[data-ws-feedback][data-for="${i.id}"]`)) })));
+const greyCount = (page) => page.evaluate(() => [...document.querySelectorAll('#mqLessonPlayer .mq-lp-draw *')].filter((e) => !e.closest('[data-ws-feedback]')).filter((e) => { const c = getComputedStyle(e); return e.matches('[data-ws-ink="trace"], [data-ws-mark="trace"]') || c.color === 'rgb(148, 148, 148)' && [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()) || c.fill === 'rgb(148, 148, 148)' || c.stroke === 'rgb(148, 148, 148)'; }).length);
+
+/** One measured item state (Warm-up / We do / pupil I do), judged against slice 2's contract. */
+function checkS2(tag, m, w, mode, part) {
+    const mode0 = 'render';
+    if (m.hscroll) fail(mode0, `${tag}: horizontal scroll`);
+    const min = mode === 'board' ? 64 : 48;
+    const small = m.small.filter((b) => b.h < min - 0.5 || b.w < min - 0.5);
+    if (small.length) fail(mode0, `${tag}: targets under ${min} px: ${small.map((b) => `${b.t} ${Math.round(b.w)}x${Math.round(b.h)}`).join(', ')}`);
+    if (m.emoji.length) fail(mode0, `${tag}: emoji in the player: ${m.emoji.join(' ')}`);
+    if (!m.cell) { fail(mode0, `${tag}: no screen cell`); return; }
+    if (m.part !== part) fail(mode0, `${tag}: the stage shows ${m.part}, not ${part}`);
+    if (m.clip > 1) fail(mode0, `${tag}: the cell runs ${m.clip} px past the stage`);
+    if (m.badInk.length) fail(mode0, `${tag}: cell ink not #000/#fff/#949494: ${m.badInk.join(', ')}`);
+    if (m.fonts.some((f) => !/^Andika$/i.test(f))) fail(mode0, `${tag}: non-Andika type in the cell: ${m.fonts.join(', ')}`);
+    if (m.band >= 0.30) fail(mode0, `${tag}: H13 empty band ${(m.band * 100).toFixed(1)} % of the cell (${m.cellH} px)`);
+    if (m.stepsFoot !== undefined && m.stepsFoot > 6) fail(mode0, `${tag}: H13 the Steps column has ${Math.round(m.stepsFoot)} px empty under its last row`);
+    const t = targetOf(w, mode);
+    // (card §3: "a drawing too big for the stage takes the whole stage" - under the signed size only when the drawing already
+    // fills its work area's height or width, so no room was left; reported as a note, never silently)
+    const full = m.drawFill && (m.drawFill.h >= 0.9 || m.drawFill.w >= 0.9);
+    if (m.digitPx < t - 1 && full) notes.push(`${tag}: digits ${m.digitPx.toFixed(0)} px under the signed ${t} px - the drawing takes the whole stage (${(m.drawFill.h * 100).toFixed(0)} % of the height, ${(m.drawFill.w * 100).toFixed(0)} % of the width)`);
+    else if (m.digitPx < t - 1) fail(mode0, `${tag}: digits ${m.digitPx.toFixed(0)} px under the signed ${t} px`);
+    if (m.digitPx > t * 1.25 + 1) fail(mode0, `${tag}: digits ${m.digitPx.toFixed(0)} px over 1.25 x the signed ${t} px`);
+    if (!m.leave) fail(mode0, `${tag}: no visible Leave control`);
+    else if (m.leave.w < min - 0.5 || m.leave.h < min - 0.5) fail(mode0, `${tag}: Leave ${Math.round(m.leave.w)}x${Math.round(m.leave.h)} under ${min} px`);
+    if (m.stageEmpty >= 0.30) fail(mode0, `${tag}: ${(m.stageEmpty * 100).toFixed(1)} % of the stage is outside the cell and the Steps (< 30 %)`);
+    if (m.cellOut > 1) fail(mode0, `${tag}: the cell runs ${m.cellOut.toFixed(0)} px past the stage`);
+    if (m.align) { if (Math.abs(m.align.d) > 4) fail(mode0, `${tag}: the cell top is ${m.align.d.toFixed(0)} px from ${m.align.beside ? "the Steps' top" : 'directly under the chip row'} (+-4)`); }
+    else if (Math.abs(m.stageTopD) > 4) fail(mode0, `${tag}: the cell top is ${m.stageTopD.toFixed(0)} px under the stage's top (+-4)`);
+    console.log(`       ${tag}: band ${(m.band * 100).toFixed(1)} %, stage empty ${(m.stageEmpty * 100).toFixed(1)} %, cell ${m.cellH} px, digits ${m.digitPx.toFixed(0)} px (signed ${t})`);
+}
+
+async function shotS2(page, w, mode, name) {
+    if (!SHOTS) return;
+    if (!((mode === 'board' && (w === 1920 || w === 1280)) || (mode === 'pupil' && (w === 1024 || w === 820)))) return;
+    mkdirSync(SHOTS, { recursive: true });
+    await page.screenshot({ path: join(SHOTS, `${name}.png`) });
+}
+
+async function renderS2() {
+    for (const mode of ['board', 'pupil']) {
+        for (const w of WIDTHS) {
+            let h;
+            try { h = await openPlayer(w, 'warmup', `&mode=${mode}`); } catch (e) { fail('render', `S2 ${mode} ${w}: the player did not open (${e.message.split('\n')[0]})`); continue; }
+            try {
+                const { page } = h;
+                const st0 = await state(page);
+                if (st0.mode !== mode) fail('render', `S2 ${w}: mode=${mode} opened ${st0.mode}`);
+                const parts = mode === 'pupil' ? ['ido', 'warmup', 'wedo'] : ['warmup', 'wedo'];
+                for (const part of parts) {
+                    await gotoPart(page, part);
+                    let st = await state(page);
+                    if (st.part !== part) { fail('render', `S2 ${mode} ${w}: ${part} did not open`); continue; }
+                    if (part === 'ido') {
+                        for (let k = 0; k < st.steps; k++) {
+                            const m = await page.evaluate(measureInPage);
+                            checkS2(`${mode} ${w} ido step ${k + 1}/${st.steps}`, m, w, mode, part);
+                            await shotS2(page, w, mode, `ido-${mode}-${w}-step${k + 1}`);
+                            if (k < st.steps - 1) await press(page, 'ArrowRight');
+                        }
+                        continue;
+                    }
+                    const n = st.items || 0;
+                    if (!n) { fail('render', `S2 ${mode} ${w}: ${part} has no items`); continue; }
+                    for (let i = 0; i < n; i++) {
+                        st = await state(page);
+                        if (st.item !== i) fail('render', `S2 ${mode} ${w} ${part}: expected item ${i + 1}, at ${st.item + 1}`);
+                        if (part === 'warmup') {
+                            const m = await page.evaluate(measureInPage);
+                            checkS2(`${mode} ${w} warmup item ${i + 1}/${n}`, m, w, mode, part);
+                            await shotS2(page, w, mode, `warmup-${mode}-${w}-item${i + 1}`);
+                        } else {
+                            let cellH = null;
+                            for (let guard = 0; guard < 4; guard++) {
+                                st = await state(page);
+                                const m = await page.evaluate(measureInPage);
+                                checkS2(`${mode} ${w} wedo item ${i + 1}/${n} rung ${st.rung}`, m, w, mode, part);
+                                if (cellH !== null && Math.abs(cellH - m.cellH) > 1) fail('render', `S2 ${mode} ${w} wedo item ${i + 1}: the cell is ${m.cellH} px at rung ${st.rung}, ${cellH} px before (it must not jump between rungs)`);
+                                cellH = m.cellH;
+                                await shotS2(page, w, mode, `wedo-${mode}-${w}-item${i + 1}-rung${st.rung}`);
+                                if (st.rung <= 1) break;
+                                if (!(await act(page, 'hint'))) { fail('render', `S2 ${mode} ${w} wedo item ${i + 1}: no Hint control at rung ${st.rung}`); break; }
+                            }
+                        }
+                        if (i < n - 1 && !(await act(page, 'next'))) fail('render', `S2 ${mode} ${w} ${part}: no Next to item ${i + 2}`);
+                    }
+                }
+                if (h.problems.length) fail('render', `S2 ${mode} ${w}: console errors: ${h.problems.map((p) => p.text).join(' | ').slice(0, 300)}`);
+                ok('render', `S2 ${mode} ${w}: ${parts.join(', ')} measured`);
+            } finally { await h.close(); }
+        }
+    }
+}
+
+async function hintsS2() {
+    const M = 'hints';
+    // PUPIL: the rung follows the pupil (P-ON-7), Hint never writes (P-ON-8), live per-digit marks (SP-31), ink still
+    {
+        let h;
+        try { h = await openPlayer(1280, 'wedo', '&mode=pupil'); } catch (e) { fail(M, `pupil We do did not open (${e.message.split('\n')[0]})`); h = null; }
+        if (h) try {
+            const { page } = h;
+            let st = await state(page);
+            if (st.items < 2 || st.items > 3) fail(M, `We do has ${st.items} items (2-3)`);
+            const plan = st.plan && st.plan.wedo;
+            if (!plan || plan.some((it, i) => it.rung !== Math.min(3, i + 1))) fail(M, `the plan's rungs are ${plan ? plan.map((x) => x.rung).join(',') : '-'} (1, 2, 3)`);
+            // item 1 at rung 1: grey working + the next step's sentence; Hint at rung 1 writes nothing
+            if (st.rung !== 1) fail(M, `item 1 opens at rung ${st.rung}, not 1`);
+            if (!(await greyCount(page))) fail(M, 'rung 1: no grey working marks in the cell');
+            if (!st.words || st.words !== st.nextSentence) fail(M, `rung 1: the words "${st.words}" are not the next step's sentence "${st.nextSentence}"`);
+            await press(page, 'h');
+            if ((await inputsOf(page)).some(Boolean)) fail(M, 'P-ON-8: a hint wrote into an answer box (item 1)');
+            // a right answer: every typed box marked right, live
+            await fillAns(page, st.itemAns);
+            let lm = await liveMarks(page);
+            if (lm.filter((x) => x.v).some((x) => x.mark !== 'ok' || !x.badge)) fail(M, `SP-31: the right answer ${st.itemAns} is not marked right per digit, live (${JSON.stringify(lm)})`);
+            await act(page, 'check');
+            st = await state(page);
+            if (st.checked !== 'right') fail(M, `Check on the right answer: ${st.checked}`);
+            await act(page, 'next');
+            st = await state(page);
+            if (st.item !== 1 || st.rung !== 2) fail(M, `after a right item 1: item ${st.item + 1} at rung ${st.rung} (want item 2 at rung 2)`);
+            if (!st.words || st.words !== st.nextSentence) fail(M, `rung 2: the words "${st.words}" are not the next step's sentence`);
+            const g2 = await greyCount(page);
+            const ink2 = await page.evaluate(inkMarksInPage);
+            // a wrong answer: the wrong digit marked live; Check keeps the rung
+            const wrong = String(Number(st.itemAns) + 1);
+            await fillAns(page, wrong);
+            lm = await liveMarks(page);
+            if (!lm.some((x) => x.mark === 'bad' && x.badge)) fail(M, `SP-31: the wrong answer ${wrong} shows no live wrong-digit mark (${JSON.stringify(lm)})`);
+            await act(page, 'check');
+            st = await state(page);
+            if (st.checked !== 'wrong' || st.rung !== 2) fail(M, `a wrong Check: ${st.checked}, rung ${st.rung} (want wrong, rung kept at 2)`);
+            const before = await inputsOf(page);
+            await act(page, 'hint');
+            st = await state(page);
+            const after = await inputsOf(page);
+            if (st.rung !== 1) fail(M, `Hint at rung 2 opened rung ${st.rung} (want 1)`);
+            if (JSON.stringify(before) !== JSON.stringify(after)) fail(M, `P-ON-8: Hint changed the answer boxes ${JSON.stringify(before)} -> ${JSON.stringify(after)}`);
+            if (!((await greyCount(page)) > g2)) fail(M, 'rung 1 (after Hint) draws no more grey working than rung 2');
+            const ink1 = await page.evaluate(inkMarksInPage);
+            const at = new Map(ink1.map((x) => [x.key, x]));
+            const moved = ink2.filter((x) => { const y = at.get(x.key); return y && (Math.abs(y.x - x.x) > 1 || Math.abs(y.y - x.y) > 1); });
+            if (moved.length) fail(M, `ink-still: ${moved.length} black mark(s) moved between rung 2 and rung 1 (${moved[0].key})`);
+            await fillAns(page, st.itemAns);
+            await act(page, 'check');
+            await act(page, 'next');
+            st = await state(page);
+            if (st.items === 3) {
+                if (st.item !== 2 || st.rung !== 3) fail(M, `after a right item 2: item ${st.item + 1} at rung ${st.rung} (want item 3 at rung 3)`);
+                const hl = await page.evaluate(() => { const e = document.querySelector('#mqLessonPlayer .mq-lp-steps .mq-lp-step.is-now'); return e ? e.textContent.trim() : ''; });
+                if (st.words !== 'What comes next?' || !hl) fail(M, `rung 3: words "${st.words}", highlighted Steps row "${hl}" (want "What comes next?" and the next step's row)`);
+            }
+            if (h.problems.length) fail(M, `pupil: console errors: ${h.problems.map((p) => p.text).join(' | ').slice(0, 300)}`);
+        } finally { await h.close(); }
+    }
+    // PUPIL: a wrong item keeps the rung for the next item
+    {
+        let h;
+        try { h = await openPlayer(1280, 'wedo', '&mode=pupil'); } catch (e) { h = null; fail(M, 'pupil We do (2) did not open'); }
+        if (h) try {
+            const { page } = h;
+            let st = await state(page);
+            await fillAns(page, String(Number(st.itemAns) + 1));
+            await act(page, 'check');
+            await act(page, 'next');
+            st = await state(page);
+            if (st.item !== 1 || st.rung !== 1) fail(M, `after a wrong item 1 the next item opens at rung ${st.rung} (P-ON-7: a wrong Check keeps the rung, 1)`);
+            else ok(M, 'pupil: rungs 1 -> 2 -> 3 on right items, a wrong Check keeps the rung, Hint writes nothing, live per-digit marks, ink still');
+        } finally { await h.close(); }
+    }
+    // BOARD: the teacher drives the rung with Hint / Next; Show answer is the teacher's (A), never a hint
+    {
+        let h;
+        try { h = await openPlayer(1280, 'wedo', '&mode=board'); } catch (e) { h = null; fail(M, 'board We do did not open'); }
+        if (h) try {
+            const { page } = h;
+            let st = await state(page);
+            const seen = [];
+            for (let i = 0; i < st.items; i++) {
+                st = await state(page);
+                seen.push(`${st.item + 1}@${st.rung}`);
+                if (st.rung !== Math.min(3, i + 1)) fail(M, `board item ${i + 1} opens at rung ${st.rung} (want ${Math.min(3, i + 1)})`);
+                while (st.rung > 1) {
+                    const r0 = st.rung;
+                    await act(page, 'hint');
+                    st = await state(page);
+                    if (st.rung !== r0 - 1) { fail(M, `board Hint at rung ${r0} -> ${st.rung}`); break; }
+                    if ((await inputsOf(page)).some(Boolean)) fail(M, `P-ON-8: board Hint wrote into an answer box (item ${i + 1})`);
+                }
+                if (i < st.items - 1) await act(page, 'next');
+            }
+            if (!(await act(page, 'show'))) fail(M, 'board: no Show answer control on We do');
+            else { const v = (await inputsOf(page)).join(''); st = await state(page); if (v !== String(st.itemAns)) fail(M, `board Show answer shows "${v}", not ${st.itemAns}`); }
+            ok(M, `board: items open at rungs ${seen.join(', ')}, Hint lowers the rung and writes nothing, Show answer reveals`);
+        } finally { await h.close(); }
+    }
+    // WARM-UP (pupil): Check marks it; a miss shows the "If missed" line (the Prerequisite Check's route), in chrome
+    {
+        let h;
+        try { h = await openPlayer(1280, 'warmup', '&mode=pupil'); } catch (e) { h = null; fail(M, 'pupil Warm-up did not open'); }
+        if (h) try {
+            const { page } = h;
+            let st = await state(page);
+            await fillAns(page, String(Number(st.itemAns) + 1));
+            await act(page, 'check');
+            st = await state(page);
+            const fb = await page.evaluate(() => { const e = document.querySelector('#mqLessonPlayer .mq-lp-fb'); return e && e.offsetParent !== null ? e.textContent.replace(/\s+/g, ' ').trim() : ''; });
+            if (st.checked !== 'wrong') fail(M, `Warm-up wrong Check: ${st.checked}`);
+            if (st.ifMissed && !/If missed/.test(fb)) fail(M, `Warm-up miss: no "If missed" line (feedback "${fb}")`);
+            if (!st.ifMissed) notes.push(`Warm-up item 1 (${st.itemText}) has no Prerequisite Check route: no "If missed" line expected`);
+            await fillAns(page, st.itemAns);
+            await act(page, 'check');
+            st = await state(page);
+            if (st.checked !== 'right') fail(M, `Warm-up right Check: ${st.checked}`);
+            else ok(M, `Warm-up: Check marks it, a miss shows "${fb.slice(0, 80)}"`);
+        } finally { await h.close(); }
+    }
+    // PUPIL I do reads itself, only while sound is on (D6, A17)
+    {
+        let h;
+        try { h = await openPlayer(1280, 'ido', '&mode=pupil'); } catch (e) { h = null; fail(M, 'pupil I do did not open'); }
+        if (h) try {
+            const { page } = h;
+            await page.evaluate(() => { window.setTTS(false); window.speechSynthesis && (window.speechSynthesis.speak = () => {}); });
+            await press(page, 'ArrowRight');
+            let st = await state(page);
+            if (st.autoSpoke) fail(M, `A17: pupil I do spoke "${st.autoSpoke}" with sound off`);
+            await page.evaluate(() => window.setTTS(true));
+            await press(page, 'ArrowLeft');
+            st = await state(page);
+            const words = await page.evaluate(() => (document.querySelector('.mq-lp-words') || {}).textContent || '');
+            if (!st.autoSpoke || !st.autoSpoke.startsWith(words)) fail(M, `D6: pupil I do with sound on did not read "${words}" (spoke "${st.autoSpoke}")`);
+            else ok(M, 'pupil I do reads each step itself with sound on, never with sound off (A17)');
+        } finally { await h.close(); }
+    }
+}
+
+async function anyPartS2() {
+    const M = 'any-part';
+    for (const mode of ['board', 'pupil']) {
+        for (const part of ['warmup', 'ido', 'wedo', 'youdo', 'exit']) {
+            let h;
+            try { h = await openPlayer(1280, part, `&mode=${mode}`); } catch (e) { fail(M, `S2 ${mode} ?part=${part}: did not open`); continue; }
+            try {
+                const { page } = h;
+                const s0 = await state(page);
+                const shows = await page.evaluate(() => (document.querySelector('.mq-lp-cell') ? 'cell' : document.querySelector('.mq-lp-stage [data-soon]') ? 'soon' : 'none'));
+                const want = ['youdo', 'exit'].includes(part) ? 'soon' : 'cell';
+                if (s0.part !== part || s0.mode !== mode || shows !== want) fail(M, `S2 ${mode} ?part=${part} opened ${s0.part} (${s0.mode}, stage ${shows}, want ${want})`);
+                for (const to of ['warmup', 'ido', 'wedo', 'youdo', 'exit'].filter((x) => x !== part)) {
+                    await gotoPart(page, to);
+                    const t = await state(page);
+                    if (t.part !== to) fail(M, `S2 ${mode} from ${part}: the part bar did not jump to ${to}`);
+                }
+            } finally { await h.close(); }
+        }
+    }
+    // pupil mode resumes at the last part reached (D4); a link with ?part= opens that part
+    let h;
+    try { h = await openPlayer(1280, 'wedo', '&mode=pupil'); } catch (e) { fail(M, 'S2 resume: pupil did not open'); return; }
+    try {
+        const { page } = h;
+        await page.evaluate(async (lesson) => { history.replaceState({}, '', `/index.html?lesson=${encodeURIComponent(lesson)}&mode=pupil`); window.closeLessonPlayer(); await window.openLessonPlayer(`?lesson=${encodeURIComponent(lesson)}&mode=pupil`); }, LESSON);
+        await H.waitFor(page, () => window.lessonPlayerState().ready, 90000, 'resumed');
+        const s = await state(page);
+        if (s.part !== 'wedo') fail(M, `D4: pupil mode reopened at ${s.part}, not the last part reached (We do)`);
+        else ok(M, 'S2: Warm-up and We do open as cells by URL in both modes, the part bar jumps, pupil mode resumes at the last part reached, You do / Exit stay coming soon');
+    } finally { await h.close(); }
+}
+
+/** D2 seeds and paper parity of the Warm-up and We do (browser). */
+async function unitS2(mods) {
+    const { P } = mods;
+    if (typeof P.partSeed !== 'function') { fail('unit', 'D2: plan.js has no partSeed(S, part, i)'); return; }
+    const S = 1000;
+    const want = { warmup: 1100, wedo: 1200, youdo: 1300, exit: 1900 };
+    for (const [k, v] of Object.entries(want)) if (P.partSeed(S, k, 0) !== v || P.partSeed(S, k, 2) !== v + 2) fail('unit', `D2: partSeed(S, ${k}, i) != S + ${v - S} + i`);
+    let h;
+    try { h = await openPlayer(1280, 'wedo'); } catch (e) { fail('unit', 'S2: the player did not open'); return; }
+    try {
+        const r = await h.page.evaluate(async (lesson) => {
+            const P2 = await import('/js/modules/lesson-player/plan.js');
+            const ps = await import('/js/modules/print-sheet.js');
+            const st = window.lessonPlayerState();
+            const res = await ps.buildSheet(P2.chartRequest(P2.resolveLessonId(lesson), st.seed));
+            const t = (res.lesson && res.lesson.teach) || {};
+            return { plan: st.plan, warm: (t.warmQs || []).map((l) => l.map((q) => ({ text: q.text, ans: q.ans, seed: q.seed }))), wedo: (t.weDoQs || []).map((q) => ({ text: q.text, ans: q.ans, seed: q.seed })) };
+        }, LESSON);
+        const pw = (r.plan && r.plan.warmup) || [], pd = (r.plan && r.plan.wedo) || [];
+        const paperWarm = r.warm.map((l) => l[0]).filter(Boolean).slice(0, 3);
+        const same = (a, b) => a.length === b.length && a.every((x, i) => x.text === b[i].text && String(x.ans) === String(b[i].ans) && x.seed === b[i].seed);
+        if (!pw.length) fail('unit', 'S2: the plan has no Warm-up items');
+        else if (paperWarm.length && !same(pw, paperWarm)) fail('unit', `P-ON-5: Warm-up ${pw.map((x) => x.text).join(' | ')} != the packet's ${paperWarm.map((x) => x.text).join(' | ')}`);
+        else ok('unit', `Warm-up = the packet's own (${pw.map((x) => `${x.text} [seed ${x.seed}]`).join('; ')})`);
+        if (!pd.length) fail('unit', 'S2: the plan has no We do items');
+        else if (r.wedo.length && !same(pd, r.wedo)) fail('unit', `P-ON-5: We do ${pd.map((x) => x.text).join(' | ')} != the packet's Guided ${r.wedo.map((x) => x.text).join(' | ')}`);
+        else ok('unit', `We do = the packet's Guided cells (${pd.map((x) => `${x.text} [seed ${x.seed}]`).join('; ')})`);
+    } finally { await h.close(); }
+}
+
 /* ================================================================ run */
 (async () => {
     console.log(`${TOOL}: lesson ${LESSON}, modes ${modes.join(', ') || '-'}${modes.some((m) => m !== 'unit') ? `, widths ${WIDTHS.join(', ')}` : ''}`);
     let mods = null;
     try {
-        if (modes.includes('unit')) { mods = await unitNode(); if (mods) await unitBrowser(mods); }
-        if (modes.includes('render') && !fails.some((f) => /player did not open|no js\/modules\/lesson-player/.test(f))) await render();
+        if (modes.includes('unit')) { mods = await unitNode(); if (mods) { await unitBrowser(mods); if (S2) await unitS2(mods); } }
+        if (modes.includes('render') && !fails.some((f) => /player did not open|no js\/modules\/lesson-player/.test(f))) { await render(); if (S2) await renderS2(); }
         if (modes.includes('reveal')) await reveal();
+        if (modes.includes('hints') && S2) await hintsS2();
         if (modes.includes('any-part')) await anyPart();
+        if (modes.includes('any-part') && S2) await anyPartS2();
         if (modes.includes('leave')) await leaveAndMarks();
     } catch (e) { fail('run', e.stack || String(e)); }
     for (const n of notes) console.log(`  note ${n}`);

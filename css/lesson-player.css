@@ -193,3 +193,76 @@ body.mq-lp-open { overflow: hidden; }
     .mq-lp-top { padding: 8px 12px; gap: 8px; }
     .mq-lp-pill { padding: 0 10px; }
 }
+
+/* =========================================================================
+   Slice 2 (lane lf-hosts): Warm-up and We do, both modes. NEW rules only (additive).
+   An item part shows ONE cell at a time: the kit drawing with its answer slot turned into input(s) in place, the We do
+   Steps strip beside it (chips on a tablet), and a chrome feedback strip under the cell (SP-33: tints on chrome only).
+   ========================================================================= */
+.mq-lp-stage-item { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(20px * var(--lp-k)); }
+.mq-lp-stage-wedo { grid-template-columns: calc(260px * var(--lp-k)) minmax(0, 1fr); }
+.mq-lp-stage-item .mq-lp-cellwrap { gap: calc(10px * var(--lp-k)); }
+.mq-lp-qcell .mq-lp-work { align-items: center; }
+.mq-lp-qcell .mq-lp-group { justify-content: center; }
+.mq-lp-work[data-variant="row"][data-stack] .mq-lp-group { flex-direction: column; align-items: center; }
+.mq-lp-qcell .mq-lp-side { align-self: center; }
+.mq-lp-qcell .mq-lp-words { font-size: calc(34px * var(--lp-k)); }
+/* the answer slot on screen: the kit slot keeps its place; its input fills it (one box) or each digit place (one per digit) */
+.mq-lp .mq-lp-slot { position: relative; }
+.mq-lp .mq-lp-slot-one { display: inline-flex; }
+.mq-lp .mq-lp-place { position: relative; display: block; }
+.mq-lp input.mq-lp-in {
+    font: inherit; font-weight: 400; color: #000; background: #fff; text-align: center; line-height: 1;
+    width: 100%; height: 100%; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 0; caret-color: #000;
+    -webkit-appearance: none; appearance: none;
+}
+.mq-lp .mq-lp-slot-one input.mq-lp-in { position: absolute; inset: 0; }
+.mq-lp .mq-lp-slot-digits { min-height: 1.15em; }
+.mq-lp .mq-lp-place input.mq-lp-in { border: 1.5px solid #000; height: 1.15em; }
+.mq-lp .ws-factans.mq-lp-slot-digits { column-gap: 0.06em; }
+.mq-lp input.mq-lp-in:focus { outline: 1.2px solid #1f6feb !important; outline-offset: 1px; }
+/* (the drawing is zoomed 1.5-4 x: these widths are before the zoom) */
+.mq-lp input.mq-lp-in[data-mq-lp="ok"] { outline: 1.2px solid #1a7f37 !important; outline-offset: 1px; }
+.mq-lp input.mq-lp-in[data-mq-lp="bad"] { outline: 1.2px solid #cf222e !important; outline-offset: 1px; text-decoration: underline 1px #cf222e; }
+.mq-lp input.mq-lp-in[data-mq-shown] { color: #949494; }
+/* the live mark's badge (SP-30): outside the box's bottom-right corner, chrome */
+.mq-lp .mq-lp-badge {
+    position: absolute; right: -0.3em; bottom: -0.3em; width: 0.32em; height: 0.32em; min-width: 14px; min-height: 14px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; pointer-events: none; z-index: 2;
+}
+.mq-lp .mq-lp-badge svg { width: 70%; height: 70%; }
+.mq-lp .mq-lp-badge[data-mark="ok"] { background: #1a7f37; }
+.mq-lp .mq-lp-badge[data-mark="bad"] { background: #cf222e; }
+/* the feedback strip (chrome, outside the cell): the prompt, then Right / Not yet / the If-missed route */
+.mq-lp-fb {
+    flex: none; min-height: calc(48px * var(--lp-k)); padding: calc(8px * var(--lp-k)) calc(16px * var(--lp-k));
+    background: var(--lp-chrome); color: #fff; border-radius: 10px; font-size: calc(24px * var(--lp-k)); line-height: 1.3;
+    display: flex; align-items: center;
+}
+.mq-lp-fb[data-kind="right"] { background: #1a7f37; }
+.mq-lp-fb[data-kind="wrong"] { background: #8a1c24; }
+.mq-lp-cellwrap[data-verdict="right"] .mq-lp-qcell { box-shadow: 0 0 0 5px #1a7f37; }
+.mq-lp-cellwrap[data-verdict="wrong"] .mq-lp-qcell { box-shadow: 0 0 0 5px #cf222e; }
+.mq-lp-btn[hidden] { display: none; }
+.mq-lp-btn.mq-lp-check { background: #ffd166; color: var(--lp-chrome); border-color: #ffd166; }
+
+/* ---- pupil mode (D5): the card scale; the stage is the card, its content's height, centred ---- */
+.mq-lp[data-mode="pupil"] { --lp-k: 0.7; --lp-ctl: 48px; }
+.mq-lp[data-mode="pupil"] .mq-lp-stage { align-self: center; justify-self: center; width: min(100%, 1000px); }
+@media (max-width: 1199px) {
+    .mq-lp[data-mode="pupil"] { --lp-k: 0.65; }
+    .mq-lp-stage-wedo { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .mq-lp-bar { flex-wrap: wrap; row-gap: 8px; }
+    .mq-lp-btn.mq-lp-next { min-width: calc(200px * var(--lp-k)); }
+}
+.mq-lp[data-mode="pupil"] .mq-lp-pill { min-width: var(--lp-pill); }
+.mq-lp-fb.mq-lp-fb-bar { flex: 1 1 0; min-width: 0; min-height: 0; background: transparent; padding: 0 8px; font-size: calc(22px * var(--lp-k)); border-radius: 6px; }
+.mq-lp-fb.mq-lp-fb-bar[data-kind="right"] { background: #1a7f37; }
+.mq-lp-fb.mq-lp-fb-bar[data-kind="wrong"] { background: #8a1c24; }
+/* a tall stage (tablet portrait): a counting picture's answer box under the picture (player.js fitItem) */
+.mq-lp [data-portrait] .k2-count > div { grid-template-columns: minmax(0, 1fr) !important; justify-items: center; }
+.mq-lp-bar .mq-lp-btn { white-space: nowrap; }
+.mq-lp-bar .mq-lp-count { white-space: nowrap; }
+/* item parts: the key legend gives its room to Hint / Check / Show answer (the keys still work, D6) */
+.mq-lp[data-part="warmup"] .mq-lp-keys, .mq-lp[data-part="wedo"] .mq-lp-keys { display: none; }
+.mq-lp[data-part="warmup"] .mq-lp-btn.mq-lp-next, .mq-lp[data-part="wedo"] .mq-lp-btn.mq-lp-next { margin-left: auto; }

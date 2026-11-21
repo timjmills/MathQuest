@@ -14,10 +14,22 @@
 //   - The part bar (D11) jumps to any part; a part this slice does not play opens a navigable "coming soon" stage.
 //     Each part's place is kept for the session; the URL follows the part (?part=), so a link opens that part.
 //
-// Later slices add their parts' renderers to RENDER (warmup, wedo, youdo, exit) and their plans to plan.js.
+//
+// Slice 2 (lane lf-hosts): Warm-up and We do, in BOTH modes, one cell at a time (D11: a part steps on the board with the
+// same Next / Back / clicker keys). Their items are the printed lesson sheet's own Warm-up and Guided items for the seed
+// (res.lesson.teach.warmQs / weDoQs, P-ON-5); the player deals its own (generateQuestionFor at D2's S+100+i / S+200+i) only
+// where the packet prints no such band. Each answer slot of the kit drawing becomes an input in place (one per digit where
+// the paper slot has digit places), with live per-digit marks (SP-31, chrome: data-ws-feedback, SP-30). We do runs the hint
+// fade (P-ON-7): item i opens at rung i+1 - board: the teacher drives the rung with Hint / Next; pupil: a right Check moves
+// the next item down a rung, a wrong one keeps it - and no hint ever writes into a box (P-ON-8). Pupil mode is the card
+// scale (D5), saves only the part reached and resumes there (D4); its I do reads itself, only while sound is on (D6, A17).
+// Later slices add their parts' renderers (youdo, exit) beside renderItem and their plans to plan.js.
 
-import { planLesson, parseLaunch, launchSearch, chartRequest, PLAYER_PARTS, PART_IDS, partOf, lessonSeedOf, BUILT_MODES } from './plan.js';
-import { stopSpeaking } from '../hints-speech.js';
+import { planLesson, parseLaunch, launchSearch, chartRequest, PLAYER_PARTS, PART_IDS, partOf, lessonSeedOf, BUILT_MODES, partSeed, RUNG3_WORDS, WARM_MAX, WEDO_MAX } from './plan.js';
+import { stopSpeaking, speakExplanation } from '../hints-speech.js';
+import { weDoRender } from '../sheet/lesson-pages/we-do.js';
+import { state as appState } from '../state.js';
+import { savePersistentData } from '../storage.js';
 import { stateDrawing, chartLayout } from '../sheet/lesson-pages/chart.js';
 import { panelHops } from '../sheet/lesson-arch/fact.js';
 import { lessonData } from '../lessons/library.js';
@@ -52,19 +64,28 @@ export async function openLessonPlayer(launch = (typeof location !== 'undefined'
         stageMessage('No such lesson', `There is no lesson called “${(l && l.raw) || ''}”. Check the link.`);
         return lessonPlayerState();
     }
-    // (critic r1 F7: pupil mode is not built in this slice - the Board plays, and no Pupil pill shows)
     if (!BUILT_MODES.includes(l.mode)) l.mode = 'board';
     if (l.seed === undefined || l.seed === null) l.seed = lessonSeedOf(l.lesson);
-    S = { launch: l, plan: null, part: PART_IDS.includes(l.part) ? l.part : 'ido', pos: {}, visited: new Set(), done: new Set(), ready: false, spoke: '', item: null, fit: null };
+    // (D4: a pupil link with no ?part= resumes at the last part reached)
+    if (l.mode === 'pupil' && !l.partGiven) { const back = reachedOf(l.lesson); if (back && PART_IDS.includes(back)) l.part = back; }
+    S = { launch: l, plan: null, part: PART_IDS.includes(l.part) ? l.part : 'ido', pos: {}, visited: new Set(), done: new Set(), ready: false, spoke: '', autoSpoke: '', item: null, fit: null,
+        hosts: { warmup: [], wedo: [] }, vals: {}, checked: {}, wrongs: {}, rungs: {}, starts: {}, shown: {} };
     mountShell({ title: 'Lesson', mode: l.mode });
     stageMessage('Getting the lesson ready…', 'The worked example is being made from the lesson.');
     try {
         const ps = await import('../print-sheet.js');
         const res = await ps.buildSheet(chartRequest(l.lesson, l.seed));
         const exQ = res && res.lesson && res.lesson.chart && (res.lesson.chart.exampleQs || [])[0];
-        S.plan = planLesson(l.lesson, { seed: l.seed, mode: l.mode, example: exQ || null, title: (res && res.title) || '' });
+        // (slice 2: the lesson sheet's own Warm-up and Guided items - built with the chart by the same request)
+        const teach = (res && res.lesson && res.lesson.teach) || {};
+        let warmQs = (teach.warmQs || []).filter((x) => x && x.length);
+        let weDoQs = (teach.weDoQs || []).filter(Boolean);
+        if (!warmQs.length || !weDoQs.length) ({ warmQs, weDoQs } = await dealOwn(l, warmQs, weDoQs));
+        S.plan = planLesson(l.lesson, { seed: l.seed, mode: l.mode, example: exQ || null, title: (res && res.title) || '', warmQs, weDoQs, warmInstr: teach.warmInstr || [], weDoInstr: teach.weDoInstr || '' });
         S.chartExample = (res && res.lesson && res.lesson.example) || '';
         S.item = exQ ? ps.lessonPlayerItem(exQ) : null;
+        S.hosts.warmup = warmQs.slice(0, WARM_MAX).map((list) => ps.lessonPlayerItem(list[0]));
+        S.hosts.wedo = weDoQs.slice(0, WEDO_MAX).map((q) => ps.lessonPlayerItem(q));
         S.ready = true;
     } catch (e) {
         console.warn('[lesson-player] the lesson did not build', e);
@@ -101,7 +122,21 @@ export function lessonPlayerState() {
         step: S.pos.ido || 0, steps: ido ? ido.steps.length : 0, say: ido ? ido.say : '', example: ido && ido.example ? ido.example.text : '',
         chartExample: S.chartExample || '', spoke: S.spoke, visited: [...S.visited], title: S.plan ? S.plan.title : '',
         parts: S.plan ? S.plan.parts.map((p) => ({ part: p.part, built: !!p.built })) : [],
+        autoSpoke: S.autoSpoke || '',
+        plan: S.plan ? { warmup: partPlan('warmup').items.map((x) => ({ text: x.text, ans: x.ans, seed: x.seed })), wedo: partPlan('wedo').items.map((x) => ({ text: x.text, ans: x.ans, seed: x.seed, rung: x.rung })) } : null,
+        ...itemState(),
     };
+}
+
+/** The open item part's state (Warm-up / We do), for the gates. */
+function itemState() {
+    if (!S || !S.plan || !isItemPart(S.part)) return {};
+    const p = partPlan(S.part);
+    const i = S.pos[S.part] || 0;
+    const it = p.items[i] || {};
+    const k = `${S.part}:${i}`;
+    return { item: i, items: p.items.length, rung: S.part === 'wedo' ? rungOf(i) : 0, itemAns: it.ans, itemText: it.text, checked: S.checked[k] || '',
+        wrongChecks: S.wrongs[k] || 0, words: S.part === 'wedo' ? wordsOf(i) : '', nextSentence: S.part === 'wedo' ? it.sentence || '' : '', ifMissed: S.part === 'warmup' ? it.ifMissed || null : null };
 }
 
 /* ============================================================== the shell */
@@ -119,7 +154,7 @@ function mountShell({ title, mode }) {
     r.innerHTML = `
 <header class="mq-lp-top">
   <h1 class="mq-lp-title">${esc(title)}</h1>
-  <span class="mq-lp-mode">Board</span>
+  <span class="mq-lp-mode">${mode === 'pupil' ? 'Pupil' : 'Board'}</span>
   <nav class="mq-lp-rail" aria-label="Lesson parts">${PLAYER_PARTS.map((p) => `<button type="button" class="mq-lp-pill" data-part="${p.id}"${p.built ? '' : ' data-soon'}>${esc(p.name)}</button>`).join('')}</nav>
   <button type="button" class="mq-lp-leave" data-act="leave" aria-label="Leave the lesson">Leave</button>
 </header>
@@ -127,8 +162,11 @@ function mountShell({ title, mode }) {
 <footer class="mq-lp-bar">
   <button type="button" class="mq-lp-btn" data-act="back" aria-label="Back one step">${TRI_LEFT} Back</button>
   <button type="button" class="mq-lp-btn" data-act="read" aria-label="Read this step aloud">Read aloud</button>
+  <button type="button" class="mq-lp-btn" data-act="hint" aria-label="Hint" hidden>Hint</button>
+  <button type="button" class="mq-lp-btn mq-lp-check" data-act="check" aria-label="Check the answer" hidden>Check</button>
+  <button type="button" class="mq-lp-btn" data-act="show" aria-label="Show the answer" hidden>Answer</button>
   <span class="mq-lp-count" aria-live="polite"></span>
-  <div class="mq-lp-keys" aria-hidden="true">→ / Space / clicker: next · ← back<br>R read again · Esc leave</div>
+  <div class="mq-lp-keys" aria-hidden="true">→ / Space / clicker: next · ← back<br>R read · H hint${mode === 'pupil' ? '' : ' · A answer'} · Esc leave</div>
   <button type="button" class="mq-lp-btn mq-lp-next" data-act="next"></button>
 </footer>`;
     document.body.appendChild(r);
@@ -153,6 +191,9 @@ function mountShell({ title, mode }) {
         if (b.dataset.act === 'next') next();
         else if (b.dataset.act === 'back') back();
         else if (b.dataset.act === 'read') readAloud();
+        else if (b.dataset.act === 'hint') hint();
+        else if (b.dataset.act === 'check') checkItem();
+        else if (b.dataset.act === 'show') showAnswer();
     });
     document.removeEventListener('keydown', onKey, true);
     document.addEventListener('keydown', onKey, true);
@@ -190,10 +231,13 @@ function goPart(id, { at = null } = {}) {
     S.part = id;
     if (at === 'end' && id === 'ido') S.pos.ido = Math.max(0, idoPart().steps.length - 1);
     else if (at === 'start' && id === 'ido') S.pos.ido = 0;
+    else if (at === 'end' && isItemPart(id)) S.pos[id] = Math.max(0, partPlan(id).items.length - 1);
+    else if (at === 'start' && isItemPart(id)) S.pos[id] = 0;
     if (S.pos[id] === undefined) S.pos[id] = 0;
     // (the URL follows the part, D11: a copied link opens this part; replaceState, so Back in the browser leaves the player)
     try { history.replaceState({}, document.title, location.pathname + launchSearch(Object.assign({}, S.launch, { part: id })) + location.hash); } catch (e) { /* no history */ }
     S.launch.part = id;
+    if (S.launch.mode === 'pupil') saveReached(S.launch.lesson, id);
     render();
 }
 
@@ -204,6 +248,10 @@ function next() {
         const n = idoPart().steps.length;
         if ((S.pos.ido || 0) < n - 1) { S.pos.ido = (S.pos.ido || 0) + 1; render(); return; }
     }
+    if (isItemPart(S.part)) {
+        const n = partPlan(S.part).items.length;
+        if ((S.pos[S.part] || 0) < n - 1) { S.pos[S.part] = (S.pos[S.part] || 0) + 1; render(); return; }
+    }
     const i = partIndex(S.part);
     if (i < PART_IDS.length - 1) goPart(PART_IDS[i + 1], { at: 'start' });
 }
@@ -212,6 +260,7 @@ function back() {
     if (!S || !S.ready) return;
     try { stopSpeaking(); } catch (e) { /* no speech */ }
     if (S.part === 'ido' && (S.pos.ido || 0) > 0) { S.pos.ido -= 1; render(); return; }
+    if (isItemPart(S.part) && (S.pos[S.part] || 0) > 0) { S.pos[S.part] -= 1; render(); return; }
     const i = partIndex(S.part);
     if (i > 0) goPart(PART_IDS[i - 1], { at: 'end' });
 }
@@ -219,10 +268,15 @@ function back() {
 function onKey(e) {
     if (!rootEl()) return;
     const t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) && !['Enter', 'Tab'].includes(e.key)) return;
+    const inInput = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+    if (inInput && !['Enter', 'Tab'].includes(e.key)) return;
     const k = e.key;
+    if (k === 'Tab') return;
     let done = true;
-    if (k === 'ArrowRight' || k === ' ' || k === 'Spacebar' || k === 'PageDown') next();
+    if (k === 'Enter') { if (isItemPart(S && S.part)) checkItem(); else if (!inInput) next(); else done = false; }
+    else if (k === 'ArrowRight' || k === ' ' || k === 'Spacebar' || k === 'PageDown') next();
+    else if ((k === 'h' || k === 'H') && isItemPart(S && S.part)) hint();
+    else if ((k === 'a' || k === 'A') && isItemPart(S && S.part) && S.launch.mode === 'board') showAnswer();
     else if (k === 'ArrowLeft' || k === 'PageUp') back();
     else if (k === 'r' || k === 'R') readAloud();
     else if (k === 'Escape') closeLessonPlayer();
@@ -233,13 +287,18 @@ function onKey(e) {
 let resizeT = 0;
 function onResize() {
     clearTimeout(resizeT);
-    resizeT = setTimeout(() => { if (S && S.ready) { S.fit = null; if (S.part === 'ido') render(); } }, 60);
+    resizeT = setTimeout(() => { if (S && S.ready) { S.fit = null; if (S.part === 'ido' || isItemPart(S.part)) render(); } }, 60);
 }
 
 /* ============================================================== read aloud (D6: on demand on the board) */
 
 function currentSpeech() {
     if (!S || !S.ready) return '';
+    if (isItemPart(S.part)) {
+        const i = S.pos[S.part] || 0;
+        const it = partPlan(S.part).items[i] || {};
+        return S.part === 'wedo' ? wordsOf(i) : [it.instr, plainQ(it.text)].filter(Boolean).join(' ');
+    }
     if (S.part !== 'ido') return `${(partOf(S.part) || {}).name || ''}. Coming soon.`;
     const p = idoPart();
     const k = S.pos.ido || 0;
@@ -285,7 +344,10 @@ function render() {
     delete bar.dataset.idle;
     delete r.dataset.idle;
     if (S.part === 'ido' && idoPart().steps.length && (S.pos.ido || 0) >= idoPart().steps.length - 1) S.done.add('ido');
+    r.querySelectorAll('.mq-lp-fb-bar').forEach((e) => e.remove());
+    syncButtons(r);
     if (S.part === 'ido') renderIdo(r);
+    else if (isItemPart(S.part)) renderItem(r, S.part);
     else renderSoon(r, S.part);
 }
 
@@ -293,13 +355,14 @@ function nextLabel() {
     const i = partIndex(S.part);
     const p = idoPart();
     if (S.part === 'ido' && (S.pos.ido || 0) < p.steps.length - 1) return 'Next step';
+    if (isItemPart(S.part) && (S.pos[S.part] || 0) < partPlan(S.part).items.length - 1) return 'Next item';
     return i < PART_IDS.length - 1 ? `Next: ${partOf(PART_IDS[i + 1]).name}` : 'End of lesson';
 }
 
 function setBar(count) {
     const r = rootEl();
     const i = partIndex(S.part);
-    const atStart = i === 0 && !(S.part === 'ido' && (S.pos.ido || 0) > 0);
+    const atStart = i === 0 && !(S.part === 'ido' && (S.pos.ido || 0) > 0) && !(isItemPart(S.part) && (S.pos[S.part] || 0) > 0);
     const atEnd = i === PART_IDS.length - 1;
     r.querySelector('.mq-lp-count').innerHTML = count;
     const nb = r.querySelector('.mq-lp-next');
@@ -358,6 +421,7 @@ function renderIdo(r) {
     const cur = p.steps[k];
     const last = k === n - 1;
     st.className = 'mq-lp-stage mq-lp-stage-ido';
+    fullStage(r);
     const instr = (S.item && S.item.cellPrompt) || '';
     const pc = statePieces(cur ? cur.group : 0);
     const stepsHtml = p.steps.map((s, i) => {
@@ -383,12 +447,22 @@ function renderIdo(r) {
 </section>`;
     setBar(n ? `Step ${k + 1} of ${n}${last && p.say ? ' <span class="mq-lp-together">· Say it together</span>' : ''}` : 'Worked example');
     fitDrawing();
+    if (S.launch.mode === 'pupil') { fitPupilStage(r); autoRead(); }
+}
+
+/** D6 + A17: pupil I do reads each step itself through the sound toggle (speakExplanation: nothing while sound is off). */
+function autoRead() {
+    const text = currentSpeech();
+    S.autoSpoke = '';
+    if (!text) return;
+    try { if (speakExplanation(text)) S.autoSpoke = text; } catch (e) { /* no voice */ }
 }
 
 function renderSoon(r, id) {
     const st = r.querySelector('.mq-lp-stage');
     const def = partOf(id);
     st.className = 'mq-lp-stage mq-lp-stage-soon';
+    st.style.height = '';
     st.innerHTML = `<div class="mq-lp-msg mq-lp-soon" data-soon="${esc(id)}"><h2>${esc(def.name)}: coming soon</h2>`
         + `<p>This part of the lesson is being built.</p><p>Use the part bar, or Back and Next, to move to another part.</p></div>`;
     setBar(esc(def.name));
@@ -399,7 +473,9 @@ function renderSoon(r, id) {
 const kOf = (r) => parseFloat(getComputedStyle(r).getPropertyValue('--lp-k')) || 1;
 // The signed cell-digit size (card drawing.sizes, D5): board 104 px at 1280 / 1366, x1.5 at 1920 (156 px); the tablet board
 // at the player's tablet scale (--lp-k 0.8: 83 px - the card names no tablet figure).
-const digitTarget = (r) => 104 * kOf(r);
+const digitTarget = (r) => (r.dataset.mode === 'pupil' ? pupilDigit() : 104 * kOf(r));
+// D5: pupil mode is the card scale of .mq-scell (RUBRIC C3: 56 px on a computer, 48 px on a tablet)
+const pupilDigit = () => (window.innerWidth >= 1200 ? 56 : 48);
 const basePxOf = () => (resolveCtx({ mode: 'print', size: 'L', look: 'ican' }).metrics.digitPt || 28) * (4 / 3);
 
 /**
@@ -583,6 +659,369 @@ function applyFit(r, f) {
     if (room) room.style.height = `${Math.ceil(f.sayH)}px`;
     r.dataset.digitPx = String(Math.round(basePxOf() * f.z));
     r.dataset.digitTarget = String(Math.round(digitTarget(r)));
+}
+
+
+/* ============================================================== slice 2: Warm-up and We do (item parts) */
+
+const ITEM_PARTS = ['warmup', 'wedo'];
+function isItemPart(id) { return ITEM_PARTS.includes(id); }
+function partPlan(id) { return (S && S.plan && S.plan.parts.find((p) => p.part === id)) || { items: [] }; }
+const plainQ = (t) => String(t || '').replace(/<[^>]*>/g, '').replace(/\?(?=\s*$)/, '?').trim();
+
+/** D4 / D7: the part a pupil reached, kept on the lesson's practice-skill progress record (no new store). */
+function reachedRec(lesson, make) {
+    const ref = S && S.plan ? S.plan.practice : null;
+    const sk = (ref && ref.skillId) || '';
+    if (!sk || !appState.skillProgress) return null;
+    if (!appState.skillProgress[sk] && make) appState.skillProgress[sk] = { correct: 0, total: 0, streak: 0, bestStreak: 0, mastery: 0, lastPracticed: null, history: [] };
+    return appState.skillProgress[sk] || null;
+}
+function reachedOf(lesson) {
+    try {
+        for (const rec of Object.values(appState.skillProgress || {})) if (rec && rec.lessonReached && rec.lessonReached[lesson]) return rec.lessonReached[lesson];
+    } catch (e) { /* no progress */ }
+    return null;
+}
+function saveReached(lesson, part) {
+    try {
+        const rec = reachedRec(lesson, true);
+        if (!rec) return;
+        rec.lessonReached = Object.assign({}, rec.lessonReached || {}, { [lesson]: part });
+        savePersistentData();
+    } catch (e) { /* not saved */ }
+}
+
+/**
+ * The player's own deal, ONLY where the printed packet has no Warm-up or Guided band (D2 seeds: Warm-up S+100+i, We do
+ * S+200+i): one item per prerequisite skill, and three of the practice skill.
+ */
+async function dealOwn(l, warmQs, weDoQs) {
+    let gen = null;
+    try { gen = (await import('../generate-question.js')).generateQuestionFor; } catch (e) { gen = null; }
+    const { lessonData: ld, practiceRef } = await import('../lessons/library.js');
+    const deal = (ref, seed) => { try { const [category, skill] = String(ref.key || `${ref.categoryId}:${ref.skillId}`).split(':'); const q = gen({ category, skill, opts: ref.opts || {}, seed }); return q ? Object.assign(q, { categoryId: q.categoryId || category, skillId: q.skillId || skill, seed: q.seed !== undefined ? q.seed : seed }) : null; } catch (e) { return null; } };
+    const data = ld(l.lesson) || {};
+    if (gen && !warmQs.length) warmQs = (data.skills || []).slice(0, WARM_MAX).map((ref, i) => [deal(ref, partSeed(l.seed, 'warmup', i))]).filter((x) => x[0]);
+    const pr = practiceRef(l.lesson);
+    if (gen && !weDoQs.length && pr) weDoQs = [0, 1, 2].map((i) => deal(pr, partSeed(l.seed, 'wedo', i))).filter(Boolean);
+    return { warmQs, weDoQs };
+}
+
+/** We do: the item's rung now (P-ON-7). Board: the plan's (item i at i+1); pupil: one down per item answered right. */
+function startRung(i) {
+    if (S.starts[i] !== undefined) return S.starts[i];
+    const plan = partPlan('wedo').items;
+    let r = (plan[i] && plan[i].rung) || 1;
+    if (S.launch.mode === 'pupil') r = i === 0 ? 1 : Math.max(1, Math.min(3, startRung(i - 1) + (S.checked[`wedo:${i - 1}`] === 'right' ? 1 : 0)));
+    S.starts[i] = r;
+    return r;
+}
+function rungOf(i) { return S.rungs[i] !== undefined ? S.rungs[i] : startRung(i); }
+function wordsOf(i) { const it = partPlan('wedo').items[i] || {}; return rungOf(i) >= 3 ? RUNG3_WORDS : (it.sentence || ''); }
+
+function syncButtons(r) {
+    const item = isItemPart(S.part);
+    const show = (a, on) => { const b = r.querySelector(`.mq-lp-bar [data-act="${a}"]`); if (b) b.hidden = !on; };
+    show('hint', S.part === 'wedo');
+    show('check', item);
+    show('show', item && S.launch.mode === 'board');
+    if (S.part === 'wedo') {
+        const i = S.pos.wedo || 0;
+        const hb = r.querySelector('.mq-lp-bar [data-act="hint"]');
+        // (P-ON-7: after two wrong Checks the app offers "Show me" - rung 1 for that item)
+        hb.textContent = (S.wrongs[`wedo:${i}`] || 0) >= 2 && rungOf(i) > 1 ? 'Show me' : 'Hint';
+        hb.disabled = rungOf(i) <= 1;
+    }
+}
+
+/** Hint (H; the board's rung control): one rung more help on this item; never writes into a box (P-ON-8). */
+function hint() {
+    if (!S || S.part !== 'wedo') return;
+    try { stopSpeaking(); } catch (e) { /* no speech */ }
+    const i = S.pos.wedo || 0;
+    if (rungOf(i) <= 1) return;
+    keepVals();
+    S.rungs[i] = rungOf(i) - 1;
+    render();
+    if (S.launch.mode === 'pupil') { const t = wordsOf(i); try { speakExplanation(t); } catch (e) { /* no voice */ } }
+}
+
+function cellInputs() { const r = rootEl(); return r ? [...r.querySelectorAll('.mq-lp-cell input.mq-lp-in')] : []; }
+function keepVals() { if (S && isItemPart(S.part)) S.vals[`${S.part}:${S.pos[S.part] || 0}`] = cellInputs().map((x) => x.value); }
+const valueOf = () => cellInputs().map((x) => x.value.trim()).join('');
+
+/** Check (Enter): the whole answer judged; right / wrong in chrome (SP-33); a wrong one keeps the rung (P-ON-7). */
+function checkItem() {
+    if (!S || !isItemPart(S.part)) return;
+    const i = S.pos[S.part] || 0;
+    const it = partPlan(S.part).items[i] || {};
+    const k = `${S.part}:${i}`;
+    const v = valueOf();
+    if (!v) { feedback('Type your answer first.', ''); return; }
+    const right = String(it.ans).trim() === v || Number(v) === Number(it.ans);
+    S.checked[k] = right ? 'right' : 'wrong';
+    if (!right) S.wrongs[k] = (S.wrongs[k] || 0) + 1;
+    keepVals();
+    cellInputs().forEach((x) => markInput(x, true));
+    const cell = rootEl().querySelector('.mq-lp-cell');
+    if (cell) cell.closest('.mq-lp-cellwrap').dataset.verdict = S.checked[k];
+    const miss = S.part === 'warmup' && !right && it.ifMissed ? ` If missed: go back to the lesson “${it.ifMissed.title || it.ifMissed.lesson}” (${it.ifMissed.lesson}).` : '';
+    feedback(right ? 'Right!' : `Not yet. The red box is wrong: try again${S.part === 'wedo' ? ' or ask for a hint' : ''}.${miss}`, right ? 'right' : 'wrong');
+    syncButtons(rootEl());
+}
+
+/** Show answer (A, board only): the teacher's reveal - the answer written in the boxes, marked as shown. */
+function showAnswer() {
+    if (!S || !isItemPart(S.part) || S.launch.mode !== 'board') return;
+    const i = S.pos[S.part] || 0;
+    const it = partPlan(S.part).items[i] || {};
+    fillBoxes(cellInputs(), String(it.ans));
+    S.shown[`${S.part}:${i}`] = true;
+    keepVals();
+    cellInputs().forEach((x) => { x.dataset.mqShown = '1'; markInput(x, false); });
+    feedback(`The answer is ${it.ans}.`, 'shown');
+}
+
+function fillBoxes(ins, val) {
+    if (ins.length === 1) { ins[0].value = val; return; }
+    const pad = ins.length - val.length;
+    ins.forEach((e, j) => { e.value = j >= pad ? val.charAt(j - pad) : ''; });
+}
+
+function feedback(text, kind) {
+    const fb = rootEl() && rootEl().querySelector('.mq-lp-fb');
+    if (!fb) return;
+    fb.hidden = false;
+    fb.textContent = text;
+    fb.dataset.kind = kind || '';
+    if (S && isItemPart(S.part)) S.fb = Object.assign(S.fb || {}, { [`${S.part}:${S.pos[S.part] || 0}`]: { text, kind } });
+}
+
+const BADGE_OK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10.5l4.2 4.2L16.5 5.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const BADGE_BAD = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+
+/**
+ * The live mark of one box (SP-31, Guided items: as typed). A digit box judges its own place (the answer right-aligned in
+ * the boxes); a whole-answer box judges a finished value, and a prefix still being typed stays unmarked. `final`: the
+ * Check's judgement (a prefix is then wrong). The mark is chrome: an outline and a badge outside the box (SP-30).
+ */
+function markInput(el, final) {
+    const want = String(el.dataset.want || '');
+    const v = el.value.trim();
+    let m = '';
+    if (v) {
+        if (el.dataset.digit === '1') m = v === want ? 'ok' : 'bad';
+        else m = v === want ? 'ok' : (!final && want.startsWith(v)) ? '' : 'bad';
+    } else if (final && want) m = 'bad';
+    el.dataset.mqLp = m;
+    const host = el.parentElement;
+    let b = host && host.querySelector(`[data-ws-feedback][data-for="${el.id}"]`);
+    if (!m) { if (b) b.remove(); return; }
+    if (!b && host) { b = document.createElement('span'); b.className = 'mq-lp-badge'; b.setAttribute('data-ws-feedback', ''); b.dataset.for = el.id; b.setAttribute('aria-hidden', 'true'); host.appendChild(b); }
+    if (b) { b.dataset.mark = m; b.innerHTML = m === 'ok' ? BADGE_OK : BADGE_BAD; }
+}
+
+/** The answer slot of a kit drawing becomes the pupil's input(s) in place: one per digit place where the slot has them. */
+function adoptSlots(root, want, part, i) {
+    const slots = [...root.querySelectorAll('[data-ws-slot]')].filter((e) => /^(ans|answer)$/.test(e.getAttribute('data-ws-slot')));
+    const slot = slots[0];
+    if (!slot) return 0;
+    const places = [...slot.children].filter((c) => c.tagName === 'SPAN' && !c.children.length && !c.textContent.trim());
+    const mk = (id, label, digit, wantV, max) => {
+        const inp = document.createElement('input');
+        inp.type = 'text'; inp.className = 'mq-lp-in'; inp.id = id;
+        inp.setAttribute('inputmode', 'numeric'); inp.setAttribute('autocomplete', 'off'); inp.setAttribute('maxlength', String(max));
+        inp.setAttribute('aria-label', label);
+        inp.dataset.want = wantV; if (digit) inp.dataset.digit = '1';
+        inp.addEventListener('input', () => { inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, max); markInput(inp, false); keepVals(); });
+        return inp;
+    };
+    const w = String(want);
+    slot.classList.add('mq-lp-slot');
+    if (places.length >= w.length && places.length > 1) {
+        slot.classList.add('mq-lp-slot-digits');
+        const pad = places.length - w.length;
+        places.forEach((sp, j) => { sp.classList.add('mq-lp-place'); sp.appendChild(mk(`mqlp-${part}-${i}-${j}`, `answer, digit ${j + 1} of ${places.length}`, true, j >= pad ? w.charAt(j - pad) : '', 1)); });
+        return places.length;
+    }
+    slot.textContent = '';
+    slot.classList.add('mq-lp-slot-one');
+    slot.appendChild(mk(`mqlp-${part}-${i}-0`, 'answer', false, w, Math.max(2, w.length)));
+    return 1;
+}
+
+/** The drawing of an item at its rung (We do: the printed Guided cell - rung 1 its cell 1, step 1's marks grey). */
+function itemDrawing(part, i, rung) {
+    const it = S.hosts[part][i];
+    if (!it) return '';
+    const ctx = drawCtx();
+    try { return part === 'wedo' ? weDoRender(it, rung <= 1 ? 0 : 1, 170)(ctx, { cols: 2 }) : it.render(ctx, { cols: 2 }); } catch (e) { console.warn('[lesson-player] item', e); return ''; }
+}
+
+function renderItem(r, part) {
+    const st = r.querySelector('.mq-lp-stage');
+    const pp = partPlan(part);
+    const n = pp.items.length;
+    const i = Math.min(S.pos[part] || 0, Math.max(0, n - 1));
+    S.pos[part] = i;
+    const it = pp.items[i] || {};
+    st.className = `mq-lp-stage mq-lp-stage-item mq-lp-stage-${part}`;
+    if (!n) { st.innerHTML = '<div class="mq-lp-msg"><h2>No items</h2><p>This lesson deals nothing for this part.</p></div>'; setBar(''); return; }
+    const rung = part === 'wedo' ? rungOf(i) : 0;
+    const instr = part === 'wedo' ? (pp.instr || '') : (it.instr || plainQ(it.text));
+    const ido = idoPart();
+    const stepsHtml = part === 'wedo' && ido.steps.length ? `<aside class="mq-lp-steps" aria-label="Steps"><h2>Steps</h2><ol>${ido.steps.map((s0, j) => {
+        const now = rung >= 3 && j === (it.hintStep || 0);
+        return `<li class="mq-lp-step${now ? ' is-now' : ''}"${now ? ' aria-current="step"' : ''}><span class="mq-lp-n">${stepMarker(j + 1)}</span><span class="mq-lp-t">${esc(s0.name)}</span></li>`;
+    }).join('')}</ol>${ido.chant ? `<p class="mq-lp-chant"><b>Rule:</b> ${esc(ido.chant)}</p>` : ''}</aside>` : '';
+    const words = part === 'wedo' ? `<div class="mq-lp-side"><div class="mq-lp-wordsbox"><p class="mq-lp-words">${esc(wordsOf(i))}</p></div></div>` : '';
+    const k = `${part}:${i}`;
+    st.innerHTML = `${stepsHtml}
+<section class="mq-lp-cellwrap"${S.checked[k] ? ` data-verdict="${S.checked[k]}"` : ''}>
+  <div class="mq-scell mq-lp-cell mq-lp-qcell" role="group" aria-label="${esc(part === 'wedo' ? 'We do' : 'Warm-up')}, item ${i + 1} of ${n}" data-item="${i + 1}" data-rung="${rung}">
+    ${instr ? `<div class="mq-lp-instr">${esc(instr)}</div>` : ''}
+    <div class="mq-lp-work" data-variant="${part === 'wedo' ? 'row' : 'col'}">
+      <div class="mq-lp-group"><div class="mq-lp-draw">${kit(itemDrawing(part, i, rung))}</div>${words}</div>
+    </div>
+  </div>
+  <div class="mq-lp-fb" aria-live="polite"></div>
+</section>`;
+    const draw = st.querySelector('.mq-lp-draw');
+    adoptSlots(draw, it.ans, part, i);
+    const saved = S.vals[k];
+    if (saved) cellInputs().forEach((x, j) => { if (saved[j] !== undefined) x.value = saved[j]; });
+    if (S.shown[k]) cellInputs().forEach((x) => { x.dataset.mqShown = '1'; });
+    cellInputs().forEach((x) => markInput(x, !!S.checked[k]));
+    const fbs = S.fb && S.fb[k];
+    if (fbs) feedback(fbs.text, fbs.kind);
+    else feedback(S.launch.mode === 'pupil' ? 'Type your answer, then press Check.' : (part === 'wedo' ? 'Work it together. Hint gives more help.' : 'Answer together, then Check.'), '');
+    const label0 = `Item ${i + 1} of ${n}`;
+    setBar(esc(label0));
+    syncButtons(r);
+    fullStage(r);
+    fitItem(r, part, i);
+    if (S.launch.mode === 'pupil') fitPupilStage(r);
+    // (pupil: the caret waits in the first empty box; the board is the teacher's clicker - nothing takes the keys from it)
+    const first = S.launch.mode === 'pupil' ? (cellInputs().find((x) => !x.value) || cellInputs()[0]) : null;
+    if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* no focus */ } }
+}
+
+/**
+ * Size an item part (one zoom for every rung of the item, so no mark moves and the cell never jumps): the drawing at the
+ * signed digit size, up to +25 % to fill free room (A22), the words beside it where they fit, else under it. Board: the
+ * cell takes the stage's height, its content centred; pupil: the cell is its content's height (the card).
+ */
+function fitItem(r, part, i) {
+    const cell = r.querySelector('.mq-lp-cell');
+    const wrap = r.querySelector('.mq-lp-cellwrap');
+    const work = r.querySelector('.mq-lp-work');
+    const zoomEl = r.querySelector('.mq-lp-draw > .mq-lp-zoom');
+    if (!cell || !work || !zoomEl) return;
+    const k = kOf(r);
+    // the drawing's box and digit size at zoom 1, over every rung's drawing of this item (they keep one size)
+    const sizer = document.createElement('div');
+    sizer.className = 'mq-lp-sizer';
+    sizer.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;';
+    const variants = part === 'wedo' ? [1, 2] : [0];
+    sizer.innerHTML = variants.map((v) => `<div class="mq-lp-sz">${kit(itemDrawing(part, i, v))}</div>`).join('');
+    r.appendChild(sizer);
+    sizer.querySelectorAll('.mq-lp-sz').forEach((el) => adoptSlots(el, '0', 'sz', 0));
+    let wD = 1, hD = 1, base = 0;
+    sizer.querySelectorAll('.mq-lp-sz > .mq-lp-zoom').forEach((el) => { const q = el.getBoundingClientRect(); wD = Math.max(wD, q.width); hD = Math.max(hD, q.height); });
+    for (const el of sizer.querySelectorAll('*')) {
+        const own = el.tagName === 'INPUT' || [...el.childNodes].some((c) => c.nodeType === 3 && /\d/.test(c.nodeValue));
+        if (own) base = Math.max(base, parseFloat(getComputedStyle(el).fontSize) || 0);
+    }
+    if (!(base > 0)) base = basePxOf();
+    const want = digitTarget(r) / base;
+    // (D5 targets: a digit box is >= 48 px wide at the least zoom the item may take - the digit tracks of the drawing widen on
+    // screen where 0.72 em would be narrower; the sum's columns stay lined up, SP-12a spacing may differ)
+    const minW = (r.dataset.mode === 'pupil' ? 48 : 64) / want;
+    sizer.querySelectorAll('.mq-lp-sz').forEach((el) => widenPlaces(el, minW));
+    widenPlaces(r.querySelector('.mq-lp-draw'), minW);
+    // (a tall stage - a tablet held upright - puts a counting picture's answer box under the picture, not beside it)
+    const portrait = wrap.clientHeight > wrap.clientWidth * 1.1;
+    r.querySelectorAll('.mq-lp-draw, .mq-lp-sizer').forEach((el) => { if (portrait) el.dataset.portrait = '1'; else delete el.dataset.portrait; });
+    wD = 1; hD = 1;
+    sizer.querySelectorAll('.mq-lp-sz > .mq-lp-zoom').forEach((el) => { const q = el.getBoundingClientRect(); wD = Math.max(wD, q.width); hD = Math.max(hD, q.height); });
+    sizer.remove();
+    const cap = want * 1.25;
+    const fb = r.querySelector('.mq-lp-fb');
+    const fbH = fb ? fb.getBoundingClientRect().height + parseFloat(getComputedStyle(wrap).rowGap || 0) : 0;
+    cell.style.height = '';
+    const instrEl = cell.querySelector('.mq-lp-instr');
+    const instrH = instrEl ? instrEl.getBoundingClientRect().height : 0;
+    const wcs = getComputedStyle(work);
+    const padX = parseFloat(wcs.paddingLeft) + parseFloat(wcs.paddingRight), padY = parseFloat(wcs.paddingTop) + parseFloat(wcs.paddingBottom);
+    const bw = 2 * (parseFloat(getComputedStyle(cell).borderTopWidth) || 0);
+    const availW = cell.clientWidth - padX;
+    const stageH = wrap.clientHeight;
+    const availH = stageH - fbH - instrH - padY - bw;
+    const side = r.querySelector('.mq-lp-side');
+    const wb = r.querySelector('.mq-lp-wordsbox');
+    const gap = 32 * k;
+    const wordsAt = (w) => { if (!wb) return 0; wb.style.width = `${Math.max(40, Math.floor(w))}px`; return wb.getBoundingClientRect().height; };
+    let natW = 0;
+    if (wb) { wb.style.width = 'max-content'; natW = wb.getBoundingClientRect().width + 2; }
+    let best = null;
+    for (let z = cap; z >= 0.2; z *= 0.985) {
+        const dw = wD * z, dh = hD * z;
+        if (dw > availW + 0.5) continue;
+        if (wb) {
+            const sw = Math.min(natW, availW - gap - dw);
+            if (sw >= Math.min(natW, 220 * k)) { const h = Math.max(dh, wordsAt(sw)); if (h <= availH + 0.5) { best = { z, stack: false, sw, h }; break; } }
+            const sh = wordsAt(Math.min(availW, Math.max(dw, natW)));
+            if (dh + 14 * k + sh <= availH + 0.5) { best = { z, stack: true, sw: Math.min(availW, Math.max(dw, natW)), h: dh + 14 * k + sh }; break; }
+            continue;
+        }
+        if (dh <= availH + 0.5) { best = { z, stack: false, sw: 0, h: dh }; break; }
+    }
+    if (!best) best = { z: 0.2, stack: true, sw: availW, h: hD * 0.2 };
+    if (best.stack) work.dataset.stack = '1'; else delete work.dataset.stack;
+    zoomEl.style.zoom = String(+best.z.toFixed(4));
+    const draw = r.querySelector('.mq-lp-draw');
+    draw.style.width = `${Math.ceil(wD * best.z)}px`;
+    draw.style.height = `${Math.ceil(hD * best.z)}px`;
+    if (side && wb) { side.style.width = `${Math.ceil(best.sw)}px`; wb.style.width = `${Math.ceil(best.sw)}px`; }
+    const contentH = Math.ceil(best.h + instrH + padY + bw) + 2;
+    // board: the cell fills the stage (its content centred); pupil: the card, its content's height
+    cell.style.height = `${Math.floor(S.launch.mode === 'pupil' ? Math.min(contentH, stageH - fbH) : stageH - fbH)}px`;
+    r.dataset.digitPx = String(Math.round(base * best.z));
+    r.dataset.digitTarget = String(Math.round(digitTarget(r)));
+}
+
+/** Pupil mode is the card (D5): the stage holds its content's height, centred on the page - no stage of empty room. */
+/** Widen a fact's digit tracks so each digit box is at least `minPx` wide at zoom 1 (0.72 em on paper). */
+function widenPlaces(root, minPx) {
+    if (!root) return;
+    root.querySelectorAll('.ws-fact').forEach((f) => {
+        const fd = parseFloat(getComputedStyle(f).fontSize) || 0;
+        if (!(fd > 0) || 0.72 * fd >= minPx) return;
+        const em = (minPx / fd + 0.02).toFixed(3);
+        const fix = (el) => { const g = el.style.gridTemplateColumns; if (g && /0\.72em/.test(g)) el.style.gridTemplateColumns = g.replace(/0\.72em/g, `${em}em`); };
+        fix(f);
+        f.querySelectorAll('[style*="grid-template-columns"]').forEach(fix);
+    });
+}
+
+/** Pupil mode sizes against the whole stage row first (the card then shrinks to its content: fitPupilStage). */
+function fullStage(r) {
+    const st = r.querySelector('.mq-lp-stage');
+    if (!st) return;
+    if (r.dataset.mode !== 'pupil') { st.style.height = ''; return; }
+    const top = r.querySelector('.mq-lp-top'), bar = r.querySelector('.mq-lp-bar');
+    st.style.height = `${Math.max(200, r.clientHeight - (top ? top.offsetHeight : 0) - (bar ? bar.offsetHeight : 0))}px`;
+}
+
+function fitPupilStage(r) {
+    const st = r.querySelector('.mq-lp-stage');
+    if (!st) return;
+    const cs = getComputedStyle(st);
+    const top = st.getBoundingClientRect().top + parseFloat(cs.paddingTop);
+    let bottom = top;
+    st.querySelectorAll('.mq-lp-steps, .mq-lp-cell, .mq-lp-fb').forEach((el) => { bottom = Math.max(bottom, el.getBoundingClientRect().bottom); });
+    st.style.height = `${Math.ceil(bottom - top + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom))}px`;
 }
 
 export default { openLessonPlayer, closeLessonPlayer, lessonPlayerState };

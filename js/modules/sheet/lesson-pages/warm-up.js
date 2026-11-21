@@ -182,6 +182,8 @@ export function warmUpBand(env) {
             warmCount += its.length;
             return part;
         });
+        // (lane lf-hosts, lesson player slice 2: each skill's own library instruction, before a shared one is moved to the strip)
+        env.warmInstr = parts.map((p) => String((p.parts[0] && p.parts[0].text) || ''));
         if (stacked) {
             // Lessons r2: the first row's instruction sits on the band's own strip ("Warm-up:
             // Write the two tens ..."), not on an empty strip with the instruction under it.
@@ -237,7 +239,9 @@ export function warmUpBand(env) {
     }
     env.letter = letter;
     env.warmCount = warmCount;
-    env.warm = { halves, shape };
+    // (lane lf-hosts, lesson player slice 2: the band's own items per prerequisite skill, in order - the player's Warm-up
+    // takes them from here, so the screen deals what the packet prints; read only by roles/lesson.js meta.warmQs)
+    env.warm = { halves, shape, instr: env.warmInstr || [], items: halves.map((id) => wPools[id].slice(0, shape[id].k * (shape[id].rows || 1))) };
     return env;
 }
 

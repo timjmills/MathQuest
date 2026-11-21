@@ -50,7 +50,7 @@
 // (lesson-pages/index.js), so a new page job registers itself there without editing this file. The
 // role's earlier exports are re-exported below, unchanged.
 
-import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf, stringsOf, stripWrapMm, stripExtraMm } from './compose.js';
+import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf, stringsOf, stripWrapMm, stripExtraMm, instructionText, instructionKeyOf } from './compose.js';
 import { workedStepsOf } from '../anchors.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { hopsSvg } from '../lesson-arch/fact.js';
@@ -536,6 +536,10 @@ function planOnce(input = {}) {
             partFit: { chart: chartDesigned, chartMin, wedo: env.weDoFit !== undefined ? env.weDoFit : weDo.length, wedoMin: env.weDoMin, rows: cur.indepFit ? cur.indepFit.rows : 0, perRow: cur.indepFit ? cur.indepFit.ic : 0, remember: lesson.partN && lesson.partN.remember === false ? !!(data && data.concepts && data.concepts[0]) : groups.some((g) => g.sections[0] && (g.sections[0].label === 'Remember:' || g.sections[0].label === 'Rule:')) },
             // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
             exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),
+            // (lane lf-hosts, lesson player slice 2: the Warm-up items per prerequisite skill and the Guided (We do) items as this
+            // sheet deals them - the player plays these, so its Warm-up and We do are the printed packet's own, P-ON-5)
+            warmQs: ((env.warm && env.warm.items) || []).map((list) => list.map((x) => x.q)), weDoQs: weDo.map((x) => x.q),
+            warmInstr: (env.warm && env.warm.instr) || [], weDoInstr: weDo.length ? instructionText(instructionKeyOf(weDo, input.skills), weDo) : '',
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],
             notes: data0 ? [] : ['No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.'],
         },

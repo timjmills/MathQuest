@@ -27,17 +27,26 @@ import { fitLessonData } from '../sheet/roles/lesson.js';
 import { wrmLessonSeed, wrmLessonVariant } from '../wrm-links.js';
 
 export const PLAYER_PARTS = Object.freeze([
-    Object.freeze({ id: 'warmup', name: 'Warm-up', built: false, slice: 2 }),
+    Object.freeze({ id: 'warmup', name: 'Warm-up', built: true, slice: 2 }),
     Object.freeze({ id: 'ido', name: 'I do', built: true, slice: 1 }),
-    Object.freeze({ id: 'wedo', name: 'We do', built: false, slice: 2 }),
+    Object.freeze({ id: 'wedo', name: 'We do', built: true, slice: 2 }),
     Object.freeze({ id: 'youdo', name: 'You do', built: false, slice: 3 }),
     Object.freeze({ id: 'exit', name: 'Exit ticket', built: false, slice: 3 }),
 ]);
 export const PART_IDS = Object.freeze(PLAYER_PARTS.map((p) => p.id));
 export const DEFAULT_PART = 'ido';
 export const MODES = Object.freeze(['board', 'pupil']);
-// The modes this slice plays (critic r1 F7): pupil mode is slice 2, so a ?mode=pupil link opens the Board until then.
-export const BUILT_MODES = Object.freeze(['board']);
+// The modes the player plays (slice 2 builds pupil mode: self-paced, saves the part reached, D4).
+export const BUILT_MODES = Object.freeze(['board', 'pupil']);
+/** The most Warm-up cells (one per prerequisite skill, card §2) and the We do items (2-3, P-LC-7). */
+export const WARM_MAX = 3;
+export const WEDO_MIN = 2;
+export const WEDO_MAX = 3;
+/** D2: the seed of item i of a part dealt by the player itself: Warm-up S+100+i, We do S+200+i, You do S+300+i, Exit S+900+i. */
+const PART_OFFSET = Object.freeze({ warmup: 100, wedo: 200, youdo: 300, exit: 900 });
+export const partSeed = (S, part, i = 0) => ((Number(S) >>> 0) + (PART_OFFSET[part] || 0) + (Number(i) || 0)) >>> 0;
+/** The words of We do rung 3 (card §2: "'What comes next?' + Steps row highlighted"). */
+export const RUNG3_WORDS = 'What comes next?';
 
 export const partOf = (id) => PLAYER_PARTS.find((p) => p.id === id) || null;
 
@@ -79,7 +88,8 @@ export function parseLaunch(search = '') {
     const seed = sRaw !== null && sRaw !== '' && Number.isFinite(Number(sRaw)) ? Number(sRaw) >>> 0 : (lesson ? lessonSeedOf(lesson) : 0);
     const modeRaw = String(p.get('mode') || 'board').toLowerCase();
     const mode = BUILT_MODES.includes(modeRaw) ? modeRaw : 'board';
-    return { raw, lesson, part, seed, mode, board: p.get('board') === '1' };
+    // (D4: a pupil link without ?part= resumes at the last part reached - `partGiven` tells the screen whether to look)
+    return { raw, lesson, part, seed, mode, board: p.get('board') === '1', partGiven: p.has('part') && PART_IDS.includes(partRaw) };
 }
 
 export function launchSearch({ raw, lesson, part, seed, mode, board }) {
@@ -125,8 +135,48 @@ export function planIdo(exampleQ, data0 = null) {
     };
 }
 
+/** A dealt question as the plan keeps it (plain data: the gates JSON-compare plans). */
+const qRef = (q) => ({ text: String((q && q.text) || ''), ans: q ? q.ans : '', seed: q ? q.seed : undefined, categoryId: (q && q.categoryId) || '', skillId: (q && q.skillId) || '' });
+
+/**
+ * The Warm-up (card §2): one cell per prerequisite skill, at most WARM_MAX - the FIRST item of each skill the printed
+ * lesson sheet's Warm-up band deals (`warmQs`, one list per skill; P-ON-5: screen = paper), each with its library
+ * instruction and, where the lesson's Prerequisite Check routes that skill, its "If missed" lesson.
+ */
+export function planWarmup(warmQs = [], data = null, instr = []) {
+    const pre = (data && Array.isArray(data.prereqs) ? data.prereqs : []);
+    const items = [];
+    (warmQs || []).forEach((list, k) => {
+        const q = (list || [])[0];
+        if (!q || items.length >= WARM_MAX) return;
+        const key = `${q.categoryId}:${q.skillId}`;
+        const keyOf = (p) => p.key || (p.ref ? `${p.ref.categoryId}:${p.ref.skillId}` : '');
+        const route = pre.find((p) => p && keyOf(p) === key && p.lesson) || null;
+        const why = ((data && data.skills) || []).find((s) => s && s.key === key);
+        items.push(Object.assign(qRef(q), { instr: String(instr[k] || ''), why: (why && why.why) || '', ifMissed: route ? { lesson: route.lesson, title: route.title || '' } : null }));
+    });
+    return { part: 'warmup', items };
+}
+
+/**
+ * The We do (card §2, P-LC-7, P-ON-7): the printed Guided cells (`weDoQs`), 2-3 of them, item i opening at rung i+1
+ * (1 = the next step's working marks grey + its sentence, 2 = its sentence, 3 = "What comes next?" + its Steps row). The
+ * next step is the item's first worked step (the pupil starts each item at the beginning); its sentence is the provider's
+ * own words for THIS item (L6). A step that only writes the answer is never the hint (P-ON-8: no hint gives the answer).
+ */
+export function planWeDo(weDoQs = [], stepsOf = () => [], instr = '') {
+    const items = (weDoQs || []).slice(0, WEDO_MAX).map((q, i) => {
+        const steps = stepsOf(q) || [];
+        const ansStep = (s) => (s.marks || []).some((m) => m && /^(ans|answer)/.test(String(m.slot || '')));
+        let h = steps.findIndex((s) => !ansStep(s));
+        if (h < 0) h = 0;
+        return Object.assign(qRef(q), { rung: Math.min(3, i + 1), hintStep: h, sentence: steps[h] ? String(steps[h].text || '') : '', steps: steps.length });
+    });
+    return { part: 'wedo', items, instr: String(instr || '') };
+}
+
 /** The whole plan of a lesson. `example`: the anchor chart's example question (from chartRequest's build). */
-export function planLesson(id, { seed, mode = 'board', example = null, title = '' } = {}) {
+export function planLesson(id, { seed, mode = 'board', example = null, title = '', warmQs = null, weDoQs = null, warmInstr = [], weDoInstr = '', stepsOf = null } = {}) {
     const lid = lessonIdOf(id);
     if (!lid) return null;
     const l = lessonById(lid);
@@ -138,8 +188,10 @@ export function planLesson(id, { seed, mode = 'board', example = null, title = '
         practice: practiceRef(lid),
         parts: PLAYER_PARTS.map((p) => (p.id === 'ido'
             ? Object.assign({ name: p.name, built: true }, planIdo(example, data) || { part: 'ido', steps: [], say: '', chant: '', worked: false })
-            : { part: p.id, name: p.name, built: false, slice: p.slice })),
+            : p.id === 'warmup' ? Object.assign({ name: p.name, built: true }, planWarmup(warmQs || [], data, warmInstr))
+                : p.id === 'wedo' ? Object.assign({ name: p.name, built: true }, planWeDo(weDoQs || [], stepsOf || ((q) => workedStepsOf({ q })), weDoInstr))
+                    : { part: p.id, name: p.name, built: false, slice: p.slice })),
     };
 }
 
-export default { PLAYER_PARTS, PART_IDS, partOf, resolveLessonId, lessonSeedOf, lessonVariantOf, chartRequest, parseLaunch, launchSearch, planIdo, planLesson };
+export default { PLAYER_PARTS, PART_IDS, partSeed, planWarmup, planWeDo, partOf, resolveLessonId, lessonSeedOf, lessonVariantOf, chartRequest, parseLaunch, launchSearch, planIdo, planLesson };

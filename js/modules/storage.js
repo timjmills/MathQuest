@@ -70,6 +70,7 @@ export function loadPersistentData() {
                         lastPracticed: v.lp || null,
                         history: v.h || []
                     };
+                    if (v.lr && typeof v.lr === 'object') expanded[k].lessonReached = v.lr;
                 } else {
                     // Already full format
                     expanded[k] = v;
@@ -121,6 +122,8 @@ export function savePersistentData() {
                     lp: v.lastPracticed,
                     h: (v.history || []).slice(-10)
                 };
+                // (lesson player D4: the part a pupil reached in each lesson of this skill - only when there is one)
+                if (v.lessonReached) compact[k].lr = v.lessonReached;
             }
             setCookie('mathquest_skill_progress', compact);
         }
