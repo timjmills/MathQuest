@@ -9,6 +9,7 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: chart_120 r1 FAIL, r2 FAIL, r3 PASS; word-stories r1 FAIL
 
 ## Now
+- 2026-11-21 06:06Z: UN-PARKED (lead: owner added budget; stop raised +$40 to $815.37; cost $705.44). Do A23 (dealer places the band-100 Model; >= 3 distinct Model rows over 40 seeds), plus the STEP-COVER-aware search and the quiet retry; then backtests, re-grade, DEPLOY. LESSON-MIXED only if money is left.
 - 2026-11-20 18:30Z: PARKED (cost $705 of the $775.37 stop; round cap reached on the vertical-run class). Not for deploy; the deployed chart_120 (969306c1e) is unaffected.
   - Critic r7 (critic-blanks-r7.md): H1/H2/H3 closed; p2 and all keys pass.
   - H4 FAILS on hcf band-100 practice p3: an edge-column stripe.
