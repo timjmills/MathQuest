@@ -177,7 +177,11 @@ function weDoBandOwn(env) {
     // their stacks (H13); every other lesson keeps its third)
     // The width left of the Steps zone is two thirds of the page: 2 cells are a 3-column page's
     // cells, 3 cells are narrower (a 4-column page's measurement, plus the fact's cue beside it).
-    const colsFor = (k) => (k >= 3 ? 4 : k === 2 ? 3 : 2);
+    // (lead ruling A28, lf-engine 2026-11-21: a lesson with no worked steps - no Steps zone - draws NO Steps band; its Guided
+    // cells take the band's width, the page's 186 mm, measured at that width: 3 cells a 3-column page's, 2 a 2-column page's)
+    const noSteps = !stepsZone;
+    const bandW = noSteps ? 186 : 186 - WEDO_W_MM;
+    const colsFor = (k) => (noSteps ? Math.max(1, Math.min(3, k)) : (k >= 3 ? 4 : k === 2 ? 3 : 2));
     const cue = (its) => its.some((it) => countCueOf(it));
     let gk = 3;
     // A vertical fact is about 26 mm wide. An ACROSS fact ("132 ÷ 12 =", the answer line under it:
@@ -192,8 +196,8 @@ function weDoBandOwn(env) {
     // (the widest of the pool: the Guided set is picked from it after this count is chosen)
     const factW = Math.max(26, ...main.filter((it) => it.template === 'fact').map(acrossW));
     const drawnW = (it) => (it.template === 'fact' ? factW : ((it.footprint && it.footprint.wMm) || 99));
-    while (gk > 2 && !(fitsWidth(rest.slice(0, gk), 4) && rest.slice(0, gk).every((it) => drawnW(it) + (cue([it]) ? 10 : 0) <= 124 / gk - 4))) gk--;
-    if (gk === 2 && !fitsWidth(rest.slice(0, 2), 3)) gk = 1;
+    while (gk > 2 && !(fitsWidth(rest.slice(0, gk), colsFor(gk)) && rest.slice(0, gk).every((it) => drawnW(it) + (cue([it]) ? 10 : 0) <= bandW / gk - 4))) gk--;
+    if (gk === 2 && !fitsWidth(rest.slice(0, 2), colsFor(2))) gk = 1;
     const zH = hOf(stepsZone, 3);
     // Short cells beside a tall Steps list (a rounding strip beside four steps and a chant) stack
     // in ONE column, three rows, so the band is as tall as the Steps and no cell is mostly empty
@@ -204,7 +208,7 @@ function weDoBandOwn(env) {
     // (one stacked row is not a stack: it left a single Guided cell beside the Steps - critic R1,
     // div_facts long-division lesson - so a stack is at least two rows)
     // (`guidedStack` k on lesson data - the detailed lesson maker, lesson 2: k cells too wide to stand side by side stack beside the Steps)
-    const forceStack = data && Number(data.guidedStack) >= 2 && rest.length >= Number(data.guidedStack) ? Math.min(3, Number(data.guidedStack)) : 0;
+    const forceStack = !noSteps && data && Number(data.guidedStack) >= 2 && rest.length >= Number(data.guidedStack) ? Math.min(3, Number(data.guidedStack)) : 0;
     let stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
     // (lf-partopts: `lesson.partN.wedo` - the teacher's cell count, 1 .. the fit; 0 = no We Do band. The fit is reported
@@ -257,7 +261,7 @@ function weDoBandOwn(env) {
         env._weDoMin = weDo.length;
         // (only one-line facts, whose drawn width the band knows exactly: a worked cell - a stack, a story - draws its ink
         // off-centre in a wider cell, measured 30.0 % at M with two stacks; its count stays the fit until it declares its ink)
-        if (weDo.every((it) => it.template === 'fact')) for (let k = 2; k < weDo.length; k++) if (inkW >= 0.5 * (124 / k - 4)) { env._weDoMin = k; break; }
+        if (weDo.every((it) => it.template === 'fact')) for (let k = 2; k < weDo.length; k++) if (inkW >= 0.5 * (bandW / k - 4)) { env._weDoMin = k; break; }
     }
     if (wN !== null && weDo.length > wN) {
         // (a strip-over-the-cells set picked its own count: the teacher's count caps it, the rows / columns follow)
@@ -271,7 +275,7 @@ function weDoBandOwn(env) {
     // cell (a centred problem then leaves under 25 % each side, EB-SIDE 30 %); roles/lesson.js sheetOffers reads it.)
     if (wN !== null && weDo.length) {
         const k = top ? (top.rows ? 1 : weDo.length) : stackRows ? 1 : weDo.length;
-        const W = (top ? 186 : 124) / k - 4;
+        const W = (top ? 186 : bandW) / k - 4;
         // (a rounding cell draws the chart's number line under its problem, as long as its column leaves - weDoRender)
         const pc = top ? top.cols : stackRows ? 2 : colsFor(weDo.length);
         const lineW = (it) => (isRound(it) ? Math.max(28, Math.min(62, 186 / pc - 8)) : 0);
@@ -294,14 +298,14 @@ function weDoBandOwn(env) {
     // css/sheet-kit.css; the Guided rows split the Steps panel's height, lesson S Guided row 2 left 30 % under the line)
     const rowStretch = (it, cols, cellH) => (it && it.template === 'pv' && rowStretches(it, cols, cellH) ? 'ws-rowstretch' : '');
     const weCellH = stackRows ? weH / stackRows : weH;
-    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter', rowStretch(it, gcols, weCellH)].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, (186 - WEDO_W_MM - 10) / Math.max(1, stackRows ? 1 : weDo.length)), nolabel: true }));
+    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter', rowStretch(it, gcols, weCellH)].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, (bandW - 10) / Math.max(1, stackRows ? 1 : weDo.length)), nolabel: true }));
     const zoneCtx = resolveCtx({ size: ctx.size, look: ctx.look, mode: 'print' });
-    const weBand = {
+    const guidedPart = { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content: gridPart(weItems, stackRows ? { cols: 1, rows: stackRows, cellH: weH / stackRows, labels: 'none' } : { cols: weDo.length || 1, rows: 1, cellH: weNoSt ? Math.min(weH, gH * NO_STRETCH_ROOM) : weH, labels: 'none' }) };
+    // (A28: no Steps zone - the Guided band alone, at the page's width; no empty "Steps:" frame beside it)
+    const stepsPart = noSteps ? null : { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-lstepsbox" style="height:${weH.toFixed(2)}mm">${stepsZone.render(zoneCtx)}</div>` };
+    const weBand = noSteps ? guidedPart : {
         kind: 'row', cls: 'mq-modelrow mq-lwedorow', widths: ['1fr', `${WEDO_W_MM}mm`],
-        parts: [
-            { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content: gridPart(weItems, stackRows ? { cols: 1, rows: stackRows, cellH: weH / stackRows, labels: 'none' } : { cols: weDo.length || 1, rows: 1, cellH: weNoSt ? Math.min(weH, gH * NO_STRETCH_ROOM) : weH, labels: 'none' }) },
-            { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-lstepsbox" style="height:${weH.toFixed(2)}mm">${stepsZone ? stepsZone.render(zoneCtx) : ''}</div>` },
-        ],
+        parts: [guidedPart, stepsPart],
     };
     // The Guided cells take little of the page's spare height: they are sized to their problems
     // (or to the Steps beside them); the Independent rows under them take the rest.
@@ -325,8 +329,8 @@ function weDoBandOwn(env) {
         // prediction for it; its width is judged by weDoSideOk)
         env.weDoCells = { grid, items: weDo.filter((it) => !isRound(it)), cols: top.rows ? 1 : top.cols };
     } else if (weDo.length) {
-        groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: weNoSt ? 0 : 0.1, capIfEmpty: weNoSt ? 0 : weInPlace ? 0.1 : 0.35, tmpls: weDo.map((it) => it.template || '') }));
-        env.weDoCells = { grid: weBand.parts[0].content, items: weDo.filter((it) => !isRound(it)), cols: gcols };
+        groups.push(band(m.strip + weH, weBand, { h: weH, grid: [guidedPart.content], box: stepsPart || undefined, cap: weNoSt ? 0 : 0.1, capIfEmpty: weNoSt ? 0 : weInPlace ? 0.1 : 0.35, tmpls: weDo.map((it) => it.template || '') }));
+        env.weDoCells = { grid: guidedPart.content, items: weDo.filter((it) => !isRound(it)), cols: gcols };
     }
     env.weDo = weDo;
     return env;
