@@ -39,6 +39,11 @@
 //                      part ("1,590" split as "1" | "590"; a "dropped zeros" total beside the right part).
 //   EA-WRONG-KIND      (lf-ops sizes r2, critic r1 F3 / F4) a column multiplication's wrong work on EA / TF / Reason It is never
 //                      the two factors added, and over a skill's pages its 4+ wrong works show at least two kinds of error.
+//   MODEL-FINAL-COMPLETE (lf-ops sizes N-round, critic r2 N1) the last Scripted Model state and the last lesson anchor-chart
+//                      panel of a template with its own `stepState` hold every number the item's answered drawing (the key)
+//                      writes: no work place - an area model's partial-sum lines - is left empty by the final state.
+//   COLUMN-NO-GROUP    (lf-ops sizes N-round, critic r2 N2) no comma or other grouping mark is drawn in a digit row of a column
+//                      template (stack, long-multiplication), on the pupil page or its key (EA's "2 1 , 7 6 3" moved Th one place).
 //   SAY-AGREE          every Say frame a page prints - the opener's UNFILLED one among them - agrees in number with the page's
 //                      Model item (N3: "The missing number is __." under a two-gap Model): an item of k > 1 answer parts
 //                      (`keyParts`) prints a plural frame, with k blanks when it is unfilled. Judged on chart windows.
@@ -76,7 +81,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0 } = part || {};
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'EA-WORK-COHERENT', 'EA-WRONG-KIND'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'EA-WORK-COHERENT', 'EA-WRONG-KIND', 'MODEL-FINAL-COMPLETE', 'COLUMN-NO-GROUP'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -312,6 +317,57 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             }
                             if (states.length >= 2) judgeStates(`${key} ${role} ${size} seed ${s}`, states, role === 'scripted-model' && !!TRACE && !TRACE.has(modelTpl) && hasStepState(modelTpl));
                         }
+                        // COLUMN-NO-GROUP (lf-ops sizes N-round, critic r2 N2): no comma or other grouping mark is drawn in a digit row of a
+                        // column template (stack, long-multiplication) - on the pupil page and on its key. "2 1 , 7 6 3": the comma took a
+                        // digit track and the thousands digit sat one place left of its column.
+                        if (on('COLUMN-NO-GROUP') && /data-ws-cell="(stack|long-multiplication)"/.test(r.pupilHtml)) {
+                            let kh = '';
+                            try { kh = (await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId }] }], size, paper: 'A4', seed: s, key: true })).keyHtml || ''; } catch (e) { kh = ''; }
+                            for (const [which, html] of [['pupil', r.pupilHtml], ['key', kh]]) {
+                                const d = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+                                const bad = [];
+                                d.querySelectorAll('[data-ws-cell="stack"] .ws-stack, [data-ws-cell="long-multiplication"] [role="group"]').forEach((g) => {
+                                    // (a digit row's tracks are the grid's own children; a grouping mark is a track's whole text or sits between digits in one)
+                                    [...g.children].forEach((t) => { const x = t.textContent.trim(); if (/^[,'\u2019\u00a0\u2009\u202f]$/.test(x) || /\d[,'\u2019\u00a0\u2009\u202f]\d/.test(x)) bad.push(x); });
+                                });
+                                if (bad.length) out.push(`COLUMN-NO-GROUP ${key} ${role} ${size} seed ${s} ${which}: a column template's digit row draws a grouping mark (${bad.length}x "${bad[0]}") - it takes a digit column and moves the digits left of their places`);
+                            }
+                        }
+                        // MODEL-FINAL-COMPLETE (lf-ops sizes N-round, critic r2 N1): the LAST state of a Scripted Model and of the lesson's
+                        // anchor chart leaves no work place empty that the answer key fills. Judged for every template with its own
+                        // `stepState`: the final drawing's numbers must hold every number the same item draws answered (the key's
+                        // drawing, scaffold off) - the area model's "Add the parts" state left its partial-sum lines blank.
+                        if (on('MODEL-FINAL-COMPLETE') && (role === 'scripted-model' || role === 'lesson') && REG) {
+                            const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');
+                            let fin = null, q = null;
+                            if (role === 'scripted-model') {
+                                q = modelIt && modelIt.q;
+                                const sc = cellsOf(r.pupilHtml).filter((c) => c.querySelector('[data-ws-slot], [data-ws-aslot], table, svg'));
+                                if (sc.length >= 2) fin = sc[sc.length - 1];
+                            } else {
+                                q = Array.isArray(meta.exampleQs) ? meta.exampleQs[0] : null;
+                                const ps = [...d.querySelectorAll('.mq-cstate:not(.mq-ctailp)')].filter((e) => e.querySelector('.mq-cdraw'));
+                                if (ps.length >= 2) fin = ps[ps.length - 1].querySelector('.mq-cdraw');
+                            }
+                            const ftpl = q && q.cell && q.cell.template;
+                            if (fin && ftpl && hasStepState(ftpl)) {
+                                const toks = (el) => {
+                                    const x = el.cloneNode(true);
+                                    x.querySelectorAll('.mq-steptext, .mq-steptop, .ws-modeltab, [data-ws-label], .ws-letter, .mq-chead, .mq-cwords, style, script').forEach((e) => e.remove());
+                                    const m = new Map();
+                                    const w = x.ownerDocument.createTreeWalker(x, 4);
+                                    for (let n = w.nextNode(); n; n = w.nextNode()) for (const t of (n.nodeValue.replace(/(\d),(?=\d{3})/g, '$1').match(/\d+/g) || [])) m.set(t, (m.get(t) || 0) + 1);
+                                    return m;
+                                };
+                                let ref = '';
+                                try { ref = REG.renderCell(q, { size, state: 'answered', scaffoldLevel: 3 }); } catch (e) { ref = ''; }
+                                const rd = new DOMParser().parseFromString(`<div>${ref}</div>`, 'text/html').body.firstChild;
+                                const want = toks(rd), have = toks(fin);
+                                const miss = [];
+                                for (const [t, n] of want) if ((have.get(t) || 0) < n) miss.push(n - (have.get(t) || 0) > 1 ? `${t} x${n - (have.get(t) || 0)}` : t);
+                                if (miss.length) out.push(`MODEL-FINAL-COMPLETE ${key} ${role} ${size} seed ${s} (${ftpl}): the last ${role === 'lesson' ? 'chart panel' : 'Model state'} leaves empty what the key writes - ${miss.join(', ')}`);
+                            }
+                        }
                         if (on('SAY-AGREE') && modelIt && /chartwindow/.test(String(modelTpl))) {
                             const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');
                             const f = d.querySelector('.ws-sayframe');
@@ -368,7 +424,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|EA-WORK-COHERENT|EA-WRONG-KIND) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|EA-WORK-COHERENT|EA-WRONG-KIND|MODEL-FINAL-COMPLETE|COLUMN-NO-GROUP) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);

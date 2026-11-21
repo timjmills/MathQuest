@@ -160,8 +160,8 @@ function renderExt(p, ctx, wMm) {
     const workRow = !G.work ? '' : lines.map(([r, cs], li) => `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:${C.length >= 4 && li % 2 ? '0.2em' : '0.45em'};margin-left:${g.em(sideMm - (li ? g.E * 1.28 : 0))}">`
         + cs.map((c) => {
             const i = r * C.length + c;
-            const v = sv ? '' : vAt(`part-${i}`);
-            const wink = iAt(`part-${i}`);
+            const v = sv ? ((sv[`sum-${i}`] && sv[`sum-${i}`].value) || '') : vAt(`part-${i}`);
+            const wink = sv ? ((sv[`sum-${i}`] && sv[`sum-${i}`].ink) || null) : iAt(`part-${i}`);
             const fill = v && wink ? `<span data-ws-ink="${wink}" style="font-weight:${wink === 'trace' ? 400 : 700};color:${wink === 'trace' ? INK.grey : INK.ink}">${esc(v)}</span>` : '';
             return `${i ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
                 + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
@@ -233,8 +233,8 @@ register('area-model', {
         // never runs wider than the model (it ran 207 mm at L on one line).
         const workLine = (idx, lead) => `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:${lead ? '0.2em' : '0.45em'};margin-left:${g.em(mulMm)}">`
             + idx.map((i, j) => {
-                const v = sv ? '' : vAt(`part-${i}`);
-                const wink = iAt(`part-${i}`);
+                const v = sv ? ((sv[`sum-${i}`] && sv[`sum-${i}`].value) || '') : vAt(`part-${i}`);
+                const wink = sv ? ((sv[`sum-${i}`] && sv[`sum-${i}`].ink) || null) : iAt(`part-${i}`);
                 const fill = v && wink ? `<span data-ws-ink="${wink}" style="font-weight:${wink === 'trace' ? 400 : 700};color:${wink === 'trace' ? INK.grey : INK.ink}">${esc(v)}</span>` : '';
                 return `${j || lead ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
                     + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
@@ -243,10 +243,10 @@ register('area-model', {
             ? workLine(parts.map((_, i) => i).slice(0, 2), false) + workLine(parts.map((_, i) => i).slice(2), true)
             : `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:0.45em;margin-left:${g.em(mulMm)}">`
             + parts.map((_, i) => {
-                // A step-by-step anchor (stepVals) fills the part boxes one step at a time; its
-                // work row stays empty so each step shows one new value.
-                const v = sv ? '' : vAt(`part-${i}`);
-                const wink = iAt(`part-${i}`);
+                // A step-by-step anchor (stepVals) fills the part boxes one step at a time; its work
+                // row is written by the ADD step (stepState's `sum-<i>`, with the total), never before.
+                const v = sv ? ((sv[`sum-${i}`] && sv[`sum-${i}`].value) || '') : vAt(`part-${i}`);
+                const wink = sv ? ((sv[`sum-${i}`] && sv[`sum-${i}`].ink) || null) : iAt(`part-${i}`);
                 const fill = v && wink ? `<span data-ws-ink="${wink}" style="font-weight:${wink === 'trace' ? 400 : 700};color:${wink === 'trace' ? INK.grey : INK.ink}">${esc(v)}</span>` : '';
                 return `${i ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
                     + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
@@ -301,6 +301,13 @@ register('area-model', {
             if (e && isExt(p)) return `${e[1]}-${e[2]}`;
             return WHOLE_SLOTS.has(slot) ? 'total' : null;
         });
+        // The ADD step (lf-ops sizes N-round, critic r2 N1, MODEL-FINAL-COMPLETE): the state that writes the total writes the
+        // parts on the work lines under the grid too, in the total's ink - "Add the parts: 2400 + 240 + 120 + 12" shows where
+        // the parts are written and added. Before it the work lines stay empty, so each earlier step shows only its part.
+        if (sv.total) {
+            const vals = isExt(p) ? extPartials(p) : partialsOf(p);
+            vals.forEach((v, i) => { sv[`sum-${i}`] = { value: (sv[`part-${i}`] && sv[`part-${i}`].value) || String(v), ink: sv.total.ink }; });
+        }
         return this.render(p, Object.assign({}, ctx, { state: 'blank', stepVals: sv }));
     },
 });
