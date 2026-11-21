@@ -15933,17 +15933,17 @@
  },
  {
   "id": "pass-chip-filter-skills",
-  "check": "owner 2026-11-21 (lead ruling A33): the Skills bar's 8/10 chip filters (aria-pressed, a count 8/10 · N skills); pressed, the cards shown are exactly REDESIGN_PASSED (Maths area, all grades) and only passed skills in every other view and search; an empty result says so; 'What does 8/10 mean?' beside it; 48 px",
+  "check": "owner 2026-11-21 (lead ruling A33, critic r1 D1-D6): the Skills bar's 8/10 chip filters (aria-pressed, a count 8/10 · N skills) in EVERY view: pressed, Maths area shows exactly REDESIGN_PASSED; White Rose, Standard, MAP and My sets show no empty step / standard / grade grid or header, every Add all / Add whole grade carries passed keys only, every Show all N / + Add all N equals what it then lists, the Standard view shows exactly each standard's passed skills, MAP is filtered or the chip is disabled with its note, at most one empty note; unpress returns the same card ids; 'What does 8/10 mean?' on the chip's row at 1366/1280/1024/820; 48 px",
   "kind": "commit-pair",
   "rule": "ws-teacher-library PASS-CHIP-FILTER",
   "browser": true,
   "fail": {
-   "commit": "5a51918eb",
-   "state": "origin/master: the 8/10 mark is explained in 'What the marks mean' only, no filter"
+   "commit": "04ec06c32",
+   "state": "critic r1 state: White Rose / Standard keep empty steps and unpassed Add all (filter after the cut), MAP unfiltered, two notes in My sets, the info link wraps off the chip's row at 1280 / 820"
   },
   "pass": {
-   "commit": "3ad1a57ef",
-   "state": "the 8/10 chip is a filter toggle with the explanation beside it"
+   "commit": "8e918994e",
+   "state": "r2 fix: every view filtered before grouping and the cut, MAP chip disabled with its note, one empty note, chip and info link in one nowrap group"
   },
   "command": "node tests/scripts/ws-teacher-library.cjs --only PASS-CHIP-FILTER",
   "expect": {
