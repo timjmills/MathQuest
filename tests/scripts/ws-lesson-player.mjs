@@ -982,7 +982,9 @@ async function hintsS2() {
             await fillAns(page, wrong);
             lm = await liveMarks(page);
             if (!lm.some((x) => x.mark === 'bad' && x.badge)) fail(M, `SP-31: the wrong answer ${wrong} shows no live wrong-digit mark (${JSON.stringify(lm)})`);
+            if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: join(SHOTS, 'wedo-pupil-1280-wrong-live.png') }); }
             await act(page, 'check');
+            if (SHOTS) await page.screenshot({ path: join(SHOTS, 'wedo-pupil-1280-wrong-checked.png') });
             st = await state(page);
             if (st.checked !== 'wrong' || st.rung !== 2) fail(M, `a wrong Check: ${st.checked}, rung ${st.rung} (want wrong, rung kept at 2)`);
             const before = await inputsOf(page);

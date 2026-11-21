@@ -15930,6 +15930,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-player-s2-hints",
+  "check": "ws-lesson-player --hints --slice2: We do items open at rungs 1 -> 2 -> 3, a right Check moves the next item down a rung and a wrong one keeps it (P-ON-7), Hint never writes into an answer box (P-ON-8), live per-digit marks with a badge (SP-31), black ink still between rungs, rung 3 = 'What comes next?' + its Steps row; board Hint / Next / Show answer; Warm-up Check and the 'If missed' route; pupil I do reads itself only with sound on (A17)",
+  "kind": "commit-pair",
+  "rule": "lesson-player card §2 We do + Warm-up, D6, P-ON-7, P-ON-8, SP-31 (lane lf-hosts slice 2)",
+  "browser": true,
+  "fail": {
+   "commit": "7e3421868",
+   "state": "master after slice 1: Warm-up and We do are 'coming soon', mode=pupil opens the Board, no partSeed"
+  },
+  "pass": {
+   "commit": "deac66eaa",
+   "state": "slice 2: We do hint fade and Warm-up in both modes"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --hints --slice2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-any-part",
+  "check": "ws-lesson-player --any-part --slice2: Warm-up and We do open as cells by ?part= in board AND pupil mode, the part bar jumps to every part, pupil mode resumes at the last part reached (D4), You do / Exit stay coming soon and navigable",
+  "kind": "commit-pair",
+  "rule": "PLAYER-ANY-PART slice 2 (lesson-player card D4, D11)",
+  "browser": true,
+  "fail": {
+   "commit": "7e3421868",
+   "state": "master after slice 1: Warm-up and We do are 'coming soon', mode=pupil opens the Board, no partSeed"
+  },
+  "pass": {
+   "commit": "deac66eaa",
+   "state": "slice 2: both parts and both modes open by URL; pupil resumes"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --any-part --slice2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-unit",
+  "check": "ws-lesson-player --unit --slice2: D2 partSeed(S, part, i) = S+100+i / S+200+i / S+300+i / S+900+i; the player's Warm-up and We do items equal the printed packet's own Warm-up and Guided items for the same seed (text, answer, seed; P-ON-5)",
+  "kind": "commit-pair",
+  "rule": "lesson-player card D2, P-ON-5 (lane lf-hosts slice 2)",
+  "browser": true,
+  "fail": {
+   "commit": "7e3421868",
+   "state": "master after slice 1: Warm-up and We do are 'coming soon', mode=pupil opens the Board, no partSeed"
+  },
+  "pass": {
+   "commit": "deac66eaa",
+   "state": "slice 2: Warm-up / We do = the packet's items"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --unit --slice2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-render",
+  "check": "ws-lesson-player --render --slice2 --widths 1280,820: Warm-up (every item) and We do (every item and rung) on the board, and I do / Warm-up / We do in pupil mode: no scroll, B&W Andika cell ink (feedback chrome excluded, SP-30), H13 < 30 %, the cell top level with the Steps / the stage top, < 30 % of the stage empty, digits in [signed, 1.25 x] (board 104 / 83, pupil 56 / 48; under it only where the drawing takes the whole stage), every button and answer input >= 64 px (board) / 48 px (pupil), the cell height constant across rungs",
+  "kind": "commit-pair",
+  "rule": "lesson-player card D5, A22, H13, SP-10 (lane lf-hosts slice 2)",
+  "browser": true,
+  "fail": {
+   "commit": "7e3421868",
+   "state": "master after slice 1: Warm-up and We do are 'coming soon', mode=pupil opens the Board, no partSeed"
+  },
+  "pass": {
+   "commit": "deac66eaa",
+   "state": "slice 2: every item / rung measured green at 1280 and 820"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --render --slice2 --widths 1280,820",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
- ]
+]
 }
