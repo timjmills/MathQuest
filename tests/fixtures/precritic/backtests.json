@@ -16290,6 +16290,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-r2-ri-amodel-overflow-l",
+   "check": "ws-cell-checks OVERFLOW on area-model Reason It L (4by1, 2by2, 3by2): A and B never overprint or leave the page - including the pages a capacity ruling (A9b, one a page) covers: a ruling never clears an OVERFLOW",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r1 F5; LESSONS_LEARNED Process rule 19",
+   "browser": true,
+   "fail": {
+    "commit": "c180eacc6",
+    "state": "area-model footprint gave no true width (workW 0): BESIDE layout, A and B ran over each other and off the page; 2by2 / 3by2 L ruled A9b yet overflowing"
+   },
+   "pass": {
+    "commit": "a815b980c",
+    "state": "reason-it FULL layout for an area model wider than the panel beside the response; stacked copies drop the work lines (noWork)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:area_model_4by1,multiplication:area_model_2by2,multiplication:area_model_3by2 --roles reason-it --size L --rules OVERFLOW",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
