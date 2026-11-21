@@ -15,13 +15,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const ONLY = (() => { const i = process.argv.indexOf('--only'); return i > -1 ? process.argv[i + 1] : ''; })();
 const SHOTS = (() => { const i = process.argv.indexOf('--shots'); return i > -1 ? process.argv[i + 1] : ''; })();
 
-/* PASS-CHIP-FILTER (owner 2026-11-21, lead ruling A33): the Skills bar's 8/10 chip is a FILTER toggle (aria-pressed, a
-   count "8/10 · N skills"); pressed, the cards shown in every view are exactly the passed skills (REDESIGN_PASSED) - all of
-   them in the Maths area view at all grades; an empty result says so; "What does 8/10 mean?" beside it; 48 px targets. */
+/* PASS-CHIP-FILTER (owner 2026-11-21, lead ruling A33; strengthened after critic r1 D1-D6): the Skills bar's 8/10 chip is a
+   FILTER toggle (aria-pressed, a count "8/10 · N skills"). Pressed, in EVERY view (Maths area, White Rose, Standard, MAP,
+   My sets): only passed skills (REDESIGN_PASSED) are shown, no empty step / standard / grade / area grid or header is left,
+   every "+ Add all N" and "Add whole ..." adds only passed skills, nothing passed hides behind a cut (the Standard view's
+   passed skills equal each standard's passed skills; White Rose's equal the passed skills linked to its steps), every count
+   ("Show all N", "+ Add all N", the chip) equals what is listed, pressed or not, and at most one empty note shows. MAP is
+   either filtered or shows the chip disabled with "8/10 filter: not available in MAP view". Unpressing returns the SAME card
+   ids. "What does 8/10 mean?" sits on the chip's row at 1366, 1280, 1024 and 820; 48 px targets. */
 async function passChipFilter(page, check, { shots = '' } = {}) {
   const tag = 'PASS-CHIP-FILTER';
   const fs = require('fs');
-  const shot = async (name) => { if (shots) { fs.mkdirSync(shots, { recursive: true }); await page.screenshot({ path: require('path').join(shots, name) }); } };
+  const shot = async (name) => { if (shots) { fs.mkdirSync(shots, { recursive: true }); await page.evaluate(() => { const f = document.querySelector('[data-screen="skills"].is-active .ts-filters'); if (f) f.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0); }); await page.screenshot({ path: require('path').join(shots, name) }); } };
   await page.evaluate(() => { try { localStorage.removeItem('mq_teacher_skills_ui'); } catch (e) {} window.tvGo('skills'); });
   await waitFor(page, () => !!document.querySelector('[data-screen="skills"].is-active #tsList'), 20000, 'skills screen');
   await sleep(400);
@@ -32,30 +37,160 @@ async function passChipFilter(page, check, { shots = '' } = {}) {
   check(!!chip0, `${tag}: no 8/10 chip with aria-pressed on the Skills bar`);
   if (!chip0) return;
   const click = async (sel) => { await page.$eval(sel, (b) => b.click()); await sleep(450); };
+  const browse = async (v) => { await click(`#tsBrowse [data-arg="${v}"]`); await sleep(300); };
+  const cardIds = () => page.$$eval('#tsList .ts-card[data-skill]', (c) => [...new Set(c.map((x) => x.dataset.skill))].sort());
+  const openAll = async () => { for (let i = 0; i < 300; i++) { const more = await page.$('#tsList [data-act="showall"], #tsList [data-act="more"]'); if (!more) break; await more.evaluate((b) => b.click()); await sleep(250); } };
+  // "Show all N": open each cut one at a time and check N against what it then lists
+  const openAllCounted = async (v) => {
+    for (let i = 0; i < 300; i++) {
+      const rec = await page.evaluate(() => {
+        const box = document.querySelector('#tsList');
+        const b = box.querySelector('[data-act="showall"], [data-act="more"]');
+        if (!b) return null;
+        const secs = [...box.querySelectorAll('.ts-group')];
+        const sec = b.closest('.ts-group');
+        const std = b.closest('.ts-std');
+        const r = { act: b.dataset.act, text: b.textContent.replace(/\s+/g, ' ').trim(), s: secs.indexOf(sec), d: std && sec ? [...sec.querySelectorAll('.ts-std')].indexOf(std) : -1 };
+        b.click();
+        return r;
+      });
+      if (!rec) break;
+      await sleep(250);
+      if (rec.act !== 'showall') continue;
+      const n = +((rec.text.match(/Show all (\d+)/) || [])[1]);
+      const got = await page.evaluate((r) => {
+        const sec = [...document.querySelectorAll('#tsList .ts-group')][r.s];
+        if (!sec) return -1;
+        if (r.d > -1) return [...sec.querySelectorAll('.ts-std')][r.d].querySelectorAll('.ts-card[data-skill]').length;
+        if (/steps/.test(r.text)) return sec.querySelectorAll('.ts-step').length;
+        if (sec.querySelector('.ts-std')) return sec.querySelectorAll('.ts-std').length;
+        if (sec.querySelector('.ts-task')) return sec.querySelectorAll('.ts-task').length;
+        return sec.querySelectorAll('.ts-card[data-skill]').length;
+      }, rec);
+      check(got === n, `${tag}: "${v}" view: "${rec.text}" then lists ${got}`);
+    }
+  };
+  // one view's structure: empty grids / headers, Add-all keys and counts, empty notes
+  const audit = async (v, pressed) => {
+    const bad = await page.evaluate((Pa, pressed) => {
+      const S = new Set(Pa); const out = [];
+      const box = document.querySelector('#tsList');
+      const nCards = (el) => el.querySelectorAll('.ts-card[data-skill]').length;
+      const txt = (el) => (el ? el.textContent.replace(/\s+/g, ' ').trim().slice(0, 60) : '');
+      if (pressed) {
+        box.querySelectorAll('.ts-grid').forEach((g) => { if (!nCards(g)) out.push(`empty grid under "${txt(g.previousElementSibling)}"`); });
+        box.querySelectorAll('.ts-group').forEach((g) => { if (!nCards(g) && !g.querySelector('.ts-task')) out.push(`empty header "${txt(g.querySelector('.ts-band, h2, h3') || g)}"`); });
+        box.querySelectorAll('.ts-std').forEach((g) => { if (!nCards(g)) out.push(`empty standard "${txt(g.querySelector('.ts-step'))}"`); });
+        const heads = [...box.querySelectorAll('.ts-grade-head')];
+        heads.forEach((h, i) => {
+          let n = 0;
+          for (let e = h.nextElementSibling; e && e !== heads[i + 1]; e = e.nextElementSibling) n += (e.matches('.ts-card[data-skill]') ? 1 : 0) + nCards(e);
+          if (!n) out.push(`empty grade header "${txt(h)}"`);
+        });
+        const notes = [...box.querySelectorAll('.ts-note')].filter((p) => /^(No |Nothing |8\/10 filter)/.test(p.textContent.trim()));
+        if (notes.length > 1) out.push(`${notes.length} empty notes at once: ${notes.map((p) => `"${txt(p)}"`).join(' + ')}`);
+      }
+      box.querySelectorAll('[data-act="addkeys"]').forEach((b) => {
+        const keys = (b.dataset.arg || '').split(',').filter(Boolean);
+        const n = +((b.textContent.match(/(\d+)/) || [])[1]);
+        if (pressed) { const un = keys.filter((k) => !S.has(k)); if (un.length) out.push(`"${txt(b)}" (${b.dataset.what}) adds ${un.length} unpassed: ${un.slice(0, 2)}`); }
+        if (n !== keys.length) out.push(`"${txt(b)}" (${b.dataset.what}) carries ${keys.length} keys`);
+        const host = b.closest('.ts-std') || (b.closest('.ts-step') && b.closest('.ts-step').nextElementSibling);
+        if (host && !host.querySelector('[data-act="showall"]') && !(host.nextElementSibling && host.nextElementSibling.matches('[data-act="showall"]')) && nCards(host) !== n) out.push(`"${txt(b)}" (${b.dataset.what}) but ${nCards(host)} cards listed`);
+      });
+      return out;
+    }, passed, pressed);
+    bad.slice(0, 6).forEach((m) => check(false, `${tag}: ${pressed ? 'pressed' : 'unpressed'}, "${v}" view: ${m}`));
+    if (bad.length > 6) check(false, `${tag}: ${pressed ? 'pressed' : 'unpressed'}, "${v}" view: ... and ${bad.length - 6} more`);
+  };
+
+  // "What does 8/10 mean?" on the chip's row, at 1366, 1280, 1024 and 820
+  const vp0 = page.viewport();
+  for (const w of [1366, 1280, 1024, 820]) {
+    await page.setViewport({ width: w, height: 768, deviceScaleFactor: 1 });
+    await sleep(250);
+    const row = await page.evaluate(() => { const s = document.querySelector('[data-screen="skills"].is-active .ts-marks > summary'); const c = document.querySelector('#tsPassChip [aria-pressed]'); if (!s || !c) return null; const a = c.getBoundingClientRect(); const b = s.getBoundingClientRect(); return { chipTop: Math.round(a.top), chipRight: Math.round(a.right), infoTop: Math.round(b.top), infoLeft: Math.round(b.left) }; });
+    check(row && Math.abs(row.chipTop - row.infoTop) <= 4 && row.infoLeft >= row.chipRight - 1, `${tag}: at ${w} px "What does 8/10 mean?" is not on the chip's row: ${JSON.stringify(row)}`);
+  }
+  await page.setViewport(vp0);
+  await sleep(250);
+
   await page.evaluate(() => { const b = document.querySelector('#tsBrowse [data-arg="area"]'); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); });
   await sleep(300);
   if ((await page.$eval('#tsGrades [data-arg="ALL"]', (b) => b.getAttribute('aria-pressed'))) !== 'true') await click('#tsGrades [data-arg="ALL"]');
   const info = await page.evaluate(() => { const s = document.querySelector('[data-screen="skills"].is-active .ts-marks > summary'); const c = document.querySelector('#tsPassChip [aria-pressed]'); return { text: s ? s.textContent.trim() : '', h: s ? s.getBoundingClientRect().height : 0, ch: c.getBoundingClientRect().height, label: c.textContent.replace(/\s+/g, ' ').trim(), pressed: c.getAttribute('aria-pressed') }; });
   check(/What does 8\/10 mean\?/.test(info.text) && info.h >= 47.5, `${tag}: no "What does 8/10 mean?" beside the chip (or under 48 px): ${JSON.stringify(info)}`);
   check(info.ch >= 47.5 && info.pressed === 'false', `${tag}: the chip is under 48 px or starts pressed: ${JSON.stringify(info)}`);
-  check(info.label === `✓8/10 · ${P.size} skills` || info.label === `✓ 8/10 · ${P.size} skills` || info.label.endsWith(`8/10 · ${P.size} skills`), `${tag}: the chip reads "${info.label}", want "8/10 · ${P.size} skills"`);
+  check(info.label.endsWith(`8/10 · ${P.size} skills`), `${tag}: the chip reads "${info.label}", want "8/10 · ${P.size} skills"`);
   await shot('skills-bar-unpressed.png');
+
+  // unpressed at Grade 2: the card ids to come back, and the counts of the White Rose and Standard views
+  await click('#tsGrades [data-arg="2"]');
+  await openAll();
+  const before = await cardIds();
+  for (const v of ['wrm', 'std']) { await browse(v); await audit(v, false); }
+  await browse('area');
+  await click('#tsGrades [data-arg="ALL"]');
+
   await click(chipSel);
   check((await page.$eval(chipSel, (b) => b.getAttribute('aria-pressed'))) === 'true', `${tag}: the chip is not pressed after a click`);
-  for (let i = 0; i < 8; i++) { const more = await page.$('#tsList [data-act="showall"], #tsList [data-act="more"]'); if (!more) break; await more.evaluate((b) => b.click()); await sleep(300); }
-  const shown = await page.$$eval('#tsList .ts-card[data-skill]', (c) => [...new Set(c.map((x) => x.dataset.skill))]);
+  await openAll();
+  const shown = await cardIds();
   const wrong = shown.filter((k) => !P.has(k));
   const missing = passed.filter((k) => !shown.includes(k));
   check(!wrong.length && !missing.length, `${tag}: pressed, the Maths area view (all grades) shows ${shown.length} skills: ${wrong.length} not passed (${wrong.slice(0, 3)}), ${missing.length} passed ones missing (${missing.slice(0, 3)})`);
-  await page.evaluate(() => window.scrollTo(0, 0));
+  const eb = await page.$eval('#tsEyebrow', (e) => e.textContent);
+  check(new RegExp(`\\b${shown.length} skills?\\b`).test(eb), `${tag}: pressed, the Maths area eyebrow reads "${eb}" but ${shown.length} skills are listed`);
+  await audit('area', true);
   await shot('skills-bar-pressed.png');
-  for (const v of ['wrm', 'std', 'sets']) {
-    await click(`#tsBrowse [data-arg="${v}"]`);
+
+  // the expected passed skills of the White Rose and Standard views, all grades
+  const expect = await page.evaluate((Pa) => Promise.all(['wrm.js', 'standards.js', 'teacher-standards.js', 'teacher-ui.js'].map((f) => import(new URL(`js/modules/${f}`, location.href).href))).then(([W, St, TS, UI]) => {
+    const S = new Set(Pa);
+    const cat = new Set(UI.skillCatalogue().map((s) => `${s.categoryId}:${s.skillId}`));
+    const ok = (k) => cat.has(k) && S.has(k);
+    const wrm = new Set();
+    ['K', '1', '2', '3', '4', '5', '6'].forEach((g) => { const y = W.WRM_YEARS.find((x) => x.usGrade === g); if (y) W.WRM_STEPS.filter((st) => st.id.startsWith(`${y.id}.`)).forEach((st) => W.skillsForWrmStep(st.id).filter(ok).forEach((k) => wrm.add(k))); });
+    const std = {};
+    ['K', '1', '2', '3', '4', '5', '6'].forEach((g) => TS.coverageRows(St, { fw: 'ccss', grade: g }).forEach((r) => { const l = r.short || r.code; const ks = r.skills.filter(ok); if (ks.length) std[l] = [...new Set([...(std[l] || []), ...ks])].sort(); }));
+    return { wrm: [...wrm].sort(), std };
+  }), passed);
+
+  // My sets first (an empty tray, no sets yet): one empty note only
+  await browse('sets');
+  await audit('sets', true);
+  for (const v of ['wrm', 'std']) {
+    await browse(v);
     await sleep(500);
-    const c = await page.$$eval('#tsList .ts-card[data-skill]', (x) => x.map((y) => y.dataset.skill));
+    await shot(`pressed-${v}-top.png`);
+    await openAllCounted(v);
+    const c = await cardIds();
     check(c.every((k) => P.has(k)), `${tag}: pressed, the "${v}" view shows skills that did not pass: ${c.filter((k) => !P.has(k)).slice(0, 3)}`);
+    await audit(v, true);
+    if (v === 'wrm') {
+      const miss = expect.wrm.filter((k) => !c.includes(k));
+      check(!miss.length, `${tag}: pressed, the White Rose view (all grades, every cut opened) hides ${miss.length} passed skills linked to its steps: ${miss.slice(0, 3)}`);
+    } else {
+      const got = await page.$$eval('#tsList .ts-std', (ss) => { const o = {}; ss.forEach((s) => { const l = (s.querySelector('.ts-gpill') || {}).textContent || '?'; o[l] = [...new Set([...(o[l] || []), ...[...s.querySelectorAll('.ts-card[data-skill]')].map((x) => x.dataset.skill)])].sort(); }); return o; });
+      const diff = [...new Set([...Object.keys(got), ...Object.keys(expect.std)])].filter((l) => JSON.stringify(got[l] || []) !== JSON.stringify(expect.std[l] || []));
+      check(!diff.length, `${tag}: pressed, the Standard view (all grades, every cut opened): ${diff.length} standards do not show exactly their passed skills: ${diff.slice(0, 3).map((l) => `${l} shows ${(got[l] || []).length} want ${(expect.std[l] || []).length}`).join('; ')}`);
+    }
   }
-  await click('#tsBrowse [data-arg="area"]');
+  // MAP: filtered, or the chip disabled with its note
+  await browse('map');
+  await sleep(500);
+  await shot('pressed-map-top.png');
+  const map = await page.evaluate((Pa) => import(new URL('js/modules/teacher-map-tasks.js', location.href).href).then((m) => m.mapTaskList()).then((T) => {
+    const S = new Set(Pa);
+    const c = document.querySelector('#tsPassChip [aria-pressed]');
+    const note = [...document.querySelectorAll('#tsList .ts-note')].map((p) => p.textContent.trim());
+    const tasks = [...document.querySelectorAll('#tsList .ts-task[data-arg]')].map((b) => T[+b.dataset.arg]).filter(Boolean);
+    return { disabled: c && c.getAttribute('aria-disabled') === 'true', h: c ? c.getBoundingClientRect().height : 0, note: note.includes('8/10 filter: not available in MAP view'), passNote: !!document.querySelector('#tsList [data-ts-empty="only"]'), unpassed: tasks.filter((t) => !t.skills.some((k) => S.has(k))).length, tasks: tasks.length };
+  }), passed);
+  if (map.disabled) check(map.note && map.h >= 47.5 && !map.passNote, `${tag}: MAP view: the chip is disabled but ${JSON.stringify(map)} (want the note "8/10 filter: not available in MAP view", 48 px, no 8/10 empty note)`);
+  else check(!map.unpassed, `${tag}: pressed, the MAP view shows ${map.unpassed} of ${map.tasks} tasks with no passed skill and the chip is not disabled`);
+  await audit('map', true);
+  await browse('area');
   await page.evaluate(() => { const s = document.querySelector('#tsSearch'); s.value = 'add within 20'; s.dispatchEvent(new Event('input', { bubbles: true })); });
   await sleep(700);
   const hits = await page.$$eval('#tsList .ts-card[data-skill]', (x) => x.map((y) => y.dataset.skill));
@@ -69,12 +204,26 @@ async function passChipFilter(page, check, { shots = '' } = {}) {
     await click(`#tsGrades [data-arg="${emptyG}"]`);
     const em = await page.evaluate(() => ({ cards: document.querySelectorAll('#tsList .ts-card[data-skill]').length, note: (document.querySelector('#tsList [data-ts-empty="only"]') || {}).textContent || '' }));
     check(!em.cards && /No skill here has passed 8\/10 yet/.test(em.note), `${tag}: grade ${emptyG} with the chip pressed: ${JSON.stringify(em)}`);
-    await click('#tsGrades [data-arg="ALL"]');
+    await audit(`area, grade ${emptyG}`, true);
   }
+  // "Add whole grade" / "Add all N grades" adds passed skills only
+  await click('#tsGrades [data-arg="ALL"]');
+  const tray0 = await page.evaluate(() => import(new URL('js/modules/teacher-tray.js', location.href).href).then((m) => m.trayKeys()));
+  if (await page.$('#tsList [data-act="addgrade"]')) {
+    await click('#tsList [data-act="addgrade"]');
+    const tray1 = await page.evaluate(() => import(new URL('js/modules/teacher-tray.js', location.href).href).then((m) => m.trayKeys()));
+    const added = tray1.filter((k) => !tray0.includes(k));
+    check((added.length || tray1.some((k) => P.has(k))) && added.every((k) => P.has(k)), `${tag}: pressed, "Add whole grade" added ${added.length} skills, ${added.filter((k) => !P.has(k)).length} unpassed: ${added.filter((k) => !P.has(k)).slice(0, 3)}`);
+  }
+  // unpress: the same card ids come back (Grade 2, every cut opened)
+  await click('#tsGrades [data-arg="2"]');
   await click(chipSel);
   check((await page.$eval(chipSel, (b) => b.getAttribute('aria-pressed'))) === 'false', `${tag}: the chip does not turn off`);
-  const after = await page.$$eval('#tsList .ts-card[data-skill]', (c) => c.length);
-  check(after > shown.length, `${tag}: unpressed, the view did not come back (${after} cards)`);
+  await openAll();
+  const after = await cardIds();
+  const lost = before.filter((k) => !after.includes(k));
+  const extra = after.filter((k) => !before.includes(k));
+  check(!lost.length && !extra.length, `${tag}: unpressed, Grade 2 does not come back the same: ${lost.length} cards gone (${lost.slice(0, 3)}), ${extra.length} new (${extra.slice(0, 3)})`);
 }
 
 (async () => {

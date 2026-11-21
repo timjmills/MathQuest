@@ -574,3 +574,6 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-passchip:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: 2px; }
 #teacherApp .ts-marks > summary { min-height: 48px; }
 #teacherApp .ts-marks-i { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1.5px solid var(--text); border-radius: 50%; font: italic var(--fw-700) 12px/1 var(--font-ui); }
+/* lf-checks passchip r2 (critic r1 D5, D3): the 8/10 chip and "What does 8/10 mean?" stay on one row; the chip disabled in MAP */
+#teacherApp .ts-passgrp { display: inline-flex; flex-wrap: nowrap; align-items: center; gap: var(--sp-8, 8px); }
+#teacherApp .ts-passchip[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
