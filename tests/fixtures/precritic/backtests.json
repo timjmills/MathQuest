@@ -16310,6 +16310,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-r2-screen-clip",
+   "check": "ws-screen-slots SCREEN-CLIP (runs with --screen-digit, as precritic does): on the card, the online worksheet and the quiz at 1280 / 1366 / 820 / 1024, every kit cell's ink lies inside its cell and inside every clipping box above it",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r1 F6 (area_model_4by1: the 4th part cut off in the quiz at 820 / 1024 / 1280 and on the 820 card; H2 / H6)",
+   "browser": true,
+   "fail": {
+    "commit": "c180eacc6",
+    "state": "the quiz paper held at 720 px and the 820 card's visual pane at 703 px: the 15.4 em model at its 48 / 56 px floor ran past them"
+   },
+   "pass": {
+    "commit": "78bedb2d4",
+    "state": "screen-cell.css: the quiz paper widens to the card for an area model; the card's side padding narrows below 1024 px"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:area_model_4by1 --screen-clip 2>&1 | grep -E '^ws-screen-slots: (OK|FAIL)'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
