@@ -23,10 +23,10 @@
 //   #wrm/<grade>/<unit>/<n|slug> a lesson (unchanged from the unit pages, so old bookmarks still open it)
 // The sequence and link data (~350 KB with standards) load the first time the screen opens, never at boot.
 
-import { icon, esc, hideToast, toast, copyText, findSkill } from './teacher-ui.js';
+import { icon, esc, hideToast, toast, copyText, findSkill, savedSets, writeSets, setLessonEntries, setWhatText } from './teacher-ui.js';
 import { skillView, viewToggleHTML } from './teacher-preview.js';
 import { createPicker, liveKey, skillLabelOf, makePracticeLink, k2p } from './teacher-skillpick.js';
-import { restoreTray, syncTray, trayAddLesson, trayLessons, trayBorrow, trayReturn, trayKeys } from './teacher-tray.js';
+import { restoreTray, syncTray, trayAddLesson, trayLessons, trayBorrow, trayReturn, trayKeys, setTrayContext, TRAY_SET_ID } from './teacher-tray.js';
 import { setPrintExtra, onSheetClose, printBatch } from './teacher-sheet.js';
 import { buildSheet } from './print-sheet.js';
 import { printHtml } from './teacher-print.js';
@@ -629,10 +629,65 @@ function tickedItems() {
 }
 const preItems = () => (links ? links.prereq : []).filter((x) => liveKey(x.key)).map((x) => { const [c, sk] = x.key.split(':'); return x.opts && Object.keys(x.opts).length ? { categoryId: c, skillId: sk, weight: 1, opts: x.opts } : { categoryId: c, skillId: sk, weight: 1 }; });
 
+/* ================================================================= What to send (lf-wrmsend, owner ruling A34, 2026-11-21)
+ * One choice says what every action sends: This lesson | These N skills | Lesson + N skills.
+ *   This lesson    = the made lesson (Print), its "Skills that teach" practice (Share, Tray), a lesson entry (Set).
+ *   These N skills = the ticked skills with their options.
+ *   Lesson + N     = both. The default follows the ticks (Lesson + N when skills are ticked, This lesson when none);
+ * a lesson the app cannot make has no "This lesson" / "Lesson + N" (reason stated). The teacher's own pick is kept
+ * while it stays possible on this lesson. */
+const send = { lesson: '', choice: '', pop: false, naming: false };
+function teachItems() {
+    return (links ? links.direct : []).filter((x) => liveKey(x.key)).map((x) => { const [c, sk] = x.key.split(':'); return x.opts && Object.keys(x.opts).length ? { categoryId: c, skillId: sk, weight: 1, opts: x.opts } : { categoryId: c, skillId: sk, weight: 1 }; });
+}
+const kOf = (x) => `${x.categoryId}:${x.skillId}`;
+function sendChoice(l) {
+    if (send.lesson !== (l ? l.key : '')) { send.lesson = l ? l.key : ''; send.choice = ''; send.pop = false; send.naming = false; }
+    const n = pick.ticked.size;
+    const made = !!madeLesson(l);
+    const ok = (c) => (c === 'lesson' ? made : c === 'both' ? made && n > 0 : true);
+    if (send.choice && ok(send.choice)) return send.choice;
+    return n ? (made ? 'both' : 'skills') : (made ? 'lesson' : 'skills');
+}
+/** What the current choice sends: { choice, lesson: {key, name, made} | null, skills: ticked items, teach: the lesson's practice }. */
+function sendPayload(l, c = sendChoice(l)) {
+    return { choice: c, lesson: c === 'skills' ? null : { key: l.key, name: lessonName(l), made: madeLesson(l) }, skills: c === 'lesson' ? [] : tickedItems(), teach: teachItems() };
+}
+/** The pupils' practice the choice sends: the ticked skills, the lesson's teaching skills, or both (each once, the lesson's options first). */
+function practiceOf(p) {
+    const out = p.lesson ? p.teach.slice() : [];
+    for (const x of p.skills) if (!out.some((y) => kOf(y) === kOf(x))) out.push(x);
+    return out;
+}
+const plu = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+/** "Lesson 7: Compare amounts + 3 skills" · "3 skills" · "Lesson 7: Compare amounts". */
+function whatWords(p) { return p.lesson ? (p.skills.length ? `${p.lesson.name} + ${plu(p.skills.length, 'skill')}` : p.lesson.name) : plu(p.skills.length, 'skill'); }
+function sendRecord(act, p, extra = {}) {
+    // read by ws-teacher-wrm SEND-WHAT: what an action actually sent (the lesson's key and every skill with its options)
+    window.tvwLastSend = Object.assign({ act, choice: p.choice, lesson: p.lesson ? p.lesson.key : null, what: whatWords(p) }, extra);
+}
+const optsOf = (x) => (x.opts ? JSON.parse(JSON.stringify(x.opts)) : null);
+
 function actsHTML(l) {
     const n = pick.ticked.size;
-    const dis = n ? '' : ' aria-disabled="true" data-why="Tick skills first"';
     const made = madeLesson(l);
+    const c = sendChoice(l);
+    const p = sendPayload(l, c);
+    const noMade = 'This lesson has no lesson to print yet: send its skills.';
+    const seg = (id, label, why) => `<button type="button" data-w-send="${id}" aria-pressed="${c === id}"${why ? ` aria-disabled="true" data-why="${esc(why)}" title="${esc(why)}"` : ''}>${esc(label)}</button>`;
+    const nSk = n ? plu(n, 'skill') : 'skills';
+    const lname = lessonName(l);
+    const nT = p.teach.length;
+    const cap = c === 'lesson' ? `What goes: ${lname} (the lesson to print; its practice is ${nT ? plu(nT, 'skill') + ' that teach' + (nT === 1 ? 'es' : '') + ' it' : 'not tagged yet'}).`
+        : c === 'skills' ? (n ? `What goes: only the ${plu(n, 'ticked skill')}, not the lesson.` : 'Tick skills below to send them.')
+            : `What goes: ${lname} and its ${plu(n, 'ticked skill')}.`;
+    const empty = !practiceOf(p).length && !p.lesson;
+    const dis = empty ? ' aria-disabled="true" data-why="Tick skills first"' : '';
+    const word = c === 'lesson' ? 'lesson' : c === 'skills' ? nSk : `lesson + ${nSk}`;
+    const printL = `Print ${word}`;
+    const shareL = c === 'lesson' ? 'Share lesson practice' : `Share ${word}`;
+    const shareDis = !practiceOf(p).length ? ` aria-disabled="true" data-why="${c === 'lesson' ? 'No skills teach this lesson yet' : 'Tick skills first'}"` : '';
+    const trayL = `Add ${word} to tray`;
     const nPre = preItems().length;
     const nx = nextLesson();
     const count = n ? `${n} skill${n === 1 ? '' : 's'} selected` : 'Tick the skills you want';
@@ -640,21 +695,59 @@ function actsHTML(l) {
         ? `<div class="tvw-linkbox"><label class="tvw-link-l" for="tvwLink">${esc(pick.linkNote || 'Practice link for pupils')}</label>
             <div class="tvw-linkrow"><input id="tvwLink" class="tv-input tvw-link" readonly value="${esc(pick.link)}">
             <button type="button" class="tv-btn" data-w-act="copy">${icon('copy', 18)}<span>Copy</span></button></div></div>` : '';
-    return `<section class="tv-card tvw-acts" id="tvwBar" aria-label="Print and share this lesson">
+    return `<section class="tv-card tvw-acts" id="tvwBar" aria-label="Print and share this lesson" data-w-choice="${c}">
+        <div class="tvw-send"><div class="tv-h3" id="tvwSendH">What to send</div>
+          <div class="ts-seg tvw-send-seg" role="group" aria-labelledby="tvwSendH">${seg('lesson', 'This lesson', made ? '' : noMade)}${seg('skills', n === 1 ? 'This skill' : n ? `These ${nSk}` : 'Ticked skills', '')}${seg('both', `Lesson + ${nSk}`, made ? (n ? '' : 'Tick skills first') : noMade)}</div>
+          <p class="tv-cap tvw-send-cap" id="tvwSendCap">${esc(cap)}</p></div>
         <div class="tvw-acts-main">
-          ${made ? `<button type="button" class="tv-btn tv-btn-primary" data-w-act="lesson" data-w-made="${made.kind}">${icon('book', 18)}<span>Print lesson</span></button>` : ''}
-          <button type="button" class="tv-btn${made ? '' : ' tv-btn-primary'}" data-w-act="print"${dis}>${icon('print', 18)}<span>Print practice</span></button>
-          <button type="button" class="tv-btn" data-w-act="link"${dis}>${icon('link', 18)}<span>Share practice</span></button>
-          ${nPre ? `<button type="button" class="tv-btn" data-w-act="pre">${icon('back', 18)}<span>Practise pre-skills</span></button>` : ''}
+          <button type="button" class="tv-btn tv-btn-primary" data-w-act="print"${dis}>${icon('print', 18)}<span>${esc(printL)}</span></button>
+          <button type="button" class="tv-btn" data-w-act="link"${shareDis}>${icon('link', 18)}<span>${esc(shareL)}</span></button>
+          <button type="button" class="tv-btn" data-w-act="tray"${shareDis}>${icon('plus', 18)}<span>${esc(trayL)}</span></button>
+          <button type="button" class="tv-btn" data-w-act="set" aria-expanded="${send.pop}" aria-controls="tvwSetPop"${dis}>${icon('bookmark', 18)}<span>Add to a set</span></button>
         </div>
-        <div class="tvw-acts-sub"><div class="tv-actionbar-text"><div class="tv-h3">${count}</div>
-            <p class="tv-cap">${n ? 'Print, share, or add them to the tray as this lesson.' : 'Tick skills below.'}</p></div>
-          <div class="tvw-acts-tray"><button type="button" class="tv-btn" data-w-act="tray"${dis}>${icon('plus', 18)}<span>Add to tray</span></button>
-            ${nx ? `<button type="button" class="tv-btn" data-w-nextl="${esc(nx.key)}" aria-label="${esc(`Next lesson: ${nx.title}`)}"><span>Next lesson</span>${icon('chevR', 18)}</button>` : ''}</div></div>
+        ${send.pop ? setPopHTML(p) : ''}
         ${left}
-      </section>`;
+      </section>
+      <div class="tvw-acts-sub tvw-acts-after"><div class="tv-actionbar-text"><div class="tv-h3 tvw-count">${count}</div>
+          <p class="tv-cap">${n ? 'Tick the skills you want below. The choice above says what goes.' : 'Tick skills below.'}</p></div>
+        <div class="tvw-acts-tray">${nPre ? `<button type="button" class="tv-btn" data-w-act="pre">${icon('back', 18)}<span>Practise pre-skills</span></button>` : ''}
+          ${nx ? `<button type="button" class="tv-btn" data-w-nextl="${esc(nx.key)}" aria-label="${esc(`Next lesson: ${nx.title}`)}"><span>Next lesson</span>${icon('chevR', 18)}</button>` : ''}</div></div>`;
 }
-
+function setPopHTML(p) {
+    const sets = savedSets().filter((s) => s.id !== TRAY_SET_ID);
+    return `<div class="tvw-setpop" id="tvwSetPop" role="dialog" aria-label="Add to a set">
+        <div class="tv-h3">Add to a set</div>
+        <p class="tv-cap tvw-setpop-sum"><b>Adds:</b> ${esc(whatWords(p))}</p>
+        ${sets.length ? `<div class="tvw-setpop-list" role="group" aria-label="Your sets">${sets.map((s) => `<button type="button" class="tv-btn" data-w-setto="${esc(s.id)}"><span>${esc(s.name || 'Untitled set')}</span><span class="tvw-setpop-n">${esc(setWhatText(s))}</span></button>`).join('')}</div>` : '<p class="tv-cap">No sets yet: make a new one.</p>'}
+        ${send.naming ? `<div class="tvw-setpop-new"><label class="tv-cap" for="tvwSetName">Name of the new set</label>
+          <div class="tvw-linkrow"><input id="tvwSetName" class="tv-input" value="${esc(p.lesson ? p.lesson.name : 'New set')}"><button type="button" class="tv-btn tv-btn-primary" data-w-setsave>${icon('bookmark', 18)}<span>Save set</span></button></div></div>`
+        : `<button type="button" class="tv-btn tv-btn-primary" data-w-setnew>${icon('plus', 18)}<span>New set…</span></button>`}
+      </div>`;
+}
+/** Add what the choice sends to a saved set (id) or a new one (name): skills as ordinary entries, the lesson once as {kind:'lesson', key}. */
+function addToSet(id, name) {
+    const l = L.lessonByKey(v.lesson);
+    if (!l) return;
+    const p = sendPayload(l);
+    const list = savedSets();
+    const now = Date.now();
+    let rec = id ? list.find((s) => s.id === id) : null;
+    if (id && !rec) { toast('That set is gone'); return; }
+    if (!rec) rec = { id: 'set_' + now.toString(36) + Math.random().toString(36).slice(2, 6), name: String(name || whatWords(p)).trim() || 'New set', createdAt: now, skills: [] };
+    rec = { ...rec, skills: (rec.skills || []).slice(), lastUsed: now };
+    for (const x of p.skills) if (!rec.skills.some((y) => kOf(y) === kOf(x))) rec.skills.push(x.opts ? { categoryId: x.categoryId, skillId: x.skillId, weight: 1, opts: x.opts } : { categoryId: x.categoryId, skillId: x.skillId, weight: 1 });
+    if (p.lesson) {
+        const ents = setLessonEntries(rec);
+        if (!ents.some((e) => e.key === p.lesson.key)) ents.push({ kind: 'lesson', key: p.lesson.key, name: p.lesson.name });
+        rec.entries = ents;
+    }
+    writeSets([rec, ...list.filter((s) => s.id !== rec.id)]);
+    sendRecord('set', p, { set: rec.id, skills: p.skills.map((x) => ({ key: kOf(x), opts: optsOf(x) })) });
+    send.pop = false; send.naming = false;
+    redrawActs();
+    root.querySelector('#tvwBar [data-w-act="set"]')?.focus({ preventScroll: true });
+    toast(`Added to “${rec.name}”: ${whatWords(p)}`);
+}
 /** Open a sheet on ONLY these skills; the tray comes back when it closes. */
 function sheetWith(kind, items, title = '') {
     if (typeof window.tvOpenSheet !== 'function') { toast('Not ready yet'); return; }
@@ -665,32 +758,52 @@ function sheetWith(kind, items, title = '') {
 }
 
 async function shareLink() {
-    const items = tickedItems();
-    if (!items.length) { toast('Tick at least one skill first'); return; }
+    const l = L.lessonByKey(v.lesson);
+    if (!l) return;
+    const p = sendPayload(l);
+    const items = practiceOf(p);
+    if (!items.length) { toast(p.lesson ? 'No skills teach this lesson yet' : 'Tick at least one skill first'); return; }
     pick.link = makePracticeLink(items);
-    const what = `Practice link · ${items.length} skill${items.length === 1 ? '' : 's'}${items.length > 1 ? ' mixed' : ''}`;
+    sendRecord('share', p, { skills: items.map((x) => ({ key: kOf(x), opts: optsOf(x) })) });
+    const what = `Practice link · ${p.choice === 'lesson' ? `${p.lesson.name} · ` : p.lesson ? `${whatWords(p)} · ` : ''}${items.length} skill${items.length === 1 ? '' : 's'}${items.length > 1 ? ' mixed' : ''}`;
     if (!pick.link) { pick.linkNote = what; redrawActs(); toast('Could not make a link'); return; }
     const ok = await copyText(pick.link);
     pick.linkNote = ok ? `${what} · copied` : `${what} · copy it from the box`;
     redrawActs();
     barH();
-    toast(ok ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
+    toast(ok ? `Practice link copied: ${p.choice === 'lesson' ? `${p.lesson.name} practice` : whatWords(p)} (${items.length} skill${items.length === 1 ? '' : 's'})` : 'Link ready: copy it from the box');
     root.querySelector('#tvwLink')?.select();
 }
 function redrawActs() {
     const l = v.lesson ? L.lessonByKey(v.lesson) : null;
     const box = root && root.querySelector('#tvwBar');
-    if (l && box) box.outerHTML = actsHTML(l);
+    if (!l || !box) return;
+    const sub = box.nextElementSibling && box.nextElementSibling.classList.contains('tvw-acts-after') ? box.nextElementSibling : null;
+    if (sub) sub.remove();
+    box.outerHTML = actsHTML(l);
+    barH();
 }
 
 function addToTray() {
     const l = L.lessonByKey(v.lesson);
-    const items = tickedItems();
-    if (!l || !items.length) { toast('Tick skills first'); return; }
-    const opts = Object.fromEntries(items.filter((x) => x.opts).map((x) => [`${x.categoryId}:${x.skillId}`, x.opts]));
-    trayAddLesson({ id: l.key, name: lessonName(l), ord: ordOf(l), keys: items.map((x) => `${x.categoryId}:${x.skillId}`), opts });
+    if (!l) return;
+    const p = sendPayload(l);
+    const items = practiceOf(p);
+    if (!items.length) { toast(p.lesson ? 'No skills teach this lesson yet' : 'Tick skills first'); return; }
+    const opts = Object.fromEntries(items.filter((x) => x.opts).map((x) => [kOf(x), x.opts]));
+    sendRecord('tray', p, { skills: items.map((x) => ({ key: kOf(x), opts: optsOf(x) })) });
+    trayAddLesson({ id: l.key, name: lessonName(l), ord: ordOf(l), keys: items.map(kOf), opts, made: !!p.lesson, msg: `Added to tray: ${whatWords(p)}` });
 }
-
+/** Print: the lesson (its own document), the ticked skills (the Print sheet on only them), or the lesson and then its skills. */
+async function printSend() {
+    const l = L.lessonByKey(v.lesson);
+    if (!l) return;
+    const p = sendPayload(l);
+    if (!p.lesson && !p.skills.length) { toast('Tick skills first'); return; }
+    sendRecord('print', p, { skills: p.skills.map((x) => ({ key: kOf(x), opts: optsOf(x) })) });
+    if (p.lesson) await printLesson();
+    if (p.skills.length) sheetWith('print', p.skills, lessonName(l));
+}
 function practisePre() {
     // share only: the do-first skills are borrowed for the Share sheet and the tray comes back as it was
     const l = L.lessonByKey(v.lesson);
@@ -728,6 +841,7 @@ async function printLesson() {
         const html = String(res.docHtml || res.pupilHtml || '').replace(/Form [AB]\b\s*(·\s*)?/g, '');
         if (!html) throw new Error('empty');
         hideToast();
+        window.tvwLastLessonPrint = { lesson: l.key, kind: made.kind };
         await printHtml(html, lessonName(l), 'A4');
     } catch (e) { console.warn('[teacher-wrm] lesson', e); toast('Could not make this lesson'); } finally { lessonBusy = false; }
 }
@@ -819,6 +933,10 @@ function barH() {
     const h = tb && tb.getClientRects().length ? tb.offsetHeight : 0;   // (a fixed bar has no offsetParent)
     document.documentElement.style.setProperty('--tv-bar-h', `${h}px`);
     document.documentElement.style.setProperty('--tvw-tray-h', `${h}px`);
+    // the What-to-send card's height: the page's scroll-padding while it sticks (lf-wrmsend)
+    const acts = root && root.querySelector('#tvwBar');
+    const stuck = acts && acts.getClientRects().length && getComputedStyle(acts).position === 'sticky';
+    document.documentElement.style.setProperty('--tvw-acts-h', `${stuck ? acts.offsetHeight + 8 : 0}px`);
 }
 
 /** The list stays; the current row, the domain buttons, the slide-over state and the panel follow v.lesson. */
@@ -831,6 +949,8 @@ function showLesson() {
     drawMeta();
     root.querySelector('#tvwGrid')?.classList.toggle('is-open', !!v.lesson);
     redrawDetail();
+    // the tray bar says which of its skills are this lesson's and which are from earlier (lf-wrmsend)
+    setTrayContext(() => (L && v.lesson && wrmHashActive() ? { id: v.lesson } : null));
 }
 
 /** The list has its own scroll box (desktop widths), else the page scrolls it. */
@@ -955,12 +1075,16 @@ function wire(el) {
         if (d.wBack) { closeLesson(); return; }
         if (d.wNextl) { openLesson(d.wNextl, 'title'); return; }
         if (t.getAttribute('aria-disabled') === 'true' && d.wAct) { toast(d.why || 'Tick skills first'); return; }
-        if (d.wAct === 'print') { const items = tickedItems(); const l = L.lessonByKey(v.lesson); if (items.length) sheetWith('print', items, l ? lessonName(l) : ''); else toast('Tick skills first'); return; }
+        if (d.wSend) { if (t.getAttribute('aria-disabled') === 'true') { toast(d.why || 'Not for this lesson'); return; } send.choice = d.wSend; redrawActs(); root.querySelector(`#tvwBar [data-w-send="${d.wSend}"]`)?.focus({ preventScroll: true }); return; }
+        if (d.wAct === 'set') { send.pop = !send.pop; send.naming = false; redrawActs(); root.querySelector(send.pop ? '#tvwSetPop button' : '#tvwBar [data-w-act="set"]')?.focus({ preventScroll: true }); return; }
+        if (d.wSetto) { addToSet(d.wSetto, ''); return; }
+        if ('wSetnew' in d) { send.naming = true; redrawActs(); const i = root.querySelector('#tvwSetName'); if (i) { i.focus({ preventScroll: true }); i.select(); } return; }
+        if ('wSetsave' in d) { addToSet('', (root.querySelector('#tvwSetName') || {}).value || ''); return; }
+        if (d.wAct === 'print') { printSend(); return; }
         if (d.wAct === 'link') { shareLink(); return; }
         if (d.wAct === 'copy') { copyText(pick.link).then((ok) => toast(ok ? 'Practice link copied' : 'Select the link and copy it')); return; }
         if (d.wAct === 'tray') { addToTray(); return; }
         if (d.wAct === 'pre') { practisePre(); return; }
-        if (d.wAct === 'lesson') { printLesson(); return; }
         if (d.wTmToggle) { tmOpen = !tmOpen; redrawDetail(); root.querySelector('[data-w-tm-toggle]')?.focus({ preventScroll: true }); return; }
         if (d.wLesson) { openLesson(d.wLesson, t.classList.contains('tvw-nrow') ? 'row' : 'title'); return; }
         if (d.wDlLink) { detailedLink(d.wDlLink); return; }
@@ -1003,6 +1127,8 @@ function wire(el) {
     });
     el.addEventListener('keydown', (e) => {
         const t = e.target;
+        if (t.id === 'tvwSetName' && e.key === 'Enter') { e.preventDefault(); addToSet('', t.value); return; }
+        if (send.pop && e.key === 'Escape' && t.closest && t.closest('#tvwSetPop, #tvwBar')) { e.preventDefault(); e.stopPropagation(); send.pop = false; send.naming = false; redrawActs(); root.querySelector('#tvwBar [data-w-act="set"]')?.focus({ preventScroll: true }); return; }
         if (t.id === 'tvwSearch' && e.key === 'Enter') {
             const first = el.querySelector('#tvwHits [data-w-jump]');
             if (first) { e.preventDefault(); first.click(); }

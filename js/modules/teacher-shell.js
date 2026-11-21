@@ -26,7 +26,7 @@ import { listTests, loadTest, deleteTest, exportTestJSON, importTestJSON, compre
 import { populateVoicePicker, setSelectedVoiceURI, testSelectedVoice, getSelectedVoiceURI } from './voice-picker.js';
 import { isSfxEnabled } from './sfx.js';
 import {
-    icon, esc, toast, copyText, fmtDay, savedSets, findSkill, levelText, levelsSummary, currentSet,
+    icon, esc, toast, copyText, fmtDay, savedSets, setWhatText, findSkill, levelText, levelsSummary, currentSet,
     loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode, hideToast, toastAction,
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
@@ -497,7 +497,7 @@ function renderHome(el) {
         const n = s.skills.length;
         const lv = levelsSummary(s.skills);
         return `<tr>
-  <td><button type="button" class="tv-cell-title tv-link-row" data-open-set="${esc(s.id)}">${esc(s.name || 'Untitled set')}</button><span class="tv-cell-sub">${n} skill${n === 1 ? '' : 's'}${lv ? ' · ' + esc(lv) : ''}</span></td>
+  <td><button type="button" class="tv-cell-title tv-link-row" data-open-set="${esc(s.id)}">${esc(s.name || 'Untitled set')}</button><span class="tv-cell-sub">${esc(setWhatText(s, n))}${lv ? ' · ' + esc(lv) : ''}</span></td>
   <td>${s.code ? `<code class="tv-code" title="${esc(pupilCode(s.code))}">${esc(pupilCode(s.code))}</code><span class="tv-cell-sub" style="margin-top:2px;">${s.type === 'qs' ? 'Quick Start link' : 'Direct link'}</span>` : '<span class="tv-cell-sub">No link yet</span>'}</td>
   <td><span class="tv-cell-sub">${esc(fmtDay(s.lastUsed || s.createdAt))}</span></td>
   <td style="text-align:right;padding:0 16px 0 0;overflow:visible;">${s.link ? `<button type="button" class="tv-icon-btn" data-copy-set="${esc(s.id)}" aria-label="Copy the link for ${esc(s.name || 'this set')}">${icon('copy', 18)}</button>` : ''}</td>

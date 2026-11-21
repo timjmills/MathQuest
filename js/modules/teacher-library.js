@@ -39,7 +39,7 @@ import {
     gbadge, gradeName, shortName, trayItems, TRAY_SET_ID, openTrayPopup,
 } from './teacher-tray.js';
 import { mountCropped, refitCropped, croppedReady, openChipSheet } from './teacher-chip.js';
-import { savedSets, writeSets } from './teacher-ui.js';
+import { savedSets, writeSets, setLessonEntries, setWhatText } from './teacher-ui.js';
 import { REDESIGN_PASSED } from './redesign-passed.js';
 import { mountQuickPrints } from './simple-print.js';   // owner 2026-11-03 item 5: Quick prints on the Skills page
 import { offeredSize } from './sheet/tokens.js';   // owner 2026-11-13: a set saved at S is labelled M
@@ -1130,7 +1130,7 @@ function setsHTML() {
             if (st.id === TRAY_SET_ID) return `<button type="button" class="ts-set" data-act="openset" data-arg="${i}"><span class="ts-set-name">Your tray (saved as you go)</span>${chips(live)}<span class="ts-note">${plural2(live.length, 'skill')} · open the tray</span></button>`;
             const nm = esc(st.name || 'Untitled set');
             const pr = st.print && st.print.opts ? setPrintWords(st.print.opts) : '';
-            return `<div class="ts-set ts-set-saved" data-set-id="${esc(st.id)}"><span class="ts-set-name">${nm}</span>${chips(live)}<span class="ts-note">${plural2(live.length, 'skill')}${pr ? ` · ${esc(pr)}` : ''}</span>
+            return `<div class="ts-set ts-set-saved" data-set-id="${esc(st.id)}"><span class="ts-set-name">${nm}</span>${chips(live)}<span class="ts-note"${setLessonEntries(st).length ? ' data-set-lessons="' + setLessonEntries(st).length + '"' : ''}>${esc(setWhatText(st, live.length))}${pr ? ` · ${esc(pr)}` : ''}</span>
   <span class="ts-set-acts">
     <button type="button" class="tv-btn tv-btn-sm" data-act="setquiz" data-arg="${i}" aria-label="Quiz: ${nm}">${icon('sheet', 16)}<span>Quiz</span></button>
     <button type="button" class="tv-btn tv-btn-sm" data-act="setsend" data-arg="${i}" aria-label="Send: ${nm}">${icon('link', 16)}<span>Send</span></button>

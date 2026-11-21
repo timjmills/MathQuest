@@ -184,11 +184,31 @@ export function savedSets() {
 }
 export function writeSets(list) { writeStore(SETS_KEY, list.slice(0, 50)); }
 
+/* A lesson in a set (lf-wrmsend, owner ruling A34, 2026-11-21): the ADDITIVE optional field `entries`, each
+ * {kind:'lesson', key, name}, a lesson stored once beside the set's ordinary skill entries. Sets without it read as before. */
+export function setLessonEntries(set) {
+    const seen = new Set();
+    return (set && Array.isArray(set.entries) ? set.entries : [])
+        .filter((e) => e && e.kind === 'lesson' && typeof e.key === 'string' && e.key && !seen.has(e.key) && seen.add(e.key))
+        .map((e) => ({ kind: 'lesson', key: e.key, name: String(e.name || 'Lesson') }));
+}
+/** What a set holds in words: "Lesson 7 Compare amounts + 3 skills", "2 lessons + 1 skill", "3 skills". */
+export function setWhatText(set, nSkills = (set && Array.isArray(set.skills) ? set.skills.length : 0)) {
+    const ls = setLessonEntries(set);
+    const sk = `${nSkills} skill${nSkills === 1 ? '' : 's'}`;
+    if (!ls.length) return sk;
+    const lead = ls.length === 1 ? ls[0].name : `${ls.length} lessons`;
+    return nSkills ? `${lead} + ${sk}` : lead;
+}
+
 /* A whole set in a link (owner 2026-10-25): the optional &set= suffix of a Send link. base64url of compact JSON
  * {v:1, n:name, s:[items with opts / count / lockPct / weight / leftOut], l:locks, g:groups, ls:lessons, p:print}. */
 export function encodeSetParam(rec) {
-    if (!rec || !Array.isArray(rec.skills) || !rec.skills.length) return '';
+    const ents = setLessonEntries(rec);
+    if (!rec || !Array.isArray(rec.skills) || (!rec.skills.length && !ents.length)) return '';
     const o = { v: 1, n: rec.name || '', s: rec.skills };
+    // optional (lf-wrmsend): the set's lessons; a link without it decodes exactly as before
+    if (ents.length) o.e = ents.map((x) => ({ k: x.key, n: x.name }));
     if (rec.locks && Object.keys(rec.locks).length) o.l = rec.locks;
     if (rec.groups && rec.groups.length) o.g = rec.groups;
     if (rec.lessons && rec.lessons.length) o.ls = rec.lessons;
@@ -205,8 +225,10 @@ export function decodeSetParam(text) {
         const o = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
         if (!o || o.v !== 1 || !Array.isArray(o.s)) return null;
         const skills = o.s.filter((x) => x && typeof x.categoryId === 'string' && typeof x.skillId === 'string');
-        if (!skills.length) return null;
+        const ents = Array.isArray(o.e) ? setLessonEntries({ entries: o.e.map((x) => ({ kind: 'lesson', key: x && x.k, name: x && x.n })) }) : [];
+        if (!skills.length && !ents.length) return null;
         const rec = { name: String(o.n || ''), skills };
+        if (ents.length) rec.entries = ents;
         if (o.l && typeof o.l === 'object') rec.locks = o.l;
         if (Array.isArray(o.g)) rec.groups = o.g;
         if (Array.isArray(o.ls)) rec.lessons = o.ls;
@@ -223,7 +245,7 @@ export function importSharedSet(text) {
     const rec = decodeSetParam(text);
     if (!rec) return null;
     const list = savedSets();
-    const same = (x) => JSON.stringify([x.skills, x.print || null]) === JSON.stringify([rec.skills, rec.print || null]);
+    const same = (x) => JSON.stringify([x.skills, x.print || null, setLessonEntries(x)]) === JSON.stringify([rec.skills, rec.print || null, setLessonEntries(rec)]);
     const hit = list.find((x) => x.id !== 'tray' && same(x));
     if (hit) return hit;
     const now = Date.now();

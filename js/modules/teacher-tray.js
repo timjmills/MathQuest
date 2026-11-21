@@ -310,21 +310,23 @@ export function trayFromSetName() { const r = fromSetRec(); return r ? r.name ||
  * their lesson order (ord), are saved with the tray (and with Save as set), and the Print sheet offers one worksheet
  * per lesson, one for all, or both. A skill can sit in two lessons' groups; it is in the tray once. */
 function cleanLessons(list) {
-    return (Array.isArray(list) ? list : []).map((g) => ({ id: String(g.id || g.name || ''), name: String(g.name || 'Lesson'), ord: Number(g.ord) || 0, skills: [...new Set((g.skills || []).filter(trayHas))] }))
+    // made (lf-wrmsend, additive): the group stands for the lesson itself too ("Lesson + N skills"), not only its skills
+    return (Array.isArray(list) ? list : []).map((g) => Object.assign({ id: String(g.id || g.name || ''), name: String(g.name || 'Lesson'), ord: Number(g.ord) || 0, skills: [...new Set((g.skills || []).filter(trayHas))] }, g.made ? { made: true } : {}))
         .filter((g) => g.id && g.skills.length).sort((a, b) => a.ord - b.ord);
 }
 /** The lesson groups in lesson order: [{ id, name, ord, skills }]. */
 export function trayLessons() { return cleanLessons(T.lessons).map((g) => ({ ...g, skills: g.skills.slice() })); }
 /** Add a lesson's skills as its group (the same lesson again replaces its group), with Undo. */
-export function trayAddLesson({ id, name, ord = 0, keys = [], opts = {} }) {
+export function trayAddLesson({ id, name, ord = 0, keys = [], opts = {}, made = false, msg = '' }) {
     const before = snapshot();
     let n = 0;
     for (const k of keys) if (addOne(k, opts[k] ? { opts: opts[k] } : {})) n++;
     const live = keys.filter(trayHas);
     if (!live.length) { undoToast('Tick skills first: they go in the tray as this lesson.', null); return 0; }
-    T.lessons = cleanLessons([...T.lessons.filter((g) => g.id !== id), { id, name, ord, skills: live }]);
+    T.lessons = cleanLessons([...T.lessons.filter((g) => g.id !== id), Object.assign({ id, name, ord, skills: live }, made ? { made: true } : {})]);
     changed();
     const nl = T.lessons.length;
+    if (msg) { undoToast(`${msg}${n < live.length ? ` (${live.length - n} already there)` : ''} · ${plural(nl, 'lesson')}, ${plural(trayItems().length, 'skill')}.`, before); return live.length; }
     undoToast(`${name}: ${plural(live.length, 'skill')} in the tray${n < live.length ? ` (${live.length - n} already there)` : ''} · ${plural(nl, 'lesson')}, ${plural(trayItems().length, 'skill')}.`, before);
     return live.length;
 }
@@ -754,15 +756,34 @@ function barHTML() {
         lead = `<button type="button" class="tt-label tt-label-btn" data-act="trayopen" aria-label="Open the tray: ${esc(trayTitle(keys))}, ${plural(areas.length, 'area')}"><b>Tray</b><span>${esc(trayTitle(keys).split(' · ')[0])}</span><span>${label} · ${plural(areas.length, 'area')} ▸</span></button>`;
         mid = `<div class="tt-segs">${areas.map((x) => `<button type="button" class="tt-seg" data-domain="${x.a}" data-act="trayarea" data-arg="${x.a}" title="${esc(AREAS[x.a].name)}: open in the tray">${areaIcon(x.a, 16)}<span class="tt-seg-long">${esc(AREAS[x.a].short)}</span><span class="tt-seg-abbr">${ABBR[x.a]}</span><b>${x.ks.length}</b></button>`).join('')}<button type="button" class="tt-btn tt-more" data-act="trayopen" hidden>+0</button></div>`;
     }
+    const src = traySourceText(keys);
+    if (src) lead = `<div class="tt-label tt-src-label"><b>Tray</b><span class="tt-src" data-tt-src>${esc(src.replace(/^Tray: /, ''))}</span></div>`;
     return `${lead}${mid}
       <button type="button" class="tt-btn tt-count" data-act="trayopen">${n ? `${esc(label)} ▸` : 'Tray empty'}</button>
       <div class="tt-actions">${n ? '' : '<span class="tt-hint">Tick skills first</span>'}
-        ${n ? `<button type="button" class="tt-btn tt-ic tt-clear" data-act="tray-clear" aria-label="Clear the tray">${icon('trash', 20)}<span class="tt-l">Clear</span></button>` : ''}
+        ${n ? `<button type="button" class="tt-btn tt-ic tt-clear" data-act="tray-clear" aria-label="Clear the tray">${icon('trash', 20)}<span class="tt-l">${src ? 'Clear tray' : 'Clear'}</span></button>` : ''}
         <button type="button" class="tt-btn tt-ic" data-act="tray-quiz" aria-label="Quiz">${icon('sheet', 20)}<span class="tt-l">Quiz</span></button>
         <button type="button" class="tt-btn tt-ic" data-act="tray-share" aria-label="Send"${dis}>${icon('link', 20)}<span class="tt-l">Send</span></button>
         <button type="button" class="tt-btn tt-ic" data-act="tray-save" aria-label="Save"${dis}>${icon('bookmark', 20)}<span class="tt-l">Save</span></button>
         <button type="button" class="tt-btn${n ? ' tt-primary' : ''}" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button>
       </div>`;
+}
+
+/* Where the tray's skills came from (lf-wrmsend, owner ruling A34): a screen that sends a lesson (the WRM lesson page)
+ * names it here, and the bar then says which skills are this lesson's and which are from earlier. fn() -> {id, name} | null. */
+let trayCtx = null;
+export function setTrayContext(fn) { trayCtx = typeof fn === 'function' ? fn : null; renderBar(); }
+function ctxNow() { try { return trayCtx ? trayCtx() : null; } catch (e) { return null; } }
+/** "Tray: 5 skills from earlier (not this lesson)" · "Tray: Lesson 7 Compare amounts (3 skills) + 2 from earlier". */
+export function traySourceText(keys = trayKeys()) {
+    const c = ctxNow();
+    if (!c || !keys.length) return '';
+    const g = T.lessons.find((x) => x.id === c.id);
+    const mine = g ? keys.filter((k) => g.skills.includes(k)) : [];
+    const earlier = keys.length - mine.length;
+    if (!mine.length) return `Tray: ${plural(earlier, 'skill')} from earlier (not this lesson)`;
+    const lead = `Tray: ${g.name}${g.made ? ' (lesson' : ' ('}${g.made ? ' + ' : ''}${plural(mine.length, 'skill')})`;
+    return earlier ? `${lead} + ${plural(earlier, 'skill')} from earlier` : lead;
 }
 
 /** Draw the tray bar (it is in the page from the first Skills visit; CSS shows it only on Skills). */

@@ -175,6 +175,9 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       if (on !== (x === g)) { await tap(sel); await sleep(80); }
     }
   };
+  // lf-wrmsend: these scenarios send the TICKED skills only, so they choose "These N skills" first (the default with
+  // ticks is Lesson + N skills); a no-op on a page without the choice
+  const skillsOnly = async () => { const sel = '[data-screen="wrm"].is-active #tvwBar [data-w-send="skills"][aria-pressed="false"]:not([aria-disabled="true"])'; if (await page.$(sel)) { await tap(sel); await sleep(100); } };
   // T4: "Skills to be made for this lesson" is folded at the end of the panel: unfold it before using it
   const openTm = async () => { if (await page.$('[data-screen="wrm"].is-active [data-w-tm-toggle][aria-expanded="false"]')) { await tap('[data-screen="wrm"].is-active [data-w-tm-toggle]'); await sleep(150); } };
   const decode = (u) => page.evaluate((link) => {
@@ -324,7 +327,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           const s = await state(p);
           check(s.pressed.join() === c, `${t}: pressed ${s.pressed}`);
           check(s.print === w.print && s.link === w.link && s.tray === w.tray && s.set === 'Add to a set', `${t}: labels ${JSON.stringify([s.print, s.link, s.tray, s.set])} want ${JSON.stringify([w.print, w.link, w.tray])}`);
-          check(s.cap.includes(c === 'skills' ? `${n} ticked skills only` : lname) && (c === 'lesson' || s.cap.includes(`${n} ticked skill`)), `${t}: caption "${s.cap}"`);
+          check(s.cap.includes(c === 'skills' ? `only the ${n} ticked skills` : lname) && (c === 'lesson' || s.cap.includes(`${n} ticked skill`)), `${t}: caption "${s.cap}"`);
           // Share: the link carries exactly the stated skills with their options
           await press(p, '#tvwBar [data-w-act="link"]', touch);
           await waitFor(p, () => !!document.querySelector('#tvwLink') && !!window.__copied, 5000, `${t} link`);
@@ -638,10 +641,10 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     const firstDirect = await page.$eval('[data-w-group="direct"] .tvw-tick', (b) => b.dataset.wTick);
     await tap('[data-w-group="direct"] .tvw-tick');
     await sleep(100);
-    check(await page.$eval('#tvwBar .tv-h3', (h) => /^1 skill selected/.test(h.textContent)), 'tick: bar does not say 1 skill');
+    check(await page.$eval('.tvw-acts-after .tvw-count, #tvwBar .tvw-acts-sub .tv-h3', (h) => /^1 skill selected/.test(h.textContent)), 'tick: bar does not say 1 skill');
     await tap('[data-w-all="prereq"]');
     await sleep(100);
-    check(await page.$eval('#tvwBar .tv-h3', (h, n) => h.textContent.startsWith(`${n + 1} skills`), nPre), 'select all prereq: count wrong');
+    check(await page.$eval('.tvw-acts-after .tvw-count, #tvwBar .tvw-acts-sub .tv-h3', (h, n) => h.textContent.startsWith(`${n + 1} skills`), nPre), 'select all prereq: count wrong');
     await tap('[data-w-all="direct"]');
     await sleep(100);
     const ticked = await page.$$eval('[data-w-group="direct"] .tvw-tick[aria-checked="true"]', (b) => b.map((x) => x.dataset.wTick));
@@ -653,6 +656,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     check(tickedPre.length === new Set(await page.$$eval('[data-w-group="prereq"] .tvw-tick', (b) => b.map((x) => x.dataset.wTick))).size, `only do-first ticked: ${tickedPre.length}`);
 
     /* ---------------------------------------------------- practice link decodes to the ticked skills */
+    await skillsOnly();
     await tap('[data-w-act="link"]');
     await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'link box');
     const link = await page.$eval('#tvwLink', (i) => i.value);
@@ -680,6 +684,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
 
     /* ---------------------------------------------------- Print practice: the sheet opens on ONLY the ticked skills (T4) */
     const trayBefore = await page.evaluate(() => JSON.stringify((window.skillQueue || []).map((x) => `${x.categoryId}|${x.skillId}`)));
+    await skillsOnly();
     await tap('[data-w-act="print"]');
     await waitFor(page, () => !!document.querySelector('#tvSheet .tvs-sheet'), 8000, 'print sheet');
     const pr = await page.evaluate(() => ({ st: window.tvSheetState(), keys: (window.skillQueue || []).map((x) => `${x.categoryId}|${x.skillId}`), hash: location.hash, screen: (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen }));
@@ -698,6 +703,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     const oneKey = await page.$eval('[data-w-group="related"] .tvw-tick', (b) => b.dataset.wTick);
     await tap('[data-w-group="related"] .tvw-tick');
     await sleep(100);
+    await skillsOnly();
     await tap('[data-w-act="link"]');
     await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'one link');
     const one = await decode(await page.$eval('#tvwLink', (i) => i.value));
@@ -773,6 +779,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await fit('1280 thumbs');
     await shot('11-thumbs-1280');
     await tickAll();
+    await skillsOnly();
     await tap('[data-w-act="link"]');
     await sleep(300);
     await page.evaluate(() => window.scrollTo(0, 400));
@@ -864,7 +871,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 10000, 'opt lesson');
       await sleep(300);
       await tickOnly('prereq');
-      await tap('[data-w-act="link"]');
+      await skillsOnly();
+    await tap('[data-w-act="link"]');
       await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'opt link');
       const od = await decodeOpts(await page.$eval('#tvwLink', (i) => i.value));
       const want = links.linksFor(optLesson).prereq.filter((x) => x.opts);
@@ -1389,6 +1397,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'm8 wrm');
       await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); });
       await tickAll();
+      await skillsOnly();
       await tap('[data-screen="wrm"].is-active [data-w-act="link"]');
       await sleep(80);
       const on1 = await page.evaluate(() => document.getElementById('tvToast')?.classList.contains('is-on'));
@@ -1475,7 +1484,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         const r = links.linksFor(siteTagged);
         check(tv.tag === r.verdict && tv.flag === links.siteFlagText(siteTagged), `tagged site lesson head ${JSON.stringify(tv)} want ${r.verdict}`);
         await tickOnly('direct');
-        await tap('[data-w-act="link"]');
+        await skillsOnly();
+    await tap('[data-w-act="link"]');
         await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'site link');
         const sd = await decode(await page.$eval('#tvwLink', (i) => i.value));
         const wantKeys = r.direct.map((x) => x.key.replace(':', '|'));
