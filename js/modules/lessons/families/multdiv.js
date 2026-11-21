@@ -397,6 +397,9 @@ export const ROUTINES = Object.freeze({
         // (lead A9: the area model is too wide for a half-page panel, so the chart prints one full-width panel a row; down to LR-15's
         // 0.8 floor, two panel rows share a chart page instead of one, chart.js chartPage)
         chartMinZoom: 0.8,
+        // (lf-ops sizes N-round, critic r2 N5: each panel a row - the drawing beside its step - so two panels and the Say / Rule bands
+        // share a page and the chart takes 2 pages, not 3 or 4 with one panel on each, chart.js chartRowFit)
+        chartRowFit: true,
         example: { match: '^Split' },
     },
     'mult-area-2digit': {
@@ -426,6 +429,9 @@ export const ROUTINES = Object.freeze({
         // (lead A9: the area model is too wide for a half-page panel, so the chart prints one full-width panel a row; down to LR-15's
         // 0.8 floor, two panel rows share a chart page instead of one, chart.js chartPage)
         chartMinZoom: 0.8,
+        // (lf-ops sizes N-round, critic r2 N5: each panel a row - the drawing beside its step - so two panels and the Say / Rule bands
+        // share a page and the chart takes 2 pages, not 3 or 4 with one panel on each, chart.js chartRowFit)
+        chartRowFit: true,
         example: { match: '^Split' },
     },
 });

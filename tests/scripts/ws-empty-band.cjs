@@ -64,6 +64,9 @@
 //             (js/modules/sheet/layout.js ROW_ROOM_MM) in a row taller than its NATURAL height (the cell laid out of the grid with
 //             no row stretch; the tallest of its row) + that room by more than 1.5 mm. A cell beside non-cell content (the Opener
 //             Model beside its Steps) is not judged. --self-test checks it. EB_DUMP=1 prints every cell's height / natural height.
+//   EB-CHART  (always on, the lesson role; lf-ops sizes N-round, critic r2 N5) the anchor chart's pages: CHART-PAGES, a chart of
+//             4 or fewer step panels takes at most 2 pages; CHART-FILL, no chart page past the first is 35 % or more empty under
+//             its last block (EB-PAGE's measure).
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
 //   EB-LASTPAGE (with --page-fill; lf-ops critic cbt r3 F1) the LAST (or only) page of a fixed-capacity role (pre-skill-check,
 //             true-false, reason-it, error-analysis, test) with 30 % or more of its body empty when its next row fits; every other
@@ -304,7 +307,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY', 'EB-STRETCH', 'EB-CLIP', 'TAB-CLEAR'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY', 'EB-STRETCH', 'EB-CLIP', 'TAB-CLEAR', 'EB-CHART'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -1392,6 +1395,21 @@ async function main() {
                         if (process.env.EB_GAP_DEBUG) for (const c of cells) console.log('gap', key, j.tag, c.page, c.cell, c.step, c.hMm, 'below', c.belowMm, (c.belowMm / c.hMm * 100).toFixed(1), c.gapAtMm, c.gapMm, (c.gapMm / c.hMm * 100).toFixed(1) + '%', JSON.stringify(c.iv));
                         cells.forEach((c, i) => { if (gapBad(j.role, cells, i, BAND)) F('EB-GAP', `${key} ${j.tag} p${c.page} cell ${c.cell} (state ${c.step})`, `empty band ${c.gapMm} mm between the step text and the problem in a ${c.hMm} mm cell (${(c.gapMm / c.hMm * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} %, RUBRIC H13; critic r3 S5)`); });
                         mo.used.forEach((v, i) => { if (v < 70) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the Scripted Model page body used (limit 70 %)`); });
+                    }
+                    // EB-CHART (lf-ops sizes N-round, critic r2 N5; always on, the lesson role): the anchor chart's pages. CHART-PAGES - a chart
+                    // of 4 or fewer steps takes at most 2 pages; CHART-FILL - no chart page past the first is 35 % or more empty under its
+                    // last block (EB-PAGE's measure). The F8 fix moved the area 2by2 / 3by2 chart's overflow into page count: 3 pages, p2 /
+                    // p3 one panel each and 40-45 % blank.
+                    if (j.role === 'lesson') {
+                        const ch = await sh.evaluate((scope) => {
+                            const pgs = [...document.querySelectorAll(scope)].filter((pg) => pg.getAttribute('data-ws-sheet') === 'lesson-chart');
+                            return { pages: pgs.length, states: pgs.reduce((a, pg) => a + pg.querySelectorAll('.mq-cstate:not(.mq-ctailp)').length, 0), idx: pgs.map((pg) => [...document.querySelectorAll(scope)].indexOf(pg)) };
+                        }, 'body > section.ws-page, body > .ws-page');
+                        if (ch.pages && ch.states && ch.states <= 4 && ch.pages > 2) F('EB-CHART', `${key} ${j.tag}`, `CHART-PAGES: an anchor chart of ${ch.states} step panel(s) takes ${ch.pages} pages (at most 2 for 4 or fewer steps)`);
+                        if (ch.pages > 1) {
+                            const pf = await sh.evaluate(measurePageFill, 'body > section.ws-page, body > .ws-page');
+                            ch.idx.slice(1).forEach((pi) => { const v = pf[pi]; if (v && v.pct >= 35) F('EB-CHART', `${key} ${j.tag} p${pi + 1}`, `CHART-FILL: chart page ${pi + 1} is ${v.pct} % empty under its last block (a chart page past the first; limit 35 %)`); });
+                        }
                     }
                     // EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1): a one-page Guided page under its §12.1 tries ceiling leaves
                     // white under its grid of at least one drawn row of tries (the grid's last row) - the fit counted rows at a taller

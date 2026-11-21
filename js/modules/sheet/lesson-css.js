@@ -58,6 +58,11 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-cwords{font-size:var(--ws-text);line-height:1.3;display:flex;flex-direction:column;gap:.8mm}
 :is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
 :is(.ws-page,.ws-sheet) .mq-cwords>.mq-cnote{font-weight:700}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cstatecell.mq-crowfitcell{padding:2mm 4mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-rowfit{gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-crowfit{flex:1 1 auto;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:5mm;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-crowfit>.mq-cdraw{flex:0 0 auto}
+:is(.ws-page,.ws-sheet) .mq-crowfit>.mq-cwords{flex:0 1 auto;min-width:50mm;max-width:70mm;text-align:left}
 :is(.ws-page,.ws-sheet) .mq-hopwrap{display:flex;flex-direction:column;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-chops>.mq-hops{margin:0!important}
 :is(.ws-page,.ws-sheet) :is(.mq-cfinal-h,.mq-cnote,.mq-cstate-n .mq-chead>b){text-wrap:balance}

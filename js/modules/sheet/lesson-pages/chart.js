@@ -140,6 +140,19 @@ export function otherExamples(input, example, data) {
     return { ex2: out[0] || null, ex3: out[1] || null, ex4: out[2] || null };
 }
 
+/**
+ * `chartRowFit` panels (lf-ops sizes N-round): the panel's inner width (186 mm less the cell's 2 x 4 mm padding), the gap and the
+ * words column's floor beside the drawing (lesson-css .mq-crowfit). The drawing takes what is left: ROWFIT_DRAW_MM at zoom 1.
+ */
+const ROWFIT_INNER_MM = 178, ROWFIT_GAP_MM = 5, ROWFIT_SIDE_MM = 50;
+const ROWFIT_DRAW_MM = ROWFIT_INNER_MM - ROWFIT_GAP_MM - ROWFIT_SIDE_MM;
+/** The width (mm, zoom 1) of the example's drawing as the chart draws it: its template's footprint at the chart's size. */
+function drawWMm(example, size) {
+    const t = example && stepTemplateOf(example);
+    if (!t || typeof t.footprint !== 'function') return 0;
+    try { return Number(t.footprint(Object.assign({}, example.q.cell.payload || {}), resolveCtx({ size, state: 'blank', scaffoldLevel: 3 })).wMm) || 0; } catch (e) { return 0; }
+}
+
 /** The drawing of state k of the example (no slots: the Model is never scored, AK-1). */
 export function stateDrawing(it, steps, groups, k, c) {
     if (msOf({ q: it.q }) && steps.length === 4 && groups.length === 3) return unslot(twoState(it, k, c));
@@ -189,8 +202,12 @@ export function stateDrawing(it, steps, groups, k, c) {
 }
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
-export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
+export const chartLayout = (n, data = null) => (data && data.chartRowFit ? { cols: 1, rows: n, variant: 'col', rowFit: true } : data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
     : n >= 4 ? { cols: data && data.chartFull ? 1 : 2, rows: data && data.chartFull ? n : Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+// `chartRowFit` (lesson data - lf-ops sizes N-round, critic r2 N5): a drawing too wide for a half panel and too tall for two
+// full-width panels a page (the area model). Each panel is full width: its step head(s) on top, then the drawing at its own width
+// (zoomed, flex auto) with the step's words BESIDE it, so a panel is head + drawing, not head + drawing + words; the panels run on
+// over as few chart pages as fit, balanced (chartPage). Nothing else of the lesson changes (`chartWide` also turns the Guided rows full width).
 // `chartFull` (roles/lesson.js chartDataOf, CELL-FITS 2026-11-20): an authored lesson whose example needs the full width - four
 // panels one a row instead of 2 x 2; nothing else of the lesson changes.
 // `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
@@ -235,7 +252,7 @@ export function stateItems(example, data) {
     };
     const panels = groups.map((g, k) => Object.assign({}, base, {
         lessonState: k,
-        cellCls: `mq-cstatecell mq-cstate-${variant}cell`,
+        cellCls: `mq-cstatecell mq-cstate-${variant}cell${data && data.chartRowFit ? ' mq-crowfitcell' : ''}`,
         render: (c, o) => {
             const z = Number(c.chartZoom) > 0 ? Number(c.chartZoom) : 1;
             // Lessons r2: a 3-column chart (the panels share the grid with the other examples)
@@ -256,11 +273,13 @@ export function stateItems(example, data) {
             // page's 186 mm and ran 39 mm across the panel's border. `cellLiveMm`, read by count-row, is that width at zoom 1.)
             // (critic cbt r1 D8: a `chartWide` panel is the page's full width - read as half (cols unset -> 2), the times=each and
             // 15-jump rows wrapped into 77 mm at 13 pt, 60 % of the panel)
-            const cellLiveMm = ((v === 'row' ? 186 * 0.42 - 4 : 186 / Math.max(1, cols || (data && data.chartWide ? 1 : 2)) - 16)) / z;
+            const rowFit = v === 'col' && cols <= 1 && !!(data && data.chartRowFit);
+            const cellLiveMm = ((rowFit ? ROWFIT_DRAW_MM : v === 'row' ? 186 * 0.42 - 4 : 186 / Math.max(1, cols || (data && data.chartWide ? 1 : 2)) - 16)) / z;
             const cz = Object.assign({}, c, { cellLiveMm }, v === 'row' ? {} : { hops: true }, data && data.chartWide ? { chartTwoLines: true } : {});
             const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, cz)}</div>`;
             return v === 'row'
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
+                : rowFit ? `<div class="mq-cstate mq-cstate-col mq-cstate-rowfit"><div class="mq-cheads">${heads}</div><div class="mq-crowfit">${draw}${wordsHtml}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;
         },
     }));
@@ -451,7 +470,10 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // measure under-reads by a millimetre - a times fact in the stack, tiles=null on the long-multiplication lesson - ran out of
     // its panel by 0.6 mm. A lesson may cap the growth; never under 1, absent nothing moves.)
     const zCap = data && Number(data.chartMaxZoom) >= 1 ? Number(data.chartMaxZoom) : Infinity;
-    const zMax = Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, zCap, ...zW));
+    // (`chartRowFit`: the drawing at zoom z beside the side column's floor - its width caps the zoom, which may be under 1)
+    const rowFit = !!lay.rowFit;
+    const wD = rowFit ? drawWMm(example, 'L') : 0;
+    const zMax = rowFit && wD > 0 ? Math.min(1.6, zCap, ROWFIT_DRAW_MM / wD) : Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, zCap, ...zW));
     const H = (z) => Math.max(...states.map((st, k) => base[k] + (z - 1) * dH[k]));
     // The largest zoom in [lo, hi] at which `total(z)` fits `room`; 0 when not even `lo` does.
     const solve = (total, room, lo, hi) => {
@@ -506,13 +528,45 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // chart (above): a chart whose measured panels merely read taller than the page prints as before (its measure over-reads
     // its render - add_wp_10, fact_family_sort ... are inside their page by CELL-FITS).
     let perPage = 0;
+    let rowFitPack = null;
     if (mode === 'one') {
         // (`chartMinZoom`, lesson data - lane lf-ops sizes: a long-multiplication grid - top number, two rows, the sum and their
         // carry boxes - is ~20 mm too tall for two panel rows at zoom 1; it may draw down to this zoom, never under LR-15's 0.8,
         // rather than run over the Say band. Absent, the floor stays 1 and no chart moves.)
         const zMin = data && Number(data.chartMinZoom) >= 0.8 && Number(data.chartMinZoom) < 1 ? Number(data.chartMinZoom) : 1;
-        const z1 = solve((q) => lay.rows * H(q), availP, zMin, zMax);
+        const z1 = zMax >= zMin ? solve((q) => lay.rows * H(q), availP, zMin, zMax) : 0;
         if (z1) z = z1;
+        else if (rowFit && !tailItem && zMax >= zMin && H(zMin) <= availP && lay.rows > 1) {
+            // (`chartRowFit`, lf-ops sizes N-round, critic r2 N5 - CHART-PAGES / CHART-FILL: the run-on chart took 3 pages, the last two
+            // one panel each and 40-45 % blank. The fewest pages first, then the largest zoom with that count, then the panels
+            // shared evenly - the last page holds the Say and Rule bands under its panels)
+            // (each panel its own height: its heads - a merged panel holds two or three - and its drawing at the zoom)
+            const hk = (k, q) => base[k] + (q - 1) * dH[k];
+            const R1 = availP + m.say + chantH, R2 = availP;
+            const packAt = (q) => {
+                const h = states.map((_, k) => hk(k, q));
+                const sumOf = (a, b) => h.slice(a, b).reduce((t, v) => t + v, 0);
+                let bestP = null;
+                const walk = (start, cuts) => {
+                    if (start === n) return;
+                    for (let end = start + 1; end <= n; end++) {
+                        const last = end === n;
+                        if (sumOf(start, end) > (last ? R2 : R1)) break;
+                        const next = cuts.concat([[start, end]]);
+                        if (last) {
+                            // the fewest pages; then the most even fill of the pages after the first (their white, CHART-FILL)
+                            const white = Math.max(0, ...next.slice(1).map(([a, b], i) => 1 - sumOf(a, b) / (i === next.length - 2 ? R2 : R1)));
+                            if (!bestP || next.length < bestP.cuts.length || (next.length === bestP.cuts.length && white < bestP.white)) bestP = { cuts: next, white, h };
+                        } else walk(end, next);
+                    }
+                };
+                walk(0, []);
+                return bestP;
+            };
+            let best = null;
+            for (let q = Math.floor(zMax * 100) / 100; q >= zMin - 1e-9; q = Math.round((q - 0.01) * 100) / 100) { const pk = packAt(q); if (pk && (!best || pk.cuts.length < best.pk.cuts.length)) best = { pk, q }; }
+            if (best) { z = best.q; perPage = 1; rowFitPack = best.pk; } else { fallback = true; z = zMin; }
+        }
         else if (lay !== lay0 && !tailItem && H(1) <= availP && lay.rows > 1) {
             z = 1; perPage = Math.max(1, Math.floor((availP + m.say + chantH) / H(1)));
             // (`chartMinZoom`, lane lf-ops sizes A9: an area-model chart printed ONE full-width panel a chart page - 4 pages, each
@@ -540,11 +594,24 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         const per = perPage * cols;
         const lastPer = Math.max(1, Math.floor(availP / H(z))) * cols;
         const cuts = [];
-        for (let k = 0; k < states.length; k += per) cuts.push(states.slice(k, k + per));
-        const tail0 = cuts[cuts.length - 1];
-        if (tail0.length > lastPer) cuts.splice(cuts.length - 1, 1, tail0.slice(0, tail0.length - lastPer), tail0.slice(tail0.length - lastPer));
+        if (rowFitPack) {
+            for (const [a, b] of rowFitPack.cuts) cuts.push(states.slice(a, b));
+        } else {
+            for (let k = 0; k < states.length; k += per) cuts.push(states.slice(k, k + per));
+            const tail0 = cuts[cuts.length - 1];
+            if (tail0.length > lastPer) cuts.splice(cuts.length - 1, 1, tail0.slice(0, tail0.length - lastPer), tail0.slice(tail0.length - lastPer));
+        }
         for (const [k, chunk] of cuts.entries()) {
+            // (`chartRowFit`: each page's rows take its room - a quarter taller than the panel at most, the drawing centred in it)
             const grid = gridPart(chunk.map((st) => withZoom(st, cols)), { cols, rows: Math.ceil(chunk.length / cols), cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
+            if (rowFitPack) {
+                // (each row as tall as its own panel, the page's room shared out - a quarter taller at most, the drawing centred)
+                const roomK = (k === cuts.length - 1 ? availP : availP + m.say + chantH) - 1;
+                const hs = chunk.map((st) => rowFitPack.h[states.indexOf(st)]);
+                const kk = Math.min(1.25, Math.max(1, roomK / hs.reduce((t, v) => t + v, 0)));
+                grid.rowsTpl = hs.map((h) => `${Math.round(h * kk * 10) / 10}fr`).join(' ');
+                grid.height = `${Math.round(hs.reduce((t, v) => t + v * kk, 0) * 100) / 100}mm`;
+            }
             (k === 0 ? sections : (more[more.length] = [])).push(grid);
         }
     } else if (mode === 'grid3') {
