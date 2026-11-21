@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>MathQuest Pace</title>
+<style>
+/* Layout: one column of cards; tiles in an auto-fit grid; every chart sized from its card's width. */
+:root {
+  --bg: #f3f1ee; --panel: #ffffff; --ink: #1d1b22; --muted: #5d5966; --line: #dcd8d2;
+  --accent: #6a4fd6; --accent-soft: #ece8fb; --good: #2f7d4f; --warn: #a76a00; --bad: #b3261e;
+  --k-skill: #6a4fd6; --k-lesson: #1f7a8c; --k-feature: #8a5a00; --k-fix: #b3261e; --k-check: #2f7d4f; --k-other: #6b6770;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17151b; --panel: #211e27; --ink: #f1eff5; --muted: #aaa4b5; --line: #37323f;
+  --accent: #a891ff; --accent-soft: #2c2640; --good: #6cc995; --warn: #e3b04b; --bad: #ff8a80;
+  --k-skill: #a891ff; --k-lesson: #5fc4d6; --k-feature: #e3b04b; --k-fix: #ff8a80; --k-check: #6cc995; --k-other: #aaa4b5; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #17151b; --panel: #211e27; --ink: #f1eff5; --muted: #aaa4b5; --line: #37323f;
+  --accent: #a891ff; --accent-soft: #2c2640; --good: #6cc995; --warn: #e3b04b; --bad: #ff8a80;
+  --k-skill: #a891ff; --k-lesson: #5fc4d6; --k-feature: #e3b04b; --k-fix: #ff8a80; --k-check: #6cc995; --k-other: #aaa4b5; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 20px; }
+header h1 { margin: 0; font-size: 28px; letter-spacing: -0.01em; }
+header p { margin: 4px 0 0; color: var(--muted); }
+.lead { font-size: 17px; color: var(--ink); margin: 10px 0 0; max-width: 70ch; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; min-width: 0; }
+.card h2 { margin: 0 0 4px; font-size: 18px; text-wrap: balance; }
+.card .sub { margin: 0 0 14px; color: var(--muted); font-size: 13.5px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-width: 0; }
+.tile .lbl { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.tile .num { font-size: 30px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 4px; }
+.tile .chg { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.up { color: var(--good) !important; } .flat { color: var(--muted) !important; } .down { color: var(--bad) !important; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 7px 13px; font: inherit; font-size: 13.5px; cursor: pointer; min-height: 36px; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select, input[type="search"] { font: inherit; font-size: 14px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-height: 36px; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 12px; font-family: var(--sans); }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.12); white-space: nowrap; font-variant-numeric: tabular-nums; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: middle; }
+th { color: var(--muted); font-weight: 600; font-size: 12.5px; letter-spacing: 0.03em; text-transform: uppercase; }
+td.n, th.n { text-align: right; }
+.scroll { overflow-x: auto; }
+.bar { height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; display: flex; min-width: 90px; }
+.bar i { display: block; height: 100%; }
+.eta { font-weight: 600; }
+.pill { display: inline-block; font-size: 11.5px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; color: #fff; }
+.k-skill { background: var(--k-skill); } .k-lesson { background: var(--k-lesson); } .k-feature { background: var(--k-feature); }
+.k-fix { background: var(--k-fix); } .k-check { background: var(--k-check); } .k-other { background: var(--k-other); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.log li { display: grid; grid-template-columns: 92px 84px 1fr; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--line); min-width: 0; }
+.log .d { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13.5px; }
+.log .t { min-width: 0; overflow-wrap: anywhere; }
+.log .t small { display: block; color: var(--muted); margin-top: 2px; }
+.counts { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13.5px; color: var(--muted); margin-bottom: 8px; }
+.counts b { color: var(--ink); font-variant-numeric: tabular-nums; }
+details summary { cursor: pointer; font-weight: 600; }
+details p, details li { color: var(--muted); font-size: 14px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); margin-top: 6px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.err { color: var(--bad); }
+@media (max-width: 560px) { .log li { grid-template-columns: 1fr; gap: 2px; } header h1 { font-size: 23px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MathQuest pace</h1>
+    <p id="genLine">Loading the weekly numbers…</p>
+    <p class="lead" id="summary"></p>
+  </header>
+
+  <section aria-labelledby="hThis">
+    <h2 id="hThis" style="margin:0 0 10px;font-size:18px">This week against last week</h2>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section class="card" aria-labelledby="hTrend">
+    <h2 id="hTrend">Week by week</h2>
+    <p class="sub">Each point is the end of a week (weeks run from the Thursday 22:00 UTC usage reset). Pick what to plot.</p>
+    <div class="row" id="metricChips" role="group" aria-label="Metric to plot"></div>
+    <div class="chart" id="trend"></div>
+  </section>
+
+  <section class="card" aria-labelledby="hEta">
+    <h2 id="hEta">Estimated time to finish</h2>
+    <p class="sub">Remaining work divided by the average weekly pace. Change the window to see how the estimate moves.</p>
+    <div class="row"><label for="win">Average over</label>
+      <select id="win"><option value="2">the last 2 weeks</option><option value="3" selected>the last 3 weeks</option><option value="4">the last 4 weeks</option><option value="99">every week</option></select>
+    </div>
+    <div class="scroll"><table id="etaTable" aria-label="Estimated time to finish"><thead><tr><th>Work</th><th class="n">Done</th><th class="n">Left</th><th class="n">Per week</th><th>Estimate</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="card" aria-labelledby="hChecks">
+    <h2 id="hChecks">Automatic checks added each week</h2>
+    <p class="sub">Every critic finding a machine could have caught becomes a check, proved to fail on the bad page and pass on the fix.</p>
+    <div class="chart" id="checks"></div>
+    <div class="legend" id="checksLegend"></div>
+  </section>
+
+  <section class="card" aria-labelledby="hWrm">
+    <h2 id="hWrm">White Rose small steps by year</h2>
+    <p class="sub">Covered means a live skill teaches the whole step. Gap steps are the lessons still to build.</p>
+    <div class="scroll"><table id="wrmTable" aria-label="White Rose coverage by year"><thead><tr><th>Year</th><th>US grade</th><th class="n">Steps</th><th class="n">Covered</th><th class="n">Partial</th><th class="n">Gap</th><th>Coverage</th></tr></thead><tbody></tbody></table></div>
+    <div class="legend"><span style="--c:var(--good)">Covered</span><span style="--c:var(--warn)">Partial</span><span style="--c:var(--line)">Gap</span></div>
+  </section>
+
+  <section class="card" aria-labelledby="hLog">
+    <h2 id="hLog">Weekly log</h2>
+    <p class="sub">What went live or was decided, from the project status record. Filter by week, by kind, or search.</p>
+    <div class="row">
+      <label for="weekSel">Week</label><select id="weekSel"></select>
+      <input type="search" id="q" placeholder="Search the log" aria-label="Search the log">
+    </div>
+    <div class="row" id="kindChips" role="group" aria-label="Kind of work"></div>
+    <div class="counts" id="logCounts"></div>
+    <ul class="log" id="log"></ul>
+  </section>
+
+  <details class="card">
+    <summary>How each number is worked out</summary>
+    <ul>
+      <li><b>Live skills</b>: every skill in the app's skill list (retired ones stay listed so share codes keep working).</li>
+      <li><b>Redesign passed</b>: skills an independent critic scored 8 or more on every criterion, every page type and every screen.</li>
+      <li><b>Lessons</b>: lessons the app prints, each pinned page by page so an unplanned change is caught.</li>
+      <li><b>Check tools</b>: the automatic check programs. <b>Proved checks</b>: each one shown to fail on the bad page and pass on the fix. <b>Critic findings turned into checks</b>: rows in the findings ledger, dated by the week the finding came in.</li>
+      <li><b>White Rose steps</b>: the 872 small steps; covered when a live skill teaches the whole step.</li>
+      <li><b>Usage</b>: the share of the weekly limit used, typed in each week; marked "about" where it is an estimate.</li>
+      <li>The board is rebuilt each week by <code>node tests/scripts/ws-pace.cjs --write</code>; the deploy check <code>--check</code> fails if a finished week is missing or its numbers differ from the project history.</li>
+    </ul>
+  </details>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const fmt = new Intl.NumberFormat('en-US');
+  const dFmt = (s) => { const d = new Date(s + 'T12:00:00Z'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }); };
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const KINDS = [['all', 'All'], ['skill', 'Skills'], ['lesson', 'Lessons'], ['feature', 'Features'], ['fix', 'Fixes'], ['check', 'Checks & tools'], ['other', 'Other']];
+  const METRICS = [
+    ['passed', 'Redesign passed'], ['skills', 'Live skills'], ['lessons', 'Lessons'],
+    ['backtests', 'Proved checks'], ['gates', 'Check tools'], ['ledger', 'Critic findings → checks'],
+    ['wrmCovered', 'White Rose steps covered'], ['usagePct', 'Usage %'],
+  ];
+  const get = (w, k) => k === 'wrmCovered' ? (w.wrm ? w.wrm.covered : null) : w[k];
+  let D, metric = 'passed', kind = 'all';
+
+  function tooltip(box) { let t = box.querySelector('.tip'); if (!t) { t = document.createElement('div'); t.className = 'tip'; t.hidden = true; box.appendChild(t); } return t; }
+
+  function tiles() {
+    const W = D.weeks, cur = W[W.length - 1], prev = W[W.length - 2];
+    const ch = (a, b) => (a == null || b == null) ? null : a - b;
+    const items = [
+      ['Redesign passed', cur.passed, ch(cur.passed, prev.passed), 'skills at 8/10'],
+      ['Live skills', cur.skills, ch(cur.skills, prev.skills), 'in the app'],
+      ['Lessons', cur.lessons, ch(cur.lessons, prev.lessons), 'pinned, page by page'],
+      ['Proved checks', cur.backtests, ch(cur.backtests, prev.backtests), 'fail-then-pass tests'],
+      ['Check tools', cur.gates, ch(cur.gates, prev.gates), 'automatic checkers'],
+      ['Findings → checks', cur.ledgerAdded, ch(cur.ledgerAdded, prev.ledgerAdded), 'ledger rows this week'],
+      ['White Rose covered', cur.wrm ? cur.wrm.covered : null, cur.wrm && prev.wrm ? cur.wrm.covered - prev.wrm.covered : null, cur.wrm ? `of ${cur.wrm.total} steps` : ''],
+      ['Usage', cur.usagePct, ch(cur.usagePct, prev.usagePct), cur.usageEstimated ? 'about, of the weekly limit' : 'of the weekly limit'],
+    ];
+    const box = $('#tiles'); box.replaceChildren();
+    for (const [lbl, n, d, note] of items) {
+      const t = document.createElement('div'); t.className = 'tile';
+      const a = document.createElement('div'); a.className = 'lbl'; a.textContent = lbl;
+      const b = document.createElement('div'); b.className = 'num'; b.textContent = n == null ? '—' : (lbl === 'Usage' ? n + '%' : fmt.format(n));
+      const c = document.createElement('div'); c.className = 'chg';
+      if (d == null) { c.textContent = note; }
+      else {
+        const good = lbl === 'Usage' ? d <= 0 : d > 0;
+        c.className = 'chg ' + (d === 0 ? 'flat' : good ? 'up' : 'down');
+        c.textContent = `${d > 0 ? '+' : d < 0 ? '−' : '±'}${fmt.format(Math.abs(d))} vs last week · ${note}`;
+      }
+      t.append(a, b, c); box.appendChild(t);
+    }
+  }
+
+  function summary() {
+    const W = D.weeks, cur = W[W.length - 1], prev = W[W.length - 2];
+    const live = (D.log[cur.start] || []).length;
+    const pd = cur.passed - prev.passed, bt = cur.backtests - prev.backtests;
+    $('#summary').textContent = `Week of ${dFmt(cur.start)}${cur.done ? '' : ' (in progress)'}: ${live} items went live or were decided, ` +
+      `${pd >= 0 ? pd : 0} more skill${pd === 1 ? '' : 's'} passed the 8/10 redesign, and ${fmt.format(Math.max(0, bt))} proved checks were added.`;
+    $('#genLine').textContent = `Updated ${new Date(D.generated).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })} · project version ${D.head}`;
+  }
+
+  function trend() {
+    const box = $('#trend'); box.querySelectorAll('svg').forEach((s) => s.remove());
+    const W = D.weeks, pts = W.map((w, i) => ({ i, w, v: get(w, metric) })).filter((p) => p.v != null);
+    const width = Math.max(300, box.clientWidth), height = Math.min(320, Math.max(200, width * 0.36));
+    const m = { l: 52, r: 16, t: 14, b: 30 };
+    const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': `${METRICS.find((x) => x[0] === metric)[1]} by week` });
+    box.prepend(svg);
+    if (!pts.length) { const t = el('text', { x: width / 2, y: height / 2, 'text-anchor': 'middle' }, svg); t.textContent = 'No figures recorded yet for this measure.'; return; }
+    const maxV = Math.max(...pts.map((p) => p.v)), minV = Math.min(0, ...pts.map((p) => p.v));
+    const nice = (v) => { const p = Math.pow(10, Math.floor(Math.log10(Math.max(1, v)))); return Math.ceil(v / p) * p; };
+    const top = nice(maxV || 1);
+    const x = (i) => m.l + (W.length === 1 ? 0 : (i / (W.length - 1)) * (width - m.l - m.r));
+    const y = (v) => m.t + (1 - (v - minV) / (top - minV)) * (height - m.t - m.b);
+    for (let k = 0; k <= 4; k++) {
+      const v = minV + (top - minV) * k / 4;
+      el('line', { x1: m.l, x2: width - m.r, y1: y(v), y2: y(v), stroke: css('--line') }, svg);
+      const t = el('text', { x: m.l - 8, y: y(v) + 4, 'text-anchor': 'end' }, svg); t.textContent = fmt.format(Math.round(v));
+    }
+    W.forEach((w, i) => { if (W.length > 8 && i % 2) return; const t = el('text', { x: x(i), y: height - 8, 'text-anchor': 'middle' }, svg); t.textContent = dFmt(w.start); });
+    const acc = css('--accent');
+    const area = `M${x(pts[0].i)},${y(minV)} ` + pts.map((p) => `L${x(p.i)},${y(p.v)}`).join(' ') + ` L${x(pts[pts.length - 1].i)},${y(minV)} Z`;
+    el('path', { d: area, fill: acc, 'fill-opacity': 0.1 }, svg);
+    el('path', { d: pts.map((p, k) => `${k ? 'L' : 'M'}${x(p.i)},${y(p.v)}`).join(' '), fill: 'none', stroke: acc, 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, svg);
+    const tip = tooltip(box);
+    pts.forEach((p, k) => {
+      const last = k === pts.length - 1;
+      const c = el('circle', { cx: x(p.i), cy: y(p.v), r: last ? 5.5 : 4, fill: last ? acc : css('--panel'), stroke: acc, 'stroke-width': 2 }, svg);
+      if (last) { const t = el('text', { x: x(p.i) - 8, y: y(p.v) - 10, 'text-anchor': 'end' }, svg); t.textContent = fmt.format(p.v) + (metric === 'usagePct' ? '%' : ''); t.setAttribute('fill', css('--ink')); }
+      const hit = el('rect', { x: x(p.i) - 18, y: m.t, width: 36, height: height - m.t - m.b, fill: 'transparent' }, svg);
+      const show = () => { tip.hidden = false; tip.textContent = `Week of ${dFmt(p.w.start)}: ${fmt.format(p.v)}${metric === 'usagePct' ? '%' + (p.w.usageEstimated ? ' (about)' : '') : ''}`; const r = box.getBoundingClientRect(); const px = (x(p.i) / width) * r.width; tip.style.left = Math.min(r.width - tip.offsetWidth, Math.max(0, px - tip.offsetWidth / 2)) + 'px'; tip.style.top = Math.max(0, (y(p.v) / height) * r.height - 44) + 'px'; };
+      hit.addEventListener('mouseenter', show); hit.addEventListener('touchstart', show, { passive: true }); hit.addEventListener('mouseleave', () => { tip.hidden = true; });
+    });
+  }
+
+  function eta() {
+    const W = D.weeks.filter((w) => w.done || w === D.weeks[D.weeks.length - 1]);
+    const n = +$('#win').value; const cur = W[W.length - 1];
+    const span = W.slice(-Math.min(n, W.length - 1) - 1);
+    const rate = (f) => { const a = span[0], b = span[span.length - 1]; const va = f(a), vb = f(b); if (va == null || vb == null) return null; const weeks = span.length - 1; return weeks ? (vb - va) / weeks : null; };
+    const g = D.grades || []; const gap3 = g.find((r) => r.year === 'Year 4');
+    const rows = [
+      ['Skills through the 8/10 redesign', cur.passed, cur.skills - cur.passed, rate((w) => w.passed)],
+      ['White Rose steps fully covered', cur.wrm ? cur.wrm.covered : null, cur.wrm ? cur.wrm.partial + cur.wrm.gap : null, rate((w) => w.wrm ? w.wrm.covered : null)],
+      ['White Rose gap steps (lessons with no skill)', cur.wrm ? cur.wrm.total - cur.wrm.gap : null, cur.wrm ? cur.wrm.gap : null, rate((w) => w.wrm ? w.wrm.total - w.wrm.gap : null)],
+      ['Grade 3 gap steps (WRM Year 4)', gap3 ? gap3.steps - gap3.gap : null, gap3 ? gap3.gap : null, null],
+      ['Lessons pinned', cur.lessons, null, rate((w) => w.lessons)],
+    ];
+    const tb = $('#etaTable tbody'); tb.replaceChildren();
+    for (const [name, done, left, r] of rows) {
+      const tr = document.createElement('tr');
+      const cells = [name, done == null ? '—' : fmt.format(done), left == null ? '—' : fmt.format(left), r == null ? '—' : (Math.round(r * 10) / 10).toString()];
+      cells.forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i) td.className = 'n'; tr.appendChild(td); });
+      const td = document.createElement('td'); td.className = 'eta';
+      if (left == null) td.textContent = 'Total keeps growing as lessons are added';
+      else if (left === 0) { td.textContent = 'Done'; td.classList.add('up'); }
+      else if (r == null) { td.textContent = 'Starts next week: no pace yet'; td.classList.add('flat'); }
+      else if (r <= 0) { td.textContent = 'No progress in this window'; td.classList.add('down'); }
+      else { const wks = Math.ceil(left / r); const end = new Date(Date.parse(cur.start + 'T22:00:00Z') + wks * 7 * 864e5); td.textContent = `about ${wks} week${wks === 1 ? '' : 's'} (${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })})`; }
+      tr.appendChild(td); tb.appendChild(tr);
+    }
+  }
+
+  function checks() {
+    const box = $('#checks'); box.querySelectorAll('svg').forEach((s) => s.remove());
+    const W = D.weeks.slice(1);
+    const series = [['Proved checks added', (w) => Math.max(0, w.added ? w.added.backtests : 0), '--accent'], ['Critic findings turned into checks', (w) => w.ledgerAdded || 0, '--good'], ['New check tools', (w) => Math.max(0, w.added ? w.added.gates : 0), '--warn']];
+    const width = Math.max(300, box.clientWidth), height = 240, m = { l: 44, r: 10, t: 12, b: 30 };
+    const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': 'Automatic checks added each week' }); box.prepend(svg);
+    const maxV = Math.max(1, ...W.flatMap((w) => series.map((s) => s[1](w))));
+    const y = (v) => m.t + (1 - v / maxV) * (height - m.t - m.b);
+    for (let k = 0; k <= 4; k++) { const v = maxV * k / 4; el('line', { x1: m.l, x2: width - m.r, y1: y(v), y2: y(v), stroke: css('--line') }, svg); const t = el('text', { x: m.l - 6, y: y(v) + 4, 'text-anchor': 'end' }, svg); t.textContent = fmt.format(Math.round(v)); }
+    const gw = (width - m.l - m.r) / W.length, bw = Math.max(6, Math.min(26, (gw - 14) / series.length));
+    const tip = tooltip(box);
+    W.forEach((w, i) => {
+      const gx = m.l + i * gw + (gw - bw * series.length) / 2;
+      series.forEach(([name, f, c], s) => {
+        const v = f(w); const r = el('rect', { x: gx + s * bw, y: y(v), width: bw - 2, height: Math.max(0, y(0) - y(v)), fill: css(c), rx: 2 }, svg);
+        const show = () => { tip.hidden = false; tip.textContent = `${dFmt(w.start)} · ${name}: ${fmt.format(v)}`; const b = box.getBoundingClientRect(); tip.style.left = Math.min(b.width - tip.offsetWidth, Math.max(0, ((gx + s * bw) / width) * b.width - 40)) + 'px'; tip.style.top = Math.max(0, (y(v) / height) * b.height - 40) + 'px'; };
+        r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.hidden = true; });
+      });
+      const t = el('text', { x: m.l + i * gw + gw / 2, y: height - 8, 'text-anchor': 'middle' }, svg); t.textContent = dFmt(w.start);
+    });
+    const lg = $('#checksLegend'); lg.replaceChildren();
+    series.forEach(([n, , c]) => { const s = document.createElement('span'); s.style.setProperty('--c', `var(${c})`); s.textContent = n; lg.appendChild(s); });
+  }
+
+  function wrm() {
+    const tb = $('#wrmTable tbody'); tb.replaceChildren();
+    for (const r of D.grades || []) {
+      const tr = document.createElement('tr');
+      [r.year, r.grade, r.steps, r.covered, r.partial, r.gap].forEach((v, i) => { const td = document.createElement('td'); td.textContent = typeof v === 'number' ? fmt.format(v) : v; if (i > 1) td.className = 'n'; tr.appendChild(td); });
+      const td = document.createElement('td'); const bar = document.createElement('div'); bar.className = 'bar'; bar.setAttribute('role', 'img'); bar.setAttribute('aria-label', `${Math.round(100 * r.covered / r.steps)}% covered`);
+      [[r.covered, '--good'], [r.partial, '--warn']].forEach(([v, c]) => { const i = document.createElement('i'); i.style.width = (100 * v / r.steps) + '%'; i.style.background = `var(${c})`; bar.appendChild(i); });
+      td.appendChild(bar); tr.appendChild(td); tb.appendChild(tr);
+    }
+  }
+
+  function logView() {
+    const wk = $('#weekSel').value, q = $('#q').value.trim().toLowerCase();
+    const items = (D.log[wk] || []).filter((x) => (kind === 'all' || x.kind === kind) && (!q || (x.title + ' ' + x.detail).toLowerCase().includes(q)));
+    const all = D.log[wk] || [];
+    const cnt = $('#logCounts'); cnt.replaceChildren();
+    for (const [k, lbl] of KINDS.slice(1)) { const n = all.filter((x) => x.kind === k).length; if (!n) continue; const s = document.createElement('span'); s.append(lbl + ' '); const b = document.createElement('b'); b.textContent = n; s.appendChild(b); cnt.appendChild(s); }
+    const ul = $('#log'); ul.replaceChildren();
+    if (!items.length) { const li = document.createElement('li'); li.textContent = all.length ? 'Nothing matches this filter.' : 'No entries recorded for this week.'; li.style.gridTemplateColumns = '1fr'; ul.appendChild(li); return; }
+    for (const x of items) {
+      const li = document.createElement('li');
+      const d = document.createElement('span'); d.className = 'd'; d.textContent = dFmt(x.date);
+      const k = document.createElement('span'); const p = document.createElement('span'); p.className = 'pill k-' + x.kind; p.textContent = (KINDS.find((z) => z[0] === x.kind) || [, x.kind])[1].replace(' & tools', ''); k.appendChild(p);
+      const t = document.createElement('span'); t.className = 't'; t.textContent = x.title;
+      if (x.detail) { const s = document.createElement('small'); s.textContent = x.detail; t.appendChild(s); }
+      li.append(d, k, t); ul.appendChild(li);
+    }
+  }
+
+  function controls() {
+    const mc = $('#metricChips');
+    for (const [k, lbl] of METRICS) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = lbl; b.setAttribute('aria-pressed', String(k === metric)); b.addEventListener('click', () => { metric = k; mc.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === b))); trend(); }); mc.appendChild(b); }
+    const kc = $('#kindChips');
+    for (const [k, lbl] of KINDS) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = lbl; b.setAttribute('aria-pressed', String(k === kind)); b.addEventListener('click', () => { kind = k; kc.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === b))); logView(); }); kc.appendChild(b); }
+    const ws = $('#weekSel');
+    D.weeks.slice().reverse().forEach((w) => { const o = new Option(`Week of ${dFmt(w.start)}${w.done ? '' : ' (this week)'} · ${(D.log[w.start] || []).length} items`, w.start); ws.appendChild(o); });
+    ws.addEventListener('change', logView); $('#q').addEventListener('input', logView); $('#win').addEventListener('change', eta);
+    let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { trend(); checks(); }, 120); });
+  }
+
+  fetch('data/pace/pace.json', { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then((d) => {
+    D = d; controls(); summary(); tiles(); trend(); eta(); checks(); wrm(); logView();
+  }).catch((e) => { $('#genLine').textContent = 'The weekly numbers could not be loaded (' + e.message + '). Run node tests/scripts/ws-pace.cjs --write and reload.'; $('#genLine').className = 'err'; });
+})();
+</script>
+</body>
+</html>
