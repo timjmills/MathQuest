@@ -4839,7 +4839,8 @@ async function buildRoleSheet(n, metaOf) {
             }
             const k = out.length;
             const prepared = typeof mod.prepare === 'function'
-                ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
+                // (a Pre-skill Check's Quick review pool names its review and the sheet's skills: its item takes its own prompt)
+                ? mod.prepare(it, Object.assign({ index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look }, pool.review ? { review: pool.review, skills: allSkills } : {}))
                 : it;
             if (!prepared) return false;
             prepared.pool = pool.id;

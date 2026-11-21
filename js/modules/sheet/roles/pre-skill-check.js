@@ -29,7 +29,7 @@
 // Pure module (SCC-01).
 
 import { LESSON_ROUTE_CSS } from '../lesson-css.js';
-import { getProvider } from '../contract.js';
+import { getProvider, toScreenInstruction } from '../contract.js';
 import { estimateTitleLines } from './practice.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
@@ -75,6 +75,36 @@ function checkSources(skills, { earlier }) {
     // One quadrant per prerequisite, up to four. A skill with fewer earlier skills checks fewer
     // quadrants (a first skill checks itself once) rather than repeating one skill four times.
     return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
+}
+/**
+ * REVIEW-INSTR (lf-roles critic qreview r1, 2026-11-21): a Quick review item prints its OWN short prompt at the top of its cell -
+ * its skill's library instruction (instructionKeyOf / instructionText, never label text: PSC-INSTR), since the band's line
+ * "Quick review. Solve each one." says nothing of "Shade", "Is it a fact family?" or "Circle a.m. or p.m.". A pure compute
+ * instruction (REVIEW_PROMPT_PLAIN) relies on the band line. The prompt is drawn by the item's render, so the bridge MEASURES it
+ * into the cell's height and ink (the content is never shrunk); it starts right of the number tab (TAB-CLEAR). The screen
+ * takes the screen verb (toScreenInstruction). '' when the item needs none.
+ */
+export const REVIEW_PROMPT_PLAIN = /^(?:Solve|Add|Subtract|Multiply|Divide)\.(?:\s+Write the answer\.)?$/;
+export function reviewPromptOf(it, skills) {
+    let text = '';
+    try { text = String(instructionText(instructionKeyOf([it], skills || []), [it]) || '').trim(); } catch (e) { text = ''; }
+    return !text || REVIEW_PROMPT_PLAIN.test(text) ? '' : text;
+}
+const promptEsc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** The bridge's per-item hook: a review pool's item (info.review) takes its prompt; every other item is returned untouched. */
+export function prepare(it, info = {}) {
+    if (!info || !info.review || !it || typeof it.render !== 'function') return it;
+    const text = reviewPromptOf(it, info.skills);
+    if (!text) return it;
+    const r0 = it.render;
+    it.render = (c, o) => {
+        const mt = (c && c.metrics) || {};
+        const tab = Number.isFinite(mt.tabMm) ? mt.tabMm : 5;
+        const words = c && c.mode === 'screen' ? toScreenInstruction(text) : text;
+        return `<div class="ws-revprompt" data-review-prompt style="align-self:stretch;margin:0 0 1.5mm ${(2 * tab - 1).toFixed(1)}mm;font-size:${mt.textPt || 13}pt;line-height:1.25;text-align:left;color:#000;">${promptEsc(words)}</div>${r0(c, o)}`;
+    };
+    it.reviewPrompt = text;
+    return it;
 }
 // (lead ruling A24 item 1a, 2026-11-21: a 3-column choice for the stacked check bands and the Quick review rows)
 export const measureCols = () => [1, 2, 3, 4];
