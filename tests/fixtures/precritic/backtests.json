@@ -16030,6 +16030,146 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-player-s2-column-grade",
+  "check": "ws-lesson-player --column-grade F1: pupil 820 / 1024 / 1280, every Warm-up and We do item: the caret starts in the ONES box (SP-32), a blank Check grades nothing, the answer typed one column to the left is graded wrong (per column), a wrong digit keeps the rung",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "autofocus on the tens box; valueOf joined the boxes, so \"5|_\" passed as 5"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "caret in the ones box; judge() grades each box against its own place"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --column-grade",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-board-ink",
+  "check": "ws-lesson-player --board-ink F2: board 1920 / 1366 / 1024, every We do item: no black mark moves > 1 px on any rung change (Hint, Show me)",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "the words column took each rung's own width (the centred group moved 37-69 px); a wrong Check's longer feedback shrank the cell"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "the words column sized for every rung's words; the feedback strip keeps its longest message's height from the start"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --board-ink",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-showme",
+  "check": "ws-lesson-player --showme F3 (P-ON-7): after two wrong Checks the control reads \"Show me\" and opens rung 1",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "Show me at rung 3 opened rung 2"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "Show me sets rung 1"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --showme",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-rung1-marks",
+  "check": "ws-lesson-player --rung1-marks F4: every We do item at rung 1 draws only the chart's state-1 grey marks (I do step 1), never step 2's dot card",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "rung 1 drew the dot card (step 2's cue) in grey"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "the dot card keeps its room at rung 1 but is not drawn"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --rung1-marks",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-warmup-bond",
+  "check": "ws-lesson-player --warmup-bond F5: board Warm-up at every width: digits >= the signed size (no \"takes the whole stage\" pass) and >= 0.25 digit clear under the drawing's lowest ink",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "the bond at 1366 drew 75 px digits (signed 104), its part boxes on the cell border"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "a compact screen bond (parts 0.35 box under the whole, digits 0.75 box) and 0.3 digit of foot room"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --warmup-bond",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-feedback",
+  "check": "ws-lesson-player --feedback F6: a wrong Check is told in words with no colour word and a drawn cross in the feedback strip; no unused (blank-is-right) box carries a cross",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "\"The red box is wrong\", no mark in the strip"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "\"Not yet. The ones box is empty ...\" with a drawn cross beside the words"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --feedback",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-player-s2-pupil-fill",
+  "check": "ws-lesson-player --pupil-fill F7 (as A22b): pupil 1280 / 1366 / 1920 Warm-up and We do: < 30 % of the room between the bars outside the card, digits 56-70 px",
+  "kind": "commit-pair",
+  "rule": "lf-hosts player s2 critic r1",
+  "browser": true,
+  "fail": {
+   "commit": "7c18dbafa",
+   "state": "the pupil card filled 26-36 % of the room (64-86 % outside)"
+  },
+  "pass": {
+   "commit": "c261c290c",
+   "state": "the card takes the stage width and grows to 2.2 x its content, trimmed to H13 (28 %); counting pictures put their box under the picture"
+  },
+  "command": "node tests/scripts/ws-lesson-player.mjs --pupil-fill",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
