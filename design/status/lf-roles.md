@@ -614,7 +614,7 @@ commit each; backtest rows PASS (FAIL bd27ee70d -> OK fix).
   p2 check 11-16 -> 9-14. sub_wp_20 L joins the default fixtures.
 - REVIEW-INSTR (`psc-review-instr`, OK 5d6597615): the role's prepare hook gives each review item its LIBRARY instruction as a
   prompt line at the top of its cell (measured into the cell; pure compute instructions rely on the band line); its words sit in a
-  span so the bridge's ink reads the text width (EB-SIDE, a7-style follow-up commit).
+  span so the bridge's ink reads the text width (EB-SIDE, follow-up commit).
 - Review-cell acceptance also caps the cell's total horizontal white at 50 % (REVIEW_EMPTY_MAX).
 - ws-psc-review's fixture judge accepts the ruled cases: a multi-strip check keeps per-prerequisite scores (no "Check __/n"); a page
   whose room is under the shortest whole review row (second-shortest candidate at one column count) + strip has no band.
