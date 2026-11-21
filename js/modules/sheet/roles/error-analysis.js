@@ -496,8 +496,11 @@ export function prepare(it, info = {}) {
     let glue = P ? (P.glue || glueOf(P.display, P.parts)) : null;
     // every value the pupil wrote in a slot is written like the right one there (L3)
     const keySlots = (it.key && it.key.slots) || {};
+    const boxFmt = it.template === 'area-model' ? {} : fmt;
     let shownSlots = isWrong && wrong.slots
-        ? Object.fromEntries(Object.entries(wrong.slots).map(([id, v]) => [id, keySlots[id] ? likeAnswer(v, keySlots[id].value, fmt) : v]))
+        // (an area model's boxes are written like the KEY's boxes - raw digits - never with the page's commas: "1,590" in a part box
+        // read as two parts; lf-ops sizes r2, EA-WORK-COHERENT)
+        ? Object.fromEntries(Object.entries(wrong.slots).map(([id, v]) => [id, keySlots[id] ? likeAnswer(v, keySlots[id].value, boxFmt) : v]))
         : undefined;
     let sParts = null;
     if (P) {
@@ -509,10 +512,10 @@ export function prepare(it, info = {}) {
                 || (P.glue && /^\d+$/.test(String(wrong.value).trim()) ? [String(wrong.value).trim(), '', ''] : null)
                 || (/[;,]\s/.test(String(wrong.value)) ? String(wrong.value).split(/[;,]\s*/) : null);
             sParts = ids.map((id, i) => {
-                if (wrong.slots && wrong.slots[id] !== undefined) return likeAnswer(wrong.slots[id], P.parts[i].value, fmt);
+                if (wrong.slots && wrong.slots[id] !== undefined) return likeAnswer(wrong.slots[id], P.parts[i].value, boxFmt);
                 // a part the wrong answer does not name was written right ("5, 7, 28": one
                 // group short leaves the 5 and the 7 as they were)
-                return likeAnswer(split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value), P.parts[i].value, fmt);
+                return likeAnswer(split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value), P.parts[i].value, boxFmt);
             });
             if (sParts.every((v) => v === '')) sParts = null;
             // Parts the whole answer does not spell out (an area model's partial products under

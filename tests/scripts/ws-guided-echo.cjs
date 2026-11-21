@@ -34,6 +34,9 @@
 //                      multiplication, area-model ...), whose Scripted Model states must also CHANGE: a state whose step has an
 //                      "=" or a "Write" draws something the state before it did not (the column / area Models drew every state
 //                      but the last blank).
+//   EA-WORK-COHERENT   (lf-ops sizes r2, critic r1 F2 / F12) on Error analysis, True or False? and Reason It, an area model's
+//                      shown work is coherent: no box holds a grouped number, and the total is the parts' sum or that sum less one
+//                      part ("1,590" split as "1" | "590"; a "dropped zeros" total beside the right part).
 //   SAY-AGREE          every Say frame a page prints - the opener's UNFILLED one among them - agrees in number with the page's
 //                      Model item (N3: "The missing number is __." under a two-gap Model): an item of k > 1 answer parts
 //                      (`keyParts`) prints a plural frame, with k blanks when it is unfilled. Judged on chart windows.
@@ -71,7 +74,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             const { seedFrom = 1, seedTo = N, vBand = null, finalize = false, screen = 0 } = part || {};
             const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
-            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE'].some(on);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE', 'MODEL-STATE-MARKS', 'SAY-AGREE', 'EA-WORK-COHERENT'].some(on);
             // (the templates whose Model states draw their marks; absent on a tree without the export - every template then)
             let TRACE = null;
             try { const SMm = await import(new URL('js/modules/sheet/roles/scripted-model.js', location.href).href); TRACE = SMm.TRACE_TEMPLATES || null; } catch (e) { TRACE = null; }
@@ -253,6 +256,23 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                                 if (/^Correct/i.test(String((it.key && it.key.short) || ''))) ea.multiCorrect++; else ea.multiFix++;
                             }
                         }
+                        // EA-WORK-COHERENT (lf-ops sizes r2, critic r1 F2 / F12): the finished work an area model shows on a thinking
+                        // page is a pupil's work: no box holds a grouped number ("1,590" split into "1" | "590"), and the total is the sum
+                        // of the parts shown, or that sum less one part (the "left out a part" error) - never a total the parts do not make.
+                        if (on('EA-WORK-COHERENT') && ['error-analysis', 'true-false', 'reason-it'].includes(role)) {
+                            const d = new DOMParser().parseFromString(`<div>${r.pupilHtml}</div>`, 'text/html');
+                            d.querySelectorAll('[data-ws-cell="area-model"]').forEach((c, ci) => {
+                                const val = (id) => { const e = c.querySelector(`[data-ws-slot="${id}"]`); return e ? e.textContent.replace(/\s/g, '') : null; };
+                                const parts = []; for (let k = 0; val(`part-${k}`) !== null; k++) parts.push(val(`part-${k}`));
+                                const tot = val('total');
+                                if (!parts.length || tot === null || !tot || parts.some((x) => !x)) return;
+                                const lab = `${key} ${role} ${size} seed ${s} model ${ci + 1}`;
+                                const grouped = parts.concat([tot]).filter((x) => /\d,\d/.test(x));
+                                if (grouped.length) { out.push(`EA-WORK-COHERENT ${lab}: a box holds a grouped number (${grouped.join(', ')}) - parts ${parts.join(' | ')}, total ${tot}`); return; }
+                                const P = parts.map(Number), T = Number(tot), S = P.reduce((a, b) => a + b, 0);
+                                if (T !== S && !P.some((x) => S - x === T)) out.push(`EA-WORK-COHERENT ${lab}: the parts ${parts.join(' + ')} = ${S} do not make the total ${tot} (nor does any part left out)`);
+                            });
+                        }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
                         const modelIt = pp.flatMap((pg) => pg.items).find((it) => it && it.q && it.q.cell);
                         const modelTpl = modelIt && modelIt.q.cell.template;
@@ -328,7 +348,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE|MODEL-STATE-MARKS|SAY-AGREE|EA-WORK-COHERENT) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);

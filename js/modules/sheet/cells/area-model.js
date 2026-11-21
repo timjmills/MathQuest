@@ -187,7 +187,9 @@ register('area-model', {
         const ink = inkOf(ctx);
         const key = keySlots(p);
         const vals = slotValues(ctx, key, (w) => {
-            const l = splitList(w);
+            // (a grouped number - "1,590" - is ONE value, the total: never split on its comma into the part boxes; lf-ops sizes r2,
+            // critic r1 F2, EA-WORK-COHERENT)
+            const l = /^\d{1,3}(,\d{3})+$/.test(String(w).trim()) ? [String(w).trim().replace(/,/g, '')] : splitList(w);
             const o = {};
             // A single shown value is a total; a list is the parts, then the total.
             if (l.length === 1) o.total = l[0];

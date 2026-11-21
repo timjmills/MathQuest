@@ -58,7 +58,10 @@ export function prepare(it, info = {}) {
     // at L and cost the page an item (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3)
     const stem = eq || (place.kind === 'list' ? 'Answer: ' : 'The answer is ');
     const render = (c, o = {}) => {
-        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
+        // (EA-WORK-COHERENT, lf-ops sizes r2 / critic r1 F12: a False statement whose error names SEVERAL boxes - an area model's
+        // parts and total - draws every box it names, so the work shows the error it claims, not the right part beside a short total)
+        const multi = isFalse && wrong.slots && Object.keys(wrong.slots).length >= 2 ? { shownSlots: wrong.slots } : {};
+        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }, multi));
         // no frame row (a sentence answer, PT-TOF-4): the True / False boxes stand BESIDE the statement (10 mm off any box column
         // the statement draws itself, critic r3 D7), one over the other, so
         // the cell is as tall as its statement (critic r2 R2: under it, the cell kept a frame row's height and L printed 3 of 4)

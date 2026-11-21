@@ -246,22 +246,30 @@ function areaSteps(q) {
 function areaWrong(q) {
     const M = areaModel(q);
     if (!M) return null;
+    // EA-WORK-COHERENT (lf-ops sizes r2, critic r1 F2 / F12): the wrong work names EVERY box of the template - its own slot ids
+    // `part-<k>` (row-major) and `total`, raw digits - so the cell never splits a grouped total ("1,590") into its part boxes,
+    // and the shown parts and total agree under the named misconception.
+    const pid = (i, j) => `part-${i * M.cols.length + j}`;
+    const right = {};
+    M.rows.forEach((r, i) => M.cols.forEach((col, j) => { right[pid(i, j)] = r * col; }));
+    const work = (over, total) => Object.assign(Object.fromEntries(Object.entries(right).map(([k, v]) => [k, String(v)])), over, { total: String(total) });
     const c = [];
-    // Dropped the zeros of the biggest part: 7 × 80 written as 56.
+    // Dropped the zeros of the biggest part: 7 × 80 written as 56 (the total adds the parts as written).
     let bi = 0; let bj = 0; let best = -1;
     M.rows.forEach((r, i) => M.cols.forEach((col, j) => { if (r * col > best) { best = r * col; bi = i; bj = j; } }));
     const r = M.rows[bi]; const col = M.cols[bj];
     const dropped = stripZeros(r) * stripZeros(col);
     if (dropped !== r * col) {
-        const slot = M.grid ? `r${bi}c${bj}` : `part${bj}`;
-        c.push({ value: M.product - r * col + dropped, misconception: 'dropped-zeros', slot,
-            slots: { [slot]: String(dropped), total: String(M.product - r * col + dropped) },
+        const v = M.product - r * col + dropped;
+        c.push({ value: v, misconception: 'dropped-zeros', slot: pid(bi, bj),
+            slots: work({ [pid(bi, bj)]: String(dropped) }, v),
             explain: `Wrote ${r} × ${col} as ${dropped}: the zeros are missing.` });
     }
-    // Left the last (ones) part out of the total.
+    // Left the last (ones) part out of the total: every part right, the total short by that part.
     const lastRow = M.rows[M.rows.length - 1];
     const lastCol = M.cols[M.cols.length - 1];
-    c.push({ value: M.product - lastRow * lastCol, misconception: 'left-out-part', slot: 'total',
+    const lo = M.product - lastRow * lastCol;
+    c.push({ value: lo, misconception: 'left-out-part', slot: 'total', slots: work({}, lo),
         explain: `Did not add the ${lastRow} × ${lastCol} part.` });
     return chooseWrong(q, c);
 }
