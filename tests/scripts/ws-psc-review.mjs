@@ -2,7 +2,7 @@
 // ws-psc-review — the Pre-skill Check + Quick review checks (card design/cards/psc-review/PSC_REVIEW_CARD.md, signed by the
 // lead 2026-11-20). Check first: each FAILS on master (no Quick review band yet); next week's build makes them PASS.
 //
-//   node tests/scripts/ws-psc-review.mjs                       # fixtures: add_facts M / L, div_facts M / L, mult_facts M / L
+//   node tests/scripts/ws-psc-review.mjs                       # fixtures: add_facts M / L, div_facts M / L, mult_facts M / L, sub_wp_20 L
 //   node tests/scripts/ws-psc-review.mjs --skills a:b,c:d --sizes M,L --seed 7
 //   node tests/scripts/ws-psc-review.mjs --self-test            # the pure judges on planted plans, no browser
 //   node tests/scripts/ws-psc-review.mjs --only PSC-SCORES      # judge only these rules (comma list)
@@ -21,6 +21,16 @@
 // PSC-REVIEW-GRADE (lead A24 item 5): every review item's grade lies in the pupil's grade down to two grades below.
 // KEYLABEL-CLEAR (lead A24 item 5): on the key, each review label's box does not intersect its cell's ink box (the union of the
 //   cell's painted parts, the label and the number tab aside), measured in the DOM.
+// (lf-roles critic qreview r1, 2026-11-21 - each check first:)
+// KEYLABEL-GREY: every [data-review-label] prints in the one grey (its computed colour is the --ws-grey token) and is not a key
+//   answer (no [data-ws-key-ans] on it or an ancestor: the key ink's !important rule would paint it orange).
+// KEYLABEL-WORDS: a label is ONE line and no word of it spans two line boxes (Range rects; "Operat/ions" in a side column).
+// REVIEW-TAG-ID: each label's skill text is the label of THAT category + skill in SKILLS (fractions:identify was tagged
+//   "Name the Place", placevalue:identify's label); a short tag is the domain name alone.
+// REVIEW-INSTR: a review cell whose response is a choice / check / yes-no / shade / draw / circle slot prints its own verb
+//   prompt ([data-review-prompt], a print verb first or a question) - "Quick review. Solve each one." does not say what to do.
+// PSC-REVIEW-ORDER: every review item's number is after every check item's number (a review band on page 1 of a two-page
+//   check was numbered 9-10 with the check's 11-16 on page 2).
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -52,7 +62,16 @@ export function judge(b, own, grade) {
     const F = (rule, msg) => out.push({ rule, msg });
     const rev = (b.plan && b.plan.meta && b.plan.meta.review) || null;
     const items = b.plan && b.plan.meta ? Number(b.plan.meta.items) || 0 : 0;
-    if (!/Quick review\. Solve each one\./.test(b.pupil || '') || !Array.isArray(rev) || !rev.length) F('PSC-REVIEW-DOMAINS', 'R1 no "Quick review" band (instruction "Quick review. Solve each one." and plan.meta.review) on a page with room left under the check');
+    // (the ruled cases, lead A24 item 4 and the card: a page whose room under the check is less than the shortest review cell +
+    // the band's strip has no band - `reviewFit` {room, strip, cands: [{h4, h3, h2}]}; a check of more than one strip keeps its
+    // per-prerequisite scores, so it prints no "Check __/n")
+    const fitR = b.reviewFit || null;
+    // (a review row is whole - at least two cells across - so the shortest row is the SECOND-shortest candidate at one column count)
+    const shortest = fitR ? Math.min(Infinity, ...['h4', 'h3', 'h2'].map((k) => (fitR.cands || []).map((c) => c[k]).filter((h) => Number.isFinite(h)).sort((a, b) => a - b)[1]).filter((h) => Number.isFinite(h))) + 1 : Infinity;
+    const noRoom = !(rev && rev.length) && !!fitR && fitR.room - fitR.strip < shortest;
+    const strips = (b.bands || []).filter((x) => !x.shared && x.instr && x.instr !== 'Quick review. Solve each one.').length;
+    if (noRoom) return out.concat(b.again !== b.pupil ? [{ rule: 'PSC-REVIEW-DOMAINS', msg: 'R4 two builds with the same seed differ' }] : []);
+    if (!/Quick review\. Solve each one\./.test(b.pupil || '') || !Array.isArray(rev) || !rev.length) F('PSC-REVIEW-DOMAINS', `R1 no "Quick review" band (instruction "Quick review. Solve each one." and plan.meta.review) on a page with room left under the check${fitR ? ` (room ${fitR.room} mm, strip ${fitR.strip}, shortest cell ${shortest.toFixed(1)} mm)` : ''}`);
     else {
         const why = rotationBad(rev.map((r) => r.domain), allowedDomains(grade));
         if (why) F('PSC-REVIEW-DOMAINS', `R2 ${why}`);
@@ -61,15 +80,16 @@ export function judge(b, own, grade) {
     }
     if (b.again !== b.pupil) F('PSC-REVIEW-DOMAINS', 'R4 two builds with the same seed differ');
     const ck = /Check\s*__\s*\/\s*(\d+)/.exec(b.pupil || '');
-    if (!ck) F('PSC-SCORES', 'S1 no "Check __/n" score on the page');
-    else if (rev && Number(ck[1]) !== items) F('PSC-SCORES', `S1 "Check __/${ck[1]}" but the check has ${items} items`);
+    if (!ck && strips <= 1) F('PSC-SCORES', 'S1 no "Check __/n" score on the page');
+    else if (ck && rev && Number(ck[1]) !== items) F('PSC-SCORES', `S1 "Check __/${ck[1]}" but the check has ${items} items`);
     // (lead A24 item 1b: page 1 of a two-page check may carry a review band too - each band scores its own items; they sum to m)
     const rss = [...(b.pupil || '').matchAll(/Review\s*__\s*\/\s*(\d+)/g)].map((x) => Number(x[1]));
     const m = rev ? rev.reduce((t, r) => t + (Number(r.n) || 1), 0) : 0;
     const rsum = rss.reduce((t, x) => t + x, 0);
     if (!rss.length) F('PSC-SCORES', 'S2 no "Review __/m" score on the page');
     else if (rsum !== m) F('PSC-SCORES', `S2 "Review __/${rss.join(' + ')}" but the review has ${m} items`);
-    const labels = ((b.key || '').match(/data-review-label[^>]*>[^<]*·[^<]*</g) || []).length;
+    // (a label too long for its one line prints the domain alone - critic qreview r1, lead A32-2; REVIEW-TAG-ID checks its words)
+    const labels = ((b.key || '').match(/data-review-label[^>]*>[^<]+</g) || []).length;
     if (!rev || labels < rev.length) F('PSC-SCORES', `S3 the key labels ${labels} of ${rev ? rev.length : 0} review answers with "<domain> · <skill>"`);
     return out;
 }
@@ -113,7 +133,32 @@ function measureKeyLabels() {
             const stroked = !svg && ['Top', 'Right', 'Bottom', 'Left'].some((s2) => parseFloat(st[`border${s2}Width`]) > 0 && st[`border${s2}Style`] !== 'none');
             if (shape || pic || stroked || d.hasAttribute('data-ws-slot')) add(d.getBoundingClientRect());
         }
-        out.push({ text: lab.textContent.trim(), label: box(lab.getBoundingClientRect()), cell: box(cell.getBoundingClientRect()), ink: ink ? { l: ink.l / mm, t: ink.t / mm, r: ink.r / mm, b: ink.b / mm } : null });
+        // (KEYLABEL-GREY: the grey token resolved to a colour on a probe; KEYLABEL-WORDS: the label's line boxes and any word
+        // whose characters lie on two of them)
+        const probe = document.createElement('span');
+        probe.style.color = 'var(--ws-grey)';
+        lab.parentElement.appendChild(probe);
+        const grey = getComputedStyle(probe).color;
+        probe.remove();
+        const tops = new Set();
+        const split = [];
+        for (const nd of lab.childNodes) {
+            if (nd.nodeType !== 3) continue;
+            const txt = nd.textContent;
+            const rg = document.createRange();
+            rg.selectNodeContents(nd);
+            for (const q of rg.getClientRects()) if (q.width > 0.5) tops.add(Math.round(q.top));
+            const re = /\S+/g;
+            let w;
+            while ((w = re.exec(txt))) {
+                const wr = document.createRange();
+                wr.setStart(nd, w.index); wr.setEnd(nd, w.index + w[0].length);
+                const wt = new Set([...wr.getClientRects()].filter((q) => q.width > 0.5).map((q) => Math.round(q.top)));
+                if (wt.size > 1) split.push(w[0]);
+            }
+        }
+        out.push({ text: lab.textContent.trim(), label: box(lab.getBoundingClientRect()), cell: box(cell.getBoundingClientRect()), ink: ink ? { l: ink.l / mm, t: ink.t / mm, r: ink.r / mm, b: ink.b / mm } : null,
+            color: getComputedStyle(lab).color, grey, keyAns: !!lab.closest('[data-ws-key-ans]'), lines: tops.size, split });
     }
     return out.map((c, i) => Object.assign(c, { n: i + 1 }));
 }
@@ -128,6 +173,55 @@ export function gradeWindowBad(items, grade, where = '') {
         .map((x) => ({ rule: 'PSC-REVIEW-GRADE', msg: `${where}review item ${x.skill} is grade ${x.grade || '?'}, outside the grade-${grade} window (grades ${Math.max(0, own - 2) || 'K'}-${grade})` }));
 }
 
+
+export const REVIEW_DOMAIN_NAMES = Object.freeze({ CC: 'Counting', OA: 'Operations', NBT: 'Base Ten', NF: 'Fractions', 'MD-m': 'Measurement', 'MD-d': 'Data', G: 'Geometry' });
+/** KEYLABEL-GREY over measured labels [{text, color, grey, keyAns}]. Pure. */
+export function keyLabelGreyBad(labels, where = '') {
+    const out = [];
+    for (const [i, l] of labels.entries()) {
+        if (l.keyAns) out.push({ rule: 'KEYLABEL-GREY', msg: `${where}label ${i + 1} "${l.text}" is tagged a key answer ([data-ws-key-ans] on it or an ancestor)` });
+        if (l.color !== l.grey) out.push({ rule: 'KEYLABEL-GREY', msg: `${where}label ${i + 1} "${l.text}" prints ${l.color}, not the grey ${l.grey}` });
+    }
+    return out;
+}
+/** KEYLABEL-WORDS over measured labels [{text, lines, split: [word]}]. Pure. */
+export function keyLabelWordsBad(labels, where = '') {
+    const out = [];
+    for (const [i, l] of labels.entries()) {
+        if (l.lines > 1) out.push({ rule: 'KEYLABEL-WORDS', msg: `${where}label ${i + 1} "${l.text}" prints on ${l.lines} lines (one line only)` });
+        for (const w of l.split || []) out.push({ rule: 'KEYLABEL-WORDS', msg: `${where}label ${i + 1}: the word "${w}" breaks across two lines` });
+    }
+    return out;
+}
+/** REVIEW-TAG-ID: `review` [{skill, tag}], `labelOf(cat, id)` the SKILLS label, `printed` the labels' texts. Pure. */
+export function tagIdBad(review, labelOf, printed = [], where = '') {
+    const out = [];
+    for (const [i, r] of (review || []).entries()) {
+        const [c, id] = String(r.skill || '').split(':');
+        const want = String(labelOf(c, id) || '').replace(/\s*\([^)]*\)/g, '').trim();
+        const got = String(r.tag || '').split(' · ').slice(1).join(' · ').trim();
+        if (got !== want) out.push({ rule: 'REVIEW-TAG-ID', msg: `${where}review item ${i + 1} ${r.skill} is tagged "${got}", its label is "${want}"` });
+        const p = printed[i];
+        const dom = String(r.tag || '').split(' · ')[0];
+        if (p !== undefined && p !== r.tag && p !== dom) out.push({ rule: 'REVIEW-TAG-ID', msg: `${where}review item ${i + 1} prints "${p}", neither its tag "${r.tag}" nor its domain "${dom}"` });
+    }
+    return out;
+}
+export const PROMPT_VERBS = ['Look', 'Read', 'Say', 'Count', 'Circle', 'Underline', 'Box', 'Cross out', 'Trace', 'Write', 'Draw', 'Shade', 'Mark', 'Match', 'Measure', 'Use', 'Find', 'Fill in', 'Finish', 'Check', 'Fix', 'Think', 'Start', 'Put', 'Move', 'Add', 'Subtract', 'Multiply', 'Divide', 'Solve', 'Round', 'Compare', 'Estimate', 'Regroup', 'Bring down', 'Cut', 'Sort', 'Glue', 'Color', 'Tap', 'Type', 'Drag'];
+// (a prompt names the task: one of its sentences starts with a print verb, or it asks a question - "Odd or even? Check one box.")
+const verbPrompt = (t) => { const s = String(t || '').trim(); if (!s) return false; const sent = s.split(/(?<=[.?!])\s+/);
+    return sent.some((x) => PROMPT_VERBS.some((v) => x.startsWith(`${v} `) || x.startsWith(`${v}.`)) || /\?$/.test(x)); };
+/** REVIEW-INSTR over measured review cells [{n, choice: bool, prompt: string|null}]. Pure. */
+export function reviewInstrBad(cells, where = '') {
+    return cells.filter((c) => c.choice && !verbPrompt(c.prompt))
+        .map((c) => ({ rule: 'REVIEW-INSTR', msg: `${where}review cell ${c.n} answers in a choice / check / shade / circle slot with ${c.prompt ? `the prompt "${c.prompt}" (no verb)` : 'no prompt of its own'}` }));
+}
+/** PSC-REVIEW-ORDER: check numbers and review numbers, as printed. Pure. */
+export function reviewOrderBad(checkNs, reviewNs, where = '') {
+    const top = Math.max(0, ...checkNs);
+    const early = reviewNs.filter((x) => x <= top);
+    return early.length ? [{ rule: 'PSC-REVIEW-ORDER', msg: `${where}review item(s) ${early.join(', ')} are numbered inside the check (its last item is ${top})` }] : [];
+}
 function selfTest() {
     const ok = { plan: { meta: { items: 12, review: [{ skill: 'placevalue:identify', domain: 'NBT' }, { skill: 'geometry:x', domain: 'G' }] } },
         pupil: 'Quick review. Solve each one. Check __/12 Review __/2', key: '<i data-review-label>Base Ten · Place value<i data-review-label>Geometry · Shapes<', again: null };
@@ -148,6 +242,20 @@ function selfTest() {
         ['KEYLABEL over the ink fails', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 3, r: 40, b: 40 } }]).length, 1],
         ['KEYLABEL above the ink passes', keyLabelBad([{ n: 1, label: { l: 30, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 4.5, r: 40, b: 40 } }]).length, 0],
         ['KEYLABEL outside its cell fails', keyLabelBad([{ n: 1, label: { l: 30, t: 41, r: 52, b: 44 }, ink: { l: 5, t: 3, r: 40, b: 30 }, cell: { l: 0, t: 0, r: 46, b: 46 } }]).length, 1],
+        ['S1 waived on a multi-strip check', judge(Object.assign({}, ok, { pupil: ok.pupil.replace('Check __/12 ', ''), again: ok.pupil.replace('Check __/12 ', ''), bands: [{ instr: 'Add.' }, { instr: 'Subtract.' }] }), [], 1).length, 0],
+        ['S1 kept on a one-strip check', judge(Object.assign({}, ok, { pupil: ok.pupil.replace('Check __/12 ', ''), again: ok.pupil.replace('Check __/12 ', ''), bands: [{ instr: 'Add.' }, { instr: 'Add.', shared: true }] }), [], 1).length, 1],
+        ['no room: no band is no fault', judge({ plan: { meta: { items: 8 } }, pupil: '__/8', key: '', again: '__/8', reviewFit: { room: 30, strip: 9, cands: [{ h4: null, h3: 30, h2: 15 }, { h2: 25 }] } }, [], 1).length, 0],
+        ['room: no band is a fault', judge({ plan: { meta: { items: 8 } }, pupil: '__/8', key: '', again: '__/8', reviewFit: { room: 60, strip: 9, cands: [{ h4: null, h3: 30, h2: 25 }, { h2: 25 }] } }, [], 1).length > 0, true],
+        ['GREY orange label fails', keyLabelGreyBad([{ text: 'a', color: 'rgb(194, 65, 12)', grey: 'rgb(102, 102, 102)', keyAns: true }]).length, 2],
+        ['GREY grey label passes', keyLabelGreyBad([{ text: 'a', color: 'rgb(102, 102, 102)', grey: 'rgb(102, 102, 102)', keyAns: false }]).length, 0],
+        ['WORDS split word fails', keyLabelWordsBad([{ text: 'Operat ions', lines: 2, split: ['Operations'] }]).length, 2],
+        ['WORDS one line passes', keyLabelWordsBad([{ text: 'Base Ten', lines: 1, split: [] }]).length, 0],
+        ['TAG-ID wrong category label fails', tagIdBad([{ skill: 'fractions:identify', tag: 'Fractions \u00b7 Name the Place' }], () => 'Identify Fractions').length, 1],
+        ['TAG-ID own label passes, short tag printed', tagIdBad([{ skill: 'fractions:identify', tag: 'Fractions \u00b7 Identify Fractions' }], () => 'Identify Fractions (Visual)', ['Fractions']).length, 0],
+        ['INSTR yes/no cell with no prompt fails', reviewInstrBad([{ n: 9, choice: true, prompt: null }]).length, 1],
+        ['INSTR prompt with a verb passes', reviewInstrBad([{ n: 9, choice: true, prompt: 'Shade 1/3.' }, { n: 10, choice: true, prompt: 'Is it a fact family?' }, { n: 11, choice: false, prompt: null }]).length, 0],
+        ['ORDER review inside the check fails', reviewOrderBad([1, 2, 11, 12], [9, 10]).length, 1],
+        ['ORDER review after the check passes', reviewOrderBad([1, 2, 3], [4, 5]).length, 0],
         ['KEYLABEL beside the ink passes', keyLabelBad([{ n: 1, label: { l: 41, t: 1, r: 45, b: 4 }, ink: { l: 5, t: 0, r: 40, b: 40 } }]).length, 0],
     ];
     const bad = t.filter(([, got, want]) => got !== want);
@@ -162,7 +270,9 @@ async function main() {
         ? arg('skills').split(',').flatMap((k) => arg('sizes', 'M,L').split(',').map((size) => ({ k, size })))
         : [{ k: 'addition:add_facts', size: 'M' }, { k: 'addition:add_facts', size: 'L' }, { k: 'division:div_facts', size: 'M' },
             // (lead A24: the L fact pages the 3-column / side rule filled, and the grade-3 window)
-            { k: 'division:div_facts', size: 'L' }, { k: 'multiplication:mult_facts', size: 'M' }, { k: 'multiplication:mult_facts', size: 'L' }];
+            { k: 'division:div_facts', size: 'L' }, { k: 'multiplication:mult_facts', size: 'M' }, { k: 'multiplication:mult_facts', size: 'L' },
+            // (critic qreview r1 PSC-REVIEW-ORDER: a two-page check whose page 1 takes review rows - lead A24 item 1b)
+            { k: 'subtraction:sub_wp_20', size: 'L' }];
     // (--only R1,R2: the rules to judge - an older backtest row pins the rules it was written for)
     const only = arg('only', null) ? new Set(arg('only').split(',')) : null;
     const seed = Number(arg('seed', '7'));
@@ -176,12 +286,19 @@ async function main() {
             const meta = r.plan && r.plan.meta ? r.plan.meta : {};
             return { plan: { meta: { items: meta.items, review: meta.review || null, prereqs: meta.prereqs || [] } }, pupil: r.pupilHtml, key: r.keyHtml, again: r2.pupilHtml,
                 keyDoc: r.keyHtml ? window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }) : null,
+                bands: (meta.bands || []).map((x) => ({ instr: x.instr, shared: !!x.shared })), reviewFit: meta.reviewFit || null,
+                // (REVIEW-TAG-ID: each review skill's own label, from SKILLS by category AND id, cleaned as SKILL_FULL_LABELS cleans it)
+                labels: (meta.review || []).concat(((meta.reviewFit || {}).cands || []).filter((x) => x.tag)).map((x) => { const [c2, s2] = x.skill.split(':'); const e = ((window.SKILLS || {})[c2] || []).find((y) => y && y.v === s2);
+                    return e ? String(e.l || '').replace(/\s*\(Visual\)\s*$/i, '').replace(/\s*\(No Visuals?\)\s*$/i, '').replace(/^[\u{1F7E2}\u{1F7E1}\u{1F7E0}\u{1F534}\u{1F3B2}\u{1F522}\u{1F967}\u{1F4D0}\u{1F4CA}\u{1F524}\u{1F4CF}\u{1F500}\u{1F3AF}\u{1F52C}\u{1F9EE}\u{1F4CD}\u{1F4C8}\u2B1C\u{1F537}\u00BD]+\s*/u, '') : ''; }),
                 reviewGrades: (meta.review || []).map((x) => { const [c2, s2] = x.skill.split(':'); return { skill: x.skill, grade: String((window.getSkillGrade && window.getSkillGrade(s2, c2)) || '') }; }),
                 grade: (window.getSkillGrade && window.getSkillGrade(a.s)) || '' };
         }, { c: categoryId, s: skillId, size: j.size, seed });
         const own = [j.k].concat(b.plan.meta.prereqs || []);
         const out = judge(b, own, b.grade);
         out.push(...gradeWindowBad(b.reviewGrades, b.grade));
+        const candTags = ((b.reviewFit || {}).cands || []).filter((x) => x.tag);
+        const labelBy = new Map((b.plan.meta.review || []).concat(candTags).map((r, i) => [r.skill, b.labels[i]]));
+        let printed = [];
         // KEYLABEL-CLEAR: the key rendered as printed, every review label against its cell's ink box
         if (b.keyDoc) {
             const kp = await app.browser.newPage();
@@ -191,9 +308,26 @@ async function main() {
                 await kp.setContent(b.keyDoc, { waitUntil: 'networkidle0', timeout: 60000 });
                 await kp.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                 await kp.emulateMediaType('print');
-                out.push(...keyLabelBad(await kp.evaluate(measureKeyLabels), ''));
+                const kl = await kp.evaluate(measureKeyLabels);
+                out.push(...keyLabelBad(kl, ''));
+                out.push(...keyLabelGreyBad(kl), ...keyLabelWordsBad(kl));
+                printed = kl.map((x) => x.text);
+                // (the pupil page: the printed numbers and the review cells' own prompts - read as markup, no layout needed)
+                const pp = await app.browser.newPage();
+                let cells = [];
+                try {
+                    await pp.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
+                    cells = await pp.evaluate((html) => { const d = new DOMParser().parseFromString(html, 'text/html'); return [...d.querySelectorAll('.ws-cell')].map((cell) => { const tab = cell.querySelector('.ws-tab'); const pr = cell.querySelector('[data-review-prompt]');
+                        return { n: tab ? Number(String(tab.textContent).trim()) : NaN, review: !!cell.closest('[data-psc-review]'), prompt: pr ? pr.textContent.trim() : null,
+                            choice: !!cell.querySelector('[data-ws-shape="choice"], [data-ws-shape="check"], [data-ws-shape="shade"], [data-ws-shape="draw"], [data-ws-shape="circle"], [data-ws-shape="ring"], [data-ws-shape="mark"], [data-k2-check], .ws-choice') || /\bYes\b[\s\S]*\bNo\b/.test(cell.textContent) }; }).filter((c) => Number.isFinite(c.n)); }, b.pupil);
+                } finally { await pp.close(); }
+                out.push(...reviewOrderBad(cells.filter((c) => !c.review).map((c) => c.n), cells.filter((c) => c.review).map((c) => c.n)));
+                out.push(...reviewInstrBad(cells.filter((c) => c.review)));
             } finally { await kp.close(); }
         }
+        out.push(...tagIdBad(b.plan.meta.review, (c, id) => labelBy.get(`${c}:${id}`), printed));
+        // (and every candidate the band chose from - meta.reviewFit.cands carries each one's tag)
+        out.push(...tagIdBad(candTags, (c, id) => labelBy.get(`${c}:${id}`), [], 'candidate: '));
         if (process.env.KL_DEBUG) for (const r of b.plan.meta.review || []) console.log('   meta', r.tag, JSON.stringify(r.label));
         if (only) for (let i = out.length - 1; i >= 0; i--) if (!only.has(out[i].rule)) out.splice(i, 1);
         for (const x of out) console.log(`  FAIL ${x.rule} ${j.k} pre-skill-check ${j.size}: ${x.msg}`);

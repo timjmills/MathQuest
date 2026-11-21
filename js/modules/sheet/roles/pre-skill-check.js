@@ -748,6 +748,8 @@ export function keyTagPlace(it, cols, h, ctx) {
 }
 export function reviewRows(input, ctx, m, room) {
     const pools = (input.pools || []).filter((p) => p && p.review && REVIEW_POOL.test(p.id));
+    // (the fit record says the room even when it is too small for the band's strip: ws-psc-review reads a page with no room as ruled)
+    if (pools.length && input.reviewFitOut && !(room > m.strip)) input.reviewFitOut.fit = { room: +room.toFixed(1), strip: +m.strip.toFixed(1), cands: [] };
     if (!pools.length || !(room > m.strip)) return null;
     // (a second review band - page 1 of a two-page check - takes only the domains the first did not: lead A24 item 1b)
     const skipD = new Set(input.reviewSkipDomains || []);
@@ -760,8 +762,9 @@ export function reviewRows(input, ctx, m, room) {
     const space = room - m.strip;
     const skipT = REVIEW_SKIP_TEMPLATES[ctx.size] || REVIEW_SKIP_TEMPLATES.M;
     const tplOf = (it) => { const c = it && it.q && it.q.cell; return c && c.template && hasCell(c.template) ? c.template : 'legacy'; };
-    const fit = { room: +room.toFixed(1), strip: +m.strip.toFixed(1), cands: cands.map((it) => ({ skill: it.reviewSkill, d: it.reviewDomain, tpl: tplOf(it),
+    const fit = { room: +room.toFixed(1), strip: +m.strip.toFixed(1), cands: cands.map((it) => ({ skill: it.reviewSkill, d: it.reviewDomain, tag: it.reviewTag, tpl: tplOf(it),
         h4: fitsAt([it], 4, ctx) ? +hMinAt([it], 4, ctx).toFixed(1) : null, h3: fitsAt([it], 3, ctx) ? +hMinAt([it], 3, ctx).toFixed(1) : null, h2: fitsAt([it], 2, ctx) ? +hMinAt([it], 2, ctx).toFixed(1) : null,
+        bot2: it.measured && it.measured[2] && Number.isFinite(it.measured[2].inkBotMm) ? +(hMinAt([it], 2, ctx) + REVIEW_ROW_PAD_MM - it.measured[2].inkBotMm).toFixed(1) : null, top2: it.measured && it.measured[2] && Number.isFinite(it.measured[2].inkTopMm) ? +it.measured[2].inkTopMm.toFixed(1) : null,
         ink3: it.measured && it.measured[3] && it.measured[3].inkMm ? +it.measured[3].inkMm.toFixed(1) : null, ink2: it.measured && it.measured[2] && it.measured[2].inkMm ? +it.measured[2].inkMm.toFixed(1) : null })) };
     if (input.reviewFitOut) input.reviewFitOut.fit = fit;
     // 1. the rows that can be drawn: per set of domains, the few earliest-ranked rows of distinct height
