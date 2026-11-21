@@ -16410,6 +16410,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-n-column-no-group",
+   "check": "ws-guided-echo COLUMN-NO-GROUP: no comma or other grouping mark is drawn in a digit row of a column template (stack, long-multiplication), on the pupil page or its key",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r2 N2 (mult_4by1_column Error analysis drew '2 1 , 7 6 3': the comma took a digit column and the thousands digit sat one place left of Th)",
+   "browser": true,
+   "fail": {
+    "commit": "5c2ae8707",
+    "state": "error-analysis wrote the shown value with the page's commas and the stack split '21,763' into tracks, the comma one of them"
+   },
+   "pass": {
+    "commit": "f72d9c029",
+    "state": "the stack drops grouping marks from any shown value it writes into its digit tracks"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills multiplication:mult_4by1_column,multiplication:mult_3by2_standard --seeds 1 --sizes M --only COLUMN-NO-GROUP --screen-seeds 0 --score-roles error-analysis,true-false,reason-it",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
