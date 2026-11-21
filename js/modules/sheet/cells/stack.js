@@ -392,7 +392,12 @@ register('stack', {
         // The scaffold ladder (section 2.5) decides what is drawn, never the generator (SCC-Q10).
         const { level, heads, regroup } = scaffoldOf(p, ctx);
         const t = tracksOf(p);
-        const shown = ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : value;
+        // (a shown value is written in DIGIT TRACKS: a thousands comma or any other grouping mark - "21,763" from a page that
+        // writes its big numbers with commas - would take a track of its own and move every digit left of its place. The
+        // column's places ARE the grouping, so the marks are dropped here, whoever formatted the value; lf-ops sizes N-round,
+        // critic r2 N2, COLUMN-NO-GROUP)
+        const shown0 = ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : value;
+        const shown = typeof shown0 === 'string' ? shown0.replace(/(\d)[,'\u2019\u00a0\u2009\u202f](?=\d)/g, '$1') : shown0;
         // SCC-T10: geometry is identical across states, so the ANSWER ZONE's shape is chosen by
         // the scaffold level alone and the state only decides what ink goes in it. A Guided or
         // Model cell keeps its digit boxes in every state and the digits sit inside them; an
