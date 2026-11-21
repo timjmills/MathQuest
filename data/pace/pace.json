@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T06:10:53.233Z",
- "head": "b196c4254",
+ "generated": "2026-11-21T07:21:09.816Z",
+ "head": "2a0df9acf",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 71,
    "usageEstimated": false,
-   "rev": "b196c4254",
+   "rev": "2a0df9acf",
    "skills": 742,
    "retired": 10,
    "presets": 130,
@@ -1755,6 +1755,13 @@
    }
   ],
   "2026-11-19": [
+   {
+    "date": "2026-11-21",
+    "title": "Bug fix: shared gates (lead; no critic)",
+    "detail": "ws-card-rulings / ws-dealer-uniform crashed for EVERY skill on master: a card with no skills of its own (lesson-player, \"skills\": []) and no rulings is now skipped, not an error.",
+    "kind": "fix",
+    "from": "STATUS.md"
+   },
    {
     "date": "2026-11-21",
     "title": "Deploy the pace board (owner request; lead build, critic pending)",
