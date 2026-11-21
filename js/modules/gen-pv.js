@@ -39,7 +39,7 @@
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
 import { dealIndex, freshDeal, onNewPage } from './page-deal.js';
-import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL } from './skill-options.js';
+import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL, levelsAt, levelIndexAt } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
 import { pvRoundingErrors } from './sheet/providers/pv.js';
@@ -856,7 +856,8 @@ function numberOfLength(nd, hi) {
 function comparableSet(count, cap, o) {
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
-    const mixed = o.lengths === 'mixed' && nd >= 2;
+    // ('some' digit counts, lf-placevalue compare-opts: about half the items mixed, interleaved - the order pages too)
+    const mixed = (o.lengths === 'mixed' || (o.lengths === 'some' && [0, 1, 1, 0, 0, 1][slot(6)] === 1)) && nd >= 2;
     // 'some': every other item is close, so the first digit does not decide every item.
     // (Not strictly alternate: in a two-column page that would put every close item in one column.)
     const close = o.closeness === 'close' || (o.closeness === 'some' && [0, 1, 1, 0, 1, 0][slot(6)] === 1);
@@ -1009,10 +1010,106 @@ function m6Wrong(a, b) {
     return (last !== '=' && last !== right) || (first !== '=' && first !== right);
 }
 
-function genCompare(q, skill, o) {
+/* compare's decimal items (lf-placevalue compare-opts, 2026-11-21) ------------------------------------------------- */
+/** A decimal written with exactly `dp` places, the number's whole part grouped with commas: "1,234.50". */
+const fmtDec = (s) => { const [w, d] = String(s).split('.'); return Number(w).toLocaleString('en-US') + (d !== undefined ? '.' + d : ''); };
+/** `dp` random decimal digits, the last never 0 (so the number really has `dp` places). */
+const fracDigits = (dp) => Array.from({ length: dp }, (_, i) => randInt(i === dp - 1 ? 1 : 0, 9)).join('');
+/**
+ * A decimal pair, as strings with their own places (0.50 keeps its zero). The whole part has two fewer digits than the band
+ * allows (at least one: 0-9 at 99 and 999), so every number stays within the band. `ord` is the item's place in its block of
+ * six; `lengths` here reads the decimal places: equal (both `dp` places), mixed (one has fewer places), some (in turn).
+ *  - ord 5 ("=", the plan's): the trailing-zero item, 0.5 = 0.50 (the shorter one written without the zero);
+ *  - the LONGER-IS-NOT-BIGGER trap (0.5 > 0.45): one item a block always (ord 0), and every unequal item when the places
+ *    differ: the number with fewer places is the bigger one (but ord 4, drawn freely);
+ *  - close: the same whole part (the decimals decide); far: different whole parts.
+ */
+function compareDecimalPair(cap, dp, o, ord, close, mixedLen) {
+    const [, hi] = digitSpan(cap);
+    const wd = Math.max(1, String(hi).length - 2);
+    const whole = () => (wd === 1 ? randInt(0, 9) : randInt(10 ** (wd - 1), 10 ** wd - 1));
+    const val = (s) => Number(s);
+    for (let t = 0; t < 80; t++) {
+        const w = whole();
+        if (ord === 5) {
+            const short = dp === 1 ? String(w) : `${w}.${fracDigits(dp - 1)}`;
+            return [short, dp === 1 ? `${w}.0` : `${short}0`];
+        }
+        const trap = mixedLen || ord === 0;
+        if (trap && ord !== 4) {
+            // fewer places, the bigger number: 4.6 against 4.56 (w2 the same whole part when close)
+            const w2 = close || ord === 0 ? w : whole();
+            const longF = fracDigits(dp);
+            const shortLen = dp === 1 ? 0 : randInt(1, dp - 1);
+            if (shortLen === 0) { if (w2 === w) continue; }
+            const shortF = shortLen ? fracDigits(shortLen) : '';
+            const a = `${w}.${longF}`, b = shortLen ? `${w2}.${shortF}` : String(w2);
+            if (val(b) <= val(a) || val(a) > hi || val(b) > hi) continue;
+            return [a, b];
+        }
+        const places2 = mixedLen ? randInt(Math.max(0, dp - 2), dp - 1) : dp;
+        const a = `${w}.${fracDigits(dp)}`;
+        let b;
+        if (close) {
+            b = places2 ? `${w}.${fracDigits(places2)}` : String(w);
+        } else {
+            let w2 = whole();
+            if (w2 === w) continue;
+            b = places2 ? `${w2}.${fracDigits(places2)}` : String(w2);
+        }
+        if (val(a) === val(b) || val(a) > hi || val(b) > hi) continue;
+        return [a, b];
+    }
+    return [`${1}.${'5'.padEnd(dp, '1')}`, `${2}.${'1'.repeat(dp)}`];
+}
+
+function genCompare(q, skill, o0) {
+    // LEVEL SETS: the item's own size and decimal places (the ticked levels in turn, easiest first); a page pattern that runs
+    // in blocks of six (close / far, the mixed-length place) runs inside each level, on the item's place among its own level
+    const o = { ...levelsAt('placevalue', skill, o0, _at) };
+    const lvAt = levelIndexAt('placevalue', skill, o0, _at);
+    o.band = Array.isArray(o.band) ? o.band[0] : o.band;
+    const dp = Array.isArray(o.dp) ? Number(o.dp[0]) || 0 : 0;
+    if (dp > 0) return genCompareDecimal(q, skill, o, dp, lvAt);
+    if (o.lengths === 'some') o.lengths = [0, 1, 1, 0, 0, 1][((lvAt % 6) + 6) % 6] === 1 ? 'mixed' : 'equal';
+    const atAll = _at;
+    _at = lvAt;
+    try { return genCompareWhole(q, skill, o, atAll); } finally { _at = atAll; }
+}
+
+function genCompareDecimal(q, skill, o, dp, lvAt) {
     const cap = capOf('placevalue', skill, o, 999);
     const P = comparePlan();
-    const eq = o.lengths !== 'mixed' && planEq(P, _at);
+    const eq = planEq(P, _at);
+    const loc = ((lvAt % 6) + 6) % 6;
+    const ord = eq ? 5 : [1, 3, 0, 2, 4, 1][loc];
+    const close = o.closeness === 'close' || (o.closeness === 'some' && [0, 1, 1, 0, 1, 0][loc] === 1);
+    const mixedLen = o.lengths === 'mixed' || (o.lengths === 'some' && [0, 1, 1, 0, 0, 1][loc] === 1);
+    let [a, b] = compareDecimalPair(cap, dp, o, ord, close, mixedLen);
+    const na = Number(a), nb = Number(b);
+    if (na !== nb && (na > nb) !== (planSign(P, _at) === 1)) [a, b] = [b, a];
+    const A = fmtDec(a), B = fmtDec(b);
+    q.text = `Compare: ${A} ___ ${B}`;
+    q.printText = 'Write <, > or = in the circle.';
+    q.ans = Number(a) > Number(b) ? '>' : Number(a) < Number(b) ? '<' : '=';
+    q.answerType = 'symbol';
+    q.options = ['>', '<', '='];
+    q.hint = 'Compare the whole parts first. Same whole part: compare the tenths, then the hundredths. More digits is not bigger.';
+    q.skillLabel = 'Compare Numbers';
+    q.visual = `<div style="display:flex;justify-content:center;align-items:center;gap:20px;color:#000;">`
+        + `<div style="font-size:2rem;font-weight:700;">${A}</div>`
+        + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
+        + `<div style="font-size:2rem;font-weight:700;">${B}</div></div>`;
+    if (Number(a) === Number(b)) q.noModel = true;
+    const wa = String(a).split('.')[0], wb = String(b).split('.')[0];
+    q.pv = { kind: 'compare', a, b, dp, closeness: wa === wb ? 'close' : 'far', lengths: (String(a).split('.')[1] || '').length === (String(b).split('.')[1] || '').length ? 'equal' : 'mixed' };
+    setCell(q, { kind: 'compare', a, b, keyValue: q.ans, inPlace: true });
+}
+
+function genCompareWhole(q, skill, o, atAll) {
+    const cap = capOf('placevalue', skill, o, 999);
+    const P = comparePlan();
+    const eq = o.lengths !== 'mixed' && planEq(P, atAll);
     // (the block-of-six place still deals the free item - ord 4 - and the two-digits-shorter mixed item - ord 0; the "=" is
     // the plan's, so the block's own "=" place deals an ordinary item)
     const ord0 = blockOrder(6)[slot(6)];
@@ -1022,7 +1119,7 @@ function genCompare(q, skill, o) {
     let [a, b] = comparePair(cap, o, ord, close) || comparableSet(2, cap, o);
     if (eq) b = a;
     // the sign is the plan's, never the item's parity (N3); turning the pair keeps every property it was dealt for
-    if (a !== b && (a > b) !== (planSign(P, _at) === 1)) [a, b] = [b, a];
+    if (a !== b && (a > b) !== (planSign(P, atAll) === 1)) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
     q.ans = a > b ? '>' : a < b ? '<' : '=';

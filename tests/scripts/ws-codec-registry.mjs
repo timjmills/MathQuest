@@ -193,6 +193,14 @@ for (const [cat, id] of live) {
             continue;
         }
         const u = REG.tokenUnion(d.id);
+        // A LEVEL SET (skill-options.js levelSetOption) is written as the enum it grew from: its members are scalar tokens.
+        if (d.levelSet && d.type === 'set') {
+            for (const x of d.values || []) {
+                if (typeof x.v === 'string' && !(x.v in u)) fail(`${where}: level value "${x.v}" has no token`);
+                if (typeof x.v === 'number' && !(Number.isInteger(x.v) && x.v >= 0)) fail(`${where}: level scalar ${x.v} cannot be written as decimal digits`);
+            }
+            continue;
+        }
         for (const x of d.values || []) {
             if (typeof x.v === 'string' && !(x.v in u)) fail(`${where}: value "${x.v}" has no token`);
             if (typeof x.v === 'number' && d.type === 'set' && !(String(x.v) in u)) fail(`${where}: set member ${x.v} is not in NUMERIC_SET_VALUES.${d.id}`);
@@ -256,6 +264,27 @@ for (const [cat, id] of live) {
         if (!/^[A-Z0-9_]+$/.test(payload)) fail(`${tag}: unsafe character`);
         const back = NEW.decodeOptionPayload(cat, id, payload);
         if (!eq(back, want)) fail(`${tag}: new decoder read ${JSON.stringify(back)}, want ${JSON.stringify(want)}`);
+        // A LEVEL SET's deployed form is the ENUM it grew from, which this copy of the deployed decoder cannot model (it runs
+        // on today's defs). Its own check instead: one tick is exactly the enum's token, several start with "Y" (no scalar the
+        // deployed enum reads, so the old app keeps its default), and the deployed decoder is run on the payload without it.
+        const lvl = defs.filter((d) => d.levelSet && d.type === 'set' && REG.OPTION_KEYS[d.id]);
+        if (lvl.length) {
+            let rest = payload;
+            for (const d of lvl) {
+                const k = REG.OPTION_KEYS[d.id];
+                const f = payload.split('_').find((x) => x.startsWith(k) && (k.length === 2 || !REG.MULTI_KEY_RE.test(x)));
+                if (!f) continue;
+                const body = f.slice(k.length);
+                const ticks = want[d.id] || [];
+                if (ticks.length === 1 && body.startsWith('Y') && body.length > 1) fail(`${tag}: one ${d.id} tick is not the enum's own token`);
+                if (ticks.length > 1 && body[0] !== 'Y') fail(`${tag}: several ${d.id} ticks do not start with Y`);
+                if (ticks.length > 1 && /^\d+$/.test(body)) fail(`${tag}: several ${d.id} ticks read as one scalar`);
+                rest = rest.split('_').filter((x) => x !== f).join('_');
+            }
+            const restWant = rest ? NEW.decodeOptionPayload(cat, id, rest) : {};
+            if (rest && !eq(NEW.decodeOptionPayload(cat, id, rest), restWant)) fail(`${tag}: the rest of the payload reads differently`);
+            continue;
+        }
         const oldRead = OLD.decodeOptionPayload(cat, id, payload);
         // A VALUE appended to a one-letter key after the deployed build (P9's `support: strip`,
         // `response: bank` ...) has a token the deployed decoder's table lacks: it skips that

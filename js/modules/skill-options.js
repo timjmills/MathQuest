@@ -57,6 +57,29 @@ export const bandOption = (values, dflt) => ({
     help: 'Bounds the answer, not the numbers you start from.',
 });
 
+// ---------------------------------------------------------------------------
+// LEVEL SETS — a generic multi-select LEVEL option (lf-placevalue compare-opts, 2026-11-21; lf-partopts rolls it out)
+// ---------------------------------------------------------------------------
+// A level set is a `type: 'set'` def with `levelSet: true`. It is a pick-one control (an enum) that a teacher may tick
+// more of: "Numbers to 100 and 1,000", "Whole and 2 places". It differs from a plain set in four ways:
+//   1. at least one value stays ticked: normalizeOptions reads an empty list as the default, and the options sheet will
+//      not untick the last chip;
+//   2. its share-code field is ADDITIVE over the enum it replaces: one tick is written exactly as the enum wrote it (so an
+//      old enum code decodes as that one tick and a one-tick code is byte-identical to the old code); several ticks are
+//      "Y" + each value's token, each preceded by its length in base 36 (skill-option-codec.js);
+//   3. the page deals across EVERY ticked value, interleaved from easy to hard in the def's value order: levelsAt() gives
+//      item i its own one-value options (the cross product of the skill's level sets, ordered by the sum of the value
+//      positions, so the easiest combination comes first), and levelIndexAt() the item's place among the items of its own
+//      combination (so a block-of-six pattern still runs inside every level);
+//   4. levelSetLabel() names a mix ("within 100, 1,000 and 10,000 · whole + 2 places") for the sheet header and tray.
+// A skill declares one with levelSetOption(enumDef): the enum's id, values and labels, its default as a one-item list.
+// A generator reads a single value with levelsAt(cat, skill, opts, index)[id][0], never the raw list.
+export const isLevelSet = (def) => !!def && def.type === 'set' && def.levelSet === true;
+export const levelSetOption = (enumDef) => ({
+    ...enumDef, type: 'set', levelSet: true,
+    default: Array.isArray(enumDef.default) ? enumDef.default.slice() : [enumDef.default],
+});
+
 // Single-fact sets: the teacher ticks which facts the page drills — one ("Add 6"), a few
 // ("x2, x5, x10" as a cumulative set) or all of them. All ticked is "mixed", and is the default
 // (owner, 2026-09-19). + and - take a constant 0-13 and run to 30; x and / use the set order
@@ -690,8 +713,25 @@ const _pvCloseness = () => ({
 });
 const _pvLengths = () => ({
     id: 'lengths', label: 'Digit counts', type: 'enum', default: 'equal', group: 'difficulty',
-    values: [{ v: 'equal', l: 'Same number of digits' }, { v: 'mixed', l: 'Different numbers of digits' }],
-    help: 'Different lengths teach that more digits means a bigger number.',
+    // 'some' (appended, lf-placevalue compare-opts 2026-11-21): about half the items the same count, half different, interleaved.
+    values: [{ v: 'equal', l: 'Same number of digits' }, { v: 'mixed', l: 'Different numbers of digits' }, { v: 'some', l: 'Mixed: some the same, some different' }],
+    help: 'Different lengths teach that more digits means a bigger number. Mixed puts both on one page, so the pupil counts first every time.',
+});
+// compare's "Numbers to" as a LEVEL SET (lf-placevalue compare-opts, 2026-11-21): tick one or more sizes; the page deals
+// every ticked size, interleaved easy to hard. The old band values keep their meaning (a number at most the value) and an
+// old one-value code decodes as that one tick. 9,999,999 (numbers to ten million) is appended.
+const _pvCompareBand = () => levelSetOption({
+    ..._pvBand([99, 999, 9999, 99999, 999999, 9999999], 999,
+        'The biggest number on the page. Tick more than one size and the page mixes them, smallest size first, in turn.'),
+    // (the labels of the old values stay as they were - a page or a sheet header that names one does not move)
+});
+// compare's decimal places (a level set): Whole is the default; a decimal item keeps the band's bound (4.56 at 1,000),
+// with two fewer whole digits than the band allows, and deals the decimal traps on purpose (0.5 > 0.45: longer is not
+// bigger; 0.5 = 0.50).
+const _pvCompareDp = () => levelSetOption({
+    id: 'dp', label: 'Decimals', type: 'enum', default: 0, group: 'difficulty',
+    values: [{ v: 0, l: 'Whole' }, { v: 1, l: '1 place' }, { v: 2, l: '2 places' }, { v: 3, l: '3 places' }],
+    help: 'Tick Whole and a decimal size to mix them. A decimal item has two fewer whole digits than Numbers to allows (4.56 at 999), and "close" means the same whole part.',
 });
 const _pvOrderCount = () => ({
     id: 'count', label: 'How many numbers', type: 'enum', default: 3, group: 'difficulty',
@@ -770,7 +810,7 @@ const P9_PV_OPTIONS = {
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
-    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvCloseness(), _pvLengths()],
+    'placevalue:compare': [_pvCompareBand(), _pvCloseness(), _pvLengths(), _pvCompareDp()],
     'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
@@ -4237,6 +4277,12 @@ export function normalizeOptions(categoryId, skillId, opts) {
             const byText = new Map(def.values.map(x => [String(x.v), x.v]));
             if (list) out[def.id] = list.map(x => legal.has(x) ? x : byText.has(String(x)) ? byText.get(String(x)) : x)
                 .filter(x => legal.has(x));
+            // A level set keeps at least one tick, in the def's order, each value once (the deal order is the value order).
+            if (def.levelSet && list) {
+                const order = def.values.map(x => x.v);
+                out[def.id] = [...new Set(out[def.id])].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+                if (!out[def.id].length) out[def.id] = def.default.slice();
+            }
         }
     }
     // A control another option overrides (`lockedBy`, count_by_tables "All 12 tables on one page")
@@ -4257,6 +4303,75 @@ export function packOptions(categoryId, skillId, opts) {
         if (JSON.stringify(v) !== JSON.stringify(dflt[k])) out[k] = v;
     }
     return out;
+}
+
+/** The level-set defs of a skill (a preset reads its host's). */
+export function levelSetDefs(categoryId, skillId) {
+    return optionsFor(categoryId, skillId).filter(isLevelSet);
+}
+
+/**
+ * Every combination of the ticked levels, easiest first: [{id: value, ...}], ordered by the sum of the values' positions in
+ * their defs (ties: the first level set's position first). One combination when every level set has one tick.
+ */
+export function levelCombos(categoryId, skillId, opts) {
+    const defs = levelSetDefs(categoryId, skillId);
+    const o = normalizeOptions(categoryId, skillId, opts);
+    let combos = [{ c: {}, rank: [] }];
+    for (const def of defs) {
+        const order = def.values.map(x => x.v);
+        const ticks = Array.isArray(o[def.id]) && o[def.id].length ? o[def.id] : def.default;
+        const next = [];
+        for (const k of combos) for (const v of ticks) next.push({ c: { ...k.c, [def.id]: v }, rank: [...k.rank, order.indexOf(v)] });
+        combos = next;
+    }
+    const sum = (r) => r.reduce((a, b) => a + b, 0);
+    const lex = (x, y) => { for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return x[i] - y[i]; return 0; };
+    combos.sort((x, y) => sum(x.rank) - sum(y.rank) || lex(x.rank, y.rank));
+    return combos.map(k => k.c);
+}
+
+/** True when any level set of the skill has two or more ticks. */
+export function isLevelMix(categoryId, skillId, opts) {
+    const o = normalizeOptions(categoryId, skillId, opts);
+    return levelSetDefs(categoryId, skillId).some(d => Array.isArray(o[d.id]) && o[d.id].length > 1);
+}
+
+/**
+ * Item `index`'s own options: each level set holds the one value the item deals (a one-item list), the combinations taken
+ * in turn, easiest first. `opts` with no mix comes back normalised and otherwise unchanged.
+ */
+export function levelsAt(categoryId, skillId, opts, index) {
+    const o = normalizeOptions(categoryId, skillId, opts);
+    const combos = levelCombos(categoryId, skillId, o);
+    const n = combos.length;
+    const i = ((Math.floor(Number(index) || 0) % n) + n) % n;
+    const out = { ...o };
+    for (const [id, v] of Object.entries(combos[i] || {})) out[id] = [v];
+    return out;
+}
+
+/** Item `index`'s place among the items of its own level combination (0, 1, 2 ... for each combination). */
+export function levelIndexAt(categoryId, skillId, opts, index) {
+    const n = Math.max(1, levelCombos(categoryId, skillId, opts).length);
+    return Math.floor((Math.floor(Number(index) || 0)) / n);
+}
+
+/**
+ * The words for a mix of levels, '' when nothing is mixed: "within 100, 1,000 and 10,000 · whole + 2 places". A def may
+ * name its own mix with `mixWords(values) -> string`; else its value labels are joined.
+ */
+export function levelSetLabel(categoryId, skillId, opts) {
+    const o = normalizeOptions(categoryId, skillId, opts);
+    const and = (ls) => (ls.length <= 1 ? ls.join('') : `${ls.slice(0, -1).join(', ')} and ${ls[ls.length - 1]}`);
+    const parts = [];
+    for (const def of levelSetDefs(categoryId, skillId)) {
+        const v = Array.isArray(o[def.id]) ? o[def.id] : [];
+        if (v.length < 2) continue;
+        if (typeof def.mixWords === 'function') { parts.push(def.mixWords(v)); continue; }
+        parts.push(and(def.values.filter(x => v.includes(x.v)).map(x => String(x.l))));
+    }
+    return parts.join(' · ');
 }
 
 // ---------------------------------------------------------------------------

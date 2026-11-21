@@ -243,7 +243,10 @@ export const MULTI_KEYS = Object.freeze({
     vocabTask: '6C',     // the picture task: match3 / pick3
     vocabGrade: '6D',    // the grade of the words (1-4)
     vocabSet: '6E',      // one BUILD lesson's word set (an index, append-only), or every word of the grade
-    // NEXT FREE IN BLOCK 6: 6F.
+    // lane lf-placevalue compare-opts (2026-11-21): placevalue:compare's decimal places, a LEVEL SET (one tick = the digit,
+    // several = "Y" + length-prefixed digits; skill-option-codec.js)
+    dp: '6F',
+    // NEXT FREE IN BLOCK 6: 6G.
     // Wave 1 lane A (sub-range 6X-6Z, pupil practice): the calculator button and the Skip rule.
     calculator: '6X',    // every skill: show the pupil a calculator button (default off)
     skipAfter: '6Y',     // every skill: wrong tries before Skip appears (default 5, 0 = off)
@@ -387,7 +390,8 @@ export const VALUE_TOKENS = Object.freeze({
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
     closeness: Object.freeze({ far: 'F', close: 'C', some: 'S' }),
-    lengths: Object.freeze({ equal: 'E', mixed: 'M', same: 'S', shorter: 'H' }),   // same / shorter: sub_*_no_regroup (2026-10-23)
+    lengths: Object.freeze({ equal: 'E', mixed: 'M', same: 'S', shorter: 'H',   // same / shorter: sub_*_no_regroup (2026-10-23)
+        some: 'B' }),   // compare / order: some the same, some different (lf-placevalue compare-opts, 2026-11-21)
     zeros: Object.freeze({ off: 'F', on: 'N' }),
     source: Object.freeze({ word: 'W', expanded: 'E', numeral: 'N' }),
     rename: Object.freeze({ standard: 'S', more: 'M' }),
@@ -497,6 +501,8 @@ export const SCALAR_ONLY = Object.freeze({
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
     // lane lf-algebra (2026-11-07)
     patShow: 'bool',
+    // lane lf-placevalue compare-opts (2026-11-21): a level set of decimal places (0-3), written as digits
+    dp: 'decimal',
 });
 
 /**

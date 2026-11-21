@@ -95,6 +95,57 @@ function _fromToken(optId, def, tok, inSet) {
     return Number.isFinite(n) ? n : undefined;
 }
 
+// LEVEL SETS (skill-options.js levelSetOption; lf-placevalue compare-opts, 2026-11-21). The field is ADDITIVE over the
+// enum the level set grew from:
+//   one tick        the enum's own token ("B9999", "6F2"), so an old enum code decodes as that one tick, and a one-tick
+//                   code is byte-identical to the code the enum wrote;
+//   several ticks   "Y" + for each tick, its token's length in base 36 then the token ("BY2993999" = 99 and 999;
+//                   "6FY1012" = Whole and 2 places). The ticks are written in the def's value order.
+// A deployed decoder that knows only the enum reads "Y..." as no value it knows and keeps the option at its default (the
+// old app prints a one-size page, never a wrong one). A body is read as several ticks only when it starts with Y AND parses
+// whole into two or more known values; anything else is read as one enum token (a one-character "Y" token stays one tick).
+function _levelToken(def, v) {
+    if (def.tokens) return _defToken(def, v);
+    if (v === null || v === undefined) return _nullable(def) ? NULL_TOKEN : null;
+    return _scalarToken(def.id, v);
+}
+function _encodeLevelSet(def, v) {
+    const order = (def.values || []).map(x => x.v);
+    const list = (Array.isArray(v) ? v : [v]).filter(x => order.includes(x)).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    if (!list.length) return null;
+    const toks = list.map(x => _levelToken(def, x));
+    if (toks.some(t => t === null || t === undefined || !t.length || t.length > 35)) return null;
+    if (toks.length === 1) return toks[0];
+    return 'Y' + toks.map(t => t.length.toString(36).toUpperCase() + t).join('');
+}
+function _levelValue(def, tok) {
+    if (def.tokens) {
+        const hit = Object.entries(def.tokens).find(([, t]) => String(t).toUpperCase() === tok);
+        return hit ? (def.values || []).map(x => x.v).find(x => String(x) === hit[0]) : undefined;
+    }
+    if (tok === NULL_TOKEN && _nullable(def)) return null;
+    const v = _fromToken(def.id, def, tok, false);
+    return (def.values || []).some(x => x.v === v || String(x.v) === String(v)) ? (def.values.find(x => String(x.v) === String(v)) || {}).v : undefined;
+}
+function _decodeLevelSet(def, body) {
+    if (body.length > 1 && body[0] === 'Y') {
+        const out = [];
+        let i = 1, ok = true;
+        while (i < body.length) {
+            const n = parseInt(body[i], 36);
+            const tok = body.slice(i + 1, i + 1 + n);
+            if (!(n > 0) || tok.length !== n) { ok = false; break; }
+            const v = _levelValue(def, tok);
+            if (v === undefined) { ok = false; break; }
+            out.push(v);
+            i += 1 + n;
+        }
+        if (ok && out.length >= 2) return out;
+    }
+    const v = _levelValue(def, body);
+    return v === undefined ? null : [v];
+}
+
 /**
  * The payload for a skill's options, WITHOUT the leading "~": '' when every option is at its
  * default (so the skill's code is exactly the old code). Options the skill does not declare, and
@@ -111,6 +162,11 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
         const out = _isMultiKey(key) ? multi : fields;
         const v = packed[def.id];
         try {
+            if (def.levelSet && def.type === 'set') {
+                const f = _encodeLevelSet(def, v);
+                if (f !== null) out.push(key + f);
+                continue;
+            }
             if (def.type === 'set') {
                 const order = (def.values || []).map(x => x.v);
                 const list = (Array.isArray(v) ? v : []).slice().sort((a, b) => order.indexOf(a) - order.indexOf(b));
@@ -178,6 +234,7 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
         const def = optId && defs.find(d => d.id === optId);
         if (!def) continue;                    // an option this skill (or this app) does not know
         const body = field.slice(keyLen);
+        if (def.levelSet && def.type === 'set') { const v = _decodeLevelSet(def, body); if (v) raw[optId] = v; continue; }
         if (def.type === 'rows') { raw[optId] = decodeRows(body); continue; }
         if (def.tokens) {
             const w = def.tokenWidth || 1;

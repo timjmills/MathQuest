@@ -15,7 +15,8 @@ import { num, fmt, obj, arr, chooseWrong, strings, step, clampSteps } from './ut
 
 const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
 const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
-const f = (v) => fmt(Number(v));
+// (a decimal held as a string keeps its places - "0.50": compare's decimal items, 2026-11-21)
+const f = (v) => (typeof v === 'string' && /^\d+\.\d+$/.test(v) ? Number(v.split('.')[0]).toLocaleString('en-US') + '.' + v.split('.')[1] : fmt(Number(v)));
 /** lf-placevalue r1 F11: "1 hundred", "1 one", never "1 hundreds" / "1 ones" (the count decides the noun). */
 const placeWord = (place, count) => { const w = PLACE_WORD[place] || ''; return Number(count) === 1 ? w.replace(/s$/, '') : w; };
 const pvOf = (q) => obj(q && q.pv) || {};
@@ -774,6 +775,22 @@ export function compareM6(a, b) {
     };
 }
 
+/**
+ * How a DECIMAL compare item is decided (compare-opts, 2026-11-21): the whole parts first, then the decimal places from the
+ * tenths, a missing place read as 0 (0.5 = 0.50). {kind: 'whole'|'place'|'equal', wa, wb, i, da, db, place}.
+ */
+const DEC_PLACE = ['tenths', 'hundredths', 'thousandths'];
+export function decimalDecision(a, b) {
+    const [wa, fa = ''] = String(a).split('.'), [wb, fb = ''] = String(b).split('.');
+    if (Number(wa) !== Number(wb)) return { kind: 'whole', wa: Number(wa), wb: Number(wb) };
+    const n = Math.max(fa.length, fb.length);
+    const pa = fa.padEnd(n, '0'), pb = fb.padEnd(n, '0');
+    const i = [...pa].findIndex((d, k) => d !== pb[k]);
+    if (i < 0) return { kind: 'equal', wa: Number(wa), wb: Number(wb), n, fa, fb };
+    return { kind: 'place', wa: Number(wa), wb: Number(wb), i, da: Number(pa[i]), db: Number(pb[i]), place: DEC_PLACE[i] || `${i + 1}th place`, fa, fb };
+}
+const isDecimalItem = (p) => !!p && Number(p.dp) > 0;
+
 registerSkill('placevalue:compare', {
     // (compare r4, critic r2 N1: an item M6 gets right - "=", a pair the ones place decides - names no error on purpose; a True
     // or False? False slot skips it, as Error analysis does, instead of printing it True: 12-33 % false, PT-TOF-1 asks 40-60 %)
@@ -785,13 +802,21 @@ registerSkill('placevalue:compare', {
         say: '__ is __ __.',
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
-    misconceptions: ['M-C1', 'M-C2', 'M-C3'],
+    misconceptions: ['M-C1', 'M-C2', 'M-C3', 'M-D1', 'M-D2'],
     // HINT-NO-BLANK r3 (critic r2 R2-7): the printed steps write the sign; the screen teaches the order of the checks on the
     // item's two numbers, and the Say line keeps the relation as its one gap
     screenHelp: (q) => {
         const p = pvOf(q);
         if (p.a === undefined || p.b === undefined) return null;
         const A = f(p.a), B = f(p.b);
+        if (isDecimalItem(p)) {
+            return {
+                steps: [`Compare the whole parts of ${A} and ${B}.`,
+                    'Same whole part: compare the tenths, then the hundredths. A missing place is 0.',
+                    'More digits is not bigger. Now write the sign in the box.'],
+                say: `${A} is ___ ${B}.`,
+            };
+        }
         return {
             steps: [`Count the digits in ${A} and in ${B}. More digits is bigger.`,
                 'Same number of digits: look from the left for the first digit that is different.',
@@ -802,6 +827,27 @@ registerSkill('placevalue:compare', {
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
+        if (isDecimalItem(p)) {
+            const dd = decimalDecision(p.a, p.b);
+            const A = f(p.a), B = f(p.b);
+            const rel = (x, s2, y) => `${x}\u00a0${s2}\u00a0${y}`;
+            const answer = { slot: 'answer', value: String(q.ans) };
+            const win = Number(p.a) > Number(p.b) ? 'a' : 'b';
+            if (dd.kind === 'whole') {
+                return [step(`The whole parts differ: ${dd.wa}\u00a0${dd.wa > dd.wb ? '>' : '<'}\u00a0${dd.wb}.`, [{ slot: 'win', value: win }]),
+                    step(`Write ${rel(A, q.ans, B)}.`, [answer])];
+            }
+            if (dd.kind === 'equal') {
+                return [step(`Same whole part: ${dd.wa}.`, []),
+                    step(`Put a 0 on: ${dd.wa}.${dd.fa.padEnd(dd.n, '0')} and ${dd.wb}.${dd.fb.padEnd(dd.n, '0')} are the same.`, [{ slot: 'digits', value: 'all' }]),
+                    step(`Write ${rel(A, '=', B)}.`, [answer])];
+            }
+            const wDigits = String(dd.wa).length;
+            const both = dd.i < dd.fa.length && dd.i < dd.fb.length;
+            return [step(`Same whole part: ${dd.wa}.`, []),
+                step(`The ${dd.place} differ: ${dd.da}\u00a0${dd.da > dd.db ? '>' : '<'}\u00a0${dd.db}.`, both ? [{ slot: 'digits', value: String(wDigits + dd.i) }] : []),
+                step(`Write ${rel(A, q.ans, B)}.`, [{ slot: 'win', value: win }, answer])];
+        }
         const d = compareDecision(p.a, p.b);
         const A = f(p.a), B = f(p.b);
         // (critic compare r3 N9, the wrap class a second time: EVERY relation a step writes is one unbreakable unit - "Write
@@ -829,6 +875,19 @@ registerSkill('placevalue:compare', {
     wrongAnswer: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return null;
+        if (isDecimalItem(p)) {
+            // the decimal errors on purpose: LONGER IS BIGGER (0.45 > 0.5, the digits after the point read as a whole number)
+            // and 0.50 > 0.5 (a zero on the end read as more)
+            const dd = decimalDecision(p.a, p.b);
+            if (dd.kind === 'whole') return null;
+            const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
+            const fa = dd.fa || '', fb = dd.fb || '';
+            const wrong = fa.length !== fb.length ? cmp(fa.length, fb.length) : cmp(Number(fa), Number(fb));
+            if (wrong === String(q.ans)) return null;
+            return choose(q, [dd.kind === 'equal'
+                ? { value: wrong, misconception: 'M-D2', explain: 'Thought a 0 on the end makes a decimal bigger.' }
+                : { value: wrong, misconception: 'M-D1', explain: 'Thought more digits after the point is bigger.' }]);
+        }
         const m6 = compareM6(p.a, p.b);
         // (critic r1 F3: the thinking pages show the card's M6 - "89 > 312 because 8 > 3" - and nothing else. Different lengths:
         // the first-digit form whenever it gives a wrong sign, else the last digits; same length: the last digits. An item M6

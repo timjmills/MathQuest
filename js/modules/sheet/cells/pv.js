@@ -55,7 +55,10 @@ export function zoneCapacity(place, size = 'L') {
     return Math.floor(inner / (d + 2)) ** 2;
 }
 
-const fmt = (v) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 });
+// (a decimal held as a STRING keeps its own places - "0.50" - the whole part grouped: compare's decimal items, 2026-11-21)
+const fmt = (v) => (typeof v === 'string' && /^\d+\.\d+$/.test(v)
+    ? Number(v.split('.')[0]).toLocaleString('en-US') + '.' + v.split('.')[1]
+    : Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 }));
 
 /** The label point size that fits a disk: zone-label size, shrunk for "1,000", never below 8 pt (TY-11). */
 function labelPt(place, size) {

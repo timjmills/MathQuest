@@ -126,7 +126,18 @@
     "familyChart": "4K",
     "patTask": "4U",
     "patShow": "4V",
-    "growShape": "4W"
+    "growShape": "4W",
+    "zeros": "3N",
+    "tenChoice": "4J",
+    "writeValue": "4L",
+    "answerAs": "4M",
+    "msChoose": "4T",
+    "amEdges": "5V",
+    "amForm": "5W",
+    "vocabTask": "6C",
+    "vocabGrade": "6D",
+    "vocabSet": "6E",
+    "dp": "6F"
   },
   "blocks": {
     "0": {
@@ -195,7 +206,9 @@
       "10": "A",
       "11": "B",
       "12": "C",
-      "13": "D"
+      "13": "D",
+      "14": "E",
+      "15": "F"
     },
     "notation": {
       "stacked": "S",
@@ -527,7 +540,10 @@
     },
     "lengths": {
       "equal": "E",
-      "mixed": "M"
+      "mixed": "M",
+      "same": "S",
+      "shorter": "H",
+      "some": "B"
     },
     "count": {},
     "source": {
@@ -801,7 +817,38 @@
       "dots": "D",
       "squares": "S",
       "mixed": "M"
-    }
+    },
+    "zeros": {
+      "off": "F",
+      "on": "N"
+    },
+    "tenChoice": {
+      "two": "T",
+      "four": "F"
+    },
+    "writeValue": {},
+    "answerAs": {
+      "unit": "U",
+      "value": "V"
+    },
+    "msChoose": {},
+    "amEdges": {
+      "given": "G",
+      "blank": "B",
+      "mixed": "M"
+    },
+    "amForm": {
+      "sign": "S",
+      "long": "L",
+      "fraction": "F"
+    },
+    "vocabTask": {
+      "match3": "M",
+      "pick3": "P"
+    },
+    "vocabGrade": {},
+    "vocabSet": {},
+    "dp": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -850,7 +897,11 @@
     "msLetter": "bool",
     "msCheck": "bool",
     "familyChart": "bool",
-    "patShow": "bool"
+    "patShow": "bool",
+    "writeValue": "bool",
+    "vocabGrade": "decimal",
+    "vocabSet": "decimal",
+    "dp": "decimal"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
