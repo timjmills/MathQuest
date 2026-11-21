@@ -81,6 +81,18 @@ function grades(cov) {
     }
     return rows;
 }
+function todoChecks(md) { // the LAST "Checks proposed but not yet on master" table in design/status/speed-audit.md
+    const parts = (md || '').split(/^#+ Checks proposed but not yet on master[^\n]*$/m);
+    if (parts.length < 2) return [];
+    const rows = [];
+    for (const l of parts[parts.length - 1].split('\n')) {
+        if (/^#/.test(l)) break;
+        const c = l.split('|').map((x) => x.trim());
+        if (c.length < 5 || /^-+$/.test(c[1]) || c[1] === 'check') continue;
+        rows.push({ check: c[1].replace(/`/g, ''), owner: c[2], where: c[3].replace(/`/g, '') });
+    }
+    return rows;
+}
 function logFor(starts, headRev) {
     const log = {};
     for (const s of starts) log[iso(s)] = [];
@@ -143,6 +155,7 @@ function build(nowMs) {
         head: head.slice(0, 9),
         weeks,
         grades: grades(show(head, 'design/WRM_COVERAGE.md')),
+        todoChecks: todoChecks(show(head, 'design/status/speed-audit.md')),
         log: logFor(starts, head),
     };
 }

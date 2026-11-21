@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T05:22:11.394Z",
- "head": "4d7c09f63",
+ "generated": "2026-11-21T05:24:41.027Z",
+ "head": "690b673dd",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -146,10 +146,10 @@
    "done": false,
    "usagePct": 77,
    "usageEstimated": true,
-   "rev": "4d7c09f63",
+   "rev": "690b673dd",
    "skills": 742,
    "passed": 33,
-   "gates": 173,
+   "gates": 174,
    "backtests": 799,
    "ledger": 649,
    "lessons": 57,
@@ -163,7 +163,7 @@
    "added": {
     "skills": 6,
     "passed": 1,
-    "gates": 30,
+    "gates": 31,
     "backtests": 197,
     "lessons": 16,
     "wrmCovered": 0
@@ -226,6 +226,128 @@
    "covered": 63,
    "partial": 15,
    "gap": 36
+  }
+ ],
+ "todoChecks": [
+  {
+   "check": "STEPS-PANEL-EMPTY (lesson Steps panel draws step text) + Model state ink (step marks on every Model state)",
+   "owner": "lf-ops",
+   "where": "-lf-ops-sizes: design/status/lf-ops-sizes.md \"F1 master check\" (backtest on master f8164ca5d FAIL)"
+  },
+  {
+   "check": "KEYLABEL-CLEAR (review key label box clear of the cell's ink) + review grade window",
+   "owner": "lf-roles",
+   "where": "-lf-roles-qreview: design/status/lf-roles.md \"Quick review A24\" item 5"
+  },
+  {
+   "check": "CODE-TAIL (ws-merge-master: two branches claiming one share code)",
+   "owner": "lf-checks",
+   "where": "-lf-algebra-mult3: design/status/lf-algebra.md A25"
+  },
+  {
+   "check": "THUMB-NO-FREEZE (CPU ×4 main-thread budget)",
+   "owner": "lf-checks",
+   "where": "**-lf-tools-lessons branch only** (ws-lessons-browse.mjs, row lessons-browse-thumb-no-freeze); fails on its own head 0e0811755"
+  },
+  {
+   "check": "LESSON-MIXED (lesson checks rerun with mixed:true)",
+   "owner": "lf-builds",
+   "where": "-lf-builds: design/status/lf-builds.md A11 item 1"
+  },
+  {
+   "check": "NEAR-TWIN-smaller (measured against the smaller window; row c120b-near-twin-small)",
+   "owner": "lf-builds",
+   "where": "-lf-builds: lf-builds.md A11 (2). NEAR-TWIN itself is only on the lf-builds branch"
+  },
+  {
+   "check": "EDGE-SHARE / PAGE-COL-RUN / SKELETON-TWIN",
+   "owner": "lf-builds",
+   "where": "-lf-builds 67cf59870 (no backtest rows; no pass commit)"
+  },
+  {
+   "check": "GUIDED-TAB",
+   "owner": "lf-engine",
+   "where": "design/STATUS.md 2026-11-20 rowcap deploy, routed minor m1"
+  },
+  {
+   "check": "STATE-PROGRESS on vocab_grade_pictures Scripted Model",
+   "owner": "lf-vocab",
+   "where": "STATUS rowcap deploy m2. Exists in ws-patterns-cells, but for patterns skills only"
+  },
+  {
+   "check": "MIN-PT (EA name tag)",
+   "owner": "lf-engine",
+   "where": "STATUS rowcap deploy m3"
+  },
+  {
+   "check": "SOL leftovers: a pinned, shrink-only count of the Problem / \"[object\" lines ws-solution-text's wrapper drops; sub_facts Show Solution method = card (R3-6); nearest_10000 box wording (R3-5)",
+   "owner": "lf-placevalue (tool), lf-ops (R3-6)",
+   "where": "design/status/lf-placevalue.md \"HINT-NO-BLANK r3 critic\" + \"Show Solution text fix\""
+  },
+  {
+   "check": "N1 My Worksheets: every button in #wsSaveSheet's bar the same height, ≥ 48 px at 820 / 1024",
+   "owner": "lf-partopts",
+   "where": "CHECKS_FROM_CRITICS 2026-11-20 (PENDING)"
+  },
+  {
+   "check": "N2 My Worksheets: late deal (5 s) answered at 4.5 s then saved = screen, or a message",
+   "owner": "lf-partopts",
+   "where": "CHECKS_FROM_CRITICS 2026-11-20 (PENDING)"
+  },
+  {
+   "check": "STUDENT-OPTS-WORDS over mixed members names (bans B&W, mc, q\\d, \", visual\")",
+   "owner": "lf-partopts",
+   "where": "CHECKS_FROM_CRITICS 2026-11-20 (planned; STUDENT-OPTS-WORDS exists without it)"
+  },
+  {
+   "check": "PSC-REVIEW-DOMAINS / PSC-SCORES / EB-PAGE on every PSC page / EB-PSCCAP",
+   "owner": "lf-roles",
+   "where": "-lf-roles-qreview / -psc2 branches only (red on purpose)"
+  },
+  {
+   "check": "PSC-QUADRANT-16 (declared 16-item quadrant exception read by EB-PSCCAP)",
+   "owner": "lf-roles",
+   "where": "lf-roles.md (qreview branch) \"item 2, option iii\""
+  },
+  {
+   "check": "NON-LIVE-ID (buildSheet / PSC title refuse an id not in SKILLS)",
+   "owner": "lf-roles",
+   "where": "design/status/lf-roles.md d2d5 notes"
+  },
+  {
+   "check": "LINE-ORPHAN (Guided Model line ending on a lone word)",
+   "owner": "lf-roles",
+   "where": "CHECKS_FROM_CRITICS 2026-11-20 (deferred, lead)"
+  },
+  {
+   "check": "Model-state change step by step, wrong work coherent, screen clipping (area_model_4by1), PSC tests the size below",
+   "owner": "lf-ops",
+   "where": "lf-ops-sizes.md critic r1 next-week list F1, F2/F12, F6, F9"
+  },
+  {
+   "check": "ws-chart-offer (exists on -lf-builds only; not on master or its precritic path)",
+   "owner": "lf-builds",
+   "where": "CHECKS_FROM_CRITICS 2026-11-20 c120b-gaps-row-hidden"
+  },
+  {
+   "check": "DEPLOY-BT: ws-partopts-unit --bt-only, the mws-* and lesson-player backtest rows in ws-deploy-gates.sh for a shared-engine deploy",
+   "owner": "lf-checks",
+   "where": "this audit (lesson 7); ws-deploy-gates.sh has no partopts-unit / lesson-player entry"
+  },
+  {
+   "check": "GATE-LINE: the deploy gate log prints each gate's last line with the head sha, and the lead's deploy note quotes it",
+   "owner": "lf-checks",
+   "where": "this audit (lesson 1, rule 11)"
+  },
+  {
+   "check": "LESSON-OPENER-SAME signature fix (5 misfires: compare cells, not masked text)",
+   "owner": "lf-checks",
+   "where": "STATUS 2026-11-20 lesson first-page deploy"
+  },
+  {
+   "check": "nested mq-browser-run slot guard",
+   "owner": "lf-checks",
+   "where": "LESSONS_LEARNED rule 8a (\"Check: none yet\")"
   }
  ],
  "log": {

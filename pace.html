@@ -107,6 +107,13 @@ details p, details li { color: var(--muted); font-size: 14px; }
     <div class="legend" id="checksLegend"></div>
   </section>
 
+  <section class="card" aria-labelledby="hTodo">
+    <h2 id="hTodo">Automatic checks still to build</h2>
+    <p class="sub">Found in this week's review: each is written down with an owner and goes in before that lane's next critic.</p>
+    <div class="counts" id="todoCount"></div>
+    <div class="scroll"><table id="todoTable" aria-label="Automatic checks still to build"><thead><tr><th>Check</th><th>Owner</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
   <section class="card" aria-labelledby="hWrm">
     <h2 id="hWrm">White Rose small steps by year</h2>
     <p class="sub">Covered means a live skill teaches the whole step. Gap steps are the lessons still to build.</p>
@@ -295,6 +302,16 @@ details p, details li { color: var(--muted); font-size: 14px; }
     }
   }
 
+  function todo() {
+    const rows = D.todoChecks || []; const tb = $('#todoTable tbody'); tb.replaceChildren();
+    const by = {}; rows.forEach((r) => { by[r.owner] = (by[r.owner] || 0) + 1; });
+    const c = $('#todoCount'); c.replaceChildren();
+    const tot = document.createElement('span'); tot.append('To build '); const tb2 = document.createElement('b'); tb2.textContent = rows.length; tot.appendChild(tb2); c.appendChild(tot);
+    Object.entries(by).forEach(([o, n]) => { const s = document.createElement('span'); s.append(o + ' '); const b = document.createElement('b'); b.textContent = n; s.appendChild(b); c.appendChild(s); });
+    if (!rows.length) { const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 2; td.textContent = 'None listed: every proposed check is built.'; tr.appendChild(td); tb.appendChild(tr); return; }
+    for (const r of rows) { const tr = document.createElement('tr'); [r.check, r.owner].forEach((v) => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); }); tb.appendChild(tr); }
+  }
+
   function logView() {
     const wk = $('#weekSel').value, q = $('#q').value.trim().toLowerCase();
     const items = (D.log[wk] || []).filter((x) => (kind === 'all' || x.kind === kind) && (!q || (x.title + ' ' + x.detail).toLowerCase().includes(q)));
@@ -325,7 +342,7 @@ details p, details li { color: var(--muted); font-size: 14px; }
   }
 
   fetch('data/pace/pace.json', { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then((d) => {
-    D = d; controls(); summary(); tiles(); trend(); eta(); checks(); wrm(); logView();
+    D = d; controls(); summary(); tiles(); trend(); eta(); checks(); todo(); wrm(); logView();
   }).catch((e) => { $('#genLine').textContent = 'The weekly numbers could not be loaded (' + e.message + '). Run node tests/scripts/ws-pace.cjs --write and reload.'; $('#genLine').className = 'err'; });
 })();
 </script>
