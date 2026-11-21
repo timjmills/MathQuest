@@ -1040,6 +1040,9 @@ function buildPlan(ctx) {
         // at S / M / L, its option variants, and the screen hosts (card 1280 / 1366 / 820 / 1024, worksheet, quiz; owner 2026-11-13: no phone width), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
         add(gate('empty-band', 'ws-empty-band (every offered role x M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(','), ...emptyBandDefaults(keys)], { missingMsg: 'ws-empty-band is not in this tree' }));
+        // STEPS-PANEL-EMPTY (lf-ops-steps, lead 2026-11-21: mult_2by1_column's lesson printed its "Steps:" band beside Guided
+        // Practice EMPTY - the skill had no provider workedSteps): the run's skills' lessons, pupil + key, M / L
+        add(gate('lesson-pages-skills', 'ws-lesson-pages --skills (STEPS-PANEL-EMPTY: no lesson page prints a Steps panel with no step text)', `${scope} × lesson × M/L`, 'browser', 'ws-lesson-pages', ['--skills', keys.join(','), '--sizes', 'M,L', '--rules', 'STEPS-PANEL-EMPTY'], { missingMsg: 'ws-lesson-pages is not in this tree', needFlags: ['skills'] }));
         // FIX-WORDS on every skill (folded from lf-placevalue's opt-in, lf-checks 2026-11-12): the error-analysis Fix-it frame
         // prints the frame's own words, never the answer's singular
         add(gate('fixit-words', 'ws-fixit-words (FIX-WORDS: the error-analysis Fix-it frame prints its own words)', scope, 'browser', 'ws-fixit-words', ['--skills', keys.join(',')], { missingMsg: 'ws-fixit-words is not in this tree' }));
@@ -1520,6 +1523,10 @@ function buildPlan(ctx) {
             // all modelled "11 × n") LESSON-EMPTY-FIRST + LESSON-OPENER-SAME on every built lesson the White Rose screen prints
             // for the grade (a --unit G<g>-<block> run: that grade, that block); blocking like the other lesson gates. Fix: lf-engine.
             for (const [g, b] of lessonPagesScopes(ctx)) add(gate(`lesson-pages-g${g}${b ? `-${b}` : ''}`, 'ws-lesson-pages (LESSON-EMPTY-FIRST: no lesson page prints only its title; LESSON-OPENER-SAME: consecutive lessons of a block never open on the same model item)', `grade ${g} WRM lessons${b ? ` of ${b}` : ''} × M`, 'browser', 'ws-lesson-pages', ['--grade', g, ...(b ? ['--blocks', b] : [])], { missingMsg: 'ws-lesson-pages is not in this tree' }));
+            // (lf-engine nosteps, lead ruling A28 2026-11-21: 404 of 843 WRM lessons printed an EMPTY "Steps:" panel beside
+            // Guided Practice - a skill with no provider worked steps had no Steps zone and we-do.js drew the band's frame anyway;
+            // A28: no steps, no Steps band, the cells take its width) STEPS-PANEL-EMPTY on every WRM lesson, pupil + key; blocking.
+            add(gate('lesson-pages-steps', 'ws-lesson-pages --grade all --rules STEPS-PANEL-EMPTY (no WRM lesson page, pupil or key, prints a "Steps:" panel with no step text)', 'every WRM lesson (K-6) × M', 'browser', 'ws-lesson-pages', ['--grade', 'all', '--rules', 'STEPS-PANEL-EMPTY'], { missingMsg: 'ws-lesson-pages is not in this tree', needFlags: ['rules'] }));
             // (lead via lf-engine, 2026-11-20: two_step_letter_equation's anchor chart drew its full-width story / bars / "= n" in
             // half-width 2 x 2 panels, past the page edge into the Say band and the footer) CELL-FITS: no cell ink outside its
             // panel or its page, on the render, on every library lesson at M and L; blocking.
