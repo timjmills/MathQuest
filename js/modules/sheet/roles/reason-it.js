@@ -170,7 +170,13 @@ export function prepare(it, info = {}) {
     // takes the rest, so a count row keeps two lines at L and the page its two items - ws-cell-checks LONE-PAGE)
     const panelLive = (c) => LIVE_W_MM - (place.kind !== 'one' ? 36 : 52) - 10 - (stackTagOf(c) ? 13 : 4) - 6;
     const work0 = work;
+    // (lf-algebra mixed_numbers_intro r3: a mixed-number partition WITH its bar model - compose / name read the bars - draws the bars
+    // in one row its panel's width UNDER the diagram, as the lesson chart does (frac-model `_barsUnder`); beside the diagram they
+    // wrapped over it in the panel and the stacked pair ran 6-128 mm off the page - ws-print-lint PG-12)
+    const pwBarsUnder = !!(it.q && it.q.cell && it.q.cell.template === 'frac-model' && it.q.cell.payload && it.q.cell.payload.task === 'partition'
+        && it.q.cell.payload.model === 'bar' && it.q.cell.payload.form !== 'eq');
     work = (c, o, v, slots) => {
+        if (pwBarsUnder) return work0(c, Object.assign({}, o, { payload: Object.assign({}, (o && o.payload) || {}, { _barsUnder: panelLive(c) }) }), v, slots);
         if (!(it.template === 'count-row' && wide && !legacy)) return work0(c, o, v, slots);
         const colsF = 186 / (panelLive(c) + 14);
         // (the host reads wrapToCell from its item, never the ctx: set for this one draw, then restored)

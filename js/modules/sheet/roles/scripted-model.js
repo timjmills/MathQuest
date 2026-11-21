@@ -472,6 +472,18 @@ export function plan(input = {}) {
         }
         if (best) { steps = best.v.steps; marks = best.v.marks; H = best.Hs; deal = best.d; tightTop = !!best.t.tight; }
     }
+    // (opt-in, a template that declares `stateKeepOutMm` - lf-algebra mixed_numbers_intro r3: the greedy deal kept the Say band's room
+    // on EVERY page, so page 1 held one state of four (1 + 2 + 1, ws-print-lint LONE at L) while it had room for two. The Say band
+    // stands on the last page only: with it there, the fewest pages that hold every state with none alone. Other templates: as before.)
+    if (koOwn !== null && koOwn !== undefined && !marks && cols === 1 && hasLone(deal, steps.length)) {
+        const capAt = (k, P) => Math.max(1, Math.floor(((k ? mCont.budget : m.budget) - m.strip - (k === P - 1 ? m.say : 0) - (k ? 0 : storyMm)) / H));
+        for (let P = 1; P <= steps.length; P++) {
+            const caps = Array.from({ length: P }, (_, k) => capAt(k, P));
+            if (P === 1) { if (caps[0] >= steps.length) { deal = [steps.length]; break; } continue; }
+            const even = spread(steps.length, caps);
+            if (even) { if (even.length <= deal.length) deal = even; break; }
+        }
+    }
     // A FACT page (factRows; lf-ops facts-roles task, RUBRIC H13): the short fact beside its step text left 35 % of the state
     // cell and 48-72 % of the text cell empty. Its states stand side by side instead, one column a state, each with its
     // step text over it at one height (the facts level), so the row is as tall as one fact and the longest step's text.

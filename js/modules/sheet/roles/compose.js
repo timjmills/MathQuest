@@ -418,10 +418,20 @@ export function answerPlace(id, correct, it = null, others = []) {
     return { kind: 'list', slots, parts, digits: parts.map(width), tail };
 }
 
+/** Every "n/d" in the TEXT of `html` (never in a tag or attribute) stacked over its bar (TY-7) at 0.7 of the line's size (the class's
+ * 0.55 em printed the key's digits at 7.1 pt, TY-11); html with none is returned as is. */
+export function stackSlashFracs(html) {
+    const s = String(html);
+    if (!/>[^<]*\d\s*\/\s*\d/.test(s)) return s;
+    return s.replace(/>([^<]*)</g, (m, t) => `>${t.replace(/(\d+)\s*\/\s*(\d+)/g, '<span class="mq-frac" style="font-size:.7em;vertical-align:middle;margin:0 .3mm"><span>$1</span><span>$2</span></span>')}<`);
+}
+
 /** The write line(s) of an `answerPlace` ('' for 'none'); a list carries its own closing full stop. */
 export function answerPlaceHtml(place, id, ctx, key) {
     if (place.kind === 'none') return '';
-    if (place.kind === 'one') return writeLine(id, ctx, key, place.digits);
+    // (TY-7, lf-algebra mixed_numbers_intro r3: a key answer that holds a fraction - "3 + 1/2" - prints it stacked over its bar,
+    // never with a slash; a line with no slash fraction in its text is unchanged, byte for byte)
+    if (place.kind === 'one') return stackSlashFracs(writeLine(id, ctx, key, place.digits));
     // a part and its comma never part; the list wraps under the frame's words in a narrow cell (.mq-framelist)
     const n = place.parts.length;
     if (place.tail) {

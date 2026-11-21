@@ -134,6 +134,29 @@ export const scorePoints = (items) => (items || []).reduce((a, it) => a + (it &&
  * @param {{bodyFirstMm: number, bodyContMm: number}} bodies  body heights of page 1 and pages 2+
  * @returns {{cont: boolean, parts: {section: number, chunk: Object, heightMm: number}[], usedMm: number, bodyMm: number}[]}
  */
+/**
+ * Split one chunk of whole rows so its first rows fit `roomMm` (placeSections `fillRest`): [head, tail] with each part's own
+ * rows, grid height and row template, or null when not even one row fits or every row does.
+ */
+function splitChunkAt(chunk, layout, gridMm, roomMm) {
+    const rows = Number(chunk.rows) || 0;
+    const cols = Math.max(1, Number(layout && layout.cols) || Math.ceil((Number(chunk.count) || 0) / Math.max(1, rows)));
+    if (rows < 2 || !(gridMm > 0)) return null;
+    const fr = String(chunk.rowsTpl || '').trim().split(/\s+/).map((t) => parseFloat(t));
+    const w = fr.length === rows && fr.every((x) => x > 0) ? fr : Array.from({ length: rows }, () => 1);
+    const tot = w.reduce((a, b) => a + b, 0);
+    const hs = w.map((x) => (gridMm * x) / tot);
+    let n = 0, sum = 0;
+    while (n < rows - 1 && sum + hs[n] <= roomMm) { sum += hs[n]; n++; }
+    if (n < 1) return null;
+    const r2 = (x) => Math.round(x * 100) / 100;
+    const tpl = (a) => (fr.length === rows ? a.map((x) => `${x}fr`).join(' ') : '');
+    const headCount = Math.min(n * cols, chunk.count);
+    const head = Object.assign({}, chunk, { count: headCount, rows: n, gridMm: r2(sum), rowsTpl: tpl(w.slice(0, n)), filledRest: true });
+    const tail = Object.assign({}, chunk, { from: chunk.from + headCount, count: chunk.count - headCount, rows: rows - n, gridMm: r2(gridMm - sum), rowsTpl: tpl(w.slice(n)), filledRest: true });
+    return [head, tail];
+}
+
 export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
     const pages = [];
     let cur = null;
@@ -156,6 +179,23 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
                 && cur.parts.length > 0 && cur.parts[cur.parts.length - 1].section === s.sharesWith;
             let heightMm = (shares ? 0 : s.instrMm) + (Number(chunk.anchorMm) || 0) + gridMm;
             const fitsHere = cur && ci === 0 && cur.usedMm + heightMm <= cur.bodyMm - SAFETY;
+            // (opt-in `fillRest`, lane lf-algebra 2026-11-21: a part that FOLLOWS its full-width group on the page - practice.js
+            // wideFirst, mixed_numbers_intro's bar model fading down the page - was paginated against a whole page, so when all of
+            // its rows did not fit under the full-width rows every one went overleaf and the page kept a 66-86 mm strip (lesson M
+            // PAGEFILL 37 %). Its first chunk now leaves the rows that fit under the group on this page and the rest start the next.
+            // Every section without the flag is placed exactly as before.)
+            if (!fitsHere && s.fillRest && shares && !chunk.blocks && !chunk.anchorMm) {
+                const split = splitChunkAt(chunk, s.layout, gridMm, cur.bodyMm - SAFETY - cur.usedMm);
+                if (split) {
+                    cur.parts.push({ section: si, chunk: split[0], heightMm: split[0].gridMm });
+                    cur.usedMm += split[0].gridMm;
+                    open();
+                    const h2 = s.instrMm + split[1].gridMm;
+                    cur.parts.push({ section: si, chunk: split[1], heightMm: h2 });
+                    cur.usedMm += h2;
+                    return;
+                }
+            }
             if (!fitsHere) { open(); heightMm = s.instrMm + (Number(chunk.anchorMm) || 0) + gridMm; }
             cur.parts.push({ section: si, chunk, heightMm });
             cur.usedMm += heightMm;

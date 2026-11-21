@@ -810,8 +810,13 @@ function partitionRow(p, ctx) {
     }
     // a lesson chart panel (lead ruling 2026-11-21 (2): compose / name keep their bars on every panel): the diagram, then the
     // bars in one row the panel's full width UNDER it - beside it the pair was wider than the panel and the chart overflowed
-    if (!isTwin(ctx) && Number(p._barsUnder) > 0) {
-        const rowMm = Math.max(60, Math.min(Number(p._barsUnder) - 8, 170));
+    // (lf-algebra r3: on paper a cell of a 2+ column grid - the Opener's half-width Model pane - is too narrow for the bars beside
+    // the diagram: they wrapped over it and the page ran 13 mm past its foot (ws-print-lint PG-12 / PG-21). The bars go under, in
+    // one row the cell's width; the measure draws the same, so the page is planned at the height it prints.)
+    const narrowCols = !isTwin(ctx) && !(Number(p._barsUnder) > 0) && Number(ctx && ctx.columns) >= 2 && Math.floor(Number(ctx.columns)) === Number(ctx.columns);
+    if (!isTwin(ctx) && (Number(p._barsUnder) > 0 || narrowCols)) {
+        const under = Number(p._barsUnder) > 0 ? Number(p._barsUnder) : 186 / Number(ctx.columns) - 6;
+        const rowMm = Math.max(60, Math.min(under - 8, 170));
         return `<div class="fm-row fm-pw-row" data-fm-model="bar" data-fm-bars-under="1" style="display:flex;flex-direction:column;align-items:center;width:100%;box-sizing:border-box;gap:${L(ctx, 2.5)};">`
             + `${diagram}${pwBars(p, ctx, rowMm)}</div>`;
     }

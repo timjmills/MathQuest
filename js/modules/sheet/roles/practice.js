@@ -849,7 +849,8 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         });
     }
     const pages = placeSections(
-        layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
+        // (`fillRest`: only the part that follows its full-width group - wideFirst, a hint that fades down the page; paginate.js)
+        layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf, ...(sectionsIn[si].wideFirst ? { fillRest: true } : {}) })),
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };

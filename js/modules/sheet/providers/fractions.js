@@ -725,7 +725,9 @@ registerSkill('fractions:mixed_numbers_intro', {
     // and Reason It judge a WRITTEN partition of a printed mixed number (their A / B panels hold the diagram, not the bars)
     // (the opener's Model pane is half the page: the bars stood over the diagram and ran the page over - ws-cell-checks OVERFLOW;
     // its Steps and the Scripted Model teach the bars. compose / name draw their bars whatever this says)
-    roleOpts: (role, opts) => (/^(test|error-analysis|check-it|true-false|reason|opener|lesson-opener)/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : opts),
+    // (null on every other role: contract.roleOptions then keeps the request's own opts - returning the copy it was handed turned an
+    // absent opts into {}, so a lesson asked for by its skill alone never dealt its record's practice opts, dealPracticeOpts)
+    roleOpts: (role, opts) => (/^(test|error-analysis|check-it|true-false|reason|opener|lesson-opener)/.test(String(role)) ? Object.assign({}, opts, { model: 'none' }) : null),
     // the Pre-skill check: the fraction and whole-number skills this one stands on (data.js order would give the presets
     // appended before it); nearest first
     // (on bars, the model this skill draws: a page of one picture)

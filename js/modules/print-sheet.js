@@ -5400,7 +5400,7 @@ async function buildLesson(n, metaOf) {
     const besideCap = [4, 3, 2].find((c) => !reflow(c)) || 1;
     // The practice section and its grid shapes (sheet/lesson-pages/practice.js, the shared builder, §8c).
     const section = practiceSection({ skill: practiceSk, facts, rounding, divFactsOnly, besideCap });
-    const stackShapes = practiceStackShapes(data);
+    const stackShapes = practiceStackShapes(data, size);
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.

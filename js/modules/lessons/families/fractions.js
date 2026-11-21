@@ -39,6 +39,10 @@ export const ROUTINES = {
             why: 'Four actions in a fixed order; the chant keeps the wholes before the part.',
         },
         example: { match: 'wholes' },
+        // (lf-algebra r3, lesson M PAGEFILL 37 %: the Practice page is ONE page - the two bar-model rows the hint fades from, then
+        // one row of two diagrams under them (sheet/paginate.js fillRest); six problems ran to a second page that held one row)
+        // (at L the two bar rows fill the page with the step strip: a row of diagrams no longer fits under them)
+        practiceShapesBySize: { M: [[4, 2]], L: [[2, 1]] },
     },
 };
 // (mnTask compose / name - A18: every chart panel is a full-width row, the step's words over the drawing; the bars stand in one
@@ -48,14 +52,17 @@ export const ROUTINES = {
 ROUTINES['mixed-partition'].byOption = {
     mnTask: {
         compose: {
-            chartWide: true, chartRow: false, guidedRows: 1, headFirst: true,
+            // (every compose / name problem is a full-width bar-model row: the Practice page holds three at M, two at L, on one page)
+            chartWide: true, chartRow: false, guidedRows: 1, headFirst: true, practiceShapesBySize: { M: [[3, 1]], L: [[2, 1]] },
             steps: [{ icon: 'look', text: 'Read the parts.' }, { icon: 'write', text: 'Write the wholes.' }, { icon: 'write', text: 'Write the fraction.' }, { icon: 'say', text: 'Say it.' }],
         },
         name: {
-            chartWide: true, chartRow: false, guidedRows: 1, headFirst: true,
+            chartWide: true, chartRow: false, guidedRows: 1, headFirst: true, practiceShapesBySize: { M: [[3, 1]], L: [[2, 1]] },
             steps: [{ icon: 'count', text: 'Count the bars.' }, { icon: 'write', text: 'Write the mixed number.' }, { icon: 'write', text: 'Write the parts.' }, { icon: 'say', text: 'Say it.' }],
         },
     },
+    // (the equation form draws no bars: its short rows fill the Practice page, the most that fit first)
+    mnForm: { eq: { practiceShapesBySize: { M: [[12, 2], [10, 2], [8, 2]], L: [[12, 2], [10, 2], [8, 2]] } } },
 };
 Object.freeze(ROUTINES);
 

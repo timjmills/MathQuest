@@ -188,7 +188,10 @@ export function practiceSection({ skill, facts, rounding, divFactsOnly, besideCa
  */
 // (`practiceShapes`: the shapes to try, densest first - the first that prints on its pages wins; visual-quality r2:
 // eight stories at M, six at L, never six over a 25 % strip - ported from master 2026-11-07)
-export const practiceStackShapes = (data) => (data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
+// (`practiceShapesBySize` {M?, L?}: the shapes of ONE print size, where a lesson's practice rows differ in height by size - lane
+// lf-algebra mixed_numbers_intro r3; absent, or no entry for the size: the shapes below, as before)
+export const practiceStackShapes = (data, size) => (data && data.practiceShapesBySize && Array.isArray(data.practiceShapesBySize[size]) && data.practiceShapesBySize[size].length ? data.practiceShapesBySize[size]
+    : data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
     : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]]);
 
 /**
