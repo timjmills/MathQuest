@@ -81,6 +81,9 @@ export function parseRulings(text, file = '') {
     if (raw == null) return null;
     let j;
     try { j = JSON.parse(raw); } catch (e) { throw new Error(`${file}: the rulings block is not JSON (${e.message})`); }
+    // A card with no skills of its own (a host or tool card, e.g. the lesson player, "skills": []) and no rulings has
+    // nothing to check: it is skipped, not an error (lead 2026-11-21: it crashed the gate for EVERY skill on master).
+    if (Array.isArray(j.skills) && !j.skills.length && !(j.rulings || []).length) return null;
     if (!Array.isArray(j.skills) || !j.skills.length) throw new Error(`${file}: the rulings block has no "skills"`);
     for (const k of j.skills) if (!/^[a-z0-9_]+:[a-z0-9_]+$/i.test(k)) throw new Error(`${file}: "${k}" is not category:skill`);
     const KINDS = new Set(['range', 'digits', 'noRegroup', 'boxes', 'maxShare', 'minShare']);

@@ -1035,3 +1035,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Updates itself: .github/workflows/pace-board.yml rebuilds and commits pace.json on every master push, daily, and after the Thursday reset. `ws-pace --check` joins deploy session 1; `--self-test` covers the week maths and the log classifier.
 - Speed reflection 2026-11-20 merged (LESSONS_LEARNED process rules 11-20, speed-audit, metrics).
 - 2026-11-21 (owner: "estimates into 2029 cannot be correct"): the board now counts the redesign against 602 skills (presets and retired skills apart), shows the finish at the pace reached AND at a planned pace (data/pace/targets.json, owner confirmed 12 skills / 6 lessons / 8 gap steps a week), and says how many weeks of records the pace rests on.
+- 2026-11-21: pace board independent critic r1 FAIL (7/6/7/6) -> fixes -> narrow r2 PASS 8/8/8/8 (finished-week pace, phone cards, live-recorded freezing, 36 h freshness check, headline log kinds). Minor after r2: "moving this week" wording for rows with progress this week but no finished-week pace.
+
+## 2026-11-21 — Bug fix: shared gates (lead; no critic)
+- ws-card-rulings / ws-dealer-uniform crashed for EVERY skill on master: a card with no skills of its own (lesson-player, "skills": []) and no rulings is now skipped, not an error.
+- ws-print-lint poolSkill read mixed_numbers_intro / mixed_improper_visual as MIXED POOLS (POOL-MIN false positives); mixed-number skills are excluded.
+- ws-sibling-compare: siblings.json `firstOfDrawing` (lead ruling A25) makes NO-SIBLING rows of the first skill of a new drawing non-blocking, with its proof; listed: mixed_numbers_intro and its two presets.
