@@ -398,9 +398,10 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         const sc = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         check(sc <= 0, `${tag}: page scrolls sideways by ${sc}px`);
         if (SHOTS && W === 1280) {
-          await press(p, '#tvwBar [data-w-act="set"]', touch);
+          await p.evaluate(() => { for (const id of ['tvToast', 'tvTrayToast']) { const e = document.getElementById(id); if (e) { e.classList.remove('is-on'); e.hidden = id === 'tvTrayToast'; } } });
+          if (!(await p.$('#tvwSetPop'))) await press(p, '#tvwBar [data-w-act="set"]', touch);
           await p.$eval('#tvwBar', (e) => e.scrollIntoView({ block: 'start' }));
-          await sleep(200);
+          await sleep(300);
           fs.mkdirSync(OUT, { recursive: true });
           await p.screenshot({ path: path.join(OUT, 'send-set-popover-1280.png') });
           await press(p, '#tvwBar [data-w-act="set"]', touch);
@@ -497,7 +498,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           await press(p, '#tvwBar [data-w-act="tray"]', touch);
           await sleep(200);
           const lab2 = await p.evaluate(() => ((document.querySelector('#tvTray [data-tt-src]') || {}).textContent || '').replace(/\s+/g, ' '));
-          check(lab2.includes('Compare amounts') && lab2.includes(`${nOld} skill${nOld === 1 ? '' : 's'} from earlier`), `${tag}: after adding this lesson the bar says "${lab2}"`);
+          check(/^this lesson \(the lesson \+ \d+ skills?\)/.test(lab2) && lab2.includes(`${nOld} skill${nOld === 1 ? '' : 's'} from earlier`), `${tag}: after adding this lesson the bar says "${lab2}"`);
           if (SHOTS) { fs.mkdirSync(OUT, { recursive: true }); await p.screenshot({ path: path.join(OUT, 'send-tray-source-1280.png') }); }
           const clr = await p.evaluate(() => { const b = document.querySelector('#tvTray [data-act="tray-clear"]'); return b ? b.textContent.replace(/\s+/g, ' ').trim() : ''; });
           check(/Clear tray/.test(clr), `${tag}: no "Clear tray" on the bar ("${clr}")`);

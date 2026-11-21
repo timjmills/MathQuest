@@ -555,3 +555,6 @@ body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-
   #teacherApp .tvw-acts:has(.tvw-setpop) { position: relative; top: auto; bottom: auto; }
 }
 #teacherApp .tvw-setpop-list { display: flex; flex-direction: column; gap: var(--sp-8); max-height: 240px; overflow-y: auto; }
+@media (min-width: 1024px) {
+  #teacherApp .tvw-acts:not(:has(.tvw-setpop)) { box-shadow: var(--shadow-1); }
+}

@@ -774,7 +774,7 @@ function barHTML() {
 let trayCtx = null;
 export function setTrayContext(fn) { trayCtx = typeof fn === 'function' ? fn : null; renderBar(); }
 function ctxNow() { try { return trayCtx ? trayCtx() : null; } catch (e) { return null; } }
-/** "Tray: 5 skills from earlier (not this lesson)" · "Tray: Lesson 7 Compare amounts (3 skills) + 2 from earlier". */
+/** "Tray: 5 skills from earlier (not this lesson)" · "Tray: this lesson (the lesson + 3 skills) · 2 skills from earlier". */
 export function traySourceText(keys = trayKeys()) {
     const c = ctxNow();
     if (!c || !keys.length) return '';
@@ -782,8 +782,8 @@ export function traySourceText(keys = trayKeys()) {
     const mine = g ? keys.filter((k) => g.skills.includes(k)) : [];
     const earlier = keys.length - mine.length;
     if (!mine.length) return `Tray: ${plural(earlier, 'skill')} from earlier (not this lesson)`;
-    const lead = `Tray: ${g.name}${g.made ? ' (lesson' : ' ('}${g.made ? ' + ' : ''}${plural(mine.length, 'skill')})`;
-    return earlier ? `${lead} + ${plural(earlier, 'skill')} from earlier` : lead;
+    const lead = `Tray: this lesson${g.made ? ' (the lesson + ' : ' ('}${plural(mine.length, 'skill')})`;
+    return earlier ? `${lead} · ${plural(earlier, 'skill')} from earlier` : lead;
 }
 
 /** Draw the tray bar (it is in the page from the first Skills visit; CSS shows it only on Skills). */
