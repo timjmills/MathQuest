@@ -101,7 +101,9 @@ export function prepare(it, info = {}) {
         const mt = (c && c.metrics) || {};
         const tab = Number.isFinite(mt.tabMm) ? mt.tabMm : 5;
         const words = c && c.mode === 'screen' ? toScreenInstruction(text) : text;
-        return `<div class="ws-revprompt" data-review-prompt style="align-self:stretch;margin:0 0 1.5mm ${(2 * tab - 1).toFixed(1)}mm;font-size:${mt.textPt || 13}pt;line-height:1.25;text-align:left;color:#000;">${promptEsc(words)}</div>${r0(c, o)}`;
+        // (the words in their own span: the bridge reads a cell's ink from its LEAVES, so the stretched line box would have read as
+        // ink across the whole cell and let a one-sided item past the side rule - EB-SIDE 35.9 % on number_word_form, div_facts M)
+        return `<div class="ws-revprompt" data-review-prompt style="align-self:stretch;margin:0 0 1.5mm ${(2 * tab - 1).toFixed(1)}mm;font-size:${mt.textPt || 13}pt;line-height:1.25;text-align:left;color:#000;"><span>${promptEsc(words)}</span></div>${r0(c, o)}`;
     };
     it.reviewPrompt = text;
     return it;
