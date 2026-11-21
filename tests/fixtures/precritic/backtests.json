@@ -15936,7 +15936,7 @@
    "kind": "commit-pair",
    "check": "card design/cards/psc-review (owner ruling 2026-11-20): a Pre-skill Check with room under its check prints a Quick review band of earlier skills, one per CCSS domain in turn (the grade's), never the lesson skill or a prerequisite, seeded; two scores Check __/n and Review __/m; the key labels each review answer <domain> · <skill>",
    "rule": "ws-psc-review PSC-REVIEW-DOMAINS / PSC-SCORES",
-   "command": "node tests/scripts/ws-psc-review.mjs",
+   "command": "node tests/scripts/ws-psc-review.mjs --skills addition:add_facts --sizes M,L --only PSC-REVIEW-DOMAINS,PSC-SCORES && node tests/scripts/ws-psc-review.mjs --skills division:div_facts --sizes M --only PSC-REVIEW-DOMAINS,PSC-SCORES",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -15968,6 +15968,66 @@
    "pass": {
     "commit": "edfa8cd7a",
     "state": "the Quick review rows fill the last page (M 4 items, add/sub L 2 items); mult/div_facts L (31 / 33 %) and sub_wp_20 L p1 (51 %, not the last page) stay red, for a ruling"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-review-ebpage-l",
+   "kind": "commit-pair",
+   "check": "EB-PAGE on every Pre-skill Check page, the L pages left red by the first Quick review build (lead ruling A24 item 1): mult_facts L 31 %, div_facts L 33 %, sub_wp_20 L p1 51 % white",
+   "rule": "ws-empty-band EB-PAGE (pre-skill-check, every page)",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts,division:div_facts,subtraction:sub_wp_20 --roles pre-skill-check --sizes L --hosts none --page-fill --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "39cdc584e",
+    "state": "mult_facts L 31 %, div_facts L 33 %, sub_wp_20 L p1 51 % white (review rows of 4 or 2 only, ink >= 72 % of the cell, last page only)"
+   },
+   "pass": {
+    "commit": "d8ff5a1c6",
+    "state": "pre-skill-check.js: 3-column choice (measureCols, checkColsOf, review rows of 3), the review side rule (the wider empty side < 27 % of the cell), page 1 of a 2-page check takes review rows: mult_facts L 9 %, div_facts L 11 %, sub_wp_20 L p1 16 % / p2 23 %"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-keylabel-clear",
+   "kind": "commit-pair",
+   "check": "KEYLABEL-CLEAR (lead ruling A24 item 5): on every Quick review answer in the key, the grey <domain> · <skill> label box does not intersect the cell's ink box (union of the painted parts, label and number tab aside) and stays inside its cell",
+   "rule": "ws-psc-review KEYLABEL-CLEAR",
+   "command": "node tests/scripts/ws-psc-review.mjs --only KEYLABEL-CLEAR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "4b78a07ef",
+    "state": "the label at the cell's top-right corner over the item's first line: 8 overlaps on add_facts M, div_facts M/L, mult_facts M/L (e.g. Operations · Addition Word Problems 40.3 x 2.0 mm)"
+   },
+   "pass": {
+    "commit": "8b520fd20",
+    "state": "print-sheet.js measures each cell's ink box in both states (inkTop/Bot/Left/RightMm); pre-skill-check.js keyTagPlace lays the label in a clear strip (foot, top right of the tab, or a column beside the ink) and passes over an item with none; answer-key.js draws it there"
+   },
+   "browser": true
+  },
+  {
+   "id": "psc-review-grade",
+   "kind": "commit-pair",
+   "check": "PSC-REVIEW-GRADE (lead ruling A24 item 5): Quick review items come only from the pupil's grade down to two grades below; a domain with nothing in that window is skipped (a grade-3 page takes no K counting)",
+   "rule": "ws-psc-review PSC-REVIEW-GRADE",
+   "command": "node tests/scripts/ws-psc-review.mjs --only PSC-REVIEW-GRADE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "fail": {
+    "commit": "87fb8dcf5",
+    "state": "div_facts / mult_facts (grade 3) review K skills: comparing:classify_count at M, counting:count_objects at L (4 findings)"
+   },
+   "pass": {
+    "commit": "352c8244a",
+    "state": "print-sheet.js reviewCandidates skips a skill below the pupil's grade minus 2 (REVIEW_GRADE_SPAN), 12 candidates a domain"
    },
    "browser": true
   }
