@@ -207,3 +207,20 @@ Gate reruns (round 2 head, the six skills, one browser gate at a time):
 | ws-backtest (six round-2 rows) | 6 PASS |
 | ws-roles-unit | OK (115) |
 | ws-boot-smoke | OK |
+
+## 2026-11-21: narrow critic r2. Criticals closed, parked at round cap 2
+Report: design/audit/runs/lf-ops/critic-sizes-r2-narrow.md (08ba25e01).
+- F1, F2/F12, F3/F4, F5, F6 and F8 are all FIXED.
+- The shared scripted-model change is safe toward master: the regression sample at M shows add_100_regroup, sub_100_regroup and long_div_2digit better, and nothing broken.
+- The skills do not pass yet. Per rule 7 the branch parks; the next round is next week at medium, a fresh builder, check-first for each item.
+
+**Next week, in order:**
+1. **N1 (major):** the area-model Model and anchor chart never fill the partial-sum lines before "Add the parts". Check: MODEL-FINAL-COMPLETE.
+2. **N5 (major):** the F8 fix moved the overflow into page count. The 4-step chart takes 3 pages, and p2/p3 are 40–45 % blank. Checks: empty-band on chart pages; at most 2 pages for a chart of 4 or fewer steps.
+3. **N2 (major):** the comma in mult_4by1 error-analysis wrong work takes a digit column. Check: extend NO-GROUPED-SLOT to digit rows.
+4. **area_model_4by1 Reason It L:** one a page, unruled (waiting on the lead); 9/8/7/8.
+5. **F11:** the mult_4by1 Model takes about 60 mm plus half a page blank. area_model_4by1 takes 3 pages for 6 states.
+6. **F9, F10, F7, F13–F15**, and lesson L p5/p6 Practice OVERFLOW.
+7. **N4:** count area wrong kinds per page set. **N6:** the screen focus line splits the part box. **N3:** True or False keys leave True sentences blank (role-wide, route to lf-roles).
+8. **A9c item 1:** area-model Reason It + word-problems at M, 2 a page.
+9. **Lesson TOPSTART ×12** (stack write-above); mult_4by1 Reason It L TAB-CLEAR 0.7 mm.
