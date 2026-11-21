@@ -2999,7 +2999,9 @@ const NA_DOCS = [];
 // plus N - 1 derived ones (hash(cat__skill:print:k)), or at the seeds listed; every other skill keeps its one
 // seed. Each extra page is its own document (`cat:skill@seed`), so PAGEFILL, L-KEY and the rest are judged
 // page by page. (--kind single only.)
-const poolSkill = (s) => /^mixed_|_all$/.test(s.skillId) || s.skillId === 'all_domains_mixed';
+// A MIXED POOL skill deals several skills; mixed_numbers_intro / mixed_improper_visual are about mixed NUMBERS and are not
+// pools (lead 2026-11-21, lf-algebra: the old /^mixed_/ read them as pools and applied POOL-MIN).
+const poolSkill = (s) => (/^mixed_|_all$/.test(s.skillId) && !/^mixed_(numbers?|improper|fraction)/.test(s.skillId)) || s.skillId === 'all_domains_mixed';
 function seedsOf(s) {
     const SEEDS_N = Math.max(1, parseInt(arg('seeds', '1'), 10) || 1);
     const SEED_LIST = (arg('seed-list', '') || '').split(',').map(x => x.trim()).filter(Boolean).map(Number).filter(Number.isFinite);

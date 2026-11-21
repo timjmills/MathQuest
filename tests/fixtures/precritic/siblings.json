@@ -37,5 +37,10 @@
     "subtraction:sub_1m_no_regroup": ["subtraction:sub_1m_regroup"]
    }
   }
- }
+ },
+ "firstOfDrawing": [
+  {"skill": "fractions:mixed_numbers_intro", "proof": "lead ruling A25 2026-11-21: first skill of the frac-model 'partition' drawing (design/cards/mixed-partition, signed 2026-11-20); no approved sibling exists"},
+  {"skill": "fractions:name_mixed_from_model", "proof": "lead ruling A25: preset of mixed_numbers_intro, same new drawing"},
+  {"skill": "fractions:write_mixed_from_parts", "proof": "lead ruling A25: preset of mixed_numbers_intro, same new drawing"}
+ ]
 }
