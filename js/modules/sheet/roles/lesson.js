@@ -51,7 +51,7 @@
 // role's earlier exports are re-exported below, unchanged.
 
 import { ctxOf, frameOf, layoutHeader, bandMetrics, assemble, poolItems, labelStyleOf, stringsOf, stripWrapMm, stripExtraMm } from './compose.js';
-import { workedStepsOf } from '../anchors.js';
+import { workedStepsOf, lessonChartAllowed } from '../anchors.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { hopsSvg } from '../lesson-arch/fact.js';
 import { roundLineSvg, roundLineMm, roundLinePad } from '../lesson-arch/line.js';
@@ -166,9 +166,10 @@ export function extras(input = {}) {
     // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
     const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
     const out = [];
-    if (ex) out.push(...stateItems(ex, data));
+    // (lf-ops A28: a provider with `lessonChart: false` keeps its Steps zone and strip but draws no anchor chart)
+    if (ex && lessonChartAllowed(ex)) out.push(...stateItems(ex, data));
     const { ex2, ex3, ex4 } = otherExamples(input, ex, data);
-    if (ex2) out.push(...secondItems(ex2));
+    if (ex2 && lessonChartAllowed(ex2)) out.push(...secondItems(ex2));
     // Lessons r2-r3: the other examples whole (the chart shows them when the second example's row
     // of states does not fit), the third and fourth cases where the lesson names them (rounding:
     // ends in 5; the 90s round up to 100).

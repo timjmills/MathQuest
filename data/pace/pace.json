@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T06:06:14.905Z",
- "head": "7e3421868",
+ "generated": "2026-11-21T08:01:25.872Z",
+ "head": "f8f0a379f",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 71,
    "usageEstimated": false,
-   "rev": "7e3421868",
+   "rev": "f8f0a379f",
    "skills": 742,
    "retired": 10,
    "presets": 130,
@@ -483,8 +483,8 @@
    "corePassed": 29,
    "passed": 33,
    "gates": 174,
-   "backtests": 799,
-   "ledger": 649,
+   "backtests": 801,
+   "ledger": 651,
    "lessons": 57,
    "lessonsPassed": 1,
    "lessonsPending": 5,
@@ -560,14 +560,16 @@
     "lessonsPassed": 6,
     "wrmGap": 8,
     "wrmCovered": 10,
-    "todoChecks": 12
+    "todoChecks": 12,
+    "from": "2026-11-26"
    },
-   "ledgerAdded": 130,
+   "liveRecorded": true,
+   "ledgerAdded": 132,
    "added": {
     "skills": 6,
     "passed": 1,
     "gates": 31,
-    "backtests": 197,
+    "backtests": 199,
     "lessons": 16,
     "lessonsPassed": null,
     "wrmCovered": 0
@@ -767,7 +769,7 @@
     "date": "2026-10-17",
     "title": "Deploy fixes: teacher-shell knows the Lesson: detailed card; mult_properties legacy forms print the true × glyph",
     "detail": "",
-    "kind": "lesson",
+    "kind": "feature",
     "from": "git"
    },
    {
@@ -851,7 +853,7 @@
     "date": "2026-10-17",
     "title": "pre-existing ws-screen-slots defect (reading_ruler_hard card doubled answer area) recorded",
     "detail": "",
-    "kind": "feature",
+    "kind": "check",
     "from": "git"
    },
    {
@@ -879,7 +881,7 @@
     "date": "2026-10-16",
     "title": "custom number line 5.2 passed critic r8 (R8-D1 open, minor)",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -900,7 +902,7 @@
     "date": "2026-10-16",
     "title": "small fixes passed critic r7 (N17/N18 nits, owner Q1-Q3)",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -921,7 +923,7 @@
     "date": "2026-10-16",
     "title": "custom number line 5.2 passed critic r9 (R8-D1 fixed; R9-D1 open, minor)",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    }
   ],
@@ -958,7 +960,7 @@
     "date": "2026-10-24",
     "title": "T1 mock-up critic r6 result; app defects routed",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -972,7 +974,7 @@
     "date": "2026-10-24",
     "title": "speed audit final summary; critic owed on tonight's three owner-ruling changes",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -1000,14 +1002,14 @@
     "date": "2026-10-24",
     "title": "S1 merged; critic of the HD-5a/CL-11a/CL-4b changes FAIL, fixes queued",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
     "date": "2026-10-24",
     "title": "S2 T3 merged; critic fixes D1/D2/D6 landed",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -1056,14 +1058,14 @@
     "date": "2026-10-23",
     "title": "critic r1 times",
     "detail": "",
-    "kind": "check",
+    "kind": "skill",
     "from": "git"
    },
    {
     "date": "2026-10-23",
     "title": "critic r2 started",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -1105,7 +1107,7 @@
     "date": "2026-10-23",
     "title": "precritic additions from the pilot lessons started",
     "detail": "",
-    "kind": "lesson",
+    "kind": "check",
     "from": "git"
    },
    {
@@ -1140,7 +1142,7 @@
     "date": "2026-10-23",
     "title": "pilot SU-C critic r2 result and lead decision",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    },
    {
@@ -1217,7 +1219,7 @@
     "date": "2026-10-23",
     "title": "CL-11a and CL-4b owned by the lead's branch; merge before the critic",
     "detail": "",
-    "kind": "check",
+    "kind": "other",
     "from": "git"
    }
   ],
@@ -1233,7 +1235,7 @@
     "date": "2026-11-03",
     "title": "owner print/options decisions 2026-11-03; all-skills number options queued after the reset",
     "detail": "",
-    "kind": "skill",
+    "kind": "feature",
     "from": "git"
    },
    {
@@ -1247,7 +1249,7 @@
     "date": "2026-11-03",
     "title": "Nov 3 deploys (simple print 2, student bar, fact families)",
     "detail": "",
-    "kind": "skill",
+    "kind": "feature",
     "from": "git"
    },
    {
@@ -1296,7 +1298,7 @@
     "date": "2026-10-30",
     "title": "teacher follow-ups, lesson 6 and Y4 site lessons live",
     "detail": "",
-    "kind": "lesson",
+    "kind": "feature",
     "from": "git"
    },
    {
@@ -1317,7 +1319,7 @@
     "date": "2026-10-30",
     "title": "Skip-count fix held for a clean precritic + signed card; ops G1 fail and its lesson",
     "detail": "",
-    "kind": "lesson",
+    "kind": "feature",
     "from": "git"
    }
   ],
@@ -1489,7 +1491,7 @@
     "date": "2026-11-15",
     "title": "Deploy tables to 15 x 15 (owner request; lf-ops critic t15 9/9/9 + D1 narrow re-check C2 9)",
     "detail": "mult_facts / div_facts: \"Tables to\" offers 15 x 15 (band 225); the 13-15 ticks show only under it; new preset skills mult_facts_15 / div_facts_15 (codes, standards, WRM, search terms); \"How it is written\" leads the options panel. Facts card signed 2026-11-15.",
-    "kind": "check",
+    "kind": "skill",
     "from": "STATUS.md"
    },
    {
@@ -1510,14 +1512,14 @@
     "date": "2026-11-14",
     "title": "Deploy correct-answer sound (owner request; lf-checks critic 9/9/10/9)",
     "detail": "A correct answer plays a short rising four-note power-up (C5-E5-G5-C6, Web Audio, no file) on the card, worksheet and quiz, only when SOUND is on; never on a wrong answer; silent in end-only-feedback quizzes. ws-correct-sound 18/18.",
-    "kind": "check",
+    "kind": "feature",
     "from": "STATUS.md"
    },
    {
     "date": "2026-11-14",
     "title": "Deploy lf-roles round 11 (narrow critic r11 PASS: count rows held to ink on continuation pages; X2 ruled; ctx.guided plumbing)",
     "detail": "Guided continuation pages hold count rows to their ink (GUIDED-COUNT-TIGHT); ctx.guided carried in render and measure (no page change); X2 lone-Model Guided page ruled for the two-step family.",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    },
    {
@@ -1531,7 +1533,7 @@
     "date": "2026-11-14",
     "title": "Deploy lf-roles round 10 (narrow critic PASS on the changed pages)",
     "detail": "Guided fit by the drawn frame (count_by_tables M Model + 4), a lone Guided story sized to its work (two_step_add_then_div), the tries ceiling counts answers consistently; vocab_grade_pictures Guided L gains a try (graded >= 8). Open: X1 count-row stretch on continuation pages, X2 Model alone on a Guided page.",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    },
    {
@@ -1650,7 +1652,7 @@
     "date": "2026-11-13",
     "title": "Deploy-6: shared roles Guided round (lf-roles, critic r8b + r8c PASS)",
     "detail": "Guided Practice: the 7 subtraction stack skills at M/L; expand M/L, unit_form M/L, combine L (9/8/9/8-9). Tight rows refilled, side band capped, Model-height try rows fixed; each finding has a check + backtest row.",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    },
    {
@@ -1669,6 +1671,13 @@
    },
    {
     "date": "2026-11-13",
+    "title": "Owner approves the fastest-implementation plan (all eight changes)",
+    "detail": "design/plans/FASTEST_PLAN_2026-11-13.md; summary in CLAUDE.md \"Fastest-implementation plan\". Unit order (round 1 first), copy-light review, batch critics, round cap 2, deploy train 11:00 / 19:00 UTC, six lanes, no phone width (390) — print + computer/Chromebook + tablet only, long lessons paused.",
+    "kind": "other",
+    "from": "STATUS.md"
+   },
+   {
+    "date": "2026-11-13",
     "title": "Deploy lf-checks -r2 (narrow critic PASS 9/8/8/8)",
     "detail": "Checker minors (FOCUS-GAP per line, EB-SIDE between, slot-ink / EB-FOOT notes, EB-ITEMKEY / EB-ITEMPARITY), LP-RASTER on role pages (ws-grade-render --raster-fit), no-dropped-row merge-base fix. Checks only; 50/50 builds byte-identical.",
     "kind": "check",
@@ -1676,9 +1685,23 @@
    },
    {
     "date": "2026-11-13",
+    "title": "Owner: usage back at 0 %; cap 70 % for now",
+    "detail": "All 10 lanes told to resume from their saved resume points. Budget: 70 % ≈ $1,960 (1 % ≈ $28), split per lane in design/status/usage-week-2026-11-13.md with each session's cost_usd baseline.",
+    "kind": "other",
+    "from": "STATUS.md"
+   },
+   {
+    "date": "2026-11-13",
+    "title": "Weekly usage limit reached (resets 2026-11-19 22:00 UTC)",
+    "detail": "Lane builders hit HTTP 429 (weekly limit). Owner had lifted the budget limits (\"let things be\"); the CLAUDE.md 80 % rule was suspended by owner and the account reached 100 %.",
+    "kind": "other",
+    "from": "STATUS.md"
+   },
+   {
+    "date": "2026-11-13",
     "title": "Deploy shared page roles deploy-5 (lf-roles, critic r7a PASS, 0 counted defects)",
     "detail": "npr Error Analysis S: the Correct / Fix it column keeps its own width (was flex-grow, judgement at 69.5 vs 131.5 mm); EA redo work left-aligned like its copy (G2, EA-REDO-ALIGN); owner rule batch: 11 backtest rows, ws-cell-checks --fixture, ws-precritic --overflow-fixture, per-role precritic plans (duplicate per-role gate removed so --model-states stays); teacher-preview F8 ledger row closed again",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    },
    {
@@ -1699,7 +1722,7 @@
     "date": "2026-11-13",
     "title": "Deploy shared page roles deploy-4: Reason It (lf-roles, critics r6e + r6g PASS, 0 counted defects)",
     "detail": "Reason It: work wider than half the room stands A over B (never shrunk); work that fits half a cell keeps A | B with the response as a full-width row under them; a column word story prints once over A and B; \"__ is correct.\" dropped (PT-RSN-4: \"Circle A or B. The answer is __.\"); one answer line length for every word answer (LINE-TELL); KEYFIT (a letter answer takes the word line); Guided tightRow",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    },
    {
@@ -1727,16 +1750,30 @@
     "date": "2026-11-13",
     "title": "Deploy shared page roles deploy-3 (lf-roles r9, critic r5b/r5c PASS)",
     "detail": "Scripted Model: earlier steps black, only the newest step grey (MOD-MARKS-INK); Error Analysis label offsets on tables / count rows (PUPILTAG, EA-PAD, EA-ROWX); Pre-skill Check at L splits 2+2 with full headers (PSC-2PG-BALANCE, lead ruling R13); FIX-MINIMAL.",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    }
   ],
   "2026-11-19": [
    {
     "date": "2026-11-21",
+    "title": "Deploy lf-ops steps hotfix (bug fix, no critic)",
+    "detail": "Column multiplication lessons (mult_2by1 / 3by1) printed an EMPTY Steps panel: multiply had no provider. Now a multiply provider for column items fills the lesson Steps panel (4 steps), the Guided Steps band and the Practice strip; `lessonChart: false` keeps the lesson's page set exactly as master (A28: no new Model page without a critic).",
+    "kind": "fix",
+    "from": "STATUS.md"
+   },
+   {
+    "date": "2026-11-21",
+    "title": "Bug fix: shared gates (lead; no critic)",
+    "detail": "ws-card-rulings / ws-dealer-uniform crashed for EVERY skill on master: a card with no skills of its own (lesson-player, \"skills\": []) and no rulings is now skipped, not an error.",
+    "kind": "fix",
+    "from": "STATUS.md"
+   },
+   {
+    "date": "2026-11-21",
     "title": "Deploy the pace board (owner request; lead build, critic pending)",
     "detail": "pace.html (site root) + data/pace/pace.json from `node tests/scripts/ws-pace.cjs --write`: live and 8/10-passed skills and lessons, this week vs last, week-by-week trends, estimated time to finish, automatic checks added each week, checks still to build (from the weekly speed reflection), White Rose coverage by year, and a weekly log filterable by week / kind / search. Usage % is typed weekly into",
-    "kind": "check",
+    "kind": "other",
     "from": "STATUS.md"
    },
    {
@@ -1799,7 +1836,7 @@
     "date": "2026-11-20",
     "title": "Deploy count_by_tables (lf-ops critic r4 8/8/8/8; redesign-passed 33) ; lesson re-pin with proof",
     "detail": "count_by_tables passes the 8/10 redesign (Pre-skill check L 14 items, opener title, True or False? instruction, Scripted Model L 4 states); passed skills changed by the shared code re-graded >= 8 (hash proof design/status/lf-ops-cbt-proof.md).",
-    "kind": "lesson",
+    "kind": "skill",
     "from": "STATUS.md"
    },
    {
@@ -1820,7 +1857,7 @@
     "date": "2026-11-20",
     "title": "Deploy SKIP button (owner request; lf-hosts critic r2 8+ on every host) + end-run / touch-target bug fixes + Guided hint W2 mask (lf-roles critic PASS) + HINT-NO-BLANK smaller head (lf-placevalue; strictly better than master)",
     "detail": "Skip on card / worksheet / quiz / MAP: skipped items return at the end (\"Fixing k of n\"); never wrong, never break a streak; MAP twice-skipped scores incorrect for RIT (lead ruling), results say Skipped. A run ends once (END-ONCE); infinite Finish counts answered only. Card tools and add_wp_20 sign >= 48 px.",
-    "kind": "fix",
+    "kind": "feature",
     "from": "STATUS.md"
    },
    {

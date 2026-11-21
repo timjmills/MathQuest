@@ -1,0 +1,37 @@
+{
+ "about": "ws-lesson-pages LESSON-ROLE-SET pins: the page roles (data-ws-sheet; key pages key:<role>) each lesson printed on master e0c90f8ad (role 'lesson', default options, practicePages 1, mixed, key on; seeds 506061 and 4242 alike). lf-ops A28 (lead 2026-11-21): the column presets of multiplication:multiply print no anchor chart (lesson-chart) until one is graded. Made with --pin-roles on master.",
+ "pins": {
+  "multiplication:mult_2by1_column/M": [
+   "key:lesson-mixed",
+   "key:lesson-practice",
+   "key:lesson-sheet",
+   "lesson-mixed",
+   "lesson-practice",
+   "lesson-sheet"
+  ],
+  "multiplication:mult_2by1_column/L": [
+   "key:lesson-mixed",
+   "key:lesson-practice",
+   "key:lesson-sheet",
+   "lesson-mixed",
+   "lesson-practice",
+   "lesson-sheet"
+  ],
+  "multiplication:mult_3by1_column/M": [
+   "key:lesson-mixed",
+   "key:lesson-practice",
+   "key:lesson-sheet",
+   "lesson-mixed",
+   "lesson-practice",
+   "lesson-sheet"
+  ],
+  "multiplication:mult_3by1_column/L": [
+   "key:lesson-mixed",
+   "key:lesson-practice",
+   "key:lesson-sheet",
+   "lesson-mixed",
+   "lesson-practice",
+   "lesson-sheet"
+  ]
+ }
+}

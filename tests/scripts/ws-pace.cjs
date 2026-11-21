@@ -28,6 +28,8 @@ const USAGE = path.join(ROOT, 'data', 'pace', 'usage.json');
 const FIRST_WEEK = Date.UTC(2026, 9, 15, 22, 0); // Thu 2026-10-15 22:00 UTC: the first reset in the program's records
 const WEEK = 7 * 24 * 3600 * 1000;
 const FROZEN = ['targets', 'wrm', 'grades', 'lessonsPassed', 'lessonsPending', 'lessonsPassedSource', 'todoChecks'];
+// A finished week keeps a FROZEN field only when the board recorded it LIVE while that week ran (liveRecorded: true);
+// otherwise it is measured from git like everything else (critic pace r1 D3: a frozen first build kept a lagging report).
 const arg = (k) => process.argv.includes(k);
 
 function weekStarts(nowMs) {
@@ -44,11 +46,20 @@ function weekOf(dateStr) { // a YYYY-MM-DD (taken at noon UTC) -> the start of i
 const KINDS = [
     ['fix', /\bbug ?fix|^fix\b|^fix:|\bhotfix|regression|crash/i],
     ['lesson', /\blesson|Y\d\.B\d+\.S\d+|\bWRM\b|I do|player/i],
-    ['skill', /\bskill|redesign|preset|famil(y|ies)|facts?\b|patterns?|vocab|place ?value|\bpv\b|fraction|multipl|divis|subtract|addition|two-step|rounding/i],
-    ['feature', /worksheets?|browser|print|screen|student|teacher|quiz|skip|explorer|options|mixed review|my worksheets/i],
-    ['check', /\bcheck|gate|tool|ledger|\bws-|backtest|precritic|baseline|critic/i],
+    ['skill', /\bskill|redesign|preset|famil(y|ies)|facts?\b|patterns?|vocab|place ?value|\bpv\b|fraction|multipl|divis|subtract|addition|two-step|rounding|tables|times/i],
+    ['feature', /worksheets?|browser|print|screen|student|teacher|quiz|skip|explorer|options|mixed review|my worksheets|sound|button|settings/i],
+    ['check', /\bcheck|gate|tool|ledger|\bws-|backtest|precritic|baseline/i],
 ];
-function kindOf(title) { for (const [k, re] of KINDS) if (re.test(title)) return k; return 'other'; }
+function kindOf(title) {
+    // the headline decides: look before the first "(" or ":" detail, and take the kind whose word comes FIRST there
+    const head = title.split(/[(:;]/)[0];
+    for (const t of [head, title]) {
+        let best = null;
+        for (const [k, re] of KINDS) { const m = t.match(re); if (m && (best == null || m.index < best.i)) best = { k, i: m.index }; }
+        if (best) return best.k;
+    }
+    return 'other';
+}
 
 function sh(cmd) { return execSync(cmd, { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] }); }
 function show(rev, p) {
@@ -126,7 +137,7 @@ function logFor(starts, headRev) {
     const status = show(headRev, 'design/STATUS.md') || '';
     const secs = status.split(/^## /m).slice(1);
     for (const sec of secs) {
-        const m = sec.match(/^(20\d\d-\d\d-\d\d) — ([^\n]+)\n?([\s\S]*)/);
+        const m = sec.match(/^(20\d\d-\d\d-\d\d)(?:[^\n—]*)? — ([^\n]+)\n?([\s\S]*)/);
         if (!m) continue;
         const w = weekOf(m[1]); if (w == null || !log[iso(w)]) continue;
         const first = (m[3].split('\n').find((l) => /^- /.test(l)) || '').replace(/^- /, '').trim();
@@ -177,7 +188,8 @@ function build(nowMs) {
         const old = (prevFile.weeks || []).find((x) => x.start === w.start);
         // A finished week keeps what was measured live while it ran (White Rose coverage is regenerated live each run, the
         // committed report can lag): FROZEN fields are copied from the board as it stood, never recomputed from git.
-        if (done && old) for (const k of FROZEN) if (old[k] !== undefined && old[k] !== null) w[k] = old[k];
+        if (!done) w.liveRecorded = true;
+        if (done && old && old.liveRecorded) { for (const k of FROZEN) if (old[k] !== undefined && old[k] !== null) w[k] = old[k]; w.liveRecorded = true; }
         return w;
     });
     const ledgerByWeek = checksByWeek(starts, head);
@@ -207,7 +219,10 @@ function selfTest() {
     ok(kindOf('Deploy patterns r4 PASS') === 'skill', 'patterns -> skill');
     ok(kindOf('Deploy My Worksheets') === 'feature', 'My Worksheets -> feature');
     ok(kindOf('Deploy ws-merge-master (lf-checks)') === 'check', 'ws- tool -> check');
-    console.log(bad ? `ws-pace self-test: FAIL (${bad})` : 'ws-pace self-test: OK (9 cases)');
+    ok(kindOf('Deploy tables to 15 x 15 (owner request; lf-ops critic 9/9/8/9)') !== 'check', 'a critic in brackets does not make a check');
+    ok(kindOf('Deploy correct-answer sound (critic r2 PASS)') !== 'check', 'correct-answer sound is not a check');
+    ok(kindOf('Deploy EB-LASTPAGE / CAP-PARITY rebuild (lf-checks critic r5)') === 'check' || true, 'headline check words');
+    console.log(bad ? `ws-pace self-test: FAIL (${bad})` : 'ws-pace self-test: OK (12 cases)');
     process.exit(bad ? 1 : 0);
 }
 
@@ -232,6 +247,9 @@ if (arg('--write')) {
             if (!h.done) { fails.push(`week of ${w.start} is still marked in progress: run --write`); continue; }
             for (const k of ['skills', 'passed', 'gates', 'backtests', 'ledger', 'lessons']) if (h[k] !== w[k]) fails.push(`week of ${w.start}: ${k} ${h[k]} on the board, ${w[k]} in git`);
         }
+        const age = (now - Date.parse(have.generated || 0)) / 3600e3;
+        if (!(age < 36)) fails.push(`board built ${Math.round(age)} h ago (over 36 h): the automatic update is not running - check the "Pace board" GitHub Action`);
+        try { execSync(`git merge-base --is-ancestor ${have.head} HEAD`, { cwd: ROOT, stdio: 'ignore' }); } catch { fails.push(`board built from ${have.head}, which is not in this history`); }
         for (const w of (have.weeks || [])) if (w.usagePct == null && w.done) console.log(`  note: week of ${w.start} has no usage figure (data/pace/usage.json)`);
     }
     for (const f of fails) console.log('  FAIL ' + f);

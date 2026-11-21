@@ -40,6 +40,9 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `stories(q, {seed}) -> Story | null`: an original story carrying ONE item's numbers, with a
     // number + label answer, for the word-problem role (section 3.8; providers/stories.js).
     'stories',
+    // `lessonChart: false | (q) -> boolean`: the lesson draws no anchor chart (Model page) from this skill's worked steps;
+    // they still fill the Steps zone, the Guided band and the Practice strip (lf-ops A28; anchors.js lessonChartAllowed).
+    'lessonChart',
     // `wrongAnswers(q) -> WrongAnswer[]`: EVERY misconception's wrong answer for one item (the detailed
     // lesson's Check Question options, 2026-10-16); `wrongAnswer` stays the one a page shows.
     'wrongAnswers',
