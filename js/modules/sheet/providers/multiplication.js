@@ -430,6 +430,11 @@ function multiplyWrong(q) {
 
 registerSkill('multiplication:multiply', {
     // (lf-ops sizes r2: the card's misconceptions M-S1..M-S5 - never the default "added the factors")
+    // (lead A28, 2026-11-21, from lf-ops-steps: the live column presets' lessons - a 2- or 3-digit number by one digit,
+    // mult_2by1_column / mult_3by1_column - print no anchor chart / Model page, a page type they never printed; their worked
+    // steps still fill the Steps zone, the Guided band and the Practice strip. ws-lesson-pages LESSON-ROLE-SET pins them. This
+    // branch's size presets - 4 digits by 1, the long-multiplication grids - keep the chart their lessons were graded with.)
+    lessonChart: (q) => { const ops = columnMultOps(q); return !(ops && String(ops[0]).length <= 3); },
     misconceptions: ['placeholder-zero', 'last-carry-dropped', 'regroup-not-added', 'sum-no-regroup', 'zero-as-one'],
     wrongAnswer: multiplyWrong,
     // (lf-ops-steps: the default adapter's strings, with the column steps added for a column item; `keyIsDefault`: its

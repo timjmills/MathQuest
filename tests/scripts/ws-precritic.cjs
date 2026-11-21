@@ -1042,7 +1042,8 @@ function buildPlan(ctx) {
         add(gate('empty-band', 'ws-empty-band (every offered role x M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(','), ...emptyBandDefaults(keys)], { missingMsg: 'ws-empty-band is not in this tree' }));
         // STEPS-PANEL-EMPTY (lf-ops-steps, lead 2026-11-21: mult_2by1_column's lesson printed its "Steps:" band beside Guided
         // Practice EMPTY - the skill had no provider workedSteps): the run's skills' lessons, pupil + key, M / L
-        add(gate('lesson-pages-skills', 'ws-lesson-pages --skills (STEPS-PANEL-EMPTY: no lesson page prints a Steps panel with no step text)', `${scope} × lesson × M/L`, 'browser', 'ws-lesson-pages', ['--skills', keys.join(','), '--sizes', 'M,L', '--rules', 'STEPS-PANEL-EMPTY'], { missingMsg: 'ws-lesson-pages is not in this tree', needFlags: ['skills'] }));
+        // LESSON-ROLE-SET (lead A28, 2026-11-21): a lesson with pinned page roles prints exactly master's set (no new Model page)
+        add(gate('lesson-pages-skills', 'ws-lesson-pages --skills (STEPS-PANEL-EMPTY: no lesson page prints a Steps panel with no step text; LESSON-ROLE-SET: pinned lessons print master\'s page roles)', `${scope} × lesson × M/L`, 'browser', 'ws-lesson-pages', ['--skills', keys.join(','), '--sizes', 'M,L', '--rules', 'STEPS-PANEL-EMPTY,LESSON-ROLE-SET'], { missingMsg: 'ws-lesson-pages is not in this tree', needFlags: ['skills'] }));
         // FIX-WORDS on every skill (folded from lf-placevalue's opt-in, lf-checks 2026-11-12): the error-analysis Fix-it frame
         // prints the frame's own words, never the answer's singular
         add(gate('fixit-words', 'ws-fixit-words (FIX-WORDS: the error-analysis Fix-it frame prints its own words)', scope, 'browser', 'ws-fixit-words', ['--skills', keys.join(',')], { missingMsg: 'ws-fixit-words is not in this tree' }));
