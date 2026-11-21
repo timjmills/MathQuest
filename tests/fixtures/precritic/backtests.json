@@ -15930,6 +15930,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pass-chip-filter-skills",
+  "check": "owner 2026-11-21 (lead ruling A33): the Skills bar's 8/10 chip filters (aria-pressed, a count 8/10 · N skills); pressed, the cards shown are exactly REDESIGN_PASSED (Maths area, all grades) and only passed skills in every other view and search; an empty result says so; 'What does 8/10 mean?' beside it; 48 px",
+  "kind": "commit-pair",
+  "rule": "ws-teacher-library PASS-CHIP-FILTER",
+  "browser": true,
+  "fail": {
+   "commit": "5a51918eb",
+   "state": "origin/master: the 8/10 mark is explained in 'What the marks mean' only, no filter"
+  },
+  "pass": {
+   "commit": "3ad1a57ef",
+   "state": "the 8/10 chip is a filter toggle with the explanation beside it"
+  },
+  "command": "node tests/scripts/ws-teacher-library.cjs --only PASS-CHIP-FILTER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
