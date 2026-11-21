@@ -573,3 +573,15 @@ Stopped at the budget stop; the round cap is reached for HINT-NO-BLANK, so R3-3 
   support-ladder OK, role-sweep (print uses solutionSteps via sheet/adapters.js) 528 identical. ws-hint-no-blank: HINT-LEAK pin shrunk
   (mult_break_apart, mult_properties no longer fail); still FAIL on SAYLESS multiplication:mult_break_apart, the same on master
   2c42746aa and 688f755a6 before this change (lf-ops: its provider has a Say frame the screen does not show). Not pinned (pins only shrink).
+
+### 2026-11-21 — compare-opts (A35/A35b/A35c) PARKED at budget: WIP 957537f77, untested beyond syntax
+Done: generic level-set option (skill-options.js `type:'set'`, `levelSet:true`, `levelSetOption()`, levelsAt / levelIndexAt /
+levelCombos / levelSetLabel / isLevelMix); codec (skill-option-codec.js: one tick = old enum token, several = "Y" + length-prefixed
+tokens; key dp=6F, lengths some=B); compare "Numbers to" as a set, Decimals set, lengths 'some'; gen-pv deals one level per item
+in turn, decimal traps; pv provider decimal steps/hints/errors. compare_decimal: see-also (its generator ignores these opts).
+NOT done (resume in this order): checks first (options-verify per set, MIX-LEVELS, PRESET-SNAP for every SKILL_PRESETS entry,
+SET-CODE round trip, content-audit within N) + backtests; default pages byte-identical (role-sweep / lesson-baseline / capacity-pin);
+codec registry 2 FAILs (also on master: confirm); preset "Compare Numbers to 10,000,000" (data.js, appended code, 4.NBT.A.2 + EE,
+SKILL_WRM, links, search terms); PRESET-SNAP in the options sheet (generic) + keep-one-ticked + See-also link; honest mixed-range
+header; renders; 5.NBT.A.3b note for compare_decimal; merge master; narrow critic; DEPLOY. Note: the top level is 9,999,999 in
+the WIP - check it reads "10,000,000" to the teacher and that "within N" holds.
