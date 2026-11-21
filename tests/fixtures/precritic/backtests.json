@@ -16230,6 +16230,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "sizes-r2-model-state-marks",
+   "check": "ws-guided-echo MODEL-STATE-MARKS on the stepState templates (stack, long-multiplication, area-model): every Scripted Model state whose step says 'Write N' draws N (a stack's digits read from its ink marks), and a state whose step has '=' or 'Write' draws something the state before it did not (MODEL-STATE-CHANGE)",
+   "kind": "commit-pair",
+   "rule": "lf-ops-sizes critic r1 F1 (PT-MOD-1: the column and area Model states printed empty boxes)",
+   "browser": true,
+   "fail": {
+    "commit": "c180eacc6",
+    "state": "scripted-model.js drew marks only for TRACE_TEMPLATES / statePayload: every state but the last blank"
+   },
+   "pass": {
+    "commit": "60363ee14",
+    "state": "stepStatesFor: the template's own stepState draws state k (registry.renderCell modelState), as the lesson anchor chart does"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills multiplication:mult_4by1_column,multiplication:mult_3by2_standard,multiplication:area_model_4by1 --seeds 1 --sizes M --only MODEL-STATE-MARKS --screen-seeds 0 --score-roles scripted-model",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
