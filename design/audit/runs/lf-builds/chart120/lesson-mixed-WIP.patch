@@ -1,0 +1,151 @@
+diff --git a/js/modules/print-sheet.js b/js/modules/print-sheet.js
+index 625455710..b03042ec4 100644
+--- a/js/modules/print-sheet.js
++++ b/js/modules/print-sheet.js
+@@ -396,6 +396,8 @@ function normaliseRequest(req = {}) {
+         ...(req.lessonFit === true ? { lessonFit: true } : {}),
+         // (the detailed lesson maker, lesson 2 r4: `leadHalf` may drop a partner's only shelf or narrow it)
+         leadDrop: !!req.leadDrop,
++        // (LESSON-MIXED, lead ruling A11: a chart lesson's lead counts the items it could deal)
++        ...(req.leadDealt ? { leadDealt: true } : {}),
+         // The detailed lesson maker: no Steps strip on the lesson's Mixed page (critic D18).
+         mixedStrip: req.mixedStrip === false ? false : undefined,
+         // The detailed lesson maker (lessons/detailed/*): a lesson's chart / sheet data in the
+@@ -1049,6 +1051,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
+                 setChartSheet(_cwAll(seen));
+                 try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: CW_SKILLS.has(`${sk.categoryId}:${sk.skillId}`) && (_cwRoleTiles || (_cwEdge && _cw120(sk))) ? Object.assign({}, sk.opts, { tiles: _cwRoleTiles || 3 }) : sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; if (e && /rows-of-ten grid/.test(String(e.message))) _rowsErr = String(e.message); } finally { if (pin) setDealPin(null); setChartSheet(null); }
+                 if (!cand) continue;
++                if (!_cwMixOk(cand)) continue;
+                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
+                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
+                 const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
+@@ -4474,6 +4477,7 @@ async function buildRoleSheet(n, metaOf) {
+         latticeN: n.latticeN || 0,
+         leadHalf: !!n.leadHalf,
+         leadDrop: !!n.leadDrop || undefined,
++        leadDealt: n.leadDealt || undefined,
+         lessonFit: n.lessonFit === true || undefined,
+         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
+         perQuestion: n.perQuestion || undefined,
+@@ -5355,13 +5359,31 @@ async function buildLesson(n, metaOf) {
+             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,
+             mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed,
+             stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab, lessonFit: !n.lessonData,
++            leadDropAlways: CW_SKILLS.has(`${practiceSk.categoryId}:${practiceSk.skillId}`),
+         }));
+     };
+     if (built.includes('mixed')) {
+         // (LR-5: the Mixed page never repeats a Prerequisite Check item - its partners are the same earlier skills; a lesson
+         // without a check avoids exactly what it did before)
+         const preTexts = (((parts.find((p) => p.part === 'prereq') || {}).res || {}).items || []).map(refText).filter(Boolean);
+-        const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'), undefined, preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts);
++        // (lead ruling A11, LESSON-MIXED: the Mixed page's chart windows are dealt as the skill's own windows - its default
++        // tiles, not the band-120 teaching sheet's edge columns of 3 - against every window the packet printed before it)
++        const edge0 = _cwEdge;
++        // (the earlier pages are other pages: the Mixed page's windows are judged against them by _cwMixOk - no twin, no near
++        // twin, no repeated answer set, at most one re-asked answer a window - and give nothing away only among themselves; an
++        // earlier answer printed as a given is lead ruling A13's case)
++        const sheet0 = new Map(_cwSheet);
++        // (read off the pages the packet built - every part before this one, as the practice page's printedKeys are)
++        const priorW = [];
++        for (const pt of parts) for (const pl of (pt.res && (pt.res.keyPlans || [pt.res.plan])) || []) for (const pg of (pl && pl.pages) || []) {
++            const walk = (x) => { if (!x || typeof x !== 'object') return; if (Array.isArray(x)) { x.forEach(walk); return; } if (x.kind === 'grid') (x.items || []).forEach((it) => { const c = it && it.q && !(it.anchor || it.model) ? chartOfQ(it.q) : null; if (c) priorW.push(c); }); for (const k of ['sections', 'parts', 'content', 'contents']) if (x[k]) walk(x[k]); };
++            walk(pg);
++        }
++        _cwMixPrior = priorW.concat([..._cwAll(new Set())].map(cwParse).filter((w) => w && !w.shows));
++        _cwSheet.clear();
++        _cwEdge = false; setChartEdge(false); setChartPart('mixed');
++        let res;
++        try { res = await buildMixed(lessonPartSeed(n.seed, 'mixed'), undefined, preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts); } finally { _cwEdge = edge0; setChartEdge(edge0); setChartPart(null); _cwMixPrior = null; _cwSheet.clear(); for (const [k, v] of sheet0) _cwSheet.set(k, v); }
+         parts.push({ part: 'mixed', role: 'mixed-practice', res });
+         // (lf-partopts §8a: `partOpts.mixed.n` is the total - a whole number of Mixed pages, each its own sheet that fills its page,
+         // each dealt avoiding the pages before it)
+@@ -6448,6 +6470,24 @@ let _cwForceFirst = null;
+ // (lead ruling (a) 2026-11-14, critic blanks B2: a band-120 LESSON's pupil windows - teaching sheet and practice pages - hold 3
+ // blanks, on the columns either side of the worked example's five: rows 91-120 hold one shown window and five pupil windows then)
+ let _cwEdge = false;
++// (LESSON-MIXED, lead ruling A11: while a lesson's Mixed page deals, the windows the earlier pages printed - {rows, cols, gaps})
++let _cwMixPrior = null;
++const cwParse = (k) => { const m = /^cw:([\d.]+):([\d.]+):([\d.]*)(:s)?$/.exec(String(k)); if (!m) return null; const sp = (x) => (x ? x.split('.').map(Number) : []); return { rows: sp(m[1]), cols: sp(m[2]), gaps: sp(m[3]), shows: !!m[4] }; };
++const _cwMixOk = (q) => {
++    const c = _cwMixPrior && chartOfQ(q);
++    if (!c) return true;
++    const sq = (w) => { const z = new Set(); for (const r of w.rows) for (const k of w.cols) z.add(r * 10 + k + 1); return z; };
++    const gs = c.gaps.slice().sort((a, b) => a - b).join(), me = sq(c);
++    const asked = new Set(_cwMixPrior.flatMap((w) => w.gaps));
++    if (c.gaps.filter((g) => asked.has(g)).length > 1) return false;
++    return !_cwMixPrior.some((w) => {
++        if (w.gaps.slice().sort((a, b) => a - b).join() === gs) return true;
++        const o = sq(w), sh = [...o].filter((x) => me.has(x));
++        if (sh.length * 10 < Math.max(o.size, me.size) * 6) return false;
++        const a = sh.filter((x) => w.gaps.includes(x)).sort((x, y) => x - y).join(), b = sh.filter((x) => c.gaps.includes(x)).sort((x, y) => x - y).join();
++        return !!a && a === b;
++    });
++};
+ const _cw120 = (sk) => !!sk && (Number(sk.opts && sk.opts.band) === 120 || (sk.skillId === 'chart_to_120' && !(sk.opts && sk.opts.band)));
+ const CW_SKILLS = new Set(['composing:hundreds_chart_fill', 'composing:chart_to_120']);
+ // (the sheet's chart windows across ALL its runs - a lesson deals its anchor and each practice section in runs of their own)
+diff --git a/js/modules/sheet/lesson-pages/mixed.js b/js/modules/sheet/lesson-pages/mixed.js
+index d61e62b80..b5e8ceb66 100644
+--- a/js/modules/sheet/lesson-pages/mixed.js
++++ b/js/modules/sheet/lesson-pages/mixed.js
+@@ -13,9 +13,12 @@
+  *
+  * @param {{common: object, lookAsked?: string, lead: object, partners: object[], practiceTexts: string[],
+  *          packNums?: string[]|null, mixedLattice?: number, mixedLeadDrop?: boolean, seed: number,
+- *          stripHtml?: string, stripH?: number, mixedStrip?: boolean, packTab?: string[], lessonFit?: boolean}} o
++ *          stripHtml?: string, stripH?: number, mixedStrip?: boolean, packTab?: string[], lessonFit?: boolean,
++ *          leadDropAlways?: boolean}} o
++ * (`leadDropAlways`, LESSON-MIXED lead ruling A11: a chart lesson's Mixed page - its windows are few, the band-120 crossing
++ * holds two that neither twin nor give each other away - lets a partner give its band up so the lesson keeps half)
+  */
+-export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts, packNums = null, mixedLattice, mixedLeadDrop, seed, stripHtml, stripH, mixedStrip, packTab, lessonFit = false }) {
++export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts, packNums = null, mixedLattice, mixedLeadDrop, seed, stripHtml, stripH, mixedStrip, packTab, lessonFit = false, leadDropAlways = false }) {
+     const withSkills = partners;
+     const practiceSk = lead;
+     return Object.assign({}, common, {
+@@ -27,7 +30,7 @@ export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts,
+         arrangement: 'sections',
+         // Lessons r3: never a problem the Practice page printed; the lesson skill at least
+         // half the placed items (`leadHalf`, enforced after packing).
+-        sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: mixedLattice || 6, leadHalf: true, leadDrop: !!(packNums && mixedLeadDrop), growLast: !!packNums,
++        sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: mixedLattice || 6, leadHalf: true, leadDrop: !!((packNums && mixedLeadDrop) || leadDropAlways), growLast: !!packNums, ...(leadDropAlways ? { leadDealt: true } : {}),
+         seed,
+         // (`lessonFit`, a library lesson - live-pm r2: no 30 % band from the fill, no lone shelf on a continuation page;
+         // absent on a detailed lesson's Mixed page, byte-identical)
+diff --git a/js/modules/sheet/roles/mixed-practice.js b/js/modules/sheet/roles/mixed-practice.js
+index b5e4bd2cd..847bacc14 100644
+--- a/js/modules/sheet/roles/mixed-practice.js
++++ b/js/modules/sheet/roles/mixed-practice.js
+@@ -139,10 +139,12 @@ function packing(poolsIn, input) {
+     // a partner gives up an extra shelf, and the lesson takes a shelf where one fits.
+     if (input.leadHalf && ids.length > 1 && !A) {
+         const lead = ids[0];
+-        const cnt = (id) => shelf[id].n * shelf[id].per;
++        // (LESSON-MIXED, lead ruling A11: with `leadDealt`, the lead counts only the items its probe could deal - a chart lesson's
++        // Mixed page deals two windows however many its shelves hold)
++        const cnt = (id) => (input.leadDealt && id === lead ? Math.min(shelf[id].n * shelf[id].per, (poolsIn[id] || []).length) : shelf[id].n * shelf[id].per);
+         const rest = () => ids.slice(1).reduce((a, id) => a + cnt(id), 0);
+         // (lessonFit over several pages: a lead shelf fits when the pages stay the pages the start took)
+-        const leadFits = () => { if (!multi) return used + bandH(lead, false) <= m.budget; shelf[lead].n++; const ok = pagesOf() <= basePages; shelf[lead].n--; return ok; };
++        const leadFits = () => { if (input.leadDealt && cnt(lead) >= (poolsIn[lead] || []).length) return false; if (!multi) return used + bandH(lead, false) <= m.budget; shelf[lead].n++; const ok = pagesOf() <= basePages; shelf[lead].n--; return ok; };
+         for (let g = 0; g < 24 && cnt(lead) < rest(); g++) {
+             const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
+             if (shelves < maxShelves * basePages && leadFits()) { shelf[lead].n++; used += bandH(lead, false); continue; }
+diff --git a/tests/scripts/ws-guided-echo.cjs b/tests/scripts/ws-guided-echo.cjs
+index 32ce9e7d3..50f5d50dc 100644
+--- a/tests/scripts/ws-guided-echo.cjs
++++ b/tests/scripts/ws-guided-echo.cjs
+@@ -558,7 +558,11 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
+                                 const base = exQs.filter((it) => winOf(it.q)).length + pItems.length;
+                                 const n0 = out.length;
+                                 judgeGiveaway(`${key} lesson packet mixed ${size} seed ${s}`, exQs.filter((it) => winOf(it.q)).concat(pItems, mItems));
+-                                const cg = out.splice(n0).filter((f) => { const m = f.match(/window (\d+)'s missing .* window (\d+)/); return m && (Number(m[1]) > base || Number(m[2]) > base); });
++                                // (lead ruling A11 with A13: the Mixed page is a later page - a mixed window printing an earlier page's answer as
++                                // a given, or asking a square an earlier page printed, is the A13 case (band 120: the practice rows grid prints every
++                                // square of 91-120, so no Mixed window could avoid it); its re-asks are ANSWER-REUSE's, judged above. Mixed against
++                                // mixed still fails.)
++                                const cg = out.splice(n0).filter((f) => { const m = f.match(/window (\d+)'s missing .* window (\d+)/); return m && Number(m[1]) > base && Number(m[2]) > base; });
+                                 cg.forEach((f) => out.push(`${L} ${f.replace(/^CROSS-GIVEAWAY /, 'CROSS-GIVEAWAY ')}`));
+                                 const n1 = out.length;
+                                 judgeBlanks(`${key} lesson mixed page ${size} seed ${s}`, mItems, (w, b) => (w.rows.length === 3 && w.cols.length === 10 ? b.length : tilesWant));
