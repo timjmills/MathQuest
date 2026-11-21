@@ -448,6 +448,13 @@ function renderIdo(r) {
 </section>`;
     setBar(n ? `Step ${k + 1} of ${n}${last && p.say ? ' <span class="mq-lp-together">· Say it together</span>' : ''}` : 'Worked example');
     fitDrawing();
+    // (critic s2 r1 F7: the grown pupil card trimmed once per viewport to H13's limit on the state it opens at, then kept, so
+    // the cell never changes height between steps)
+    if (S.launch.mode === 'pupil' && pupilDesk() && S.fit && n) {
+        const cell = r.querySelector('.mq-lp-cell');
+        if (S.fit.trimH) cell.style.height = `${S.fit.trimH}px`;
+        else if (cell) { trimBand(cell); S.fit.trimH = Math.floor(cell.getBoundingClientRect().height); }
+    }
     if (S.launch.mode === 'pupil') { fitPupilStage(r); autoRead(); }
 }
 
@@ -477,6 +484,48 @@ const kOf = (r) => parseFloat(getComputedStyle(r).getPropertyValue('--lp-k')) ||
 const digitTarget = (r) => (r.dataset.mode === 'pupil' ? pupilDigit() : 104 * kOf(r));
 // D5: pupil mode is the card scale of .mq-scell (RUBRIC C3: 56 px on a computer, 48 px on a tablet)
 const pupilDigit = () => (window.innerWidth >= 1200 ? 56 : 48);
+/** Pupil mode on a computer (critic s2 r1 F7): the card fills the stage as the board does (A22b). */
+const pupilDesk = () => window.innerWidth >= 1200;
+// (the I do card's growth over its content: its states keep room for words, hops and the Say line, so it grows less)
+const IDO_GROW = 1.8;
+
+/**
+ * Critic s2 r1 F7 with H13: a pupil card grown into the stage keeps every empty band of its height under 28 % - the
+ * largest band between its ink (borders, text, drawn shapes, answer boxes) is measured and the cell trimmed (its content
+ * is centred, so a trim takes from the bands above and below alike).
+ */
+function bandOf(cell) {
+    const cq = cell.getBoundingClientRect();
+    const bw = parseFloat(getComputedStyle(cell).borderTopWidth) || 0;
+    const top = cq.top + bw, bottom = cq.bottom - bw;
+    const ys = [];
+    const add = (a, b) => { if (b > a) ys.push([Math.max(a, top), Math.min(b, bottom)]); };
+    for (const el of cell.querySelectorAll('*')) {
+        const cs = getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[data-ws-feedback]')) continue;
+        const q = el.getBoundingClientRect();
+        if (!(q.width > 0.5 && q.height > 0.5)) continue;
+        if (el instanceof SVGElement) { if (['path', 'text', 'rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'].includes(el.tagName)) add(q.top, q.bottom); continue; }
+        if (el.tagName === 'INPUT') add(q.top, q.bottom);
+        if (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== 'none') add(q.top, q.top + 1);
+        if (parseFloat(cs.borderBottomWidth) > 0 && cs.borderBottomStyle !== 'none') add(q.bottom - 1, q.bottom);
+        if (parseFloat(cs.borderLeftWidth) > 0 && cs.borderLeftStyle !== 'none') add(q.top, q.bottom);
+        for (const c of el.childNodes) if (c.nodeType === 3 && c.nodeValue.trim()) { const rg = document.createRange(); rg.selectNodeContents(c); const t = rg.getBoundingClientRect(); add(t.top, t.bottom); }
+    }
+    ys.sort((a, b) => a[0] - b[0]);
+    let cur = top, gap = 0;
+    for (const [a, b] of ys) { gap = Math.max(gap, a - cur); cur = Math.max(cur, b); }
+    gap = Math.max(gap, bottom - cur);
+    return { gap, h: bottom - top };
+}
+function trimBand(cell, limit = 0.28) {
+    for (let n = 0; n < 4; n++) {
+        const { gap, h } = bandOf(cell);
+        if (!(h > 0) || gap <= limit * h) return;
+        const d = Math.ceil((gap - limit * h) / (0.5 - limit)) + 2;
+        cell.style.height = `${Math.max(40, Math.floor(cell.getBoundingClientRect().height - d))}px`;
+    }
+}
 const basePxOf = () => (resolveCtx({ mode: 'print', size: 'L', look: 'ican' }).metrics.digitPt || 28) * (4 / 3);
 
 /**
@@ -631,6 +680,9 @@ function solveFit(r) {
     // room adds to the step-1 band inside the cell (cell H13); at most the stage.
     const c = best.chromeH + best.groupH;
     best.cellH = Math.min(best.stageH, Math.ceil(c) + 2);
+    // (critic s2 r1 F7, as A22b: pupil mode on a computer - the card grows into the stage, up to 2.2 x its content, the
+    // content centred in it, so each band around it stays under H13's 30 %)
+    if (r.dataset.mode === 'pupil' && pupilDesk()) best.cellH = Math.min(best.stageH, Math.max(best.cellH, Math.ceil(c * IDO_GROW)));
     return best;
 }
 
@@ -744,7 +796,8 @@ function hint() {
     const i = S.pos.wedo || 0;
     if (rungOf(i) <= 1) return;
     keepVals();
-    S.rungs[i] = rungOf(i) - 1;
+    // (P-ON-7, critic s2 r1 F3: after two wrong Checks the control is "Show me" - rung 1 for that item, not one rung down)
+    S.rungs[i] = (S.wrongs[`wedo:${i}`] || 0) >= 2 ? 1 : rungOf(i) - 1;
     render();
     if (S.launch.mode === 'pupil') { const t = wordsOf(i); try { speakExplanation(t); } catch (e) { /* no voice */ } }
 }
@@ -752,6 +805,56 @@ function hint() {
 function cellInputs() { const r = rootEl(); return r ? [...r.querySelectorAll('.mq-lp-cell input.mq-lp-in')] : []; }
 function keepVals() { if (S && isItemPart(S.part)) S.vals[`${S.part}:${S.pos[S.part] || 0}`] = cellInputs().map((x) => x.value); }
 const valueOf = () => cellInputs().map((x) => x.value.trim()).join('');
+// (the digit boxes of an answer slot, right-aligned: the right-most is the ones box)
+const PLACE_NAMES = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands'];
+const digitBoxes = () => { const ins = cellInputs(); return ins.length > 1 && ins.every((x) => x.dataset.digit === '1') ? ins : null; };
+
+/**
+ * Critic s2 r1 F1: an answer in digit boxes is judged PER COLUMN - each box against its own place (a ones digit typed into
+ * the tens box is wrong, and a box the answer does not use is right only when blank); one box judges the whole value.
+ * Returns {right, wrongs: [{place, why}]} (why: 'empty' | 'extra' | 'digit').
+ */
+function judge(ans) {
+    const dig = digitBoxes();
+    if (!dig) { const v = valueOf(); return { right: String(ans).trim() === v || (v !== '' && Number(v) === Number(ans)), wrongs: [] }; }
+    const wrongs = [];
+    dig.forEach((x, j) => {
+        const want = String(x.dataset.want || ''), v = x.value.trim();
+        if (v === want) return;
+        wrongs.push({ place: PLACE_NAMES[dig.length - 1 - j] || 'digit', why: !v ? 'empty' : !want ? 'extra' : 'digit' });
+    });
+    return { right: !wrongs.length, wrongs };
+}
+
+/** Critic s2 r1 F6: the wrong answer told in words (never by colour), naming each box by its place. */
+function wrongWords(wrongs) {
+    if (!wrongs.length) return '';
+    const say = (w) => (w.why === 'empty' ? `the ${w.place} box is empty` : w.why === 'extra' ? `the ${w.place} box should be empty` : `the ${w.place} digit is not right`);
+    const parts = wrongs.slice().reverse().map(say);
+    const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts[0];
+    return `${list.charAt(0).toUpperCase()}${list.slice(1)}.`;
+}
+
+/** The whole wrong-answer message of an item (words only; the strip adds the drawn cross). */
+function wrongMsg(wrongs, part, it) {
+    // (short enough for one line on the board: the strip's height is reserved from the start, fitItem)
+    const miss = part === 'warmup' && it && it.ifMissed ? ` If missed: lesson ${it.ifMissed.lesson}, “${it.ifMissed.title || it.ifMissed.lesson}”.` : '';
+    return `Not yet. ${[wrongWords(wrongs), `Fix the box with the cross${part === 'wedo' ? ', or ask for a hint' : ''}.`].filter(Boolean).join(' ')}${miss}`;
+}
+
+/** SP-32: the caret's box - after a wrong Check the right-most wrong box, else the ones box (the right-most). */
+function caretBox() {
+    const ins = cellInputs();
+    if (!ins.length) return null;
+    const byRight = ins.slice().sort((a, b) => a.getBoundingClientRect().right - b.getBoundingClientRect().right);
+    const wrong = byRight.filter((x) => x.dataset.mqLp === 'bad');
+    return wrong.length ? wrong[wrong.length - 1] : byRight[byRight.length - 1];
+}
+function focusCaret(select) {
+    const b = caretBox();
+    if (!b) return;
+    try { b.focus({ preventScroll: true }); if (select) b.select(); } catch (e) { /* no focus */ }
+}
 
 /** Check (Enter): the whole answer judged; right / wrong in chrome (SP-33); a wrong one keeps the rung (P-ON-7). */
 function checkItem() {
@@ -760,17 +863,18 @@ function checkItem() {
     const it = partPlan(S.part).items[i] || {};
     const k = `${S.part}:${i}`;
     const v = valueOf();
-    if (!v) { feedback('Type your answer first.', ''); return; }
-    const right = String(it.ans).trim() === v || Number(v) === Number(it.ans);
+    if (!v) { feedback('Type your answer first.', ''); focusCaret(false); return; }
+    const jd = judge(it.ans);
+    const right = jd.right;
     S.checked[k] = right ? 'right' : 'wrong';
     if (!right) S.wrongs[k] = (S.wrongs[k] || 0) + 1;
     keepVals();
     cellInputs().forEach((x) => markInput(x, true));
     const cell = rootEl().querySelector('.mq-lp-cell');
     if (cell) cell.closest('.mq-lp-cellwrap').dataset.verdict = S.checked[k];
-    const miss = S.part === 'warmup' && !right && it.ifMissed ? ` If missed: go back to the lesson “${it.ifMissed.title || it.ifMissed.lesson}” (${it.ifMissed.lesson}).` : '';
-    feedback(right ? 'Right!' : `Not yet. The red box is wrong: try again${S.part === 'wedo' ? ' or ask for a hint' : ''}.${miss}`, right ? 'right' : 'wrong');
+    feedback(right ? 'Right!' : wrongMsg(jd.wrongs, S.part, it), right ? 'right' : 'wrong');
     syncButtons(rootEl());
+    if (!right && S.launch.mode === 'pupil') focusCaret(true);
 }
 
 /** Show answer (A, board only): the teacher's reveal - the answer written in the boxes, marked as shown. */
@@ -795,7 +899,13 @@ function feedback(text, kind) {
     const fb = rootEl() && rootEl().querySelector('.mq-lp-fb');
     if (!fb) return;
     fb.hidden = false;
-    fb.textContent = text;
+    // (critic s2 r1 F6: a right / wrong verdict carries a drawn tick / cross beside its words - never colour alone)
+    const mark = kind === 'right' ? BADGE_OK : kind === 'wrong' ? BADGE_BAD : '';
+    fb.innerHTML = mark ? `<span class="mq-lp-fbmark" data-fb-mark="${kind}" aria-hidden="true">${mark}</span>` : '';
+    const sp = document.createElement('span');
+    sp.className = 'mq-lp-fbtext';
+    sp.textContent = text;
+    fb.appendChild(sp);
     fb.dataset.kind = kind || '';
     if (S && isItemPart(S.part)) S.fb = Object.assign(S.fb || {}, { [`${S.part}:${S.pos[S.part] || 0}`]: { text, kind } });
 }
@@ -836,7 +946,11 @@ function adoptSlots(root, want, part, i) {
         inp.setAttribute('inputmode', 'numeric'); inp.setAttribute('autocomplete', 'off'); inp.setAttribute('maxlength', String(max));
         inp.setAttribute('aria-label', label);
         inp.dataset.want = wantV; if (digit) inp.dataset.digit = '1';
-        inp.addEventListener('input', () => { inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, max); markInput(inp, false); keepVals(); });
+        inp.addEventListener('input', () => {
+            inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, max); markInput(inp, false); keepVals();
+            // (column entry, ones first: a digit typed moves the caret to the next place on the left, if any)
+            if (digit && inp.value && inp.isConnected) { const ins = cellInputs(); const j = ins.indexOf(inp); if (j > 0) { try { ins[j - 1].focus({ preventScroll: true }); ins[j - 1].select(); } catch (e) { /* no focus */ } } }
+        });
         return inp;
     };
     const w = String(want);
@@ -858,7 +972,27 @@ function itemDrawing(part, i, rung) {
     const it = S.hosts[part][i];
     if (!it) return '';
     const ctx = drawCtx();
-    try { return part === 'wedo' ? weDoRender(it, rung <= 1 ? 0 : 1, 170)(ctx, { cols: 2 }) : it.render(ctx, { cols: 2 }); } catch (e) { console.warn('[lesson-player] item', e); return ''; }
+    let html = '';
+    try { html = part === 'wedo' ? weDoRender(it, rung <= 1 ? 0 : 1, 170)(ctx, { cols: 2 }) : it.render(ctx, { cols: 2 }); } catch (e) { console.warn('[lesson-player] item', e); return ''; }
+    // (critic s2 r1 F4: rung 1 = the chart's state 1 - step 1's marks only; the dot card is step 2's cue, so it keeps its
+    // room (no black mark moves between rungs) but is not drawn)
+    if (part === 'wedo' && rung <= 1) html = html.replace(/class="mq-cue(?=[ "])/g, 'class="mq-cue mq-lp-cue-off');
+    return screenBond(html);
+}
+
+/**
+ * Critic s2 r1 F5: a number bond on the board, compact - the part boxes 0.35 of a box under the whole (paper 0.9) and the
+ * digits 0.75 of a box (paper 0.52; RP-60 fixes neither), so the bond reaches the signed board digit with room under it
+ * at 1366 x 768. Screen only: the printed bond is untouched.
+ */
+function screenBond(html) {
+    if (!/viewBox="0 0 4\.2 2\.9"/.test(html)) return html;
+    const U = '([0-9.]+mm|var\\(--mq-bond, [0-9.]+mm\\))';
+    return html.replace(/viewBox="0 0 4\.2 2\.9"/g, 'viewBox="0 0 4.2 2.35"')
+        .replace(/ y2="1\.9"/g, ' y2="1.35"')
+        .replace(new RegExp(`height:calc\\(${U} \\* 2\\.9\\)`, 'g'), 'height:calc($1 * 2.35)')
+        .replace(new RegExp(`top:calc\\(${U} \\* 1\\.9\\)`, 'g'), 'top:calc($1 * 1.35)')
+        .replace(new RegExp(`font-size:calc\\(${U} \\* 0\\.52\\)`, 'g'), 'font-size:calc($1 * 0.75)');
 }
 
 function renderItem(r, part) {
@@ -903,10 +1037,11 @@ function renderItem(r, part) {
     syncButtons(r);
     fullStage(r);
     fitItem(r, part, i);
+    if (S.launch.mode === 'pupil' && pupilDesk()) { const c = r.querySelector('.mq-lp-cell'); if (c) trimBand(c); }
     if (S.launch.mode === 'pupil') fitPupilStage(r);
-    // (pupil: the caret waits in the first empty box; the board is the teacher's clicker - nothing takes the keys from it)
-    const first = S.launch.mode === 'pupil' ? (cellInputs().find((x) => !x.value) || cellInputs()[0]) : null;
-    if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* no focus */ } }
+    // (pupil: the caret waits in the ONES box - the right-most (SP-32; critic s2 r1 F1), or the right-most wrong box after a
+    // wrong Check; the board is the teacher's clicker - nothing takes the keys from it)
+    if (S.launch.mode === 'pupil') focusCaret(S.checked[k] === 'wrong');
 }
 
 /**
@@ -943,14 +1078,37 @@ function fitItem(r, part, i) {
     sizer.querySelectorAll('.mq-lp-sz').forEach((el) => widenPlaces(el, minW));
     widenPlaces(r.querySelector('.mq-lp-draw'), minW);
     // (a tall stage - a tablet held upright - puts a counting picture's answer box under the picture, not beside it)
-    const portrait = wrap.clientHeight > wrap.clientWidth * 1.1;
+    // (critic s2 r1 F7: pupil mode on a computer too - the card fills the stage, so the box under the picture fills it best)
+    const portrait = wrap.clientHeight > wrap.clientWidth * 1.1 || (S.launch.mode === 'pupil' && pupilDesk());
     r.querySelectorAll('.mq-lp-draw, .mq-lp-sizer').forEach((el) => { if (portrait) el.dataset.portrait = '1'; else delete el.dataset.portrait; });
     wD = 1; hD = 1;
     sizer.querySelectorAll('.mq-lp-sz > .mq-lp-zoom').forEach((el) => { const q = el.getBoundingClientRect(); wD = Math.max(wD, q.width); hD = Math.max(hD, q.height); });
     sizer.remove();
+    // (critic s2 r1 F5: a Warm-up drawing keeps 0.3 of a digit clear under its lowest ink - the bond's part boxes sat on the
+    // cell's border)
+    if (part === 'warmup') hD += 0.3 * base;
     const cap = want * 1.25;
     const fb = r.querySelector('.mq-lp-fb');
-    const fbH = fb ? fb.getBoundingClientRect().height + parseFloat(getComputedStyle(wrap).rowGap || 0) : 0;
+    // (critic s2 r1 F2: the feedback strip keeps the height of the LONGEST message this item can show from the start, so a
+    // wrong Check's longer words never shrink the cell - no black mark moves on Check, Hint or Show me)
+    let fbH = 0;
+    if (fb) {
+        const keep = { html: fb.innerHTML, kind: fb.dataset.kind || '' };
+        fb.style.minHeight = '';
+        let hm = fb.getBoundingClientRect().height;
+        const n = cellInputs().length;
+        const worst = Array.from({ length: Math.max(1, n) }, (x, j) => ({ place: PLACE_NAMES[j] || 'digit', why: 'extra' }));
+        const it = partPlan(part).items[i] || {};
+        for (const t of [wrongMsg(n > 1 ? worst : [], part, it), wrongMsg([], part, it)]) {
+            fb.dataset.kind = 'wrong';
+            fb.innerHTML = `<span class="mq-lp-fbmark">${BADGE_BAD}</span><span class="mq-lp-fbtext"></span>`;
+            fb.lastChild.textContent = t;
+            hm = Math.max(hm, fb.getBoundingClientRect().height);
+        }
+        fb.innerHTML = keep.html; fb.dataset.kind = keep.kind;
+        fb.style.minHeight = `${Math.ceil(hm)}px`;
+        fbH = Math.ceil(hm) + parseFloat(getComputedStyle(wrap).rowGap || 0);
+    }
     cell.style.height = '';
     const instrEl = cell.querySelector('.mq-lp-instr');
     const instrH = instrEl ? instrEl.getBoundingClientRect().height : 0;
@@ -963,9 +1121,14 @@ function fitItem(r, part, i) {
     const side = r.querySelector('.mq-lp-side');
     const wb = r.querySelector('.mq-lp-wordsbox');
     const gap = 32 * k;
-    const wordsAt = (w) => { if (!wb) return 0; wb.style.width = `${Math.max(40, Math.floor(w))}px`; return wb.getBoundingClientRect().height; };
+    // (critic s2 r1 F2: the words column is sized for EVERY rung's words of the item - the sentence and "What comes next?" -
+    // so its width, and the centred group with it, never change when the rung does: no black mark moves)
+    const wordsNow = wb ? wb.innerHTML : '';
+    const pi = part === 'wedo' ? (partPlan('wedo').items[i] || {}) : {};
+    const wordSets = wb ? [...new Set([pi.sentence || '', RUNG3_WORDS, wordsOf(i)].filter(Boolean))].map((t) => `<p class="mq-lp-words">${esc(t)}</p>`) : [];
+    const wordsAt = (w) => { if (!wb) return 0; wb.style.width = `${Math.max(40, Math.floor(w))}px`; let hh = 0; wordSets.forEach((x) => { wb.innerHTML = x; hh = Math.max(hh, wb.getBoundingClientRect().height); }); wb.innerHTML = wordsNow; return hh; };
     let natW = 0;
-    if (wb) { wb.style.width = 'max-content'; natW = wb.getBoundingClientRect().width + 2; }
+    if (wb) { wb.style.width = 'max-content'; wordSets.forEach((x) => { wb.innerHTML = x; natW = Math.max(natW, wb.getBoundingClientRect().width + 2); }); wb.innerHTML = wordsNow; }
     let best = null;
     for (let z = cap; z >= 0.2; z *= 0.985) {
         const dw = wD * z, dh = hD * z;
@@ -985,10 +1148,12 @@ function fitItem(r, part, i) {
     const draw = r.querySelector('.mq-lp-draw');
     draw.style.width = `${Math.ceil(wD * best.z)}px`;
     draw.style.height = `${Math.ceil(hD * best.z)}px`;
-    if (side && wb) { side.style.width = `${Math.ceil(best.sw)}px`; wb.style.width = `${Math.ceil(best.sw)}px`; }
+    if (side && wb) { side.style.width = `${Math.ceil(best.sw)}px`; wb.style.width = `${Math.ceil(best.sw)}px`; wb.style.minHeight = `${Math.ceil(wordsAt(best.sw))}px`; }
     const contentH = Math.ceil(best.h + instrH + padY + bw) + 2;
-    // board: the cell fills the stage (its content centred); pupil: the card, its content's height
-    cell.style.height = `${Math.floor(S.launch.mode === 'pupil' ? Math.min(contentH, stageH - fbH) : stageH - fbH)}px`;
+    // board: the cell fills the stage (its content centred); pupil: the card, its content's height - on a computer (critic s2
+    // r1 F7, as A22b) the card grows into the stage too, up to 2.2 x its content (each band around the centred content < 30 %)
+    const full = stageH - fbH;
+    cell.style.height = `${Math.floor(S.launch.mode !== 'pupil' ? full : pupilDesk() ? Math.min(full, Math.max(contentH, contentH * 2.2)) : Math.min(contentH, full))}px`;
     r.dataset.digitPx = String(Math.round(base * best.z));
     r.dataset.digitTarget = String(Math.round(digitTarget(r)));
 }

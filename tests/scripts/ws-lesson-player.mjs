@@ -50,6 +50,21 @@
 //                          You do / Exit ticket stay "coming soon" and navigable
 //                --unit    D2: partSeed(S, part, i) = S+100+i / S+200+i / S+300+i / S+900+i; the player's Warm-up and We do items ==
 //                          the printed packet's own Warm-up and Guided items for the same seed (buildSheet, P-ON-5)
+//   SLICE 2 critic r1 checks (on in --hints / --render on this tree; on a backtest checkout only with their own flag; a flag
+//   alone runs that check alone):
+//   --column-grade  pupil 820 / 1024 / 1280, every Warm-up and We do item: autofocus on the ONES box (the right-most, SP-32);
+//                   a blank Check says "Type your answer first" and grades nothing; the right digit(s) one column to the left
+//                   are graded WRONG (per column, never the boxes joined); a wrong digit keeps the We do rung (P-ON-7)
+//   --board-ink     board 1920 / 1366 / 1024, every We do item: no black mark moves > 1 px on any rung change (Hint, Show me)
+//   --showme        pupil: after two wrong Checks on an item the Hint control reads "Show me" and opens rung 1 (P-ON-7)
+//   --rung1-marks   board: every We do item at rung 1 draws only the grey kinds the chart's state 1 (I do step 1) draws -
+//                   never a later step's mark such as the dot card
+//   --feedback      pupil: a wrong Check is told in words with no colour word, with a non-colour mark (a drawn tick / cross)
+//                   in the feedback strip; an unused box (blank is right) never carries a cross
+//   --warmup-bond   board, every width, every Warm-up item: digits >= the signed size (no "takes the whole stage" pass) and
+//                   >= 0.25 of a digit clear under the drawing's lowest ink inside the cell
+//   --pupil-fill    pupil 1280 / 1366 / 1920, Warm-up / We do: < 30 % of the room between the top bar and the bottom bar
+//                   outside the card (cell, Steps, feedback); digits in [56, 70] px (I do: measured and noted, not judged)
 //   --exit / --sheet-to-play / packet page ids: later slices (3, 5 / 4) - reported NOT IN THIS SLICE, never passed
 //
 //   --widths 1280,1920   override the widths (default SCREEN_WIDTHS + 1920)   --shots <dir>  write PNGs (dsf 2)
@@ -78,7 +93,12 @@ const LATER = Object.assign(S2 ? {} : { hints: 'slice 2 (We do)' }, { exit: 'sli
 if (S2 && !MODES.includes('hints')) MODES.push('hints');
 let modes = MODES.filter((m) => argv.includes(`--${m}`));
 const later = Object.keys(LATER).filter((m) => argv.includes(`--${m}`));
-if (!modes.length && !later.length) modes = MODES.slice();
+// SLICE 2 critic r1 (lf-hosts player s2 critic r1 F1-F7): each check is part of its parent mode on this tree; a backtest
+// checkout (MQ_ROOT set) runs one only when its own flag is given; a flag alone runs that check alone.
+const R1 = { 'column-grade': 'hints', 'board-ink': 'hints', showme: 'hints', 'rung1-marks': 'hints', feedback: 'hints', 'warmup-bond': 'render', 'pupil-fill': 'render' };
+const r1Given = Object.keys(R1).filter((k) => argv.includes(`--${k}`));
+if (!modes.length && !later.length && !r1Given.length) modes = MODES.slice();
+const r1On = (k) => r1Given.includes(k) || (!process.env.MQ_ROOT && modes.includes(R1[k]));
 const LESSON = arg('--lesson', 'add-within-10');
 // A22 (lead ruling 2026-11-20): the stage-fill / Say-band contract; see --stage-fill above
 const A22 = argv.includes('--stage-fill') || !process.env.MQ_ROOT;
@@ -1171,6 +1191,290 @@ async function unitS2(mods) {
     } finally { await h.close(); }
 }
 
+/* ================================================================ slice 2 critic r1 (F1-F7) */
+const boxesOf = (page) => page.evaluate(() => {
+    const ins = [...document.querySelectorAll('#mqLessonPlayer .mq-lp-cell input.mq-lp-in')];
+    const a = document.activeElement;
+    const xs = ins.map((e) => e.getBoundingClientRect().right);
+    const right = xs.length ? xs.indexOf(Math.max(...xs)) : -1;
+    return { n: ins.length, vals: ins.map((e) => e.value), focused: ins.indexOf(a), right };
+});
+/** Put one value per box (left to right), as typed. */
+const setBoxes = (page, vals) => page.evaluate((v) => {
+    [...document.querySelectorAll('#mqLessonPlayer .mq-lp-cell input.mq-lp-in')].forEach((e, i) => { e.value = v[i] || ''; e.dispatchEvent(new Event('input', { bubbles: true })); });
+}, vals);
+const fbText = (page) => page.evaluate(() => { const e = document.querySelector('#mqLessonPlayer .mq-lp-fb'); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; });
+/** The wrong-answer feedback: its words, a non-colour mark in the strip, crosses on unused boxes (blank is right). */
+const fbInfo = (page, ans) => page.evaluate((a) => {
+    const fb = document.querySelector('#mqLessonPlayer .mq-lp-fb');
+    const ins = [...document.querySelectorAll('#mqLessonPlayer .mq-lp-cell input.mq-lp-in')];
+    const unused = ins.length > 1 ? ins.length - String(a).length : 0;
+    const crossed = (i) => i.dataset.mqLp === 'bad' || !!(i.parentElement && i.parentElement.querySelector(`[data-ws-feedback][data-for="${i.id}"][data-mark="bad"]`));
+    const mk = fb && fb.querySelector('svg, [data-fb-mark]');
+    return { text: fb ? fb.textContent.replace(/\s+/g, ' ').trim() : '', mark: !!(mk && mk.getBoundingClientRect().width > 4), crossUnused: ins.slice(0, Math.max(0, unused)).filter((i) => !i.value && crossed(i)).length };
+}, ans);
+const greyKinds = (page) => page.evaluate(() => {
+    const out = new Set();
+    const GREY = 'rgb(148, 148, 148)';
+    for (const e of document.querySelectorAll('#mqLessonPlayer .mq-lp-cell .mq-lp-draw *')) {
+        if (e.closest('[data-ws-feedback]')) continue;
+        const c = getComputedStyle(e);
+        if (c.visibility === 'hidden' || c.display === 'none') continue;
+        const q = e.getBoundingClientRect();
+        if (q.width < 1 && q.height < 1) continue;
+        const grey = e.matches('[data-ws-ink="trace"], [data-ws-mark="trace"]') || (c.color === GREY && [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()))
+            || c.fill === GREY || c.stroke === GREY || (c.borderTopColor === GREY && parseFloat(c.borderTopWidth) > 0 && c.borderTopStyle !== 'none');
+        if (grey) out.add(e.closest('.mq-cue') ? 'cue' : e.closest('.mq-hops, .mq-chops') ? 'hops' : 'mark');
+    }
+    return [...out].sort();
+});
+const inkMoved = (a, b) => { const at = new Map(b.map((x) => [x.key, x])); return a.filter((x) => { const y = at.get(x.key); return y && (Math.abs(y.x - x.x) > 1 || Math.abs(y.y - x.y) > 1); }); };
+
+/** F1: autofocus on the ones box, per-column grading, blank Check, a wrong digit keeps the rung (pupil, every item). */
+async function columnGrade() {
+    const M = 'column-grade';
+    let bad = 0, wrongCol = 0;
+    for (const w of [820, 1024, 1280]) {
+        for (const part of ['warmup', 'wedo']) {
+            let h;
+            try { h = await openPlayer(w, part, '&mode=pupil'); } catch (e) { fail(M, `${w} ${part}: did not open`); bad++; continue; }
+            try {
+                const { page } = h;
+                let st = await state(page);
+                for (let i = 0; i < st.items; i++) {
+                    st = await state(page);
+                    const tag = `pupil ${w} ${part} item ${i + 1} (${st.itemText} = ${st.itemAns})`;
+                    const b = await boxesOf(page);
+                    if (!b.n) { fail(M, `${tag}: no answer box`); bad++; continue; }
+                    if (b.focused !== b.right) { fail(M, `${tag}: SP-32 the caret is in box ${b.focused + 1} of ${b.n}, not the ones box (box ${b.right + 1}, the right-most)`); bad++; }
+                    await act(page, 'check');
+                    const t0 = await fbText(page);
+                    const s0 = await state(page);
+                    if (!/Type your answer first/i.test(t0) || s0.checked) { fail(M, `${tag}: a blank Check said "${t0}" (graded ${s0.checked || 'nothing'})`); bad++; }
+                    const ans = String(st.itemAns);
+                    if (b.n > ans.length) {
+                        // the right digits, one column to the left (a ones digit typed into the tens box)
+                        const v = Array(b.n).fill('');
+                        for (let j = 0; j < ans.length; j++) v[b.n - ans.length - 1 + j] = ans.charAt(j);
+                        await setBoxes(page, v);
+                        await act(page, 'check');
+                        const s1 = await state(page);
+                        wrongCol++;
+                        if (s1.checked !== 'wrong') { fail(M, `${tag}: "${v.map((x) => x || '_').join('|')}" (the answer one column to the left) graded ${s1.checked}, not wrong`); bad++; }
+                    }
+                    // a wrong digit in the right column keeps the rung (P-ON-7)
+                    const r0 = st.rung;
+                    await fillAns(page, String((Number(ans) + 1) % 10 === Number(ans) ? Number(ans) + 2 : Number(ans) + 1));
+                    await act(page, 'check');
+                    const s2 = await state(page);
+                    if (s2.checked !== 'wrong') { fail(M, `${tag}: a wrong answer graded ${s2.checked}`); bad++; }
+                    if (part === 'wedo' && s2.rung !== r0) { fail(M, `${tag}: a wrong Check moved the rung ${r0} -> ${s2.rung}`); bad++; }
+                    await fillAns(page, ans);
+                    await act(page, 'check');
+                    if (i < st.items - 1) await act(page, 'next');
+                }
+            } finally { await h.close(); }
+        }
+    }
+    if (!wrongCol) notes.push(`${M}: no item had a spare column to type into (the wrong-column case did not run)`);
+    if (!bad) ok(M, `pupil 820 / 1024 / 1280: the caret starts in the ones box, a blank Check grades nothing, the answer one column left is wrong (${wrongCol} items), a wrong digit keeps the rung`);
+}
+
+/** F2 (board ink still on every rung change) and, at 1366 board, F3 (Show me). */
+async function boardInk() {
+    const M = 'board-ink';
+    let bad = 0;
+    for (const w of [1920, 1366, 1024]) {
+        let h;
+        try { h = await openPlayer(w, 'wedo', '&mode=board'); } catch (e) { fail(M, `${w}: did not open`); bad++; continue; }
+        try {
+            const { page } = h;
+            let st = await state(page);
+            for (let i = 0; i < st.items; i++) {
+                st = await state(page);
+                let prev = await page.evaluate(inkMarksInPage);
+                while (st.rung > 1) {
+                    const r0 = st.rung;
+                    if (!(await act(page, 'hint'))) { fail(M, `board ${w} item ${i + 1}: no Hint at rung ${r0}`); bad++; break; }
+                    st = await state(page);
+                    const now = await page.evaluate(inkMarksInPage);
+                    const mv = inkMoved(prev, now);
+                    if (mv.length) { const y = now.find((x) => x.key === mv[0].key); fail(M, `board ${w} item ${i + 1} rung ${r0} -> ${st.rung}: ${mv.length} black mark(s) moved (${mv[0].key} by ${Math.round(y.x - mv[0].x)}, ${Math.round(y.y - mv[0].y)} px)`); bad++; }
+                    prev = now;
+                }
+                if (i < st.items - 1) await act(page, 'next');
+            }
+            // Show me on the board: the last item back at its opening rung is not reachable (rungs only fall); a fresh open
+            // of item 3 (rung 3), two wrong Checks, Show me
+            await page.evaluate(() => window.closeLessonPlayer());
+        } finally { await h.close(); }
+        try { h = await openPlayer(w, 'wedo', '&mode=board'); } catch (e) { continue; }
+        try {
+            const { page } = h;
+            await act(page, 'next'); await act(page, 'next');
+            let st = await state(page);
+            const before = await page.evaluate(inkMarksInPage);
+            for (let k = 0; k < 2; k++) { await fillAns(page, String(Number(st.itemAns) + 1)); await act(page, 'check'); }
+            await act(page, 'hint');
+            st = await state(page);
+            const mv = inkMoved(before, await page.evaluate(inkMarksInPage));
+            if (mv.length) { fail(M, `board ${w} item 3: Show me moved ${mv.length} black mark(s) (${mv[0].key})`); bad++; }
+        } finally { await h.close(); }
+    }
+    if (!bad) ok(M, 'board 1920 / 1366 / 1024: no black mark moved on any rung change (Hint, Show me)');
+}
+
+/** F3: after two wrong Checks, "Show me" opens rung 1 (P-ON-7). */
+async function showMe() {
+    const M = 'showme';
+    let h;
+    try { h = await openPlayer(1280, 'wedo', '&mode=pupil'); } catch (e) { fail(M, 'pupil We do did not open'); return; }
+    try {
+        const { page } = h;
+        let st = await state(page);
+        for (let i = 0; i < st.items - 1; i++) { st = await state(page); await fillAns(page, st.itemAns); await act(page, 'check'); await act(page, 'next'); }
+        st = await state(page);
+        const r0 = st.rung;
+        if (r0 < 2) { fail(M, `the last item opens at rung ${r0}; Show me needs a rung above 1`); return; }
+        for (let k = 0; k < 2; k++) { await fillAns(page, String(Number(st.itemAns) + 1)); await act(page, 'check'); }
+        const lbl = await page.evaluate(() => { const b = document.querySelector('#mqLessonPlayer .mq-lp-bar [data-act="hint"]'); return b && !b.hidden ? b.textContent.trim() : ''; });
+        if (lbl !== 'Show me') fail(M, `after two wrong Checks the hint control reads "${lbl}", not "Show me"`);
+        await act(page, 'hint');
+        st = await state(page);
+        if (st.rung !== 1) fail(M, `P-ON-7: Show me at rung ${r0} opened rung ${st.rung}, not rung 1`);
+        else ok(M, `two wrong Checks at rung ${r0} -> "Show me" -> rung 1`);
+    } finally { await h.close(); }
+}
+
+/** F4: rung 1 draws only the chart's state-1 marks (the I do step 1), never a later step's (the dot card). */
+async function rung1Marks() {
+    const M = 'rung1-marks';
+    let h;
+    try { h = await openPlayer(1280, 'ido', '&mode=board'); } catch (e) { fail(M, 'board did not open'); return; }
+    try {
+        const { page } = h;
+        const chart1 = await greyKinds(page);
+        await gotoPart(page, 'wedo');
+        let st = await state(page);
+        let bad = 0;
+        for (let i = 0; i < st.items; i++) {
+            st = await state(page);
+            while (st.rung > 1) { if (!(await act(page, 'hint'))) break; st = await state(page); }
+            const k = await greyKinds(page);
+            const extra = k.filter((x) => !chart1.includes(x));
+            if (!k.length) { fail(M, `item ${i + 1} rung 1 draws no grey working`); bad++; }
+            if (extra.length) { fail(M, `item ${i + 1} rung 1 draws grey ${extra.join(', ')} - the chart's state 1 draws only ${chart1.join(', ') || 'nothing'}`); bad++; }
+            if (i < st.items - 1) await act(page, 'next');
+        }
+        if (!bad) ok(M, `every We do item at rung 1 draws only the chart's state-1 marks (${chart1.join(', ')})`);
+    } finally { await h.close(); }
+}
+
+/** F6: the wrong-answer feedback in words + a non-colour mark; no cross on an unused box. */
+async function feedbackCheck() {
+    const M = 'feedback';
+    let bad = 0;
+    for (const part of ['warmup', 'wedo']) {
+        let h;
+        try { h = await openPlayer(1024, part, '&mode=pupil'); } catch (e) { fail(M, `${part}: did not open`); bad++; continue; }
+        try {
+            const { page } = h;
+            let st = await state(page);
+            for (let i = 0; i < st.items; i++) {
+                st = await state(page);
+                const ans = String(st.itemAns);
+                await fillAns(page, String(Number(ans) + 1 === 10 && ans.length === 1 ? Number(ans) - 1 : Number(ans) + 1));
+                await act(page, 'check');
+                const f = await fbInfo(page, ans);
+                const tag = `pupil 1024 ${part} item ${i + 1}`;
+                if (!/Not yet/i.test(f.text)) { fail(M, `${tag}: a wrong Check says "${f.text}" (no "Not yet")`); bad++; }
+                if (/\b(red|green|orange|blue)\b/i.test(f.text)) { fail(M, `${tag}: the feedback leans on colour: "${f.text}"`); bad++; }
+                if (!f.mark) { fail(M, `${tag}: no non-colour mark (drawn cross) in the feedback strip`); bad++; }
+                if (f.crossUnused) { fail(M, `${tag}: ${f.crossUnused} unused box(es) (blank is right) carry a cross`); bad++; }
+                if (i < st.items - 1) await act(page, 'next');
+            }
+        } finally { await h.close(); }
+    }
+    if (!bad) ok(M, 'a wrong Check is told in words (no colour word) with a drawn cross in the strip; no unused box is crossed');
+}
+
+/** F5: board Warm-up digits >= the signed size at every width, >= 0.25 digit clear under the drawing's lowest ink. */
+async function warmupBond() {
+    const M = 'warmup-bond';
+    let bad = 0;
+    for (const w of WIDTHS) {
+        let h;
+        try { h = await openPlayer(w, 'warmup', '&mode=board'); } catch (e) { fail(M, `${w}: did not open`); bad++; continue; }
+        try {
+            const { page } = h;
+            let st = await state(page);
+            for (let i = 0; i < st.items; i++) {
+                st = await state(page);
+                const m = await page.evaluate(measureInPage);
+                const foot = await page.evaluate(() => {
+                    const cell = document.querySelector('#mqLessonPlayer .mq-lp-cell');
+                    const cq = cell.getBoundingClientRect();
+                    const inner = cq.bottom - (parseFloat(getComputedStyle(cell).borderBottomWidth) || 0);
+                    let low = -Infinity;
+                    // (ink only: SVG shapes, bordered boxes, answer inputs, text - never a layout box's empty padding)
+                    for (const e of cell.querySelectorAll('.mq-lp-draw *')) {
+                        if (e.closest('[data-ws-feedback]')) continue;
+                        const c = getComputedStyle(e);
+                        if (c.display === 'none' || c.visibility === 'hidden') continue;
+                        const q = e.getBoundingClientRect();
+                        if (!(q.width > 0.5 && q.height > 0.5)) continue;
+                        const shape = e instanceof SVGElement && ['path', 'text', 'rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'].includes(e.tagName);
+                        const border = !(e instanceof SVGElement) && ['Top', 'Bottom', 'Left', 'Right'].some((sd) => parseFloat(c[`border${sd}Width`]) > 0 && c[`border${sd}Style`] !== 'none');
+                        if (shape || border || e.tagName === 'INPUT') low = Math.max(low, q.bottom);
+                        // (a digit in a writing box is drawn inside the box: its text line box, taller than the glyph, is clipped to it)
+                        for (const n of e.childNodes) if (n.nodeType === 3 && n.nodeValue.trim()) { const rg = document.createRange(); rg.selectNodeContents(n); low = Math.max(low, border ? Math.min(q.bottom, rg.getBoundingClientRect().bottom) : rg.getBoundingClientRect().bottom); }
+                    }
+                    return inner - low;
+                });
+                const t = DIGIT_TARGET(w);
+                const tag = `board ${w} warm-up item ${i + 1} (${st.itemText})`;
+                if (m.digitPx < t - 1) { fail(M, `${tag}: digits ${m.digitPx.toFixed(0)} px under the signed ${t} px`); bad++; }
+                if (foot < 0.25 * m.digitPx - 0.5) { fail(M, `${tag}: ${foot.toFixed(0)} px under the drawing's lowest ink (want >= 0.25 digit, ${(0.25 * m.digitPx).toFixed(0)} px)`); bad++; }
+                console.log(`       ${tag}: digits ${m.digitPx.toFixed(0)} px (signed ${t}), foot ${foot.toFixed(0)} px`);
+                if (i < st.items - 1) await act(page, 'next');
+            }
+        } finally { await h.close(); }
+    }
+    if (!bad) ok(M, `board Warm-up at ${WIDTHS.join(' / ')}: digits >= signed, >= 0.25 digit clear under the drawing`);
+}
+
+/** F7: the pupil card fills the stage on a computer (A22b): < 30 % of the room between the bars outside the card. */
+async function pupilFill() {
+    const M = 'pupil-fill';
+    let bad = 0;
+    for (const w of WIDTHS.filter((x) => x >= 1200)) {
+        let h;
+        try { h = await openPlayer(w, 'ido', '&mode=pupil'); } catch (e) { fail(M, `${w}: did not open`); bad++; continue; }
+        try {
+            const { page } = h;
+            for (const part of ['ido', 'warmup', 'wedo']) {
+                if (part !== 'ido') await gotoPart(page, part);
+                // (the I do card is measured and reported, not judged: its step-1 reserved rows (answer row, hops, Say line)
+                // bind it to H13 before it can fill the stage at the 70 px cap - open for a lead ruling)
+                const f = await page.evaluate(() => {
+                    const r = document.getElementById('mqLessonPlayer');
+                    const T = r.querySelector('.mq-lp-top').getBoundingClientRect().bottom, B = r.querySelector('.mq-lp-bar').getBoundingClientRect().top;
+                    const W = window.innerWidth;
+                    const area = (q) => Math.max(0, Math.min(q.right, W) - Math.max(q.left, 0)) * Math.max(0, Math.min(q.bottom, B) - Math.max(q.top, T));
+                    const used = [...r.querySelectorAll('.mq-lp-stage .mq-lp-cell, .mq-lp-stage .mq-lp-steps, .mq-lp-stage .mq-lp-fb')].filter((e) => e.offsetParent !== null).reduce((a, e) => a + area(e.getBoundingClientRect()), 0);
+                    return { empty: 1 - used / Math.max(1, W * (B - T)), digit: Number(r.dataset.digitPx) || 0 };
+                });
+                const tag = `pupil ${w} ${part}`;
+                if (f.empty >= 0.30 && part === 'ido') notes.push(`${tag}: ${(f.empty * 100).toFixed(1)} % of the room between the bars is outside the I do card (H13-bound at step 1; not judged, open for the lead)`);
+                else if (f.empty >= 0.30) { fail(M, `${tag}: ${(f.empty * 100).toFixed(1)} % of the room between the bars is outside the card (< 30 %)`); bad++; }
+                if (f.digit < 55 || f.digit > 71) { fail(M, `${tag}: digits ${f.digit} px outside [56, 70]`); bad++; }
+                console.log(`       ${tag}: ${(f.empty * 100).toFixed(1)} % outside the card, digits ${f.digit} px`);
+            }
+        } finally { await h.close(); }
+    }
+    if (!bad) ok(M, 'the pupil Warm-up / We do card fills the stage on a computer (< 30 % outside it), digits 56-70 px');
+}
+
 /* ================================================================ run */
 (async () => {
     console.log(`${TOOL}: lesson ${LESSON}, modes ${modes.join(', ') || '-'}${modes.some((m) => m !== 'unit') ? `, widths ${WIDTHS.join(', ')}` : ''}`);
@@ -1183,6 +1487,13 @@ async function unitS2(mods) {
         if (modes.includes('any-part')) await anyPart();
         if (modes.includes('any-part') && S2) await anyPartS2();
         if (modes.includes('leave')) await leaveAndMarks();
+        if (r1On('column-grade')) await columnGrade();
+        if (r1On('board-ink')) await boardInk();
+        if (r1On('showme')) await showMe();
+        if (r1On('rung1-marks')) await rung1Marks();
+        if (r1On('feedback')) await feedbackCheck();
+        if (r1On('warmup-bond')) await warmupBond();
+        if (r1On('pupil-fill')) await pupilFill();
     } catch (e) { fail('run', e.stack || String(e)); }
     for (const n of notes) console.log(`  note ${n}`);
     console.log(fails.length ? `${TOOL}: FAIL (${fails.length})` : `${TOOL}: OK`);

@@ -266,3 +266,28 @@ body.mq-lp-open { overflow: hidden; }
 /* item parts: the key legend gives its room to Hint / Check / Show answer (the keys still work, D6) */
 .mq-lp[data-part="warmup"] .mq-lp-keys, .mq-lp[data-part="wedo"] .mq-lp-keys { display: none; }
 .mq-lp[data-part="warmup"] .mq-lp-btn.mq-lp-next, .mq-lp[data-part="wedo"] .mq-lp-btn.mq-lp-next { margin-left: auto; }
+
+/* =========================================================================
+   Slice 2, critic r1 fixes (additive).
+   ========================================================================= */
+/* F4: at We do rung 1 the dot card (step 2's cue) keeps its room - no black mark moves between rungs - but is not drawn */
+.mq-lp .mq-cue.mq-lp-cue-off { visibility: hidden; }
+/* F6: the verdict's drawn tick / cross beside its words in the feedback strip (never colour alone) */
+.mq-lp-fb .mq-lp-fbmark {
+    flex: none; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.35em; height: 1.35em; margin-right: 0.5em; border-radius: 50%; background: #fff;
+}
+.mq-lp-fb .mq-lp-fbmark svg { width: 72%; height: 72%; }
+.mq-lp-fb[data-kind="right"] .mq-lp-fbmark { color: #1a7f37; }
+.mq-lp-fb[data-kind="wrong"] .mq-lp-fbmark { color: #8a1c24; }
+/* F7 (as A22b): pupil mode on a computer - the card takes the stage's width and a larger text scale */
+@media (min-width: 1200px) {
+    .mq-lp[data-mode="pupil"] { --lp-k: 0.85; }
+    .mq-lp[data-mode="pupil"] .mq-lp-stage { width: 100%; }
+}
+@media (min-width: 1200px) {
+    .mq-lp[data-mode="pupil"] .mq-lp-stage-ido .mq-lp-work { align-items: center; }
+}
+@media (min-width: 1600px) {
+    .mq-lp[data-mode="pupil"] { --lp-k: 1.05; }
+}
