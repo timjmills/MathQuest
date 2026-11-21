@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T09:26:39.101Z",
- "head": "d94a4a886",
+ "generated": "2026-11-21T09:27:15.969Z",
+ "head": "65b66b94d",
  "weeks": [
   {
    "start": "2026-10-15",
@@ -475,7 +475,7 @@
    "done": false,
    "usagePct": 71,
    "usageEstimated": false,
-   "rev": "d94a4a886",
+   "rev": "65b66b94d",
    "skills": 742,
    "retired": 10,
    "presets": 130,
