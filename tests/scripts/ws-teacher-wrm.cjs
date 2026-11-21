@@ -230,43 +230,43 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     check(await page.evaluate(() => document.querySelector('#teacherMain .tv-screen.is-active').dataset.screen === 'wrm'), 'nav: wrm screen not active');
     check(/^#wrm\/2$/.test(await hash()), `hash on open: ${await hash()}`);
     const grades = await page.$$eval('[data-w-grade]', (b) => b.map((x) => x.textContent.trim()));
-    check(grades.join() === 'Pre-K,K,Grade 1,Grade 2,Grade 3,Grade 4,Grade 5', `grade row ${grades}`);
+    // the lessons browser (signed card design/cards/lessons-browser 2026-11-20): All + the grades the lessons carry
+    check(grades.join() === 'All,Pre-K,K,Grade 1,Grade 2,Grade 3,Grade 4,Grade 5', `grade row ${grades}`);
     check(await page.$eval('.tvw-empty', (e) => /Choose a lesson/.test(e.textContent)), 'empty detail: no "Choose a lesson"');
     await fit('1366 start');
     await shot('01-start-1366');
 
-    /* ---------------------------------------------------- the navigation (owner 2026-10-17): grade → domains → the list */
-    // what the list shows, read from the page, against gradeSections() (domains in the site's order, Extra lessons last,
-    // every lesson of the grade once, numbered 1, 2, 3 within its section, title + at most two small tags, no weeks)
+    /* ---------------------------------------------------- the navigation: grade → maths areas → the list (lessons browser) */
+    // what the list shows, read from the page: every lesson of the grade once (assessments left out: no skills), grouped
+    // under the area headings in AREA_ORDER, each numbered 1, 2, 3 in the school's order within its area, title + the
+    // browser's chips only (the deep checks of areas, counts and chips are ws-lessons-browse.mjs), no weeks or dates
+    const AREA_ORDER = ['CC', 'OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G', 'RPNS', 'MIXED', 'WORDS', 'NOSTD'];
+    const CHIP = /^(Full|Covers part|To build|CCSS Build|Pending re-check|✓ 8\/10)$/;
     const navCheck = async (g, tag) => {
-      const want = links.gradeSections(g);
       const r = await page.evaluate(() => {
         const list = document.querySelector('[data-screen="wrm"].is-active #tvwLessons');
         return {
-          doms: [...document.querySelectorAll('[data-screen="wrm"].is-active #tvwDoms [data-w-sec]')].map((b) => [b.dataset.wSec, b.textContent.trim()]),
-          secs: [...list.querySelectorAll('[data-w-secbox]')].map((s) => ({ key: s.dataset.wSecbox, name: s.querySelector('.tvw-sec-t').textContent.trim(),
+          secs: [...list.querySelectorAll('[data-w-secbox]')].map((s) => ({ key: s.dataset.wSecbox,
             rows: [...s.querySelectorAll('.tvw-nrow')].map((b) => ({ key: b.dataset.wLesson, n: b.querySelector('.tvw-nrow-n').textContent.trim(),
-              tags: [...b.querySelectorAll('.tvw-nrow-tags .tvw-tag')].map((x) => x.textContent.trim()), all: b.querySelectorAll('.tvw-tag').length })),
+              tags: [...b.querySelectorAll('.tvw-nrow-tags .tvw-tag')].map((x) => x.textContent.trim()) })),
             tmuHidden: !s.querySelector('.tvw-tmu') || s.querySelector('.tvw-tmu').hidden })),
           text: list.innerText,
           pressed: [...document.querySelectorAll('[data-screen="wrm"].is-active [data-w-grade][aria-pressed="true"]')].map((b) => b.dataset.wGrade),
         };
       });
       check(r.pressed.join() === g, `${tag}: grade row marks ${r.pressed} not ${g}`);
-      check(JSON.stringify(r.doms) === JSON.stringify(want.map((s) => [s.key, s.name])), `${tag}: domain row ${JSON.stringify(r.doms)} not ${JSON.stringify(want.map((s) => [s.key, s.name]))}`);
-      check(r.secs.map((s) => s.key).join() === want.map((s) => s.key).join() && r.secs.map((s) => s.name).join() === want.map((s) => s.name).join(), `${tag}: sections ${r.secs.map((s) => s.name)}`);
-      const extraWant = want.find((s) => s.extra);
-      if (extraWant) check(r.secs[r.secs.length - 1].key === 'extra' && r.secs[r.secs.length - 1].name === 'Extra lessons', `${tag}: Extra lessons is not the last section`);
-      const mine = all.filter((l) => l.grade === g);
+      const order = r.secs.map((s) => AREA_ORDER.indexOf(s.key));
+      check(order.every((x, i) => x >= 0 && (!i || x > order[i - 1])), `${tag}: area sections ${r.secs.map((s) => s.key)} not in AREA_ORDER`);
+      check(!r.secs.some((s) => s.key === 'extra') && !/Extra lessons/.test(r.text), `${tag}: an "Extra lessons" section is still shown (R4: extra lessons are mixed into their areas)`);
+      const mine = all.filter((l) => l.grade === g && l.type !== 'assessment');
       const keys = r.secs.flatMap((s) => s.rows.map((x) => x.key));
       check(keys.length === mine.length && new Set(keys).size === keys.length && mine.every((l) => keys.includes(l.key)), `${tag}: ${keys.length} rows for ${mine.length} lessons (each once)`);
-      const extraRows = (r.secs.find((s) => s.key === 'extra') || { rows: [] }).rows.map((x) => x.key);
-      const nonCore = mine.filter((l) => !links.isCoreLesson(l)).map((l) => l.key);
-      check(extraRows.length === nonCore.length && nonCore.every((k) => extraRows.includes(k)), `${tag}: Extra lessons holds ${extraRows.length} rows, ${nonCore.length} non-core lessons`);
-      for (const [i, s] of r.secs.entries()) {
-        check(JSON.stringify(s.rows.map((x) => x.key)) === JSON.stringify(want[i].lessons.map((l) => l.key)), `${tag} ${s.key}: rows not in the site's order`);
+      const siteOrder = links.gradeSections(g).flatMap((s) => s.lessons).map((l) => l.key);
+      for (const s of r.secs) {
+        const idx = s.rows.map((x) => siteOrder.indexOf(x.key));
+        check(idx.every((x, i) => !i || x > idx[i - 1]), `${tag} ${s.key}: rows not in the school's order`);
         check(s.rows.every((x, j) => x.n === String(j + 1)), `${tag} ${s.key}: rows not numbered 1, 2, 3 …`);
-        check(s.rows.every((x) => x.all <= 2 && x.tags.every((t) => /^(Full|Covers part|No skill yet|CCSS · BUILD)$/.test(t))), `${tag} ${s.key}: a row with other tags ${JSON.stringify(s.rows.find((x) => x.all > 2 || x.tags.some((t) => !/^(Full|Covers part|No skill yet|CCSS · BUILD)$/.test(t))))}`);
+        check(s.rows.every((x) => x.tags.every((t) => CHIP.test(t))), `${tag} ${s.key}: a row with other tags ${JSON.stringify(s.rows.find((x) => x.tags.some((t) => !CHIP.test(t))))}`);
         check(s.tmuHidden, `${tag} ${s.key}: the Skills to be made card is open by default`);
       }
       const wk = /\bWeeks?\b|\bW\d\d\b|\b\d{1,2}\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|\bStrand|\+\d\b/.exec(r.text);
@@ -274,28 +274,27 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     };
     await navCheck('2', 'nav Grade 2');
 
-    /* ---------------------------------------------------- grade → domain → lesson */
+    /* ---------------------------------------------------- grade → area → lesson */
     await page.click('[data-w-grade="3"]');
     await waitFor(page, () => document.querySelector('[data-w-grade="3"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 3');
     check(/^#wrm\/3$/.test(await hash()), `hash after grade: ${await hash()}`);
-    const units3 = await page.$$eval('[data-w-sec]', (b) => b.map((x) => x.dataset.wSec));
-    check(units3.join() === 'D1,D2,D3,D4,D5,extra', `grade 3 domain row ${units3}`);
     await navCheck('3', 'nav Grade 3');
-    // a domain button jumps the list to that section (its heading in the list's view) and is the bookmark
-    await page.click('[data-w-sec="D4"]');
+    // an area chip filters the list to that area and is the bookmark
+    await page.$eval('.tvw-areabtn[data-w-area="NF"]', (b) => b.click());
+    await sleep(250);
+    const onlyNf = await page.$$eval('#tvwLessons [data-w-secbox]', (s) => s.map((x) => x.dataset.wSecbox));
+    check(onlyNf.join() === 'NF' && (await hash()) === '#wrm/3?a=NF', `area chip: sections ${onlyNf} hash ${await hash()}`);
+    await page.$eval('.tvw-areabtn[data-w-area=""]', (b) => b.click());
     await sleep(200);
-    const jump = await page.evaluate(() => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const h = document.querySelector('#tvwSecH-D4').getBoundingClientRect(); return { inList: h.top >= l.top - 1 && h.top < l.top + 80, focus: document.activeElement && document.activeElement.id }; });
-    check(jump.inList && jump.focus === 'tvwSecH-D4' && (await hash()) === '#wrm/3/D4', `domain jump: ${JSON.stringify(jump)} ${await hash()}`);
     await page.click('[data-w-grade="2"]');
     await waitFor(page, () => document.querySelector('[data-w-grade="2"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 2');
-    await page.click(`[data-w-sec="${secOf(rich)}"]`);
     await sleep(300);
     await tap(`.tvw-nrow[data-w-lesson="${rich.key}"]`);
     await waitFor(page, () => !!document.querySelector('.tvw-head'), 5000, 'detail');
     check((await hash()) === `${links.lessonHash(rich)}`, `hash after lesson: ${await hash()}`);
-    // the lesson opens BESIDE the list (right column), the list stays on screen
-    const side0 = await page.evaluate(() => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const d = document.querySelector('#tvwDetail').getBoundingClientRect(); const row = document.querySelector('.tvw-nrow[aria-current="true"]'); return { beside: d.left >= l.right, listOn: l.width > 200 && l.bottom > 100, rowOn: !!row && row.getBoundingClientRect().width > 0, fixed: getComputedStyle(document.querySelector('#tvwDetail')).position, back: (document.querySelector('[data-w-back]') || { getClientRects: () => [] }).getClientRects().length }; });
-    check(side0.beside && side0.listOn && side0.rowOn && side0.fixed !== 'fixed' && !side0.back, `1366 side panel: ${JSON.stringify(side0)}`);
+    // the lesson opens OVER the list (lessons browser §7): the list and filters hidden, "← All lessons" at the top
+    const side0 = await page.evaluate(() => { const l = document.querySelector('#tvwLessons'); const d = document.querySelector('#tvwDetail').getBoundingClientRect(); const bk = document.querySelector('#tvwDetail [data-w-back]'); return { listOff: !l.getClientRects().length, panelOn: d.width > 600, fixed: getComputedStyle(document.querySelector('#tvwDetail')).position, back: !!bk && bk.getClientRects().length > 0 && /All lessons/.test(bk.textContent) }; });
+    check(side0.listOff && side0.panelOn && side0.fixed !== 'fixed' && side0.back, `1366 lesson over the list: ${JSON.stringify(side0)}`);
     const d = await page.evaluate(() => ({
       title: document.querySelector('.tvw-title').textContent,
       groups: [...document.querySelectorAll('[data-w-group]')].map((g) => [g.dataset.wGroup, g.querySelectorAll('.tvw-row').length]),
@@ -404,7 +403,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     check((await hash()) === `${links.lessonHash(gapLesson)}`, `search jump hash ${await hash()}`);
 
     /* ---------------------------------------------------- gap and to-be-built lessons */
-    const gap = await page.evaluate(() => ({ none: (document.querySelector('[data-w-group="direct"] .tvw-none') || {}).textContent || '', verdict: (document.querySelector('.tvw-verdict') || {}).textContent || '', rowGap: !!document.querySelector('.tvw-lesson[aria-current="true"].is-gap') }));
+    const gap = await page.evaluate(() => ({ none: (document.querySelector('[data-w-group="direct"] .tvw-none') || {}).textContent || '', verdict: (document.querySelector('.tvw-verdict') || {}).textContent || '', rowGap: !!document.querySelector('.tvw-lesson[aria-current="true"][data-w-verdict="build"]') }));
     check(/No skill teaches this lesson yet/.test(gap.none) && gap.rowGap, `gap lesson: ${JSON.stringify(gap)}`);
     await fit('1366 gap');
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -420,7 +419,9 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await shot('08-build-lesson-1366');
 
     /* ---------------------------------------------------- Pre-K */
-    // the grade and domain rows stay on screen while a lesson is open
+    // the lessons browser: a lesson opens over the list; "← All lessons" brings the grade row back
+    await page.$eval('#tvwDetail [data-w-back]', (b) => b.click());
+    await sleep(300);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.click('[data-w-grade="PK"]');
     await sleep(300);
@@ -474,13 +475,17 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await sleep(150);
     await shot('13-dark-1280');
     await page.evaluate(() => document.documentElement.classList.remove('dark'));
+    // back on the list ("← All lessons"), where the grade row is
+    await page.evaluate(() => { const b = document.querySelector('#tvwDetail [data-w-back]'); if (b && b.getClientRects().length) b.click(); });
+    await sleep(300);
     await page.focus('[data-w-grade="4"]');
     await page.keyboard.press('Enter');
     await sleep(300);
     check(/^#wrm\/4$/.test(await hash()), `keyboard: Enter on a grade button gave ${await hash()}`);
     // the list: arrow keys move through the rows (across sections), End to the last, Enter opens the row with the focus
     {
-      const order = links.gradeSections('4').flatMap((s) => s.lessons.map((l) => l.key));
+      // the browser's row order (area by area); arrows go across the area sections
+      const order = await page.$$eval('#tvwLessons .tvw-nrow', (b) => b.map((x) => x.dataset.wLesson));
       await page.focus(`.tvw-nrow[data-w-lesson="${order[0]}"]`);
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('ArrowDown');
@@ -494,8 +499,9 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('Enter');
       await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(links.lessonByKey(order[1])))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, 'keyboard Enter opens');
-      const kf = await page.evaluate(() => document.activeElement && document.activeElement.dataset.wLesson);
-      check(kf === order[1], `keyboard: after Enter the focus is on ${kf}, not the row`);
+      // the lesson opens over the list (lessons browser §7), so the focus goes to its title
+      const kf = await page.evaluate(() => !!document.activeElement && document.activeElement.classList.contains('tvw-title'));
+      check(kf, 'keyboard: after Enter the focus is not on the lesson title');
     }
 
     /* ---------------------------------------------------- the pupil link opens the pupil flow */
@@ -673,18 +679,18 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await page.evaluate((id) => { window.__tmo = id; }, first);
       await waitFor(page, () => !!document.querySelector(`[data-screen="todo"].is-active [data-t-item="${CSS.escape(window.__tmo)}"].is-open`), 15000, 'todo at the to-make entry');
       // the unit cards: Grade 3 · Operations & Algebraic Thinking and Grade 4 · Number & Operations in Base Ten
-      const unitOf = (g, dom) => (links.gradeSections(g).find((s) => s.domain === dom) || {}).key;
+      // lessons browser: the card sits at the top of each MATHS AREA section (the area's lessons, read from the page)
+      const AREA_NAME = { OA: 'Operations & Algebraic Thinking', NBT: 'Number & Operations in Base Ten' };
       for (const [g, dom, name] of [['3', 'OA', 'unit-g3-operations-algebraic-thinking'], ['4', 'NBT', 'unit-g4-number-operations-base-ten']]) {
-        const u = unitOf(g, dom);
-        if (!u) { failures.push(`to-make unit: no Grade ${g} ${dom} unit`); continue; }
-        // owner 2026-10-17 navigation: the card sits at the top of the domain's section, folded until the teacher opens it
-        const lessons = (links.gradeSections(g).find((s) => s.key === u) || { lessons: [] }).lessons;
+        const u = dom;
+        await freshLoad(`#wrm/${g}?view=list`, `[data-screen="wrm"].is-active [data-w-secbox="${u}"] .tvw-nrow`);
+        const lessons = (await page.$$eval(`[data-screen="wrm"].is-active [data-w-secbox="${u}"] .tvw-nrow`, (b) => b.map((x) => x.dataset.wLesson))).map((k) => links.lessonByKey(k));
         const rows = TMK.unitToMake(lessons.map((l) => ({ lesson: l, links: links.linksFor(l), detailed: DLK.detailedOf(dlx, l) })), { queue: Qi });
         const CARD = `[data-screen="wrm"].is-active #tvwTmu-${u}`;
         for (const [w, h] of [[390, 844], [1280, 800]]) {
           await vp(w, h);
           // a fresh load: the card is folded on every new visit
-          await freshLoad(`#wrm/${g}/${u}`, `${CARD}:not([data-w-tomake-unit="loading"])`);
+          await freshLoad(`#wrm/${g}?view=list`, `${CARD}:not([data-w-tomake-unit="loading"])`);
           await page.evaluate(() => { navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; });
           await sleep(150);
           const fold = await page.$eval(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`, (b) => ({ text: b.textContent.trim(), exp: b.getAttribute('aria-expanded'), hidden: document.querySelector(`#tvwTmu-${b.dataset.wTmuToggle}`).hidden }));
@@ -699,7 +705,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
               forOk: [...c.querySelectorAll('.tvw-tm-row')].every((r) => r.querySelector('.tvw-tm-for [data-w-lesson]') && r.querySelector('.tvw-tm-name') && r.querySelector('.tvw-tm-kind') && r.querySelector('.tvw-tm-what') && r.querySelector('.tvw-tm-status') && r.querySelector('[data-todo-open], [data-w-dl-goto]')),
               atTop: !!sec && sec.dataset.wSecbox === c.dataset.wTmuSec && !!(c.compareDocumentPosition(sec.querySelector('.tvw-nlist')) & Node.DOCUMENT_POSITION_FOLLOWING) };
           }, CARD);
-          const wantTitle = `Skills to be made for Grade ${g} · ${links.domainName(dom)}`;
+          const wantTitle = `Skills to be made for Grade ${g} · ${AREA_NAME[dom]}`;
           check(!uf.hidden && uf.title === wantTitle && uf.atTop, `unit ${g} ${u} @${w}: title "${uf.title}" (want "${wantTitle}"), open ${!uf.hidden}, at the top of its section ${uf.atTop}`);
           check(uf.count === rows.length && uf.shown === Math.min(6, rows.length), `unit ${g} ${u} @${w}: badge ${uf.count} rows ${uf.shown}, want ${rows.length} (first 6 shown)`);
           check(rows.length ? uf.forOk : uf.empty === TMK.EMPTY_UNIT.replace(/\bdomain\b/, 'area'), `unit ${g} ${u} @${w}: a row lacks its parts or lessons`);
@@ -1123,24 +1129,17 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
       check(siteBuild && supportLesson && assessLesson, 'data: no CCSS BUILD, support lesson or assessment to test');
       if (CUR_YEARS.includes('Y5')) check(!!siteTagged, 'data: Y5 is loaded but no site lesson is tagged');
-      // owner 2026-10-17: the site's own lessons and assessments are the Extra lessons section, grouped (support lessons,
-      // projects and other school lessons, enrichment, assessments); the domain sections hold the site's core lessons
+      // lessons browser R4 (owner 2026-11-19): no Extra lessons section - the site's own lessons sit under their maths area
+      // with the CCSS Build chip; assessments stay out of the list (no skills) and open from their link
       const unitOf = assessLesson;
       await freshLoad(`#wrm/${unitOf.grade}/extra`);
-      await navCheck(unitOf.grade, `nav Grade ${unitOf.grade} (fresh load at #wrm/${unitOf.grade}/extra)`);
-      const ex = await page.evaluate(() => {
-        const s = document.querySelector('[data-screen="wrm"].is-active [data-w-secbox="extra"]');
-        const l = document.querySelector('#tvwLessons').getBoundingClientRect();
-        return { groups: [...s.querySelectorAll('[data-w-extra-kind]')].map((h) => [h.dataset.wExtraKind, h.textContent.trim(), h.nextElementSibling.querySelectorAll('.tvw-nrow').length]),
-          inView: s.querySelector('.tvw-sec-h').getBoundingClientRect().top < l.top + 80 && s.querySelector('.tvw-sec-h').getBoundingClientRect().top >= l.top - 1 };
-      });
-      const exWant = links.gradeSections(unitOf.grade).find((s) => s.extra).groups.map((x) => [x.kind, x.label, x.lessons.length]);
-      check(JSON.stringify(ex.groups) === JSON.stringify(exWant) && ex.inView, `Extra lessons: groups ${JSON.stringify(ex.groups)} want ${JSON.stringify(exWant)}, at the top of the list ${ex.inView}`);
+      await navCheck(unitOf.grade, `nav Grade ${unitOf.grade} (fresh load at the old link #wrm/${unitOf.grade}/extra)`);
+      const ex = await page.evaluate((k) => ({ assessRow: !!document.querySelector(`#tvwLessons .tvw-nrow[data-w-lesson="${CSS.escape(k)}"]`), extra: !!document.querySelector('#tvwLessons [data-w-secbox="extra"]') }), assessLesson.key);
+      check(!ex.assessRow && !ex.extra, `site lessons: an assessment row or an Extra lessons section is listed ${JSON.stringify(ex)}`);
       await fit('1366 extra lessons');
       await shot('30-extra-lessons-1366');
-      // an assessment: its flag, the plain no-skills sentence, no tick groups
-      await tap(`.tvw-nrow[data-w-lesson="${assessLesson.key}"]`);
-      await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(assessLesson))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, 'assessment');
+      // an assessment (by its link): its flag, the plain no-skills sentence, no tick groups
+      await freshLoad(links.lessonHash(assessLesson), '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
       const as = await page.evaluate(() => ({ flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', v: (document.querySelector('#tvwDetail .tvw-verdict') || {}).textContent || '', groups: document.querySelectorAll('#tvwDetail [data-w-group]').length, bar: !!document.querySelector('#tvwDetail .tvw-bar') }));
       check(as.flag === 'Assessment' && /No skills are linked to this assessment/.test(as.v) && !as.groups && !as.bar, `assessment detail ${JSON.stringify(as)}`);
       // a CCSS BUILD lesson only the site has, with no links entry: "Skills not tagged yet"
@@ -1150,7 +1149,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       // a support lesson: listed in Extra lessons under "Support lessons"
       await page.evaluate((x) => { location.hash = x; }, links.lessonHash(supportLesson));
       await waitFor(page, `(document.querySelector('[data-screen="wrm"].is-active .tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson === ${JSON.stringify(supportLesson.key)} && !!document.querySelector('#tvwDetail .tvw-head')`, 20000, 'support lesson');
-      check(await page.evaluate(() => { const r = document.querySelector('.tvw-lesson[aria-current="true"]'); return /^Support lessons$/.test((r?.closest('ol')?.previousElementSibling || {}).textContent || '') && !!r.closest('[data-w-secbox="extra"]') && /Support lesson/.test(document.querySelector('#tvwDetail .tvw-tags').textContent); }), 'support lesson: not under Extra lessons › Support lessons, or no flag');
+      check(await page.evaluate(() => { const r = document.querySelector('.tvw-lesson[aria-current="true"]'); return !!r.closest('.tvw-asec') && !!r.querySelector('[data-w-chip="ccss"]') && /Support lesson/.test(document.querySelector('#tvwDetail .tvw-tags').textContent); }), 'support lesson: not under its maths area with the CCSS Build chip, or no flag');
       // a tagged site lesson: verdict, skills, Tick → Practice link decodes to the lesson's teaching skills
       if (siteTagged) {
         await page.goto(`${base}/index.html#wrm/${siteTagged.grade}/${secOf(siteTagged)}`, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -1287,15 +1286,14 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
 
     /* ==================================================== owner 2026-10-17: the list beside the panel (1280, 1024), deep links */
     await step('nav side panel and deep links', async () => {
+      // lessons browser §7: a lesson opens OVER the list (full width, list and filters hidden, "← All lessons" at the top)
       const besideCheck = async (tag) => {
         const r = await page.evaluate(() => {
-          const l = document.querySelector('#tvwLessons').getBoundingClientRect();
           const d = document.querySelector('#tvwDetail').getBoundingClientRect();
-          const row = document.querySelector('.tvw-nrow[aria-current="true"]');
-          const q = row && row.getBoundingClientRect();
-          return { beside: d.left >= l.right - 1, listW: Math.round(l.width), panelW: Math.round(d.width), rowIn: !!q && q.top >= l.top - 1 && q.bottom <= l.bottom + 1 && q.bottom <= innerHeight, fixed: getComputedStyle(document.querySelector('#tvwDetail')).position };
+          const bk = document.querySelector('#tvwDetail [data-w-back]');
+          return { listOff: !document.querySelector('#tvwLessons').getClientRects().length, panelW: Math.round(d.width), back: !!bk && !!bk.getClientRects().length, fixed: getComputedStyle(document.querySelector('#tvwDetail')).position };
         });
-        check(r.beside && r.listW >= 240 && r.panelW >= 380 && r.rowIn && r.fixed !== 'fixed', `${tag}: list beside the panel ${JSON.stringify(r)}`);
+        check(r.listOff && r.panelW >= 600 && r.back && r.fixed !== 'fixed', `${tag}: the lesson over the list ${JSON.stringify(r)}`);
       };
       for (const [w, h] of [[1280, 800], [1024, 768]]) {
         await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
@@ -1319,24 +1317,24 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         await clearOfBar(`${w} lesson beside the list`);
         await page.evaluate(() => window.scrollTo(0, 0));
         await shotNav(`${w}-lesson-panel`);
-        // a second lesson from the list: the list stays, the panel follows
+        // a second lesson from the list: "← All lessons", then the row
         const next = links.gradeSections('3')[0].lessons[5];
+        await page.$eval('#tvwDetail [data-w-back]', (x) => x.click());
+        await sleep(300);
         await tap(`.tvw-nrow[data-w-lesson="${next.key}"]`);
         await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(next))} && (document.querySelector('#tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(next.title.slice(0, 12))})`, 8000, `second lesson ${w}`);
         await besideCheck(`${w} second lesson`);
       }
       await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
-      // the Extra lessons section (domain button), with a support lesson open beside it
+      // a support lesson open (lessons browser R4: listed under its maths area, no Extra lessons section)
       await freshLoad(`${links.lessonHash(supportLesson)}`, '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
-      await page.click('[data-w-sec="extra"]');
-      await sleep(200);
       await page.evaluate(() => window.scrollTo(0, 0));
       await shotNav('1280-extra-lessons');
-      // deep links: a domain section, Extra lessons, a Pre-K small unit (opens its domain)
-      for (const [h, sec] of [['#wrm/3/D4', 'D4'], ['#wrm/5/extra', 'extra'], ['#wrm/PK/CC3', 'CC1'], ['#wrm/K/D5', 'D5']]) {
+      // old section links (a domain, Extra lessons, a Pre-K small unit) open the grade's list, its link rewritten
+      for (const [h, g] of [['#wrm/3/D4', '3'], ['#wrm/5/extra', '5'], ['#wrm/PK/CC3', 'PK'], ['#wrm/K/D5', 'K']]) {
         await freshLoad(h);
-        const r = await page.evaluate((sec) => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const s = document.querySelector(`#tvwSecH-${sec}`); const q = s && s.getBoundingClientRect(); return { hash: location.hash, top: !!q && q.top >= l.top - 1 && q.top < l.top + 80, empty: !!document.querySelector('#tvwDetail .tvw-empty') }; }, sec);
-        check(r.top && r.empty, `deep link ${h}: section ${sec} at the top of the list ${JSON.stringify(r)}`);
+        const r = await page.evaluate(() => ({ hash: location.hash, list: !!document.querySelector('#tvwLessons .tvw-nrow') && !!document.querySelector('#tvwLessons').getClientRects().length, grade: (document.querySelector('[data-w-grade][aria-pressed="true"]') || {}).dataset?.wGrade }));
+        check(r.list && r.grade === g && r.hash === `#wrm/${g}`, `old section link ${h}: ${JSON.stringify(r)}`);
       }
       // a link from before the site order (#wrm/<grade>/E/<n>: the workbook's enrichment unit is gone) opens the lesson
       // it was made for (W1), wherever the site lists it now; a numbered link to a lesson no longer listed opens the list
@@ -1425,7 +1423,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     /* ==================================================== round 7: site lessons at 390 with touch */
     await step('site lessons 390 touch', async () => {
       await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
-      for (const l of [siteTagged || siteBuild, assessLesson, supportLesson]) {
+      // (an assessment is not a list row since the lessons browser, R4: it opens from its link, checked at 1366)
+      for (const l of [siteTagged || siteBuild, supportLesson]) {
         await freshLoad(`#wrm/${l.grade}/${secOf(l)}`, `[data-screen="wrm"].is-active .tvw-nrow[data-w-lesson="${l.key}"]`);
         await page.$eval(`.tvw-nrow[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
         await sleep(80);
@@ -1462,7 +1461,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
             tray: ((t) => (t && t.getClientRects().length ? Math.round(t.getBoundingClientRect().top) : innerHeight))(document.querySelector('#tvTray')),
             back: b ? [Math.round(b.width), Math.round(b.height), Math.round(b.top), back.textContent.trim()] : null, focus: document.activeElement === back };
         });
-        check(o.fixed === 'fixed' && o.top === 0 && o.right === o.W && Math.abs(o.bottom - o.tray) <= 1 && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'Back to the lessons' && o.focus,
+        // lessons browser §7: the lesson opens over the list in the page (not a fixed slide-over), "← All lessons" at its top
+        check(o.fixed !== 'fixed' && o.right >= o.W - 40 && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'All lessons' && o.focus,
           `slide-over @${w}: ${JSON.stringify(o)}`);
         await side(`slide-over @${w}`);
         await rows390(`slide-over @${w}`);

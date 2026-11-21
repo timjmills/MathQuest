@@ -1551,6 +1551,11 @@ function buildPlan(ctx) {
         if (ctx.lesson) w.push('--lesson', ctx.lesson);
         add(gate('teacher-wrm', `ws-teacher-wrm${w.length ? ' ' + w.join(' ') : ''}`, ctx.grade || ctx.lesson ? `White Rose ${[ctx.grade && `grade ${ctx.grade}`, ctx.lesson && `lesson ${ctx.lesson}`].filter(Boolean).join(', ')}` : 'White Rose, every lesson', 'browser', 'ws-teacher-wrm', w, { needFlags: [ctx.grade && 'grade', ctx.lesson && 'lesson'].filter(Boolean) }));
         add(gate('lesson-link-uses', 'ws-lesson-link-uses', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
+        // the lessons browser (lf-checks, signed card design/cards/lessons-browser 2026-11-20): LESSON-DOMAIN, AREA-LABELS,
+        // FILTER-PASSED, LESSON-BROWSE; the lessons-passed registry (stamps bound to the render); the school-year unit dates
+        add(gate('lessons-browse', 'ws-lessons-browse (LESSON-DOMAIN, AREA-LABELS, FILTER-PASSED, LESSON-BROWSE)', 'Lessons + Skills screens', 'browser', 'ws-lessons-browse', [], { missingMsg: 'no tests/scripts/ws-lessons-browse.mjs' }));
+        add(gate('lessons-passed', 'ws-lessons-passed (LP-LIVE, LP-EVIDENCE, LP-STAMP, LP-STATUS)', 'js/modules/lessons-passed.js', 'node', 'ws-lessons-passed', [], { missingMsg: 'no tests/scripts/ws-lessons-passed.mjs' }));
+        add(gate('pacing', 'ws-pacing (PACING-FILE)', 'data/curriculum/pacing', 'node', 'ws-pacing', [], { missingMsg: 'no tests/scripts/ws-pacing.mjs' }));
         add(gate('teacher-flows', 'ws-teacher-flows', 'teacher flows (§2.9)', 'browser', 'ws-teacher-flows', []));
         add(gate('teacher-tokens', 'ws-teacher-tokens', 'teacher tokens (§2.8)', 'node', 'ws-teacher-tokens', []));
         // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing

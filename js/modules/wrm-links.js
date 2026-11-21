@@ -26,6 +26,9 @@ import { STANDARD_PROPOSALS, WRM_EXTENSIONS, canonicalEntry } from './build-list
 import { plainNote, isPlain } from './plain-words.js';
 import { SITE_LESSONS, SITE_ASSESSMENTS, STEP_SITE } from './site-lessons-db.js';
 import { LEGACY_HASHES, LEGACY_DATE, SLUG_ALIASES } from './wrm-legacy-hashes-db.js';
+import { detailedOf } from './detailed-links.js';
+import { lessonPassFor, lessonPendingFor } from './lessons-passed.js';
+import { lessonGradeOf, sortGrades } from './grade-of.js';
 
 // ---- curated links (data/curriculum/links/<YEAR>.json, written by the tagging lane) ------------
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
@@ -1020,3 +1023,90 @@ export function repPairsOfText(text) {
     const t = String(text || '');
     return REP_PAIRS.filter((p) => p.match.test(t)).map((p) => p.id);
 }
+
+
+/* =================================================================== the lessons BROWSER (design/cards/lessons-browser)
+ * One row per lesson of a school grade (assessments stay out: no skills), with the facts the Lessons screen filters,
+ * groups and counts by. Pure: the screen and the gate (tests/scripts/ws-lessons-browse.mjs) call the same functions.
+ *   grade  the school grade it is listed in (R3, grade-of.js)
+ *   kind   'wrm' (a White Rose row, type 'wr') or 'build' (every other row: CCSS BUILD and the site's extra lessons, R4)
+ *   cover  'full' | 'part' | 'build' — exactly one coverage chip (R5): 'build' when no skill teaches it (direct empty)
+ *   area   §6: areaOf() of its first direct skill; else of the first build-list skill it waits for
+ *          (WRM_PROPOSALS[id].skill); else areaOfCode(ccss[0], grade); else NOSTD
+ *   pass   the LESSONS_PASSED id that marks it ('' when none); pending the PENDING_RECHECK id ('' when none) */
+// teacher-areas.js reads data.js (the app's globals), so its two functions are handed in (setAreaFns) by the screen and
+// the gates, the way setSkillLabeler hands in the labels: this file stays importable in node.
+let AREA_FNS = null;
+export function setAreaFns(fns) { AREA_FNS = fns && typeof fns.areaOf === 'function' && typeof fns.areaOfCode === 'function' ? fns : null; }
+const areaOf = (c, k) => (AREA_FNS ? AREA_FNS.areaOf(c, k) : 'NOSTD');
+const areaOfCode = (code, g) => (AREA_FNS ? AREA_FNS.areaOfCode(code, g) : null);
+export const lessonKind = (l) => (l && l.type === 'wr' ? 'wrm' : 'build');
+export function lessonCover(links) {
+    if (!links || !links.direct || !links.direct.length) return 'build';
+    return links.verdict === 'partial' ? 'part' : 'full';
+}
+export function lessonArea(l, links) {
+    const g = lessonGradeOf(l);
+    const first = links && links.direct && links.direct[0];
+    // a skill that is not live yet (a build-list skill still to make) has no area of its own (NOSTD): the next rule decides
+    if (first) { const [c, k] = String(first.key).split(':'); const a = areaOf(c, k); if (a && a !== 'NOSTD') return a; }
+    for (const id of (links && links.build) || []) {
+        const sk = WRM_PROPOSALS[id] && WRM_PROPOSALS[id].skill;
+        if (sk) { const [c, k] = String(sk).split(':'); const a = areaOf(c, k); if (a && a !== 'NOSTD') return a; break; }
+    }
+    return areaOfCode((l && l.ccss && l.ccss[0]) || '', g) || 'NOSTD';
+}
+/** The rows of one grade in list order (domains in the site's order, then the extra lessons), assessments left out. */
+export function browseRows(gradeId, { live, detailed = null } = {}) {
+    return gradeSections(gradeId).flatMap((s) => s.lessons).filter((l) => l.type !== 'assessment').map((l) => {
+        const links = linksFor(l, { live });
+        const dl = detailedOf(detailed, l).map((r) => r.id);
+        return { key: l.key, lesson: l, grade: lessonGradeOf(l), kind: lessonKind(l), cover: lessonCover(links), area: lessonArea(l, links),
+            firstSkill: links && links.direct && links.direct[0] ? { key: links.direct[0].key, opts: links.direct[0].opts || null } : null,
+            pass: lessonPassFor(l, dl), pending: lessonPendingFor(l, dl), detailed: dl };
+    });
+}
+/** The grades the school lists lessons in, in order (the generated grade chips). */
+export function browseGrades() { return sortGrades(WRM_SEQUENCE.filter((g) => gradeSections(g.id).some((s) => s.lessons.some((l) => l.type !== 'assessment'))).map((g) => g.id)); }
+/** WRM and CCSS Build counts over rows: { wrm: {n, pass, full, part, build}, build: {...} } (R5). */
+export function browseCounts(rows) {
+    const z = () => ({ n: 0, pass: 0, full: 0, part: 0, build: 0 });
+    const out = { wrm: z(), build: z() };
+    for (const r of rows) { const c = out[r.kind]; c.n++; c[r.cover]++; if (r.pass) c.pass++; }
+    return out;
+}
+
+/* ---- By unit / date (0b): the school's units in TEACHING order with the dates of data/curriculum/pacing/<YYYY-YY>.json */
+/** The school year a date falls in ('2026-27': August to July). */
+export function schoolYearOf(date) {
+    const d = date instanceof Date ? date : new Date(date);
+    const y = d.getMonth() >= 7 ? d.getFullYear() : d.getFullYear() - 1;
+    return `${y}-${String((y + 1) % 100).padStart(2, '0')}`;
+}
+/** 'YYYY-MM-DD' of a local date. */
+export const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const UNIT_AREA = { CC: 'CC', OA: 'OA', NBT: 'NBT', NF: 'NF', MD: 'MEAS', G: 'G' };
+/**
+ * A grade's units for the By unit / date view: [{ unit, name, domain, area, start, end, now, rows }]. With a pacing file
+ * for the grade: its order (the teaching order) and dates, units it leaves undated after them in the site's order; the
+ * "Now" unit is the one whose start <= today <= end, else (a break) the last unit that has started. Without one: the
+ * site's order, no dates, no Now. `rows` are browseRows of the grade (already filtered), placed in each unit's order.
+ */
+export function unitGroups(gradeId, rows, pacing = null, today = new Date()) {
+    const g = WRM_SEQUENCE.find((x) => x.id === String(gradeId));
+    if (!g) return [];
+    const plan = (pacing && pacing.grades && pacing.grades[String(gradeId)]) || [];
+    const dated = plan.filter((p) => p && p.start && p.end);
+    const byId = new Map(g.units.map((u) => [u.id, u]));
+    const order = [...dated.map((p) => p.unit), ...g.units.map((u) => u.id).filter((id) => !dated.some((p) => p.unit === id))].filter((id) => byId.has(id));
+    const t = isoDay(today);
+    const now = (dated.find((p) => p.start <= t && t <= p.end) || dated.filter((p) => p.start <= t).pop() || {}).unit || '';
+    const rowOf = new Map(rows.map((r) => [r.key, r]));
+    return order.map((id) => {
+        const u = byId.get(id);
+        const p = dated.find((x) => x.unit === id) || null;
+        const list = unitLessons(g.id, id).map((l) => rowOf.get(l.key)).filter(Boolean);
+        return { unit: id, name: u.name, domain: u.domain, area: UNIT_AREA[u.domain] || 'NOSTD', start: p ? p.start : '', end: p ? p.end : '', now: id === now, rows: list };
+    });
+}
+

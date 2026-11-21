@@ -20,7 +20,7 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, GRADE_COLORS } from './data.js';
 import { presetOf } from './skill-presets.js';
 import { optionsFor } from './skill-options.js';
 import { addMultipleQuestions } from './quiz-builder.js';
@@ -31,7 +31,8 @@ import {
 import { printSkills } from './teacher-print.js';
 import { skillView, setSkillView, viewToggleHTML, mountSample, lazyThumbs, tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { renderStandardsCoverage, coverageRows } from './teacher-standards.js';
-import { areaDetail, areaOfCode, AREAS, AREA_ORDER, areaIcon } from './teacher-areas.js';
+import { areaDetail, areaOfCode, AREAS, AREA_ORDER, AREA_LABELS, areaIcon } from './teacher-areas.js';
+import { GRADE_ORDER, sortGrades, gradeWord as gradeChipWord, gradeLong } from './grade-of.js';
 import { primaryStandard } from './standards.js';
 import { mapTaskList, mapStrandNames } from './teacher-map-tasks.js';
 import {
@@ -686,17 +687,30 @@ const BROWSE = [['area', 'Maths area', 'Area'], ['wrm', 'White Rose step', 'Whit
 // view Thumbnail · List · Chip on every area band (one choice for the page).
 const SIZES = [['big', 'Big'], ['medium', 'Medium'], ['small', 'Small']];
 const LAYOUTS = [['thumb', 'Thumbnail', 'grid'], ['list', 'List', 'list'], ['chip', 'Chip', 'layers']];
-const GRADES = [['K', 'K', 'Kindergarten'], ['1', '1', 'Grade 1'], ['2', '2', 'Grade 2'], ['3', '3', 'Grade 3'], ['4', '4', 'Grade 4'], ['5', '5', 'Grade 5'], ['6', '6', 'Grade 6'], ['M', 'Mixed levels', 'Mixed levels']];
+// The Grade pills are the grades the skills carry (design/cards/lessons-browser §5: generated, never listed), in the
+// order of grade-of.js, with Mixed levels last.
+let GRADES_ = null;
+function gradesList() {
+    if (!GRADES_) {
+        let levels = [];
+        try { levels = skillCatalogue().map((s) => s.level); } catch (e) { levels = []; }
+        const gs = sortGrades(levels.filter((g) => g !== 'M'));
+        const list = [...(gs.length ? gs : ['K', '1', '2', '3', '4', '5', '6']).map((g) => [g, gradeChipWord(g), gradeLong(g)]), ['M', 'Mixed levels', 'Mixed levels']];
+        if (!gs.length) return list;   // the catalogue is not in yet: not kept
+        GRADES_ = list;
+    }
+    return GRADES_;
+}
 
-const G = { q: '', browse: 'area', grade: '2', grades: ['2'], size: 'medium', layout: 'thumb', limit: G_PAGE, open: {}, fw: 'ccss', status: 'all', show: 'both', only: false };
+const G = { q: '', browse: 'area', grade: '2', grades: ['2'], size: 'medium', layout: 'thumb', limit: G_PAGE, open: {}, fw: 'ccss', status: 'all', show: 'both', only: false, area: '' };
 /** The grid's data-view: a card size for thumbnails, else 'list' / 'chip'. */
 const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
 (function restoreG() {
     const s = readStore(G_KEY, null);
     if (!s || typeof s !== 'object') return;
     if (BROWSE.some((b) => b[0] === s.browse)) G.browse = s.browse;
-    if (GRADES.some((g) => g[0] === s.grade)) G.grade = s.grade;
-    const gs = Array.isArray(s.grades) ? GRADES.map((g) => g[0]).filter((g) => s.grades.includes(g)) : [];
+    if (GRADE_ORDER.includes(s.grade)) G.grade = s.grade;
+    const gs = Array.isArray(s.grades) ? GRADE_ORDER.filter((g) => s.grades.includes(g)) : [];
     G.grades = gs.length ? gs : [G.grade];
     G.grade = G.grades[0];
     if (SIZES.some((v) => v[0] === s.size)) G.size = s.size;
@@ -743,8 +757,8 @@ function wholeSet(g, a) {
 
 // Several grades at once (owner 2026-10-25: "select multiple grades or all grades"): G.grades in pill order;
 // G.grade is the first one (the White Rose and Standard views draw one grade at a time).
-const ALL_GRADES = GRADES.map((g) => g[0]);
-const allOn = () => ALL_GRADES.every((g) => G.grades.includes(g));
+const allGrades = () => gradesList().map((g) => g[0]);
+const allOn = () => allGrades().every((g) => G.grades.includes(g));
 const multi = () => G.grades.length > 1;
 const realGrades = () => G.grades.filter((g) => g !== 'M');
 /** One of each skill across every selected grade (or one area of them). */
@@ -760,10 +774,10 @@ function gradesName() {
     return `Grades ${ls.slice(0, -1).join(', ')} and ${ls[ls.length - 1]}`;
 }
 function pickGrade(g) {
-    if (g === 'ALL') G.grades = allOn() ? ['2'] : ALL_GRADES.slice();
+    if (g === 'ALL') G.grades = allOn() ? ['2'] : allGrades();
     else if (allOn()) G.grades = [g];                           // from All, a grade means just that grade
     else if (G.grades.includes(g)) { if (multi()) G.grades = G.grades.filter((x) => x !== g); }
-    else G.grades = ALL_GRADES.filter((x) => x === g || G.grades.includes(x));
+    else G.grades = allGrades().filter((x) => x === g || G.grades.includes(x));
     G.grade = G.grades[0];
 }
 /** Draw `fn` once per selected grade (one at a time), each under its grade heading when there are several. */
@@ -803,6 +817,8 @@ function gShellHTML() {
 <div class="ts-filters">
   <div class="ts-frow"><span class="ts-flabel" id="tsGradeL">Grade</span><div class="ts-pills" role="group" aria-labelledby="tsGradeL" id="tsGrades"></div><span class="ts-note" id="tsSearchNote"></span></div>
   <div class="ts-fdiv" role="presentation"></div>
+  <div class="ts-frow" id="tsAreaRow"><span class="ts-flabel" id="tsAreaL">Maths area</span><div class="ts-pills ts-areas" role="group" aria-labelledby="tsAreaL" id="tsAreas"></div></div>
+  <div class="ts-fdiv" role="presentation"></div>
   <div class="ts-frow"><span class="ts-flabel" id="tsBrowseL">Browse by</span><div class="ts-seg ts-browse" role="group" aria-labelledby="tsBrowseL" id="tsBrowse"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsSizeL">Size</span><div class="ts-seg" role="group" aria-labelledby="tsSizeL" id="tsViews"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsShowL">Skills to make</span><div class="ts-seg" role="group" aria-labelledby="tsShowL" id="tsShow"></div>
@@ -826,7 +842,15 @@ function gSyncControls() {
     if (sh) sh.innerHTML = `<button type="button" class="ts-show-plan" data-act="show" data-arg="${G.show === 'plan' ? 'both' : 'plan'}" ${pressedA(G.show === 'plan')}>Yet to be built: ${G.show === 'plan' ? 'On' : 'Off'}</button>`;
     r.querySelector('#tsBrowse').innerHTML = BROWSE.map(([k, l]) => `<button type="button" data-act="browse" data-arg="${k}" ${pressedA(G.browse === k)}>${l}</button>`).join('');
     r.querySelector('#tsViews').innerHTML = SIZES.map(([k, l]) => `<button type="button" data-act="size" data-arg="${k}" ${pressedA(G.size === k)}${G.layout === 'thumb' ? '' : ' title="The size of the thumbnail cards"'}>${l}</button>`).join('');
-    r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + GRADES.map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}" ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
+    // the Maths area chips (AREA_LABELS, the one label table) filter the Maths area view; the 8/10 chip (passChipHTML) filters every view
+    const inGrades = skillCatalogue().filter((s) => G.grades.includes(s.level));
+    const carried = AREA_ORDER.filter((a) => inGrades.some((s) => adOf(s).area === a));
+    if (G.area && !carried.includes(G.area)) G.area = '';
+    const nA = (a) => inGrades.filter((s) => adOf(s).area === a && (!G.only || REDESIGN_PASSED.has(gkey(s)))).length;
+    r.querySelector('#tsAreas').innerHTML = `<button type="button" class="ts-pill ts-area-all" data-act="area" data-arg="" ${pressedA(!G.area)}>All areas</button>`
+        + carried.map((a) => `<button type="button" class="ts-pill ts-areabtn" data-act="area" data-arg="${a}" data-domain="${a}" ${pressedA(G.area === a)}><i class="tvw-adot" aria-hidden="true"></i><span class="ts-area-l">${esc(AREA_LABELS[a])}</span> <span class="tvw-n">${nA(a)}</span></button>`).join('');
+    r.querySelector('#tsAreaRow').hidden = G.browse !== 'area' || searching;
+    r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + gradesList().map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}"${GRADE_COLORS[g] && GRADE_COLORS[g].bg && g !== 'M' ? ` style="--gr:${GRADE_COLORS[g].bg}"` : ''} ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
     r.querySelector('#tsPassChip').innerHTML = passChipHTML(G.only, REDESIGN_PASSED.size, 'skill');
     // MAP tasks are not filtered (critic r1 D3): the chip says so by being disabled there, with a one-line note in the view
     const pc = r.querySelector('#tsPassChip [aria-pressed]');
@@ -912,7 +936,7 @@ function gGroup(a, list, { cross = false, addArea = false, budget, planned = [],
     if (planned.length) body += `<h3 class="ts-grade-head ts-plan-head"><span class="ts-plan-tag">Yet to be built</span><span class="ts-count">${plural2(planned.length, 'skill')} planned</span></h3><div class="ts-grid" data-view="${gv()}">${planned.map(planCard).join('')}</div>`;
     const n = addArea ? wholeSetG(a).length : 0;
     const add = addArea && n > 1 ? `<button type="button" class="ts-btn ts-add" data-act="addarea" data-arg="${a}">+ Add whole area (${n})</button>` : '';
-    return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(list.length, 'skill') + (planned.length ? ` · ${planned.length} yet to be built` : ''), layoutSegHTML() + add)}${body}</section>`;
+    return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREA_LABELS[a], plural2(list.length, 'skill') + (planned.length ? ` · ${planned.length} yet to be built` : ''), layoutSegHTML() + add)}${body}</section>`;
 }
 
 /* ------------------------------------------------------------------ "Yet to be built" (owner 2026-10-25)
@@ -990,18 +1014,20 @@ function gRender() {
                 + order.map((a) => gGroup(a, by[a], { cross: true, budget })).join('') + moreHTML(hits.length - G.limit);
         }
     } else if (G.browse === 'area') {
-        const list = skillCatalogue().filter((s) => G.grades.includes(s.level) && passOk(gkey(s)));
-        eyebrow.textContent = `${gradesName()} • ${plural2(list.length, 'skill')}`;
+        // the area chips and the 8/10 chip combine (AND) with the grades (design/cards/lessons-browser §4, §6)
+        const list = skillCatalogue().filter((s) => G.grades.includes(s.level) && (!G.area || adOf(s).area === G.area) && passOk(gkey(s)));
+        eyebrow.textContent = `${gradesName()} • ${plural2(list.length, 'skill')}${G.only ? ' with 8/10 ✓' : ''}`;
         const { by } = byArea(list);
         const whole = wholeSetG();
         const nG = realGrades().length;
         const budget = { left: G.limit };
-        const plan = G.only ? {} : plannedByArea();   // a planned skill has not passed
+        const plan = G.only ? {} : plannedByArea();
+        if (G.area) for (const k of Object.keys(plan)) if (k !== G.area) delete plan[k];
         const order = AREA_ORDER.filter((a) => by[a] || plan[a]);
         order.forEach((a) => { by[a] = (by[a] || []).sort(stdSort); });
         html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>${nG > 1 ? `Add all ${nG} grades` : 'Add whole grade'}</span></button><span class="ts-note">Add ${whole.length} skills from ${esc(allOn() ? 'every grade' : nG > 1 ? gradesNameOf(realGrades()) : gradeName(realGrades()[0]))} to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
             + (order.map((a) => gGroup(a, by[a], { cross: multi() || G.grade === 'M', addArea: nG > 0, budget, planned: plan[a] || [], perArea: true })).join('')
-                || `<p class="ts-note">${G.show === 'plan' ? 'Nothing is planned for these grades yet.' : 'No skills here.'}</p>`);
+                || `<p class="ts-note" data-ts-empty="${G.only ? 'only' : 'none'}">${G.only ? 'No skill here has passed 8/10 yet. Press "8/10" again to see every skill.' : G.show === 'plan' ? 'Nothing is planned for these grades yet.' : 'No skills here.'}</p>`);
     } else if (G.browse === 'wrm') {
         eyebrow.textContent = `${gradesName()} · White Rose steps`;
         html = perGrade(wrmHTML);
@@ -1086,7 +1112,7 @@ function stdHTML() {
     const groups = AREA_ORDER.filter((a) => by[a]).map((a) => {
         const key = `s${a}`;
         const lim = G.open[key] ? by[a].length : 4;
-        return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(by[a].length, G.fw === 'ee' ? 'element' : 'standard'), layoutSegHTML())}`
+        return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREA_LABELS[a], plural2(by[a].length, G.fw === 'ee' ? 'element' : 'standard'), layoutSegHTML())}`
             + by[a].slice(0, lim).map((r) => {
                 const skills = skillsOf(r);
                 const sk = `k${r.code}`;
@@ -1303,6 +1329,8 @@ function gAction(act, arg, b) {
         case 'todo': import('./teacher-todo.js').then((m) => m.openTodo(arg)); return;
         case 'browse': G.browse = arg; G.q = ''; G.limit = G_PAGE; persistG(); break;
         case 'grade': pickGrade(arg); G.q = ''; G.limit = G_PAGE; persistG(); break;
+        case 'area': G.area = AREA_ORDER.includes(arg) ? arg : ''; G.limit = G_PAGE; break;
+        case 'only': G.only = !G.only; G.limit = G_PAGE; persistG(); break;
         case 'size': G.size = arg; if (G.layout !== 'thumb') G.layout = 'thumb'; persistG(); break;
         case 'layout': G.layout = arg; persistG(); break;
         case 'fw': G.fw = arg === 'ee' ? 'ee' : 'ccss'; persistG(); break;

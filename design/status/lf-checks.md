@@ -975,3 +975,57 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   so the gate crashed (ERR_MODULE_NOT_FOUND). Now it copies the whole js/modules tree with a {"type":"module"} package.json
   (no new import can break it, no typeless-package warning), and --self-test loads skill-options.js and its imports. Row
   `content-audit-module-load` (a real --skill add_facts run: crash on master, OK on the fix).
+## 2026-11-20 — lessons browser build (signed card design/cards/lessons-browser)
+
+- Built: `js/modules/lessons-passed.js` (THE ONE registry: 3 passed with render stamps at d38308824, 3 pending re-check),
+  `js/modules/grade-of.js`, `AREA_LABELS` in teacher-areas.js, `wrm-links.js` browseRows / lessonArea / lessonCover /
+  browseCounts / unitGroups, the Lessons screen browser (grade chips All + generated, area chips + headings, status chips,
+  WRM | CCSS Build summary, "Only 8/10 ✓", Thumbnails | List | By unit / date with Now, "← All lessons" restoring state),
+  the Skills screen's generated grade pills + area chips + "Only 8/10 ✓", `data/curriculum/pacing/2026-27.json` (seeded by
+  `ws-pacing-seed.mjs` from the site's unit weeks; Pre-K and grade 2 D3 have no weeks: undated).
+- Gates: `ws-lessons-browse.mjs` (LESSON-DOMAIN, AREA-LABELS, FILTER-PASSED, LESSON-BROWSE, SCREEN), `ws-lessons-passed.mjs`,
+  `ws-pacing.mjs`; on precritic --teacher and in deploy session 1. Grade-3 counts equal the card's R5 line exactly.
+- RED BY DESIGN, lead decision needed: `ws-lessons-passed` FAILS on the merged tree (LP-STAMP stale on all 3 passes).
+  master e7c418bd4 (lf-ops, 2026-11-20 08:14) re-pinned design/audit/baselines/lesson-baseline.json, which changed the
+  pinned pages of the 3 detailed lessons after the critic's d38308824 stamp (its message: class-only lint markers
+  mq-tofblank / mq-smstate). With `--baseline-ref d38308824` the gate is OK. Either a narrow critic re-stamps the 3 on
+  the current render, or they move to PENDING_RECHECK until then.
+- Results on the lane tree: ws-boot-smoke OK, ws-code-snapshot OK (741 codes), ws-lessons-browse OK (1366 + 1024),
+  ws-pacing OK, ws-teacher-wrm OK and --fallback OK (expectations moved to the browser: area sections, no Extra lessons,
+  the lesson over the list with "← All lessons"), ws-teacher-library OK, ws-teacher-tokens OK, ws-plain-words --check OK
+  ("assessments" appended to plain-words-hand.txt: its only screen text was the removed Extra lessons caption),
+  ws-backtest on the 7 new rows PASS, ws-precritic-plan --checks-from-critics OK. ws-lessons-passed FAIL (stale, above).
+- Not built as the card says: detailed-lesson first-page previews with an IndexedDB cache (§7) - every card shows its first
+  teaching skill's real item (lazy, teacher-chip mountCropped) or a plain "To build" card; teacher-chip.js unchanged.
+  The "Only 8/10 ✓" switch on the Skills screen filters the Maths area view (the other Browse-by views ignore it).
+  Screenshots: design/status/lf-checks/lessons-browser/build/.
+## 2026-11-20 — lessons browser fix round (critic lessons-browser r1 FAIL, D1-D10; medium, rebuild after a fail)
+
+- D1 first page of a detailed lesson as its card thumbnail (teacher-chip.js mountLessonPage: built once, one-page sheet in
+  an inert iframe scaled whole; cached `lessonId|renderHash` in memory + IndexedDB; renderHash = import-map stamps of the
+  sheet kit / lessons / print-sheet). D2 Skills "Only 8/10" row hidden outside the Maths area view and while searching.
+  D3 pending wording from the registry's own reason (lessons-passed.js pendingKind / pendingWords); empty state lists the
+  grade's pending lessons only. D4 48 px: the control token is 48 on the Skills and Lessons screens plus a 48 px floor for
+  every control (not inside item previews); "Skills to be made" toggle not shown at n = 0. D5 a link into By unit / date
+  scrolls Now into view. D6 item previews drawn whole ('preview' fit, then a refit of anything still outside the box).
+  D7 header card: grade, area and pass / pending only (the old tag row keeps CCSS · BUILD and the verdict); cards one top band.
+  D8-D10 gate: four default widths, round trip asserts view=list, exact Skills grade pills; one rule per defect.
+- Pre-existing, not this lane: ws-teacher-shell FAILs 3 on 6d0d8ff4a as well (popover summary / sample / board code).
+- 2026-11-20 lf-checks: critic r2 D11 reverted (lead ruling A20: item card thumbnails, no first-page build), THUMB-NO-FREEZE + THUMB-DETAILED-ITEM rules and backtests, D12 explicit pending kind; card waiver A20.
+
+## 2026-11-20 — lessons browser HELD (lead ruling (a), after A20)
+- Head 0e0811755 is held and not deployed. THUMB-NO-FREEZE fails on it: one 6,429 ms task and a 6,783 ms frame gap at 1024 with the CPU slowed ×4 and a cold cache.
+- Next week, item 1, in this order:
+  1. Profile the stall with a CPU profile at ×4 and name the function; no guessing.
+  2. Fix it.
+  3. Add the on-request "Show first page" button, cached.
+  4. Add a backtest row for D12.
+  5. Run the tiny critic on the D11 revert, D12 and THUMB-NO-FREEZE.
+- Spend on the lessons browser is about $170 of the $180 allowance (agent estimates).
+
+## 2026-11-21 — lessons browser stall profiled and fixed (rebuild after critic r2 fail, medium)
+- Profile (CPU x4, cold cache, 1024, grade 3 Thumbnails): each IntersectionObserver callback (teacher-wrm.js lessonThumbs) drew every card entering the viewport in one task, via drawLessonThumb -> mountCropped (teacher-chip.js:111). Each took 220-415 ms, mostly forced style flushes. On these screens a flush restyles the whole document because of `:has()` rules outside the subject in the shared sheets: about 35 ms a flush, 1 ms with them gone. Summary: design/status/lf-checks/lessons-browser/stall-profile.md.
+- Fix c2f413dfb: a queue runs one step of one thumbnail per task. mountBuilt and fit are built from the same steps, so the other callers are unchanged. No CSS change.
+- Before and after: longest task 6,429 -> 166 ms, frame gap 6,783 -> 300 ms. THUMB-NO-FREEZE passes; ws-lessons-browse passes all 14 rules at the 4 default widths.
+- Backtests: `lessons-browse-thumb-no-freeze` now passes on c2f413dfb. New row `lessons-passed-pending-kind` (D12: FAIL on 1c8bb3aa2 -> OK on c2f413dfb), with a ledger row.
+- Not done: the shared `:has()` rules (sheet-kit, screen-cell, ui-components) still make every flush cost a whole-document restyle on teacher screens. Route them to their owners.
