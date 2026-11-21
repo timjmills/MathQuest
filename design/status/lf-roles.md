@@ -596,3 +596,7 @@ Built at medium (continuation of the first build of the Quick review section). E
   Still red, same on master: word-work EB-STRETCH / TAB-CLEAR on sub_wp_20 and add_wp_20's own check cells (lf-builds); add_wp_20 M p1
   32 % (a 2-page check whose page 1 the plan reads under 30 %: not briefed, master 32 % too); ws-empty-band --self-test rule coverage
   (EB-PSCCAP has no backtest row - its trim is next).
+- (lead A32-5, 2026-11-21) EB-PSCCAP PARKED before DEPLOY: out of ws-empty-band RULES and judged only with the opt-in
+  `--psccap` flag (pscCapBad and its self-test rows kept). It returns, blocking, with the PSC-QUADRANT-16 trim next week.
+- (lead A32) Review cells judged by EB-SIDE's wider-side < 27 % (review cells only); add_wp_20 M p1 32 % QUEUED (plan the review
+  against the printed measure); frac-wall (compose_whole "1 whole" vs the tab at L) routed to the fractions family.

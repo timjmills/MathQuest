@@ -314,7 +314,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-PSCCAP', 'EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY', 'EB-STRETCH', 'EB-CLIP', 'TAB-CLEAR'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-LASTPAGE', 'CAP-PARITY', 'EB-STRETCH', 'EB-CLIP', 'TAB-CLEAR'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -1441,7 +1441,8 @@ async function main() {
                         // (a Pre-skill Check prints every page's white, so a lane reports it before and after - lead A24 item 1)
                         if (j.role === 'pre-skill-check') console.log(`  note: EB-PAGE fill ${key} ${j.tag}: ${pf.map((v, i) => `p${i + 1} ${v.pct} %`).join(', ')} empty`);
                         pf.slice(0, -1).forEach((v, i) => { if (v.pct >= 30 && !(j.role === 'scripted-model' && EB_PAGE_EXEMPT[shapes[i]])) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v.pct} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
-                        pf.forEach((v, i) => { const nCk = v.checkItems === undefined ? v.items : v.checkItems; const cap = pscCapBad(j.role, j.size, nCk, CAPK && CAPK.ROLE_CAPACITY); if (cap) F('EB-PSCCAP', `${key} ${j.tag} p${i + 1}`, `${nCk} check items on the page, above its declared ${j.size} ceiling of ${cap} (role-capacity.js)`); });
+                        // (EB-PSCCAP is PARKED until the PSC-QUADRANT-16 trim, lead ruling A32-5: opt-in --psccap only, not in RULES)
+                        if (has('psccap')) pf.forEach((v, i) => { const nCk = v.checkItems === undefined ? v.items : v.checkItems; const cap = pscCapBad(j.role, j.size, nCk, CAPK && CAPK.ROLE_CAPACITY); if (cap) F('EB-PSCCAP', `${key} ${j.tag} p${i + 1}`, `${nCk} check items on the page, above its declared ${j.size} ceiling of ${cap} (role-capacity.js)`); });
                         if (pf.length && pageAllBad(j.role, pf[pf.length - 1].pct)) F('EB-PAGE', `${key} ${j.tag} p${pf.length}`, `${pf[pf.length - 1].pct} % of the last page body is empty under its last block (a Pre-skill Check is one short page: every page judged, at its ceiling too; limit 30 %)`);
                         // EB-LASTPAGE (critic cbt r3 F1): the last (or only) page is measured too - judged on a fixed-capacity role
                         if (pf.length) {
